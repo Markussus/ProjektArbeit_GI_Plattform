@@ -1,0 +1,142 @@
+{
+  "nav": {
+    "title": "THEORETISCHE INFORMATIK",
+    "home": "TRAININGSCENTER"
+  },
+  "sidebar": {
+    "moduleOverview": "MODULÜBERSICHT",
+    "theoreticalCs": "THEORETISCHE INFORMATIK",
+    "turingMachines": "TURINGMASCHINEN",
+    "finiteAutomata": "ENDLICHE AUTOMATEN",
+    "numberSystems": "ZAHLENSYSTEME",
+    "mooreMealy": "MOORE & MEALY",
+    "dnf": "DNF",
+    "documentation": "DOKUMENTATION",
+    "support": "HILFE"
+  },
+  "footer": {
+    "copyright": "© 2026 THWS — Theoretische Informatik"
+  },
+  "theme": {
+    "light": "Heller Modus",
+    "dark": "Dunkler Modus"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "exercises": "Übungen",
+    "examples": "Beispiele",
+    "simulation": "Simulation"
+  },
+  "home": {
+    "heroTitle1": "Komplexe Systeme meistern",
+    "heroTitle2": "durch interaktives Lernen.",
+    "heroDescription": "Zugang zu den offiziellen Trainingsmodulen der Hochschule für Theoretische Informatik, Logikdesign und Diskrete Mathematik.",
+    "selectModule": "MODUL AUSWÄHLEN",
+    "exploreModules": "Verfügbare Module erkunden",
+    "turingDesc": "Formale Modelle der Berechenbarkeit & Komplexität",
+    "automataDesc": "Deterministische und nicht-deterministische Automaten",
+    "numberDesc": "Binär, Oktal, Hexadezimal & Gleitkomma",
+    "mooreDesc": "Sequentieller Schaltungsentwurf & Zustandsautomaten",
+    "dnfDesc": "Disjunktive Normalform & Boolesche Algebra"
+  },
+  "turing": {
+    "title": "Turingmaschinen",
+    "description": "Lernen Sie die Grundlagen der Berechenbarkeit durch Turingmaschinen und ihre Übergangsfunktionen. Erforschen Sie die Grenzen dessen, was berechenbar ist.",
+    "overviewTitle": "Was ist eine Turingmaschine?",
+    "overviewText": "Eine Turingmaschine ist ein mathematisches Modell der Berechenbarkeit, das eine abstrakte Maschine definiert, die Symbole auf einem Band nach einer Regeltabelle manipuliert. Sie bietet ein einfaches, aber mächtiges Rahmenwerk zum Verständnis algorithmisch lösbarer Probleme.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Band & Kopfbewegung",
+    "concept2": "Zustände & Übergänge",
+    "concept3": "Akzeptanz & Ablehnung",
+    "concept4": "Church-Turing-These",
+    "exercise1": "Einfacher Übergang",
+    "exercise1Desc": "Entwerfen Sie eine einfache TM-Übergangstabelle",
+    "exercise2": "2-Band TM Entwurf",
+    "exercise2Desc": "Bauen Sie eine Mehrband-Turingmaschine",
+    "exercise3": "Fleißiger Biber Problem",
+    "exercise3Desc": "Finden Sie die maximale Ausgabe für n-Zustands-TMs",
+    "exercise4": "Das Halteproblem",
+    "exercise4Desc": "Beweisen Sie die Unentscheidbarkeit des Halteproblems"
+  },
+  "automata": {
+    "title": "Endliche Automaten",
+    "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Lernen Sie, wie man verschiedene Automaten entwirft, minimiert und konvertiert.",
+    "overviewTitle": "Was sind Endliche Automaten?",
+    "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "DFA & NFA",
+    "concept2": "Reguläre Sprachen",
+    "concept3": "Zustandsminimierung",
+    "concept4": "NFA zu DFA Konvertierung",
+    "exercise1": "DFA erstellen",
+    "exercise1Desc": "Erstellen Sie einen DFA, der Zeichenketten akzeptiert, die auf '01' enden",
+    "exercise2": "NFA Entwurf",
+    "exercise2Desc": "Entwerfen Sie einen NFA für einen gegebenen regulären Ausdruck",
+    "exercise3": "DFA minimieren",
+    "exercise3Desc": "Entfernen Sie unerreichbare und äquivalente Zustände",
+    "exercise4": "NFA zu DFA",
+    "exercise4Desc": "Konvertierung mittels Teilmengenkonstruktion"
+  },
+  "number": {
+    "title": "Zahlensysteme",
+    "description": "Meistern Sie Konvertierungen zwischen Binär, Oktal, Dezimal und Hexadezimal. Verstehen Sie die IEEE 754 Gleitkommadarstellung.",
+    "overviewTitle": "Warum Zahlensysteme wichtig sind",
+    "overviewText": "Zahlensysteme sind grundlegend dafür, wie Computer Daten speichern und verarbeiten. Das Verständnis von Binär-, Oktal- und Hexadezimaldarstellungen ist essentiell für systemnahe Programmierung, Netzwerke und digitales Design.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Binär (Basis-2)",
+    "concept2": "Oktal (Basis-8)",
+    "concept3": "Hexadezimal (Basis-16)",
+    "concept4": "IEEE 754 Gleitkomma",
+    "exercise1": "Binärkonvertierung",
+    "exercise1Desc": "Konvertieren Sie Dezimalzahlen in Binär und zurück",
+    "exercise2": "Hex-Arithmetik",
+    "exercise2Desc": "Addition und Subtraktion im Hexadezimalsystem",
+    "exercise3": "IEEE 754 Kodierung",
+    "exercise3Desc": "Kodieren Sie Dezimalzahlen im IEEE 754 Format",
+    "exercise4": "Gemischte Basen",
+    "exercise4Desc": "Konvertierung zwischen beliebigen Zahlensystemen"
+  },
+  "moore": {
+    "title": "Moore & Mealy Automaten",
+    "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",
+    "overviewTitle": "Moore vs. Mealy",
+    "overviewText": "Moore- und Mealy-Automaten sind endliche Zustandsautomaten mit Ausgabe. Bei Moore-Automaten hängt die Ausgabe nur vom aktuellen Zustand ab. Bei Mealy-Automaten hängt die Ausgabe sowohl vom Zustand als auch von der Eingabe ab. Beide sind grundlegend für digitalen Schaltungsentwurf.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Moore-Automat Ausgabe",
+    "concept2": "Mealy-Automat Ausgabe",
+    "concept3": "Zustandsdiagramme",
+    "concept4": "Moore ↔ Mealy Konvertierung",
+    "exercise1": "Moore-Automat entwerfen",
+    "exercise1Desc": "Erstellen Sie einen Sequenzdetektor als Moore-Automat",
+    "exercise2": "Mealy-Automat entwerfen",
+    "exercise2Desc": "Erstellen Sie einen Sequenzdetektor als Mealy-Automat",
+    "exercise3": "Moore zu Mealy",
+    "exercise3Desc": "Konvertieren Sie einen Moore-Automat in einen Mealy-Automat",
+    "exercise4": "Mealy zu Moore",
+    "exercise4Desc": "Konvertieren Sie einen Mealy-Automat in einen Moore-Automat"
+  },
+  "dnf": {
+    "title": "Disjunktive Normalform",
+    "description": "Lernen Sie, boolesche Ausdrücke in DNF umzuwandeln. Üben Sie mit Wahrheitstabellen, Karnaugh-Diagrammen und logischen Vereinfachungstechniken.",
+    "overviewTitle": "Was ist DNF?",
+    "overviewText": "Die Disjunktive Normalform (DNF) ist eine standardisierte Art, boolesche Ausdrücke als Disjunktion (ODER) von Konjunktionen (UND) zu schreiben. Jede boolesche Funktion kann in DNF ausgedrückt werden, was sie zu einer universellen Darstellung für logische Schaltungen macht.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Minterme & Maxterme",
+    "concept2": "Wahrheitstabellen",
+    "concept3": "Karnaugh-Diagramme",
+    "concept4": "Boolesche Vereinfachung",
+    "exercise1": "Wahrheitstabelle zu DNF",
+    "exercise1Desc": "Leiten Sie die DNF aus einer Wahrheitstabelle ab",
+    "exercise2": "Karnaugh-Diagramm",
+    "exercise2Desc": "Vereinfachen Sie eine boolesche Funktion mit K-Maps",
+    "exercise3": "DNF zu Schaltung",
+    "exercise3Desc": "Zeichnen Sie die Logikschaltung für eine gegebene DNF",
+    "exercise4": "Mehrvariablen-DNF",
+    "exercise4Desc": "Behandlung von Ausdrücken mit 4+ Variablen"
+  },
+  "difficulty": {
+    "easy": "LEICHT",
+    "medium": "MITTEL",
+    "hard": "SCHWER"
+  }
+}
