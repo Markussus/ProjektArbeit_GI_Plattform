@@ -1,4 +1,7 @@
 {
+  "app": {
+    "title": "THWS - Traingscenter"
+  },
   "nav": {
     "title": "THEORETISCHE INFORMATIK",
     "home": "TRAININGSCENTER"
@@ -15,7 +18,7 @@
     "support": "HILFE"
   },
   "footer": {
-    "copyright": "© 2026 THWS — Theoretische Informatik"
+    "copyright": "© 2026 THWS - Theoretische Informatik"
   },
   "theme": {
     "light": "Heller Modus",

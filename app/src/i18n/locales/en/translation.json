@@ -1,4 +1,7 @@
 {
+  "app": {
+    "title": "THWS - Traingscenter"
+  },
   "nav": {
     "title": "THEORETICAL COMPUTER SCIENCE",
     "home": "TRAINING CENTER"
@@ -15,7 +18,7 @@
     "support": "SUPPORT"
   },
   "footer": {
-    "copyright": "© 2026 THWS — Theoretical Computer Science"
+    "copyright": "© 2026 THWS - Theoretical Computer Science"
   },
   "theme": {
     "light": "Light Mode",
