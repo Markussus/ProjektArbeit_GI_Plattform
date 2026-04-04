@@ -1,96 +1,81 @@
-import type { LucideIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Cpu, GitBranch, Hash, ToggleLeft, TableProperties } from 'lucide-react'
+import { ChevronDown, ChevronRight, Layers3, Sparkles } from 'lucide-react'
+import { learningModules } from '@/data/modules'
 import { cn } from '@/lib/utils'
 
-type ModuleAccent =
-    | 'orange'
-    | 'blue'
-    | 'purple'
-    | 'green'
-    | 'rose'
-
-interface ModuleCardProps {
-  icon: LucideIcon
-  title: string
-  description: string
-  path: string
-  accent: ModuleAccent
-}
-
-function getAccentClasses(accent: ModuleAccent) {
-  return {
-    orange: 'bg-module-orange-bg text-module-orange-fg',
-    blue: 'bg-module-blue-bg text-module-blue-fg',
-    purple: 'bg-module-purple-bg text-module-purple-fg',
-    green: 'bg-module-green-bg text-module-green-fg',
-    rose: 'bg-module-rose-bg text-module-rose-fg',
-  }[accent]
-}
-
-function ModuleCard({ icon: Icon, title, description, path, accent }: ModuleCardProps) {
-  return (
-      <Link
-          to={path}
-          className="flex items-center gap-4 rounded-lg p-4 hover:bg-muted/50"
-      >
-        <div
-            className={cn(
-                'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                getAccentClasses(accent)
-            )}
-        >
-          <Icon className="size-5" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </div>
-      </Link>
-  )
-}
-
 export function ModuleSelector() {
-  const { t } = useTranslation()
+    const { t } = useTranslation()
+    const tk = (key: string) => t(key as never)
+    const [isOpen, setIsOpen] = useState(false)
 
-  const modules = [
-    { icon: Cpu, titleKey: 'turing.title', descKey: 'home.turingDesc', path: '/turing-machine', accent: 'orange' },
-    { icon: GitBranch, titleKey: 'automata.title', descKey: 'home.automataDesc', path: '/finite-automata', accent: 'blue' },
-    { icon: Hash, titleKey: 'number.title', descKey: 'home.numberDesc', path: '/number-systems', accent: 'purple' },
-    { icon: ToggleLeft, titleKey: 'moore.title', descKey: 'home.mooreDesc', path: '/moore-mealy', accent: 'green' },
-    { icon: TableProperties, titleKey: 'dnf.title', descKey: 'home.dnfDesc', path: '/dnf', accent: 'rose' },
-  ] as const
+    return (
+        <div className="relative mx-auto w-full max-w-2xl">
+            <p className="mb-3 text-center text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase">
+                {t('home.selectModule')}
+            </p>
 
-  return (
-      <div className="mx-auto w-full max-w-lg">
-        <p className="mb-3 text-center text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
-          {t('home.selectModule')}
-        </p>
-
-        <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <div className="flex items-center gap-3">
-              <TableProperties className="size-4 text-muted-foreground" />
-              <span className="text-sm font-semibold text-foreground">
+            <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+                <button
+                    type="button"
+                    onClick={() => setIsOpen((prev) => !prev)}
+                    className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-muted/40"
+                >
+                    <div className="flex items-center gap-3">
+                        <Layers3 className="size-4 text-muted-foreground" />
+                        <span className="text-base font-semibold text-foreground">
               {t('home.exploreModules')}
             </span>
-            </div>
-          </div>
+                    </div>
 
-          <div className="divide-y divide-border">
-            {modules.map(({ icon, titleKey, descKey, path, accent }) => (
-                <ModuleCard
-                    key={path}
-                    icon={icon}
-                    title={t(titleKey)}
-                    description={t(descKey)}
-                    path={path}
-                    accent={accent}
-                />
-            ))}
-          </div>
+                    <ChevronDown
+                        className={cn(
+                            'size-4 text-muted-foreground transition-transform',
+                            isOpen && 'rotate-180'
+                        )}
+                    />
+                </button>
+            </div>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-xl bg-card shadow-lg ring-1 ring-foreground/10">
+                    <div className="max-h-[min(60vh,24rem)] overflow-y-auto">
+                        <div className="divide-y divide-border">
+                            {learningModules.map((module) => (
+                                <Link
+                                    key={module.id}
+                                    to={module.path}
+                                    className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/40"
+                                >
+                                    <div>
+                                        <p className="text-base font-semibold text-foreground">
+                                            {tk(module.titleKey)}
+                                        </p>
+                                        <p className="mt-1 text-sm text-muted-foreground">
+                                            {tk(module.descriptionKey)}
+                                        </p>
+                                    </div>
+
+                                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                                </Link>
+                            ))}
+
+                            <div className="flex items-center gap-3 px-5 py-4">
+                                <Sparkles className="size-4 text-muted-foreground" />
+                                <div>
+                                    <p className="text-base font-semibold text-foreground">
+                                        {t('modules.moreComingSoon')}
+                                    </p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {t('modules.moreComingSoonDescription')}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-      </div>
-  )
+    )
 }

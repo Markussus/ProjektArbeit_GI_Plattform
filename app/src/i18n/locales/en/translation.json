@@ -152,5 +152,15 @@
     "selectedExercise": "Selected exercise",
     "taskTextPlaceholder": "You can add the concrete task text here later.",
     "workspace": "Simulation"
+  },
+  "modules": {
+    "label": "Module",
+    "topicsTitle": "Topics",
+    "fundamentalsCs": {
+      "title": "Fundamentals of Computer Science",
+      "description": "This module bundles the core foundations of theoretical computer science. Select a topic to start learning."
+    },
+    "moreComingSoon": "More coming soon",
+    "moreComingSoonDescription": "Additional learning modules will be added in future versions."
   }
 }

@@ -1,46 +1,35 @@
-import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
+import { FileText, HelpCircle, Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import {
-  Cpu,
-  GitBranch,
-  Hash,
-  ToggleLeft,
-  TableProperties,
-  FileText,
-  HelpCircle,
-  Menu,
-} from 'lucide-react'
-
-interface ModuleNavItem {
-  labelKey:
-      | 'sidebar.turingMachines'
-      | 'sidebar.finiteAutomata'
-      | 'sidebar.numberSystems'
-      | 'sidebar.mooreMealy'
-      | 'sidebar.dnf'
-  path: string
-  icon: LucideIcon
-}
-
-const modules: ModuleNavItem[] = [
-  { labelKey: 'sidebar.turingMachines', path: '/turing-machine', icon: Cpu },
-  { labelKey: 'sidebar.finiteAutomata', path: '/finite-automata', icon: GitBranch },
-  { labelKey: 'sidebar.numberSystems', path: '/number-systems', icon: Hash },
-  { labelKey: 'sidebar.mooreMealy', path: '/moore-mealy', icon: ToggleLeft },
-  { labelKey: 'sidebar.dnf', path: '/dnf', icon: TableProperties },
-]
+import { learningModules, type TopicAccent } from '@/data/modules'
 
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
 }
 
+function getAccentClasses(accent: TopicAccent) {
+  return {
+    orange: 'text-module-orange-fg',
+    blue: 'text-module-blue-fg',
+    purple: 'text-module-purple-fg',
+    green: 'text-module-green-fg',
+    rose: 'text-module-rose-fg',
+  }[accent]
+}
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation()
   const location = useLocation()
+
+  const tk = (key: string) => t(key as never)
+
   const isHome = location.pathname === '/'
+  const fundamentalsModule = learningModules.find((module) => module.id === 'fundamentals-cs')
+
+  const isFundamentalsRoute = location.pathname.startsWith('/fundamentals-cs')
+  const isFundamentalsOverview = location.pathname === '/fundamentals-cs'
 
   return (
       <aside
@@ -60,45 +49,54 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </button>
         </div>
 
-        {!collapsed && !isHome && (
+        {!collapsed && !isHome && isFundamentalsRoute && fundamentalsModule && (
             <div className="px-4 pb-3">
               <NavLink
-                  to="/"
-                  className="text-brand text-sm font-semibold tracking-wider uppercase"
+                  to={fundamentalsModule.path}
+                  className={cn(
+                      'text-sm font-semibold tracking-wider uppercase',
+                      isFundamentalsOverview ? 'text-brand' : 'text-foreground'
+                  )}
               >
-                {t('sidebar.theoreticalCs')}
+                {tk(fundamentalsModule.titleKey)}
               </NavLink>
-              <p className="mt-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                {t('sidebar.moduleOverview')}
-              </p>
             </div>
         )}
 
-        <nav className="flex-1 space-y-1 px-2 py-2">
-          {modules.map(({ labelKey, path, icon: Icon }) => (
-              <NavLink key={path} to={path}>
-                {({ isActive }) => (
-                    <div
-                        className={cn(
-                            'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold tracking-wide',
-                            isActive
-                                ? 'bg-nav-active-bg text-nav-active-fg'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                            collapsed && 'justify-center px-0'
-                        )}
-                    >
-                      <Icon
-                          className={cn(
-                              'size-4 shrink-0',
-                              isActive ? 'text-brand' : 'text-current'
-                          )}
-                      />
-                      {!collapsed && <span>{t(labelKey)}</span>}
-                    </div>
-                )}
-              </NavLink>
-          ))}
-        </nav>
+        {!isHome && isFundamentalsRoute && fundamentalsModule ? (
+            <nav className="flex-1 space-y-1 px-2 py-2">
+              {fundamentalsModule.topics.map((topic) => {
+                const Icon = topic.icon
+
+                return (
+                    <NavLink key={topic.id} to={topic.path}>
+                      {({ isActive }) => (
+                          <div
+                              className={cn(
+                                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold tracking-wide',
+                                  isActive
+                                      ? 'bg-nav-active-bg text-nav-active-fg'
+                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                  collapsed && 'justify-center px-0'
+                              )}
+                          >
+                            <Icon
+                                className={cn(
+                                    'size-4 shrink-0',
+                                    getAccentClasses(topic.accent)
+                                )}
+                            />
+
+                            {!collapsed && <span>{tk(topic.titleKey)}</span>}
+                          </div>
+                      )}
+                    </NavLink>
+                )
+              })}
+            </nav>
+        ) : (
+            <div className="flex-1" />
+        )}
 
         <div className="space-y-1 border-t border-border px-2 py-3">
           <a

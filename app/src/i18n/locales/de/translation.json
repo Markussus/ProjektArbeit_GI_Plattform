@@ -152,5 +152,15 @@
     "selectedExercise": "Ausgewählte Übung",
     "taskTextPlaceholder": "Hier kannst du später den konkreten Aufgabentext einfügen.",
     "workspace": "Simulation"
+  },
+  "modules": {
+    "label": "Modul",
+    "topicsTitle": "Themen",
+    "fundamentalsCs": {
+      "title": "Grundlagen der Informatik",
+      "description": "Dieses Modul bündelt die zentralen Grundlagen der theoretischen Informatik. Wählen Sie ein Thema aus, um mit dem Training zu beginnen."
+    },
+    "moreComingSoon": "Mehr Module folgen bald",
+    "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."
   }
 }

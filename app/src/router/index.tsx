@@ -1,23 +1,25 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { MainLayout } from '@/layouts/MainLayout/MainLayout'
 import { HomePage } from '@/pages/Home/HomePage'
-import { TuringMachinePage } from '@/pages/TuringMachine/TuringMachinePage'
-import { FiniteAutomataPage } from '@/pages/FiniteAutomata/FiniteAutomataPage'
-import { NumberSystemsPage } from '@/pages/NumberSystems/NumberSystemsPage'
-import { MooreMealyPage } from '@/pages/MooreMealy/MooreMealyPage'
-import { DnfPage } from '@/pages/Dnf/DnfPage'
+import { FundamentalsCSPage } from '@/pages/FundamentalsCS/FundamentalsCSPage'
+import { TuringMachinePage } from '@/pages/FundamentalsCS/TuringMachine/TuringMachinePage'
+import { FiniteAutomataPage } from '@/pages/FundamentalsCS/FiniteAutomata/FiniteAutomataPage'
+import { NumberSystemsPage } from '@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage'
+import { MooreMealyPage } from '@/pages/FundamentalsCS/MooreMealy/MooreMealyPage'
+import { DnfPage } from '@/pages/FundamentalsCS/Dnf/DnfPage'
 
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/turing-machine', element: <TuringMachinePage /> },
-      { path: '/finite-automata', element: <FiniteAutomataPage /> },
-      { path: '/number-systems', element: <NumberSystemsPage /> },
-      { path: '/moore-mealy', element: <MooreMealyPage /> },
-      { path: '/dnf', element: <DnfPage /> },
+
+      { path: '/fundamentals-cs', element: <FundamentalsCSPage /> },
+      { path: '/fundamentals-cs/turing-machine', element: <TuringMachinePage /> },
+      { path: '/fundamentals-cs/finite-automata', element: <FiniteAutomataPage /> },
+      { path: '/fundamentals-cs/number-systems', element: <NumberSystemsPage /> },
+      { path: '/fundamentals-cs/moore-mealy', element: <MooreMealyPage /> },
+      { path: '/fundamentals-cs/dnf', element: <DnfPage /> },
     ],
   },
 ])
-
