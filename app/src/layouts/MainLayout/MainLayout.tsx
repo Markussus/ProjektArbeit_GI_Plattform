@@ -15,12 +15,9 @@ function isKnownModuleRoute(pathname: string) {
 
 export function MainLayout() {
     const location = useLocation()
-
     const hasModuleNavigation = isKnownModuleRoute(location.pathname)
 
-    const [moduleSidebarCollapsed, setModuleSidebarCollapsed] = useState(false)
-
-    const sidebarCollapsed = hasModuleNavigation ? moduleSidebarCollapsed : true
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
 
     return (
         <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
@@ -29,10 +26,7 @@ export function MainLayout() {
             <div className="flex flex-1 overflow-hidden">
                 <Sidebar
                     collapsed={sidebarCollapsed}
-                    onToggle={() => {
-                        if (!hasModuleNavigation) return
-                        setModuleSidebarCollapsed((prev) => !prev)
-                    }}
+                    onToggle={() => setSidebarCollapsed((prev) => !prev)}
                 />
 
                 <main className="flex-1 overflow-y-auto bg-background">

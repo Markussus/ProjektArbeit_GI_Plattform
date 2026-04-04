@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { FileText, HelpCircle, Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { learningModules, type TopicAccent } from '@/data/modules'
@@ -51,7 +51,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Toggle sidebar"
           >
-            <Menu className="size-4" />
+            <div className="flex size-5 items-center justify-center">
+              <Menu className="size-4" />
+            </div>
           </button>
         </div>
 
@@ -79,21 +81,25 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       {({ isActive }) => (
                           <div
                               className={cn(
-                                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold tracking-wide',
+                                  'flex h-11 items-center rounded-md px-3 text-sm font-semibold tracking-wide',
                                   isActive
                                       ? 'bg-nav-active-bg text-nav-active-fg'
                                       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                                  collapsed && 'justify-center px-0'
+                                  collapsed ? 'justify-center' : 'gap-3'
                               )}
                           >
-                            <Icon
-                                className={cn(
-                                    'size-4 shrink-0',
-                                    getAccentClasses(topic.accent)
-                                )}
-                            />
+                            <div className="flex size-5 shrink-0 items-center justify-center">
+                              <Icon
+                                  className={cn(
+                                      'size-4',
+                                      getAccentClasses(topic.accent)
+                                  )}
+                              />
+                            </div>
 
-                            {!collapsed && <span>{tk(topic.titleKey)}</span>}
+                            {!collapsed && (
+                                <span className="leading-none">{tk(topic.titleKey)}</span>
+                            )}
                           </div>
                       )}
                     </NavLink>
@@ -105,27 +111,31 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         )}
 
         <div className="space-y-1 border-t border-border px-2 py-3">
-          <a
-              href="#"
+          <Link
+              to="/documentation"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
-                  collapsed && 'justify-center px-0'
+                  'flex h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                  collapsed ? 'justify-center' : 'gap-3'
               )}
           >
-            <FileText className="size-4 shrink-0" />
-            {!collapsed && <span>{t('sidebar.documentation')}</span>}
-          </a>
+            <div className="flex size-5 shrink-0 items-center justify-center">
+              <FileText className="size-4" />
+            </div>
+            {!collapsed && <span className="leading-none">{t('sidebar.documentation')}</span>}
+          </Link>
 
-          <a
-              href="#"
+          <Link
+              to="/help"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
-                  collapsed && 'justify-center px-0'
+                  'flex h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                  collapsed ? 'justify-center' : 'gap-3'
               )}
           >
-            <HelpCircle className="size-4 shrink-0" />
-            {!collapsed && <span>{t('sidebar.support')}</span>}
-          </a>
+            <div className="flex size-5 shrink-0 items-center justify-center">
+              <HelpCircle className="size-4" />
+            </div>
+            {!collapsed && <span className="leading-none">{t('sidebar.support')}</span>}
+          </Link>
         </div>
       </aside>
   )

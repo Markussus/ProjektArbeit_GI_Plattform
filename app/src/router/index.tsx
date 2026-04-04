@@ -7,6 +7,8 @@ import { FiniteAutomataPage } from '@/pages/FundamentalsCS/FiniteAutomata/Finite
 import { NumberSystemsPage } from '@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage'
 import { MooreMealyPage } from '@/pages/FundamentalsCS/MooreMealy/MooreMealyPage'
 import { DnfPage } from '@/pages/FundamentalsCS/Dnf/DnfPage'
+import { DocumentationPage } from '@/pages/Documentation/DocumentationPage'
+import { HelpPage } from '@/pages/Help/HelpPage'
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage'
 
 export const router = createBrowserRouter([
@@ -21,6 +23,9 @@ export const router = createBrowserRouter([
       { path: '/fundamentals-cs/number-systems', element: <NumberSystemsPage /> },
       { path: '/fundamentals-cs/moore-mealy', element: <MooreMealyPage /> },
       { path: '/fundamentals-cs/dnf', element: <DnfPage /> },
+
+      { path: '/documentation', element: <DocumentationPage /> },
+      { path: '/help', element: <HelpPage /> },
 
       { path: '*', element: <NotFoundPage /> },
     ],
