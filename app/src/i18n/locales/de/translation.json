@@ -137,6 +137,10 @@
     "exercise4": "Mehrvariablen-DNF",
     "exercise4Desc": "Behandlung von Ausdrücken mit 4+ Variablen"
   },
+  "exercise": {
+    "label": "Übung {{index}}",
+    "difficulty": "Schwierigkeit"
+  },
   "difficulty": {
     "easy": "LEICHT",
     "medium": "MITTEL",

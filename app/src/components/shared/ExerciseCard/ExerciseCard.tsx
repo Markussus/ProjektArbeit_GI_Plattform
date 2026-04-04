@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { LucideIcon } from 'lucide-react'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -15,28 +16,21 @@ interface ExerciseCardProps {
   isFirst?: boolean
 }
 
-const difficultyTextColors = {
+const difficultyColors = {
   easy: 'text-difficulty-easy',
   medium: 'text-difficulty-medium',
   hard: 'text-difficulty-hard',
 }
 
-const difficultyBorders = {
-  easy: 'border-l-green-500',
-  medium: 'border-l-orange-500',
-  hard: 'border-l-red-500',
-}
-
 export function ExerciseCard({ exercise, index, isFirst }: ExerciseCardProps) {
+  const { t } = useTranslation()
   const Icon = exercise.icon
 
   return (
       <button
           type="button"
           className={cn(
-              'flex w-full items-center gap-4 border-b border-border p-4 text-left hover:bg-muted/50',
-              isFirst && 'border-l-[3px]',
-              isFirst && difficultyBorders[exercise.difficulty]
+              'flex w-full items-center gap-4 border-b border-border p-4 text-left hover:bg-muted/50'
           )}
       >
         <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -45,20 +39,22 @@ export function ExerciseCard({ exercise, index, isFirst }: ExerciseCardProps) {
 
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-foreground">
-            Exercise {index + 1}: {exercise.title}
+            {t('exercise.label', { index: index + 1 })}: {exercise.title}
           </p>
 
           <p
               className={cn(
                   'text-xs font-bold uppercase tracking-wider',
-                  difficultyTextColors[exercise.difficulty]
+                  difficultyColors[exercise.difficulty]
               )}
           >
-            DIFFICULTY: {exercise.difficulty.toUpperCase()}
+            {t('exercise.difficulty')}: {t(`difficulty.${exercise.difficulty}`)}
           </p>
         </div>
 
-        {isFirst && <ChevronRight className="size-4 shrink-0 text-muted-foreground" />}
+        {isFirst && (
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        )}
       </button>
   )
 }

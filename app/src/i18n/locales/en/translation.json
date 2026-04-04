@@ -137,6 +137,10 @@
     "exercise4": "Multi-Variable DNF",
     "exercise4Desc": "Handle expressions with 4+ variables"
   },
+  "exercise": {
+    "label": "Exercise {{index}}",
+    "difficulty": "Difficulty"
+  },
   "difficulty": {
     "easy": "EASY",
     "medium": "MEDIUM",
