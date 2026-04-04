@@ -11,28 +11,28 @@ export function Header() {
     const isHome = location.pathname === '/'
 
     return (
-        <header className="flex h-14 items-center justify-between border-b border-border bg-background px-5">
-            <div className="flex items-center gap-3">
+        <header className="flex h-18 items-center justify-between border-b border-border bg-background px-6">
+            <div className="flex items-center gap-4">
                 <Link to="/" className="flex items-center shrink-0">
                     <img
                         src={ThwsLogo}
                         alt="THWS Logo"
-                        className="h-8 w-auto"
+                        className="h-9 w-auto"
                     />
                 </Link>
 
-                <div className="h-6 w-px bg-border" />
+                <div className="h-7 w-px bg-border" />
 
-                <span className="text-lg font-bold tracking-tight text-foreground">
-    {isHome ? t('nav.home') : t('nav.title')}
-  </span>
+                <span className="text-xl font-bold tracking-tight text-foreground">
+          {isHome ? t('nav.home') : t('nav.title')}
+        </span>
             </div>
 
             <div className="flex items-center gap-2">
                 <LanguageToggle />
                 <button
                     type="button"
-                    className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                     aria-label="Help"
                 >
                     <HelpCircle className="size-4" />

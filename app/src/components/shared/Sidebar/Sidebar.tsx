@@ -46,14 +46,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <aside
           className={cn(
               'flex h-full flex-col border-r border-border bg-background',
-              collapsed ? 'w-14' : 'w-56'
+              collapsed ? 'w-16' : 'w-64'
           )}
       >
-        <div className="flex h-12 items-center px-4">
+        <div className="flex h-14 items-center px-4">
           <button
               type="button"
               onClick={onToggle}
-              className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Toggle sidebar"
           >
             <Menu className="size-4" />
@@ -61,14 +61,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </div>
 
         {!collapsed && !isHome && (
-            <div className="px-4 pb-2">
+            <div className="px-4 pb-3">
               <NavLink
                   to="/"
-                  className="text-brand text-xs font-semibold tracking-wider uppercase"
+                  className="text-brand text-sm font-semibold tracking-wider uppercase"
               >
                 {t('sidebar.theoreticalCs')}
               </NavLink>
-              <p className="mt-0.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+              <p className="mt-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                 {t('sidebar.moduleOverview')}
               </p>
             </div>
@@ -80,7 +80,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 {({ isActive }) => (
                     <div
                         className={cn(
-                            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide',
+                            'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold tracking-wide',
                             isActive
                                 ? 'bg-nav-active-bg text-nav-active-fg'
                                 : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -104,7 +104,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <a
               href="#"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                   collapsed && 'justify-center px-0'
               )}
           >
@@ -115,7 +115,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <a
               href="#"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                  'flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                   collapsed && 'justify-center px-0'
               )}
           >
