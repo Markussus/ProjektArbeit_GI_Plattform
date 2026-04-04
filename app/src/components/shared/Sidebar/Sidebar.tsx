@@ -14,7 +14,12 @@ import {
 } from 'lucide-react'
 
 interface ModuleNavItem {
-  labelKey: 'sidebar.turingMachines' | 'sidebar.finiteAutomata' | 'sidebar.numberSystems' | 'sidebar.mooreMealy' | 'sidebar.dnf'
+  labelKey:
+      | 'sidebar.turingMachines'
+      | 'sidebar.finiteAutomata'
+      | 'sidebar.numberSystems'
+      | 'sidebar.mooreMealy'
+      | 'sidebar.dnf'
   path: string
   icon: LucideIcon
 }
@@ -38,85 +43,81 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const isHome = location.pathname === '/'
 
   return (
-    <aside
-      className={cn(
-        'flex h-full flex-col border-r border-border bg-background transition-all duration-300',
-        collapsed ? 'w-14' : 'w-56'
-      )}
-    >
-      {/* Toggle button */}
-      <div className="flex h-12 items-center px-4">
-        <button
-          onClick={onToggle}
-          className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="size-4" />
-        </button>
-      </div>
-
-      {/* Module header (only when expanded and not home) */}
-      {!collapsed && !isHome && (
-        <div className="px-4 pb-2">
-          <NavLink
-            to="/"
-            className="text-xs font-semibold tracking-wider text-orange-500 uppercase"
+      <aside
+          className={cn(
+              'flex h-full flex-col border-r border-border bg-background',
+              collapsed ? 'w-14' : 'w-56'
+          )}
+      >
+        <div className="flex h-12 items-center px-4">
+          <button
+              type="button"
+              onClick={onToggle}
+              className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Toggle sidebar"
           >
-            {t('sidebar.theoreticalCs')}
-          </NavLink>
-          <p className="mt-0.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-            {t('sidebar.moduleOverview')}
-          </p>
+            <Menu className="size-4" />
+          </button>
         </div>
-      )}
 
-      {/* Navigation links */}
-      <nav className="flex-1 space-y-1 px-2 py-2">
-        {modules.map(({ labelKey, path, icon: Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) =>
-              cn(
-                'group flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide transition-all duration-200',
-                isActive
-                  ? 'border-l-[3px] border-orange-500 bg-orange-50 text-foreground dark:bg-orange-500/10'
-                  : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-                collapsed && 'justify-center border-l-0 px-0',
-                collapsed && isActive && 'bg-orange-50 dark:bg-orange-500/10'
-              )
-            }
+        {!collapsed && !isHome && (
+            <div className="px-4 pb-2">
+              <NavLink
+                  to="/"
+                  className="text-xs font-semibold tracking-wider text-orange-500 uppercase"
+              >
+                {t('sidebar.theoreticalCs')}
+              </NavLink>
+              <p className="mt-0.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+                {t('sidebar.moduleOverview')}
+              </p>
+            </div>
+        )}
+
+        <nav className="flex-1 space-y-1 px-2 py-2">
+          {modules.map(({ labelKey, path, icon: Icon }) => (
+              <NavLink
+                  key={path}
+                  to={path}
+                  className={({ isActive }) =>
+                      cn(
+                          'group flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide transition-all duration-200',
+                          isActive
+                              ? 'border-l-[3px] border-orange-500 bg-orange-50 text-foreground dark:bg-orange-500/10'
+                              : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
+                          collapsed && 'justify-center border-l-0 px-0',
+                          collapsed && isActive && 'bg-orange-50 dark:bg-orange-500/10'
+                      )
+                  }
+              >
+                <Icon className="size-4 shrink-0 transition-colors group-[.border-orange-500]:text-orange-500" />
+                {!collapsed && <span>{t(labelKey)}</span>}
+              </NavLink>
+          ))}
+        </nav>
+
+        <div className="space-y-1 border-t border-border px-2 py-3">
+          <a
+              href="#"
+              className={cn(
+                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+                  collapsed && 'justify-center px-0'
+              )}
           >
-            <Icon className="size-4 shrink-0 transition-colors group-[.border-orange-500]:text-orange-500" />
-            {!collapsed && <span>{t(labelKey)}</span>}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* Bottom links */}
-      <div className="border-t border-border px-2 py-3 space-y-1">
-        <a
-          href="#"
-          className={cn(
-            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-            collapsed && 'justify-center px-0'
-          )}
-        >
-          <FileText className="size-4 shrink-0" />
-          {!collapsed && <span>{t('sidebar.documentation')}</span>}
-        </a>
-        <a
-          href="#"
-          className={cn(
-            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-            collapsed && 'justify-center px-0'
-          )}
-        >
-          <HelpCircle className="size-4 shrink-0" />
-          {!collapsed && <span>{t('sidebar.support')}</span>}
-        </a>
-      </div>
-    </aside>
+            <FileText className="size-4 shrink-0" />
+            {!collapsed && <span>{t('sidebar.documentation')}</span>}
+          </a>
+          <a
+              href="#"
+              className={cn(
+                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+                  collapsed && 'justify-center px-0'
+              )}
+          >
+            <HelpCircle className="size-4 shrink-0" />
+            {!collapsed && <span>{t('sidebar.support')}</span>}
+          </a>
+        </div>
+      </aside>
   )
 }
-

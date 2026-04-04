@@ -10,27 +10,28 @@ export function Header() {
   const isHome = location.pathname === '/'
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-background px-5">
-      {/* Left: Logo + Title */}
-      <div className="flex items-center gap-3">
-        <Link to="/" className="text-lg font-extrabold tracking-tight text-foreground">
-          THWS
-        </Link>
-        <div className="h-5 w-px bg-border" />
-        <span className="text-xs font-semibold tracking-widest text-orange-500 uppercase">
+      <header className="flex h-14 items-center justify-between border-b border-border bg-background px-5">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="text-lg font-extrabold tracking-tight text-foreground">
+            THWS
+          </Link>
+          <div className="h-5 w-px bg-border" />
+          <span className="text-xs font-semibold tracking-widest text-orange-500 uppercase">
           {isHome ? t('nav.home') : t('nav.title')}
         </span>
-      </div>
+        </div>
 
-      {/* Right: Action Icons */}
-      <div className="flex items-center gap-1">
-        <LanguageToggle />
-        <button className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-          <HelpCircle className="size-4" />
-        </button>
-        <ThemeToggle />
-      </div>
-    </header>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <button
+              type="button"
+              className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="Help"
+          >
+            <HelpCircle className="size-4" />
+          </button>
+          <ThemeToggle />
+        </div>
+      </header>
   )
 }
-

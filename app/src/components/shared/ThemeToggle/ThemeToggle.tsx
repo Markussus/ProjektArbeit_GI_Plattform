@@ -1,17 +1,29 @@
-import { Sun, Moon } from 'lucide-react'
-import { useThemeStore } from '@/store'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
+import type { Theme } from '@/store/themeStore'
 
-export function ThemeToggle() {
-  const { theme, toggleTheme } = useThemeStore()
-
-  return (
-    <button
-      onClick={toggleTheme}
-      className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-    >
-      {theme === 'light' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
-  )
+const nextThemeMap: Record<Theme, Theme> = {
+  system: 'light',
+  light: 'dark',
+  dark: 'system',
 }
 
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+
+  const nextTheme = nextThemeMap[theme]
+
+  return (
+      <button
+          type="button"
+          onClick={() => setTheme(nextTheme)}
+          className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+          aria-label={`Switch theme to ${nextTheme}`}
+          title={`Theme: ${theme}`}
+      >
+        {theme === 'light' && <Sun className="size-4" />}
+        {theme === 'dark' && <Moon className="size-4" />}
+        {theme === 'system' && <Monitor className="size-4" />}
+      </button>
+  )
+}

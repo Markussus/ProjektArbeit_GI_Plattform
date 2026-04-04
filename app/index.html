@@ -1,13 +1,46 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trainings Center</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trainings Center</title>
+
+  <script>
+    ;(() => {
+      try {
+        const storageKey = 'theme-storage'
+        const raw = localStorage.getItem(storageKey)
+
+        let theme = 'system'
+
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          const storedTheme = parsed?.state?.theme
+
+          if (
+                  storedTheme === 'light' ||
+                  storedTheme === 'dark' ||
+                  storedTheme === 'system'
+          ) {
+            theme = storedTheme
+          }
+        }
+
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const resolvedTheme =
+                theme === 'system' ? (systemDark ? 'dark' : 'light') : theme
+
+        document.documentElement.classList.toggle('dark', resolvedTheme === 'dark')
+        document.documentElement.style.colorScheme = resolvedTheme
+      } catch {
+        // no-op
+      }
+    })()
+  </script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
 </html>
