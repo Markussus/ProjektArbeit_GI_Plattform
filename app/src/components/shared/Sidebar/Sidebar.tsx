@@ -64,7 +64,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <div className="px-4 pb-2">
               <NavLink
                   to="/"
-                  className="text-xs font-semibold tracking-wider text-orange-500 uppercase"
+                  className="text-brand text-xs font-semibold tracking-wider uppercase"
               >
                 {t('sidebar.theoreticalCs')}
               </NavLink>
@@ -90,7 +90,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       <Icon
                           className={cn(
                               'size-4 shrink-0',
-                              isActive ? 'text-orange-500' : 'text-current'
+                              isActive ? 'text-brand' : 'text-current'
                           )}
                       />
                       {!collapsed && <span>{t(labelKey)}</span>}
