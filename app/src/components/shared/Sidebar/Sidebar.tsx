@@ -53,7 +53,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <button
               type="button"
               onClick={onToggle}
-              className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Toggle sidebar"
           >
             <Menu className="size-4" />
@@ -76,22 +76,26 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
         <nav className="flex-1 space-y-1 px-2 py-2">
           {modules.map(({ labelKey, path, icon: Icon }) => (
-              <NavLink
-                  key={path}
-                  to={path}
-                  className={({ isActive }) =>
-                      cn(
-                          'group flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide transition-all duration-200',
-                          isActive
-                              ? 'border-l-[3px] border-orange-500 bg-orange-50 text-foreground dark:bg-orange-500/10'
-                              : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-                          collapsed && 'justify-center border-l-0 px-0',
-                          collapsed && isActive && 'bg-orange-50 dark:bg-orange-500/10'
-                      )
-                  }
-              >
-                <Icon className="size-4 shrink-0 transition-colors group-[.border-orange-500]:text-orange-500" />
-                {!collapsed && <span>{t(labelKey)}</span>}
+              <NavLink key={path} to={path}>
+                {({ isActive }) => (
+                    <div
+                        className={cn(
+                            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide',
+                            isActive
+                                ? 'bg-nav-active-bg text-nav-active-fg'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                            collapsed && 'justify-center px-0'
+                        )}
+                    >
+                      <Icon
+                          className={cn(
+                              'size-4 shrink-0',
+                              isActive ? 'text-orange-500' : 'text-current'
+                          )}
+                      />
+                      {!collapsed && <span>{t(labelKey)}</span>}
+                    </div>
+                )}
               </NavLink>
           ))}
         </nav>
@@ -100,17 +104,18 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <a
               href="#"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                   collapsed && 'justify-center px-0'
               )}
           >
             <FileText className="size-4 shrink-0" />
             {!collapsed && <span>{t('sidebar.documentation')}</span>}
           </a>
+
           <a
               href="#"
               className={cn(
-                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+                  'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                   collapsed && 'justify-center px-0'
               )}
           >

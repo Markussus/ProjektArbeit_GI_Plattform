@@ -2,7 +2,7 @@ import type { Theme } from '@/store/themeStore'
 
 export type ResolvedTheme = 'light' | 'dark'
 
-const THEME_STORAGE_KEY = 'theme-storage'
+export const THEME_STORAGE_KEY = 'theme-storage'
 
 function isBrowser() {
     return typeof window !== 'undefined'
@@ -74,4 +74,8 @@ export function watchSystemTheme(callback: (resolvedTheme: ResolvedTheme) => voi
     return () => {
         mediaQuery.removeEventListener('change', handleChange)
     }
+}
+
+export function getInitialTheme(): Theme {
+    return getStoredTheme()
 }

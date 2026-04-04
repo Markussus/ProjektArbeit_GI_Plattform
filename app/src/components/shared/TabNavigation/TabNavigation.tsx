@@ -12,25 +12,25 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="mb-6 flex gap-1 border-b border-border">
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onTabChange(tab)}
-          className={cn(
-            'relative px-4 py-2.5 text-sm font-medium transition-colors',
-            activeTab === tab
-              ? 'text-orange-600 dark:text-orange-400'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          {t(`tabs.${tab}`)}
-          {activeTab === tab && (
-            <span className="absolute inset-x-0 -bottom-px h-0.5 bg-orange-500" />
-          )}
-        </button>
-      ))}
-    </div>
+      <div className="mb-6 flex gap-1 border-b border-border">
+        {tabs.map((tab) => (
+            <button
+                key={tab}
+                type="button"
+                onClick={() => onTabChange(tab)}
+                className={cn(
+                    'relative px-4 py-2.5 text-sm font-medium',
+                    activeTab === tab
+                        ? 'text-tab-active'
+                        : 'text-muted-foreground hover:text-foreground'
+                )}
+            >
+              {t(`tabs.${tab}`)}
+              {activeTab === tab && (
+                  <span className="absolute inset-x-0 -bottom-px h-0.5 bg-tab-indicator" />
+              )}
+            </button>
+        ))}
+      </div>
   )
 }
-

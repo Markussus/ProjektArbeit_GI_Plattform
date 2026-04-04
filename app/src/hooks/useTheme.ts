@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import {
     applyResolvedTheme,
@@ -13,7 +13,7 @@ export function useTheme() {
     const theme = useThemeStore((state) => state.theme)
     const setThemeState = useThemeStore((state) => state.setTheme)
 
-    const resolvedTheme = useMemo(() => resolveTheme(theme), [theme])
+    const resolvedTheme = resolveTheme(theme)
 
     useEffect(() => {
         if (theme !== 'system') return
@@ -33,9 +33,7 @@ export function useTheme() {
     }
 
     const toggleTheme = () => {
-        const nextTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
-        applyTheme(nextTheme)
-        setThemeState(nextTheme)
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
     }
 
     return {
