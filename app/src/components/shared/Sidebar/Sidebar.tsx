@@ -22,14 +22,20 @@ function getAccentClasses(accent: TopicAccent) {
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation()
   const location = useLocation()
-
   const tk = (key: string) => t(key as never)
 
   const isHome = location.pathname === '/'
-  const fundamentalsModule = learningModules.find((module) => module.id === 'fundamentals-cs')
 
-  const isFundamentalsRoute = location.pathname.startsWith('/fundamentals-cs')
-  const isFundamentalsOverview = location.pathname === '/fundamentals-cs'
+  const activeModule = learningModules.find(
+      (module) =>
+          location.pathname === module.path ||
+          module.topics.some((topic) => location.pathname === topic.path)
+  )
+
+  const hasModuleNavigation = Boolean(activeModule)
+  const isModuleOverview = activeModule
+      ? location.pathname === activeModule.path
+      : false
 
   return (
       <aside
@@ -49,23 +55,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </button>
         </div>
 
-        {!collapsed && !isHome && isFundamentalsRoute && fundamentalsModule && (
+        {!collapsed && !isHome && hasModuleNavigation && activeModule && (
             <div className="px-4 pb-3">
               <NavLink
-                  to={fundamentalsModule.path}
+                  to={activeModule.path}
                   className={cn(
                       'text-sm font-semibold tracking-wider uppercase',
-                      isFundamentalsOverview ? 'text-brand' : 'text-foreground'
+                      isModuleOverview ? 'text-brand' : 'text-foreground'
                   )}
               >
-                {tk(fundamentalsModule.titleKey)}
+                {tk(activeModule.titleKey)}
               </NavLink>
             </div>
         )}
 
-        {!isHome && isFundamentalsRoute && fundamentalsModule ? (
+        {!isHome && hasModuleNavigation && activeModule ? (
             <nav className="flex-1 space-y-1 px-2 py-2">
-              {fundamentalsModule.topics.map((topic) => {
+              {activeModule.topics.map((topic) => {
                 const Icon = topic.icon
 
                 return (

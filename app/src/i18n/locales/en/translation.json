@@ -162,5 +162,16 @@
     },
     "moreComingSoon": "More coming soon",
     "moreComingSoonDescription": "Additional learning modules will be added in future versions."
+  },
+  "notFound": {
+    "title": "404 – This page does not exist",
+    "description": "The requested URL does not exist, was deleted, or was moved to another location.",
+    "requestedUrl": "Requested URL",
+    "goHome": "Go to homepage",
+    "goBack": "Go back",
+    "hintLabel": "Possible reasons",
+    "reason1": "The address may have been entered incorrectly.",
+    "reason2": "The page may have been removed or renamed.",
+    "reason3": "The link may be outdated or no longer valid."
   }
 }

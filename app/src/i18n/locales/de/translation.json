@@ -162,5 +162,16 @@
     },
     "moreComingSoon": "Mehr Module folgen bald",
     "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."
+  },
+  "notFound": {
+    "title": "404 – Diese Seite gibt es nicht",
+    "description": "Die angeforderte URL existiert nicht, wurde gelöscht oder an eine andere Stelle verschoben.",
+    "requestedUrl": "Angeforderte URL",
+    "goHome": "Zur Startseite",
+    "goBack": "Zurück",
+    "hintLabel": "Mögliche Ursachen",
+    "reason1": "Die Adresse wurde falsch eingegeben.",
+    "reason2": "Die Seite wurde entfernt oder umbenannt.",
+    "reason3": "Der Link ist veraltet oder nicht mehr gültig."
   }
 }
