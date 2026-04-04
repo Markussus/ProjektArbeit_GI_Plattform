@@ -1,10 +1,15 @@
-export function SimulationTab() {
-  return (
-    <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-      <p className="text-sm text-muted-foreground">
-        The Finite Automata simulator will be available here.
-      </p>
-    </div>
-  )
+import type { Exercise } from '@/components/shared/ExerciseCard/ExerciseCard'
+import { SimulationWorkspace } from '@/components/shared/SimulationWorkspace/SimulationWorkspace'
+
+interface SimulationTabProps {
+    selectedExercise: Exercise | null
 }
 
+export function SimulationTab({ selectedExercise }: SimulationTabProps) {
+    return (
+        <SimulationWorkspace
+            selectedExercise={selectedExercise}
+            placeholderText="The Finite Automata simulator will be available here."
+        />
+    )
+}

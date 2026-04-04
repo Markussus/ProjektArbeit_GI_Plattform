@@ -13,24 +13,42 @@ export interface Exercise {
 interface ExerciseCardProps {
   exercise: Exercise
   index: number
-  isFirst?: boolean
+  isSelected?: boolean
+  onSelect?: () => void
+  onOpen?: () => void
 }
 
-const difficultyColors = {
+const difficultyTextColors = {
   easy: 'text-difficulty-easy',
   medium: 'text-difficulty-medium',
   hard: 'text-difficulty-hard',
 }
 
-export function ExerciseCard({ exercise, index, isFirst }: ExerciseCardProps) {
+const difficultyBorderColors = {
+  easy: 'border-l-green-500',
+  medium: 'border-l-orange-500',
+  hard: 'border-l-red-500',
+}
+
+export function ExerciseCard({
+                               exercise,
+                               index,
+                               isSelected = false,
+                               onSelect,
+                               onOpen,
+                             }: ExerciseCardProps) {
   const { t } = useTranslation()
   const Icon = exercise.icon
 
   return (
       <button
           type="button"
+          onClick={onSelect}
+          onDoubleClick={onOpen}
           className={cn(
-              'flex w-full items-center gap-4 border-b border-border p-4 text-left hover:bg-muted/50'
+              'flex w-full items-center gap-4 border-b border-border p-4 text-left hover:bg-muted/50',
+              isSelected && 'border-l-[3px]',
+              isSelected && difficultyBorderColors[exercise.difficulty]
           )}
       >
         <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -45,16 +63,14 @@ export function ExerciseCard({ exercise, index, isFirst }: ExerciseCardProps) {
           <p
               className={cn(
                   'text-xs font-bold uppercase tracking-wider',
-                  difficultyColors[exercise.difficulty]
+                  difficultyTextColors[exercise.difficulty]
               )}
           >
             {t('exercise.difficulty')}: {t(`difficulty.${exercise.difficulty}`)}
           </p>
         </div>
 
-        {isFirst && (
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-        )}
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
       </button>
   )
 }

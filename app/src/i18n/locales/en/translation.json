@@ -139,11 +139,18 @@
   },
   "exercise": {
     "label": "Exercise {{index}}",
-    "difficulty": "Difficulty"
+    "difficulty": "Difficulty",
+    "currentExercises": "Current Exercises"
   },
   "difficulty": {
     "easy": "EASY",
     "medium": "MEDIUM",
     "hard": "HARD"
+  },
+  "simulation": {
+    "taskText": "Task text",
+    "selectedExercise": "Selected exercise",
+    "taskTextPlaceholder": "You can add the concrete task text here later.",
+    "workspace": "Simulation"
   }
 }

@@ -139,11 +139,18 @@
   },
   "exercise": {
     "label": "Übung {{index}}",
-    "difficulty": "Schwierigkeit"
+    "difficulty": "Schwierigkeit",
+    "currentExercises": "Aktuelle Übungen"
   },
   "difficulty": {
     "easy": "LEICHT",
     "medium": "MITTEL",
     "hard": "SCHWER"
+  },
+  "simulation": {
+    "taskText": "Aufgabentext",
+    "selectedExercise": "Ausgewählte Übung",
+    "taskTextPlaceholder": "Hier kannst du später den konkreten Aufgabentext einfügen.",
+    "workspace": "Simulation"
   }
 }
