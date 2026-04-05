@@ -17,10 +17,12 @@ export function Header() {
     const { t } = useTranslation()
     const location = useLocation()
 
+    const tk = (key: string) => t(key as never) as string
+
     const activeModule = getActiveModule(location.pathname)
 
-    const headerLabel = activeModule
-        ? t(activeModule.titleKey)
+    const headerLabel: string = activeModule
+        ? tk(activeModule.titleKey)
         : t('nav.home')
 
     return (
