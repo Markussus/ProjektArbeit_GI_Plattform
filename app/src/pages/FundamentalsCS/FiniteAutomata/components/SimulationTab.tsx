@@ -3,13 +3,21 @@ import { SimulationWorkspace } from "@/components/shared/SimulationWorkspace/Sim
 
 interface SimulationTabProps {
   selectedExercise: Exercise | null;
+  isFocused: boolean;
+  onToggleFocus: () => void;
 }
 
-export function SimulationTab({ selectedExercise }: SimulationTabProps) {
+export function SimulationTab({
+  selectedExercise,
+  isFocused,
+  onToggleFocus,
+}: SimulationTabProps) {
   return (
     <SimulationWorkspace
       selectedExercise={selectedExercise}
-      placeholderText="The Finite Automata simulator will be available here."
+      emptyStateText="The Finite Automata simulator will be available here."
+      isFocused={isFocused}
+      onToggleFocus={onToggleFocus}
     />
   );
 }
