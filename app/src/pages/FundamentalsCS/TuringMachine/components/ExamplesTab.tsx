@@ -5,6 +5,5 @@ export function ExamplesTab() {
         Interactive examples for Turing Machines will be available here.
       </p>
     </div>
-  )
+  );
 }
-

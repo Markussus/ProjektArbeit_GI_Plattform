@@ -5,6 +5,5 @@ export function ExamplesTab() {
         Interactive examples for Moore & Mealy machines will be available here.
       </p>
     </div>
-  )
+  );
 }
-

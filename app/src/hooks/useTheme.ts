@@ -1,45 +1,45 @@
-import { useEffect } from 'react'
-import { useThemeStore } from '@/store/themeStore'
+import { useEffect } from "react";
+import { useThemeStore } from "@/store/themeStore";
 import {
-    applyResolvedTheme,
-    applyTheme,
-    getSystemTheme,
-    resolveTheme,
-    watchSystemTheme,
-} from '@/lib/theme'
-import type { Theme } from '@/store/themeStore'
+  applyResolvedTheme,
+  applyTheme,
+  getSystemTheme,
+  resolveTheme,
+  watchSystemTheme,
+} from "@/lib/theme";
+import type { Theme } from "@/store/themeStore";
 
 export function useTheme() {
-    const theme = useThemeStore((state) => state.theme)
-    const setThemeState = useThemeStore((state) => state.setTheme)
+  const theme = useThemeStore((state) => state.theme);
+  const setThemeState = useThemeStore((state) => state.setTheme);
 
-    const resolvedTheme = resolveTheme(theme)
+  const resolvedTheme = resolveTheme(theme);
 
-    useEffect(() => {
-        if (theme !== 'system') return
+  useEffect(() => {
+    if (theme !== "system") return;
 
-        const unsubscribe = watchSystemTheme((nextResolvedTheme) => {
-            applyResolvedTheme(nextResolvedTheme)
-        })
+    const unsubscribe = watchSystemTheme((nextResolvedTheme) => {
+      applyResolvedTheme(nextResolvedTheme);
+    });
 
-        applyResolvedTheme(getSystemTheme())
+    applyResolvedTheme(getSystemTheme());
 
-        return unsubscribe
-    }, [theme])
+    return unsubscribe;
+  }, [theme]);
 
-    const setTheme = (nextTheme: Theme) => {
-        applyTheme(nextTheme)
-        setThemeState(nextTheme)
-    }
+  const setTheme = (nextTheme: Theme) => {
+    applyTheme(nextTheme);
+    setThemeState(nextTheme);
+  };
 
-    const toggleTheme = () => {
-        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-    }
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
 
-    return {
-        theme,
-        resolvedTheme,
-        setTheme,
-        toggleTheme,
-    }
+  return {
+    theme,
+    resolvedTheme,
+    setTheme,
+    toggleTheme,
+  };
 }

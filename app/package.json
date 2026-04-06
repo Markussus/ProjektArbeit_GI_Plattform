@@ -8,6 +8,11 @@
     "dev:open": "vite --open",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "pre:commit:check": "npm run lint && npm run format:check && npm run build:preview:open",
+    "fix": "npm run lint:fix && npm run format",
     "preview": "vite preview",
     "build:preview:open": "tsc -b && vite build && vite preview --open"
   },

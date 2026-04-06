@@ -5,6 +5,5 @@ export function ExamplesTab() {
         Interactive examples for DNF will be available here.
       </p>
     </div>
-  )
+  );
 }
-

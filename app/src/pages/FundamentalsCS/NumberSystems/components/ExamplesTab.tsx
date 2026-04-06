@@ -5,6 +5,5 @@ export function ExamplesTab() {
         Interactive examples for Number Systems will be available here.
       </p>
     </div>
-  )
+  );
 }
-

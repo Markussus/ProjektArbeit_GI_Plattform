@@ -5,6 +5,5 @@ export function ExamplesTab() {
         Interactive examples for Finite Automata will be available here.
       </p>
     </div>
-  )
+  );
 }
-
