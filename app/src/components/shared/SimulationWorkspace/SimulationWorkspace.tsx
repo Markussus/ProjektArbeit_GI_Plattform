@@ -38,13 +38,7 @@ export function SimulationWorkspace({
             </div>
 
             <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-                <h3 className="text-base font-semibold text-foreground">
-                    {t('simulation.workspace')}
-                </h3>
-
-                <div className="mt-3 rounded-lg bg-muted p-4">
-                    <p className="text-sm text-muted-foreground">{placeholderText}</p>
-                </div>
+                <p className="text-sm text-muted-foreground">{placeholderText}</p>
             </div>
         </div>
     )
