@@ -5,12 +5,12 @@ export function HeroSection() {
 
   return (
     <div className="mb-12 text-center">
-      <h1 className="text-5xl font-bold leading-tight tracking-tight text-foreground md:text-6xl">
+      <h1 className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-6xl">
         {t("home.heroTitle1")}
         <br />
         <span className="text-brand">{t("home.heroTitle2")}</span>
       </h1>
-      <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground mx-auto mt-6 max-w-xl text-base leading-relaxed">
         {t("home.heroDescription")}
       </p>
     </div>

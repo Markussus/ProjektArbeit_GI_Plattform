@@ -8,7 +8,7 @@ export function MainLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
       <Header />
 
       <div className="flex flex-1 overflow-hidden">
@@ -17,7 +17,7 @@ export function MainLayout() {
           onToggle={() => setSidebarCollapsed((prev) => !prev)}
         />
 
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="bg-background flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>

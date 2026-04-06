@@ -51,12 +51,12 @@ export function ExercisesTab({
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2 text-muted-foreground">
+      <div className="text-muted-foreground mb-4 flex items-center gap-2">
         <ClipboardList className="size-4" />
         <h3 className="text-sm font-bold">{t("exercise.currentExercises")}</h3>
       </div>
 
-      <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
         {exercises.map((exercise, i) => (
           <ExerciseCard
             key={i}

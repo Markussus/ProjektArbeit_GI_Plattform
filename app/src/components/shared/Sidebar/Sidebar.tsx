@@ -40,7 +40,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-border bg-background",
+        "border-border bg-background flex h-full flex-col border-r",
         collapsed ? "w-16" : "w-64",
       )}
     >
@@ -48,7 +48,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <button
           type="button"
           onClick={onToggle}
-          className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
           aria-label="Toggle sidebar"
         >
           <div className="flex size-5 items-center justify-center">
@@ -107,11 +107,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <div className="flex-1" />
       )}
 
-      <div className="space-y-1 border-t border-border px-2 py-3">
+      <div className="border-border space-y-1 border-t px-2 py-3">
         <Link
           to="/documentation"
           className={cn(
-            "flex h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
             collapsed ? "justify-center" : "gap-3",
           )}
         >
@@ -126,7 +126,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <Link
           to="/help"
           className={cn(
-            "flex h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
             collapsed ? "justify-center" : "gap-3",
           )}
         >

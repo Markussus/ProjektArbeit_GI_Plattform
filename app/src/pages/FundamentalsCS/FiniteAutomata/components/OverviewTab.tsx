@@ -13,17 +13,17 @@ export function OverviewTab() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <h3 className="text-lg font-semibold text-foreground">
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+        <h3 className="text-foreground text-lg font-semibold">
           {t("automata.overviewTitle")}
         </h3>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           {t("automata.overviewText")}
         </p>
       </div>
 
       <div>
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
           {t("automata.concepts")}
         </h3>
 
@@ -34,7 +34,7 @@ export function OverviewTab() {
             return (
               <div
                 key={num}
-                className="flex items-center gap-3 rounded-lg bg-card p-4 ring-1 ring-foreground/10"
+                className="bg-card ring-foreground/10 flex items-center gap-3 rounded-lg p-4 ring-1"
               >
                 <div
                   className={cn(
@@ -45,7 +45,7 @@ export function OverviewTab() {
                   <Icon className="size-4" />
                 </div>
 
-                <span className="text-sm font-medium text-foreground">
+                <span className="text-foreground text-sm font-medium">
                   {t(`automata.concept${num}`)}
                 </span>
               </div>

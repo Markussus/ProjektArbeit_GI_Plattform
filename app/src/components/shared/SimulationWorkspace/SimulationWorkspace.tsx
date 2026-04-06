@@ -14,31 +14,31 @@ export function SimulationWorkspace({
 
   if (!selectedExercise) {
     return (
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <p className="text-sm text-muted-foreground">{placeholderText}</p>
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+        <p className="text-muted-foreground text-sm">{placeholderText}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <h3 className="text-base font-semibold text-foreground">
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+        <h3 className="text-foreground text-base font-semibold">
           {t("simulation.taskText")}
         </h3>
 
-        <div className="mt-3 rounded-lg bg-muted p-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-muted mt-3 rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">
             {t("simulation.selectedExercise")}: {selectedExercise.title}
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-2 text-sm">
             {t("simulation.taskTextPlaceholder")}
           </p>
         </div>
       </div>
 
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <p className="text-sm text-muted-foreground">{placeholderText}</p>
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+        <p className="text-muted-foreground text-sm">{placeholderText}</p>
       </div>
     </div>
   );

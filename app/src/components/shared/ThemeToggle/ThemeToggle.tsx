@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+      className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
       aria-label={
         isDark ? "Zu hellem Modus wechseln" : "Zu dunklem Modus wechseln"
       }

@@ -12,7 +12,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="mb-6 flex gap-1 border-b border-border">
+    <div className="border-border mb-6 flex gap-1 border-b">
       {tabs.map((tab) => (
         <button
           key={tab}
@@ -27,7 +27,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
         >
           {t(`tabs.${tab}`)}
           {activeTab === tab && (
-            <span className="absolute inset-x-0 -bottom-px h-0.5 bg-tab-indicator" />
+            <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
           )}
         </button>
       ))}

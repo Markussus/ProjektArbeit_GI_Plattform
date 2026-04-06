@@ -13,7 +13,7 @@ export function LanguageToggle() {
     <button
       type="button"
       onClick={toggleLanguage}
-      className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+      className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
       aria-label="Toggle language"
     >
       <Globe className="size-4" />

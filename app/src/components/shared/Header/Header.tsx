@@ -26,15 +26,15 @@ export function Header() {
     : t("nav.home");
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
+    <header className="border-border bg-background flex h-16 items-center justify-between border-b px-6">
       <div className="flex items-center gap-4">
-        <Link to="/" className="flex items-center shrink-0">
+        <Link to="/" className="flex shrink-0 items-center">
           <img src={ThwsLogo} alt="THWS Logo" className="h-9 w-auto" />
         </Link>
 
-        <div className="h-7 w-px bg-border" />
+        <div className="bg-border h-7 w-px" />
 
-        <span className="text-xl font-bold tracking-tight text-foreground">
+        <span className="text-foreground text-xl font-bold tracking-tight">
           {headerLabel}
         </span>
       </div>

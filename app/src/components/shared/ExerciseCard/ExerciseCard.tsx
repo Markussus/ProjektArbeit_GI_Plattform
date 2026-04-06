@@ -46,23 +46,23 @@ export function ExerciseCard({
       onClick={onSelect}
       onDoubleClick={onOpen}
       className={cn(
-        "flex w-full items-center gap-4 border-b border-border p-4 text-left hover:bg-muted/50",
+        "border-border hover:bg-muted/50 flex w-full items-center gap-4 border-b p-4 text-left",
         isSelected && "border-l-[3px]",
         isSelected && difficultyBorderColors[exercise.difficulty],
       )}
     >
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+      <div className="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-lg">
         <Icon className="size-5" />
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-foreground">
+        <p className="text-foreground text-sm font-semibold">
           {t("exercise.label", { index: index + 1 })}: {exercise.title}
         </p>
 
         <p
           className={cn(
-            "text-xs font-bold uppercase tracking-wider",
+            "text-xs font-bold tracking-wider uppercase",
             difficultyTextColors[exercise.difficulty],
           )}
         >
@@ -70,7 +70,7 @@ export function ExerciseCard({
         </p>
       </div>
 
-      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+      <ChevronRight className="text-muted-foreground size-4 shrink-0" />
     </button>
   );
 }

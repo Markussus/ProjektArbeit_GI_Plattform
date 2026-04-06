@@ -29,28 +29,28 @@ export function FundamentalsCSPage() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <p className="text-sm font-semibold tracking-wide text-brand uppercase">
+        <p className="text-brand text-sm font-semibold tracking-wide uppercase">
           {t("modules.label")}
         </p>
 
-        <h1 className="mt-2 text-5xl font-bold tracking-tight text-foreground">
+        <h1 className="text-foreground mt-2 text-5xl font-bold tracking-tight">
           {tk(moduleData.titleKey)}
         </h1>
 
-        <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-4 max-w-3xl text-lg leading-relaxed">
           {tk(moduleData.descriptionKey)}
         </p>
       </div>
 
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
         <div className="mb-4 flex items-center gap-3">
-          <Layers3 className="size-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold text-foreground">
+          <Layers3 className="text-muted-foreground size-5" />
+          <h2 className="text-foreground text-lg font-semibold">
             {t("modules.topicsTitle")}
           </h2>
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="divide-border divide-y">
           {moduleData.topics.map((topic) => {
             const Icon = topic.icon;
 
@@ -58,7 +58,7 @@ export function FundamentalsCSPage() {
               <Link
                 key={topic.id}
                 to={topic.path}
-                className="flex items-center justify-between gap-4 px-1 py-4 hover:bg-muted/40"
+                className="hover:bg-muted/40 flex items-center justify-between gap-4 px-1 py-4"
               >
                 <div className="flex items-start gap-3">
                   <div
@@ -71,19 +71,19 @@ export function FundamentalsCSPage() {
                   </div>
 
                   <div>
-                    <p className="text-base font-semibold text-foreground">
+                    <p className="text-foreground text-base font-semibold">
                       {tk(topic.titleKey)}
                     </p>
 
                     {topic.descriptionKey && (
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mt-1 text-sm">
                         {tk(topic.descriptionKey)}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                <ChevronRight className="text-muted-foreground size-4 shrink-0" />
               </Link>
             );
           })}

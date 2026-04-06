@@ -12,26 +12,26 @@ export function ModuleSelector() {
 
   return (
     <div className="relative mx-auto w-full max-w-2xl">
-      <p className="mb-3 text-center text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase">
+      <p className="text-muted-foreground mb-3 text-center text-xs font-bold tracking-[0.2em] uppercase">
         {t("home.selectModule")}
       </p>
 
-      <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-muted/40"
+          className="hover:bg-muted/40 flex w-full items-center justify-between px-5 py-4 text-left"
         >
           <div className="flex items-center gap-3">
-            <Layers3 className="size-4 text-muted-foreground" />
-            <span className="text-base font-semibold text-foreground">
+            <Layers3 className="text-muted-foreground size-4" />
+            <span className="text-foreground text-base font-semibold">
               {t("home.exploreModules")}
             </span>
           </div>
 
           <ChevronDown
             className={cn(
-              "size-4 text-muted-foreground transition-transform",
+              "text-muted-foreground size-4 transition-transform",
               isOpen && "rotate-180",
             )}
           />
@@ -39,35 +39,35 @@ export function ModuleSelector() {
       </div>
 
       {isOpen && (
-        <div className="absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-xl bg-card shadow-lg ring-1 ring-foreground/10">
+        <div className="bg-card ring-foreground/10 absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-xl shadow-lg ring-1">
           <div className="max-h-[min(60vh,24rem)] overflow-y-auto">
-            <div className="divide-y divide-border">
+            <div className="divide-border divide-y">
               {learningModules.map((module) => (
                 <Link
                   key={module.id}
                   to={module.path}
-                  className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/40"
+                  className="hover:bg-muted/40 flex items-center justify-between gap-4 px-5 py-4"
                 >
                   <div>
-                    <p className="text-base font-semibold text-foreground">
+                    <p className="text-foreground text-base font-semibold">
                       {tk(module.titleKey)}
                     </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       {tk(module.descriptionKey)}
                     </p>
                   </div>
 
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                  <ChevronRight className="text-muted-foreground size-4 shrink-0" />
                 </Link>
               ))}
 
               <div className="flex items-center gap-3 px-5 py-4">
-                <Sparkles className="size-4 text-muted-foreground" />
+                <Sparkles className="text-muted-foreground size-4" />
                 <div>
-                  <p className="text-base font-semibold text-foreground">
+                  <p className="text-foreground text-base font-semibold">
                     {t("modules.moreComingSoon")}
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-sm">
                     {t("modules.moreComingSoonDescription")}
                   </p>
                 </div>
