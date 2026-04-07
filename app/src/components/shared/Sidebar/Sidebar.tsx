@@ -2,7 +2,10 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { FileText, HelpCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { learningModules, type TopicAccent } from "@/data/modules";
+import {
+  findModuleByPath,
+  type TopicAccent,
+} from "@/features/modules/catalog";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -26,11 +29,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   const isHome = location.pathname === "/";
 
-  const activeModule = learningModules.find(
-    (module) =>
-      location.pathname === module.path ||
-      module.topics.some((topic) => location.pathname === topic.path),
-  );
+  const activeModule = findModuleByPath(location.pathname);
 
   const hasModuleNavigation = Boolean(activeModule);
   const isModuleOverview = activeModule

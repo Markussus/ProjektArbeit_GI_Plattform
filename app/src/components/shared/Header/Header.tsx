@@ -3,15 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 import { LanguageToggle } from "@/components/shared/LanguageToggle/LanguageToggle";
 import ThwsLogo from "@/assets/THWS.svg";
-import { learningModules } from "@/data/modules";
-
-function getActiveModule(pathname: string) {
-  return learningModules.find(
-    (module) =>
-      pathname === module.path ||
-      module.topics.some((topic) => pathname === topic.path),
-  );
-}
+import { findModuleByPath } from "@/features/modules/catalog";
 
 export function Header() {
   const { t } = useTranslation();
@@ -19,7 +11,7 @@ export function Header() {
 
   const tk = (key: string) => t(key as never) as string;
 
-  const activeModule = getActiveModule(location.pathname);
+  const activeModule = findModuleByPath(location.pathname);
 
   const headerLabel: string = activeModule
     ? tk(activeModule.titleKey)

@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronRight, Layers3 } from "lucide-react";
-import { learningModules, type TopicAccent } from "@/data/modules";
+import {
+  learningModules,
+  type TopicAccent,
+} from "@/features/modules/catalog";
 import { cn } from "@/lib/utils";
 
 function getAccentClasses(accent: TopicAccent) {

@@ -1,14 +1,25 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import type { ModuleTabId } from "@/hooks/useExerciseTabs";
 
 interface TabNavigationProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  activeTab: ModuleTabId;
+  onTabChange: (tab: ModuleTabId) => void;
+  tabs?: ModuleTabId[];
 }
 
-const tabs = ["overview", "exercises", "examples", "simulation"] as const;
+const defaultTabs: ModuleTabId[] = [
+  "overview",
+  "exercises",
+  "examples",
+  "simulation",
+];
 
-export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
+export function TabNavigation({
+  activeTab,
+  onTabChange,
+  tabs = defaultTabs,
+}: TabNavigationProps) {
   const { t } = useTranslation();
 
   return (
