@@ -103,7 +103,7 @@ export function ExerciseCard({
                 onClick={onOpen}
                 className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
               >
-                In Simulation öffnen
+                {t("exercise.openInSimulation")}
               </button>
             </div>
           </div>

@@ -1,23 +1,11 @@
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
-import { SimulationWorkspace } from "@/components/shared/SimulationWorkspace/SimulationWorkspace";
+import type { ModuleSimulationTabProps } from "@/features/modules/ModuleTopicPage";
+import { TopicSimulationTab } from "@/features/modules/TopicSimulationTab";
 
-interface SimulationTabProps {
-  selectedExercise: Exercise | null;
-  isFocused: boolean;
-  onToggleFocus: () => void;
-}
-
-export function SimulationTab({
-  selectedExercise,
-  isFocused,
-  onToggleFocus,
-}: SimulationTabProps) {
+export function SimulationTab(props: ModuleSimulationTabProps) {
   return (
-    <SimulationWorkspace
-      selectedExercise={selectedExercise}
-      emptyStateText="The Finite Automata simulator will be available here."
-      isFocused={isFocused}
-      onToggleFocus={onToggleFocus}
+    <TopicSimulationTab
+      {...props}
+      emptyStateTextKey="simulation.emptyStates.automata"
     />
   );
 }

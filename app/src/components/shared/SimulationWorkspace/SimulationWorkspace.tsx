@@ -1,4 +1,5 @@
 import { Maximize2, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,8 @@ export function SimulationWorkspace({
   isFocused,
   onToggleFocus,
 }: SimulationWorkspaceProps) {
+  const { t } = useTranslation();
+
   if (!selectedExercise) {
     return (
       <div className="space-y-4 transition-all duration-300 ease-in-out">
@@ -25,11 +28,9 @@ export function SimulationWorkspace({
               onClick={onToggleFocus}
               aria-pressed={isFocused}
               aria-label={
-                isFocused
-                  ? "Simulationsfokus verlassen"
-                  : "Simulation vergrößern"
+                isFocused ? t("simulation.exitFocus") : t("simulation.expand")
               }
-              title={isFocused ? "Schließen" : "Vergrößern"}
+              title={isFocused ? t("simulation.close") : t("simulation.expand")}
               className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 items-center justify-center rounded-md border transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               {isFocused ? (
@@ -52,7 +53,7 @@ export function SimulationWorkspace({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-foreground text-sm font-semibold">
-              Ausgewählte Aufgabe
+              {t("simulation.selectedExercise")}
             </p>
             <p className="text-foreground mt-2 text-sm font-medium">
               {selectedExercise.title}
@@ -67,9 +68,9 @@ export function SimulationWorkspace({
             onClick={onToggleFocus}
             aria-pressed={isFocused}
             aria-label={
-              isFocused ? "Simulationsfokus verlassen" : "Simulation vergrößern"
+              isFocused ? t("simulation.exitFocus") : t("simulation.expand")
             }
-            title={isFocused ? "Schließen" : "Vergrößern"}
+            title={isFocused ? t("simulation.close") : t("simulation.expand")}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             {isFocused ? (

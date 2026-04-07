@@ -139,7 +139,8 @@
   "exercise": {
     "label": "Exercise {{index}}",
     "difficulty": "Difficulty",
-    "currentExercises": "Current Exercises"
+    "currentExercises": "Current Exercises",
+    "openInSimulation": "Open in simulation"
   },
   "difficulty": {
     "easy": "EASY",
@@ -150,7 +151,17 @@
     "taskText": "Task text",
     "selectedExercise": "Selected exercise",
     "taskTextPlaceholder": "You can add the concrete task text here later.",
-    "workspace": "Simulation"
+    "workspace": "Simulation",
+    "expand": "Expand simulation",
+    "exitFocus": "Exit simulation focus",
+    "close": "Close",
+    "emptyStates": {
+      "turing": "The Turing Machine simulator will be available here.",
+      "automata": "The Finite Automata simulator will be available here.",
+      "number": "The Number Systems converter will be available here.",
+      "moore": "The Moore & Mealy simulator will be available here.",
+      "dnf": "The DNF builder / truth table generator will be available here."
+    }
   },
   "modules": {
     "label": "Module",
