@@ -3,10 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { cn } from "@/lib/utils";
-import {
-  learningModules,
-  type TopicAccent,
-} from "@/features/modules/catalog";
+import { learningModules, type TopicAccent } from "@/features/modules/catalog";
 
 interface ModuleOverviewPageProps {
   moduleId: string;

@@ -2,10 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { FileText, HelpCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  findModuleByPath,
-  type TopicAccent,
-} from "@/features/modules/catalog";
+import { findModuleByPath, type TopicAccent } from "@/features/modules/catalog";
 
 interface SidebarProps {
   collapsed: boolean;
