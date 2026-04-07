@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
-import { LanguageToggle } from "@/components/shared/LanguageToggle/LanguageToggle";
+import { LanguageSelect } from "@/components/shared/LanguageSelect/LanguageSelect";
 import ThwsLogo from "@/assets/THWS.svg";
 import { findModuleByPath } from "@/features/modules/catalog";
 
@@ -32,7 +32,7 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2">
-        <LanguageToggle />
+        <LanguageSelect />
         <ThemeToggle />
       </div>
     </header>

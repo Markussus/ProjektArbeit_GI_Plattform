@@ -48,7 +48,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           type="button"
           onClick={onToggle}
           className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
-          aria-label="Toggle sidebar"
+          aria-label={t("sidebar.toggle")}
         >
           <div className="flex size-5 items-center justify-center">
             <Menu className="size-4" />

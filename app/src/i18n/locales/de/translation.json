@@ -14,14 +14,22 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOKUMENTATION",
-    "support": "HILFE"
+    "support": "HILFE",
+    "toggle": "Seitenleiste umschalten"
   },
   "footer": {
     "copyright": "© 2026 THWS"
   },
   "theme": {
     "light": "Heller Modus",
-    "dark": "Dunkler Modus"
+    "dark": "Dunkler Modus",
+    "switchToLight": "Zu hellem Modus wechseln",
+    "switchToDark": "Zu dunklem Modus wechseln"
+  },
+  "language": {
+    "select": "Sprache ausw\u00e4hlen",
+    "de": "Deutsch",
+    "en": "Englisch"
   },
   "tabs": {
     "overview": "Übersicht",

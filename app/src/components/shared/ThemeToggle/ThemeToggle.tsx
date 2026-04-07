@@ -1,7 +1,9 @@
 import { Moon, Sun } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const { resolvedTheme, toggleTheme } = useTheme();
 
   const isDark = resolvedTheme === "dark";
@@ -12,9 +14,9 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
       aria-label={
-        isDark ? "Zu hellem Modus wechseln" : "Zu dunklem Modus wechseln"
+        isDark ? t("theme.switchToLight") : t("theme.switchToDark")
       }
-      title={isDark ? "Light Mode" : "Dark Mode"}
+      title={isDark ? t("theme.light") : t("theme.dark")}
     >
       {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
