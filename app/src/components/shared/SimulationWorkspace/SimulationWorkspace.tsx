@@ -20,8 +20,8 @@ export function SimulationWorkspace({
 
   if (!selectedExercise) {
     return (
-      <div className="space-y-4 transition-all duration-300 ease-in-out">
-        <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-all duration-300 ease-in-out">
+      <div className="space-y-4">
+        <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
           <div className="mb-4 flex items-start justify-end">
             <button
               type="button"
@@ -48,8 +48,8 @@ export function SimulationWorkspace({
   }
 
   return (
-    <div className="space-y-4 transition-all duration-300 ease-in-out">
-      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-all duration-300 ease-in-out">
+    <div className="space-y-4">
+      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-foreground text-sm font-semibold">
@@ -84,7 +84,7 @@ export function SimulationWorkspace({
 
       <div
         className={cn(
-          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-all duration-300 ease-in-out",
+          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
