@@ -1,56 +1,114 @@
-import type { LucideIcon } from 'lucide-react'
-import { ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useId } from "react";
+import { useTranslation } from "react-i18next";
+import type { LucideIcon } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface Exercise {
-  title: string
-  description: string
-  difficulty: 'easy' | 'medium' | 'hard'
-  icon: LucideIcon
+  title: string;
+  description: string;
+  difficulty: "easy" | "medium" | "hard";
+  icon: LucideIcon;
 }
 
 interface ExerciseCardProps {
-  exercise: Exercise
-  index: number
-  isFirst?: boolean
+  exercise: Exercise;
+  index: number;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onOpen?: () => void;
 }
 
-const difficultyColors = {
-  easy: 'text-green-600 dark:text-green-400',
-  medium: 'text-orange-600 dark:text-orange-400',
-  hard: 'text-red-600 dark:text-red-400',
-}
+const difficultyTextColors = {
+  easy: "text-difficulty-easy",
+  medium: "text-difficulty-medium",
+  hard: "text-difficulty-hard",
+};
 
-const difficultyBorders = {
-  easy: 'border-l-green-500',
-  medium: 'border-l-orange-500',
-  hard: 'border-l-red-500',
-}
+const difficultyBorderColors = {
+  easy: "border-l-green-500",
+  medium: "border-l-orange-500",
+  hard: "border-l-red-500",
+};
 
-export function ExerciseCard({ exercise, index, isFirst }: ExerciseCardProps) {
-  const Icon = exercise.icon
+export function ExerciseCard({
+  exercise,
+  index,
+  isSelected = false,
+  onSelect,
+  onOpen,
+}: ExerciseCardProps) {
+  const { t } = useTranslation();
+  const Icon = exercise.icon;
+  const detailsId = useId();
 
   return (
-    <button
+    <div
       className={cn(
-        'flex w-full items-center gap-4 border-b border-border p-4 text-left transition-colors hover:bg-muted/50',
-        isFirst && 'border-l-[3px]',
-        isFirst && difficultyBorders[exercise.difficulty]
+        "border-border border-b last:border-b-0",
+        isSelected && "border-l-[3px]",
+        isSelected && difficultyBorderColors[exercise.difficulty],
       )}
     >
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-5" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground">
-          Exercise {index + 1}: {exercise.title}
-        </p>
-        <p className={cn('text-xs font-bold uppercase tracking-wider', difficultyColors[exercise.difficulty])}>
-          DIFFICULTY: {exercise.difficulty.toUpperCase()}
-        </p>
-      </div>
-      {isFirst && <ChevronRight className="size-4 shrink-0 text-muted-foreground" />}
-    </button>
-  )
-}
+      <button
+        type="button"
+        onClick={onSelect}
+        onDoubleClick={onOpen}
+        aria-expanded={isSelected}
+        aria-controls={detailsId}
+        className={cn(
+          "hover:bg-muted/50 focus-visible:ring-ring flex w-full items-center gap-4 p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none",
+          isSelected && "bg-muted/30",
+        )}
+      >
+        <div className="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-lg">
+          <Icon className="size-5" />
+        </div>
 
+        <div className="min-w-0 flex-1">
+          <p className="text-foreground text-sm font-semibold">
+            {t("exercise.label", { index: index + 1 })}: {exercise.title}
+          </p>
+
+          <p
+            className={cn(
+              "text-xs font-bold tracking-wider uppercase",
+              difficultyTextColors[exercise.difficulty],
+            )}
+          >
+            {t("exercise.difficulty")}: {t(`difficulty.${exercise.difficulty}`)}
+          </p>
+        </div>
+
+        {isSelected ? (
+          <ChevronDown className="text-muted-foreground size-4 shrink-0" />
+        ) : (
+          <ChevronRight className="text-muted-foreground size-4 shrink-0" />
+        )}
+      </button>
+
+      {isSelected && (
+        <div
+          id={detailsId}
+          className="border-border bg-muted/20 border-t px-4 py-4"
+        >
+          <div className="pl-14">
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {exercise.description}
+            </p>
+
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={onOpen}
+                className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+              >
+                {t("exercise.openInSimulation")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

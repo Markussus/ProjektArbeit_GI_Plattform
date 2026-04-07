@@ -1,10 +1,48 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>projektarbeit_gi_plattform</title>
+    <title>Trainings Center</title>
+
+    <script>
+      (() => {
+        try {
+          const storageKey = "theme-storage";
+          const raw = localStorage.getItem(storageKey);
+
+          let theme = "system";
+
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const storedTheme = parsed?.state?.theme;
+
+            if (
+              storedTheme === "light" ||
+              storedTheme === "dark" ||
+              storedTheme === "system"
+            ) {
+              theme = storedTheme;
+            }
+          }
+
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          const resolvedTheme =
+            theme === "system" ? (prefersDark ? "dark" : "light") : theme;
+
+          document.documentElement.classList.toggle(
+            "dark",
+            resolvedTheme === "dark",
+          );
+          document.documentElement.style.colorScheme = resolvedTheme;
+        } catch {
+          // ignore
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,122 +1,139 @@
-import type { LucideIcon } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { NavLink, useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
-import {
-  Cpu,
-  GitBranch,
-  Hash,
-  ToggleLeft,
-  TableProperties,
-  FileText,
-  HelpCircle,
-  Menu,
-} from 'lucide-react'
-
-interface ModuleNavItem {
-  labelKey: 'sidebar.turingMachines' | 'sidebar.finiteAutomata' | 'sidebar.numberSystems' | 'sidebar.mooreMealy' | 'sidebar.dnf'
-  path: string
-  icon: LucideIcon
-}
-
-const modules: ModuleNavItem[] = [
-  { labelKey: 'sidebar.turingMachines', path: '/turing-machine', icon: Cpu },
-  { labelKey: 'sidebar.finiteAutomata', path: '/finite-automata', icon: GitBranch },
-  { labelKey: 'sidebar.numberSystems', path: '/number-systems', icon: Hash },
-  { labelKey: 'sidebar.mooreMealy', path: '/moore-mealy', icon: ToggleLeft },
-  { labelKey: 'sidebar.dnf', path: '/dnf', icon: TableProperties },
-]
+import { useTranslation } from "react-i18next";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { FileText, HelpCircle, Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { findModuleByPath, type TopicAccent } from "@/features/modules/catalog";
 
 interface SidebarProps {
-  collapsed: boolean
-  onToggle: () => void
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+function getAccentClasses(accent: TopicAccent) {
+  return {
+    orange: "text-module-orange-fg",
+    blue: "text-module-blue-fg",
+    purple: "text-module-purple-fg",
+    green: "text-module-green-fg",
+    rose: "text-module-rose-fg",
+  }[accent];
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const { t } = useTranslation()
-  const location = useLocation()
-  const isHome = location.pathname === '/'
+  const { t } = useTranslation();
+  const location = useLocation();
+  const tk = (key: string) => t(key as never);
+
+  const isHome = location.pathname === "/";
+
+  const activeModule = findModuleByPath(location.pathname);
+
+  const hasModuleNavigation = Boolean(activeModule);
+  const isModuleOverview = activeModule
+    ? location.pathname === activeModule.path
+    : false;
 
   return (
     <aside
       className={cn(
-        'flex h-full flex-col border-r border-border bg-background transition-all duration-300',
-        collapsed ? 'w-14' : 'w-56'
+        "border-border bg-background flex h-full flex-col border-r",
+        collapsed ? "w-16" : "w-64",
       )}
     >
-      {/* Toggle button */}
-      <div className="flex h-12 items-center px-4">
+      <div className="flex h-14 items-center px-4">
         <button
+          type="button"
           onClick={onToggle}
-          className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Toggle sidebar"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
+          aria-label={t("sidebar.toggle")}
         >
-          <Menu className="size-4" />
+          <div className="flex size-5 items-center justify-center">
+            <Menu className="size-4" />
+          </div>
         </button>
       </div>
 
-      {/* Module header (only when expanded and not home) */}
-      {!collapsed && !isHome && (
-        <div className="px-4 pb-2">
+      {!collapsed && !isHome && hasModuleNavigation && activeModule && (
+        <div className="px-4 pb-3">
           <NavLink
-            to="/"
-            className="text-xs font-semibold tracking-wider text-orange-500 uppercase"
+            to={activeModule.path}
+            className={cn(
+              "text-sm font-semibold tracking-wider uppercase",
+              isModuleOverview ? "text-brand" : "text-foreground",
+            )}
           >
-            {t('sidebar.theoreticalCs')}
+            {tk(activeModule.titleKey)}
           </NavLink>
-          <p className="mt-0.5 text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-            {t('sidebar.moduleOverview')}
-          </p>
         </div>
       )}
 
-      {/* Navigation links */}
-      <nav className="flex-1 space-y-1 px-2 py-2">
-        {modules.map(({ labelKey, path, icon: Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) =>
-              cn(
-                'group flex items-center gap-3 rounded-md px-2 py-2 text-xs font-semibold tracking-wide transition-all duration-200',
-                isActive
-                  ? 'border-l-[3px] border-orange-500 bg-orange-50 text-foreground dark:bg-orange-500/10'
-                  : 'border-l-[3px] border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-                collapsed && 'justify-center border-l-0 px-0',
-                collapsed && isActive && 'bg-orange-50 dark:bg-orange-500/10'
-              )
-            }
-          >
-            <Icon className="size-4 shrink-0 transition-colors group-[.border-orange-500]:text-orange-500" />
-            {!collapsed && <span>{t(labelKey)}</span>}
-          </NavLink>
-        ))}
-      </nav>
+      {!isHome && hasModuleNavigation && activeModule ? (
+        <nav className="flex-1 space-y-1 px-2 py-2">
+          {activeModule.topics.map((topic) => {
+            const Icon = topic.icon;
 
-      {/* Bottom links */}
-      <div className="border-t border-border px-2 py-3 space-y-1">
-        <a
-          href="#"
+            return (
+              <NavLink key={topic.id} to={topic.path}>
+                {({ isActive }) => (
+                  <div
+                    className={cn(
+                      "flex h-11 items-center rounded-md px-3 text-sm font-semibold tracking-wide",
+                      isActive
+                        ? "bg-nav-active-bg text-nav-active-fg"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      collapsed ? "justify-center" : "gap-3",
+                    )}
+                  >
+                    <div className="flex size-5 shrink-0 items-center justify-center">
+                      <Icon
+                        className={cn("size-4", getAccentClasses(topic.accent))}
+                      />
+                    </div>
+
+                    {!collapsed && (
+                      <span className="leading-none">{tk(topic.titleKey)}</span>
+                    )}
+                  </div>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+      ) : (
+        <div className="flex-1" />
+      )}
+
+      <div className="border-border space-y-1 border-t px-2 py-3">
+        <Link
+          to="/documentation"
           className={cn(
-            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-            collapsed && 'justify-center px-0'
+            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
+            collapsed ? "justify-center" : "gap-3",
           )}
         >
-          <FileText className="size-4 shrink-0" />
-          {!collapsed && <span>{t('sidebar.documentation')}</span>}
-        </a>
-        <a
-          href="#"
+          <div className="flex size-5 shrink-0 items-center justify-center">
+            <FileText className="size-4" />
+          </div>
+          {!collapsed && (
+            <span className="leading-none">{t("sidebar.documentation")}</span>
+          )}
+        </Link>
+
+        <Link
+          to="/help"
           className={cn(
-            'flex items-center gap-3 rounded-md px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-            collapsed && 'justify-center px-0'
+            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
+            collapsed ? "justify-center" : "gap-3",
           )}
         >
-          <HelpCircle className="size-4 shrink-0" />
-          {!collapsed && <span>{t('sidebar.support')}</span>}
-        </a>
+          <div className="flex size-5 shrink-0 items-center justify-center">
+            <HelpCircle className="size-4" />
+          </div>
+          {!collapsed && (
+            <span className="leading-none">{t("sidebar.support")}</span>
+          )}
+        </Link>
       </div>
     </aside>
-  )
+  );
 }
-

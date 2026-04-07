@@ -1,25 +1,35 @@
 {
+  "app": {
+    "title": "THWS - Traing Center"
+  },
   "nav": {
-    "title": "THEORETICAL COMPUTER SCIENCE",
+    "title": "FUNDAMENTALS OF COMPUTER SCIENCE",
     "home": "TRAINING CENTER"
   },
   "sidebar": {
     "moduleOverview": "MODULE OVERVIEW",
-    "theoreticalCs": "THEORETICAL CS",
     "turingMachines": "TURING MACHINES",
     "finiteAutomata": "FINITE AUTOMATA",
     "numberSystems": "NUMBER SYSTEMS",
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOCUMENTATION",
-    "support": "SUPPORT"
+    "support": "SUPPORT",
+    "toggle": "Toggle sidebar"
   },
   "footer": {
-    "copyright": "© 2026 THWS — Theoretical Computer Science"
+    "copyright": "© 2026 THWS"
   },
   "theme": {
     "light": "Light Mode",
-    "dark": "Dark Mode"
+    "dark": "Dark Mode",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "language": {
+    "select": "Select language",
+    "de": "German",
+    "en": "English"
   },
   "tabs": {
     "overview": "Overview",
@@ -30,7 +40,7 @@
   "home": {
     "heroTitle1": "Master Complex Systems",
     "heroTitle2": "through Interactive Learning.",
-    "heroDescription": "Access the university's official training modules for Theoretical Computer Science, Logic Design, and Discrete Mathematics.",
+    "heroDescription": "Access the university's official training modules for Fundamentals of Computer Science.",
     "selectModule": "SELECT A MODULE",
     "exploreModules": "Explore Available Modules",
     "turingDesc": "Formal models of computation & complexity",
@@ -134,9 +144,74 @@
     "exercise4": "Multi-Variable DNF",
     "exercise4Desc": "Handle expressions with 4+ variables"
   },
+  "exercise": {
+    "label": "Exercise {{index}}",
+    "difficulty": "Difficulty",
+    "currentExercises": "Current Exercises",
+    "openInSimulation": "Open in simulation"
+  },
   "difficulty": {
     "easy": "EASY",
     "medium": "MEDIUM",
     "hard": "HARD"
+  },
+  "simulation": {
+    "taskText": "Task text",
+    "selectedExercise": "Selected exercise",
+    "taskTextPlaceholder": "You can add the concrete task text here later.",
+    "workspace": "Simulation",
+    "expand": "Expand simulation",
+    "exitFocus": "Exit simulation focus",
+    "close": "Close",
+    "emptyStates": {
+      "turing": "The Turing Machine simulator will be available here.",
+      "automata": "The Finite Automata simulator will be available here.",
+      "number": "The Number Systems converter will be available here.",
+      "moore": "The Moore & Mealy simulator will be available here.",
+      "dnf": "The DNF builder / truth table generator will be available here."
+    }
+  },
+  "modules": {
+    "label": "Module",
+    "topicsTitle": "Topics",
+    "fundamentalsCs": {
+      "title": "Fundamentals of Computer Science",
+      "description": "This module bundles the core foundations of Fundamentals of Computer Science. Select a topic to start learning."
+    },
+    "moreComingSoon": "More coming soon",
+    "moreComingSoonDescription": "Additional learning modules will be added in future versions."
+  },
+  "notFound": {
+    "title": "404 – This page does not exist",
+    "description": "The requested URL does not exist, was deleted, or was moved to another location.",
+    "requestedUrl": "Requested URL",
+    "goHome": "Go to homepage",
+    "goBack": "Go back",
+    "hintLabel": "Possible reasons",
+    "reason1": "The address may have been entered incorrectly.",
+    "reason2": "The page may have been removed or renamed.",
+    "reason3": "The link may be outdated or no longer valid."
+  },
+  "documentation": {
+    "label": "Documentation",
+    "title": "Documentation",
+    "description": "Structured information about the platform, the modules, and the learning environment will be available here in the future.",
+    "section1Title": "Platform overview",
+    "section1Text": "This section can serve as an entry point for the structure, navigation, and main features of the application.",
+    "section2Title": "Module notes",
+    "section2Text": "Descriptions, learning goals, and additional notes for the individual modules can be added here later.",
+    "section3Title": "Technical notes",
+    "section3Text": "This section can later contain information about features, limitations, and planned extensions."
+  },
+  "help": {
+    "label": "Help",
+    "title": "Help",
+    "description": "Support content, frequently asked questions, and guidance for common issues will be available here in the future.",
+    "section1Title": "Getting started",
+    "section1Text": "This section can later include short guidance for navigation and the most important application features.",
+    "section2Title": "Support",
+    "section2Text": "This area can later explain where to turn for questions or technical issues.",
+    "section3Title": "Troubleshooting",
+    "section3Text": "This section is intended as a placeholder for common issues, known problems, and simple solutions."
   }
 }

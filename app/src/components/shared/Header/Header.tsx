@@ -1,36 +1,40 @@
-import { HelpCircle } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Link, useLocation } from 'react-router-dom'
-import { ThemeToggle } from '@/components/shared/ThemeToggle/ThemeToggle'
-import { LanguageToggle } from '@/components/shared/LanguageToggle/LanguageToggle'
+import { useTranslation } from "react-i18next";
+import { Link, useLocation } from "react-router-dom";
+import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
+import { LanguageSelect } from "@/components/shared/LanguageSelect/LanguageSelect";
+import ThwsLogo from "@/assets/THWS.svg";
+import { findModuleByPath } from "@/features/modules/catalog";
 
 export function Header() {
-  const { t } = useTranslation()
-  const location = useLocation()
-  const isHome = location.pathname === '/'
+  const { t } = useTranslation();
+  const location = useLocation();
+
+  const tk = (key: string) => t(key as never) as string;
+
+  const activeModule = findModuleByPath(location.pathname);
+
+  const headerLabel: string = activeModule
+    ? tk(activeModule.titleKey)
+    : t("nav.home");
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-background px-5">
-      {/* Left: Logo + Title */}
-      <div className="flex items-center gap-3">
-        <Link to="/" className="text-lg font-extrabold tracking-tight text-foreground">
-          THWS
+    <header className="border-border bg-background flex h-16 items-center justify-between border-b px-6">
+      <div className="flex items-center gap-4">
+        <Link to="/" className="flex shrink-0 items-center">
+          <img src={ThwsLogo} alt="THWS Logo" className="h-9 w-auto" />
         </Link>
-        <div className="h-5 w-px bg-border" />
-        <span className="text-xs font-semibold tracking-widest text-orange-500 uppercase">
-          {isHome ? t('nav.home') : t('nav.title')}
+
+        <div className="bg-border h-7 w-px" />
+
+        <span className="text-foreground text-xl font-bold tracking-tight">
+          {headerLabel}
         </span>
       </div>
 
-      {/* Right: Action Icons */}
-      <div className="flex items-center gap-1">
-        <LanguageToggle />
-        <button className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-          <HelpCircle className="size-4" />
-        </button>
+      <div className="flex items-center gap-2">
+        <LanguageSelect />
         <ThemeToggle />
       </div>
     </header>
-  )
+  );
 }
-

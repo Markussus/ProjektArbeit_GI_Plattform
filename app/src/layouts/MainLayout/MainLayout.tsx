@@ -1,33 +1,26 @@
-import { useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
-import { Header } from '@/components/shared/Header/Header'
-import { Sidebar } from '@/components/shared/Sidebar/Sidebar'
-import { Footer } from '@/components/shared/Footer/Footer'
+import { Outlet } from "react-router-dom";
+import { Header } from "@/components/shared/Header/Header";
+import { Sidebar } from "@/components/shared/Sidebar/Sidebar";
+import { Footer } from "@/components/shared/Footer/Footer";
+import { useUiStore } from "@/store/uiStore";
 
 export function MainLayout() {
-  const location = useLocation()
-  const isHome = location.pathname === '/'
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(isHome)
+  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
+  const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      {/* Header */}
+    <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
       <Header />
 
-      {/* Body: Sidebar + Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed((prev) => !prev)}
-        />
-        <main className="flex-1 overflow-y-auto bg-background">
+        <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+
+        <main className="bg-background flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
-  )
+  );
 }
-

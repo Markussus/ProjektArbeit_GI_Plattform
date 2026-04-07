@@ -1,25 +1,35 @@
 {
+  "app": {
+    "title": "THWS - Traingscenter"
+  },
   "nav": {
-    "title": "THEORETISCHE INFORMATIK",
+    "title": "GRUNDLAGEN DER INFORMATIK",
     "home": "TRAININGSCENTER"
   },
   "sidebar": {
     "moduleOverview": "MODULÜBERSICHT",
-    "theoreticalCs": "THEORETISCHE INFORMATIK",
     "turingMachines": "TURINGMASCHINEN",
     "finiteAutomata": "ENDLICHE AUTOMATEN",
     "numberSystems": "ZAHLENSYSTEME",
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOKUMENTATION",
-    "support": "HILFE"
+    "support": "HILFE",
+    "toggle": "Seitenleiste umschalten"
   },
   "footer": {
-    "copyright": "© 2026 THWS — Theoretische Informatik"
+    "copyright": "© 2026 THWS"
   },
   "theme": {
     "light": "Heller Modus",
-    "dark": "Dunkler Modus"
+    "dark": "Dunkler Modus",
+    "switchToLight": "Zu hellem Modus wechseln",
+    "switchToDark": "Zu dunklem Modus wechseln"
+  },
+  "language": {
+    "select": "Sprache ausw\u00e4hlen",
+    "de": "Deutsch",
+    "en": "Englisch"
   },
   "tabs": {
     "overview": "Übersicht",
@@ -30,7 +40,7 @@
   "home": {
     "heroTitle1": "Komplexe Systeme meistern",
     "heroTitle2": "durch interaktives Lernen.",
-    "heroDescription": "Zugang zu den offiziellen Trainingsmodulen der Hochschule für Theoretische Informatik, Logikdesign und Diskrete Mathematik.",
+    "heroDescription": "Zugang zu den Trainingsmodulen der Hochschule für Grundlagen der Informatik.",
     "selectModule": "MODUL AUSWÄHLEN",
     "exploreModules": "Verfügbare Module erkunden",
     "turingDesc": "Formale Modelle der Berechenbarkeit & Komplexität",
@@ -134,9 +144,74 @@
     "exercise4": "Mehrvariablen-DNF",
     "exercise4Desc": "Behandlung von Ausdrücken mit 4+ Variablen"
   },
+  "exercise": {
+    "label": "Übung {{index}}",
+    "difficulty": "Schwierigkeit",
+    "currentExercises": "Aktuelle Übungen",
+    "openInSimulation": "In Simulation öffnen"
+  },
   "difficulty": {
     "easy": "LEICHT",
     "medium": "MITTEL",
     "hard": "SCHWER"
+  },
+  "simulation": {
+    "taskText": "Aufgabentext",
+    "selectedExercise": "Ausgewählte Übung",
+    "taskTextPlaceholder": "Hier kannst du später den konkreten Aufgabentext einfügen.",
+    "workspace": "Simulation",
+    "expand": "Simulation vergrößern",
+    "exitFocus": "Simulationsfokus verlassen",
+    "close": "Schließen",
+    "emptyStates": {
+      "turing": "Der Turingmaschinen-Simulator wird hier verfügbar sein.",
+      "automata": "Der Automatensimulator wird hier verfügbar sein.",
+      "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
+      "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
+      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein."
+    }
+  },
+  "modules": {
+    "label": "Modul",
+    "topicsTitle": "Themen",
+    "fundamentalsCs": {
+      "title": "Grundlagen der Informatik",
+      "description": "Dieses Modul bündelt die zentralen Grundlagen der Informatik. Wählen Sie ein Thema aus, um mit dem Training zu beginnen."
+    },
+    "moreComingSoon": "Mehr Module folgen bald",
+    "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."
+  },
+  "notFound": {
+    "title": "404 – Diese Seite gibt es nicht",
+    "description": "Die angeforderte URL existiert nicht, wurde gelöscht oder an eine andere Stelle verschoben.",
+    "requestedUrl": "Angeforderte URL",
+    "goHome": "Zur Startseite",
+    "goBack": "Zurück",
+    "hintLabel": "Mögliche Ursachen",
+    "reason1": "Die Adresse wurde falsch eingegeben.",
+    "reason2": "Die Seite wurde entfernt oder umbenannt.",
+    "reason3": "Der Link ist veraltet oder nicht mehr gültig."
+  },
+  "documentation": {
+    "label": "Dokumentation",
+    "title": "Dokumentation",
+    "description": "Hier finden Sie künftig strukturierte Informationen zur Plattform, zu den Modulen und zur Nutzung der Lernumgebung.",
+    "section1Title": "Plattformübersicht",
+    "section1Text": "Dieser Bereich dient als Einstieg in Aufbau, Navigation und zentrale Funktionen der Anwendung.",
+    "section2Title": "Modulhinweise",
+    "section2Text": "Hier können später Beschreibungen, Lernziele und weiterführende Hinweise zu den einzelnen Modulen ergänzt werden.",
+    "section3Title": "Technische Hinweise",
+    "section3Text": "In diesem Abschnitt können später Informationen zu Funktionen, Einschränkungen und geplanten Erweiterungen stehen."
+  },
+  "help": {
+    "label": "Hilfe",
+    "title": "Hilfe",
+    "description": "Hier finden Sie künftig Unterstützung zur Bedienung, häufige Fragen sowie Hilfestellungen bei Problemen.",
+    "section1Title": "Erste Schritte",
+    "section1Text": "Dieser Bereich kann später kurze Hilfen zur Navigation und zur Nutzung der wichtigsten Funktionen enthalten.",
+    "section2Title": "Support",
+    "section2Text": "Hier kann zukünftig erklärt werden, an wen man sich bei Fragen oder technischen Problemen wenden kann.",
+    "section3Title": "Fehlerbehebung",
+    "section3Text": "Dieser Bereich ist als Platzhalter für häufige Probleme, bekannte Fehler und einfache Lösungswege gedacht."
   }
 }

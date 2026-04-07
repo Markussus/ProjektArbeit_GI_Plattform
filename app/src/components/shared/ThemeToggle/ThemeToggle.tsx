@@ -1,17 +1,22 @@
-import { Sun, Moon } from 'lucide-react'
-import { useThemeStore } from '@/store'
+import { Moon, Sun } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/hooks/useTheme";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useThemeStore()
+  const { t } = useTranslation();
+  const { resolvedTheme, toggleTheme } = useTheme();
+
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
+      aria-label={isDark ? t("theme.switchToLight") : t("theme.switchToDark")}
+      title={isDark ? t("theme.light") : t("theme.dark")}
     >
-      {theme === 'light' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
-  )
+  );
 }
-
