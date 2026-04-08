@@ -6,7 +6,7 @@ import {
   getSystemTheme,
   resolveTheme,
   watchSystemTheme,
-} from "@/lib/theme";
+} from "../lib/theme";
 import type { Theme } from "@/store/themeStore";
 
 export function useTheme() {
