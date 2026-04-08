@@ -31,7 +31,7 @@ export function SimulationWorkspace({
                 isFocused ? t("simulation.exitFocus") : t("simulation.expand")
               }
               title={isFocused ? t("simulation.close") : t("simulation.expand")}
-              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 items-center justify-center rounded-md border transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none"
+              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
             >
               {isFocused ? (
                 <X className="size-4" />
@@ -71,7 +71,7 @@ export function SimulationWorkspace({
               isFocused ? t("simulation.exitFocus") : t("simulation.expand")
             }
             title={isFocused ? t("simulation.close") : t("simulation.expand")}
-            className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none"
+            className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
           >
             {isFocused ? (
               <X className="size-4" />

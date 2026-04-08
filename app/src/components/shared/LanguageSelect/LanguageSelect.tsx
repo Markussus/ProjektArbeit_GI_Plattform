@@ -58,7 +58,7 @@ export function LanguageSelect() {
         aria-expanded={isOpen}
         aria-label={t("language.select")}
         className={cn(
-          "border-border bg-background text-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex h-8 items-center gap-2 rounded-md border px-2.5 transition-colors focus-visible:ring-2 focus-visible:outline-none",
+          "border-border bg-background text-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex h-8 items-center gap-2 rounded-md border px-2.5 focus-visible:ring-2 focus-visible:outline-none",
           isOpen && "bg-muted/70",
         )}
       >
@@ -91,7 +91,7 @@ export function LanguageSelect() {
                 aria-selected={isActive}
                 onClick={() => handleSelect(language)}
                 className={cn(
-                  "hover:bg-muted focus-visible:ring-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none",
+                  "hover:bg-muted focus-visible:ring-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:outline-none",
                   isActive && "bg-muted",
                 )}
               >

@@ -57,7 +57,7 @@ export function ExerciseCard({
         aria-expanded={isSelected}
         aria-controls={detailsId}
         className={cn(
-          "hover:bg-muted/50 focus-visible:ring-ring flex w-full items-center gap-4 p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none",
+          "hover:bg-muted/50 focus-visible:ring-ring flex w-full items-center gap-4 p-4 text-left focus-visible:ring-2 focus-visible:outline-none",
           isSelected && "bg-muted/30",
         )}
       >
