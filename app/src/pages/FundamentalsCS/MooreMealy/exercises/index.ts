@@ -1,5 +1,5 @@
 import { ArrowRightLeft, Repeat, ToggleLeft, ToggleRight } from "lucide-react";
-import type { ExerciseDefinition } from "@/features/modules/types";
+import type { ExerciseDefinition } from "@/types/exercise";
 
 export const mooreMealyExercises: ExerciseDefinition[] = [
   {

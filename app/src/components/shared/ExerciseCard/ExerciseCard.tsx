@@ -1,15 +1,8 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import type { LucideIcon } from "lucide-react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface Exercise {
-  title: string;
-  description: string;
-  difficulty: "easy" | "medium" | "hard";
-  icon: LucideIcon;
-}
+import type { Exercise } from "@/types/exercise";
 
 interface ExerciseCardProps {
   exercise: Exercise;

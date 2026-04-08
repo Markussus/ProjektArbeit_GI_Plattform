@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ClipboardList } from "lucide-react";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
-import type { ExerciseDefinition } from "./types";
+import type { Exercise, ExerciseDefinition } from "@/types/exercise";
 
 interface TopicExercisesTabProps {
   exercises: ExerciseDefinition[];

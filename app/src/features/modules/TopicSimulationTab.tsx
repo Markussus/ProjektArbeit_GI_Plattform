@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { SimulationWorkspace } from "@/components/shared/SimulationWorkspace/SimulationWorkspace";
+import type { Exercise } from "@/types/exercise";
 
 interface TopicSimulationTabProps {
   emptyStateTextKey: string;

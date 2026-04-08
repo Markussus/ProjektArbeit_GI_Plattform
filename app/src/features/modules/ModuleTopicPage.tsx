@@ -1,12 +1,12 @@
 import type { ComponentType } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
+import type { Exercise } from "@/types/exercise";
 
 export interface ModuleExercisesTabProps {
   selectedExercise: Exercise | null;

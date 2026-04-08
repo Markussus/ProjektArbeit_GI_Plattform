@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
+import type { Exercise } from "@/types/exercise";
 
 export type ModuleTabId = "overview" | "exercises" | "examples" | "simulation";
 

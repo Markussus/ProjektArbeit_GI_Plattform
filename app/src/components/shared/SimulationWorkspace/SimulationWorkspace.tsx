@@ -1,7 +1,7 @@
 import { Maximize2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { cn } from "@/lib/utils";
+import type { Exercise } from "@/types/exercise";
 
 interface SimulationWorkspaceProps {
   selectedExercise: Exercise | null;

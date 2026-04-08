@@ -1,5 +1,5 @@
 import { Braces, Link2, MonitorPlay, Target } from "lucide-react";
-import type { ExerciseDefinition } from "@/features/modules/types";
+import type { ExerciseDefinition } from "@/types/exercise";
 
 export const turingMachineExercises: ExerciseDefinition[] = [
   {
