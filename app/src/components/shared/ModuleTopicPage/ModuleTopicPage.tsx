@@ -7,6 +7,7 @@ import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
 import type { Exercise } from "@/types/exercise";
+import type { TranslationKey } from "@/types/i18n";
 
 export interface ModuleExercisesTabProps {
   selectedExercise: Exercise | null;
@@ -21,8 +22,8 @@ export interface ModuleSimulationTabProps {
 }
 
 interface ModuleTopicPageProps {
-  titleKey: string;
-  descriptionKey: string;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
   examplesTab: ComponentType;
@@ -40,7 +41,6 @@ export function ModuleTopicPage({
   tabs,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
   const {
@@ -77,7 +77,7 @@ export function ModuleTopicPage({
       )}
     >
       {!isSimulationFocused && (
-        <PageIntro title={tk(titleKey)} description={tk(descriptionKey)} />
+        <PageIntro title={t(titleKey)} description={t(descriptionKey)} />
       )}
 
       <TabNavigation

@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { ClipboardList } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { Exercise, ExerciseDefinition } from "@/types/exercise";
 
@@ -17,11 +17,10 @@ export function TopicExercisesTab({
   onOpenExerciseInSimulation,
 }: TopicExercisesTabProps) {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
 
   const translatedExercises: Exercise[] = exercises.map((exercise) => ({
-    title: tk(exercise.titleKey),
-    description: tk(exercise.descriptionKey),
+    title: t(exercise.titleKey),
+    description: t(exercise.descriptionKey),
     difficulty: exercise.difficulty,
     icon: exercise.icon,
   }));

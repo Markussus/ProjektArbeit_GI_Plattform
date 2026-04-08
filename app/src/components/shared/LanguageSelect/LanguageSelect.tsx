@@ -7,10 +7,16 @@ import {
   supportedLanguages,
   type SupportedLanguage,
 } from "@/i18n/languages";
+import type { TranslationKey } from "@/types/i18n";
 
 const languageLabels: Record<SupportedLanguage, string> = {
   de: "DE",
   en: "EN",
+};
+
+const languageTranslationKeys: Record<SupportedLanguage, TranslationKey> = {
+  de: "language.de",
+  en: "language.en",
 };
 
 export function LanguageSelect() {
@@ -100,7 +106,7 @@ export function LanguageSelect() {
                     {languageLabels[language]}
                   </span>
                   <span className="text-muted-foreground text-xs">
-                    {t(`language.${language}` as never)}
+                    {t(languageTranslationKeys[language])}
                   </span>
                 </div>
 

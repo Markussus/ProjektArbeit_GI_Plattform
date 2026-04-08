@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { FileText, HelpCircle, Menu } from "lucide-react";
+import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalog";
 import { cn } from "@/lib/utils";
-import { findModuleByPath, type TopicAccent } from "@/features/modules/catalog";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -22,7 +22,6 @@ function getAccentClasses(accent: TopicAccent) {
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const tk = (key: string) => t(key as never);
 
   const isHome = location.pathname === "/";
 
@@ -62,7 +61,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               isModuleOverview ? "text-brand" : "text-foreground",
             )}
           >
-            {tk(activeModule.titleKey)}
+            {t(activeModule.titleKey)}
           </NavLink>
         </div>
       )}
@@ -91,7 +90,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     </div>
 
                     {!collapsed && (
-                      <span className="leading-none">{tk(topic.titleKey)}</span>
+                      <span className="leading-none">{t(topic.titleKey)}</span>
                     )}
                   </div>
                 )}

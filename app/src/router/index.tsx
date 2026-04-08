@@ -5,7 +5,7 @@ import { FundamentalsCSPage } from "@/pages/FundamentalsCS/FundamentalsCSPage";
 import { DocumentationPage } from "@/pages/Documentation/DocumentationPage";
 import { HelpPage } from "@/pages/Help/HelpPage";
 import { NotFoundPage } from "@/pages/NotFound/NotFoundPage";
-import { learningTopicRoutes } from "@/features/modules/catalog";
+import { learningTopicRoutes } from "@/data/moduleCatalog";
 
 export const router = createBrowserRouter([
   {

@@ -1,4 +1,4 @@
-import { ModuleTopicPage } from "@/features/modules/ModuleTopicPage";
+import { ModuleTopicPage } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { ExamplesTab } from "./components/ExamplesTab";
 import { ExercisesTab } from "./components/ExercisesTab";
 import { OverviewTab } from "./components/OverviewTab";

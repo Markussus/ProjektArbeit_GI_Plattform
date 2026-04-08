@@ -2,179 +2,204 @@
 
 ## Purpose
 
-This document explains the architectural structure of the application, the reasons behind the chosen abstractions, and the expected extension workflow for new topics, exercises, and languages.
+This document describes the current structure of the application and the intended dependency direction.
 
-The main architectural goal is modularity without unnecessary abstraction.
+The project now follows a simpler separation:
 
-## Goals
+* shared UI and shared page shells live in `components/shared`
+* central module/topic registration lives in `data`
+* topic-owned educational content stays in `pages/FundamentalsCS/<Topic>`
+* hooks, store, router, and i18n remain cross-cutting infrastructure
 
-The architecture is designed to support:
+The important constraint is:
 
-* modular learning topics
-* consistent layouts and interaction patterns
-* low coupling between routing, navigation, and topic content
-* clear separation between reusable UI, orchestration logic, and educational content
-* scalable internationalization
-* straightforward extension with new topics and future modules
+* the topic-specific `ExercisesTab.tsx` and `SimulationTab.tsx` files remain inside each topic folder
 
-## Design Principles
-
-The project follows these principles:
-
-* single source of truth for registrations and configuration
-* content stays close to the topic that owns it
-* shared behavior is abstracted once and reused
-* presentational UI is separated from domain content
-* user-facing text belongs to i18n resources, not to reusable components
-* abstractions are introduced only when they remove real duplication or reduce coupling
+They are intentionally kept as thin topic binding files, even though they mostly forward into shared components.
 
 ## Source Structure
 
 ```text
 app/src/
-  components/shared/              # generic reusable UI building blocks
-  features/modules/               # shared module-specific orchestration
+  components/shared/              # reusable UI and reusable page shells
+  data/                           # central registries and route-backed metadata
   hooks/                          # reusable state logic
-  i18n/                           # language bootstrap and language registry
-  layouts/                        # top-level route layouts
+  i18n/                           # i18n bootstrap and locale resources
+  layouts/                        # top-level layouts
   pages/                          # route pages and topic-owned content
-  router/                         # top-level router setup
-  store/                          # global cross-cutting UI state
+  router/                         # router setup
+  store/                          # small global UI state
+  types/                          # shared domain and typing helpers
 ```
 
 Topic-owned content currently lives under:
 
 ```text
 app/src/pages/FundamentalsCS/<Topic>/
-  components/                     # topic-specific UI/content blocks
-  exercises/                      # exercise definitions for this topic
-  <Topic>Page.tsx                 # route page bound to the shared topic shell
+  components/
+    ExercisesTab.tsx              # topic-owned binding for exercises
+    SimulationTab.tsx             # topic-owned binding for simulation
+    OverviewTab.tsx               # topic-specific overview UI
+    ExamplesTab.tsx               # topic-specific examples UI
+  exercises/
+    index.ts                      # topic exercise definitions
+  <Topic>Page.tsx                 # topic route page
 ```
 
-## Layers And Responsibilities
+## Responsibilities
 
-### Shared UI Layer
+### `components/shared`
 
-`components/shared/` contains UI that is generic and not owned by one specific learning topic.
-
-Examples:
-
-* header, footer, sidebar
-* page intro blocks
-* card grids
-* exercise cards
-* simulation workspace
-* tab navigation
-
-These components may receive translated content or translated domain objects, but should not contain topic-specific educational text.
-
-### Module Feature Layer
-
-`features/modules/` contains shared orchestration for learning modules and topics.
+This folder contains generic UI and reusable page-level shells.
 
 Examples:
 
-* module catalog
-* module overview page shell
-* topic page shell
-* generic exercises tab renderer
-* generic simulation tab renderer
+* `Header`, `Footer`, `Sidebar`
+* `PageIntro`, `InfoCardGrid`, `ExerciseCard`, `TabNavigation`
+* `SimulationWorkspace`
+* `ModuleOverviewPage`
+* `ModuleTopicPage`
+* `TopicExercisesTab`
+* `TopicSimulationTab`
 
-This layer exists because the application has repeated module and topic behavior that should not be reimplemented per topic.
+These components are shared across multiple topics or routes.
 
-### Topic Layer
+### `data`
 
-Each topic folder owns its educational content and topic-specific UI.
+This folder contains centralized registration and lookup data.
 
-Examples:
+Current file:
 
-* overview text and concept presentation
-* example content
-* simulator wrapper configuration
-* exercise definitions
+* `app/src/data/moduleCatalog.tsx`
 
-This keeps educational content close to the owning domain and avoids creating a large unrelated central content directory.
-
-## Standardized Page Patterns
-
-The application uses explicit shared page patterns to keep the UI and architecture consistent.
-
-### Topic Pages
-
-All topics use the same interaction shell:
-
-* page intro
-* tab navigation
-* overview
-* exercises
-* examples
-* simulation
-
-This shell is implemented in:
-
-* `app/src/features/modules/ModuleTopicPage.tsx`
-
-Reason:
-
-* all topics share the same interaction model
-* local topic folders should focus on content, not repeated state orchestration
-* the shell keeps tab handling, exercise selection, and simulation focus behavior consistent
-
-### Module Overview Pages
-
-Module landing pages use a shared overview pattern implemented in:
-
-* `app/src/features/modules/ModuleOverviewPage.tsx`
-
-Reason:
-
-* module pages repeat the same structure: intro plus topic list
-* topic navigation should be generated from the same data model used by the router and sidebar
-* this ensures that every module overview behaves consistently
-
-### Informational Pages
-
-Documentation and support-like pages use shared presentational building blocks:
-
-* `app/src/components/shared/PageIntro/PageIntro.tsx`
-* `app/src/components/shared/InfoCardGrid/InfoCardGrid.tsx`
-
-Reason:
-
-* these pages share layout structure but not module-specific behavior
-* a full "one generic page for everything" abstraction would be too broad
-* small composable UI abstractions give reuse without hiding intent
-
-## Module Catalog
-
-The central source of truth for registered learning modules is:
-
-* `app/src/features/modules/catalog.tsx`
-
-The catalog defines:
+It is the single source of truth for:
 
 * module metadata
 * topic metadata
-* route elements for topics
-* lookup logic for the current module
+* route elements
+* navigation lookups
 
-This prevents duplicated registration across:
+Although the registry contains `ReactElement`s, it is still configuration/registration and therefore belongs in `data`, not in a topic page folder.
 
-* router configuration
-* sidebar navigation
-* header context
-* module overview pages
+### `pages`
 
-### Why This Was Chosen
+Each topic folder owns the content that is truly specific to that topic.
 
-Without a central catalog, every new topic would need to be wired manually in multiple unrelated files.
+Examples:
 
-With the catalog:
+* overview text structure
+* example content
+* exercise definitions
+* topic-specific simulation binding
 
-* registration is localized
-* navigation stays consistent
-* route setup is less error-prone
-* the architecture is easier to explain and justify
+The `ExercisesTab.tsx` and `SimulationTab.tsx` files stay here on purpose.
+
+Reason:
+
+* this gives each topic one explicit place to bind shared shells to topic content
+* future topic-specific simulation logic can be added there without changing shared architecture
+* the wrapper location makes ownership obvious
+
+### `types`
+
+Shared types live centrally in `types`.
+
+Current examples:
+
+* `app/src/types/exercise.ts`
+* `app/src/types/i18n.ts`
+
+This avoids the wrong dependency direction where feature or domain types are derived from UI component files.
+
+## Shared Topic Pattern
+
+All topics use the same shared shell:
+
+* `app/src/components/shared/ModuleTopicPage/ModuleTopicPage.tsx`
+
+That shell owns:
+
+* intro rendering
+* tab state
+* exercise selection
+* "open in simulation" flow
+* simulation focus mode
+
+But the topic folder still owns the bindings:
+
+* `components/ExercisesTab.tsx`
+* `components/SimulationTab.tsx`
+
+So the shared orchestration is centralized without removing the topic-level integration points.
+
+## Shared Module Overview Pattern
+
+Module landing pages use:
+
+* `app/src/components/shared/ModuleOverviewPage/ModuleOverviewPage.tsx`
+
+This component renders:
+
+* intro
+* topic list
+* links generated from the central registry
+
+## Simulation Architecture
+
+The simulation frame lives in:
+
+* `app/src/components/shared/SimulationWorkspace/SimulationWorkspace.tsx`
+
+It now accepts `children`.
+
+That means a topic-specific simulation can be passed from:
+
+* `app/src/pages/FundamentalsCS/<Topic>/components/SimulationTab.tsx`
+
+Current intended flow:
+
+1. the topic wrapper receives the shared simulation props
+2. it forwards them to `TopicSimulationTab`
+3. it may optionally provide topic-specific simulation UI as `children`
+4. `SimulationWorkspace` renders the shared frame and the topic-specific child area
+
+This keeps the simulator slot topic-owned without duplicating the common layout.
+
+## Exercise Architecture
+
+Exercise definitions live per topic in:
+
+* `app/src/pages/FundamentalsCS/<Topic>/exercises/index.ts`
+
+The shared exercise rendering lives in:
+
+* `app/src/components/shared/TopicExercisesTab/TopicExercisesTab.tsx`
+
+The topic-specific wrapper remains in:
+
+* `app/src/pages/FundamentalsCS/<Topic>/components/ExercisesTab.tsx`
+
+This is intentional because the topic still owns the decision of which exercise list is bound into the shared renderer.
+
+## Internationalization
+
+Translations live in:
+
+* `app/src/i18n/locales/de/translation.json`
+* `app/src/i18n/locales/en/translation.json`
+
+Shared translation key typing lives in:
+
+* `app/src/types/i18n.ts`
+
+This is used for:
+
+* module titles and descriptions
+* topic titles and descriptions
+* exercise translation keys
+* simulation empty-state keys
+
+The goal is to pass typed translation keys instead of untyped `string` values wherever possible.
 
 ## Routing
 
@@ -182,135 +207,39 @@ Top-level routing remains in:
 
 * `app/src/router/index.tsx`
 
-Topic routes are generated from the module catalog instead of being manually duplicated in the router.
+Topic routes are generated from:
 
-This makes the router simpler and reduces the risk of missing a route when a new topic is added.
+* `app/src/data/moduleCatalog.tsx`
 
-## Exercise Content Model
-
-Exercise data is stored per topic in:
-
-* `app/src/pages/FundamentalsCS/<Topic>/exercises/index.ts`
-
-These files contain structured exercise definitions:
-
-* translation keys for title
-* translation keys for description
-* difficulty
-* icon
-
-The shared rendering logic lives in:
-
-* `app/src/features/modules/TopicExercisesTab.tsx`
-
-### Why Exercises Were Extracted
-
-Before the refactor, exercise definitions lived directly inside UI components.
-
-That caused two problems:
-
-* educational content and rendering logic were mixed together
-* the same rendering structure was repeated in every topic
-
-The current structure is preferable because:
-
-* exercises are now topic content, not component implementation detail
-* rendering is reused centrally
-* translation keys stay consistent with the i18n strategy
-
-### Why One File Per Topic Is Currently Preferred
-
-Each topic currently has a small, closely related set of exercises.
-
-Because of that, one `exercises/index.ts` file per topic is the best tradeoff:
-
-* easy to find
-* low file overhead
-* no unnecessary fragmentation
-
-If one topic later grows significantly, the `exercises/` folder can be split further, for example:
-
-```text
-exercises/
-  basics.ts
-  conversions.ts
-  advanced.ts
-  index.ts
-```
-
-That split should only happen when the topic size justifies it.
-
-## Internationalization
-
-All user-facing text should live in:
-
-* `app/src/i18n/locales/de/translation.json`
-* `app/src/i18n/locales/en/translation.json`
-
-This includes:
-
-* page headings
-* shared component labels
-* exercise titles and descriptions
-* simulator empty states
-* control labels
-
-Best practice in this project:
-
-* store translation keys inside topic content definitions
-* translate at the UI boundary
-* avoid hardcoded display strings in shared components
-
-## Language Handling
-
-The supported languages are registered centrally in:
-
-* `app/src/i18n/languages.ts`
-
-The language UI is implemented as a dropdown in:
-
-* `app/src/components/shared/LanguageSelect/LanguageSelect.tsx`
-
-### Why A Dropdown Was Chosen
-
-The previous implementation was a toggle between two languages.
-
-That works only as long as exactly two languages exist.
-
-A dropdown is a better architectural choice because:
-
-* it scales to more languages without redesign
-* it makes the current language explicit
-* it keeps the control stable when more locales are added later
+This avoids duplicate registration across router, sidebar, header, and module overview pages.
 
 ## Global State
 
-Global state is intentionally small and reserved for cross-cutting UI concerns.
+Global state remains intentionally small.
 
 Current shared state:
 
-* theme selection
+* theme
 * sidebar collapsed state
 
-Topic-specific interaction state stays local to the topic page shell unless there is a clear reason to share it globally.
-
-This keeps the store focused and avoids unnecessary coupling between unrelated pages.
+Topic-specific state stays local to the shared topic shell and topic hooks unless there is a real need to globalize it.
 
 ## How To Add A New Topic
 
 Recommended workflow:
 
-1. Create the topic folder under `app/src/pages/FundamentalsCS/<Topic>/`.
-2. Add topic-specific components in `components/`.
-3. Add exercise definitions in `exercises/index.ts`.
-4. Create `<Topic>Page.tsx` and bind the topic to `ModuleTopicPage`.
-5. Register the topic once in `app/src/features/modules/catalog.tsx`.
-6. Add all required translation keys in both locale files.
+1. Create `app/src/pages/FundamentalsCS/<Topic>/`.
+2. Add topic-specific overview and examples in `components/`.
+3. Add `components/ExercisesTab.tsx` and `components/SimulationTab.tsx`.
+4. Add exercise definitions in `exercises/index.ts`.
+5. Create `<Topic>Page.tsx` using the shared `ModuleTopicPage`.
+6. Register the topic once in `app/src/data/moduleCatalog.tsx`.
+7. Add all required translation keys in both locale files.
 
-Minimal page example:
+Minimal page pattern:
 
 ```tsx
-import { ModuleTopicPage } from "@/features/modules/ModuleTopicPage";
+import { ModuleTopicPage } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { ExamplesTab } from "./components/ExamplesTab";
 import { ExercisesTab } from "./components/ExercisesTab";
 import { OverviewTab } from "./components/OverviewTab";
@@ -330,80 +259,14 @@ export function ExampleTopicPage() {
 }
 ```
 
-Minimal catalog registration:
+## Summary
 
-```tsx
-{
-  id: "example-topic",
-  titleKey: "example.title",
-  descriptionKey: "example.description",
-  path: "/fundamentals-cs/example-topic",
-  icon: SomeIcon,
-  accent: "blue",
-  element: <ExampleTopicPage />,
-}
-```
+The important architectural decisions are:
 
-## How To Add New Exercises To A Topic
+* central module registry in `data/moduleCatalog.tsx`
+* shared shells in `components/shared`
+* topic-owned binding files kept inside `pages/FundamentalsCS/<Topic>/components`
+* topic-local exercise definitions
+* typed translation keys instead of ad-hoc string casts where possible
 
-Recommended workflow:
-
-1. Open `app/src/pages/FundamentalsCS/<Topic>/exercises/index.ts`.
-2. Add a new exercise definition object.
-3. Add the corresponding translation keys in `de` and `en`.
-4. Do not change the shared exercise renderer unless the behavior itself must change for all topics.
-
-Example:
-
-```ts
-{
-  titleKey: "example.exercise5",
-  descriptionKey: "example.exercise5Desc",
-  difficulty: "medium",
-  icon: SomeIcon,
-}
-```
-
-Then add:
-
-* `example.exercise5`
-* `example.exercise5Desc`
-
-to both translation files.
-
-## How To Add A New Language
-
-Recommended workflow:
-
-1. Create a new locale file under `app/src/i18n/locales/`.
-2. Register the locale in `app/src/i18n/index.ts`.
-3. Add the language code to `app/src/i18n/languages.ts`.
-4. Ensure the translations required by shared components are present.
-
-Because the language selector uses the centralized supported language list, the dropdown will then expose the new language automatically.
-
-## Tradeoffs And Boundaries
-
-The current structure intentionally keeps topics under `pages/FundamentalsCS/` because the project currently represents one course family with multiple topics.
-
-This is a pragmatic choice for the current scope because it balances:
-
-* readability
-* low refactor risk
-* modularity
-* maintainability
-
-If the application later expands into multiple separate course families, a broader structure such as `pages/<ModuleFamily>/...` or a more feature-centric multi-module organization may become worthwhile.
-
-## Summary Of The Main Architectural Decisions
-
-The most important decisions are:
-
-* one central module catalog for routing and navigation
-* one shared topic shell for all learning topics
-* one shared module overview shell for all module landing pages
-* topic-local exercise definitions with shared rendering
-* reusable page intro and info-grid components for consistent informational layouts
-* centralized language registry with a dropdown-based language selector
-
-These decisions were chosen because they increase consistency and modularity while keeping the structure understandable for a student project.
+This keeps the codebase explicit, easier to navigate, and easier to extend without hiding topic ownership.

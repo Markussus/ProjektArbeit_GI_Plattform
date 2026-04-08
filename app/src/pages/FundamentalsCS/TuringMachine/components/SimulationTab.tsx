@@ -1,5 +1,5 @@
-import type { ModuleSimulationTabProps } from "@/features/modules/ModuleTopicPage";
-import { TopicSimulationTab } from "@/features/modules/TopicSimulationTab";
+import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   return (

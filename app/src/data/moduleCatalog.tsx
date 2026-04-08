@@ -13,13 +13,14 @@ import { FiniteAutomataPage as FiniteAutomataTopicPage } from "@/pages/Fundament
 import { MooreMealyPage as MooreMealyTopicPage } from "@/pages/FundamentalsCS/MooreMealy/MooreMealyPage";
 import { NumberSystemsPage as NumberSystemsTopicPage } from "@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage";
 import { TuringMachinePage as TuringMachineTopicPage } from "@/pages/FundamentalsCS/TuringMachine/TuringMachinePage";
+import type { TranslationKey } from "@/types/i18n";
 
 export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
 export interface ModuleTopicDefinition {
   id: string;
-  titleKey: string;
-  descriptionKey?: string;
+  titleKey: TranslationKey;
+  descriptionKey?: TranslationKey;
   path: string;
   icon: LucideIcon;
   accent: TopicAccent;
@@ -28,8 +29,8 @@ export interface ModuleTopicDefinition {
 
 export interface LearningModuleDefinition {
   id: string;
-  titleKey: string;
-  descriptionKey: string;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
   path: string;
   icon: LucideIcon;
   topics: ModuleTopicDefinition[];

@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { TranslationKey } from "@/types/i18n";
 
 export type ExerciseDifficulty = "easy" | "medium" | "hard";
 
@@ -10,8 +11,8 @@ export interface Exercise {
 }
 
 export interface ExerciseDefinition {
-  titleKey: string;
-  descriptionKey: string;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
   difficulty: ExerciseDifficulty;
   icon: LucideIcon;
 }

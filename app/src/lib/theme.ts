@@ -83,7 +83,3 @@ export function watchSystemTheme(
     mediaQuery.removeEventListener("change", handleChange);
   };
 }
-
-export function getInitialTheme(): Theme {
-  return getStoredTheme();
-}

@@ -1,4 +1,4 @@
-import { ModuleOverviewPage } from "@/features/modules/ModuleOverviewPage";
+import { ModuleOverviewPage } from "@/components/shared/ModuleOverviewPage/ModuleOverviewPage";
 
 export function FundamentalsCSPage() {
   return <ModuleOverviewPage moduleId="fundamentals-cs" />;
