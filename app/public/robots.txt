@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /fundamentals-cs/
+Disallow: /documentation
+Disallow: /help

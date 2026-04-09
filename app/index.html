@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trainings Center</title>
+
+    <script>
+      (() => {
+        try {
+          // Apply the persisted theme before React mounts to avoid a light/dark flash.
+          const storageKey = "theme-storage";
+          const raw = localStorage.getItem(storageKey);
+
+          let theme = "system";
+
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const storedTheme = parsed?.state?.theme;
+
+            if (
+              storedTheme === "light" ||
+              storedTheme === "dark" ||
+              storedTheme === "system"
+            ) {
+              theme = storedTheme;
+            }
+          }
+
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          const resolvedTheme =
+            theme === "system" ? (prefersDark ? "dark" : "light") : theme;
+
+          document.documentElement.classList.toggle(
+            "dark",
+            resolvedTheme === "dark",
+          );
+          document.documentElement.style.colorScheme = resolvedTheme;
+        } catch {
+          // ignore
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

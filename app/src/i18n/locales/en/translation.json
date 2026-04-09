@@ -1,0 +1,217 @@
+{
+  "app": {
+    "title": "THWS - Traing Center"
+  },
+  "nav": {
+    "title": "FUNDAMENTALS OF COMPUTER SCIENCE",
+    "home": "TRAINING CENTER"
+  },
+  "sidebar": {
+    "moduleOverview": "MODULE OVERVIEW",
+    "turingMachines": "TURING MACHINES",
+    "finiteAutomata": "FINITE AUTOMATA",
+    "numberSystems": "NUMBER SYSTEMS",
+    "mooreMealy": "MOORE & MEALY",
+    "dnf": "DNF",
+    "documentation": "DOCUMENTATION",
+    "support": "SUPPORT",
+    "toggle": "Toggle sidebar"
+  },
+  "footer": {
+    "copyright": "© 2026 THWS"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "language": {
+    "select": "Select language",
+    "de": "German",
+    "en": "English"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "exercises": "Exercises",
+    "examples": "Examples",
+    "simulation": "Simulation"
+  },
+  "home": {
+    "heroTitle1": "Master Complex Systems",
+    "heroTitle2": "through Interactive Learning.",
+    "heroDescription": "Access the university's official training modules for Fundamentals of Computer Science.",
+    "selectModule": "SELECT A MODULE",
+    "exploreModules": "Explore Available Modules",
+    "turingDesc": "Formal models of computation & complexity",
+    "automataDesc": "Deterministic and non-deterministic machines",
+    "numberDesc": "Binary, Octal, Hexadecimal & Float logic",
+    "mooreDesc": "Sequential circuit design & state machines",
+    "dnfDesc": "Disjunctive Normal Form & boolean algebra"
+  },
+  "turing": {
+    "title": "Turing Machines",
+    "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed.",
+    "overviewTitle": "What is a Turing Machine?",
+    "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
+    "concepts": "Key Concepts",
+    "concept1": "Tape & Head Movement",
+    "concept2": "States & Transitions",
+    "concept3": "Acceptance & Rejection",
+    "concept4": "Church-Turing Thesis",
+    "exercise1": "Basic Transition",
+    "exercise1Desc": "Design a simple TM transition table",
+    "exercise2": "2-Tape TM Design",
+    "exercise2Desc": "Build a multi-tape Turing Machine",
+    "exercise3": "Busy Beaver Problem",
+    "exercise3Desc": "Find the maximum output for n-state TMs",
+    "exercise4": "The Halting Problem",
+    "exercise4Desc": "Prove undecidability of the halting problem"
+  },
+  "automata": {
+    "title": "Finite Automata",
+    "description": "Study deterministic and non-deterministic finite automata. Learn how to design, minimize, and convert between different automata representations.",
+    "overviewTitle": "What are Finite Automata?",
+    "overviewText": "Finite Automata are the simplest computational models used to recognize patterns. They consist of states, transitions, and accept/reject decisions. DFAs and NFAs form the foundation for lexical analysis, pattern matching, and regular expression engines.",
+    "concepts": "Key Concepts",
+    "concept1": "DFA & NFA",
+    "concept2": "Regular Languages",
+    "concept3": "State Minimization",
+    "concept4": "NFA to DFA Conversion",
+    "exercise1": "Build a DFA",
+    "exercise1Desc": "Create a DFA that accepts strings ending in '01'",
+    "exercise2": "NFA Design",
+    "exercise2Desc": "Design an NFA for a given regular expression",
+    "exercise3": "Minimize a DFA",
+    "exercise3Desc": "Remove unreachable and equivalent states",
+    "exercise4": "NFA to DFA",
+    "exercise4Desc": "Convert using subset construction"
+  },
+  "number": {
+    "title": "Number Systems",
+    "description": "Master conversions between Binary, Octal, Decimal, and Hexadecimal. Understand IEEE 754 floating-point representation.",
+    "overviewTitle": "Why Number Systems Matter",
+    "overviewText": "Number systems are fundamental to how computers store and process data. Understanding binary, octal, and hexadecimal representations is essential for low-level programming, networking, and digital design.",
+    "concepts": "Key Concepts",
+    "concept1": "Binary (Base-2)",
+    "concept2": "Octal (Base-8)",
+    "concept3": "Hexadecimal (Base-16)",
+    "concept4": "IEEE 754 Floating Point",
+    "exercise1": "Binary Conversion",
+    "exercise1Desc": "Convert decimal numbers to binary and back",
+    "exercise2": "Hex Arithmetic",
+    "exercise2Desc": "Perform addition and subtraction in hexadecimal",
+    "exercise3": "IEEE 754 Encoding",
+    "exercise3Desc": "Encode decimal numbers in IEEE 754 format",
+    "exercise4": "Mixed Base Challenge",
+    "exercise4Desc": "Convert between arbitrary number bases"
+  },
+  "moore": {
+    "title": "Moore & Mealy Machines",
+    "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",
+    "overviewTitle": "Moore vs. Mealy",
+    "overviewText": "Moore and Mealy machines are finite state machines with output. In Moore machines, output depends only on the current state. In Mealy machines, output depends on both the current state and the current input. Both are fundamental to digital circuit design.",
+    "concepts": "Key Concepts",
+    "concept1": "Moore Machine Output",
+    "concept2": "Mealy Machine Output",
+    "concept3": "State Diagrams",
+    "concept4": "Moore ↔ Mealy Conversion",
+    "exercise1": "Design a Moore Machine",
+    "exercise1Desc": "Create a sequence detector as Moore machine",
+    "exercise2": "Design a Mealy Machine",
+    "exercise2Desc": "Create a sequence detector as Mealy machine",
+    "exercise3": "Moore to Mealy",
+    "exercise3Desc": "Convert a Moore machine to equivalent Mealy",
+    "exercise4": "Mealy to Moore",
+    "exercise4Desc": "Convert a Mealy machine to equivalent Moore"
+  },
+  "dnf": {
+    "title": "Disjunctive Normal Form",
+    "description": "Learn to convert boolean expressions into DNF. Practice with truth tables, Karnaugh maps, and logical simplification techniques.",
+    "overviewTitle": "What is DNF?",
+    "overviewText": "Disjunctive Normal Form (DNF) is a standardized way of writing boolean expressions as a disjunction (OR) of conjunctions (AND). Every boolean function can be expressed in DNF, making it a universal representation for logical circuits and decision-making systems.",
+    "concepts": "Key Concepts",
+    "concept1": "Minterms & Maxterms",
+    "concept2": "Truth Tables",
+    "concept3": "Karnaugh Maps",
+    "concept4": "Boolean Simplification",
+    "exercise1": "Truth Table to DNF",
+    "exercise1Desc": "Derive the DNF from a given truth table",
+    "exercise2": "Karnaugh Map",
+    "exercise2Desc": "Simplify a boolean function using K-maps",
+    "exercise3": "DNF to Circuit",
+    "exercise3Desc": "Draw the logic circuit for a given DNF",
+    "exercise4": "Multi-Variable DNF",
+    "exercise4Desc": "Handle expressions with 4+ variables"
+  },
+  "exercise": {
+    "label": "Exercise {{index}}",
+    "difficulty": "Difficulty",
+    "currentExercises": "Current Exercises",
+    "openInSimulation": "Open in simulation"
+  },
+  "difficulty": {
+    "easy": "EASY",
+    "medium": "MEDIUM",
+    "hard": "HARD"
+  },
+  "simulation": {
+    "taskText": "Task text",
+    "selectedExercise": "Selected exercise",
+    "taskTextPlaceholder": "You can add the concrete task text here later.",
+    "workspace": "Simulation",
+    "expand": "Expand simulation",
+    "exitFocus": "Exit simulation focus",
+    "close": "Close",
+    "emptyStates": {
+      "turing": "The Turing Machine simulator will be available here.",
+      "automata": "The Finite Automata simulator will be available here.",
+      "number": "The Number Systems converter will be available here.",
+      "moore": "The Moore & Mealy simulator will be available here.",
+      "dnf": "The DNF builder / truth table generator will be available here."
+    }
+  },
+  "modules": {
+    "label": "Module",
+    "topicsTitle": "Topics",
+    "fundamentalsCs": {
+      "title": "Fundamentals of Computer Science",
+      "description": "This module bundles the core foundations of Fundamentals of Computer Science. Select a topic to start learning."
+    },
+    "moreComingSoon": "More coming soon",
+    "moreComingSoonDescription": "Additional learning modules will be added in future versions."
+  },
+  "notFound": {
+    "title": "404 – This page does not exist",
+    "description": "The requested URL does not exist, was deleted, or was moved to another location.",
+    "requestedUrl": "Requested URL",
+    "goHome": "Go to homepage",
+    "goBack": "Go back",
+    "hintLabel": "Possible reasons",
+    "reason1": "The address may have been entered incorrectly.",
+    "reason2": "The page may have been removed or renamed.",
+    "reason3": "The link may be outdated or no longer valid."
+  },
+  "documentation": {
+    "label": "Documentation",
+    "title": "Documentation",
+    "description": "Structured information about the platform, the modules, and the learning environment will be available here in the future.",
+    "section1Title": "Platform overview",
+    "section1Text": "This section can serve as an entry point for the structure, navigation, and main features of the application.",
+    "section2Title": "Module notes",
+    "section2Text": "Descriptions, learning goals, and additional notes for the individual modules can be added here later.",
+    "section3Title": "Technical notes",
+    "section3Text": "This section can later contain information about features, limitations, and planned extensions."
+  },
+  "help": {
+    "label": "Help",
+    "title": "Help",
+    "description": "Support content, frequently asked questions, and guidance for common issues will be available here in the future.",
+    "section1Title": "Getting started",
+    "section1Text": "This section can later include short guidance for navigation and the most important application features.",
+    "section2Title": "Support",
+    "section2Text": "This area can later explain where to turn for questions or technical issues.",
+    "section3Title": "Troubleshooting",
+    "section3Text": "This section is intended as a placeholder for common issues, known problems, and simple solutions."
+  }
+}
