@@ -38,6 +38,7 @@ export interface LearningModuleDefinition {
   topics: ModuleTopicDefinition[];
 }
 
+// The catalog is the single source of truth for both navigation UI and route generation.
 export const learningModules: LearningModuleDefinition[] = [
   {
     id: "fundamentals-cs",
@@ -111,6 +112,8 @@ export const learningTopicRoutes = learningModules.flatMap((module) =>
 export const learningRoutes = [...learningModuleRoutes, ...learningTopicRoutes];
 
 export function findModuleByPath(pathname: string) {
+  // Topic pages inherit module context in the header/sidebar, so nested topic
+  // paths also resolve back to their parent module definition here.
   return learningModules.find(
     (module) =>
       pathname === module.path ||

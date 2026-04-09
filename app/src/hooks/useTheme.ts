@@ -6,7 +6,7 @@ import {
   getSystemTheme,
   resolveTheme,
   watchSystemTheme,
-} from "../lib/theme";
+} from "@/lib/theme";
 import type { Theme } from "@/store/themeStore";
 
 export function useTheme() {
@@ -18,6 +18,8 @@ export function useTheme() {
   useEffect(() => {
     if (theme !== "system") return;
 
+    // In system mode we keep listening after the initial render so OS theme
+    // changes are reflected without requiring a page reload.
     const unsubscribe = watchSystemTheme((nextResolvedTheme) => {
       applyResolvedTheme(nextResolvedTheme);
     });

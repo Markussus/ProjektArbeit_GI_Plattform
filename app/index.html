@@ -9,6 +9,7 @@
     <script>
       (() => {
         try {
+          // Apply the persisted theme before React mounts to avoid a light/dark flash.
           const storageKey = "theme-storage";
           const raw = localStorage.getItem(storageKey);
 

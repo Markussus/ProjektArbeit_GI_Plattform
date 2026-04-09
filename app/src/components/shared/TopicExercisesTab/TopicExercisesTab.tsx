@@ -18,7 +18,9 @@ export function TopicExercisesTab({
 }: TopicExercisesTabProps) {
   const { t } = useTranslation();
 
+  // Keep a stable id from the translation key so exercise state survives language changes.
   const translatedExercises: Exercise[] = exercises.map((exercise) => ({
+    id: exercise.titleKey,
     title: t(exercise.titleKey),
     description: t(exercise.descriptionKey),
     difficulty: exercise.difficulty,
@@ -35,10 +37,10 @@ export function TopicExercisesTab({
       <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
         {translatedExercises.map((exercise, index) => (
           <ExerciseCard
-            key={`${exercise.title}-${index}`}
+            key={exercise.id}
             exercise={exercise}
             index={index}
-            isSelected={selectedExercise?.title === exercise.title}
+            isSelected={selectedExercise?.id === exercise.id}
             onSelect={() => onSelectExercise(exercise)}
             onOpen={() => onOpenExerciseInSimulation(exercise)}
           />

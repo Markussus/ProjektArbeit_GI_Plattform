@@ -56,6 +56,8 @@ export function ModuleTopicPage({
     setIsSimulationFocused((prev) => {
       const next = !prev;
       if (next) {
+        // Focus mode is meant to maximize the workspace, so the sidebar is
+        // collapsed proactively instead of waiting for a separate user action.
         setSidebarCollapsed(true);
       }
       return next;
@@ -65,6 +67,7 @@ export function ModuleTopicPage({
   const handleTabChange = (tab: ModuleTabId) => {
     setActiveTab(tab);
     if (tab !== "simulation") {
+      // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
   };

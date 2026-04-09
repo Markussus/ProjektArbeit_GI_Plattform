@@ -4,6 +4,7 @@ import type { TranslationKey } from "@/types/i18n";
 export type ExerciseDifficulty = "easy" | "medium" | "hard";
 
 export interface Exercise {
+  id: TranslationKey;
   title: string;
   description: string;
   difficulty: ExerciseDifficulty;

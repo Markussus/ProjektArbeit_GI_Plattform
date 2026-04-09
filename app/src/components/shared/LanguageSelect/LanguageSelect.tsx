@@ -29,6 +29,8 @@ export function LanguageSelect() {
   );
 
   useEffect(() => {
+    // The dropdown is rendered outside a native select element, so closing on
+    // outside click and Escape needs to be wired manually.
     const handlePointerDown = (event: PointerEvent) => {
       if (!containerRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
