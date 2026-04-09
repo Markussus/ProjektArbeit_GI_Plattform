@@ -8,18 +8,20 @@ import {
   TableProperties,
   ToggleLeft,
 } from "lucide-react";
+import { FundamentalsCSPage } from "@/pages/FundamentalsCS/FundamentalsCSPage";
 import { DnfPage as DnfTopicPage } from "@/pages/FundamentalsCS/Dnf/DnfPage";
 import { FiniteAutomataPage as FiniteAutomataTopicPage } from "@/pages/FundamentalsCS/FiniteAutomata/FiniteAutomataPage";
 import { MooreMealyPage as MooreMealyTopicPage } from "@/pages/FundamentalsCS/MooreMealy/MooreMealyPage";
 import { NumberSystemsPage as NumberSystemsTopicPage } from "@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage";
 import { TuringMachinePage as TuringMachineTopicPage } from "@/pages/FundamentalsCS/TuringMachine/TuringMachinePage";
+import type { TranslationKey } from "@/types/i18n";
 
 export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
 export interface ModuleTopicDefinition {
   id: string;
-  titleKey: string;
-  descriptionKey?: string;
+  titleKey: TranslationKey;
+  descriptionKey?: TranslationKey;
   path: string;
   icon: LucideIcon;
   accent: TopicAccent;
@@ -28,13 +30,15 @@ export interface ModuleTopicDefinition {
 
 export interface LearningModuleDefinition {
   id: string;
-  titleKey: string;
-  descriptionKey: string;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
   path: string;
   icon: LucideIcon;
+  element: ReactElement;
   topics: ModuleTopicDefinition[];
 }
 
+// The catalog is the single source of truth for both navigation UI and route generation.
 export const learningModules: LearningModuleDefinition[] = [
   {
     id: "fundamentals-cs",
@@ -42,6 +46,7 @@ export const learningModules: LearningModuleDefinition[] = [
     descriptionKey: "modules.fundamentalsCs.description",
     path: "/fundamentals-cs",
     icon: Layers3,
+    element: <FundamentalsCSPage />,
     topics: [
       {
         id: "turing-machine",
@@ -92,6 +97,11 @@ export const learningModules: LearningModuleDefinition[] = [
   },
 ];
 
+const learningModuleRoutes = learningModules.map((module) => ({
+  path: module.path,
+  element: module.element,
+}));
+
 export const learningTopicRoutes = learningModules.flatMap((module) =>
   module.topics.map((topic) => ({
     path: topic.path,
@@ -99,7 +109,11 @@ export const learningTopicRoutes = learningModules.flatMap((module) =>
   })),
 );
 
+export const learningRoutes = [...learningModuleRoutes, ...learningTopicRoutes];
+
 export function findModuleByPath(pathname: string) {
+  // Topic pages inherit module context in the header/sidebar, so nested topic
+  // paths also resolve back to their parent module definition here.
   return learningModules.find(
     (module) =>
       pathname === module.path ||

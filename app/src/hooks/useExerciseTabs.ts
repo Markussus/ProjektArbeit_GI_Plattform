@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
+import type { Exercise } from "@/types/exercise";
 
 export type ModuleTabId = "overview" | "exercises" | "examples" | "simulation";
 
@@ -13,9 +13,8 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   );
 
   const selectExercise = (exercise: Exercise) => {
-    setSelectedExercise((prev) =>
-      prev?.title === exercise.title ? null : exercise,
-    );
+    // A stable exercise id avoids losing the selection when labels change due to i18n.
+    setSelectedExercise((prev) => (prev?.id === exercise.id ? null : exercise));
   };
 
   const openInSimulation = (exercise: Exercise) => {

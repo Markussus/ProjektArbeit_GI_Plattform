@@ -18,6 +18,8 @@ export function useTheme() {
   useEffect(() => {
     if (theme !== "system") return;
 
+    // In system mode we keep listening after the initial render so OS theme
+    // changes are reflected without requiring a page reload.
     const unsubscribe = watchSystemTheme((nextResolvedTheme) => {
       applyResolvedTheme(nextResolvedTheme);
     });

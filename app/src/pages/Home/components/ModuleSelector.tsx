@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, Layers3, Sparkles } from "lucide-react";
-import { learningModules } from "@/features/modules/catalog";
+import { learningModules } from "@/data/moduleCatalog";
 import { cn } from "@/lib/utils";
 
 export function ModuleSelector() {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -50,10 +49,10 @@ export function ModuleSelector() {
                 >
                   <div>
                     <p className="text-foreground text-base font-semibold">
-                      {tk(module.titleKey)}
+                      {t(module.titleKey)}
                     </p>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      {tk(module.descriptionKey)}
+                      {t(module.descriptionKey)}
                     </p>
                   </div>
 

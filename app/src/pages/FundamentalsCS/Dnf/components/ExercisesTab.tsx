@@ -1,5 +1,5 @@
-import type { ModuleExercisesTabProps } from "@/features/modules/ModuleTopicPage";
-import { TopicExercisesTab } from "@/features/modules/TopicExercisesTab";
+import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
 import { dnfExercises } from "../exercises";
 
 export function ExercisesTab(props: ModuleExercisesTabProps) {

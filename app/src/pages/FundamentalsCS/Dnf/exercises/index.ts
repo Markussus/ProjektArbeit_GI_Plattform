@@ -1,5 +1,5 @@
 import { CircuitBoard, Grid3X3, Table, Variable } from "lucide-react";
-import type { ExerciseDefinition } from "@/features/modules/types";
+import type { ExerciseDefinition } from "@/types/exercise";
 
 export const dnfExercises: ExerciseDefinition[] = [
   {

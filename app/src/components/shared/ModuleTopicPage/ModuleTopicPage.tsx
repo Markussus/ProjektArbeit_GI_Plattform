@@ -1,12 +1,13 @@
 import type { ComponentType } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
+import type { Exercise } from "@/types/exercise";
+import type { TranslationKey } from "@/types/i18n";
 
 export interface ModuleExercisesTabProps {
   selectedExercise: Exercise | null;
@@ -21,8 +22,8 @@ export interface ModuleSimulationTabProps {
 }
 
 interface ModuleTopicPageProps {
-  titleKey: string;
-  descriptionKey: string;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
   examplesTab: ComponentType;
@@ -40,7 +41,6 @@ export function ModuleTopicPage({
   tabs,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
   const {
@@ -56,6 +56,8 @@ export function ModuleTopicPage({
     setIsSimulationFocused((prev) => {
       const next = !prev;
       if (next) {
+        // Focus mode is meant to maximize the workspace, so the sidebar is
+        // collapsed proactively instead of waiting for a separate user action.
         setSidebarCollapsed(true);
       }
       return next;
@@ -65,6 +67,7 @@ export function ModuleTopicPage({
   const handleTabChange = (tab: ModuleTabId) => {
     setActiveTab(tab);
     if (tab !== "simulation") {
+      // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
   };
@@ -77,7 +80,7 @@ export function ModuleTopicPage({
       )}
     >
       {!isSimulationFocused && (
-        <PageIntro title={tk(titleKey)} description={tk(descriptionKey)} />
+        <PageIntro title={t(titleKey)} description={t(descriptionKey)} />
       )}
 
       <TabNavigation

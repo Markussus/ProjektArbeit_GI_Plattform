@@ -1,11 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "@/layouts/MainLayout/MainLayout";
 import { HomePage } from "@/pages/Home/HomePage";
-import { FundamentalsCSPage } from "@/pages/FundamentalsCS/FundamentalsCSPage";
 import { DocumentationPage } from "@/pages/Documentation/DocumentationPage";
 import { HelpPage } from "@/pages/Help/HelpPage";
 import { NotFoundPage } from "@/pages/NotFound/NotFoundPage";
-import { learningTopicRoutes } from "@/features/modules/catalog";
+import { learningRoutes } from "@/data/moduleCatalog";
 
 export const router = createBrowserRouter([
   {
@@ -13,8 +12,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
 
-      { path: "/fundamentals-cs", element: <FundamentalsCSPage /> },
-      ...learningTopicRoutes,
+      ...learningRoutes,
 
       { path: "/documentation", element: <DocumentationPage /> },
       { path: "/help", element: <HelpPage /> },

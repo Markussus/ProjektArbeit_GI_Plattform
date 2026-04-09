@@ -3,18 +3,16 @@ import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 import { LanguageSelect } from "@/components/shared/LanguageSelect/LanguageSelect";
 import ThwsLogo from "@/assets/THWS.svg";
-import { findModuleByPath } from "@/features/modules/catalog";
+import { findModuleByPath } from "@/data/moduleCatalog";
 
 export function Header() {
   const { t } = useTranslation();
   const location = useLocation();
 
-  const tk = (key: string) => t(key as never) as string;
-
   const activeModule = findModuleByPath(location.pathname);
 
   const headerLabel: string = activeModule
-    ? tk(activeModule.titleKey)
+    ? t(activeModule.titleKey)
     : t("nav.home");
 
   return (

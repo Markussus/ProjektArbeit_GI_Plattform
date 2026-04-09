@@ -1,8 +1,7 @@
-import { useTranslation } from "react-i18next";
 import { ClipboardList } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
-import type { Exercise } from "@/components/shared/ExerciseCard/ExerciseCard";
-import type { ExerciseDefinition } from "./types";
+import type { Exercise, ExerciseDefinition } from "@/types/exercise";
 
 interface TopicExercisesTabProps {
   exercises: ExerciseDefinition[];
@@ -18,11 +17,12 @@ export function TopicExercisesTab({
   onOpenExerciseInSimulation,
 }: TopicExercisesTabProps) {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
 
+  // Keep a stable id from the translation key so exercise state survives language changes.
   const translatedExercises: Exercise[] = exercises.map((exercise) => ({
-    title: tk(exercise.titleKey),
-    description: tk(exercise.descriptionKey),
+    id: exercise.titleKey,
+    title: t(exercise.titleKey),
+    description: t(exercise.descriptionKey),
     difficulty: exercise.difficulty,
     icon: exercise.icon,
   }));
@@ -37,10 +37,10 @@ export function TopicExercisesTab({
       <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
         {translatedExercises.map((exercise, index) => (
           <ExerciseCard
-            key={`${exercise.title}-${index}`}
+            key={exercise.id}
             exercise={exercise}
             index={index}
-            isSelected={selectedExercise?.title === exercise.title}
+            isSelected={selectedExercise?.id === exercise.id}
             onSelect={() => onSelectExercise(exercise)}
             onOpen={() => onOpenExerciseInSimulation(exercise)}
           />

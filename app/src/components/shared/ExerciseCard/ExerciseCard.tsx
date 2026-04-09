@@ -1,15 +1,8 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import type { LucideIcon } from "lucide-react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface Exercise {
-  title: string;
-  description: string;
-  difficulty: "easy" | "medium" | "hard";
-  icon: LucideIcon;
-}
+import type { Exercise } from "@/types/exercise";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -57,7 +50,7 @@ export function ExerciseCard({
         aria-expanded={isSelected}
         aria-controls={detailsId}
         className={cn(
-          "hover:bg-muted/50 focus-visible:ring-ring flex w-full items-center gap-4 p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none",
+          "hover:bg-muted/50 focus-visible:ring-ring flex w-full items-center gap-4 p-4 text-left focus-visible:ring-2 focus-visible:outline-none",
           isSelected && "bg-muted/30",
         )}
       >

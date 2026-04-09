@@ -2,8 +2,8 @@ import { ChevronRight, Layers3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
+import { learningModules, type TopicAccent } from "@/data/moduleCatalog";
 import { cn } from "@/lib/utils";
-import { learningModules, type TopicAccent } from "@/features/modules/catalog";
 
 interface ModuleOverviewPageProps {
   moduleId: string;
@@ -21,8 +21,6 @@ function getAccentClasses(accent: TopicAccent) {
 
 export function ModuleOverviewPage({ moduleId }: ModuleOverviewPageProps) {
   const { t } = useTranslation();
-  const tk = (key: string) => t(key as never);
-
   const moduleData = learningModules.find((module) => module.id === moduleId);
 
   if (!moduleData) {
@@ -33,8 +31,8 @@ export function ModuleOverviewPage({ moduleId }: ModuleOverviewPageProps) {
     <div className="p-8">
       <PageIntro
         eyebrow={t("modules.label")}
-        title={tk(moduleData.titleKey)}
-        description={tk(moduleData.descriptionKey)}
+        title={t(moduleData.titleKey)}
+        description={t(moduleData.descriptionKey)}
       />
 
       <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
@@ -67,12 +65,12 @@ export function ModuleOverviewPage({ moduleId }: ModuleOverviewPageProps) {
 
                   <div>
                     <p className="text-foreground text-base font-semibold">
-                      {tk(topic.titleKey)}
+                      {t(topic.titleKey)}
                     </p>
 
                     {topic.descriptionKey && (
                       <p className="text-muted-foreground mt-1 text-sm">
-                        {tk(topic.descriptionKey)}
+                        {t(topic.descriptionKey)}
                       </p>
                     )}
                   </div>
