@@ -56,4 +56,38 @@
 * Clean up and refine the architecture
 * Gather feedback on the first version
 * Implement concrete logic (e.g., Turing machine simulator)
-* Analyze slides/tasks more deeply to derive implementation details
+
+---
+
+## GitLab Test Strategy Ideas
+
+* For GitLab CI, a good first version would be:
+    - `npm ci`
+    - `npm run lint`
+    - `npm run format:check`
+    - `npm run build`
+
+* Why?
+    - Checks if the project installs cleanly
+    - Checks code style and formatting
+    - Checks if the whole app still builds
+
+* Prettier in GitLab:
+    - Better to use `format:check` and not auto-format in CI
+    - Auto-formatting should happen locally, CI should only fail if formatting is wrong
+
+* For the simulator parts, I should not test only by clicking around in the UI
+    - Better to test the actual logic separately
+    - For example: input, transitions, output, halt/reset behavior
+
+* Possible simulator test ideas:
+    - Turing machine: movement, symbol replacement, next state, halt condition
+    - Finite automata: accepted/rejected input, correct state sequence
+    - Moore/Mealy: correct output behavior
+    - Number systems: correct conversions and invalid input handling
+    - DNF: truth tables and expected expressions
+
+* Good next step later:
+    - Add `Vitest` for logic tests
+    - Maybe later `React Testing Library` for UI/component tests
+    - First focus on testing the simulator logic, not the full UI

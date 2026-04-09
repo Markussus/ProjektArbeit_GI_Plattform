@@ -8,7 +8,7 @@ The project follows this separation:
 
 * shared UI and shared page shells live in `components/shared`
 * central module/topic registration lives in `data`
-* topic-owned educational content stays in `pages/FundamentalsCS/<Topic>`
+* module-owned pages and topic-owned educational content stay in `pages/<ModuleName>/...`
 * hooks, store, router, and i18n remain cross-cutting infrastructure
 
 They are intentionally kept as thin topic binding files, even though they mostly forward into shared components.
@@ -31,7 +31,7 @@ app/src/
 Topic-owned content currently lives under:
 
 ```text
-app/src/pages/FundamentalsCS/<Topic>/
+app/src/pages/<ModuleName>/<Topic>/
   components/
     ExercisesTab.tsx              # topic-owned binding for exercises
     SimulationTab.tsx             # topic-owned binding for simulation
@@ -150,7 +150,7 @@ It now accepts `children`.
 
 That means a topic-specific simulation can be passed from:
 
-* `app/src/pages/FundamentalsCS/<Topic>/components/SimulationTab.tsx`
+* `app/src/pages/<ModuleName>/<Topic>/components/SimulationTab.tsx`
 
 Current intended flow:
 
@@ -165,7 +165,7 @@ This keeps the simulator slot topic-owned without duplicating the common layout.
 
 Exercise definitions live per topic in:
 
-* `app/src/pages/FundamentalsCS/<Topic>/exercises/index.ts`
+* `app/src/pages/<ModuleName>/<Topic>/exercises/index.ts`
 
 The shared exercise rendering lives in:
 
@@ -173,7 +173,7 @@ The shared exercise rendering lives in:
 
 The topic-specific wrapper remains in:
 
-* `app/src/pages/FundamentalsCS/<Topic>/components/ExercisesTab.tsx`
+* `app/src/pages/<ModuleName>/<Topic>/components/ExercisesTab.tsx`
 
 This is intentional because the topic still owns the decision of which exercise list is bound into the shared renderer.
 
@@ -220,16 +220,41 @@ Current shared state:
 
 Topic-specific state stays local to the shared topic shell and topic hooks unless there is a real need to globalize it.
 
+## How To Add A New Module
+
+Recommended workflow:
+
+1. Create a new module folder like `app/src/pages/<ModuleName>/`.
+2. Create a module landing page like `<ModuleName>Page.tsx` that renders `ModuleOverviewPage`.
+3. Create one folder per topic inside that module folder.
+4. Register the module and all of its topics in `app/src/data/moduleCatalog.tsx`.
+5. Add all required translation keys in both locale files.
+
+Minimal module page pattern:
+
+```tsx
+import { ModuleOverviewPage } from "@/components/shared/ModuleOverviewPage/ModuleOverviewPage";
+
+export function ExampleModulePage() {
+  return <ModuleOverviewPage moduleId="example-module" />;
+}
+```
+
+Important note:
+
+* the module only becomes visible in home navigation, header, sidebar, and router after it is added to `moduleCatalog.tsx`
+* `router/index.tsx` already consumes `learningRoutes`, so no extra manual route entry is needed there
+
 ## How To Add A New Topic
 
 Recommended workflow:
 
-1. Create `app/src/pages/FundamentalsCS/<Topic>/`.
+1. Create `app/src/pages/<ModuleName>/<Topic>/`.
 2. Add topic-specific overview and examples in `components/`.
 3. Add `components/ExercisesTab.tsx` and `components/SimulationTab.tsx`.
 4. Add exercise definitions in `exercises/index.ts`.
 5. Create `<Topic>Page.tsx` using the shared `ModuleTopicPage`.
-6. Register the topic once in `app/src/data/moduleCatalog.tsx`.
+6. Register the topic in the correct module entry inside `app/src/data/moduleCatalog.tsx`.
 7. Add all required translation keys in both locale files.
 
 Minimal page pattern:
@@ -255,13 +280,18 @@ export function ExampleTopicPage() {
 }
 ```
 
+Important note:
+
+* the topic route, sidebar entry, header/module lookup, and module overview link are all derived from `moduleCatalog.tsx`
+* that means the topic should be registered there exactly once, with the final `path`, `icon`, `accent`, and `element`
+
 ## Summary
 
 The important architectural decisions are:
 
 * central module registry in `data/moduleCatalog.tsx`
 * shared shells in `components/shared`
-* topic-owned binding files kept inside `pages/FundamentalsCS/<Topic>/components`
+* module and topic ownership kept inside `pages/<ModuleName>/...`
 * topic-local exercise definitions
 * typed translation keys instead of ad-hoc string casts where possible
 
