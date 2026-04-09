@@ -8,6 +8,7 @@ import {
   TableProperties,
   ToggleLeft,
 } from "lucide-react";
+import { FundamentalsCSPage } from "@/pages/FundamentalsCS/FundamentalsCSPage";
 import { DnfPage as DnfTopicPage } from "@/pages/FundamentalsCS/Dnf/DnfPage";
 import { FiniteAutomataPage as FiniteAutomataTopicPage } from "@/pages/FundamentalsCS/FiniteAutomata/FiniteAutomataPage";
 import { MooreMealyPage as MooreMealyTopicPage } from "@/pages/FundamentalsCS/MooreMealy/MooreMealyPage";
@@ -33,6 +34,7 @@ export interface LearningModuleDefinition {
   descriptionKey: TranslationKey;
   path: string;
   icon: LucideIcon;
+  element: ReactElement;
   topics: ModuleTopicDefinition[];
 }
 
@@ -43,6 +45,7 @@ export const learningModules: LearningModuleDefinition[] = [
     descriptionKey: "modules.fundamentalsCs.description",
     path: "/fundamentals-cs",
     icon: Layers3,
+    element: <FundamentalsCSPage />,
     topics: [
       {
         id: "turing-machine",
@@ -93,12 +96,19 @@ export const learningModules: LearningModuleDefinition[] = [
   },
 ];
 
+const learningModuleRoutes = learningModules.map((module) => ({
+  path: module.path,
+  element: module.element,
+}));
+
 export const learningTopicRoutes = learningModules.flatMap((module) =>
   module.topics.map((topic) => ({
     path: topic.path,
     element: topic.element,
   })),
 );
+
+export const learningRoutes = [...learningModuleRoutes, ...learningTopicRoutes];
 
 export function findModuleByPath(pathname: string) {
   return learningModules.find(

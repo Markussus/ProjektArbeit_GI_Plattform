@@ -4,16 +4,12 @@
 
 This document describes the current structure of the application and the intended dependency direction.
 
-The project now follows a simpler separation:
+The project follows this separation:
 
 * shared UI and shared page shells live in `components/shared`
 * central module/topic registration lives in `data`
 * topic-owned educational content stays in `pages/FundamentalsCS/<Topic>`
 * hooks, store, router, and i18n remain cross-cutting infrastructure
-
-The important constraint is:
-
-* the topic-specific `ExercisesTab.tsx` and `SimulationTab.tsx` files remain inside each topic folder
 
 They are intentionally kept as thin topic binding files, even though they mostly forward into shared components.
 
