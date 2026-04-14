@@ -11,7 +11,8 @@ Analysiere das bestehende Projekt und beschreibe zu jedem WorkItem, was gemacht 
 Das Ziel dieser Phase ist es, den "Motor" und die Steuereinheit für *jeden beliebigen* Simulator (Automaten, DNF, Turingmaschinen) zu entwerfen.
 
 **WI-TM-1: Design des generischen Simulator-Interface**
-* **Was zu tun ist:** Definiere TypeScript-Interfaces (`ISimulator`) im `types/`-Ordner. Ein Simulator muss generische Methoden bereitstellen wie `initialize(config)`, `step()`, `reset()`, `getCurrentState()`, und `isFinished()`.
+* **Was zu tun ist:** Definiere TypeScript-Interfaces (`ISimulator`) im `types/`-Ordner. Ein Simulator muss generische Methoden bereitstellen wie `initialize(config)`, `step()`, `stepBack()`, `reset()`, `getCurrentState()`, und `isFinished()`.
+  * `getCurrentState()` gibt den kompletten Zustand zurück (z. B. Band, Kopfposition, aktueller Zustand bei TM; mit diesen Informationen kann `initialize(config)` dann auch arbeiten), damit die UI immer alles hat, um zu rendern bzw. man diesen auch exportieren kann.
 * **Warum:** Trennung von reiner Maschinen-Logik und React-UI. Andere Konzepte (Moore/Mealy) können später das gleiche Interface implementieren.
 
 **WI-TM-2: Implementierung des `useSimulationEngine` Hooks (Generischer Debugger-Hook)**
@@ -134,8 +135,6 @@ Die **Kopfzeile** besteht aus den Spalten:
 
 *Markus & Richard Notes*:
 
-* Zu WI-TM-1:
-  * Evtl. auch einen `stepBack()` zur Verfügung stellen
-  * `getCurrentState()` gibt den kompletten Zustand zurück (Band, Kopfposition, aktueller Zustand), damit die UI immer alles hat, um zu rendern bzw. man diesen auch exportieren kann.
 * Am unteren Seitenrand eine generische Export / Import Zeile
   * Export / Import mit und ohne Aliasnamen für Zustände
+  * Arbeitet vermutlich mit eignem stark komprimierten Format (z. B. Bitweise Kodierung der Übergangstabelle) und dann Base64-String für den Nutzer, damit die Datenmenge klein bleibt.
