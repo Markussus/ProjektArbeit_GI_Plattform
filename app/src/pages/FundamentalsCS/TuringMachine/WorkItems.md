@@ -42,7 +42,6 @@ Here we build views that can be used directly as "debugger" and "visualization" 
 
 **WI-TM-5: Development of the generic Debugger Toolbar (`SimulatorControls.tsx`)**
 * **What to do:** Create a UI component (in `app/src/components/shared/SimulatorControls/`). This contains buttons for Play, Pause, Step forward, Step backward (if state history is saved, very useful for debugging!) and Restart. Moreover, a slider for the simulation speed.
-  * Step backward will not be implemented and also not prepared in the UI -> Coordinate if the feature is relevant
 * **Why:** Can be reused directly in `FundamentalsCS/FiniteAutomata` or `MooreMealy`.
 
 **WI-TM-6: Generic Tape/Array Visualization (`ArrayView.tsx`)**
