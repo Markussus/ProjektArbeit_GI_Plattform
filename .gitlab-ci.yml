@@ -1,0 +1,30 @@
+stages:
+  - verify
+  - build
+
+default:
+  image: node:22-bookworm-slim
+  tags:
+    - pi
+  before_script:
+    - cd App
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - App/node_modules/
+
+verify_pipeline:
+  stage: verify
+  script:
+    - echo "Runner funktioniert"
+    - pwd
+    - ls -la
+    - node --version
+    - npm --version
+    - npm ci
+
+build_app:
+  stage: build
+  script:
+    - npm run build
