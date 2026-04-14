@@ -10,9 +10,11 @@ default:
     - cd app
 
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
+  key:
+    files:
+      - app/package-lock.json
   paths:
-    - app/node_modules/
+    - app/.npm/
 
 verify_pipeline:
   stage: verify
@@ -22,9 +24,10 @@ verify_pipeline:
     - ls -la
     - node --version
     - npm --version
-    - npm ci
+    - npm ci --cache .npm --prefer-offline
 
 build_app:
   stage: build
   script:
+    - npm ci --cache .npm --prefer-offline
     - npm run build
