@@ -11,8 +11,8 @@ Analyze the existing project and describe for each WorkItem what needs to be don
 The goal of this phase is to design the "engine" and control unit for *any* simulator (automata, DNF, Turing machines).
 
 **WI-TM-1: Design of the generic Simulator Interface**
-* **What to do:** Define TypeScript interfaces (`ISimulator`) in the `types/` folder. A simulator must provide generic methods like `initialize(config)`, `step()`, `stepBack()`, `reset()`, `getCurrentState()`, and `isFinished()`.
-  * `getCurrentState()` returns the complete state (e.g., tape, head position, current state for TM; `initialize(config)` can then also work with this information), so the UI always has everything to render or one can export it.
+* **What to do:** Define TypeScript interfaces (`ISimulator`) in the `types/` folder. A simulator must provide generic methods like `initialize(config, ?state)`, `step()`, `stepBack()`, `reset()`, `getConfig()`, `getCurrentState()`, and `isFinished()`.
+  * `getCurrentState()` returns the complete state (e.g., tape, head position, current state for TM; `initialize(config, ?state)` can then also work with this information), so the UI always has everything to render or one can export it.
 * **Why:** Separation of pure machine logic and React UI. Other concepts (Moore/Mealy) can later implement the same interface.
 
 **WI-TM-2: Implementation of the `useSimulationEngine` Hook (Generic Debugger Hook)**
