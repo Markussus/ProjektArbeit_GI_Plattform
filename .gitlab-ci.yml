@@ -7,12 +7,12 @@ default:
   tags:
     - pi
   before_script:
-    - cd App
+    - cd app
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - App/node_modules/
+    - app/node_modules/
 
 verify_pipeline:
   stage: verify
