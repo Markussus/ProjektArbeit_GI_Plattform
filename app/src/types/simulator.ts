@@ -1,8 +1,9 @@
 export interface ISimulator<TConfig, TState> {
   /**
    * Initializes the simulator directly with a configuration and state.
+   * The state is optional, if not supplied the starting state must be supplied in the config.
    */
-  initialize(config: TConfig, state: TState): void;
+  initialize(config: TConfig, state?: TState): void;
 
   /**
    * Executes a single step of the simulation.

@@ -27,7 +27,7 @@ export interface TMConfig {
   initialState: StateName;        // Initial state (q0)
   haltStates: StateName[];        // Accepting/Halting states
   transitions: TransitionTable;   // The defined logic
-  initialTapeWord: TapeSymbol[];  // The initial word on the tape
+  initialTape: TapeSymbol[];      // The initial content of the tape
 }
 
 // The current snapshot of the machine during execution (TState)
