@@ -1,8 +1,8 @@
 export interface ISimulator<TConfig, TState> {
   /**
-   * Initializes the simulator directly with a starting configuration or state.
+   * Initializes the simulator directly with a configuration and state.
    */
-  initialize(config: TConfig): void;
+  initialize(config: TConfig, state: TState): void;
 
   /**
    * Executes a single step of the simulation.
@@ -20,6 +20,12 @@ export interface ISimulator<TConfig, TState> {
   reset(): void;
 
   /**
+   * Returns the complete current config of the simulator.
+   * Useful for config exports.
+   */
+  getConfig(): TConfig;
+
+  /**
    * Returns the complete current state of the simulator.
    * Useful for UI rendering or state exports.
    */
@@ -31,4 +37,3 @@ export interface ISimulator<TConfig, TState> {
    */
   isFinished(): boolean;
 }
-

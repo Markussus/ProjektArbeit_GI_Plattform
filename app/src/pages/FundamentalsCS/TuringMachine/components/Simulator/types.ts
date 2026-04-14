@@ -1,39 +1,49 @@
-// Repräsentiert die möglichen Bewegungen des Lese-/Schreibkopfs
+// Represents the possible movements of the read/write head
 export type HeadMovement = 'L' | 'R' | 'N';
 
-// Repräsentiert das Tripel (Next State, Write Symbol, Movement)
+// Represents the transition triple (Next State, Write Symbol, Movement)
 export interface TMTransition {
-  nextState: string;
-  writeSymbol: string;
+  nextState: StateName;
+  writeSymbol: TapeSymbol;
   movement: HeadMovement;
 }
 
-// Die delta-Funktion (Übergangstabelle).
-// Struktur: Record<CurrentState, Record<ReadSymbol, TMTransition>>
-export type TransitionTable = Record<string, Record<string, TMTransition>>;
+// Represents the name or identifier of a state
+export type StateName = string;
+// Represents a single symbol on the tape
+export type TapeSymbol = string;  // Must be exactly one character long
 
-// Die Konfiguration, mit der die Turingmaschine initialisiert wird (TConfig)
+// The delta function (transition table).
+// Structured as in the lecture notes:
+// Record<ReadSymbol, Record<CurrentState, TMTransition>>
+export type TransitionTable = Record<TapeSymbol, Record<StateName, TMTransition>>;
+
+// The configuration used to initialize the Turing machine (TConfig)
 export interface TMConfig {
-  states: string[];           // Menge der Zustände (Q)
-  inputAlphabet: string[];    // Sigma
-  tapeAlphabet: string[];     // Gamma (enthält auch das Blank-Symbol)
-  blankSymbol: string;        // z.B. 'B' oder ' '
-  initialState: string;       // Startzustand (q0)
-  haltStates: string[];       // Akzeptierende/Haltende Zustände
-  transitions: TransitionTable; // Die definierte Logik
-  initialTapeWord: string;    // Das Startwort auf dem Band
+  states: StateName [];           // Set of states (Q)
+  inputAlphabet: TapeSymbol[];    // Sigma
+  tapeAlphabet: TapeSymbol[];     // Gamma (includes the blank symbol)
+  blankSymbol: TapeSymbol;        // e.g., 'B' or ' '
+  initialState: StateName;        // Initial state (q0)
+  haltStates: StateName[];        // Accepting/Halting states
+  transitions: TransitionTable;   // The defined logic
+  initialTapeWord: TapeSymbol[];  // The initial word on the tape
 }
 
-// Der aktuelle Schnappschuss der Maschine während der Ausführung (TState)
+// The current snapshot of the machine during execution (TState)
 export interface TMState {
-  currentState: string;
+  // The current active state
+  currentState: StateName;
+  // The current index position of the read/write head
   headPosition: number;
   /**
-   * Tape implementiert als Sparse-Map:
-   * Schlüssel ist der Index (kann negativ sein!), Wert ist das Symbol.
-   * Beispiel: { 0: '1', 1: '0', -1: '1' }
+   * Tape implemented as a sparse map:
+   * Key is the index (can be negative!), value is the symbol.
+   * Example: { 0: '1', 1: '0', -1: '1' }
    */
-  tape: Record<number, string>;
+  tape: Record<number, TapeSymbol>;
+  // Indicates if the machine has reached a halting state
   isHalted: boolean;
+  // Optional error message if the machine crashes or enters an invalid state
   errorMessage?: string;
 }
