@@ -44,11 +44,11 @@ Hier bauen wir Ansichten, die als "Debugger" und "Visualisierung" auch für ande
   * Schritt zurück wird nicht implementiert und auch nicht in der UI vorbereitet -> Abstimmen, ob Feature relevant ist
 * **Warum:** Kann direkt in `FundamentalsCS/FiniteAutomata` oder `MooreMealy` wiederverwendet werden.
 
-**WI-TM-6: Generische Band-/Array-Visualisierung (`ArrayTapeView.tsx`)**
+**WI-TM-6: Generische Band-/Array-Visualisierung (`ArrayView.tsx`)**
 * **Was zu tun ist:** Eine Komponente für ein (scheinbar) unendliches Array bauen (in `app/src/components/shared/ArrayVisual/`). Sie muss visuell scrollbar/verschiebbar sein und ein Element (den Kopf) farblich hervorheben ("Focus").
 * **Warum:** Ein Band wird für die Turingmaschine genutzt, aber Array-Darstellungen (oder Stacks) kommen im Informatik-Studium überall vor.
 
-**WI-TM-7: Generische Status- / Transition-Tabelle Komponente**
+**WI-TM-7: Generische Status- / Transition-Tabelle Komponente (`TableView.tsx`)**
 * **Was zu tun ist:** Eine Komponente, die tabellarische Übergänge anzeigt und die *aktuell ausführende Zeile / Spalte / Zelle* farblich highlighten kann (z.B. wenn sich der Zustand gerade ändert; in `app/src/components/shared/TableVisual/`). Der Nutzer kann Zeilen / Spalten hinzufügen, sofern dies per Props erlaubt wird.
 * **Warum:** Transitionstabellen sind nicht nur für Turingmaschinen relevant, sondern auch für endliche Automaten, Moore/Mealy-Automaten, etc.
 
@@ -95,6 +95,7 @@ Die **Kopfzeile** besteht aus den Spalten:
 
   * Diese erste Spalte ist die **Eingabesymbol-Spalte**.
   * Sie enthält pro Zeile das aktuell gelesene Bandsymbol der Turingmaschine, also zum Beispiel `0`, `1` oder das Leer-/Blank-Symbol.
+  * Sie kann jedes Symbol des Alphabets nur einmal enthalten
 
 2. **$q_n$** (Zustand-N)
 
@@ -127,3 +128,14 @@ Die **Kopfzeile** besteht aus den Spalten:
 
 * Die Zustandsnamen in der Kopfzeile sollten als `q` mit tiefgestellter Zahl erscheinen, also z. B. `q₀`, `q₁`, `q₂`.
 * Dasselbe gilt in den Tabelleneinträgen auch für Folgezustände, falls mathematische Schreibweise gewünscht ist.
+
+
+### Weitere Ideen
+
+*Markus & Richard Notes*:
+
+* Zu WI-TM-1:
+  * Evtl. auch einen `stepBack()` zur Verfügung stellen
+  * `getCurrentState()` gibt den kompletten Zustand zurück (Band, Kopfposition, aktueller Zustand), damit die UI immer alles hat, um zu rendern bzw. man diesen auch exportieren kann.
+* Am unteren Seitenrand eine generische Export / Import Zeile
+  * Export / Import mit und ohne Aliasnamen für Zustände
