@@ -12,10 +12,14 @@ export function validateTMConfig(config: TMConfig): void {
   }
 
   if (!states.has(config.initialState)) {
-    errors.push(`The initial state '${config.initialState}' must exist in the set of states.`);
+    errors.push(
+      `The initial state '${config.initialState}' must exist in the set of states.`,
+    );
   }
 
-  const invalidHaltStates = config.haltStates.filter((state) => !states.has(state));
+  const invalidHaltStates = config.haltStates.filter(
+    (state) => !states.has(state),
+  );
   if (invalidHaltStates.length > 0) {
     errors.push(
       `All halt states must exist in the set of states. Invalid halt states: ${invalidHaltStates.join(", ")}.`,
@@ -23,7 +27,9 @@ export function validateTMConfig(config: TMConfig): void {
   }
 
   if (!tapeAlphabet.has(config.blankSymbol)) {
-    errors.push(`The blank symbol '${config.blankSymbol}' must be part of the tape alphabet.`);
+    errors.push(
+      `The blank symbol '${config.blankSymbol}' must be part of the tape alphabet.`,
+    );
   }
 
   // TODO check if blank isn't allowed in input
@@ -40,7 +46,9 @@ export function validateTMConfig(config: TMConfig): void {
     );
   }
 
-  for (const [readSymbol, stateTransitions] of Object.entries(config.transitions)) {
+  for (const [readSymbol, stateTransitions] of Object.entries(
+    config.transitions,
+  )) {
     if (!tapeAlphabet.has(readSymbol)) {
       errors.push(
         `A transition is defined for read symbol '${readSymbol}', but this symbol is not part of the tape alphabet.`,

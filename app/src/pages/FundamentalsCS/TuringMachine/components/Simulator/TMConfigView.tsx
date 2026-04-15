@@ -256,7 +256,7 @@ export function TMConfigView({
           {t("tm.config.title", "Turing Machine Configuration")}
         </h2>
         {validationError && (
-          <div className="bg-destructive/10 text-destructive whitespace-pre-line rounded-md border border-current/20 p-3 text-sm">
+          <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">
             {validationError}
           </div>
         )}
