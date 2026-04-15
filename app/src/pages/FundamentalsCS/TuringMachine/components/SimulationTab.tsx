@@ -1,6 +1,6 @@
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import { DemoSimulator } from "./Simulator/DemoSimulator";
+import { TMSimulator } from "./Simulator/TMSimulator.tsx";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   return (
@@ -8,7 +8,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       {...props}
       emptyStateTextKey="simulation.emptyStates.turing"
     >
-      <DemoSimulator />
+      <TMSimulator />
     </TopicSimulationTab>
   );
 }

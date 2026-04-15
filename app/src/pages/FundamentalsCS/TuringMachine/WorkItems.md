@@ -28,7 +28,7 @@ This layer will be pure TypeScript logic, untouched by React, to ensure maximum 
 * **What to do:** Define classes or type structures for: The infinite tape (`Tape`, e.g., implemented as two arrays, doubly linked list or sparse map), the read/write head (`Head` position), the set of states `Q`, the alphabet `Sigma`/`Gamma` and the transition function (`delta`-Table).
 
 **WI-TM-4: Program the simulator logic of the Turing Machine**
-* **What to do:** Write a class `TuringMachineSimulator` that implements the interface from WI-TM-1. The core is the `step()` method:
+* **What to do:** Write a class `TMSimulator` that implements the interface from WI-TM-1. The core is the `step()` method:
   1. Read symbol at head position
   2. Look up current state + symbol in transition table
   3. Write new symbol
