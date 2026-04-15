@@ -1,44 +1,28 @@
-import { useState, useMemo } from 'react';
-import { useSimulationEngine } from '@/hooks/useSimulationEngine';
-import { TuringMachineSimulator } from './TuringMachineSimulator';
-import { SimulatorControls } from '@/components/shared/SimulatorControls/SimulatorControls';
-import { ArrayView } from '@/components/shared/ArrayVisual/ArrayView';
-import { TMConfigView } from './TMConfigView';
-import { TableView } from '@/components/shared/TableVisual/TableView';
-import type { TMConfig } from './types';
-import { formatState, formatTransition, DEFAULT_BLANK_SYMBOL } from './types';
-import { useTranslation } from 'react-i18next';
-
-const defaultConfig: TMConfig = {
-  states: ['q0', 'q1', 'q2', 'q3'],
-  inputAlphabet: ['0', '1'],
-  tapeAlphabet: ['0', '1', DEFAULT_BLANK_SYMBOL],
-  blankSymbol: DEFAULT_BLANK_SYMBOL,
-  initialState: 'q0',
-  haltStates: ['q3'],
-  initialTape: ['1', '0', '1', '1'],
-  transitions: {
-    [DEFAULT_BLANK_SYMBOL]: {
-      'q0': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
-      'q1': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
-    },
-    '0': {
-      'q0': { nextState: 'q0', writeSymbol: '1', movement: 'R' },
-      'q1': { nextState: 'q1', writeSymbol: '0', movement: 'R' },
-    },
-    '1': {
-      'q0': { nextState: 'q1', writeSymbol: '0', movement: 'R' },
-      'q1': { nextState: 'q0', writeSymbol: '1', movement: 'R' },
-    }
-  }
-};
-
-const simulator = new TuringMachineSimulator();
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useSimulationEngine } from "@/hooks/useSimulationEngine";
+import { cloneJson } from "@/lib/utils";
+import { defaultTMConfig } from "./config/defaultTMConfig";
+import { TuringMachineSimulator } from "./model/TuringMachineSimulator";
+import {
+  buildTransitionTableHeaders,
+  buildTransitionTableRows,
+  getActiveTransitionCell,
+} from "./model/tmTable";
+import { validateTMConfig } from "./model/tmConfigValidation";
+import type { TMConfig } from "./types";
+import { TMConfigView } from "./views/TMConfigView";
+import { TMSimulationView } from "./views/TMSimulationView";
 
 export function TMSimulator() {
   const { t } = useTranslation();
-  const [config, setConfig] = useState<TMConfig>(defaultConfig);
+  const [config, setConfig] = useState<TMConfig>(() =>
+    cloneJson(defaultTMConfig),
+  );
+  const [configError, setConfigError] = useState<string | null>(null);
+  const [tableEditError, setTableEditError] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
+  const simulator = useMemo(() => new TuringMachineSimulator(), []);
 
   const {
     status,
@@ -50,122 +34,84 @@ export function TMSimulator() {
     step,
     stepBack,
     reset,
-    setSpeed
+    setSpeed,
   } = useSimulationEngine(simulator, config);
 
-  // For readonly table in simulation mode
-  const tableHeaders = useMemo(() => ['δ', ...config.states.map(formatState)], [config.states]);
-
-  const tableRows = useMemo(() => {
-    return config.tapeAlphabet.map(symbol => {
-      const row = [symbol];
-      config.states.forEach(state => {
-        const trans = config.transitions[symbol]?.[state];
-        row.push(formatTransition(trans));
-      });
-      return row;
-    });
-  }, [config.tapeAlphabet, config.states, config.transitions]);
-
-  const activeCell = useMemo(() => {
-    if (!currentState) return null;
-    const currentSymbol = currentState.tape[currentState.headPosition] || config.blankSymbol;
-    const symbolIndex = config.tapeAlphabet.indexOf(currentSymbol);
-    const stateIndex = config.states.indexOf(currentState.currentState);
-
-    if (symbolIndex >= 0 && stateIndex >= 0) {
-      return { row: symbolIndex, col: stateIndex + 1 };
-    }
-    return null;
-  }, [currentState, config]);
+  const tableHeaders = useMemo(
+    () => buildTransitionTableHeaders(config.states),
+    [config.states],
+  );
+  const tableRows = useMemo(() => buildTransitionTableRows(config), [config]);
+  const activeCell = useMemo(
+    () => getActiveTransitionCell(config, currentState),
+    [config, currentState],
+  );
 
   const handleApplyConfig = () => {
+    if (tableEditError) {
+      return;
+    }
+
+    try {
+      validateTMConfig(config);
+    } catch (err) {
+      setConfigError(err instanceof Error ? err.message : String(err));
+      return;
+    }
+
     reset(config);
+    setConfigError(null);
     setIsEditMode(false);
   };
 
   const handleEditConfig = () => {
+    setConfigError(null);
+    setTableEditError(null);
     setIsEditMode(true);
     pause();
   };
 
+  const handleConfigChange = (newConfig: TMConfig) => {
+    setConfig(newConfig);
+    setConfigError(null);
+  };
+
   return (
-    <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto p-4">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4">
       {isEditMode ? (
         <div className="flex flex-col gap-4">
-          <TMConfigView config={config} onChange={setConfig} />
+          <TMConfigView
+            config={config}
+            onChange={handleConfigChange}
+            validationError={configError}
+            onTableEditErrorChange={setTableEditError}
+          />
           <button
             onClick={handleApplyConfig}
-            className="self-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            disabled={!!tableEditError}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {t('tm.config.apply', 'Start Simulation')}
+            {t("tm.config.apply", "Start Simulation")}
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">{t('tm.sim.title', 'Turing Machine Simulator')}</h2>
-            <button
-              onClick={handleEditConfig}
-              className="px-4 py-2 border rounded-md hover:bg-accent"
-            >
-              {t('tm.sim.edit', 'Edit Configuration')}
-            </button>
-          </div>
-
-          <div className="w-full">
-            <ArrayView
-              data={currentState.tape}
-              focusIndex={currentState.headPosition}
-              emptySymbol={config.blankSymbol}
-            />
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
-            <div className="flex flex-col gap-4 w-full lg:w-1/3">
-              <SimulatorControls
-                status={status}
-                speed={speed}
-                onPlay={play}
-                onPause={pause}
-                onStep={step}
-                onStepBack={stepBack}
-                onReset={() => reset()}
-                onSpeedChange={setSpeed}
-              />
-
-              <div className="border p-4 rounded-lg bg-card mt-4">
-                <h3 className="font-semibold mb-2">{t('tm.sim.status', 'Status')}</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-muted-foreground">{t('tm.sim.state', 'Current State')}:</div>
-                  <div className="font-mono">{formatState(currentState.currentState)}</div>
-                  <div className="text-muted-foreground">{t('tm.sim.symbol', 'Current Symbol')}:</div>
-                  <div className="font-mono">{currentState.tape[currentState.headPosition] || config.blankSymbol}</div>
-                  <div className="text-muted-foreground">{t('tm.sim.halt', 'Halted')}:</div>
-                  <div>{currentState.isHalted ? 'Yes' : 'No'}</div>
-                </div>
-                {currentState.errorMessage && (
-                  <div className="mt-4 p-2 bg-destructive/10 text-destructive text-sm rounded">
-                    {currentState.errorMessage}
-                  </div>
-                )}
-                {error && (
-                  <div className="mt-4 p-2 bg-destructive/10 text-destructive text-sm rounded">
-                    {error.message}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="w-full lg:w-2/3">
-              <TableView
-                headers={tableHeaders}
-                rows={tableRows}
-                activeCell={activeCell}
-              />
-            </div>
-          </div>
-        </div>
+        <TMSimulationView
+          config={config}
+          currentState={currentState}
+          tableHeaders={tableHeaders}
+          tableRows={tableRows}
+          activeCell={activeCell}
+          status={status}
+          speed={speed}
+          error={error}
+          onEditConfig={handleEditConfig}
+          onPlay={play}
+          onPause={pause}
+          onStep={step}
+          onStepBack={stepBack}
+          onReset={() => reset()}
+          onSpeedChange={setSpeed}
+        />
       )}
     </div>
   );

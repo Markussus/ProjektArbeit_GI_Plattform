@@ -1,3 +1,2 @@
-export { SimulatorControls } from './SimulatorControls';
-export type { SimulatorControlsProps } from './SimulatorControls';
-
+export { SimulatorControls } from "./SimulatorControls";
+export type { SimulatorControlsProps } from "./SimulatorControls";
