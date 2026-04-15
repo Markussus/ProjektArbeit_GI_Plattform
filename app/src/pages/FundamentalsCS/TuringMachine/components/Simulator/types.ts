@@ -51,6 +51,8 @@ export interface TMState {
   isHalted: boolean;
   // Optional error message if the machine crashes or enters an invalid state
   errorMessage?: string;
+  // The number of steps the machine has executed
+  stepCount: number;
 }
 
 /**

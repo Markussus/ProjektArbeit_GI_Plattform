@@ -177,6 +177,10 @@ export function TMSimulator() {
                       config.blankSymbol}
                   </div>
                   <div className="text-muted-foreground">
+                    {t("tm.sim.step", "Step")}:
+                  </div>
+                  <div>{currentState.stepCount}</div>
+                  <div className="text-muted-foreground">
                     {t("tm.sim.halt", "Halted")}:
                   </div>
                   <div>{currentState.isHalted ? "Yes" : "No"}</div>

@@ -16,6 +16,9 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
 
     if (state) {
       this.state = JSON.parse(JSON.stringify(state)); // deep copy state
+      if (this.state && this.state.stepCount === undefined) {
+        this.state.stepCount = 0;
+      }
     } else {
       // create initial state from config
       const initialTape: Record<number, TapeSymbol> = {};
@@ -28,6 +31,7 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
         headPosition: 0,
         tape: initialTape,
         isHalted: config.haltStates.includes(config.initialState),
+        stepCount: 0,
       };
     }
   }
@@ -82,6 +86,8 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
       this.state.headPosition -= 1;
     }
     // if 'N', head position stays the same
+
+    this.state.stepCount += 1;
 
     // Check if the new state is a halting state
     if (this.config.haltStates.includes(this.state.currentState)) {
