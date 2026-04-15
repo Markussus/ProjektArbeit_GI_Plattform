@@ -18,6 +18,10 @@ const defaultConfig: TMConfig = {
   haltStates: ['q3'],
   initialTape: ['1', '0', '1', '1'],
   transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      'q0': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
+      'q1': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
+    },
     '0': {
       'q0': { nextState: 'q0', writeSymbol: '1', movement: 'R' },
       'q1': { nextState: 'q1', writeSymbol: '0', movement: 'R' },
@@ -25,10 +29,6 @@ const defaultConfig: TMConfig = {
     '1': {
       'q0': { nextState: 'q1', writeSymbol: '0', movement: 'R' },
       'q1': { nextState: 'q0', writeSymbol: '1', movement: 'R' },
-    },
-    [DEFAULT_BLANK_SYMBOL]: {
-      'q0': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
-      'q1': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
     }
   }
 };
