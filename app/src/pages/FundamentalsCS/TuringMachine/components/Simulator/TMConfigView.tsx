@@ -1,37 +1,12 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TableView } from '@/components/shared/TableVisual/TableView';
-import type { TMConfig, TMTransition, HeadMovement } from './types';
+import type { TMConfig } from './types';
+import { formatState, parseTransition, formatTransition } from './types';
 
 export interface TMConfigViewProps {
   config: TMConfig;
   onChange: (newConfig: TMConfig) => void;
-}
-
-// Helper to wrap digits in subscript (e.g., q0 -> q₀)
-function formatStateHeader(state: string) {
-  return state.replace(/\d+/g, (match) => {
-    return match.split('').map(d => String.fromCharCode(8320 + parseInt(d))).join('');
-  });
-}
-
-// Parses string like "(q1, 0, R)" into transition object
-function parseTransition(cellValue: string): TMTransition | null {
-  const match = cellValue.match(/^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNR])\s*\)\s*$/);
-  if (match) {
-    return {
-      nextState: match[1].trim(),
-      writeSymbol: match[2].trim(),
-      movement: match[3].trim() as HeadMovement
-    };
-  }
-  return null;
-}
-
-// Formats transition object into string like "(q1, 0, R)"
-function formatTransition(transition?: TMTransition): string {
-  if (!transition) return '';
-  return `(${transition.nextState}, ${transition.writeSymbol}, ${transition.movement})`;
 }
 
 export function TMConfigView({ config, onChange }: TMConfigViewProps) {
@@ -42,11 +17,11 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
     onChange({ ...config, initialTape: value.split('') });
   };
 
-  const tableHeaders = ['δ', ...config.states.map(formatStateHeader)];
+  const tableHeaders: string[] = ['δ', ...config.states.map(formatState)];
 
   const tableRows = useMemo(() => {
     return config.tapeAlphabet.map(symbol => {
-      const row = [symbol];
+      const row: string[] = [symbol];
       config.states.forEach(state => {
         const trans = config.transitions[symbol]?.[state];
         row.push(formatTransition(trans));
@@ -114,4 +89,3 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
     </div>
   );
 }
-

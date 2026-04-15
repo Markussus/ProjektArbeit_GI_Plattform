@@ -6,13 +6,14 @@ import { ArrayView } from '@/components/shared/ArrayVisual/ArrayView';
 import { TMConfigView } from './TMConfigView';
 import { TableView } from '@/components/shared/TableVisual/TableView';
 import type { TMConfig } from './types';
+import { formatState, formatTransition, DEFAULT_BLANK_SYMBOL } from './types';
 import { useTranslation } from 'react-i18next';
 
 const defaultConfig: TMConfig = {
   states: ['q0', 'q1', 'q2', 'q3'],
   inputAlphabet: ['0', '1'],
-  tapeAlphabet: ['0', '1', 'B'],
-  blankSymbol: 'B',
+  tapeAlphabet: ['0', '1', DEFAULT_BLANK_SYMBOL],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: 'q0',
   haltStates: ['q3'],
   initialTape: ['1', '0', '1', '1'],
@@ -25,20 +26,14 @@ const defaultConfig: TMConfig = {
       'q0': { nextState: 'q1', writeSymbol: '0', movement: 'R' },
       'q1': { nextState: 'q0', writeSymbol: '1', movement: 'R' },
     },
-    'B': {
-      'q0': { nextState: 'q3', writeSymbol: 'B', movement: 'N' },
-      'q1': { nextState: 'q3', writeSymbol: 'B', movement: 'N' },
+    [DEFAULT_BLANK_SYMBOL]: {
+      'q0': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
+      'q1': { nextState: 'q3', writeSymbol: DEFAULT_BLANK_SYMBOL, movement: 'N' },
     }
   }
 };
 
 const simulator = new TuringMachineSimulator();
-
-function formatStateHeader(state: string) {
-  return state.replace(/\d+/g, (match) => {
-    return match.split('').map(d => String.fromCharCode(8320 + parseInt(d))).join('');
-  });
-}
 
 export function TMSimulator() {
   const { t } = useTranslation();
@@ -59,14 +54,14 @@ export function TMSimulator() {
   } = useSimulationEngine(simulator, config);
 
   // For readonly table in simulation mode
-  const tableHeaders = useMemo(() => ['δ', ...config.states.map(formatStateHeader)], [config.states]);
+  const tableHeaders = useMemo(() => ['δ', ...config.states.map(formatState)], [config.states]);
 
   const tableRows = useMemo(() => {
     return config.tapeAlphabet.map(symbol => {
       const row = [symbol];
       config.states.forEach(state => {
         const trans = config.transitions[symbol]?.[state];
-        row.push(trans ? `(${trans.nextState}, ${trans.writeSymbol}, ${trans.movement})` : '');
+        row.push(formatTransition(trans));
       });
       return row;
     });
@@ -143,7 +138,7 @@ export function TMSimulator() {
                 <h3 className="font-semibold mb-2">{t('tm.sim.status', 'Status')}</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="text-muted-foreground">{t('tm.sim.state', 'Current State')}:</div>
-                  <div className="font-mono">{formatStateHeader(currentState.currentState)}</div>
+                  <div className="font-mono">{formatState(currentState.currentState)}</div>
                   <div className="text-muted-foreground">{t('tm.sim.symbol', 'Current Symbol')}:</div>
                   <div className="font-mono">{currentState.tape[currentState.headPosition] || config.blankSymbol}</div>
                   <div className="text-muted-foreground">{t('tm.sim.halt', 'Halted')}:</div>
@@ -175,4 +170,3 @@ export function TMSimulator() {
     </div>
   );
 }
-
