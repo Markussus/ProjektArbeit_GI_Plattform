@@ -75,7 +75,12 @@ export function TMSimulator() {
       });
       return row;
     });
-  }, [config.tapeAlphabet, config.states, config.transitions, config.blankSymbol]);
+  }, [
+    config.tapeAlphabet,
+    config.states,
+    config.transitions,
+    config.blankSymbol,
+  ]);
 
   const activeCell = useMemo(() => {
     if (!currentState) return null;

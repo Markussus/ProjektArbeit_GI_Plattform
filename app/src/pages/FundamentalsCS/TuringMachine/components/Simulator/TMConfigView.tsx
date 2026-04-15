@@ -90,6 +90,17 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
         if (newTransitions[symbol] && newTransitions[symbol][state]) {
           delete newTransitions[symbol][state];
         }
+      } else if (
+        !config.transitions[symbol] ||
+        !config.transitions[symbol][state]
+      ) {
+        // Insert a template if the user starts typing in an empty cell
+        if (!newTransitions[symbol]) newTransitions[symbol] = {};
+        newTransitions[symbol][state] = {
+          nextState: "q",
+          writeSymbol: config.blankSymbol,
+          movement: "N",
+        };
       }
     }
 
