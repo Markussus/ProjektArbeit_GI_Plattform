@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 
@@ -12,21 +12,20 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "on-first-retry",
+    browserName: "chromium",
+    ...(isCI
+      ? {
+          channel: "chromium",
+          executablePath: "/usr/bin/chromium",
+          launchOptions: {
+            args: ["--no-sandbox"],
+          },
+        }
+      : {}),
   },
   projects: [
     {
       name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        ...(isCI
-          ? {
-              executablePath: "/usr/bin/chromium",
-              launchOptions: {
-                args: ["--no-sandbox"],
-              },
-            }
-          : {}),
-      },
     },
   ],
 });
