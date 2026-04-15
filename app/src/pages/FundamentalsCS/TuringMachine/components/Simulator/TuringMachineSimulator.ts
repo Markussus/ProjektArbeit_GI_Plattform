@@ -1,6 +1,78 @@
 import type { ISimulator } from "@/types/simulator.ts";
 import type { TMConfig, TMState, TapeSymbol } from "./types";
 
+export function validateTMConfig(config: TMConfig): void {
+  const errors: string[] = [];
+  const states = new Set(config.states);
+  const inputAlphabet = new Set(config.inputAlphabet);
+  const tapeAlphabet = new Set(config.tapeAlphabet);
+
+  if (config.haltStates.length === 0) {
+    errors.push("At least one halt state must be defined.");
+  }
+
+  if (!states.has(config.initialState)) {
+    errors.push(`The initial state '${config.initialState}' must exist in the set of states.`);
+  }
+
+  const invalidHaltStates = config.haltStates.filter((state) => !states.has(state));
+  if (invalidHaltStates.length > 0) {
+    errors.push(
+      `All halt states must exist in the set of states. Invalid halt states: ${invalidHaltStates.join(", ")}.`,
+    );
+  }
+
+  if (!tapeAlphabet.has(config.blankSymbol)) {
+    errors.push(`The blank symbol '${config.blankSymbol}' must be part of the tape alphabet.`);
+  }
+
+  // TODO check if blank isn't allowed in input
+  // if (inputAlphabet.has(config.blankSymbol)) {
+  //   errors.push(`The blank symbol '${config.blankSymbol}' must not be part of the input alphabet.`);
+  // }
+
+  const invalidInitialTapeSymbols = config.initialTape.filter(
+    (symbol) => !inputAlphabet.has(symbol),
+  );
+  if (invalidInitialTapeSymbols.length > 0) {
+    errors.push(
+      `All symbols on the initial tape must be part of the input alphabet. Invalid symbols: ${Array.from(new Set(invalidInitialTapeSymbols)).join(", ")}.`,
+    );
+  }
+
+  for (const [readSymbol, stateTransitions] of Object.entries(config.transitions)) {
+    if (!tapeAlphabet.has(readSymbol)) {
+      errors.push(
+        `A transition is defined for read symbol '${readSymbol}', but this symbol is not part of the tape alphabet.`,
+      );
+    }
+
+    for (const [currentState, transition] of Object.entries(stateTransitions)) {
+      if (!states.has(currentState)) {
+        errors.push(
+          `A transition is defined for state '${currentState}', but this state is not part of the set of states.`,
+        );
+      }
+
+      if (!states.has(transition.nextState)) {
+        errors.push(
+          `Transition from state '${currentState}' on symbol '${readSymbol}' points to unknown next state '${transition.nextState}'.`,
+        );
+      }
+
+      if (!tapeAlphabet.has(transition.writeSymbol)) {
+        errors.push(
+          `Transition from state '${currentState}' on symbol '${readSymbol}' writes unknown symbol '${transition.writeSymbol}'.`,
+        );
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("\n"));
+  }
+}
+
 export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
   private config: TMConfig | null = null;
   private state: TMState | null = null;
@@ -11,6 +83,8 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
    * Initializes the simulator with a configuration and optional initial state.
    */
   public initialize(config: TMConfig, state?: TMState): void {
+    validateTMConfig(config);
+
     this.config = JSON.parse(JSON.stringify(config)); // deep copy config
     this.history = [];
 

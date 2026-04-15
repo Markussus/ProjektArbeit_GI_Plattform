@@ -7,9 +7,14 @@ import { formatState, parseTransition, formatTransition } from "./types";
 export interface TMConfigViewProps {
   config: TMConfig;
   onChange: (newConfig: TMConfig) => void;
+  validationError?: string | null;
 }
 
-export function TMConfigView({ config, onChange }: TMConfigViewProps) {
+export function TMConfigView({
+  config,
+  onChange,
+  validationError,
+}: TMConfigViewProps) {
   const { t } = useTranslation();
 
   const handleInitialTapeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,6 +255,11 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
         <h2 className="text-lg font-bold">
           {t("tm.config.title", "Turing Machine Configuration")}
         </h2>
+        {validationError && (
+          <div className="bg-destructive/10 text-destructive whitespace-pre-line rounded-md border border-current/20 p-3 text-sm">
+            {validationError}
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_12rem]">
           <div className="flex flex-col gap-2">

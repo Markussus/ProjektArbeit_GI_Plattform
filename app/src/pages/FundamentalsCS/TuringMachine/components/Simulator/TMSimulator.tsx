@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { useSimulationEngine } from "@/hooks/useSimulationEngine";
-import { TuringMachineSimulator } from "./TuringMachineSimulator";
+import {
+  TuringMachineSimulator,
+  validateTMConfig,
+} from "./TuringMachineSimulator";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { ArrayView } from "@/components/shared/ArrayVisual/ArrayView";
 import { TMConfigView } from "./TMConfigView";
@@ -41,6 +44,7 @@ const simulator = new TuringMachineSimulator();
 export function TMSimulator() {
   const { t } = useTranslation();
   const [config, setConfig] = useState<TMConfig>(defaultConfig);
+  const [configError, setConfigError] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
 
   const {
@@ -102,20 +106,38 @@ export function TMSimulator() {
   }, [currentState, config]);
 
   const handleApplyConfig = () => {
+    try {
+      validateTMConfig(config);
+    } catch (err) {
+      setConfigError(err instanceof Error ? err.message : String(err));
+      return;
+    }
+
     reset(config);
+    setConfigError(null);
     setIsEditMode(false);
   };
 
   const handleEditConfig = () => {
+    setConfigError(null);
     setIsEditMode(true);
     pause();
+  };
+
+  const handleConfigChange = (newConfig: TMConfig) => {
+    setConfig(newConfig);
+    setConfigError(null);
   };
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4">
       {isEditMode ? (
         <div className="flex flex-col gap-4">
-          <TMConfigView config={config} onChange={setConfig} />
+          <TMConfigView
+            config={config}
+            onChange={handleConfigChange}
+            validationError={configError}
+          />
           <button
             onClick={handleApplyConfig}
             className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2"
