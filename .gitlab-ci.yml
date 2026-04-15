@@ -73,7 +73,7 @@ lighthouse_check:
     - apt-get update
     - apt-get install -y chromium
     - export CHROME_PATH=/usr/bin/chromium
-    - npm run lhci
+    - npm run lhci:ci
   artifacts:
     when: always
     expire_in: 1 week

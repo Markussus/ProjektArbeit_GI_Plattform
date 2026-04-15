@@ -24,6 +24,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "lhci:ci": "start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci",
     "e2e:ci": "start-server-and-test preview:ci http://127.0.0.1:4173 \"playwright test tests/e2e --project=chromium\""
   },
   "dependencies": {
