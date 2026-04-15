@@ -10,25 +10,28 @@ import { formatState, formatTransition, DEFAULT_BLANK_SYMBOL } from "./types";
 import { useTranslation } from "react-i18next";
 
 const defaultConfig: TMConfig = {
-  states: ["q0", "q1", "q2", "q3"],
-  inputAlphabet: ["0", "1"],
-  tapeAlphabet: ["0", "1", DEFAULT_BLANK_SYMBOL],
+  states: ["q0", "q1", "q2", "qS"],
+  inputAlphabet: ["0", "1", "E"],
+  tapeAlphabet: ["0", "1", "E", DEFAULT_BLANK_SYMBOL],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["q3"],
-  initialTape: ["1", "0", "1", "1"],
+  haltStates: ["qS"],
+  initialTape: ["1", "0", "0", "1"],
   transitions: {
     [DEFAULT_BLANK_SYMBOL]: {
-      q0: { nextState: "q3", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
-      q1: { nextState: "q3", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q1: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
     },
     "0": {
-      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
-      q1: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q0: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "0", movement: "R" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
     },
     "1": {
-      q0: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
       q1: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
     },
   },
 };
@@ -60,7 +63,11 @@ export function TMSimulator() {
   );
 
   const tableRows = useMemo(() => {
-    return config.tapeAlphabet.map((symbol) => {
+    const sortedAlphabet = [
+      config.blankSymbol,
+      ...config.tapeAlphabet.filter((s) => s !== config.blankSymbol),
+    ];
+    return sortedAlphabet.map((symbol) => {
       const row = [symbol];
       config.states.forEach((state) => {
         const trans = config.transitions[symbol]?.[state];
@@ -68,13 +75,19 @@ export function TMSimulator() {
       });
       return row;
     });
-  }, [config.tapeAlphabet, config.states, config.transitions]);
+  }, [config.tapeAlphabet, config.states, config.transitions, config.blankSymbol]);
 
   const activeCell = useMemo(() => {
     if (!currentState) return null;
     const currentSymbol =
       currentState.tape[currentState.headPosition] || config.blankSymbol;
-    const symbolIndex = config.tapeAlphabet.indexOf(currentSymbol);
+
+    const sortedAlphabet = [
+      config.blankSymbol,
+      ...config.tapeAlphabet.filter((s) => s !== config.blankSymbol),
+    ];
+
+    const symbolIndex = sortedAlphabet.indexOf(currentSymbol);
     const stateIndex = config.states.indexOf(currentState.currentState);
 
     if (symbolIndex >= 0 && stateIndex >= 0) {
