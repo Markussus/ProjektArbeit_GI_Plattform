@@ -251,25 +251,49 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
           {t("tm.config.title", "Turing Machine Configuration")}
         </h2>
 
-        <div className="mt-4 flex flex-col items-start gap-6 lg:flex-row">
-          <div className="flex w-full flex-1 flex-col gap-6 overflow-hidden">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold">
-                {t("tm.config.initialTape", "Initial Tape Word")}
-              </label>
-              <input
-                type="text"
-                className="rounded border p-2 font-mono text-lg"
-                value={config.initialTape.join("")}
-                onChange={handleInitialTapeChange}
-                placeholder={t(
-                  "tm.config.initialTapePlaceholder",
-                  "Enter input word (e.g., 1011)",
-                )}
-              />
-            </div>
+        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_12rem]">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">
+              {t("tm.config.initialTape", "Initial Tape Word")}
+            </label>
+            <input
+              type="text"
+              className="h-12 w-full rounded border px-3 py-2 font-mono text-lg"
+              value={config.initialTape.join("")}
+              onChange={handleInitialTapeChange}
+              placeholder={t(
+                "tm.config.initialTapePlaceholder",
+                "Enter input word (e.g., 1011)",
+              )}
+            />
+          </div>
 
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold">
+              {t("tm.config.startState", "Start State")}
+            </label>
+            <select
+              className="bg-background h-12 w-full rounded border px-3 py-2 font-mono text-lg"
+              value={config.initialState}
+              onChange={(e) =>
+                onChange({ ...config, initialState: e.target.value })
+              }
+            >
+              {config.states
+                .filter(
+                  (s) =>
+                    !config.haltStates.includes(s) || s === config.initialState,
+                )
+                .map((s) => (
+                  <option key={s} value={s}>
+                    {formatState(s)}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2 overflow-hidden">
+            <div className="mb-2 min-h-[3.5rem]">
               <h3 className="text-md font-semibold">
                 {t("tm.config.transitionTable", "Transition Table")}
               </h3>
@@ -278,96 +302,70 @@ export function TMConfigView({ config, onChange }: TMConfigViewProps) {
                 <code>(Next State, Write Symbol, Movement)</code>
                 {t("tm.config.transitionExample", " e.g., (q1, 0, R)")}
               </p>
-              <TableView
-                headers={tableHeaders}
-                rows={tableRows}
-                editable={true}
-                onCellChange={handleCellChange}
-                onHeaderChange={handleHeaderChange}
-                canAddRow={true}
-                onAddRow={handleAddRow}
-                canRemoveRow={true}
-                onRemoveRow={handleRemoveRow}
-                canAddColumn={true}
-                onAddColumn={handleAddColumn}
-                canRemoveColumn={true}
-                onRemoveColumn={handleRemoveColumn}
-                className="mt-2"
-              />
             </div>
+            <TableView
+              headers={tableHeaders}
+              rows={tableRows}
+              editable={true}
+              onCellChange={handleCellChange}
+              onHeaderChange={handleHeaderChange}
+              canAddRow={true}
+              onAddRow={handleAddRow}
+              canRemoveRow={true}
+              onRemoveRow={handleRemoveRow}
+              canAddColumn={true}
+              onAddColumn={handleAddColumn}
+              canRemoveColumn={true}
+              onRemoveColumn={handleRemoveColumn}
+            />
           </div>
 
-          <div className="flex w-full shrink-0 flex-col gap-6 lg:w-48">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold">
-                {t("tm.config.startState", "Start State")}
-              </label>
-              <select
-                className="bg-background rounded border p-2 font-mono text-lg"
-                value={config.initialState}
-                onChange={(e) =>
-                  onChange({ ...config, initialState: e.target.value })
-                }
-              >
-                {config.states
-                  .filter(
-                    (s) =>
-                      !config.haltStates.includes(s) ||
-                      s === config.initialState,
-                  )
-                  .map((s) => (
-                    <option key={s} value={s}>
-                      {formatState(s)}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="mb-2 min-h-[3.5rem]">
               <h3 className="text-md font-semibold">
                 {t("tm.config.haltStates", "Halt States")}
               </h3>
-              <p className="text-muted-foreground mb-2 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {t("tm.config.haltStatesDesc", "Mark states as halting.")}
               </p>
-              <div className="bg-card flex flex-col gap-2 rounded border p-3">
-                {config.states
-                  .filter((s) => s !== config.initialState)
-                  .map((s) => (
-                    <label
-                      key={s}
-                      className="flex cursor-pointer items-center gap-2"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={config.haltStates.includes(s)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            onChange({
-                              ...config,
-                              haltStates: [...config.haltStates, s],
-                            });
-                          } else {
-                            onChange({
-                              ...config,
-                              haltStates: config.haltStates.filter(
-                                (h) => h !== s,
-                              ),
-                            });
-                          }
-                        }}
-                        className="text-primary h-4 w-4 cursor-pointer rounded border-gray-300"
-                      />
-                      <span className="font-mono">{formatState(s)}</span>
-                    </label>
-                  ))}
-                {config.states.filter((s) => s !== config.initialState)
-                  .length === 0 && (
-                  <span className="text-muted-foreground text-sm italic">
-                    {t("tm.config.noStates", "No states available")}
-                  </span>
-                )}
-              </div>
+            </div>
+            <div className="bg-card flex flex-col gap-2 rounded border p-3">
+              {config.states
+                .filter((s) => s !== config.initialState)
+                .map((s) => (
+                  <label
+                    key={s}
+                    className="flex cursor-pointer items-center gap-2"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={config.haltStates.includes(s)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          onChange({
+                            ...config,
+                            haltStates: [...config.haltStates, s],
+                          });
+                        } else {
+                          onChange({
+                            ...config,
+                            haltStates: config.haltStates.filter(
+                              (h) => h !== s,
+                            ),
+                          });
+                        }
+                      }}
+                      className="text-primary h-4 w-4 cursor-pointer rounded border-gray-300"
+                    />
+                    <span className="font-mono">{formatState(s)}</span>
+                  </label>
+                ))}
+              {config.states.filter((s) => s !== config.initialState).length ===
+                0 && (
+                <span className="text-muted-foreground text-sm italic">
+                  {t("tm.config.noStates", "No states available")}
+                </span>
+              )}
             </div>
           </div>
         </div>
