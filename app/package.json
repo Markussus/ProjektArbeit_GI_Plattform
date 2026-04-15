@@ -17,7 +17,10 @@
     "build:preview:open": "tsc -b && vite build && vite preview --open",
     "e2e-test": "playwright test",
     "e2e-test:open": "playwright test --ui",
-    "e2e-test:report": "playwright show-report"
+    "e2e-test:report": "playwright show-report",
+    "preview:ci": "vite preview --host 127.0.0.1 --port 4173",
+    "lighthouse:ci": "lhci autorun",
+    "lhci": "npm run build && start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
@@ -40,6 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.59.1",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
@@ -51,6 +55,7 @@
     "globals": "^17.4.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "start-server-and-test": "^3.0.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.0",
     "vite": "^8.0.1"
