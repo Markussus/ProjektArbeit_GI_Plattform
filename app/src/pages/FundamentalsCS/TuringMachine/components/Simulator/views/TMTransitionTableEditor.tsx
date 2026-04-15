@@ -1,26 +1,35 @@
+import type { TablePosition } from "@/components/shared/TableVisual/TableView";
 import { useTranslation } from "react-i18next";
 import { TableView } from "@/components/shared/TableVisual/TableView";
 
-interface TMTransitionTableEditorProps {
+export interface TMTransitionTableEditorProps {
   headers: string[];
   rows: string[][];
   onCellChange: (rowIndex: number, colIndex: number, value: string) => void;
+  onCellBlur: (rowIndex: number, colIndex: number) => void;
   onHeaderChange: (colIndex: number, value: string) => void;
   onAddRow: () => void;
   onRemoveRow: (rowIndex: number) => void;
   onAddColumn: () => void;
   onRemoveColumn: (colIndex: number) => void;
+  invalidCell?: TablePosition | null;
+  isCellDisabled?: (rowIndex: number, colIndex: number) => boolean;
+  disabled?: boolean;
 }
 
 export function TMTransitionTableEditor({
   headers,
   rows,
   onCellChange,
+  onCellBlur,
   onHeaderChange,
   onAddRow,
   onRemoveRow,
   onAddColumn,
   onRemoveColumn,
+  invalidCell,
+  isCellDisabled,
+  disabled = false,
 }: TMTransitionTableEditorProps) {
   const { t } = useTranslation();
 
@@ -42,15 +51,23 @@ export function TMTransitionTableEditor({
         rows={rows}
         editable={true}
         onCellChange={onCellChange}
+        onCellBlur={onCellBlur}
         onHeaderChange={onHeaderChange}
+        invalidCell={invalidCell}
+        isCellDisabled={isCellDisabled}
+        headersDisabled={disabled}
         canAddRow={true}
         onAddRow={onAddRow}
+        disableAddRow={disabled}
         canRemoveRow={true}
         onRemoveRow={onRemoveRow}
+        disableRemoveRow={disabled}
         canAddColumn={true}
         onAddColumn={onAddColumn}
+        disableAddColumn={disabled}
         canRemoveColumn={true}
         onRemoveColumn={onRemoveColumn}
+        disableRemoveColumn={disabled}
       />
     </div>
   );

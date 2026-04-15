@@ -2,11 +2,12 @@ import { useTranslation } from "react-i18next";
 import type { StateName } from "../types";
 import { formatState } from "../utils/tmFormatting";
 
-interface TMHaltStatesPanelProps {
+export interface TMHaltStatesPanelProps {
   states: StateName[];
   initialState: StateName;
   haltStates: StateName[];
   onToggle: (state: StateName, isHalting: boolean) => void;
+  disabled?: boolean;
 }
 
 export function TMHaltStatesPanel({
@@ -14,6 +15,7 @@ export function TMHaltStatesPanel({
   initialState,
   haltStates,
   onToggle,
+  disabled = false,
 }: TMHaltStatesPanelProps) {
   const { t } = useTranslation();
   const selectableStates = states.filter((state) => state !== initialState);
@@ -36,6 +38,7 @@ export function TMHaltStatesPanel({
               type="checkbox"
               checked={haltStates.includes(state)}
               onChange={(event) => onToggle(state, event.target.checked)}
+              disabled={disabled}
               className="text-primary h-4 w-4 cursor-pointer rounded border-gray-300"
             />
             <span className="font-mono">{formatState(state)}</span>

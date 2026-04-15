@@ -1,7 +1,9 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { TablePosition } from "@/components/shared/TableVisual/TableView";
 import { useTranslation } from "react-i18next";
 import type { TMConfig } from "../types";
 import { isSingleTapeSymbol } from "../utils/tmSymbolValidation";
+import { parseTransition } from "../utils/tmParsing";
 import {
   addState,
   addTapeSymbol,
@@ -19,22 +21,38 @@ import {
   buildTransitionTableRows,
   getOrderedTapeAlphabet,
 } from "../model/tmTable";
-import { TMGeneralSettings } from "./TMGeneralSettings";
-import { TMHaltStatesPanel } from "./TMHaltStatesPanel";
-import { TMTransitionTableEditor } from "./TMTransitionTableEditor";
+import {
+  TMGeneralSettings,
+  type TMGeneralSettingsProps,
+} from "./TMGeneralSettings.tsx";
+import {
+  TMHaltStatesPanel,
+  type TMHaltStatesPanelProps,
+} from "./TMHaltStatesPanel.tsx";
+import {
+  TMTransitionTableEditor,
+  type TMTransitionTableEditorProps,
+} from "./TMTransitionTableEditor.tsx";
 
 export interface TMConfigViewProps {
   config: TMConfig;
   onChange: (newConfig: TMConfig) => void;
   validationError?: string | null;
+  onTableEditErrorChange?: (error: string | null) => void;
 }
 
 export function TMConfigView({
   config,
   onChange,
   validationError,
+  onTableEditErrorChange,
 }: TMConfigViewProps) {
   const { t } = useTranslation();
+  const [cellDrafts, setCellDrafts] = useState<Record<string, string>>({});
+  const [invalidCell, setInvalidCell] = useState<{
+    position: TablePosition;
+    message: string;
+  } | null>(null);
 
   const orderedTapeAlphabet = getOrderedTapeAlphabet(config);
   const tableHeaders = useMemo(
@@ -42,8 +60,80 @@ export function TMConfigView({
     [config.states],
   );
   const tableRows = useMemo(() => buildTransitionTableRows(config), [config]);
+  const displayRows = useMemo(() => {
+    return tableRows.map((row, rowIndex) =>
+      row.map((cell, colIndex) => {
+        const draftKey = getCellKey(rowIndex, colIndex);
+        return cellDrafts[draftKey] ?? cell;
+      }),
+    );
+  }, [cellDrafts, tableRows]);
+  const hasBlockingTableError = invalidCell !== null;
+  const combinedError = [validationError, invalidCell?.message]
+    .filter(Boolean)
+    .join("\n\n");
+
+  useEffect(() => {
+    onTableEditErrorChange?.(invalidCell?.message ?? null);
+
+    return () => {
+      onTableEditErrorChange?.(null);
+    };
+  }, [invalidCell, onTableEditErrorChange]);
 
   const handleCellChange = (
+    rowIndex: number,
+    colIndex: number,
+    value: string,
+  ) => {
+    if (
+      hasBlockingTableError &&
+      !isSamePosition(invalidCell?.position, { row: rowIndex, col: colIndex })
+    ) {
+      return;
+    }
+
+    setCellDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [getCellKey(rowIndex, colIndex)]: value,
+    }));
+  };
+
+  const handleCellBlur = (rowIndex: number, colIndex: number) => {
+    const draftKey = getCellKey(rowIndex, colIndex);
+    const value = cellDrafts[draftKey] ?? tableRows[rowIndex]?.[colIndex] ?? "";
+    const errorMessage = validateTransitionTableCell({
+      config,
+      orderedTapeAlphabet,
+      rowIndex,
+      colIndex,
+      value,
+      t,
+    });
+
+    if (errorMessage) {
+      setInvalidCell({
+        position: { row: rowIndex, col: colIndex },
+        message: errorMessage,
+      });
+      return;
+    }
+
+    commitCellChange(rowIndex, colIndex, value);
+    setCellDrafts((currentDrafts) => {
+      const nextDrafts = { ...currentDrafts };
+      delete nextDrafts[draftKey];
+      return nextDrafts;
+    });
+
+    if (
+      isSamePosition(invalidCell?.position, { row: rowIndex, col: colIndex })
+    ) {
+      setInvalidCell(null);
+    }
+  };
+
+  const commitCellChange = (
     rowIndex: number,
     colIndex: number,
     value: string,
@@ -53,19 +143,12 @@ export function TMConfigView({
       return;
     }
 
+    const currentValue = tableRows[rowIndex]?.[colIndex] ?? "";
+    if (value === currentValue) {
+      return;
+    }
+
     if (colIndex === 0) {
-      if (symbol === config.blankSymbol) {
-        return;
-      }
-
-      if (!isSingleTapeSymbol(value)) {
-        return;
-      }
-
-      if (config.tapeAlphabet.includes(value) && value !== symbol) {
-        return;
-      }
-
       onChange(renameTapeSymbol(config, symbol, value));
       return;
     }
@@ -142,6 +225,53 @@ export function TMConfigView({
     onChange(renameState(config, currentState, value));
   };
 
+  const generalSettingsProps: TMGeneralSettingsProps = {
+    config,
+    disabled: hasBlockingTableError,
+    onInitialTapeChange: (value) => onChange(updateInitialTape(config, value)),
+    onInitialStateChange: (state) =>
+      onChange(updateInitialState(config, state)),
+  };
+
+  const transitionTableEditorProps: TMTransitionTableEditorProps = {
+    headers: tableHeaders,
+    rows: displayRows,
+    onCellChange: handleCellChange,
+    onCellBlur: handleCellBlur,
+    onHeaderChange: handleHeaderChange,
+    invalidCell: invalidCell?.position ?? null,
+    isCellDisabled: (rowIndex: number, colIndex: number) => {
+      if (
+        colIndex === 0 &&
+        orderedTapeAlphabet[rowIndex] === config.blankSymbol
+      ) {
+        return true;
+      }
+
+      return (
+        hasBlockingTableError &&
+        !isSamePosition(invalidCell?.position, {
+          row: rowIndex,
+          col: colIndex,
+        })
+      );
+    },
+    disabled: hasBlockingTableError,
+    onAddRow: () => onChange(addTapeSymbol(config)),
+    onRemoveRow: handleRemoveRow,
+    onAddColumn: () => onChange(addState(config)),
+    onRemoveColumn: handleRemoveColumn,
+  };
+
+  const haltStatesPanelProps: TMHaltStatesPanelProps = {
+    states: config.states,
+    initialState: config.initialState,
+    haltStates: config.haltStates,
+    disabled: hasBlockingTableError,
+    onToggle: (state, isHalting) =>
+      onChange(toggleHaltState(config, state, isHalting)),
+  };
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 p-4">
       <div className="space-y-4">
@@ -149,44 +279,83 @@ export function TMConfigView({
           {t("tm.config.title", "Turing Machine Configuration")}
         </h2>
 
-        {validationError && (
+        {combinedError && (
           <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">
-            {validationError}
+            {combinedError}
           </div>
         )}
 
         <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_12rem]">
-          <TMGeneralSettings
-            config={config}
-            onInitialTapeChange={(value) =>
-              onChange(updateInitialTape(config, value))
-            }
-            onInitialStateChange={(state) =>
-              onChange(updateInitialState(config, state))
-            }
-          />
+          <TMGeneralSettings {...generalSettingsProps} />
 
-          <TMTransitionTableEditor
-            headers={tableHeaders}
-            rows={tableRows}
-            onCellChange={handleCellChange}
-            onHeaderChange={handleHeaderChange}
-            onAddRow={() => onChange(addTapeSymbol(config))}
-            onRemoveRow={handleRemoveRow}
-            onAddColumn={() => onChange(addState(config))}
-            onRemoveColumn={handleRemoveColumn}
-          />
+          <TMTransitionTableEditor {...transitionTableEditorProps} />
 
-          <TMHaltStatesPanel
-            states={config.states}
-            initialState={config.initialState}
-            haltStates={config.haltStates}
-            onToggle={(state, isHalting) =>
-              onChange(toggleHaltState(config, state, isHalting))
-            }
-          />
+          <TMHaltStatesPanel {...haltStatesPanelProps} />
         </div>
       </div>
     </div>
   );
+}
+
+function getCellKey(rowIndex: number, colIndex: number): string {
+  return `${rowIndex}:${colIndex}`;
+}
+
+function isSamePosition(
+  left: TablePosition | null | undefined,
+  right: TablePosition,
+): boolean {
+  return left?.row === right.row && left?.col === right.col;
+}
+
+function validateTransitionTableCell({
+  config,
+  orderedTapeAlphabet,
+  rowIndex,
+  colIndex,
+  value,
+  t,
+}: {
+  config: TMConfig;
+  orderedTapeAlphabet: string[];
+  rowIndex: number;
+  colIndex: number;
+  value: string;
+  t: (key: string, defaultValue: string) => string;
+}): string | null {
+  if (colIndex === 0) {
+    const currentSymbol = orderedTapeAlphabet[rowIndex];
+    if (!currentSymbol || currentSymbol === config.blankSymbol) {
+      return null;
+    }
+
+    if (!isSingleTapeSymbol(value)) {
+      return t(
+        "tm.config.symbolSingleChar",
+        "Tape symbols must consist of exactly one character.",
+      );
+    }
+
+    if (config.tapeAlphabet.includes(value) && value !== currentSymbol) {
+      return t(
+        "tm.config.symbolDuplicate",
+        "This tape symbol already exists in the transition table.",
+      );
+    }
+
+    return null;
+  }
+
+  if (value.trim() === "") {
+    return null;
+  }
+
+  if (!parseTransition(value)) {
+    return t(
+      "tm.config.transitionCellInvalid",
+      "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character.",
+    );
+  }
+
+  return null;
 }

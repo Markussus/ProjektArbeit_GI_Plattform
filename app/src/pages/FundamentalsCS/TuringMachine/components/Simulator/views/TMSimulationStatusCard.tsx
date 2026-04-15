@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { TMState, TapeSymbol } from "../types";
 import { formatState } from "../utils/tmFormatting";
 
-interface TMSimulationStatusCardProps {
+export interface TMSimulationStatusCardProps {
   currentState: TMState;
   blankSymbol: TapeSymbol;
   error: Error | null;

@@ -20,6 +20,7 @@ export function TMSimulator() {
     cloneJson(defaultTMConfig),
   );
   const [configError, setConfigError] = useState<string | null>(null);
+  const [tableEditError, setTableEditError] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const simulator = useMemo(() => new TuringMachineSimulator(), []);
 
@@ -47,6 +48,10 @@ export function TMSimulator() {
   );
 
   const handleApplyConfig = () => {
+    if (tableEditError) {
+      return;
+    }
+
     try {
       validateTMConfig(config);
     } catch (err) {
@@ -61,6 +66,7 @@ export function TMSimulator() {
 
   const handleEditConfig = () => {
     setConfigError(null);
+    setTableEditError(null);
     setIsEditMode(true);
     pause();
   };
@@ -78,10 +84,12 @@ export function TMSimulator() {
             config={config}
             onChange={handleConfigChange}
             validationError={configError}
+            onTableEditErrorChange={setTableEditError}
           />
           <button
             onClick={handleApplyConfig}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2"
+            disabled={!!tableEditError}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t("tm.config.apply", "Start Simulation")}
           </button>

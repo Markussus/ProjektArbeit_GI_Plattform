@@ -23,20 +23,32 @@ export interface TableViewProps {
   editable?: boolean;
   /** Callback when cell text changes */
   onCellChange?: (rowIndex: number, colIndex: number, value: string) => void;
+  /** Callback when a cell loses focus */
+  onCellBlur?: (rowIndex: number, colIndex: number) => void;
   /** Callback when header text changes */
   onHeaderChange?: (colIndex: number, value: string) => void;
+  /** Mark a specific cell as invalid */
+  invalidCell?: TablePosition | null;
+  /** Disable editing for specific cells */
+  isCellDisabled?: (rowIndex: number, colIndex: number) => boolean;
+  /** Disable header editing and column actions */
+  headersDisabled?: boolean;
   /** Can new rows be added by the user? */
   canAddRow?: boolean;
   onAddRow?: () => void;
+  disableAddRow?: boolean;
   /** Can rows be removed by the user? */
   canRemoveRow?: boolean;
   onRemoveRow?: (rowIndex: number) => void;
+  disableRemoveRow?: boolean;
   /** Can new columns be added by the user? */
   canAddColumn?: boolean;
   onAddColumn?: () => void;
+  disableAddColumn?: boolean;
   /** Can columns be removed by the user? */
   canRemoveColumn?: boolean;
   onRemoveColumn?: (colIndex: number) => void;
+  disableRemoveColumn?: boolean;
   className?: string;
   tableClassName?: string;
 }
@@ -49,15 +61,23 @@ export function TableView({
   activeCol,
   editable = false,
   onCellChange,
+  onCellBlur,
   onHeaderChange,
+  invalidCell,
+  isCellDisabled,
+  headersDisabled = false,
   canAddRow = false,
   onAddRow,
+  disableAddRow = false,
   canRemoveRow = false,
   onRemoveRow,
+  disableRemoveRow = false,
   canAddColumn = false,
   onAddColumn,
+  disableAddColumn = false,
   canRemoveColumn = false,
   onRemoveColumn,
+  disableRemoveColumn = false,
   className,
   tableClassName,
 }: TableViewProps) {
@@ -95,6 +115,7 @@ export function TableView({
                       <input
                         value={header}
                         onChange={(e) => onHeaderChange?.(cIdx, e.target.value)}
+                        disabled={headersDisabled}
                         className="focus:ring-primary -ml-1 w-full rounded border-none bg-transparent px-1 text-sm font-semibold focus:ring-1 focus:outline-none"
                         autoComplete="off"
                         spellCheck="false"
@@ -107,7 +128,8 @@ export function TableView({
                       <button
                         type="button"
                         onClick={() => onRemoveColumn?.(cIdx)}
-                        className="text-destructive hover:bg-destructive/10 -mr-1 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                        disabled={headersDisabled || disableRemoveColumn}
+                        className="text-destructive hover:bg-destructive/10 -mr-1 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
                         title={t(
                           "simulation.table.removeColumn",
                           "Remove column",
@@ -126,7 +148,8 @@ export function TableView({
                 <button
                   type="button"
                   onClick={onAddColumn}
-                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors"
+                  disabled={headersDisabled || disableAddColumn}
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                   title={t("simulation.table.addColumn", "Add column")}
                 >
                   <Plus size={16} />
@@ -167,6 +190,9 @@ export function TableView({
                     const isColActive = activeCol === cIdx;
                     const isCellActive =
                       activeCell?.row === rIdx && activeCell?.col === cIdx;
+                    const isCellInvalid =
+                      invalidCell?.row === rIdx && invalidCell?.col === cIdx;
+                    const cellDisabled = isCellDisabled?.(rIdx, cIdx) ?? false;
 
                     const highlightSpecificCell = isCellActive;
                     const highlightSecondary = !isCellActive && isColActive;
@@ -179,6 +205,8 @@ export function TableView({
                           highlightSpecificCell &&
                             "bg-primary/30 ring-primary z-10 font-medium ring-2 ring-inset",
                           highlightSecondary && "bg-primary/5",
+                          isCellInvalid &&
+                            "bg-destructive/10 ring-destructive z-10 ring-2 ring-inset",
                         )}
                       >
                         {editable ? (
@@ -187,7 +215,13 @@ export function TableView({
                             onChange={(e) =>
                               onCellChange?.(rIdx, cIdx, e.target.value)
                             }
-                            className="focus:ring-primary hover:bg-muted/50 focus:bg-background w-full rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none"
+                            onBlur={() => onCellBlur?.(rIdx, cIdx)}
+                            disabled={cellDisabled}
+                            className={cn(
+                              "focus:ring-primary hover:bg-muted/50 focus:bg-background w-full rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                              isCellInvalid &&
+                                "text-destructive focus:ring-destructive",
+                            )}
                             autoComplete="off"
                             spellCheck="false"
                           />
@@ -206,7 +240,8 @@ export function TableView({
                         <button
                           type="button"
                           onClick={() => onRemoveRow?.(rIdx)}
-                          className="text-destructive hover:bg-destructive/10 mx-auto flex w-full items-center justify-center rounded p-1.5 opacity-0 transition-opacity group-hover:opacity-100"
+                          disabled={disableRemoveRow}
+                          className="text-destructive hover:bg-destructive/10 mx-auto flex w-full items-center justify-center rounded p-1.5 opacity-0 transition-opacity group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
                           title={t("simulation.table.removeRow", "Remove row")}
                         >
                           <Trash2 size={14} />
@@ -228,7 +263,8 @@ export function TableView({
                 <button
                   type="button"
                   onClick={onAddRow}
-                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all"
+                  disabled={disableAddRow}
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Plus size={16} />
                   {t("simulation.table.addRow", "Add new row")}

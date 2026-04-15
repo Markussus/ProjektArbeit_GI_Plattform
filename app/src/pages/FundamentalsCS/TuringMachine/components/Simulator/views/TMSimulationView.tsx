@@ -9,7 +9,7 @@ import {
 import type { TMConfig, TMState } from "../types";
 import { TMSimulationStatusCard } from "./TMSimulationStatusCard";
 
-interface TMSimulationViewProps {
+export interface TMSimulationViewProps {
   config: TMConfig;
   currentState: TMState;
   tableHeaders: string[];
