@@ -1,5 +1,5 @@
-import type {ISimulator} from '@/types/simulator.ts';
-import type {TMConfig, TMState, TapeSymbol} from './types';
+import type { ISimulator } from "@/types/simulator.ts";
+import type { TMConfig, TMState, TapeSymbol } from "./types";
 
 export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
   private config: TMConfig | null = null;
@@ -47,7 +47,8 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
     // Save current state to history before changing it
     this.history.push(JSON.parse(JSON.stringify(this.state)));
 
-    const currentSymbol = this.state.tape[this.state.headPosition] || this.config.blankSymbol;
+    const currentSymbol =
+      this.state.tape[this.state.headPosition] || this.config.blankSymbol;
     const currentState = this.state.currentState;
 
     // Look up the transition
@@ -75,9 +76,9 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
     this.state.currentState = transition.nextState;
 
     // 3. Move head
-    if (transition.movement === 'R') {
+    if (transition.movement === "R") {
       this.state.headPosition += 1;
-    } else if (transition.movement === 'L') {
+    } else if (transition.movement === "L") {
       this.state.headPosition -= 1;
     }
     // if 'N', head position stays the same
@@ -147,4 +148,3 @@ export class TuringMachineSimulator implements ISimulator<TMConfig, TMState> {
     return this.state.isHalted || !!this.state.errorMessage;
   }
 }
-

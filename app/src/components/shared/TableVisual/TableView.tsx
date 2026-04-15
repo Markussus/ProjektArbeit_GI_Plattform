@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useTranslation } from 'react-i18next';
+import { useMemo } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface TablePosition {
   row: number;
@@ -73,11 +73,11 @@ export function TableView({
   return (
     <div
       className={cn(
-        "w-full overflow-x-auto rounded-lg border bg-card text-card-foreground shadow-sm",
-        className
+        "bg-card text-card-foreground w-full overflow-x-auto rounded-lg border shadow-sm",
+        className,
       )}
     >
-      <table className={cn("w-full text-sm border-collapse", tableClassName)}>
+      <table className={cn("w-full border-collapse text-sm", tableClassName)}>
         <thead className="bg-muted/50 border-b">
           <tr>
             {headers.map((header, cIdx) => {
@@ -86,16 +86,16 @@ export function TableView({
                 <th
                   key={`header-${cIdx}`}
                   className={cn(
-                    "p-3 font-semibold border-r last:border-r-0 relative group text-left align-middle",
-                    isColActive && "bg-primary/20 text-foreground"
+                    "group relative border-r p-3 text-left align-middle font-semibold last:border-r-0",
+                    isColActive && "bg-primary/20 text-foreground",
                   )}
                 >
-                  <div className="flex items-center justify-between gap-1 min-w-15">
+                  <div className="flex min-w-15 items-center justify-between gap-1">
                     {editable ? (
                       <input
                         value={header}
                         onChange={(e) => onHeaderChange?.(cIdx, e.target.value)}
-                        className="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary rounded px-1 -ml-1 text-sm font-semibold"
+                        className="focus:ring-primary -ml-1 w-full rounded border-none bg-transparent px-1 text-sm font-semibold focus:ring-1 focus:outline-none"
                         autoComplete="off"
                         spellCheck="false"
                       />
@@ -107,8 +107,11 @@ export function TableView({
                       <button
                         type="button"
                         onClick={() => onRemoveColumn?.(cIdx)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive/10 p-1 rounded -mr-1"
-                        title={t("simulation.table.removeColumn", "Remove column")}
+                        className="text-destructive hover:bg-destructive/10 -mr-1 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                        title={t(
+                          "simulation.table.removeColumn",
+                          "Remove column",
+                        )}
                       >
                         <Trash2 size={14} className="shrink-0" />
                       </button>
@@ -119,11 +122,11 @@ export function TableView({
             })}
 
             {canAddColumn && editable && (
-              <th className="p-1 w-10 border-l">
+              <th className="w-10 border-l p-1">
                 <button
                   type="button"
                   onClick={onAddColumn}
-                  className="w-full h-full min-h-8 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors"
                   title={t("simulation.table.addColumn", "Add column")}
                 >
                   <Plus size={16} />
@@ -142,7 +145,7 @@ export function TableView({
             <tr>
               <td
                 colSpan={maxCols + (hasRowActions ? 1 : 0)}
-                className="p-8 text-center text-muted-foreground italic rounded-b-lg"
+                className="text-muted-foreground rounded-b-lg p-8 text-center italic"
               >
                 {t("simulation.table.empty", "Table is empty")}
               </td>
@@ -155,14 +158,15 @@ export function TableView({
                 <tr
                   key={`row-${rIdx}`}
                   className={cn(
-                    "border-b last:border-b-0 group transition-colors",
-                    isRowActive && "bg-primary/10" // Row highlight
+                    "group border-b transition-colors last:border-b-0",
+                    isRowActive && "bg-primary/10", // Row highlight
                   )}
                 >
                   {Array.from({ length: maxCols }).map((_, cIdx) => {
                     const cellValue = row[cIdx] || "";
                     const isColActive = activeCol === cIdx;
-                    const isCellActive = activeCell?.row === rIdx && activeCell?.col === cIdx;
+                    const isCellActive =
+                      activeCell?.row === rIdx && activeCell?.col === cIdx;
 
                     const highlightSpecificCell = isCellActive;
                     const highlightSecondary = !isCellActive && isColActive;
@@ -171,21 +175,24 @@ export function TableView({
                       <td
                         key={`cell-${rIdx}-${cIdx}`}
                         className={cn(
-                          "p-2 border-r last:border-r-0 relative transition-all align-middle",
-                          highlightSpecificCell && "bg-primary/30 ring-inset ring-2 ring-primary z-10 font-medium",
-                          highlightSecondary && "bg-primary/5"
+                          "relative border-r p-2 align-middle transition-all last:border-r-0",
+                          highlightSpecificCell &&
+                            "bg-primary/30 ring-primary z-10 font-medium ring-2 ring-inset",
+                          highlightSecondary && "bg-primary/5",
                         )}
                       >
                         {editable ? (
                           <input
                             value={cellValue}
-                            onChange={(e) => onCellChange?.(rIdx, cIdx, e.target.value)}
-                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary rounded px-2 py-1 text-sm font-mono hover:bg-muted/50 focus:bg-background transition-colors"
+                            onChange={(e) =>
+                              onCellChange?.(rIdx, cIdx, e.target.value)
+                            }
+                            className="focus:ring-primary hover:bg-muted/50 focus:bg-background w-full rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none"
                             autoComplete="off"
                             spellCheck="false"
                           />
                         ) : (
-                          <div className="px-2 py-1 text-sm font-mono truncate min-h-7 flex items-center">
+                          <div className="flex min-h-7 items-center truncate px-2 py-1 font-mono text-sm">
                             {cellValue}
                           </div>
                         )}
@@ -194,12 +201,12 @@ export function TableView({
                   })}
 
                   {hasRowActions && (
-                    <td className="p-1 border-l w-10 text-center align-middle border-b-0">
+                    <td className="w-10 border-b-0 border-l p-1 text-center align-middle">
                       {canRemoveRow && (
                         <button
                           type="button"
                           onClick={() => onRemoveRow?.(rIdx)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-full text-destructive hover:bg-destructive/10 p-1.5 rounded mx-auto"
+                          className="text-destructive hover:bg-destructive/10 mx-auto flex w-full items-center justify-center rounded p-1.5 opacity-0 transition-opacity group-hover:opacity-100"
                           title={t("simulation.table.removeRow", "Remove row")}
                         >
                           <Trash2 size={14} />
@@ -216,12 +223,12 @@ export function TableView({
             <tr className="bg-muted/10 hover:bg-muted/30 transition-colors">
               <td
                 colSpan={maxCols + (hasRowActions ? 1 : 0)}
-                className="p-2 border-t"
+                className="border-t p-2"
               >
                 <button
                   type="button"
                   onClick={onAddRow}
-                  className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 py-1.5 px-3 rounded border border-dashed border-border hover:border-primary/50 transition-all font-medium"
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all"
                 >
                   <Plus size={16} />
                   {t("simulation.table.addRow", "Add new row")}
@@ -234,8 +241,3 @@ export function TableView({
     </div>
   );
 }
-
-
-
-
-

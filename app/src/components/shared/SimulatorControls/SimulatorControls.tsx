@@ -1,8 +1,8 @@
-import { Play, Pause, StepForward, StepBack, RotateCcw} from "lucide-react";
-import { useTranslation } from 'react-i18next';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import type { SimulationStatus } from '@/hooks/useSimulationEngine';
+import { Play, Pause, StepForward, StepBack, RotateCcw } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import type { SimulationStatus } from "@/hooks/useSimulationEngine";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,8 +37,8 @@ export function SimulatorControls({
 }: SimulatorControlsProps) {
   const { t } = useTranslation();
 
-  const isPlaying = status === 'RUNNING';
-  const isError = status === 'ERROR';
+  const isPlaying = status === "RUNNING";
+  const isError = status === "ERROR";
 
   const rangeMin = 0;
   const rangeMax = 100;
@@ -54,7 +54,7 @@ export function SimulatorControls({
   const buttonClasses = cn(
     "flex items-center justify-center p-2 rounded-md transition-colors",
     "bg-background border border-input hover:bg-accent hover:text-accent-foreground",
-    "disabled:opacity-50 disabled:cursor-not-allowed"
+    "disabled:opacity-50 disabled:cursor-not-allowed",
   );
 
   return (
@@ -139,5 +139,3 @@ export function SimulatorControls({
     </div>
   );
 }
-
-

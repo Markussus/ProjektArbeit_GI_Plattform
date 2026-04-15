@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import type {ISimulator} from '../types/simulator';
+import { useState, useEffect, useRef, useCallback } from "react";
+import type { ISimulator } from "../types/simulator";
 
-export type SimulationStatus = 'IDLE' | 'RUNNING' | 'PAUSED' | 'ERROR';
+export type SimulationStatus = "IDLE" | "RUNNING" | "PAUSED" | "ERROR";
 
 export function useSimulationEngine<TConfig, TState>(
   simulator: ISimulator<TConfig, TState>,
-  initialConfig: TConfig
+  initialConfig: TConfig,
 ) {
-  const [status, setStatus] = useState<SimulationStatus>('IDLE');
+  const [status, setStatus] = useState<SimulationStatus>("IDLE");
   const [speed, setSpeed] = useState<number>(1000); // ms per step
   const [error, setError] = useState<Error | null>(null);
 
@@ -23,7 +23,7 @@ export function useSimulationEngine<TConfig, TState>(
   const handleStep = useCallback(() => {
     try {
       if (simulator.isFinished()) {
-        setStatus('IDLE');
+        setStatus("IDLE");
         return;
       }
 
@@ -31,14 +31,14 @@ export function useSimulationEngine<TConfig, TState>(
       setCurrentState(simulator.getCurrentState());
 
       if (simulator.isFinished()) {
-        setStatus('IDLE');
+        setStatus("IDLE");
         if (timerRef.current !== null) {
           window.clearInterval(timerRef.current);
           timerRef.current = null;
         }
       }
     } catch (err) {
-      setStatus('ERROR');
+      setStatus("ERROR");
       setError(err instanceof Error ? err : new Error(String(err)));
       if (timerRef.current !== null) {
         window.clearInterval(timerRef.current);
@@ -52,50 +52,54 @@ export function useSimulationEngine<TConfig, TState>(
     try {
       simulator.stepBack();
       setCurrentState(simulator.getCurrentState());
-      if (status === 'ERROR') {
-        setStatus('PAUSED');
+      if (status === "ERROR") {
+        setStatus("PAUSED");
         setError(null);
       }
     } catch (err) {
-      setStatus('ERROR');
+      setStatus("ERROR");
       setError(err instanceof Error ? err : new Error(String(err)));
     }
   }, [simulator, status]);
 
   const play = useCallback(() => {
-    if (status === 'RUNNING' || status === 'ERROR' || simulator.isFinished()) return;
-    setStatus('RUNNING');
+    if (status === "RUNNING" || status === "ERROR" || simulator.isFinished())
+      return;
+    setStatus("RUNNING");
   }, [status, simulator]);
 
   const pause = useCallback(() => {
-    if (status === 'RUNNING') {
-      setStatus('PAUSED');
+    if (status === "RUNNING") {
+      setStatus("PAUSED");
     }
   }, [status]);
 
-  const reset = useCallback((newConfig?: TConfig) => {
-    if (timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    try {
-      if (newConfig) {
-        simulator.initialize(newConfig);
-      } else {
-        simulator.reset();
+  const reset = useCallback(
+    (newConfig?: TConfig) => {
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-      setCurrentState(simulator.getCurrentState());
-      setStatus('IDLE');
-      setError(null);
-    } catch (err) {
-      setStatus('ERROR');
-      setError(err instanceof Error ? err : new Error(String(err)));
-    }
-  }, [simulator]);
+
+      try {
+        if (newConfig) {
+          simulator.initialize(newConfig);
+        } else {
+          simulator.reset();
+        }
+        setCurrentState(simulator.getCurrentState());
+        setStatus("IDLE");
+        setError(null);
+      } catch (err) {
+        setStatus("ERROR");
+        setError(err instanceof Error ? err : new Error(String(err)));
+      }
+    },
+    [simulator],
+  );
 
   useEffect(() => {
-    if (status === 'RUNNING') {
+    if (status === "RUNNING") {
       timerRef.current = window.setInterval(handleStep, speed);
     } else if (timerRef.current !== null) {
       window.clearInterval(timerRef.current);
@@ -122,4 +126,3 @@ export function useSimulationEngine<TConfig, TState>(
     setSpeed,
   };
 }
-
