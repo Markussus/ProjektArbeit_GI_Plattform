@@ -20,7 +20,10 @@
     "e2e-test:report": "playwright show-report",
     "preview:ci": "vite preview --host 127.0.0.1 --port 4173",
     "lighthouse:ci": "lhci autorun",
-    "lhci": "npm run build && start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci"
+    "lhci": "npm run build && start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
@@ -45,19 +48,24 @@
     "@eslint/js": "^9.39.4",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.59.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/ui": "^4.1.4",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "jsdom": "^29.0.2",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "start-server-and-test": "^3.0.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.0",
-    "vite": "^8.0.1"
+    "vite": "^8.0.1",
+    "vitest": "^4.1.4"
   }
 }
