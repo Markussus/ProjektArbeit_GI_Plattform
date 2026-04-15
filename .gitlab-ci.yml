@@ -63,13 +63,14 @@ build_app:
 
 lighthouse_check:
   stage: lighthouse
+  image: projektarbeit/ci-browser:arm64
   needs:
     - job: build_app
       artifacts: true
+  before_script:
+    - cd app
   script:
     - npm ci --cache .npm --prefer-offline
-    - apt-get update
-    - apt-get install -y chromium procps
     - export CHROME_PATH=/usr/bin/chromium
     - npm run lhci:ci
   artifacts:
@@ -80,13 +81,14 @@ lighthouse_check:
 
 e2e_tests:
   stage: e2e
+  image: projektarbeit/ci-browser:arm64
   needs:
     - job: build_app
       artifacts: true
+  before_script:
+    - cd app
   script:
     - npm ci --cache .npm --prefer-offline
-    - apt-get update
-    - apt-get install -y chromium procps
     - npm run e2e:ci
   artifacts:
     when: always
