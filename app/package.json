@@ -14,7 +14,10 @@
     "pre:commit:check": "npm run lint && npm run format:check && npm run build:preview:open",
     "fix": "npm run lint:fix && npm run format",
     "preview": "vite preview",
-    "build:preview:open": "tsc -b && vite build && vite preview --open"
+    "build:preview:open": "tsc -b && vite build && vite preview --open",
+    "e2e-test": "playwright test",
+    "e2e-test:open": "playwright test --ui",
+    "e2e-test:report": "playwright show-report"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
