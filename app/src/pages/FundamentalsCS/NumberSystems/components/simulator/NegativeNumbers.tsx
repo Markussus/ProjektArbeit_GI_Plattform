@@ -12,6 +12,8 @@ interface NegativeNumbersProps {
 export function NegativeNumbers({ isExerciseMode, showSolution = true, onShowSolution, initialValue = "" }: NegativeNumbersProps) {
   const { t } = useTranslation("translation");
   const [inputValue, setInputValue] = useState<string>("-5");
+  type StepMode = "sign" | "ones" | "twos";
+  const [activeMode, setActiveMode] = useState<StepMode>("twos");
 
   useEffect(() => {
     if (isExerciseMode && initialValue) {
@@ -91,9 +93,27 @@ export function NegativeNumbers({ isExerciseMode, showSolution = true, onShowSol
             </div>
 
             <div className="space-y-4">
-              <ResultRow label={t("simulator.numbers.signMagnitude", "Vorzeichen-Betrag (Sign-Magnitude)")} value={locked ? "" : signMagnitude} valid={isValid} />
-              <ResultRow label={t("simulator.numbers.onesComplement", "Einer-Komplement")} value={locked ? "" : onesComplement} valid={isValid} />
-              <ResultRow label={t("simulator.numbers.twosComplement", "Zweier-Komplement (Standard)")} value={locked ? "" : twosComplement} valid={isValid} highlight />
+              <ResultRow 
+                label={t("simulator.numbers.signMagnitude", "Vorzeichen-Betrag (Sign-Magnitude)")} 
+                value={locked ? "" : signMagnitude} 
+                valid={isValid} 
+                highlight={activeMode === "sign"} 
+                onClick={() => setActiveMode("sign")} 
+              />
+              <ResultRow 
+                label={t("simulator.numbers.onesComplement", "Einer-Komplement")} 
+                value={locked ? "" : onesComplement} 
+                valid={isValid} 
+                highlight={activeMode === "ones"} 
+                onClick={() => setActiveMode("ones")} 
+              />
+              <ResultRow 
+                label={t("simulator.numbers.twosComplement", "Zweier-Komplement (Standard)")} 
+                value={locked ? "" : twosComplement} 
+                valid={isValid} 
+                highlight={activeMode === "twos"} 
+                onClick={() => setActiveMode("twos")} 
+              />
             </div>
           </div>
         </div>
@@ -115,7 +135,12 @@ export function NegativeNumbers({ isExerciseMode, showSolution = true, onShowSol
             <>
               <h3 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
                 <Info className="w-5 h-5 text-primary" />
-                {t("simulator.numbers.stepByStepTwos", "Schritt-für-Schritt: Zweier-Komplement")}
+                {activeMode === "twos" 
+                  ? t("simulator.numbers.stepByStepTwos", "Schritt-für-Schritt: Zweier-Komplement")
+                  : activeMode === "ones"
+                  ? t("simulator.numbers.stepByStepOnes", "Schritt-für-Schritt: Einer-Komplement")
+                  : t("simulator.numbers.stepByStepSign", "Schritt-für-Schritt: Vorzeichen-Betrag")
+                }
               </h3>
               
               {!isValid ? (
@@ -124,37 +149,60 @@ export function NegativeNumbers({ isExerciseMode, showSolution = true, onShowSol
                  <p className="text-muted-foreground text-sm">{t("simulator.numbers.positiveExplanation", "Positive Zahlen werden im Zweier-Komplement genauso wie normale Binärzahlen dargestellt. Ein Vorzeichen-Bit (erstes Bit) von 0 zeigt an, dass die Zahl positiv ist.")}</p>
               ) : (
                 <div className="space-y-6">
-                  <p className="text-sm text-muted-foreground">{t("simulator.numbers.howTwosBuilt", "So wird die Zahl {{val}} als 8-Bit Zweier-Komplement gebildet:", { val: parsed })}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {activeMode === "twos" 
+                       ? t("simulator.numbers.howTwosBuilt", "So wird die Zahl {{val}} als 8-Bit Zweier-Komplement gebildet:", { val: parsed })
+                       : activeMode === "ones"
+                       ? t("simulator.numbers.howOnesBuilt", "So wird die Zahl {{val}} als 8-Bit Einer-Komplement gebildet:", { val: parsed })
+                       : t("simulator.numbers.howSignBuilt", "So wird die Zahl {{val}} im Vorzeichen-Betrag gebildet:", { val: parsed })
+                    }
+                  </p>
                   
                   <div className="space-y-4">
                     <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner">
                       <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("simulator.numbers.step1Abs", "Schritt 1: Absolutwert in Binär")}</div>
                       <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.positive8Bit", "Die positive Zahl {{val}} in 8-Bit-Darstellung:", { val: Math.abs(parsed) })}</p>
                       <div className="font-mono text-lg tracking-[0.25em] text-foreground text-center bg-muted/50 py-2 rounded">
-                        {Math.abs(parsed).toString(2).padStart(8, '0')}
+                        {positiveBin}
                       </div>
                     </div>
 
-                    <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner relative mt-4">
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-0.5 rounded shadow">{t("simulator.numbers.flipBits", "Bits umkehren")}</div>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">{t("simulator.numbers.step2Ones", "Schritt 2: Einer-Komplement")}</div>
-                      <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.zeroToOne", "Alle Nullen werden zu Einsen, alle Einsen zu Nullen:")}</p>
-                      <div className="font-mono text-lg tracking-[0.25em] text-orange-500 text-center bg-orange-500/10 py-2 rounded">
-                        {onesComplement}
+                    {activeMode === "sign" && (
+                      <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner relative mt-4">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-0.5 rounded shadow">{t("simulator.numbers.flipFirstBit", "Vorzeichen-Bit ändern")}</div>
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">{t("simulator.numbers.step2Sign", "Schritt 2: Vorzeichen-Bit setzen")}</div>
+                        <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.setSignBit", "Das erste Bit (ganz links) wird auf 1 gesetzt, um eine negative Zahl darzustellen:")}</p>
+                        <div className="font-mono text-lg tracking-[0.25em] text-center bg-primary/10 py-2 rounded flex justify-center">
+                          <span className="font-bold text-destructive">1</span>
+                          <span className="text-primary">{positiveBin.substring(1)}</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner relative mt-4">
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-0.5 rounded shadow">{t("simulator.numbers.addOne", "+ 1 addieren")}</div>
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">{t("simulator.numbers.step3Twos", "Schritt 3: Zweier-Komplement")}</div>
-                      <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.addToOnes", "Addiere 1 zum Einer-Komplement:")}</p>
-                      <div className="flex flex-col items-center font-mono text-lg tracking-[0.25em] bg-primary/10 py-2 rounded">
-                         <div className="text-orange-500">{onesComplement}</div>
-                         <div className="text-muted-foreground/70">+      1</div>
-                         <div className="w-4/5 h-[1px] bg-primary/30 my-1"></div>
-                         <div className="text-primary font-bold">{twosComplement}</div>
+                    {(activeMode === "ones" || activeMode === "twos") && (
+                      <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner relative mt-4">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-0.5 rounded shadow">{t("simulator.numbers.flipBits", "Bits umkehren")}</div>
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">{t("simulator.numbers.step2Ones", "Schritt 2: Einer-Komplement")}</div>
+                        <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.zeroToOne", "Alle Nullen werden zu Einsen, alle Einsen zu Nullen:")}</p>
+                        <div className="font-mono text-lg tracking-[0.25em] text-orange-500 text-center bg-orange-500/10 py-2 rounded">
+                          {onesComplement}
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {activeMode === "twos" && (
+                      <div className="bg-background p-4 rounded-lg border border-border/40 shadow-inner relative mt-4">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-xs px-2 py-0.5 rounded shadow">{t("simulator.numbers.addOne", "+ 1 addieren")}</div>
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-2">{t("simulator.numbers.step3Twos", "Schritt 3: Zweier-Komplement")}</div>
+                        <p className="text-xs text-muted-foreground mb-2">{t("simulator.numbers.addToOnes", "Addiere 1 zum Einer-Komplement:")}</p>
+                        <div className="flex flex-col items-center font-mono text-lg tracking-[0.25em] bg-primary/10 py-2 rounded">
+                           <div className="text-orange-500">{onesComplement}</div>
+                           <div className="text-muted-foreground/70">+      1</div>
+                           <div className="w-4/5 h-[1px] bg-primary/30 my-1"></div>
+                           <div className="text-primary font-bold">{twosComplement}</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -166,13 +214,17 @@ export function NegativeNumbers({ isExerciseMode, showSolution = true, onShowSol
   );
 }
 
-function ResultRow({ label, value, valid, highlight = false }: { label: string; value: string; valid: boolean; highlight?: boolean }) {
+function ResultRow({ label, value, valid, highlight = false, onClick }: { label: string; value: string; valid: boolean; highlight?: boolean; onClick?: () => void }) {
   return (
-    <div className={`p-3 rounded-lg border ${highlight ? 'border-primary bg-primary/5' : 'border-border/40 bg-background'}`}>
+    <button
+      onClick={valid ? onClick : undefined}
+      disabled={!valid || !onClick}
+      className={`w-full text-left p-3 rounded-lg border transition-colors ${highlight ? 'border-primary bg-primary/5 ring-1 ring-primary/20' : 'border-border/40 bg-background hover:border-primary/50 cursor-pointer'} ${(!valid || !onClick) && 'opacity-50 cursor-not-allowed hover:border-border/40'}`}
+    >
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
       <div className={`font-mono text-base tracking-[0.2em] ${valid ? (highlight ? 'text-primary font-semibold' : 'text-foreground') : 'text-muted-foreground opacity-50'}`}>
         {valid && value ? value : "--------"}
       </div>
-    </div>
+    </button>
   );
 }

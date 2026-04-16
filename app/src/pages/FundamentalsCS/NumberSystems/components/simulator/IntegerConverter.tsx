@@ -129,7 +129,7 @@ export function IntegerConverter({ isExerciseMode, showSolution = true, onShowSo
               <div className="flex gap-2 text-muted-foreground mb-2 pb-2 border-b border-border/40">
                 {steps.map((step, idx) => (
                   <div key={idx} className="flex flex-col items-center min-w-[60px]">
-                    <span className="text-xs">{baseToNumber(sourceBase)}^{step.power}</span>
+                    <span className="text-xs">{baseToNumber(sourceBase)}<sup>{step.power}</sup></span>
                     <span className="font-bold text-foreground text-base mt-1">{step.digit}</span>
                   </div>
                 ))}
@@ -139,7 +139,7 @@ export function IntegerConverter({ isExerciseMode, showSolution = true, onShowSo
               <div className="text-foreground flex items-center flex-wrap gap-1 leading-8">
                   {steps.map((step, idx) => (
                   <span key={idx} className="flex items-center">
-                    <span>({step.digitVal.toString()} × {baseToNumber(sourceBase)}^{step.power})</span>
+                    <span>({step.digitVal.toString()} × {baseToNumber(sourceBase)}<sup>{step.power}</sup>)</span>
                     {idx < steps.length - 1 && <span className="mx-2 text-muted-foreground">+</span>}
                   </span>
                 ))}

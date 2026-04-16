@@ -351,7 +351,14 @@
       "hiddenBitDesc": "Because normalization ensures there is always a 1 before the comma (except for 0), this 1 is not stored to save 1 bit of space.",
       "invalidInputBase": "Invalid input for base",
       "nonDecConvHint": "Conversion between two non-decimal bases is easiest using decimal as an intermediate step.",
-      "resultLabel": "Result:"
+      "resultLabel": "Result:",
+      "howSignBuilt": "How the number {{val}} is formed in Sign-Magnitude:",
+      "step2Sign": "Step 2: Set Sign Bit",
+      "setSignBit": "The first bit (leftmost) is set to 1 to represent a negative number:",
+      "howOnesBuilt": "How the number {{val}} is formed as 8-bit One's Complement:",
+      "stepByStepSign": "Step-by-step: Sign-Magnitude",
+      "stepByStepOnes": "Step-by-step: One's Complement",
+      "flipFirstBit": "Flip sign bit"
     }
   },
   "modules": {

@@ -251,7 +251,14 @@
       "hiddenBitDesc": "Da durch die Normierung immer eine 1 vor dem Komma steht (außer bei 0), wird diese 1 nicht abgespeichert, um 1 Bit Platz zu sparen.",
       "invalidInputBase": "Ungültige Eingabe für die Basis",
       "nonDecConvHint": "Die Konvertierung zwischen zwei nicht-dezimalen Systemen erfolgt am einfachsten über den Zwischenschritt der Umrechnung zum Dezimalsystem.",
-      "resultLabel": "Ergebnis:"
+      "resultLabel": "Ergebnis:",
+      "howSignBuilt": "So wird die Zahl {{val}} im Vorzeichen-Betrag gebildet:",
+      "step2Sign": "Schritt 2: Vorzeichen-Bit setzen",
+      "setSignBit": "Das erste Bit (ganz links) wird auf 1 gesetzt, um eine negative Zahl darzustellen:",
+      "howOnesBuilt": "So wird die Zahl {{val}} als 8-Bit Einer-Komplement gebildet:",
+      "stepByStepSign": "Schritt-für-Schritt: Vorzeichen-Betrag",
+      "stepByStepOnes": "Schritt-für-Schritt: Einer-Komplement",
+      "flipFirstBit": "Vorzeichen ändern"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",
