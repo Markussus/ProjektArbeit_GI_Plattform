@@ -35,7 +35,11 @@
     "overview": "Overview",
     "exercises": "Exercises",
     "examples": "Examples",
-    "simulation": "Simulation"
+    "simulation": "Simulation",
+    "integers": "Integers",
+    "negative": "Negative Numbers",
+    "ieee754": "IEEE 754 (32-bit)",
+    "arithmetic": "Arithmetic"
   },
   "home": {
     "heroTitle1": "Master Complex Systems",
@@ -169,6 +173,110 @@
       "number": "The Number Systems converter will be available here.",
       "moore": "The Moore & Mealy simulator will be available here.",
       "dnf": "The DNF builder / truth table generator will be available here."
+    }
+  },
+  "simulator": {
+    "tabs": {
+      "integers": "Integers",
+      "negative": "Negative Numbers",
+      "ieee754": "IEEE 754 (32-bit)",
+      "arithmetic": "Arithmetic"
+    },
+    "arithmetic": {
+      "selectMode": "Select Operation",
+      "modes": {
+        "addition": "Addition",
+        "subtraction": "Subtraction via 2's Complement",
+        "multiplication": "Multiplication",
+        "division": "Division",
+        "shifting": "Bit-Shifting",
+        "ieee754": "IEEE 754 Addition",
+        "compare": "Compare (Bit by Bit)"
+      },
+      "common": {
+        "operandA": "Number A",
+        "operandB": "Number B",
+        "calculate": "Calculate",
+        "result": "Result",
+        "carry": "Carry:",
+        "invalidInput": "Please enter only 0 and 1.",
+        "operands8bit": "Operands (max 8-bit)",
+        "operands": "Operands",
+        "stepsResult": "Calculation Steps & Result",
+        "enterValidOperands": "Please enter valid operands.",
+        "inDecimal": "In Decimal:"
+      },
+      "addition": {
+        "desc": "Positional addition in binary. Adding two ones creates a carry to the next position.",
+        "carryOutWarning": "Warning: A carry has exceeded the 8th bit (Carry Out).",
+        "overflowWarning": "Overflow error! The addition of logically positive numbers resulted in a negative two's complement result.",
+        "overflowTitle": "Overflow Error (2s Complement):"
+      },
+      "subtraction": {
+        "desc": "Binary subtraction is usually performed as addition with the negative number (in two's complement).",
+        "step1": "1. Form one's complement (flip bits)",
+        "step2": "2. Add +1 (two's complement)",
+        "step3": "3. Add the two's complement to Number A",
+        "minuend": "Minuend (Number A)",
+        "subtrahend": "Subtrahend (Number B, to be subtracted)",
+        "carryOutTitle": "Carry Out:",
+        "carryOutInfo": "Since we subtract via two's complement, a carry-out usually means the result is positive. We just discard the carry in this fixed-point system."
+      },
+      "multiplication": {
+        "desc": "Binary written multiplication (Shift and Add).",
+        "addingRow": "Add to sum",
+        "multiplier": "Multiplier (Number A)",
+        "multiplicand": "Multiplicand (Number B)"
+      },
+      "division": {
+        "desc": "Written division by trial (go from left to right).",
+        "dividend": "Dividend (Number A, to be divided)",
+        "divisor": "Divisor (Number B)",
+        "divByZero": "Division by 0 is undefined.",
+        "remainder": "Remainder:",
+        "appendOne": "→ append 1 to the quotient",
+        "appendZero": "→ append 0 to the quotient"
+      },
+      "shifting": {
+        "desc": "Here you can shift binary numbers to the left or right.",
+        "amount": "Shift amount (n bits)",
+        "shiftLeft": "<< Left Shift (Multiply)",
+        "shiftRight": ">> Right Shift (Divide)",
+        "shiftLeftExpl": "A left shift by n positions corresponds to a multiplication by 2^n.",
+        "shiftRightExpl": "A right shift by n positions corresponds to a division by 2^n (without remainder).",
+        "binaryNumber": "Binary number",
+        "direction": "Direction",
+        "mathMeaning": "Mathematical Meaning:",
+        "integer": "(Integer)",
+        "enterBinary": "Please enter a binary number."
+      },
+      "ieee754": {
+        "desc": "Addition of two 32-bit floating-point numbers according to IEEE 754.",
+        "step1": "1. Align exponents (Denormalization)",
+        "step2": "2. Add mantissa (including Hidden Bit)",
+        "step3": "3. Normalize result",
+        "inputA": "Decimal A",
+        "inputB": "Decimal B",
+        "floatingPoint": "Floating-Point Numbers",
+        "threeSteps": "Addition in 3 Steps",
+        "zeroSkipped": "Zero-Addition skipped.",
+        "expDiff": "Exponent difference:",
+        "mantissaShifted": "The mantissa of the smaller number is shifted to the right by {{diff}} places.",
+        "expAligned": "Now both operands have the exponent 2^{{exp}} and can be added (or subtracted).",
+        "normBack": "The result is converted back into the format 1.M × 2^E.",
+        "signExpMant": "Sign | Exponent | Mantissa",
+        "decimalResult": "Decimal"
+      },
+      "compare": {
+        "desc": "Compares two binary numbers bit by bit from left to right.",
+        "pad": "The numbers are padded to the same length (with zeros on the left).",
+        "bitEqual": "Both bits are equal.",
+        "bitDiff": "Difference found! 1 is greater than 0.",
+        "resultEq": "The numbers are equal in size.",
+        "resultGreater": "Number A is greater than Number B.",
+        "resultLess": "Number A is less than Number B.",
+        "visualCompare": "Visual Comparison"
+      }
     }
   },
   "modules": {
