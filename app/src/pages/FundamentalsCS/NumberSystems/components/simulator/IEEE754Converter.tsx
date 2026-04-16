@@ -22,10 +22,10 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
   }, [isExerciseMode, initialValue]);
 
   // PARSE LOGIC
-  const cleanBinary = inputValue.replace(/[^01]/g, ""); 
+  const cleanBinary = inputValue.replace(/[^01]/g, "");
   const isIeeeToDecValid = converterMode === "ieeeToDec" && cleanBinary.length === 32;
 
-  let isValid = false;
+  let isValid: boolean;
   let floatVal = 0;
   let isNaNVal = false;
   let isSpecial = false;
@@ -40,15 +40,15 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
     isValid = inputValue.trim() !== "" && !isNaN(floatVal) && inputValue.toLowerCase() !== "nan";
     isNaNVal = inputValue.toLowerCase() === "nan" || (inputValue.trim() !== "" && isNaN(floatVal) && !isValid);
     isSpecial = isValid && (!isFinite(floatVal) || floatVal === 0);
-    
+
     if (isValid) {
       const buffer = new ArrayBuffer(4);
       const floatView = new Float32Array(buffer);
       const intView = new Uint32Array(buffer);
-      
+
       floatView[0] = floatVal;
       const bits = intView[0].toString(2).padStart(32, "0");
-      
+
       sign = bits[0];
       exponent = bits.slice(1, 9);
       mantissa = bits.slice(9);
@@ -68,7 +68,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
 
       intView[0] = parseInt(cleanBinary, 2);
       floatVal = floatView[0];
-      
+
       isNaNVal = isNaN(floatVal);
       isSpecial = !isFinite(floatVal) || floatVal === 0;
     }
@@ -94,21 +94,21 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
   return (
     <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        
+
         {/* Converter Inputs */}
         <div className="flex flex-col gap-6">
           <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h3 className="text-lg font-semibold text-foreground">{t("simulator.numbers.ieeeTitle", "IEEE 754 (Single Precision, 32-bit)")}</h3>
-                
+
                 <div className="flex bg-muted p-1 rounded-md mb-2 sm:mb-0 shrink-0">
-                    <button 
+                    <button
                         onClick={() => { setConverterMode("decToIeee"); setInputValue("12.5"); }}
                         className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors ${converterMode === "decToIeee" ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         {t("simulator.numbers.modeDecToIeee", "Dezimal zu IEEE")}
                     </button>
-                    <button 
+                    <button
                         onClick={() => { setConverterMode("ieeeToDec"); setInputValue("0 10000010 10010000000000000000000"); }}
                         className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors ${converterMode === "ieeeToDec" ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                     >
@@ -138,7 +138,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
                  <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">
                     {converterMode === "decToIeee" ? t("simulator.numbers.resultUpper", "ERGEBNIS") : t("simulator.numbers.decResultUpper", "DEZIMALWERT")}
                  </div>
-                 
+
                  {converterMode === "decToIeee" ? (
                      // DEC TO IEEE RESULT BLOCKS
                      !locked && (isValid || isNaNVal) ? (
@@ -190,7 +190,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
         </div>
 
         {/* Dynamic Explanation Panel */}
-        <div className="bg-muted/30 border border-border/50 rounded-xl p-6 shadow-sm overflow-auto max-h-[800px] xl:max-h-[600px]">
+        <div className="bg-muted/30 border border-border/50 rounded-xl p-6 shadow-sm overflow-auto max-h-200 xl:max-h-150">
           {locked ? (
             <div className="h-full flex flex-col items-center justify-center space-y-4 text-center py-12">
               <LockKeyhole className="w-12 h-12 text-muted-foreground opacity-50" />
@@ -208,7 +208,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
                 <Info className="w-5 h-5 text-primary" />
                 {t("simulator.numbers.conceptPath", "Rechenweg & Konzept")}
               </h3>
-              
+
               {(!isValid && !isNaNVal) ? (
                 <p className="text-muted-foreground text-sm">{t("simulator.numbers.enterValueForExp", "Gültige Zahl eingeben für Erklärung.")}</p>
               ) : isSpecial || isNaNVal ? (
@@ -216,7 +216,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
               ) : converterMode === "decToIeee" ? (
                 // EXISTING DEC TO IEEE EXPLANATION
                 <div className="space-y-6">
-                  
+
                   <div className="space-y-1">
                     <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">{t("simulator.numbers.step1Sign", "1. Vorzeichen (Sign)")}</div>
                     <div className="bg-background p-4 rounded-lg border border-blue-500/20 shadow-inner flex justify-between items-center">
@@ -293,7 +293,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
                        <div className="text-center font-mono tracking-widest text-orange-600 dark:text-orange-400 bg-muted/50 p-2 rounded mt-2 truncate w-full">
                            1.{mantissa}
                        </div>
-                       
+
                        {fractionSteps.length > 0 && (
                           <div className="text-xs flex flex-wrap gap-2 items-center justify-center pt-2">
                              <span>= 1 + (</span>
@@ -306,7 +306,7 @@ export function IEEE754Converter({ isExerciseMode, showSolution = true, onShowSo
                              <span>)</span>
                           </div>
                        )}
-                       
+
                        <div className="flex justify-center flex-col items-center gap-1 border-t border-border/40 pt-2 mt-2">
                           <span className="text-xs">{t("simulator.numbers.fractionSum", "Summe der gebrochenen Potenzen")}: {sumOfFractions}</span>
                           <span className="font-bold text-foreground">= 1.0 + {sumOfFractions} = {1 + sumOfFractions}</span>
