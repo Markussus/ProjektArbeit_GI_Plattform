@@ -54,7 +54,7 @@ export function Compare({ isExerciseMode, showSolution = true, onShowSolution, i
       <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm space-y-6">
         <div>
           <h3 className="text-lg font-semibold mb-2 text-foreground flex items-center gap-2">
-             Operanden
+             {t("simulator.arithmetic.common.operands", "Operanden")}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
              {t("simulator.arithmetic.compare.desc", "Vergleicht zwei Binärzahlen Bit für Bit von links nach rechts.")}
@@ -102,7 +102,7 @@ export function Compare({ isExerciseMode, showSolution = true, onShowSolution, i
           <div className="space-y-6">
             <h3 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
               <Search className="w-5 h-5 text-primary" />
-              Visueller Vergleich
+              {t("simulator.arithmetic.compare.visualCompare", "Visueller Vergleich")}
             </h3>
 
             {valA && valB ? (
@@ -150,7 +150,7 @@ export function Compare({ isExerciseMode, showSolution = true, onShowSolution, i
 
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">Bitte gebe gültige Operanden ein.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.common.enterValidOperands", "Bitte gebe gültige Operanden ein.")}</p>
             )}
 
           </div>

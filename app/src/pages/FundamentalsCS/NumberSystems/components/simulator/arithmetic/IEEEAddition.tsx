@@ -189,7 +189,7 @@ export function IEEEAddition({ isExerciseMode, showSolution = true, onShowSoluti
                             Das Resultat wird zurück in das Format $1.M \times 2^E$ verschoben.
                         </p>
                         <div className="flex flex-col gap-1 mt-2 p-2 bg-primary/5 rounded border border-primary/20">
-                            <span className="text-xs text-muted-foreground">Sign | Exponent | Mantissa</span>
+                            <span className="text-xs text-muted-foreground">{t("simulator.arithmetic.ieee754.signExpMant", "Sign | Exponent | Mantissa")}</span>
                             <div>
                                 <span className="font-bold">{steps.renorm?.resParsed.sign}</span>
                                 <span className="mx-2 text-primary">{steps.renorm?.resParsed.expBits}</span>
@@ -208,7 +208,7 @@ export function IEEEAddition({ isExerciseMode, showSolution = true, onShowSoluti
 
           </div>
         ) : (
-             <p className="text-sm text-muted-foreground text-center py-4">Bitte gebe gültige Operanden ein.</p>
+             <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.common.enterValidOperands", "Bitte gebe gültige Operanden ein.")}</p>
         )}
       </div>
     </div>

@@ -63,7 +63,7 @@ export function Shifting({ isExerciseMode, showSolution = true, onShowSolution, 
 
         <div className="space-y-4">
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Binärzahl</label>
+             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.shifting.binaryNumber", "Binärzahl")}</label>
              <input
                type="text"
                value={valA}
@@ -91,7 +91,7 @@ export function Shifting({ isExerciseMode, showSolution = true, onShowSolution, 
             </div>
             
             <div className={locked ? "pointer-events-none opacity-60" : ""}>
-               <label className="block text-xs font-medium text-muted-foreground mb-1.5">Richtung</label>
+               <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.shifting.direction", "Richtung")}</label>
                <div className="flex bg-muted p-1 rounded-md">
                  <button 
                     onClick={() => setDirection("left")}
@@ -150,7 +150,7 @@ export function Shifting({ isExerciseMode, showSolution = true, onShowSolution, 
                   
                   <div className="mt-6 bg-primary/10 border-l-4 border-primary p-4 rounded-r-md w-full">
                      <p className="text-sm text-foreground mb-2">
-                       <strong className="block mb-1">Mathematische Bedeutung:</strong>
+                       <strong className="block mb-1">{t("simulator.arithmetic.shifting.mathMeaning", "Mathematische Bedeutung:")}</strong>
                        {explanation}
                      </p>
                      
@@ -164,7 +164,7 @@ export function Shifting({ isExerciseMode, showSolution = true, onShowSolution, 
                   </div>
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">Bitte gebe eine Binärzahl ein.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.shifting.enterBinary", "Bitte gebe eine Binärzahl ein.")}</p>
             )}
 
           </div>

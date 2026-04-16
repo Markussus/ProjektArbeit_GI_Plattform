@@ -167,7 +167,7 @@ export function Addition({ isExerciseMode, showSolution = true, onShowSolution, 
                 <div className="bg-destructive/10 border-l-4 border-destructive p-4 rounded-r-md flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
                   <p className="text-sm text-destructive-foreground">
-                    <strong className="block mb-1">Carry Out:</strong> 
+                    <strong className="block mb-1">{t("simulator.arithmetic.subtraction.carryOutTitle", "Carry Out:")}</strong> 
                     {t("simulator.arithmetic.addition.carryOutWarning")}
                   </p>
                 </div>

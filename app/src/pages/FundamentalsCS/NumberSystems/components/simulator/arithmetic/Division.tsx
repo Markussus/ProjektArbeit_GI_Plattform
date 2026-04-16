@@ -84,7 +84,7 @@ export function Division({ isExerciseMode, showSolution = true, onShowSolution, 
 
         <div className="space-y-4">
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Dividend (Zahl A, die geteilt wird)</label>
+             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.division.dividend", "Dividend (Zahl A, die geteilt wird)")}</label>
              <input
                type="text"
                value={valA}
@@ -94,7 +94,7 @@ export function Division({ isExerciseMode, showSolution = true, onShowSolution, 
              />
           </div>
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Divisor (Zahl B)</label>
+             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.division.divisor", "Divisor (Zahl B)")}</label>
              <input
                type="text"
                value={valB}
@@ -127,7 +127,7 @@ export function Division({ isExerciseMode, showSolution = true, onShowSolution, 
             </h3>
 
             {isZeroDiv ? (
-               <p className="text-sm font-semibold text-destructive py-4">Division durch 0 ist nicht definiert.</p>   
+               <p className="text-sm font-semibold text-destructive py-4">{t("simulator.arithmetic.division.divByZero", "Division durch 0 ist nicht definiert.")}</p>   
             ) : valA && valB ? (
                 <div className="flex justify-center p-4 overflow-x-auto">
                   <div className="font-mono text-lg font-medium tracking-widest leading-loose select-none bg-background p-6 rounded-lg border border-border/40 shadow-inner min-w-fit">
@@ -159,7 +159,7 @@ export function Division({ isExerciseMode, showSolution = true, onShowSolution, 
 
                     {/* Result */}
                     <div className="flex justify-start gap-2 border-t-2 border-foreground/30 pt-4 mt-6">
-                       <span className="text-muted-foreground">Rest:</span>
+                       <span className="text-muted-foreground">{t("simulator.arithmetic.division.remainder", "Rest:")}</span>
                        <span className="font-bold">{remainder}</span>
                     </div>
                     
@@ -169,7 +169,7 @@ export function Division({ isExerciseMode, showSolution = true, onShowSolution, 
                   </div>
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">Bitte gebe gültige Operanden ein.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.common.enterValidOperands", "Bitte gebe gültige Operanden ein.")}</p>
             )}
 
           </div>

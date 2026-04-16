@@ -27,7 +27,7 @@
     "switchToDark": "Zu dunklem Modus wechseln"
   },
   "language": {
-    "select": "Sprache ausw\u00e4hlen",
+    "select": "Sprache auswählen",
     "de": "Deutsch",
     "en": "Englisch"
   },
@@ -104,7 +104,8 @@
     "exercise3": "IEEE 754 Kodierung",
     "exercise3Desc": "Kodieren Sie Dezimalzahlen im IEEE 754 Format",
     "exercise4": "Gemischte Basen",
-    "exercise4Desc": "Konvertierung zwischen beliebigen Zahlensystemen"
+    "exercise4Desc": "Konvertierung zwischen beliebigen Zahlensystemen",
+    "examplesFallback": "Interaktive Beispiele für Zahlensysteme werden hier verfügbar sein."
   },
   "moore": {
     "title": "Moore & Mealy Automaten",
@@ -247,7 +248,10 @@
       "step4Mantissa": "4. Mantisse & Hidden Bit",
       "mantissaDesc": "Die Mantisse speichert die Nachkommastellen nach der Normierung.",
       "hiddenBitTitle": "Das Hidden Bit:",
-      "hiddenBitDesc": "Da durch die Normierung immer eine 1 vor dem Komma steht (außer bei 0), wird diese 1 nicht abgespeichert, um 1 Bit Platz zu sparen."
+      "hiddenBitDesc": "Da durch die Normierung immer eine 1 vor dem Komma steht (außer bei 0), wird diese 1 nicht abgespeichert, um 1 Bit Platz zu sparen.",
+      "invalidInputBase": "Ungültige Eingabe für die Basis",
+      "nonDecConvHint": "Die Konvertierung zwischen zwei nicht-dezimalen Systemen erfolgt am einfachsten über den Zwischenschritt der Umrechnung zum Dezimalsystem.",
+      "resultLabel": "Ergebnis:"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",

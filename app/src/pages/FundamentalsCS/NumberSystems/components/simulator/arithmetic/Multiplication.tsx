@@ -79,7 +79,7 @@ export function Multiplication({ isExerciseMode, showSolution = true, onShowSolu
 
         <div className="space-y-4">
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Multiplikator (Zahl A)</label>
+             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.multiplication.multiplier", "Multiplikator (Zahl A)")}</label>
              <input
                type="text"
                value={valA}
@@ -89,7 +89,7 @@ export function Multiplication({ isExerciseMode, showSolution = true, onShowSolu
              />
           </div>
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">Multiplikand (Zahl B)</label>
+             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.multiplication.multiplicand", "Multiplikand (Zahl B)")}</label>
              <input
                type="text"
                value={valB}
@@ -154,7 +154,7 @@ export function Multiplication({ isExerciseMode, showSolution = true, onShowSolu
                   </div>
                 </div>
             ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">Bitte gebe gültige Operanden ein.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.common.enterValidOperands", "Bitte gebe gültige Operanden ein.")}</p>
             )}
 
           </div>

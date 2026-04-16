@@ -180,7 +180,7 @@ export function IntegerConverter({ isExerciseMode, showSolution = true, onShowSo
                   <div className="w-[120px] text-right">{step.value.toString()} : {step.base}</div>
                   <div className="w-[20px] text-center">=</div>
                   <div className="w-[80px] text-right">{step.value / BigInt(step.base)}</div>
-                  <div className="w-[40px] text-right text-muted-foreground">{t("simulator.numbers.remainder", "Rest")}</div>
+                  <div className="w-[85px] text-right text-muted-foreground whitespace-nowrap">{t("simulator.numbers.remainder", "Rest")}</div>
                   <div className="font-bold text-primary w-[20px] text-right">
                       {(targetBase === "hex" && step.remainder > 9n) ? step.remainder.toString(16).toUpperCase() : step.remainder.toString()}
                   </div>
@@ -249,7 +249,7 @@ export function IntegerConverter({ isExerciseMode, showSolution = true, onShowSo
                  className={`w-full bg-background transition-colors border rounded-md py-2 px-3 focus:outline-none font-mono text-sm text-foreground placeholder:text-muted-foreground/50 ${locked ? 'bg-muted border-input pointer-events-none' : 'border-input focus:border-primary focus:ring-1 focus:ring-primary/20'}`}
                />
                {inputValue !== "" && decValue === "" && (
-                 <p className="text-destructive text-xs mt-1">Ungültige Eingabe für die Basis {baseToNumber(sourceBase)}.</p>
+                 <p className="text-destructive text-xs mt-1">{t("simulator.numbers.invalidInputBase", "Ungültige Eingabe für die Basis")} {baseToNumber(sourceBase)}.</p>
                )}
             </div>
             
@@ -294,7 +294,7 @@ export function IntegerConverter({ isExerciseMode, showSolution = true, onShowSo
                 <div className="space-y-6">
                   {showToDecSteps && showFromDecSteps && (
                      <div className="bg-popover/50 border-l-4 border-primary p-3 text-sm text-muted-foreground rounded-r-md">
-                        Die Konvertierung zwischen zwei nicht-dezimalen Systemen erfolgt am einfachsten über den Zwischenschritt der Umrechnung zum Dezimalsystem.
+                        {t("simulator.numbers.nonDecConvHint", "Die Konvertierung zwischen zwei nicht-dezimalen Systemen erfolgt am einfachsten über den Zwischenschritt der Umrechnung zum Dezimalsystem.")}
                      </div>
                   )}
 
