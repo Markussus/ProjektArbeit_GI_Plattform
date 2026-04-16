@@ -358,7 +358,19 @@
       "howOnesBuilt": "How the number {{val}} is formed as 8-bit One's Complement:",
       "stepByStepSign": "Step-by-step: Sign-Magnitude",
       "stepByStepOnes": "Step-by-step: One's Complement",
-      "flipFirstBit": "Flip sign bit"
+      "flipFirstBit": "Flip sign bit",
+      "modeDecToIeee": "Decimal to IEEE",
+      "modeIeeeToDec": "IEEE to Decimal",
+      "ieeeInputFormat": "32-Bit Binary String (0s and 1s)",
+      "enterValid32Bit": "Please enter exactly 32 bits (0 or 1).",
+      "decResultUpper": "DECIMAL",
+      "step2ExpExtract": "2. Extract Exponent Value",
+      "expBinToDecDesc": "The 8-bit exponent is read as an unsigned integer and the bias (127) is subtracted:",
+      "step3MantExtract": "3. Resolve Mantissa (Fraction)",
+      "mantissaBinToDecDesc": "The actual mantissa value is calculated using the implicit 'hidden bit' (1 + fraction value). Each bit n after the comma is multiplied by 2^(-n):",
+      "fractionSum": "Sum of fractional powers",
+      "step4FinalCalc": "4. Final Calculation of all components",
+      "finalFormulaDesc": "For the final decimal number, the sign, actual mantissa, and exponent factor are multiplied together:"
     }
   },
   "modules": {

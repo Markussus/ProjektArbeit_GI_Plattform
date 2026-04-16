@@ -258,7 +258,19 @@
       "howOnesBuilt": "So wird die Zahl {{val}} als 8-Bit Einer-Komplement gebildet:",
       "stepByStepSign": "Schritt-für-Schritt: Vorzeichen-Betrag",
       "stepByStepOnes": "Schritt-für-Schritt: Einer-Komplement",
-      "flipFirstBit": "Vorzeichen ändern"
+      "flipFirstBit": "Vorzeichen ändern",
+      "modeDecToIeee": "Dezimal zu IEEE",
+      "modeIeeeToDec": "IEEE zu Dezimal",
+      "ieeeInputFormat": "32-Bit Binärstring (0en und 1en)",
+      "enterValid32Bit": "Bitte genau 32 Bits (0 oder 1) eingeben.",
+      "decResultUpper": "DEZIMALWERT",
+      "step2ExpExtract": "2. Exponenten-Wert extrahieren",
+      "expBinToDecDesc": "Der 8-Bit Exponent wird als positive ganze Zahl (Unsigned) gelesen und die Bias (127) abgezogen:",
+      "step3MantExtract": "3. Mantisse (Nachkommastellen) auflösen",
+      "mantissaBinToDecDesc": "Der reale Mantissen-Wert errechnet sich aus dem impliziten 'Hidden Bit' (1 + Bruchwert). Jedes Bit n nach dem Komma wird mit 2^(-n) multipliziert:",
+      "fractionSum": "Summe der gebrochenen Potenzen",
+      "step4FinalCalc": "4. Finale Verrechnung aller Komponenten",
+      "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",
