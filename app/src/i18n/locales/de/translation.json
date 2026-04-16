@@ -294,13 +294,30 @@
         "operands": "Operanden",
         "stepsResult": "Rechenweg & Ergebnis",
         "enterValidOperands": "Bitte gebe gültige Operanden ein.",
-        "inDecimal": "In Dezimal:"
+        "inDecimal": "In Dezimal:",
+        "showStepByStep": "Schritt-für-Schritt anzeigen"
       },
       "addition": {
         "desc": "Stellenweise Addition im Binärsystem. Werden zwei Einsen addiert, gibt es einen Übertrag (Carry) an die nächste Stelle.",
         "carryOutWarning": "Achtung: Ein Übertrag (Carry) hat das 8. Bit überschritten (Carry Out).",
         "overflowWarning": "Overflow-Fehler! Die Addition logisch positiver Zahlen hat zu einem negativen Zweierkomplement-Ergebnis geführt.",
-        "overflowTitle": "Overflow Error (2s Complement):"
+        "overflowTitle": "Overflow Error (2s Complement):",
+        "stepByStepTitle": "Bitweise Addition",
+        "legendA": "Zahl A",
+        "legendB": "Zahl B",
+        "legendC": "Übertrag rein",
+        "legendS": "Summe",
+        "legendOut": "Übertrag raus",
+        "bitPos": "Bit {{pos}}",
+        "step0": "0 + 0 + 0 = 0, kein Übertrag",
+        "step1": "1 + 0 + 0 = 1, kein Übertrag",
+        "step2": "0 + 1 + 0 = 1, kein Übertrag",
+        "step3": "0 + 0 + 1 = 1, kein Übertrag",
+        "step4": "1 + 1 + 0 = 0, Übertrag 1",
+        "step5": "1 + 0 + 1 = 0, Übertrag 1",
+        "step6": "0 + 1 + 1 = 0, Übertrag 1",
+        "step7": "1 + 1 + 1 = 1, Übertrag 1",
+        "finalResult": "Endergebnis:"
       },
       "subtraction": {
         "desc": "Die binäre Subtraktion wird üblicherweise als Addition mit der negativen Zahl (im Zweierkomplement) ausgeführt.",
@@ -310,13 +327,30 @@
         "minuend": "Minuend (Zahl A)",
         "subtrahend": "Subtrahend (Zahl B, die abgezogen wird)",
         "carryOutTitle": "Übertrag (Carry Out):",
-        "carryOutInfo": "Da wir via Zweierkomplement subtrahieren, bedeutet ein Carry-Out in der Regel, dass das Ergebnis positiv ist. Den Übertrag werfen wir in diesem Fixpunkt-System einfach weg."
+        "carryOutInfo": "Da wir via Zweierkomplement subtrahieren, bedeutet ein Carry-Out in der Regel, dass das Ergebnis positiv ist. Den Übertrag werfen wir in diesem Fixpunkt-System einfach weg.",
+        "flipBitDesc": "Position {{pos}}: {{orig}} → {{flipped}} (invertiert)",
+        "addOneDesc": "Position {{pos}}: {{bit}} + {{carry}} = {{sum}} → {{result}}, Carry {{nextCarry}}",
+        "add0": "Position {{pos}}: 0 + 0 + 0 = 0, kein Übertrag",
+        "add1": "Position {{pos}}: 1 + 0/1 + 1 = 0, Übertrag 1",
+        "add2": "Position {{pos}}: 1 + 1 + 0 = 0, Übertrag 1",
+        "add3": "Position {{pos}}: 1 + 1 + 1 = 1, Übertrag 1",
+        "add4": "Position {{pos}}: {{a}} + {{b}} + {{c}} = {{sum}}, Übertrag {{carry}}",
+        "onesResult": "Einerkomplement:",
+        "twosResult": "Zweierkomplement:",
+        "bitN": "Bit {{n}}"
       },
       "multiplication": {
         "desc": "Binäre schriftliche Multiplikation (Shift and Add).",
         "addingRow": "Zur Summe addieren",
         "multiplier": "Multiplikator (Zahl A)",
-        "multiplicand": "Multiplikand (Zahl B)"
+        "multiplicand": "Multiplikand (Zahl B)",
+        "stepByStepTitle": "Bitweise Multiplikation",
+        "stepN": "Bit {{n}}",
+        "stepDesc": "Bit {{n}} ({{bit}}) = 1, also Multiplikand {{val}} um {{shift}} Stellen nach links verschieben = {{result}}",
+        "skipZero": "Bit {{n}} ({{bit}}) = 0, überspringen (kein Partialprodukt)",
+        "skipShort": "× 0 → 0",
+        "inDecimal": "In Dezimal",
+        "partialProducts": "Partialprodukte werden addiert"
       },
       "division": {
         "desc": "Schriftliche Division durch Probieren (gehe von links nach rechts).",
@@ -325,7 +359,15 @@
         "divByZero": "Division durch 0 ist nicht definiert.",
         "remainder": "Rest:",
         "appendOne": "→ ergänze 1 am Ende d. Quotienten",
-        "appendZero": "→ ergänze 0 am Ende d. Quotienten"
+        "appendZero": "→ ergänze 0 am Ende d. Quotienten",
+        "stepByStepTitle": "Bitweise Division",
+        "stepN": "Schritt {{n}}",
+        "stepDesc": "Schritt {{n}}: {{current}} >= {{divisor}}, also 1 zum Quotienten und subtrahiere {{divisor}}",
+        "stepDescSmall": "Schritt {{n}}: {{current}} < {{divisor}}, also 0 zum Quotienten",
+        "appendOneShort": "→ 1",
+        "appendZeroShort": "→ 0",
+        "quotient": "Quotient",
+        "inDecimal": "In Dezimal"
       },
       "shifting": {
         "desc": "Hier kannst du Binärzahlen nach links oder rechts verschieben.",
@@ -338,7 +380,19 @@
         "direction": "Richtung",
         "mathMeaning": "Mathematische Bedeutung:",
         "integer": "(Ganzzahlig)",
-        "enterBinary": "Bitte gebe eine Binärzahl ein."
+        "enterBinary": "Bitte gebe eine Binärzahl ein.",
+        "leftStepsTitle": "Linksverschiebung: Nullen werden rechts angehängt",
+        "rightStepsTitle": "Rechtsverschiebung: Bits fallen rechts heraus",
+        "stepN": "Schritt {{n}}",
+        "stepOriginal": "Originale Binärzahl: {{val}}",
+        "stepLeftShift": "Bits werden nach links verschoben. Eine {{count}} Null wird angehängt.",
+        "stepLeftComplete": "Alle {{count}} Nullen wurden angehängt.",
+        "stepRightShift": "Das rechte Bit ({{bit}}) fällt heraus.",
+        "stepRightComplete": "Alle {{count}} rechten Bits wurden entfernt.",
+        "stepRightZero": "Verschiebung um {{count}} >= Länge der Zahl, Ergebnis ist 0.",
+        "visualization": "Visuelle Darstellung:",
+        "before": "Vorher",
+        "after": "Nachher"
       },
       "ieee754": {
         "desc": "Addition von zwei 32-Bit Gleitkommazahlen nach IEEE 754.",
@@ -355,7 +409,13 @@
         "expAligned": "Nun weisen beide Glieder den Exponenten 2^{{exp}} auf und können addiert (bzw. subtrahiert) werden.",
         "normBack": "Das Resultat wird zurück in das Format 1.M × 2^E verschoben.",
         "signExpMant": "Sign | Exponent | Mantissa",
-        "decimalResult": "Dezimal"
+        "decimalResult": "Dezimal",
+        "expDiffDesc": "Exponentendifferenz: {{larger}} - {{smaller}} = {{diff}}",
+        "shiftDesc": "Die Mantisse der kleineren Zahl wird um {{diff}} Stellen nach rechts verschoben.",
+        "shiftVisualization": "Visuelle Verschiebung:",
+        "shiftN": "Shift {{n}}",
+        "addDesc": "Nun weisen beide Glieder den Exponenten 2^{{exp}} auf und können addiert werden.",
+        "normDesc": "Das Resultat wird zurück in das Format 1.M × 2^E verschoben."
       },
       "compare": {
         "desc": "Vergleicht zwei Binärzahlen Bit für Bit von links nach rechts.",
@@ -365,7 +425,18 @@
         "resultEq": "Die Zahlen sind gleich groß.",
         "resultGreater": "Zahl A ist größer als Zahl B.",
         "resultLess": "Zahl A ist kleiner als Zahl B.",
-        "visualCompare": "Visueller Vergleich"
+        "visualCompare": "Visueller Vergleich",
+        "stepPadding": "Schritt 0: Auffüllung",
+        "padDesc": "Die Zahlen werden auf die gleiche Länge aufgefüllt (mit führenden Nullen):",
+        "paddingNote": "{{count}} führende Nullen hinzugefügt.",
+        "bitComparisonTitle": "Bitweise Vergleichung (von links nach rechts)",
+        "posN": "Pos. {{n}}",
+        "stepEqual": "Position {{pos}}: Beide Bits sind {{bit}}, weiter zum nächsten Bit.",
+        "stepResultGreater": "An Position {{pos}}: A hat 1, B hat 0 → A ist größer als B.",
+        "stepResultLess": "An Position {{pos}}: A hat 0, B hat 1 → A ist kleiner als B.",
+        "AgreaterB": "A > B",
+        "AlessB": "A < B",
+        "finalResultNote": "Da hier ein Unterschied gefunden wurde, ist der Vergleich abgeschlossen. Weitere Bits werden nicht mehr betrachtet."
       }
     }
   },

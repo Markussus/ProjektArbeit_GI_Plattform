@@ -205,13 +205,30 @@
         "operands": "Operands",
         "stepsResult": "Calculation Steps & Result",
         "enterValidOperands": "Please enter valid operands.",
-        "inDecimal": "In Decimal:"
+        "inDecimal": "In Decimal:",
+        "showStepByStep": "Show Step-by-Step"
       },
       "addition": {
         "desc": "Positional addition in binary. Adding two ones creates a carry to the next position.",
         "carryOutWarning": "Warning: A carry has exceeded the 8th bit (Carry Out).",
         "overflowWarning": "Overflow error! The addition of logically positive numbers resulted in a negative two's complement result.",
-        "overflowTitle": "Overflow Error (2s Complement):"
+        "overflowTitle": "Overflow Error (2s Complement):",
+        "stepByStepTitle": "Bitwise Addition",
+        "legendA": "Number A",
+        "legendB": "Number B",
+        "legendC": "Carry In",
+        "legendS": "Sum",
+        "legendOut": "Carry Out",
+        "bitPos": "Bit {{pos}}",
+        "step0": "0 + 0 + 0 = 0, no carry",
+        "step1": "1 + 0 + 0 = 1, no carry",
+        "step2": "0 + 1 + 0 = 1, no carry",
+        "step3": "0 + 0 + 1 = 1, no carry",
+        "step4": "1 + 1 + 0 = 0, carry 1",
+        "step5": "1 + 0 + 1 = 0, carry 1",
+        "step6": "0 + 1 + 1 = 0, carry 1",
+        "step7": "1 + 1 + 1 = 1, carry 1",
+        "finalResult": "Final Result:"
       },
       "subtraction": {
         "desc": "Binary subtraction is usually performed as addition with the negative number (in two's complement).",
@@ -221,13 +238,30 @@
         "minuend": "Minuend (Number A)",
         "subtrahend": "Subtrahend (Number B, to be subtracted)",
         "carryOutTitle": "Carry Out:",
-        "carryOutInfo": "Since we subtract via two's complement, a carry-out usually means the result is positive. We just discard the carry in this fixed-point system."
+        "carryOutInfo": "Since we subtract via two's complement, a carry-out usually means the result is positive. We just discard the carry in this fixed-point system.",
+        "flipBitDesc": "Position {{pos}}: {{orig}} → {{flipped}} (inverted)",
+        "addOneDesc": "Position {{pos}}: {{bit}} + {{carry}} = {{sum}} → {{result}}, Carry {{nextCarry}}",
+        "add0": "Position {{pos}}: 0 + 0 + 0 = 0, no carry",
+        "add1": "Position {{pos}}: 1 + 0/1 + 1 = 0, carry 1",
+        "add2": "Position {{pos}}: 1 + 1 + 0 = 0, carry 1",
+        "add3": "Position {{pos}}: 1 + 1 + 1 = 1, carry 1",
+        "add4": "Position {{pos}}: {{a}} + {{b}} + {{c}} = {{sum}}, carry {{carry}}",
+        "onesResult": "One's Complement:",
+        "twosResult": "Two's Complement:",
+        "bitN": "Bit {{n}}"
       },
       "multiplication": {
         "desc": "Binary written multiplication (Shift and Add).",
         "addingRow": "Add to sum",
         "multiplier": "Multiplier (Number A)",
-        "multiplicand": "Multiplicand (Number B)"
+        "multiplicand": "Multiplicand (Number B)",
+        "stepByStepTitle": "Bitwise Multiplication",
+        "stepN": "Bit {{n}}",
+        "stepDesc": "Bit {{n}} ({{bit}}) = 1, so multiplicand {{val}} shifted left by {{shift}} = {{result}}",
+        "skipZero": "Bit {{n}} ({{bit}}) = 0, skip (no partial product)",
+        "skipShort": "× 0 → 0",
+        "inDecimal": "In Decimal",
+        "partialProducts": "Partial products are added"
       },
       "division": {
         "desc": "Written division by trial (go from left to right).",
@@ -236,7 +270,15 @@
         "divByZero": "Division by 0 is undefined.",
         "remainder": "Remainder:",
         "appendOne": "→ append 1 to the quotient",
-        "appendZero": "→ append 0 to the quotient"
+        "appendZero": "→ append 0 to the quotient",
+        "stepByStepTitle": "Bitwise Division",
+        "stepN": "Step {{n}}",
+        "stepDesc": "Step {{n}}: {{current}} >= {{divisor}}, so 1 to quotient and subtract {{divisor}}",
+        "stepDescSmall": "Step {{n}}: {{current}} < {{divisor}}, so 0 to quotient",
+        "appendOneShort": "→ 1",
+        "appendZeroShort": "→ 0",
+        "quotient": "Quotient",
+        "inDecimal": "In Decimal"
       },
       "shifting": {
         "desc": "Here you can shift binary numbers to the left or right.",
@@ -249,7 +291,19 @@
         "direction": "Direction",
         "mathMeaning": "Mathematical Meaning:",
         "integer": "(Integer)",
-        "enterBinary": "Please enter a binary number."
+        "enterBinary": "Please enter a binary number.",
+        "leftStepsTitle": "Left Shift: Zeros are appended on the right",
+        "rightStepsTitle": "Right Shift: Bits fall off on the right",
+        "stepN": "Step {{n}}",
+        "stepOriginal": "Original binary number: {{val}}",
+        "stepLeftShift": "Bits shift left. A {{count}} zero is appended.",
+        "stepLeftComplete": "All {{count}} zeros have been appended.",
+        "stepRightShift": "The right bit ({{bit}}) falls out.",
+        "stepRightComplete": "All {{count}} right bits have been removed.",
+        "stepRightZero": "Shift by {{count}} >= length of number, result is 0.",
+        "visualization": "Visual representation:",
+        "before": "Before",
+        "after": "After"
       },
       "ieee754": {
         "desc": "Addition of two 32-bit floating-point numbers according to IEEE 754.",
@@ -266,7 +320,13 @@
         "expAligned": "Now both operands have the exponent 2^{{exp}} and can be added (or subtracted).",
         "normBack": "The result is converted back into the format 1.M × 2^E.",
         "signExpMant": "Sign | Exponent | Mantissa",
-        "decimalResult": "Decimal"
+        "decimalResult": "Decimal",
+        "expDiffDesc": "Exponent difference: {{larger}} - {{smaller}} = {{diff}}",
+        "shiftDesc": "The mantissa of the smaller number is shifted to the right by {{diff}} places.",
+        "shiftVisualization": "Visual shift:",
+        "shiftN": "Shift {{n}}",
+        "addDesc": "Now both operands have the exponent 2^{{exp}} and can be added.",
+        "normDesc": "The result is converted back into the format 1.M × 2^E."
       },
       "compare": {
         "desc": "Compares two binary numbers bit by bit from left to right.",
@@ -276,7 +336,18 @@
         "resultEq": "The numbers are equal in size.",
         "resultGreater": "Number A is greater than Number B.",
         "resultLess": "Number A is less than Number B.",
-        "visualCompare": "Visual Comparison"
+        "visualCompare": "Visual Comparison",
+        "stepPadding": "Step 0: Padding",
+        "padDesc": "The numbers are padded to the same length (with leading zeros):",
+        "paddingNote": "{{count}} leading zeros added.",
+        "bitComparisonTitle": "Bitwise Comparison (from left to right)",
+        "posN": "Pos. {{n}}",
+        "stepEqual": "Position {{pos}}: Both bits are {{bit}}, continue to next bit.",
+        "stepResultGreater": "At position {{pos}}: A has 1, B has 0 → A is greater than B.",
+        "stepResultLess": "At position {{pos}}: A has 0, B has 1 → A is less than B.",
+        "AgreaterB": "A > B",
+        "AlessB": "A < B",
+        "finalResultNote": "Since a difference was found here, the comparison is complete. Further bits are no longer considered."
       }
     },
     "numbers": {
