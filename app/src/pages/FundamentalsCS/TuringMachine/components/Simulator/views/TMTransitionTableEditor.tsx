@@ -13,6 +13,7 @@ export interface TMTransitionTableEditorProps {
   onAddColumn: () => void;
   onRemoveColumn: (colIndex: number) => void;
   invalidCell?: TablePosition | null;
+  isCellEditable?: (rowIndex: number, colIndex: number) => boolean;
   isCellDisabled?: (rowIndex: number, colIndex: number) => boolean;
   disabled?: boolean;
 }
@@ -28,6 +29,7 @@ export function TMTransitionTableEditor({
   onAddColumn,
   onRemoveColumn,
   invalidCell,
+  isCellEditable,
   isCellDisabled,
   disabled = false,
 }: TMTransitionTableEditorProps) {
@@ -49,13 +51,13 @@ export function TMTransitionTableEditor({
       <TableView
         headers={headers}
         rows={rows}
-        editable={true}
+        editMode={disabled ? "cells" : "all"}
         onCellChange={onCellChange}
         onCellBlur={onCellBlur}
         onHeaderChange={onHeaderChange}
         invalidCell={invalidCell}
+        isCellEditable={isCellEditable}
         isCellDisabled={isCellDisabled}
-        headersDisabled={disabled}
         canAddRow={true}
         onAddRow={onAddRow}
         disableAddRow={disabled}

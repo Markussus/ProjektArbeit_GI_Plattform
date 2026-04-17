@@ -240,6 +240,12 @@ export function TMConfigView({
     onCellBlur: handleCellBlur,
     onHeaderChange: handleHeaderChange,
     invalidCell: invalidCell?.position ?? null,
+    isCellEditable: (rowIndex: number, colIndex: number) =>
+      hasBlockingTableError &&
+      isSamePosition(invalidCell?.position, {
+        row: rowIndex,
+        col: colIndex,
+      }),
     isCellDisabled: (rowIndex: number, colIndex: number) => {
       if (
         colIndex === 0 &&
