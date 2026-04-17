@@ -2,56 +2,56 @@ import { useMemo } from "react";
 import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface ArrayViewProps {
-  /** Map of indices to string values. Ideal for sparse arrays like a Turing Machine tape. */
-  data: Record<number, string>;
-  /** The current active index (e.g., head position). */
-  focusIndex: number;
-  /** Number of cells to show on either side of the focused cell. */
+export interface TMTapeViewProps {
+  /** Sparse tape cells mapped by their tape index. */
+  tape: Record<number, string>;
+  /** Current tape head position. */
+  headPosition: number;
+  /** Number of visible cells to render on either side of the head. */
   windowRadius?: number;
-  /** The symbol to display when a cell at an index is undefined. */
-  emptySymbol?: string;
+  /** Symbol shown for undefined or empty tape cells. */
+  blankSymbol?: string;
   className?: string;
   cellClassName?: string;
 }
 
-export function ArrayView({
-  data,
-  focusIndex,
+export function TMTapeView({
+  tape,
+  headPosition,
   windowRadius = 10,
-  emptySymbol = " ",
+  blankSymbol = " ",
   className,
   cellClassName,
-}: ArrayViewProps) {
-  const startIndex = focusIndex - windowRadius;
-  const endIndex = focusIndex + windowRadius;
+}: TMTapeViewProps) {
+  const startIndex = headPosition - windowRadius;
+  const endIndex = headPosition + windowRadius;
 
   const cells = useMemo(() => {
     const result = [];
-    for (let i = startIndex; i <= endIndex; i++) {
-      // Find if data has a symbol, otherwise use emptySymbol
+    for (let index = startIndex; index <= endIndex; index++) {
       const symbol =
-        data[i] !== undefined && data[i] !== null ? data[i] : emptySymbol;
+        tape[index] !== undefined && tape[index] !== null
+          ? tape[index]
+          : blankSymbol;
+
       result.push({
-        index: i,
-        value: symbol === "" ? emptySymbol : symbol, // fallback
-        isFocused: i === focusIndex,
+        index,
+        value: symbol === "" ? blankSymbol : symbol,
+        isFocused: index === headPosition,
       });
     }
     return result;
-  }, [startIndex, endIndex, data, emptySymbol, focusIndex]);
+  }, [blankSymbol, endIndex, headPosition, startIndex, tape]);
 
   return (
     <div className={cn("flex w-full justify-center py-10", className)}>
       <div className="relative flex flex-col items-center justify-center">
-        {/* Infinite tape visual overflow container */}
         <div className="bg-muted/30 flex gap-1 overflow-hidden rounded-xl border p-4 shadow-inner">
           {cells.map((cell) => (
             <div
               key={cell.index}
               className="relative flex flex-col items-center"
             >
-              {/* Tape Cell */}
               <div
                 className={cn(
                   "bg-background flex h-14 w-12 items-center justify-center rounded-md border-2 font-mono text-xl transition-all duration-300",
@@ -64,7 +64,6 @@ export function ArrayView({
                 {cell.value}
               </div>
 
-              {/* Index number */}
               <span
                 className={cn(
                   "absolute -bottom-5 mt-2 origin-top text-[10px] transition-colors",
@@ -79,7 +78,6 @@ export function ArrayView({
           ))}
         </div>
 
-        {/* Head Indicator pointing to the center cell (which is focused by default) */}
         <div className="text-primary pointer-events-none absolute -bottom-6 animate-[bounce_2s_infinite]">
           <ArrowUp className="h-5 w-5 drop-shadow-sm" />
         </div>

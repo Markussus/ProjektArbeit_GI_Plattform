@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
-import { ArrayView } from "@/components/shared/ArrayVisual/ArrayView";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import {
   TableView,
@@ -8,6 +7,7 @@ import {
 } from "@/components/shared/TableVisual/TableView";
 import type { TMConfig, TMState } from "../types";
 import { TMSimulationStatusCard } from "./TMSimulationStatusCard";
+import { TMTapeView } from "./TMTapeView";
 
 export interface TMSimulationViewProps {
   config: TMConfig;
@@ -61,10 +61,10 @@ export function TMSimulationView({
       </div>
 
       <div className="w-full">
-        <ArrayView
-          data={currentState.tape}
-          focusIndex={currentState.headPosition}
-          emptySymbol={config.blankSymbol}
+        <TMTapeView
+          tape={currentState.tape}
+          headPosition={currentState.headPosition}
+          blankSymbol={config.blankSymbol}
         />
       </div>
 
