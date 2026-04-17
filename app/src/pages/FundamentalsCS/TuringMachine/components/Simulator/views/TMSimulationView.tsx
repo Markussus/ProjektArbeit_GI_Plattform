@@ -64,6 +64,7 @@ export function TMSimulationView({
         <TMTapeView
           tape={currentState.tape}
           headPosition={currentState.headPosition}
+          stepDurationMs={speed}
           blankSymbol={config.blankSymbol}
         />
       </div>
