@@ -129,8 +129,7 @@ function getTableCellState({
   const value = row[colIndex] || "";
   const isInvalid =
     invalidCell?.row === rowIndex && invalidCell?.col === colIndex;
-  const isActive =
-    activeCell?.row === rowIndex && activeCell?.col === colIndex;
+  const isActive = activeCell?.row === rowIndex && activeCell?.col === colIndex;
   const isColumnActive = activeCol === colIndex;
   const explicitlyEditable = isCellEditable?.(rowIndex, colIndex) ?? false;
   const disabled =
@@ -191,8 +190,7 @@ export function TableView({
   const showRemoveRowControl = canRemoveRow && cellsEditable;
   const showAddColumnControl = canAddColumn && headersEditable;
   const showRemoveColumnControl = canRemoveColumn && headersEditable;
-  const hasTrailingActionColumn =
-    showRemoveRowControl || showAddColumnControl;
+  const hasTrailingActionColumn = showRemoveRowControl || showAddColumnControl;
   const contentColSpan = maxCols + (hasTrailingActionColumn ? 1 : 0);
   const labels = {
     table: t("simulation.table.label", "Table view"),
@@ -217,12 +215,16 @@ export function TableView({
     });
 
   const getCellInputAriaLabel = (rowIndex: number, colIndex: number) =>
-    t("simulation.table.editCell", "Edit cell in row {{row}}, column {{column}}", {
-      row: rowIndex + 1,
-      column: normalizedHeaders[colIndex]
-        ? normalizedHeaders[colIndex]
-        : colIndex + 1,
-    });
+    t(
+      "simulation.table.editCell",
+      "Edit cell in row {{row}}, column {{column}}",
+      {
+        row: rowIndex + 1,
+        column: normalizedHeaders[colIndex]
+          ? normalizedHeaders[colIndex]
+          : colIndex + 1,
+      },
+    );
 
   const renderHeaderCell = (header: string, colIndex: number) => {
     const isColActive = activeCol === colIndex;
@@ -330,7 +332,11 @@ export function TableView({
     );
   };
 
-  const renderBodyCell = (row: string[], rowIndex: number, colIndex: number) => {
+  const renderBodyCell = (
+    row: string[],
+    rowIndex: number,
+    colIndex: number,
+  ) => {
     const columnLabel = getColumnLabel(normalizedHeaders[colIndex], colIndex);
     const cellState = getTableCellState({
       row,
@@ -370,10 +376,7 @@ export function TableView({
             spellCheck="false"
           />
         ) : (
-          <div
-            aria-label={columnLabel}
-            className={READ_ONLY_CELL_CLASS}
-          >
+          <div aria-label={columnLabel} className={READ_ONLY_CELL_CLASS}>
             {cellState.value}
           </div>
         )}
@@ -427,10 +430,7 @@ export function TableView({
 
           {showAddRowControl && (
             <tr className="bg-muted/10 hover:bg-muted/30 transition-colors">
-              <td
-                colSpan={contentColSpan}
-                className="border-t p-2"
-              >
+              <td colSpan={contentColSpan} className="border-t p-2">
                 <button
                   type="button"
                   onClick={onAddRow}
