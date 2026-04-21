@@ -8,7 +8,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       {...props}
       emptyStateTextKey="simulation.emptyStates.dnf"
     >
-      <DnfBuilder selectedExercise={props.selectedExercise} />
+      <DnfBuilder
+        key={props.selectedExercise?.id ?? "free"}
+        selectedExercise={props.selectedExercise}
+      />
     </TopicSimulationTab>
   );
 }

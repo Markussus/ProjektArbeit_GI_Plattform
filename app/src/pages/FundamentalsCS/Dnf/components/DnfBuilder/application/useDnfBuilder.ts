@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
 import type { DnfDerivation } from "../domain/dnfDerivation";
 import {
@@ -51,18 +51,8 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
     ? (exerciseSourceById[selectedExerciseId] ?? DEFAULT_DNF_SOURCE)
     : DEFAULT_DNF_SOURCE;
   const isExerciseMode = selectedExerciseId !== null;
-  const [source, setSource] = useState(DEFAULT_DNF_SOURCE);
+  const [source, setSource] = useState(exerciseSource);
   const [showSolution, setShowSolution] = useState(!isExerciseMode);
-
-  useEffect(() => {
-    if (!selectedExerciseId) {
-      setShowSolution(true);
-      return;
-    }
-
-    setSource(exerciseSource);
-    setShowSolution(false);
-  }, [selectedExerciseId, exerciseSource]);
 
   const analysis = useMemo<DnfBuilderAnalysis>(() => {
     const parseResult = parseBooleanExpression(source);
