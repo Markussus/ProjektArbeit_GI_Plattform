@@ -72,6 +72,38 @@ export function ModuleTopicPage({
     }
   };
 
+  const renderActiveTab = () => {
+    if (activeTab === "overview") {
+      return <OverviewTab />;
+    }
+
+    if (activeTab === "exercises") {
+      return (
+        <ExercisesTab
+          selectedExercise={selectedExercise}
+          onSelectExercise={selectExercise}
+          onOpenExerciseInSimulation={openInSimulation}
+        />
+      );
+    }
+
+    if (activeTab === "examples") {
+      return <ExamplesTab />;
+    }
+
+    if (activeTab === "simulation") {
+      return (
+        <SimulationTab
+          selectedExercise={simulationExercise}
+          isFocused={isSimulationFocused}
+          onToggleFocus={handleToggleSimulationFocus}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div
       className={cn(
@@ -89,25 +121,7 @@ export function ModuleTopicPage({
         tabs={tabs}
       />
 
-      {activeTab === "overview" && <OverviewTab />}
-
-      {activeTab === "exercises" && (
-        <ExercisesTab
-          selectedExercise={selectedExercise}
-          onSelectExercise={selectExercise}
-          onOpenExerciseInSimulation={openInSimulation}
-        />
-      )}
-
-      {activeTab === "examples" && <ExamplesTab />}
-
-      {activeTab === "simulation" && (
-        <SimulationTab
-          selectedExercise={simulationExercise}
-          isFocused={isSimulationFocused}
-          onToggleFocus={handleToggleSimulationFocus}
-        />
-      )}
+      {renderActiveTab()}
     </div>
   );
 }
