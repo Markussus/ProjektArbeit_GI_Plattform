@@ -1,2 +1,2 @@
-export { TMConfigView } from "./views/TMConfigView";
-export type { TMConfigViewProps } from "./views/TMConfigView";
+export { TMConfigView } from "./presentation/TMConfigView";
+export type { TMConfigViewProps } from "./presentation/TMConfigView";

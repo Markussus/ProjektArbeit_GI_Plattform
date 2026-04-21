@@ -1,116 +1,65 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSimulationEngine } from "@/hooks/useSimulationEngine";
 import { cloneJson } from "@/lib/utils";
-import { defaultTMConfig } from "./config/defaultTMConfig";
-import { TuringMachineSimulator } from "./model/TuringMachineSimulator";
-import {
-  buildTransitionTableHeaders,
-  buildTransitionTableRows,
-  getActiveTransitionCell,
-} from "./model/tmTable";
-import { validateTMConfig } from "./model/tmConfigValidation";
-import type { TMConfig } from "./types";
-import { TMConfigView } from "./views/TMConfigView";
-import { TMSimulationView } from "./views/TMSimulationView";
+import { useTMConfigEditor } from "./application/useTMConfigEditor";
+import { useTMSimulator } from "./application/useTMSimulator";
+import { defaultTMProgram } from "./config/defaultTMProgram";
+import type { TMProgram } from "./domain/tmProgram";
+import { TMConfigView } from "./presentation/TMConfigView";
+import { TMSimulationView } from "./presentation/TMSimulationView";
 
 export function TMSimulator() {
   const { t } = useTranslation();
-  const [config, setConfig] = useState<TMConfig>(() =>
-    cloneJson(defaultTMConfig),
+  const [program, setProgram] = useState<TMProgram>(() =>
+    cloneJson(defaultTMProgram),
   );
-  const [configError, setConfigError] = useState<string | null>(null);
-  const [tableEditError, setTableEditError] = useState<string | null>(null);
-  const [isEditMode, setIsEditMode] = useState<boolean>(true);
-  const simulator = useMemo(() => new TuringMachineSimulator(), []);
+  const [isEditMode, setIsEditMode] = useState(true);
+  const editor = useTMConfigEditor(program);
+  const simulation = useTMSimulator(program);
 
-  const {
-    status,
-    speed,
-    error,
-    currentState,
-    play,
-    pause,
-    step,
-    stepBack,
-    reset,
-    setSpeed,
-  } = useSimulationEngine(simulator, config);
-
-  const tableHeaders = useMemo(
-    () => buildTransitionTableHeaders(config.states),
-    [config.states],
-  );
-  const tableRows = useMemo(() => buildTransitionTableRows(config), [config]);
-  const activeCell = useMemo(
-    () => getActiveTransitionCell(config, currentState),
-    [config, currentState],
-  );
-
-  const handleApplyConfig = () => {
-    if (tableEditError) {
+  const handleApplyProgram = () => {
+    const result = editor.applyProgram();
+    if (!result.ok) {
       return;
     }
 
-    try {
-      validateTMConfig(config);
-    } catch (err) {
-      setConfigError(err instanceof Error ? err.message : String(err));
-      return;
-    }
-
-    reset(config);
-    setConfigError(null);
+    setProgram(result.program);
     setIsEditMode(false);
   };
 
-  const handleEditConfig = () => {
-    setConfigError(null);
-    setTableEditError(null);
+  const handleEditProgram = () => {
+    simulation.pause();
+    editor.resetToProgram(program);
     setIsEditMode(true);
-    pause();
-  };
-
-  const handleConfigChange = (newConfig: TMConfig) => {
-    setConfig(newConfig);
-    setConfigError(null);
   };
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4">
       {isEditMode ? (
         <div className="flex flex-col gap-4">
-          <TMConfigView
-            config={config}
-            onChange={handleConfigChange}
-            validationError={configError}
-            onTableEditErrorChange={setTableEditError}
-          />
+          <TMConfigView editor={editor} />
           <button
-            onClick={handleApplyConfig}
-            disabled={!!tableEditError}
+            onClick={handleApplyProgram}
+            disabled={editor.hasBlockingCellIssue}
             className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {t("tm.config.apply", "Start Simulation")}
+            {t("tm.config.apply")}
           </button>
         </div>
       ) : (
         <TMSimulationView
-          config={config}
-          currentState={currentState}
-          tableHeaders={tableHeaders}
-          tableRows={tableRows}
-          activeCell={activeCell}
-          status={status}
-          speed={speed}
-          error={error}
-          onEditConfig={handleEditConfig}
-          onPlay={play}
-          onPause={pause}
-          onStep={step}
-          onStepBack={stepBack}
-          onReset={() => reset()}
-          onSpeedChange={setSpeed}
+          program={program}
+          runtime={simulation.runtime}
+          status={simulation.status}
+          speed={simulation.speed}
+          error={simulation.error}
+          onEditConfig={handleEditProgram}
+          onPlay={simulation.play}
+          onPause={simulation.pause}
+          onStep={simulation.step}
+          onStepBack={simulation.stepBack}
+          onReset={() => simulation.reset()}
+          onSpeedChange={simulation.setSpeed}
         />
       )}
     </div>

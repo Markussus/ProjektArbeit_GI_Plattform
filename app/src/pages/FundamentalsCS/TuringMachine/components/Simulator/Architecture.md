@@ -1,8 +1,8 @@
 **Target Architecture**
 
-1. `domain`: pure Turing-machine concepts and rules  
-2. `application`: React-facing orchestration for editing and simulation  
-3. `presentation`: React components for rendering and user input  
+1. `domain`: pure Turing-machine concepts and rules
+2. `application`: React-facing orchestration for editing and simulation
+3. `presentation`: React components for rendering and user input
 4. `adapters`: mapping domain/application state to generic UI components such as `TableView`
 
 The key domain decisions should be:
@@ -68,11 +68,13 @@ Important:
 **Responsibilities**
 
 `domain/tmProgram.ts`
+
 - Defines the static machine program.
 - In other words: states, alphabets, blank symbol, start state, halting states, transitions.
 - Contains only domain data and small invariant helpers if needed.
 
 `domain/tmRuntime.ts`
+
 - Defines only the runtime state.
 - In other words: current state, head position, tape, step counter, halting status, halting reason.
 
@@ -96,6 +98,7 @@ interface TMRuntime {
 This is architecturally important: a missing transition is modeled explicitly instead of being mixed into an `errorMessage`.
 
 `domain/tmMachine.ts`
+
 - Contains the actual simulation logic as pure functions:
 - `createInitialRuntime(program)`
 - `stepRuntime(program, runtime)`
@@ -109,6 +112,7 @@ Important:
 - This file must remain free of React and i18n dependencies so it stays trivial to unit-test.
 
 `domain/tmProgramValidation.ts`
+
 - Validates only structural correctness:
 - referential consistency
 - symbol/state existence
@@ -118,6 +122,7 @@ Important:
 - transition targets and write symbols must exist
 
 It should `not` validate:
+
 - completeness of all transition table cells
 
 It should also `not` throw already localized text.
@@ -148,6 +153,7 @@ Example API:
 This keeps validation testable and translation-friendly.
 
 `application/tmEditorReducer.ts`
+
 - Contains editor actions such as:
 - `renameState`
 - `removeState`
@@ -164,6 +170,7 @@ Important:
 - Renaming or removing a symbol must update all affected write symbols and tape-related references.
 
 `application/useTMConfigEditor.ts`
+
 - Encapsulates the editing workflow that is currently concentrated inside `TMConfigView`.
 - Manages drafts, blocking cell errors, commit/discard behavior, and validation before apply.
 - Exposes a clear, view-friendly API to the presentation layer.
@@ -174,6 +181,7 @@ Important:
 - The hook should mainly coordinate React state.
 
 `application/useTMSimulator.ts`
+
 - Manages the simulator session:
 - current `program`
 - current `runtime`
@@ -190,6 +198,7 @@ Important:
 - The hook should be testable without rendering the full page.
 
 `adapters/tmTableAdapter.ts`
+
 - Builds the `TableView` data from domain/application state:
 - headers
 - rows
@@ -212,6 +221,7 @@ The code should be prepared for a future where the input alphabet can be edited 
 **Architecture Flow**
 
 Configuration:
+
 - `TMConfigView`
 - uses `useTMConfigEditor`
 - edits a `TMProgramDraft`
@@ -220,12 +230,14 @@ Configuration:
 - result is a valid `TMProgram`
 
 Simulation:
+
 - `TMSimulationView`
 - uses `useTMSimulator(program)`
 - `stepRuntime(program, runtime)` is the only domain simulation logic
 - halting reasons are rendered from `runtime.haltReason`
 
 Text handling:
+
 - components translate labels, buttons, helper text, validation messages, and halting messages through `i18next`
 - locale entries live in the existing translation resources under `app/src/i18n/locales/.../translation.json`
 - simulator-specific copy should be added there as stable keys instead of inline strings
@@ -235,10 +247,12 @@ Text handling:
 Missing transitions should be modeled as a `halting reason`, not as a technical error.
 
 So not:
+
 - `errorMessage?: string`
 - `ERROR` status in the domain sense
 
 Instead:
+
 - `halted: true`
 - `haltReason: { type: "missing_transition", ... }`
 

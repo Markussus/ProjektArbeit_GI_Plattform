@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { StateName } from "../types";
+import type { StateName } from "../domain/tmTypes";
 import { formatState } from "../utils/tmFormatting";
 
 export interface TMHaltStatesPanelProps {
@@ -23,11 +23,9 @@ export function TMHaltStatesPanel({
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-2 min-h-[3.5rem]">
-        <h3 className="text-md font-semibold">
-          {t("tm.config.haltStates", "Halt States")}
-        </h3>
+        <h3 className="text-md font-semibold">{t("tm.config.haltStates")}</h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.haltStatesDesc", "Mark states as halting.")}
+          {t("tm.config.haltStatesDesc")}
         </p>
       </div>
 
@@ -47,7 +45,7 @@ export function TMHaltStatesPanel({
 
         {selectableStates.length === 0 && (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.noStates", "No states available")}
+            {t("tm.config.noStates")}
           </span>
         )}
       </div>

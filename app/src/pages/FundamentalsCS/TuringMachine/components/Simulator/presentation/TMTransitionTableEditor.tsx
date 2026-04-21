@@ -1,6 +1,8 @@
-import type { TablePosition } from "@/components/shared/TableVisual/TableView";
 import { useTranslation } from "react-i18next";
-import { TableView } from "@/components/shared/TableVisual/TableView";
+import {
+  TableView,
+  type TablePosition,
+} from "@/components/shared/TableVisual/TableView";
 
 export interface TMTransitionTableEditorProps {
   headers: string[];
@@ -39,12 +41,12 @@ export function TMTransitionTableEditor({
     <div className="flex flex-col gap-2 overflow-hidden">
       <div className="mb-2 min-h-[3.5rem]">
         <h3 className="text-md font-semibold">
-          {t("tm.config.transitionTable", "Transition Table")}
+          {t("tm.config.transitionTable")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.transitionFormat", "Format:")}{" "}
+          {t("tm.config.transitionFormat")}{" "}
           <code>(Next State, Write Symbol, Movement)</code>
-          {t("tm.config.transitionExample", " e.g., (q1, 0, R)")}
+          {t("tm.config.transitionExample")}
         </p>
       </div>
 

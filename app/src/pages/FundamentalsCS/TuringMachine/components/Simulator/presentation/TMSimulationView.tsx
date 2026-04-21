@@ -1,20 +1,21 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type { SimulationStatus } from "@/hooks/useSimulationEngine";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
+import { TableView } from "@/components/shared/TableVisual/TableView";
+import type { SimulationStatus } from "@/hooks/useSimulationEngine";
 import {
-  TableView,
-  type TablePosition,
-} from "@/components/shared/TableVisual/TableView";
-import type { TMConfig, TMState } from "../types";
+  buildTransitionTableHeaders,
+  buildTransitionTableRows,
+  getActiveTransitionCell,
+} from "../adapters/tmTableAdapter";
+import type { TMProgram } from "../domain/tmProgram";
+import type { TMRuntime } from "../domain/tmRuntime";
 import { TMSimulationStatusCard } from "./TMSimulationStatusCard";
 import { TMTapeView } from "./TMTapeView";
 
 export interface TMSimulationViewProps {
-  config: TMConfig;
-  currentState: TMState;
-  tableHeaders: string[];
-  tableRows: string[][];
-  activeCell: TablePosition | null;
+  program: TMProgram;
+  runtime: TMRuntime;
   status: SimulationStatus;
   speed: number;
   error: Error | null;
@@ -28,11 +29,8 @@ export interface TMSimulationViewProps {
 }
 
 export function TMSimulationView({
-  config,
-  currentState,
-  tableHeaders,
-  tableRows,
-  activeCell,
+  program,
+  runtime,
   status,
   speed,
   error,
@@ -45,27 +43,34 @@ export function TMSimulationView({
   onSpeedChange,
 }: TMSimulationViewProps) {
   const { t } = useTranslation();
+  const tableHeaders = useMemo(
+    () => buildTransitionTableHeaders(program.states),
+    [program.states],
+  );
+  const tableRows = useMemo(() => buildTransitionTableRows(program), [program]);
+  const activeCell = useMemo(
+    () => getActiveTransitionCell(program, runtime),
+    [program, runtime],
+  );
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">
-          {t("tm.sim.title", "Turing Machine Simulator")}
-        </h2>
+        <h2 className="text-xl font-bold">{t("tm.sim.title")}</h2>
         <button
           onClick={onEditConfig}
           className="hover:bg-accent rounded-md border px-4 py-2"
         >
-          {t("tm.sim.edit", "Edit Configuration")}
+          {t("tm.sim.edit")}
         </button>
       </div>
 
       <div className="w-full">
         <TMTapeView
-          tape={currentState.tape}
-          headPosition={currentState.headPosition}
+          tape={runtime.tape}
+          headPosition={runtime.headPosition}
           stepDurationMs={speed}
-          blankSymbol={config.blankSymbol}
+          blankSymbol={program.blankSymbol}
         />
       </div>
 
@@ -83,8 +88,8 @@ export function TMSimulationView({
           />
 
           <TMSimulationStatusCard
-            currentState={currentState}
-            blankSymbol={config.blankSymbol}
+            program={{ blankSymbol: program.blankSymbol }}
+            runtime={runtime}
             error={error}
           />
         </div>

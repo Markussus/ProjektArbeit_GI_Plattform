@@ -7,25 +7,18 @@ const MIN_TRANSITION_MS = 120;
 const MAX_TRANSITION_MS = 600;
 const NO_ANIMATION_THRESHOLD_MS = 140;
 const MAX_ANIMATED_TAPE_SHIFT_CELLS = 1;
+const DEFAULT_HEAD_WINDOW_RADIUS = 5;
 
 export interface TMTapeViewProps {
-  /** Sparse tape cells mapped by their tape index. */
   tape: Record<number, string>;
-  /** Current tape head position. */
   headPosition: number;
-  /** Milliseconds per simulation step. Lower values mean faster simulation. */
   stepDurationMs?: number;
-  /** Number of visible cells to render on either side of the visible window. */
   windowRadius?: number;
-  /** Range within the visible window where the head can move before the tape recenters. */
   headWindowRadius?: number;
-  /** Symbol shown for undefined or empty tape cells. */
   blankSymbol?: string;
   className?: string;
   cellClassName?: string;
 }
-
-const DEFAULT_HEAD_WINDOW_RADIUS = 5;
 
 export function TMTapeView({
   tape,
@@ -72,7 +65,8 @@ export function TMTapeView({
 
   const cells = useMemo(() => {
     const result = [];
-    for (let index = startIndex; index <= endIndex; index++) {
+
+    for (let index = startIndex; index <= endIndex; index += 1) {
       const symbol =
         tape[index] !== undefined && tape[index] !== null
           ? tape[index]
@@ -84,6 +78,7 @@ export function TMTapeView({
         isFocused: index === headPosition,
       });
     }
+
     return result;
   }, [blankSymbol, endIndex, headPosition, startIndex, tape]);
 
@@ -95,6 +90,7 @@ export function TMTapeView({
       if (headIndicator) {
         headIndicator.style.opacity = "0";
       }
+
       return;
     }
 
