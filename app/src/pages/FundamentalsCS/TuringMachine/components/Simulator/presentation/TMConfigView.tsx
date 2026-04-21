@@ -60,9 +60,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="space-y-4 lg:mx-auto lg:w-max lg:max-w-full">
-        <h2 className="text-lg font-bold">
-          {t("tm.config.title")}
-        </h2>
+        <h2 className="text-lg font-bold">{t("tm.config.title")}</h2>
 
         {combinedError && (
           <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">

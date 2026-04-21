@@ -35,8 +35,8 @@ const ADD_ACTION_BUTTON_CLASS =
   "text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-40";
 const ADD_ROW_BUTTON_CLASS =
   "text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-40";
-const FIRST_COLUMN_WIDTH_CLASS = "w-[3.5rem] max-w-[3.5rem]";
-const DATA_COLUMN_WIDTH_CLASS = "w-[8rem] max-w-[8rem]";
+export const DEFAULT_FIRST_COLUMN_WIDTH_CLASS = "w-[2.5rem] max-w-[2.5rem]";
+export const DEFAULT_DATA_COLUMN_WIDTH_CLASS = "w-[8rem] max-w-[8rem]";
 
 export interface TablePosition {
   row: number;
@@ -86,6 +86,8 @@ export interface TableViewProps {
   canRemoveColumn?: boolean;
   onRemoveColumn?: (colIndex: number) => void;
   disableRemoveColumn?: boolean;
+  firstColumnWidthClassName?: string;
+  dataColumnWidthClassName?: string;
   className?: string;
   tableClassName?: string;
 }
@@ -107,8 +109,12 @@ function normalizeHeaders(headers: string[], maxCols: number): string[] {
   return Array.from({ length: maxCols }, (_, index) => headers[index] ?? "");
 }
 
-function getColumnWidthClassName(colIndex: number): string {
-  return colIndex === 0 ? FIRST_COLUMN_WIDTH_CLASS : DATA_COLUMN_WIDTH_CLASS;
+function getColumnWidthClassName(
+  colIndex: number,
+  firstColumnWidthClassName: string,
+  dataColumnWidthClassName: string,
+): string {
+  return colIndex === 0 ? firstColumnWidthClassName : dataColumnWidthClassName;
 }
 
 function getTableCellState({
@@ -176,6 +182,8 @@ export function TableView({
   canRemoveColumn = false,
   onRemoveColumn,
   disableRemoveColumn = false,
+  firstColumnWidthClassName = DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
+  dataColumnWidthClassName = DEFAULT_DATA_COLUMN_WIDTH_CLASS,
   className,
   tableClassName,
 }: TableViewProps) {
@@ -242,7 +250,11 @@ export function TableView({
         scope="col"
         className={cn(
           HEADER_CELL_CLASS,
-          getColumnWidthClassName(colIndex),
+          getColumnWidthClassName(
+            colIndex,
+            firstColumnWidthClassName,
+            dataColumnWidthClassName,
+          ),
           isColActive && HEADER_CELL_ACTIVE_CLASS,
         )}
       >
@@ -362,7 +374,11 @@ export function TableView({
         key={`cell-${rowIndex}-${colIndex}`}
         className={cn(
           BODY_CELL_CLASS,
-          getColumnWidthClassName(colIndex),
+          getColumnWidthClassName(
+            colIndex,
+            firstColumnWidthClassName,
+            dataColumnWidthClassName,
+          ),
           cellState.highlightSpecific && BODY_CELL_ACTIVE_CLASS,
           cellState.highlightSecondary && BODY_CELL_SECONDARY_CLASS,
           cellState.isInvalid && BODY_CELL_INVALID_CLASS,
