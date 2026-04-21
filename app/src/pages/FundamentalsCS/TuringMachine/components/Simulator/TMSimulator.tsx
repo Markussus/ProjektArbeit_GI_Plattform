@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { cloneJson } from "@/lib/utils";
+import { cloneJson, cn } from "@/lib/utils";
 import { useTMConfigEditor } from "./application/useTMConfigEditor";
 import { useTMSimulator } from "./application/useTMSimulator";
 import { defaultTMProgram } from "./config/defaultTMProgram";
@@ -34,7 +34,12 @@ export function TMSimulator() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4">
+    <div
+      className={cn(
+        "mx-auto flex w-full flex-col gap-6 p-4",
+        isEditMode ? "max-w-none" : "max-w-5xl",
+      )}
+    >
       {isEditMode ? (
         <div className="flex flex-col gap-4">
           <TMConfigView editor={editor} />

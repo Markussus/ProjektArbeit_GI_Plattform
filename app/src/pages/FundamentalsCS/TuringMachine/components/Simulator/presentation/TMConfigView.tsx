@@ -58,9 +58,11 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
   };
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 p-4">
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold">{t("tm.config.title")}</h2>
+    <div className="flex w-full flex-col gap-6">
+      <div className="space-y-4 lg:mx-auto lg:w-max lg:max-w-full">
+        <h2 className="text-lg font-bold">
+          {t("tm.config.title")}
+        </h2>
 
         {combinedError && (
           <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">
@@ -68,7 +70,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
           </div>
         )}
 
-        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_12rem]">
+        <div className="mt-4 grid w-full grid-cols-1 gap-6 lg:grid-cols-[auto_12rem] lg:items-start">
           <TMGeneralSettings
             program={editor.draft}
             disabled={editor.hasBlockingCellIssue}

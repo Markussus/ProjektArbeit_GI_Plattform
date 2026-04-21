@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 const TABLE_CONTAINER_CLASS =
-  "bg-card text-card-foreground w-full overflow-x-auto rounded-lg border shadow-sm";
-const TABLE_CLASS = "w-full border-collapse text-sm";
+  "bg-card text-card-foreground w-max max-w-full overflow-x-auto rounded-lg border shadow-sm";
+const TABLE_CLASS = "w-max table-fixed border-collapse text-sm";
 const HEADER_ROW_CLASS = "bg-muted/50 border-b";
 const HEADER_CELL_CLASS =
   "group relative border-r p-3 text-left align-middle font-semibold last:border-r-0";
@@ -35,6 +35,8 @@ const ADD_ACTION_BUTTON_CLASS =
   "text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-40";
 const ADD_ROW_BUTTON_CLASS =
   "text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-40";
+const FIRST_COLUMN_WIDTH_CLASS = "w-[3.5rem] max-w-[3.5rem]";
+const DATA_COLUMN_WIDTH_CLASS = "w-[8rem] max-w-[8rem]";
 
 export interface TablePosition {
   row: number;
@@ -103,6 +105,10 @@ function getMaxCols(headers: string[], rows: string[][]): number {
 
 function normalizeHeaders(headers: string[], maxCols: number): string[] {
   return Array.from({ length: maxCols }, (_, index) => headers[index] ?? "");
+}
+
+function getColumnWidthClassName(colIndex: number): string {
+  return colIndex === 0 ? FIRST_COLUMN_WIDTH_CLASS : DATA_COLUMN_WIDTH_CLASS;
 }
 
 function getTableCellState({
@@ -236,6 +242,7 @@ export function TableView({
         scope="col"
         className={cn(
           HEADER_CELL_CLASS,
+          getColumnWidthClassName(colIndex),
           isColActive && HEADER_CELL_ACTIVE_CLASS,
         )}
       >
@@ -355,6 +362,7 @@ export function TableView({
         key={`cell-${rowIndex}-${colIndex}`}
         className={cn(
           BODY_CELL_CLASS,
+          getColumnWidthClassName(colIndex),
           cellState.highlightSpecific && BODY_CELL_ACTIVE_CLASS,
           cellState.highlightSecondary && BODY_CELL_SECONDARY_CLASS,
           cellState.isInvalid && BODY_CELL_INVALID_CLASS,
