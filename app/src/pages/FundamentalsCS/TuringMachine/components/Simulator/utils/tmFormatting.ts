@@ -1,4 +1,4 @@
-import type { StateName, TMTransition } from "../types";
+import type { StateName, TMTransition } from "../domain/tmTypes";
 
 export function formatState(state: StateName): string {
   return state.replace(/\d+/g, (match) => {

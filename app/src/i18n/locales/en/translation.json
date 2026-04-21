@@ -404,6 +404,57 @@
       "finalFormulaDesc": "For the final decimal number, the sign, actual mantissa, and exponent factor are multiplied together:"
     }
   },
+  "tm": {
+    "config": {
+      "title": "Turing Machine Configuration",
+      "apply": "Start Simulation",
+      "initialTape": "Initial Tape Word",
+      "initialTapePlaceholder": "Enter input word (e.g., 1011)",
+      "startState": "Start State",
+      "haltStates": "Halt States",
+      "haltStatesDesc": "Mark states as halting.",
+      "noStates": "No states available",
+      "transitionTable": "Transition Table",
+      "transitionFormat": "Format:",
+      "transitionExample": " e.g., (q1, 0, R)",
+      "cannotRemoveBlank": "The blank symbol cannot be removed.",
+      "cannotRemoveSymbolColumn": "The symbol column cannot be removed.",
+      "cannotRemoveLastState": "At least one state column must remain.",
+      "symbolSingleChar": "Tape symbols must consist of exactly one character.",
+      "symbolDuplicate": "This tape symbol already exists in the transition table.",
+      "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
+    },
+    "validation": {
+      "statesEmpty": "At least one state must be defined.",
+      "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
+      "haltStatesEmpty": "At least one halt state must be defined.",
+      "haltStateMissing": "The halt state '{{state}}' must exist in the set of states.",
+      "blankSymbolMissing": "The blank symbol '{{symbol}}' must be part of the tape alphabet.",
+      "blankSymbolInvalid": "The blank symbol '{{symbol}}' must consist of exactly one character.",
+      "tapeSymbolInvalid": "Tape alphabet symbol '{{symbol}}' must consist of exactly one character.",
+      "initialTapeInvalidSymbol": "Initial tape symbol '{{symbol}}' must be part of the input alphabet and consist of exactly one character.",
+      "transitionReadSymbolMissing": "A transition is defined for read symbol '{{symbol}}', but this symbol is not part of the tape alphabet.",
+      "transitionReadSymbolInvalid": "Transition read symbol '{{symbol}}' must consist of exactly one character.",
+      "transitionStateMissing": "A transition is defined for state '{{state}}', but this state is not part of the set of states.",
+      "transitionNextStateMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' points to unknown next state '{{nextState}}'.",
+      "transitionWriteSymbolMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' writes unknown symbol '{{writeSymbol}}'.",
+      "transitionWriteSymbolInvalid": "Transition from state '{{state}}' on symbol '{{symbol}}' must write exactly one character."
+    },
+    "sim": {
+      "title": "Turing Machine Simulator",
+      "edit": "Edit Configuration",
+      "status": "Status",
+      "state": "Current State",
+      "symbol": "Current Symbol",
+      "step": "Step",
+      "halt": "Halted",
+      "yes": "Yes",
+      "no": "No",
+      "haltReason": {
+        "missingTransition": "No transition is defined for state '{{state}}' and symbol '{{symbol}}'."
+      }
+    }
+  },
   "modules": {
     "label": "Module",
     "topicsTitle": "Topics",

@@ -1,4 +1,4 @@
-import type { HeadMovement, TMTransition } from "../types";
+import type { HeadMovement, TMTransition } from "../domain/tmTypes";
 import { isSingleTapeSymbol } from "./tmSymbolValidation";
 
 export function parseTransition(cellValue: string): TMTransition | null {

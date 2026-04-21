@@ -400,6 +400,57 @@
       }
     }
   },
+  "tm": {
+    "config": {
+      "title": "Turingmaschinen-Konfiguration",
+      "apply": "Simulation starten",
+      "initialTape": "Anfangsbandwort",
+      "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
+      "startState": "Startzustand",
+      "haltStates": "Haltezustände",
+      "haltStatesDesc": "Zustände als haltend markieren.",
+      "noStates": "Keine Zustände verfügbar",
+      "transitionTable": "Übergangstabelle",
+      "transitionFormat": "Format:",
+      "transitionExample": " z. B. (q1, 0, R)",
+      "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
+      "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
+      "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
+      "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
+      "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
+      "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+    },
+    "validation": {
+      "statesEmpty": "Es muss mindestens ein Zustand definiert sein.",
+      "initialStateMissing": "Der Startzustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
+      "haltStatesEmpty": "Es muss mindestens ein Haltezustand definiert sein.",
+      "haltStateMissing": "Der Haltezustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
+      "blankSymbolMissing": "Das Blanksymbol '{{symbol}}' muss Teil des Bandalphabets sein.",
+      "blankSymbolInvalid": "Das Blanksymbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "tapeSymbolInvalid": "Das Bandalphabet-Symbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "initialTapeInvalidSymbol": "Das Anfangsband-Symbol '{{symbol}}' muss Teil des Eingabealphabets sein und aus genau einem Zeichen bestehen.",
+      "transitionReadSymbolMissing": "Für das gelesene Symbol '{{symbol}}' ist ein Übergang definiert, aber dieses Symbol ist nicht Teil des Bandalphabets.",
+      "transitionReadSymbolInvalid": "Das gelesene Übergangssymbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "transitionStateMissing": "Für den Zustand '{{state}}' ist ein Übergang definiert, aber dieser Zustand ist nicht Teil der Zustandsmenge.",
+      "transitionNextStateMissing": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' verweist auf den unbekannten Folgezustand '{{nextState}}'.",
+      "transitionWriteSymbolMissing": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' schreibt das unbekannte Symbol '{{writeSymbol}}'.",
+      "transitionWriteSymbolInvalid": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' muss genau ein Zeichen schreiben."
+    },
+    "sim": {
+      "title": "Turingmaschinen-Simulator",
+      "edit": "Konfiguration bearbeiten",
+      "status": "Status",
+      "state": "Aktueller Zustand",
+      "symbol": "Aktuelles Symbol",
+      "step": "Schritt",
+      "halt": "Angehalten",
+      "yes": "Ja",
+      "no": "Nein",
+      "haltReason": {
+        "missingTransition": "Für Zustand '{{state}}' und Symbol '{{symbol}}' ist kein Übergang definiert."
+      }
+    }
+  },
   "modules": {
     "label": "Modul",
     "topicsTitle": "Themen",
