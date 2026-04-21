@@ -45,7 +45,7 @@ export function TMHaltStatesPanel({
                 disabled={disabled}
                 className="peer sr-only"
               />
-              <span className="border-input bg-background peer-focus-visible:ring-ring peer-checked:bg-brand peer-checked:border-brand flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:outline-none peer-disabled:opacity-50">
+              <span className="border-input bg-background peer-focus-visible:ring-brand peer-checked:bg-brand peer-checked:border-brand flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:outline-none peer-disabled:opacity-50">
                 {isChecked && (
                   <Check className="text-brand-foreground h-3 w-3" />
                 )}

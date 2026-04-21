@@ -89,7 +89,7 @@ export function SimulatorControls({
             onClick={onPause}
             className={cn(
               buttonClasses,
-              "bg-primary text-primary-foreground hover:bg-primary/90",
+              "bg-brand text-brand-foreground hover:opacity-90",
             )}
             title={t("simulation.controls.pause", "Pause")}
             aria-label={t("simulation.controls.pause", "Pause")}
@@ -102,7 +102,7 @@ export function SimulatorControls({
             disabled={isError}
             className={cn(
               buttonClasses,
-              "bg-primary text-primary-foreground hover:bg-primary/90",
+              "bg-brand text-brand-foreground hover:opacity-90",
             )}
             title={t("simulation.controls.play", "Play")}
             aria-label={t("simulation.controls.play", "Play")}

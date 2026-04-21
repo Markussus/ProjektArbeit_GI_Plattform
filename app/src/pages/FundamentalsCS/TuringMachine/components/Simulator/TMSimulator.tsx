@@ -41,7 +41,7 @@ export function TMSimulator() {
           <button
             onClick={handleApplyProgram}
             disabled={editor.hasBlockingCellIssue}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 self-center rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t("tm.config.apply")}
           </button>
