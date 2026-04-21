@@ -1,6 +1,8 @@
 import type { ReactElement } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
+  Code2,
+  Coffee,
   Cpu,
   GitBranch,
   Hash,
@@ -13,6 +15,8 @@ import { DnfPage as DnfTopicPage } from "@/pages/FundamentalsCS/Dnf/DnfPage";
 import { FiniteAutomataPage as FiniteAutomataTopicPage } from "@/pages/FundamentalsCS/FiniteAutomata/FiniteAutomataPage";
 import { MooreMealyPage as MooreMealyTopicPage } from "@/pages/FundamentalsCS/MooreMealy/MooreMealyPage";
 import { NumberSystemsPage as NumberSystemsTopicPage } from "@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage";
+import { Programming1Page } from "@/pages/Programming1/Programming1Page";
+import { JavaProgrammingPage as JavaProgrammingTopicPage } from "@/pages/Programming1/Java/JavaProgrammingPage";
 import { TuringMachinePage as TuringMachineTopicPage } from "@/pages/FundamentalsCS/TuringMachine/TuringMachinePage";
 import type { TranslationKey } from "@/types/i18n";
 
@@ -92,6 +96,25 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: TableProperties,
         accent: "rose",
         element: <DnfTopicPage />,
+      },
+    ],
+  },
+  {
+    id: "programming-1",
+    titleKey: "modules.programming1.title",
+    descriptionKey: "modules.programming1.description",
+    path: "/programming-1",
+    icon: Code2,
+    element: <Programming1Page />,
+    topics: [
+      {
+        id: "java-programming",
+        titleKey: "java.title",
+        descriptionKey: "java.description",
+        path: "/programming-1/java-programming",
+        icon: Coffee,
+        accent: "orange",
+        element: <JavaProgrammingTopicPage />,
       },
     ],
   },

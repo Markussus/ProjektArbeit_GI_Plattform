@@ -23,33 +23,29 @@ export function SimulationWorkspace({
 
   return (
     <div className="space-y-4">
-      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            {selectedExercise ? (
-              <>
-                <p className="text-foreground text-sm font-semibold">
-                  {t("simulation.selectedExercise")}
-                </p>
-                <p className="text-foreground mt-2 text-sm font-medium">
-                  {selectedExercise.title}
-                </p>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                  {selectedExercise.description}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-foreground text-sm font-semibold">
-                  {t("simulation.workspace")}
-                </p>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                  {emptyStateText}
-                </p>
-              </>
-            )}
+      {selectedExercise && (
+        <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+          <div className="min-w-0">
+            <p className="text-foreground text-sm font-semibold">
+              {t("simulation.selectedExercise")}
+            </p>
+            <p className="text-foreground mt-2 text-sm font-medium">
+              {selectedExercise.title}
+            </p>
+            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+              {selectedExercise.description}
+            </p>
           </div>
+        </div>
+      )}
 
+      <div
+        className={cn(
+          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
+        )}
+      >
+        <div className="mb-3 flex justify-end">
           <button
             type="button"
             onClick={onToggleFocus}
@@ -67,14 +63,7 @@ export function SimulationWorkspace({
             )}
           </button>
         </div>
-      </div>
 
-      <div
-        className={cn(
-          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
-          isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
-        )}
-      >
         {children ?? (
           <p className="text-muted-foreground text-sm">{emptyStateText}</p>
         )}
