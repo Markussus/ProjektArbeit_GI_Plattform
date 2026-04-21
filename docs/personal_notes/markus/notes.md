@@ -91,3 +91,22 @@
     - Add `Vitest` for logic tests
     - Maybe later `React Testing Library` for UI/component tests
     - First focus on testing the simulator logic, not the full UI
+
+* Pipeline Setup:
+    - Set up the Raspberry Pi as a self-hosted CI runner machine
+    - Installed and configured Docker on the Raspberry Pi
+    - Installed GitLab Runner on the Raspberry Pi
+    - Registered the GitLab Runner and connected it to the GitLab project
+    - Configured the runner to use the Docker executor
+    - Verified that the runner service is running correctly
+    - Verified that the `gitlab-runner` user has access to Docker
+    - Created the initial `.gitlab-ci.yml` pipeline configuration
+    - Adjusted the pipeline to work with the project located in the `app/` subdirectory
+    - Added a minimal `verify` job to confirm that the runner, Docker, Node.js, and npm work correctly
+    - Added a `build` job to confirm that the frontend application builds successfully
+    - Tested and debugged the pipeline until it ran successfully
+    - Changed the Docker pull policy to `if-not-present` so the local image is reused instead of being pulled every time
+    - Replaced the `node_modules` cache approach with a local npm cache (`app/.npm/`) for a smaller and more efficient dependency cache
+    - Configured npm to use `npm ci --cache .npm --prefer-offline` so cached packages are reused whenever possible
+    - Confirmed that the local GitLab Runner cache works without any external shared cache server
+    - Successfully ran the pipeline end to end on the Raspberry Pi
