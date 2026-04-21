@@ -144,6 +144,36 @@
     "exercise4": "Multi-Variable DNF",
     "exercise4Desc": "Handle expressions with 4+ variables"
   },
+  "java": {
+    "title": "Java Programming",
+    "description": "Work with core Java basics such as console output, loops, and arrays. The simulation tab provides a directly editable Java code editor.",
+    "overviewTitle": "Getting started with Java",
+    "overviewText": "This topic introduces simple Java programs step by step. The focus is on the Main class, the main method, console output, loops, and small array-based tasks.",
+    "concepts": "Key Concepts",
+    "concept1": "Main class and main method",
+    "concept2": "System.out.println for console output",
+    "concept3": "for loops for repeated output",
+    "concept4": "Reading, sorting, and evaluating arrays",
+    "example1Title": "Simple Hello World",
+    "example1Text": "The smallest Java program with a main method and a console print statement.",
+    "example2Title": "Repeated output",
+    "example2Text": "A for loop is the standard way to repeat the same instruction several times.",
+    "example3Title": "Sorting an array",
+    "example3Text": "An integer array can be sorted in ascending order with Arrays.sort.",
+    "exercise1": "Print Hello World",
+    "exercise1Desc": "Write a Java program that prints Hello World to the console exactly once.",
+    "exercise2": "Print Hello World five times",
+    "exercise2Desc": "Use a loop to print Hello World to the console exactly five times.",
+    "exercise3": "Add two numbers",
+    "exercise3Desc": "Add two integer values and print the sum in the console.",
+    "exercise4": "Sort an array",
+    "exercise4Desc": "Sort an integer array in ascending order and print the result afterwards.",
+    "exercise5": "Find the maximum value",
+    "exercise5Desc": "Iterate over an array and determine the largest contained value.",
+    "editorLabel": "Java editor",
+    "editorLoading": "Loading Monaco editor...",
+    "resetStarterCode": "Reset starter code"
+  },
   "exercise": {
     "label": "Exercise {{index}}",
     "difficulty": "Difficulty",
@@ -168,7 +198,8 @@
       "automata": "The Finite Automata simulator will be available here.",
       "number": "The Number Systems converter will be available here.",
       "moore": "The Moore & Mealy simulator will be available here.",
-      "dnf": "The DNF builder / truth table generator will be available here."
+      "dnf": "The DNF builder / truth table generator will be available here.",
+      "java": "Select a Java exercise or start directly with your own Java snippet in the Monaco editor."
     }
   },
   "modules": {
@@ -177,6 +208,10 @@
     "fundamentalsCs": {
       "title": "Fundamentals of Computer Science",
       "description": "This module bundles the core foundations of Fundamentals of Computer Science. Select a topic to start learning."
+    },
+    "programming1": {
+      "title": "Programming 1",
+      "description": "This module introduces first programming fundamentals. Start with simple Java exercises and a built-in editor."
     },
     "moreComingSoon": "More coming soon",
     "moreComingSoonDescription": "Additional learning modules will be added in future versions."

@@ -144,6 +144,36 @@
     "exercise4": "Mehrvariablen-DNF",
     "exercise4Desc": "Behandlung von Ausdrücken mit 4+ Variablen"
   },
+  "java": {
+    "title": "Java-Programmierung",
+    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafuer direkt einen editierbaren Java-Code-Editor bereit.",
+    "overviewTitle": "Einstieg in Java",
+    "overviewText": "Dieses Thema fuehrt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
+    "concepts": "Schluesselkonzepte",
+    "concept1": "Klasse Main und main-Methode",
+    "concept2": "System.out.println fuer Konsolenausgaben",
+    "concept3": "for-Schleifen fuer wiederholte Ausgaben",
+    "concept4": "Arrays lesen, sortieren und auswerten",
+    "example1Title": "Einfaches Hello World",
+    "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
+    "example2Title": "Wiederholte Ausgabe",
+    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausfuehren.",
+    "example3Title": "Array sortieren",
+    "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
+    "exercise1": "Hello World ausgeben",
+    "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
+    "exercise2": "Hello World fuenfmal ausgeben",
+    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fuenfmal in die Konsole zu schreiben.",
+    "exercise3": "Zwei Zahlen addieren",
+    "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
+    "exercise4": "Array sortieren",
+    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschliessend aus.",
+    "exercise5": "Maximum im Array finden",
+    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
+    "editorLabel": "Java-Editor",
+    "editorLoading": "Der Monaco-Editor wird geladen...",
+    "resetStarterCode": "Startercode zuruecksetzen"
+  },
   "exercise": {
     "label": "Übung {{index}}",
     "difficulty": "Schwierigkeit",
@@ -168,7 +198,8 @@
       "automata": "Der Automatensimulator wird hier verfügbar sein.",
       "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
-      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein."
+      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
+      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
     }
   },
   "modules": {
@@ -177,6 +208,10 @@
     "fundamentalsCs": {
       "title": "Grundlagen der Informatik",
       "description": "Dieses Modul bündelt die zentralen Grundlagen der Informatik. Wählen Sie ein Thema aus, um mit dem Training zu beginnen."
+    },
+    "programming1": {
+      "title": "Programmieren 1",
+      "description": "Dieses Modul fuehrt in die ersten Programmiergrundlagen ein. Starten Sie mit einfachen Java-Aufgaben und einem direkten Editor."
     },
     "moreComingSoon": "Mehr Module folgen bald",
     "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."
