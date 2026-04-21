@@ -5,10 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { Exercise } from "@/types/exercise";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
-import type {
-  DnfParseIssue,
-  DnfParseIssueCode,
-} from "./domain/dnfParser";
+import type { DnfParseIssue, DnfParseIssueCode } from "./domain/dnfParser";
 import { DnfDerivationSteps } from "./presentation/DnfDerivationSteps";
 import { DnfInputPanel } from "./presentation/DnfInputPanel";
 import { DnfResultPanel } from "./presentation/DnfResultPanel";
@@ -21,6 +18,8 @@ const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
   unexpected_end: "dnf.builder.errors.unexpectedEnd",
   missing_closing_parenthesis: "dnf.builder.errors.missingClosingParenthesis",
 };
+
+const LARGE_VARIABLE_COUNT_THRESHOLD = 6;
 
 interface DnfBuilderProps {
   selectedExercise?: Exercise | null;
@@ -68,10 +67,42 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
 
       {shouldShowSolution && builder.analysis.status === "valid" && display && (
         <>
+          {builder.analysis.truthTable.variables.length >=
+            LARGE_VARIABLE_COUNT_THRESHOLD && (
+            <LargeTruthTableWarning
+              variableCount={builder.analysis.truthTable.variables.length}
+              rowCount={builder.analysis.truthTable.rows.length}
+            />
+          )}
           <DnfDerivationSteps derivation={builder.analysis.derivation} />
           <DnfTruthTableView display={display} />
         </>
       )}
+    </div>
+  );
+}
+
+function LargeTruthTableWarning({
+  variableCount,
+  rowCount,
+}: {
+  variableCount: number;
+  rowCount: number;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
+        <AlertTriangle className="h-5 w-5" />
+        {t("dnf.builder.largeTableTitle")}
+      </h3>
+      <p className="text-sm leading-relaxed text-amber-800 dark:text-amber-300/80">
+        {t("dnf.builder.largeTableDesc", {
+          variables: variableCount,
+          rows: rowCount,
+        })}
+      </p>
     </div>
   );
 }
@@ -128,8 +159,11 @@ function ParseErrorPanel({ issue }: { issue: DnfParseIssue }) {
 }
 
 function translateParseIssue(t: TFunction, issue: DnfParseIssue): string {
-  return t(parseIssueKeyByCode[issue.code] as never, {
-    index: issue.index + 1,
-    value: issue.value ?? "",
-  } as never) as unknown as string;
+  return t(
+    parseIssueKeyByCode[issue.code] as never,
+    {
+      index: issue.index + 1,
+      value: issue.value ?? "",
+    } as never,
+  ) as unknown as string;
 }

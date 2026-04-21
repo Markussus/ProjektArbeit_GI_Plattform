@@ -15,6 +15,11 @@ export function DnfResultPanel({
   trueRowCount,
 }: DnfResultPanelProps) {
   const { t } = useTranslation();
+  const stats = [
+    { label: t("dnf.builder.variables"), value: variableCount },
+    { label: t("dnf.builder.rows"), value: rowCount },
+    { label: t("dnf.builder.oneRows"), value: trueRowCount },
+  ];
 
   return (
     <section className="border-border bg-background/40 rounded-lg border p-4">
@@ -36,27 +41,19 @@ export function DnfResultPanel({
         {formattedDnf}
       </code>
 
-      <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
-        <div className="rounded-md border p-3">
-          <dt className="text-muted-foreground">
-            {t("dnf.builder.variables")}
-          </dt>
-          <dd className="text-foreground mt-1 font-semibold">
-            {variableCount}
-          </dd>
-        </div>
-        <div className="rounded-md border p-3">
-          <dt className="text-muted-foreground">{t("dnf.builder.rows")}</dt>
-          <dd className="text-foreground mt-1 font-semibold">{rowCount}</dd>
-        </div>
-        <div className="rounded-md border p-3">
-          <dt className="text-muted-foreground">
-            {t("dnf.builder.oneRows")}
-          </dt>
-          <dd className="text-foreground mt-1 font-semibold">
-            {trueRowCount}
-          </dd>
-        </div>
+      <div className="border-border text-muted-foreground mt-4 border-l-2 py-1 pl-3 text-xs leading-relaxed">
+        {t("dnf.builder.resultRuleHint")}
+      </div>
+
+      <dl className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-3 text-sm">
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-md border p-3">
+            <dt className="text-muted-foreground text-xs leading-snug font-medium sm:text-sm">
+              {stat.label}
+            </dt>
+            <dd className="text-foreground mt-1 font-semibold">{stat.value}</dd>
+          </div>
+        ))}
       </dl>
     </section>
   );
