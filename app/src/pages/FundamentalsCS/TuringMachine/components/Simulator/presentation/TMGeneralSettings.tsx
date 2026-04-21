@@ -25,7 +25,9 @@ export function TMGeneralSettings({
   }, [program.haltStates, program.initialState, program.states]);
   const startStateOptions = useMemo(() => {
     return selectableStates.map((state) => {
-      const label = <span className="font-mono text-lg">{formatState(state)}</span>;
+      const label = (
+        <span className="font-mono text-lg">{formatState(state)}</span>
+      );
 
       return {
         value: state,

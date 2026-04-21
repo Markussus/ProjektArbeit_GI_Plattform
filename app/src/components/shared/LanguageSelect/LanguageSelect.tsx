@@ -31,7 +31,11 @@ export function LanguageSelect() {
         {languageLabels[language]}
       </span>
     ),
-    label: <span className="font-semibold uppercase">{languageLabels[language]}</span>,
+    label: (
+      <span className="font-semibold uppercase">
+        {languageLabels[language]}
+      </span>
+    ),
     description: t(languageTranslationKeys[language]),
   }));
 
