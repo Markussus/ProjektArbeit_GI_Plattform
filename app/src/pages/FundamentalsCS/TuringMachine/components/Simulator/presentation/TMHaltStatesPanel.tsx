@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import type { StateName } from "../domain/tmTypes";
-import { formatState } from "../utils/tmFormatting";
 
 export interface TMHaltStatesPanelProps {
   states: StateName[];
@@ -51,4 +50,13 @@ export function TMHaltStatesPanel({
       </div>
     </div>
   );
+}
+
+function formatState(state: string): string {
+  return state.replace(/\d+/g, (match) => {
+    return match
+      .split("")
+      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
+      .join("");
+  });
 }

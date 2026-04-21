@@ -9,8 +9,8 @@ import {
   validateTMProgram,
   type TMProgramIssue,
 } from "../domain/tmProgramValidation";
-import { parseTransition } from "../utils/tmParsing";
-import { isSingleTapeSymbol } from "../utils/tmSymbolValidation";
+import type { HeadMovement, TMTransition } from "../domain/tmTypes";
+import { isSingleTapeSymbol } from "../domain/tmTypes";
 import {
   createProgramDraft,
   tmEditorReducer,
@@ -433,4 +433,25 @@ function isSamePosition(
   right: TMTablePosition,
 ): boolean {
   return left.row === right.row && left.col === right.col;
+}
+
+function parseTransition(cellValue: string): TMTransition | null {
+  const match = cellValue.match(
+    /^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNR])\s*\)\s*$/,
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const writeSymbol = match[2].trim();
+  if (!isSingleTapeSymbol(writeSymbol)) {
+    return null;
+  }
+
+  return {
+    nextState: match[1].trim(),
+    writeSymbol,
+    movement: match[3].trim() as HeadMovement,
+  };
 }

@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import type { TMProgram } from "../domain/tmProgram";
 import type { TMRuntime } from "../domain/tmRuntime";
 import { readCurrentSymbol } from "../domain/tmMachine";
-import { formatState } from "../utils/tmFormatting";
 
 export interface TMSimulationStatusCardProps {
   program: Pick<TMProgram, "blankSymbol">;
@@ -56,4 +55,13 @@ export function TMSimulationStatusCard({
       )}
     </div>
   );
+}
+
+function formatState(state: string): string {
+  return state.replace(/\d+/g, (match) => {
+    return match
+      .split("")
+      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
+      .join("");
+  });
 }

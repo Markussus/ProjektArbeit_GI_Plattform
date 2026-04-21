@@ -1,5 +1,5 @@
-import { isSingleTapeSymbol } from "../utils/tmSymbolValidation";
 import type { TMProgram } from "./tmProgram";
+import { isSingleTapeSymbol } from "./tmTypes";
 
 export type TMProgramIssueCode =
   | "states_empty"

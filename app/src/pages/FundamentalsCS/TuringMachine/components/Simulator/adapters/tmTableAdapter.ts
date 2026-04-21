@@ -2,8 +2,7 @@ import type { TablePosition } from "@/components/shared/TableVisual/TableView";
 import { readCurrentSymbol } from "../domain/tmMachine";
 import type { TMProgram } from "../domain/tmProgram";
 import type { TMRuntime } from "../domain/tmRuntime";
-import type { StateName, TapeSymbol } from "../domain/tmTypes";
-import { formatState, formatTransition } from "../utils/tmFormatting";
+import type { StateName, TapeSymbol, TMTransition } from "../domain/tmTypes";
 
 export function getOrderedTapeAlphabet(
   program: Pick<TMProgram, "blankSymbol" | "tapeAlphabet">,
@@ -45,4 +44,21 @@ export function getActiveTransitionCell(
   }
 
   return { row: symbolIndex, col: stateIndex + 1 };
+}
+
+function formatState(state: StateName): string {
+  return state.replace(/\d+/g, (match) => {
+    return match
+      .split("")
+      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
+      .join("");
+  });
+}
+
+function formatTransition(transition?: TMTransition): string {
+  if (!transition) {
+    return "";
+  }
+
+  return `(${transition.nextState}, ${transition.writeSymbol}, ${transition.movement})`;
 }
