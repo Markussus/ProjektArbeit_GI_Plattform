@@ -11,7 +11,9 @@
         "http://127.0.0.1:4173/fundamentals-cs/finite-automata",
         "http://127.0.0.1:4173/fundamentals-cs/number-systems",
         "http://127.0.0.1:4173/fundamentals-cs/moore-mealy",
-        "http://127.0.0.1:4173/fundamentals-cs/dnf"
+        "http://127.0.0.1:4173/fundamentals-cs/dnf",
+        "http://127.0.0.1:4173/programming-1",
+        "http://127.0.0.1:4173/programming-1/java-programming"
       ],
       "numberOfRuns": 3,
       "settings": {
