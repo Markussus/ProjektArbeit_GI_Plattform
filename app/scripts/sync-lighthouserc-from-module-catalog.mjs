@@ -6,7 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 
-const moduleCatalogFile = path.join(appRoot, "src", "data", "moduleCatalog.tsx");
+const moduleCatalogFile = path.join(
+  appRoot,
+  "src",
+  "data",
+  "moduleCatalog.tsx",
+);
 const outputFile = path.join(appRoot, "lighthouserc.json");
 
 const baseUrl = "http://127.0.0.1:4173";
