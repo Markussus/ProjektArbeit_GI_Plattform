@@ -15,21 +15,23 @@ interface SimulatorProps {
 export function Simulator({ selectedExercise }: SimulatorProps) {
   const { t } = useTranslation("translation");
   const [activeMode, setActiveMode] = useState<SimulatorMode>("integers");
-  
+
   // Exercise mode states
   const [isExerciseMode, setIsExerciseMode] = useState(false);
   const [showSolution, setShowSolution] = useState(true);
-  
+
   // Initial values for converters when launched via exercise
   const [initialValue, setInitialValue] = useState<string>("");
-  const [initialBase, setInitialBase] = useState<"dec"|"bin"|"oct"|"hex">("dec");
+  const [initialBase, setInitialBase] = useState<"dec" | "bin" | "oct" | "hex">(
+    "dec",
+  );
 
   useEffect(() => {
     if (selectedExercise) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsExerciseMode(true);
       setShowSolution(false);
-      
+
       // Match exercise id using prefix/contains or exact matching logic based on data.
       if (selectedExercise.id === "number.exercise1") {
         setActiveMode("integers");
@@ -53,21 +55,21 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
   }, [selectedExercise]);
 
   return (
-    <div className="flex flex-col h-full space-y-6">
+    <div className="flex h-full flex-col space-y-6">
       {/* Dashboard Navigation */}
-      <div className="flex flex-wrap gap-2 pb-4 border-b border-border/50">
+      <div className="border-border/50 flex flex-wrap gap-2 border-b pb-4">
         <button
-          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium transition-colors ${
             activeMode === "integers"
               ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
           }`}
           onClick={() => setActiveMode("integers")}
         >
-           {t("simulator.tabs.integers", "Ganzzahlen")}
+          {t("simulator.tabs.integers", "Ganzzahlen")}
         </button>
         <button
-          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium transition-colors ${
             activeMode === "negative"
               ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
@@ -77,7 +79,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
           {t("simulator.tabs.negative", "Negative Zahlen")}
         </button>
         <button
-          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium transition-colors ${
             activeMode === "ieee754"
               ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
@@ -87,7 +89,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
           {t("simulator.tabs.ieee754", "IEEE 754 (32-bit)")}
         </button>
         <button
-          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium transition-colors ${
             activeMode === "arithmetic"
               ? "bg-primary text-primary-foreground"
               : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
@@ -100,10 +102,41 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
 
       {/* Simulator Content */}
       <div className="flex-1 overflow-auto">
-        {activeMode === "integers" && <IntegerConverter isExerciseMode={isExerciseMode} showSolution={showSolution} onShowSolution={() => setShowSolution(true)} initialValue={initialValue} initialBase={initialBase} />}
-        {activeMode === "negative" && <NegativeNumbers isExerciseMode={isExerciseMode} showSolution={showSolution} onShowSolution={() => setShowSolution(true)} initialValue={initialValue} />}
-        {activeMode === "ieee754" && <IEEE754Converter isExerciseMode={isExerciseMode} showSolution={showSolution} onShowSolution={() => setShowSolution(true)} initialValue={initialValue} />}
-        {activeMode === "arithmetic" && <ArithmeticMode isExerciseMode={isExerciseMode} showSolution={showSolution} onShowSolution={() => setShowSolution(true)} />}
+        {activeMode === "integers" && (
+          <IntegerConverter
+            key={`integers-${selectedExercise?.id ?? "free"}-${initialBase}-${initialValue}`}
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+            initialValue={initialValue}
+            initialBase={initialBase}
+          />
+        )}
+        {activeMode === "negative" && (
+          <NegativeNumbers
+            key={`negative-${selectedExercise?.id ?? "free"}-${initialValue}`}
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+            initialValue={initialValue}
+          />
+        )}
+        {activeMode === "ieee754" && (
+          <IEEE754Converter
+            key={`ieee754-${selectedExercise?.id ?? "free"}-${initialValue}`}
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+            initialValue={initialValue}
+          />
+        )}
+        {activeMode === "arithmetic" && (
+          <ArithmeticMode
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+          />
+        )}
       </div>
     </div>
   );
