@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import type { TMProgram } from "../domain/tmProgram";
 
 export interface TMGeneralSettingsProps {
@@ -15,6 +17,25 @@ export function TMGeneralSettings({
   disabled = false,
 }: TMGeneralSettingsProps) {
   const { t } = useTranslation();
+  const selectableStates = useMemo(() => {
+    return program.states.filter(
+      (state) =>
+        !program.haltStates.includes(state) || state === program.initialState,
+    );
+  }, [program.haltStates, program.initialState, program.states]);
+  const startStateOptions = useMemo(() => {
+    return selectableStates.map((state) => {
+      const label = (
+        <span className="font-mono text-lg">{formatState(state)}</span>
+      );
+
+      return {
+        value: state,
+        label,
+        triggerLabel: label,
+      };
+    });
+  }, [selectableStates]);
 
   return (
     <>
@@ -36,24 +57,15 @@ export function TMGeneralSettings({
         <label className="text-sm font-semibold">
           {t("tm.config.startState")}
         </label>
-        <select
-          className="bg-background h-12 w-full rounded border px-3 py-2 font-mono text-lg"
+        <DropdownSelect
           value={program.initialState}
-          onChange={(event) => onInitialStateChange(event.target.value)}
+          options={startStateOptions}
+          onChange={onInitialStateChange}
+          ariaLabel={t("tm.config.startState")}
           disabled={disabled}
-        >
-          {program.states
-            .filter(
-              (state) =>
-                !program.haltStates.includes(state) ||
-                state === program.initialState,
-            )
-            .map((state) => (
-              <option key={state} value={state}>
-                {formatState(state)}
-              </option>
-            ))}
-        </select>
+          triggerClassName="h-12 w-full px-3 py-2"
+          menuClassName="right-0 left-0"
+        />
       </div>
     </>
   );

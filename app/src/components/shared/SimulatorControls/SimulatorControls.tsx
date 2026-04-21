@@ -89,7 +89,7 @@ export function SimulatorControls({
             onClick={onPause}
             className={cn(
               buttonClasses,
-              "bg-primary text-primary-foreground hover:bg-primary/90",
+              "bg-brand text-brand-foreground hover:opacity-90",
             )}
             title={t("simulation.controls.pause", "Pause")}
             aria-label={t("simulation.controls.pause", "Pause")}
@@ -102,7 +102,7 @@ export function SimulatorControls({
             disabled={isError}
             className={cn(
               buttonClasses,
-              "bg-primary text-primary-foreground hover:bg-primary/90",
+              "bg-brand text-brand-foreground hover:opacity-90",
             )}
             title={t("simulation.controls.play", "Play")}
             aria-label={t("simulation.controls.play", "Play")}
@@ -132,7 +132,13 @@ export function SimulatorControls({
           max={rangeMax}
           value={speedPercent}
           onChange={handleSliderChange}
-          className="accent-primary bg-secondary h-2 w-full cursor-pointer appearance-none rounded-lg"
+          className={cn(
+            "h-2 w-full cursor-pointer appearance-none rounded-lg bg-transparent",
+            "[&::-webkit-slider-runnable-track]:bg-secondary [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-lg",
+            "[&::-moz-range-track]:bg-secondary [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-lg [&::-moz-range-track]:border-0",
+            "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-background [&::-webkit-slider-thumb]:mt-[-4px] [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2",
+            "[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-background [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2",
+          )}
           aria-label={t("simulation.controls.speed", "Speed")}
         />
       </div>
