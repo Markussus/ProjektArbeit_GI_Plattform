@@ -15,4 +15,3 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     </TopicSimulationTab>
   );
 }
-

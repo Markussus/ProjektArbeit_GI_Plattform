@@ -1,16 +1,11 @@
 import { useTranslation } from "react-i18next";
-import {
-  formatDnfTerm,
-  type DnfDerivation,
-} from "../domain/dnfDerivation";
+import { formatDnfTerm, type DnfDerivation } from "../domain/dnfDerivation";
 
 interface DnfDerivationStepsProps {
   derivation: DnfDerivation;
 }
 
-export function DnfDerivationSteps({
-  derivation,
-}: DnfDerivationStepsProps) {
+export function DnfDerivationSteps({ derivation }: DnfDerivationStepsProps) {
   const { t } = useTranslation();
 
   if (derivation.dnf.type === "constant") {
