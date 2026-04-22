@@ -308,6 +308,7 @@
       "ieee754": {
         "desc": "Addition of two 32-bit floating-point numbers according to IEEE 754.",
         "step1": "1. Align exponents (Denormalization)",
+        "shiftBitDesc": "Shift {{n}}: Bit moved to the right.",
         "step2": "2. Add mantissa (including Hidden Bit)",
         "step3": "3. Normalize result",
         "inputA": "Decimal A",
@@ -369,6 +370,8 @@
       "enterValue": "Enter a number to see the calculation steps.",
       "decToBin": "Decimal to Binary (Division by 2)",
       "decToBinDesc": "The number is continuously divided by base 2. The remainders, read from bottom to top, give the binary number.",
+      "decToTarget": "Decimal to {{target}}",
+      "divByBaseDesc": "The number is continuously divided by base {{base}}. The remainders, read from bottom to top, give the result.",
       "remainder": "Remainder",
       "result": "Result:",
       "binToDec": "Binary to Decimal (Sum of powers)",

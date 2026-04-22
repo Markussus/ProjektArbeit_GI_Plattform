@@ -145,6 +145,36 @@
     "exercise4": "Mehrvariablen-DNF",
     "exercise4Desc": "Behandlung von Ausdrücken mit 4+ Variablen"
   },
+  "java": {
+    "title": "Java-Programmierung",
+    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafuer direkt einen editierbaren Java-Code-Editor bereit.",
+    "overviewTitle": "Einstieg in Java",
+    "overviewText": "Dieses Thema fuehrt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
+    "concepts": "Schluesselkonzepte",
+    "concept1": "Klasse Main und main-Methode",
+    "concept2": "System.out.println fuer Konsolenausgaben",
+    "concept3": "for-Schleifen fuer wiederholte Ausgaben",
+    "concept4": "Arrays lesen, sortieren und auswerten",
+    "example1Title": "Einfaches Hello World",
+    "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
+    "example2Title": "Wiederholte Ausgabe",
+    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausfuehren.",
+    "example3Title": "Array sortieren",
+    "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
+    "exercise1": "Hello World ausgeben",
+    "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
+    "exercise2": "Hello World fuenfmal ausgeben",
+    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fuenfmal in die Konsole zu schreiben.",
+    "exercise3": "Zwei Zahlen addieren",
+    "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
+    "exercise4": "Array sortieren",
+    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschliessend aus.",
+    "exercise5": "Maximum im Array finden",
+    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
+    "editorLabel": "Java-Editor",
+    "editorLoading": "Der Monaco-Editor wird geladen...",
+    "resetStarterCode": "Startercode zuruecksetzen"
+  },
   "exercise": {
     "label": "Übung {{index}}",
     "difficulty": "Schwierigkeit",
@@ -169,7 +199,8 @@
       "automata": "Der Automatensimulator wird hier verfügbar sein.",
       "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
-      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein."
+      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
+      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
     }
   },
   "simulator": {
@@ -198,6 +229,7 @@
       "enterValue": "Geben Sie eine Zahl ein, um den Rechenweg zu sehen.",
       "decToBin": "Dezimal zu Binär (Division durch 2)",
       "decToBinDesc": "Die Zahl wird fortlaufend durch die Basis 2 geteilt. Die Reste, von unten nach oben gelesen, ergeben die Binärzahl.",
+      "divByBaseDesc": "Die Zahl wird fortlaufend durch die Basis {{base}} geteilt. Die Reste, von unten nach oben gelesen, ergeben das Resultat.",
       "remainder": "Rest",
       "result": "Ergebnis:",
       "binToDec": "Binär zu Dezimal (Summe der Potenzen)",
@@ -270,7 +302,8 @@
       "mantissaBinToDecDesc": "Der reale Mantissen-Wert errechnet sich aus dem impliziten 'Hidden Bit' (1 + Bruchwert). Jedes Bit n nach dem Komma wird mit 2^(-n) multipliziert:",
       "fractionSum": "Summe der gebrochenen Potenzen",
       "step4FinalCalc": "4. Finale Verrechnung aller Komponenten",
-      "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:"
+      "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
+      "decToTarget": "Dezimal zu {{target}}"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",
@@ -295,20 +328,13 @@
         "stepsResult": "Rechenweg & Ergebnis",
         "enterValidOperands": "Bitte gebe gültige Operanden ein.",
         "inDecimal": "In Dezimal:",
-        "showStepByStep": "Schritt-für-Schritt anzeigen"
+        "showStepByStep": "Schritt für Schritt anzeigen"
       },
       "addition": {
         "desc": "Stellenweise Addition im Binärsystem. Werden zwei Einsen addiert, gibt es einen Übertrag (Carry) an die nächste Stelle.",
         "carryOutWarning": "Achtung: Ein Übertrag (Carry) hat das 8. Bit überschritten (Carry Out).",
         "overflowWarning": "Overflow-Fehler! Die Addition logisch positiver Zahlen hat zu einem negativen Zweierkomplement-Ergebnis geführt.",
         "overflowTitle": "Overflow Error (2s Complement):",
-        "stepByStepTitle": "Bitweise Addition",
-        "legendA": "Zahl A",
-        "legendB": "Zahl B",
-        "legendC": "Übertrag rein",
-        "legendS": "Summe",
-        "legendOut": "Übertrag raus",
-        "bitPos": "Bit {{pos}}",
         "step0": "0 + 0 + 0 = 0, kein Übertrag",
         "step1": "1 + 0 + 0 = 1, kein Übertrag",
         "step2": "0 + 1 + 0 = 1, kein Übertrag",
@@ -317,6 +343,13 @@
         "step5": "1 + 0 + 1 = 0, Übertrag 1",
         "step6": "0 + 1 + 1 = 0, Übertrag 1",
         "step7": "1 + 1 + 1 = 1, Übertrag 1",
+        "bitPos": "Bit {{pos}}",
+        "legendA": "Zahl A",
+        "legendB": "Zahl B",
+        "legendC": "Carry In",
+        "legendS": "Summe",
+        "legendOut": "Carry Out",
+        "bitwiseAddition": "Stellenweise Addition",
         "finalResult": "Endergebnis:"
       },
       "subtraction": {
@@ -329,28 +362,29 @@
         "carryOutTitle": "Übertrag (Carry Out):",
         "carryOutInfo": "Da wir via Zweierkomplement subtrahieren, bedeutet ein Carry-Out in der Regel, dass das Ergebnis positiv ist. Den Übertrag werfen wir in diesem Fixpunkt-System einfach weg.",
         "flipBitDesc": "Position {{pos}}: {{orig}} → {{flipped}} (invertiert)",
-        "addOneDesc": "Position {{pos}}: {{bit}} + {{carry}} = {{sum}} → {{result}}, Carry {{nextCarry}}",
+        "addOneDesc": "Position {{pos}}: {{bit}} + {{carry}} = {{sum}} → {{result}}, Übertrag {{nextCarry}}",
         "add0": "Position {{pos}}: 0 + 0 + 0 = 0, kein Übertrag",
         "add1": "Position {{pos}}: 1 + 0/1 + 1 = 0, Übertrag 1",
         "add2": "Position {{pos}}: 1 + 1 + 0 = 0, Übertrag 1",
         "add3": "Position {{pos}}: 1 + 1 + 1 = 1, Übertrag 1",
         "add4": "Position {{pos}}: {{a}} + {{b}} + {{c}} = {{sum}}, Übertrag {{carry}}",
-        "onesResult": "Einerkomplement:",
-        "twosResult": "Zweierkomplement:",
-        "bitN": "Bit {{n}}"
+        "bitN": "Bit {{n}}",
+        "onesResult": "Einer-Komplement:",
+        "twosResult": "Zweier-Komplement:",
+        "stepByStepSubtraction": "Schritt-für-Schritt Subtraktion"
       },
       "multiplication": {
         "desc": "Binäre schriftliche Multiplikation (Shift and Add).",
         "addingRow": "Zur Summe addieren",
         "multiplier": "Multiplikator (Zahl A)",
         "multiplicand": "Multiplikand (Zahl B)",
-        "stepByStepTitle": "Bitweise Multiplikation",
+        "stepDesc": "Bit {{n}} ({{bit}}) = 1, also Multiplikand {{val}} um {{shift}} Stellen links verschoben = {{result}}",
+        "skipZero": "Bit {{n}} ({{bit}}) = 0, überspringen (kein Teilprodukt)",
         "stepN": "Bit {{n}}",
-        "stepDesc": "Bit {{n}} ({{bit}}) = 1, also Multiplikand {{val}} um {{shift}} Stellen nach links verschieben = {{result}}",
-        "skipZero": "Bit {{n}} ({{bit}}) = 0, überspringen (kein Partialprodukt)",
+        "stepByStepTitle": "Stellenweise Multiplikation",
         "skipShort": "× 0 → 0",
-        "inDecimal": "In Dezimal",
-        "partialProducts": "Partialprodukte werden addiert"
+        "partialProducts": "Teilprodukte werden addiert",
+        "inDecimal": "In Dezimal"
       },
       "division": {
         "desc": "Schriftliche Division durch Probieren (gehe von links nach rechts).",
@@ -360,10 +394,10 @@
         "remainder": "Rest:",
         "appendOne": "→ ergänze 1 am Ende d. Quotienten",
         "appendZero": "→ ergänze 0 am Ende d. Quotienten",
-        "stepByStepTitle": "Bitweise Division",
-        "stepN": "Schritt {{n}}",
-        "stepDesc": "Schritt {{n}}: {{current}} >= {{divisor}}, also 1 zum Quotienten und subtrahiere {{divisor}}",
+        "stepDesc": "Schritt {{n}}: {{current}} >= {{divisor}}, also 1 zum Quotienten und {{divisor}} abziehen",
         "stepDescSmall": "Schritt {{n}}: {{current}} < {{divisor}}, also 0 zum Quotienten",
+        "stepN": "Schritt {{n}}",
+        "stepByStepTitle": "Stellenweise Division",
         "appendOneShort": "→ 1",
         "appendZeroShort": "→ 0",
         "quotient": "Quotient",
@@ -381,15 +415,15 @@
         "mathMeaning": "Mathematische Bedeutung:",
         "integer": "(Ganzzahlig)",
         "enterBinary": "Bitte gebe eine Binärzahl ein.",
-        "leftStepsTitle": "Linksverschiebung: Nullen werden rechts angehängt",
-        "rightStepsTitle": "Rechtsverschiebung: Bits fallen rechts heraus",
-        "stepN": "Schritt {{n}}",
-        "stepOriginal": "Originale Binärzahl: {{val}}",
-        "stepLeftShift": "Bits werden nach links verschoben. Eine {{count}} Null wird angehängt.",
+        "stepOriginal": "Ursprüngliche Binärzahl: {{val}}",
+        "stepLeftShift": "Bits werden nach links verschoben. {{count}} Null(en) angehängt.",
         "stepLeftComplete": "Alle {{count}} Nullen wurden angehängt.",
         "stepRightShift": "Das rechte Bit ({{bit}}) fällt heraus.",
         "stepRightComplete": "Alle {{count}} rechten Bits wurden entfernt.",
         "stepRightZero": "Verschiebung um {{count}} >= Länge der Zahl, Ergebnis ist 0.",
+        "leftStepsTitle": "Linksshift: Nullen werden rechts angehängt",
+        "rightStepsTitle": "Rechtsshift: Bits fallen rechts heraus",
+        "stepN": "Schritt {{n}}",
         "visualization": "Visuelle Darstellung:",
         "before": "Vorher",
         "after": "Nachher"
@@ -413,9 +447,9 @@
         "expDiffDesc": "Exponentendifferenz: {{larger}} - {{smaller}} = {{diff}}",
         "shiftDesc": "Die Mantisse der kleineren Zahl wird um {{diff}} Stellen nach rechts verschoben.",
         "shiftVisualization": "Visuelle Verschiebung:",
-        "shiftN": "Shift {{n}}",
-        "addDesc": "Nun weisen beide Glieder den Exponenten 2^{{exp}} auf und können addiert werden.",
-        "normDesc": "Das Resultat wird zurück in das Format 1.M × 2^E verschoben."
+        "shiftN": "Verschiebung {{n}}",
+        "addDesc": "Nun haben beide Operanden den Exponenten 2^{{exp}} und können addiert werden.",
+        "shiftBitDesc": "Verschiebung {{n}}: Bit wird nach rechts verschoben."
       },
       "compare": {
         "desc": "Vergleicht zwei Binärzahlen Bit für Bit von links nach rechts.",
@@ -426,17 +460,68 @@
         "resultGreater": "Zahl A ist größer als Zahl B.",
         "resultLess": "Zahl A ist kleiner als Zahl B.",
         "visualCompare": "Visueller Vergleich",
-        "stepPadding": "Schritt 0: Auffüllung",
+        "stepPadding": "Schritt 0: Auffüllen",
         "padDesc": "Die Zahlen werden auf die gleiche Länge aufgefüllt (mit führenden Nullen):",
         "paddingNote": "{{count}} führende Nullen hinzugefügt.",
-        "bitComparisonTitle": "Bitweise Vergleichung (von links nach rechts)",
+        "bitComparisonTitle": "Bitweiser Vergleich (von links nach rechts)",
         "posN": "Pos. {{n}}",
-        "stepEqual": "Position {{pos}}: Beide Bits sind {{bit}}, weiter zum nächsten Bit.",
-        "stepResultGreater": "An Position {{pos}}: A hat 1, B hat 0 → A ist größer als B.",
-        "stepResultLess": "An Position {{pos}}: A hat 0, B hat 1 → A ist kleiner als B.",
         "AgreaterB": "A > B",
         "AlessB": "A < B",
-        "finalResultNote": "Da hier ein Unterschied gefunden wurde, ist der Vergleich abgeschlossen. Weitere Bits werden nicht mehr betrachtet."
+        "finalResultNote": "Da hier ein Unterschied gefunden wurde, ist der Vergleich abgeschlossen. Weitere Bits werden nicht betrachtet.",
+        "stepResultGreater": "An Position {{pos}}: A hat 1, B hat 0 → A ist größer als B.",
+        "stepResultLess": "An Position {{pos}}: A hat 0, B hat 1 → A ist kleiner als B.",
+        "stepEqual": "Position {{pos}}: Beide Bits sind {{bit}}, weiter zum nächsten Bit."
+      }
+    }
+  },
+  "tm": {
+    "config": {
+      "title": "Turingmaschinen-Konfiguration",
+      "apply": "Simulation starten",
+      "initialTape": "Anfangsbandwort",
+      "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
+      "startState": "Startzustand",
+      "haltStates": "Haltezustände",
+      "haltStatesDesc": "Zustände als haltend markieren.",
+      "noStates": "Keine Zustände verfügbar",
+      "transitionTable": "Übergangstabelle",
+      "transitionFormat": "Format:",
+      "transitionExample": " z. B. (q1, 0, R)",
+      "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
+      "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
+      "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
+      "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
+      "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
+      "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+    },
+    "validation": {
+      "statesEmpty": "Es muss mindestens ein Zustand definiert sein.",
+      "initialStateMissing": "Der Startzustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
+      "haltStatesEmpty": "Es muss mindestens ein Haltezustand definiert sein.",
+      "haltStateMissing": "Der Haltezustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
+      "blankSymbolMissing": "Das Blanksymbol '{{symbol}}' muss Teil des Bandalphabets sein.",
+      "blankSymbolInvalid": "Das Blanksymbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "tapeSymbolInvalid": "Das Bandalphabet-Symbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "initialTapeInvalidSymbol": "Das Anfangsband-Symbol '{{symbol}}' muss Teil des Eingabealphabets sein und aus genau einem Zeichen bestehen.",
+      "transitionReadSymbolMissing": "Für das gelesene Symbol '{{symbol}}' ist ein Übergang definiert, aber dieses Symbol ist nicht Teil des Bandalphabets.",
+      "transitionReadSymbolInvalid": "Das gelesene Übergangssymbol '{{symbol}}' muss aus genau einem Zeichen bestehen.",
+      "transitionStateMissing": "Für den Zustand '{{state}}' ist ein Übergang definiert, aber dieser Zustand ist nicht Teil der Zustandsmenge.",
+      "transitionNextStateMissing": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' verweist auf den unbekannten Folgezustand '{{nextState}}'.",
+      "transitionWriteSymbolMissing": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' schreibt das unbekannte Symbol '{{writeSymbol}}'.",
+      "transitionWriteSymbolInvalid": "Der Übergang vom Zustand '{{state}}' mit Symbol '{{symbol}}' muss genau ein Zeichen schreiben."
+    },
+    "sim": {
+      "title": "Turingmaschinen-Simulator",
+      "edit": "Konfiguration bearbeiten",
+      "status": "Status",
+      "state": "Aktueller Zustand",
+      "symbol": "Aktuelles Symbol",
+      "step": "Schritt",
+      "halt": "Angehalten",
+      "yes": "Ja",
+      "no": "Nein",
+      "haltReason": {
+        "missingTransition": "Für Zustand '{{state}}' und Symbol '{{symbol}}' ist kein Übergang definiert."
       }
     }
   },
@@ -446,6 +531,10 @@
     "fundamentalsCs": {
       "title": "Grundlagen der Informatik",
       "description": "Dieses Modul bündelt die zentralen Grundlagen der Informatik. Wählen Sie ein Thema aus, um mit dem Training zu beginnen."
+    },
+    "programming1": {
+      "title": "Programmieren 1",
+      "description": "Dieses Modul fuehrt in die ersten Programmiergrundlagen ein. Starten Sie mit einfachen Java-Aufgaben und einem direkten Editor."
     },
     "moreComingSoon": "Mehr Module folgen bald",
     "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."

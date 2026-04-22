@@ -1,5 +1,11 @@
 import { useState, useMemo } from "react";
-import { Info, LockKeyhole, List, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Info,
+  LockKeyhole,
+  List,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface MultiplicationProps {
@@ -20,12 +26,20 @@ interface MultiplicationStep {
   explanation: string;
 }
 
-export function Multiplication({ isExerciseMode, showSolution = true, onShowSolution, initialA, initialB }: MultiplicationProps) {
+export function Multiplication({
+  isExerciseMode,
+  showSolution = true,
+  onShowSolution,
+  initialA,
+  initialB,
+}: MultiplicationProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "1101");
   const [valB, setValB] = useState(initialB || "101");
   const [showStepByStep, setShowStepByStep] = useState(false);
-  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set([0, 1, 2]));
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(
+    new Set(["0", "1", "2"]),
+  );
 
   const locked = !!isExerciseMode && !showSolution;
 
@@ -39,242 +53,288 @@ export function Multiplication({ isExerciseMode, showSolution = true, onShowSolu
   };
 
   const { steps, finalSum, finalSumDec, partialSums } = useMemo(() => {
-    if (!valA || !valB) return { steps: [], finalSum: "", finalSumDec: "", partialSums: [] };
-    
+    if (!valA || !valB)
+      return { steps: [], finalSum: "", finalSumDec: "", partialSums: [] };
+
     const stepsArr: MultiplicationStep[] = [];
     let sum = 0n;
     const partialSumsArr: string[] = [];
-    
-    const reversedB = valB.split('').reverse().join('');
-    
+
+    const reversedB = valB.split("").reverse().join("");
+
     for (let i = 0; i < reversedB.length; i++) {
-        const bit = reversedB[i];
-        let termStr = "";
-        let termVal = 0n;
-        
-        if (bit === '1') {
-            termStr = valA + "0".repeat(i);
-            termVal = BigInt("0b" + termStr);
-            sum += termVal;
-            partialSumsArr.push(termStr);
-        } else {
-            termStr = "0".repeat(valA.length + i);
-            partialSumsArr.push(termStr);
-        }
-        
-        stepsArr.push({
-            bitIndex: i,
-            bitValue: bit,
-            termStr,
-            isZero: bit === '0',
-            shiftAmount: i,
-            decimalProduct: bit === '1' ? parseInt(valA, 2) * Math.pow(2, i) : 0,
-            explanation: bit === '1'
-              ? t("simulator.arithmetic.multiplication.stepDesc", "Bit {{n}} ({{bit}}) = 1, also Multiplikand {{val}} um {{shift}} Stellen nach links verschieben = {{result}}", {
-                  n: i,
-                  bit: bit,
-                  val: valA,
-                  shift: i,
-                  result: termStr
-                })
-              : t("simulator.arithmetic.multiplication.skipZero", "Bit {{n}} ({{bit}}) = 0, überspringen (kein Partialprodukt)", {
-                  n: i,
-                  bit: bit
-                })
-        });
+      const bit = reversedB[i];
+      let termStr = "";
+      let termVal = 0n;
+
+      if (bit === "1") {
+        termStr = valA + "0".repeat(i);
+        termVal = BigInt("0b" + termStr);
+        sum += termVal;
+        partialSumsArr.push(termStr);
+      } else {
+        termStr = "0".repeat(valA.length + i);
+        partialSumsArr.push(termStr);
+      }
+
+      stepsArr.push({
+        bitIndex: i,
+        bitValue: bit,
+        termStr,
+        isZero: bit === "0",
+        shiftAmount: i,
+        decimalProduct: bit === "1" ? parseInt(valA, 2) * Math.pow(2, i) : 0,
+        explanation:
+          bit === "1"
+            ? t("simulator.arithmetic.multiplication.stepDesc", {
+                n: i,
+                bit: bit,
+                val: valA,
+                shift: i,
+                result: termStr,
+              })
+            : t("simulator.arithmetic.multiplication.skipZero", {
+                n: i,
+                bit: bit,
+              }),
+      });
     }
 
-    return { 
+    return {
       steps: stepsArr.reverse(),
       finalSum: sum.toString(2),
       finalSumDec: sum.toString(10),
-      partialSums: partialSumsArr.reverse()
+      partialSums: partialSumsArr.reverse(),
     };
   }, [valA, valB, t]);
 
   const toggleStep = (index: number) => {
     const newExpanded = new Set(expandedSteps);
-    if (newExpanded.has(index)) {
-      newExpanded.delete(index);
+    const key = String(index);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
     } else {
-      newExpanded.add(index);
+      newExpanded.add(key);
     }
     setExpandedSteps(newExpanded);
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-in fade-in zoom-in-95 duration-300">
-      
+    <div className="animate-in fade-in zoom-in-95 grid w-full grid-cols-1 gap-6 duration-300 md:grid-cols-2">
       {/* Inputs */}
-      <div className="bg-card border border-border/50 rounded-xl p-6 shadow-sm space-y-6">
+      <div className="bg-card border-border/50 space-y-6 rounded-xl border p-6 shadow-sm">
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-foreground flex items-center gap-2">
-             {t("simulator.arithmetic.common.operands", "Operanden")}
+          <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
+            {t("simulator.arithmetic.common.operands")}
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-             {t("simulator.arithmetic.multiplication.desc", "Binäre schriftliche Multiplikation (Shift and Add).")}
+          <p className="text-muted-foreground mb-4 text-sm">
+            {t("simulator.arithmetic.multiplication.desc")}
           </p>
         </div>
 
         <div className="space-y-4">
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.multiplication.multiplier", "Multiplikator (Zahl A)")}</label>
-             <input
-               type="text"
-               value={valA}
-               onChange={(e) => handleInputA(e.target.value)}
-               readOnly={locked}
-               className={`w-full bg-background transition-colors border rounded-md py-2 px-3 focus:outline-none font-mono tracking-widest text-sm text-foreground ${locked ? 'bg-muted border-input pointer-events-none' : 'border-input focus:border-primary focus:ring-1 focus-ring-primary/20'}`}
-             />
+            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              {t("simulator.arithmetic.multiplication.multiplier")}
+            </label>
+            <input
+              type="text"
+              value={valA}
+              onChange={(e) => handleInputA(e.target.value)}
+              readOnly={locked}
+              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus-ring-primary/20 focus:ring-1"}`}
+            />
           </div>
           <div className={locked ? "opacity-60" : ""}>
-             <label className="block text-xs font-medium text-muted-foreground mb-1.5">{t("simulator.arithmetic.multiplication.multiplicand", "Multiplikand (Zahl B)")}</label>
-             <input
-               type="text"
-               value={valB}
-               onChange={(e) => handleInputB(e.target.value)}
-               readOnly={locked}
-               className={`w-full bg-background transition-colors border rounded-md py-2 px-3 focus:outline-none font-mono tracking-widest text-sm text-foreground ${locked ? 'bg-muted border-input pointer-events-none' : 'border-input focus:border-primary focus:ring-1 focus:ring-primary/20'}`}
-             />
+            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              {t("simulator.arithmetic.multiplication.multiplicand")}
+            </label>
+            <input
+              type="text"
+              value={valB}
+              onChange={(e) => handleInputB(e.target.value)}
+              readOnly={locked}
+              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+            />
           </div>
         </div>
       </div>
 
       {/* Logic / Dashboard Panel */}
-      <div className="bg-muted/30 border border-border/50 rounded-xl p-6 shadow-sm overflow-auto">
+      <div className="bg-muted/30 border-border/50 overflow-auto rounded-xl border p-6 shadow-sm">
         {locked ? (
-            <div className="h-full flex flex-col items-center justify-center space-y-4 text-center py-12">
-              <LockKeyhole className="w-12 h-12 text-muted-foreground opacity-50" />
-              <div>
-                <p className="text-foreground font-medium mb-1">{t("simulator.numbers.lockedTitle", "Lösung gesperrt")}</p>
-                <p className="text-sm text-muted-foreground mb-4">{t("simulator.numbers.lockedDesc", "Klicke auf den Button, um das Ergebnis und den Rechenweg anzuzeigen.")}</p>
-              </div>
-              <button onClick={onShowSolution} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4 py-2 rounded-md shadow-sm transition-colors">
-                {t("simulator.numbers.showSolution", "Lösung anzeigen")}
-              </button>
+          <div className="flex h-full flex-col items-center justify-center space-y-4 py-12 text-center">
+            <LockKeyhole className="text-muted-foreground h-12 w-12 opacity-50" />
+            <div>
+              <p className="text-foreground mb-1 font-medium">
+                {t("simulator.numbers.lockedTitle")}
+              </p>
+              <p className="text-muted-foreground mb-4 text-sm">
+                {t("simulator.numbers.lockedDesc")}
+              </p>
             </div>
+            <button
+              onClick={onShowSolution}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 font-medium shadow-sm transition-colors"
+            >
+              {t("simulator.numbers.showSolution")}
+            </button>
+          </div>
         ) : (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
-              <Info className="w-5 h-5 text-primary" />
-              {t("simulator.arithmetic.common.stepsResult", "Rechenweg & Ergebnis")}
+            <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
+              <Info className="text-primary h-5 w-5" />
+              {t("simulator.arithmetic.common.stepsResult")}
             </h3>
 
             {valA && valB ? (
-                <>
-                  {/* Step-by-Step Toggle */}
-                  <button
-                    onClick={() => setShowStepByStep(!showStepByStep)}
-                    className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors mb-4"
-                  >
-                    <List className="w-4 h-4" />
-                    {t("simulator.arithmetic.common.showStepByStep", "Schritt-für-Schritt anzeigen")}
-                    {showStepByStep ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </button>
+              <>
+                {/* Step-by-Step Toggle */}
+                <button
+                  onClick={() => setShowStepByStep(!showStepByStep)}
+                  className="text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium transition-colors"
+                >
+                  <List className="h-4 w-4" />
+                  {t("simulator.arithmetic.common.showStepByStep")}
+                  {showStepByStep ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
 
-                  {showStepByStep && steps.length > 0 && (
-                    <div className="space-y-3 mb-6">
-                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                        {t("simulator.arithmetic.multiplication.stepByStepTitle", "Bitweise Multiplikation")}
-                      </div>
+                {showStepByStep && steps.length > 0 && (
+                  <div className="mb-6 space-y-3">
+                    <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
+                      {t("simulator.arithmetic.multiplication.stepByStepTitle")}
+                    </div>
 
-                      {/* Collapsible Steps */}
-                      <div className="space-y-2">
-                        {steps.map((step, idx) => (
-                          <div key={idx} className="border border-border/40 rounded-lg overflow-hidden">
-                            <button
-                              onClick={() => toggleStep(idx)}
-                              className="w-full flex items-center justify-between p-3 bg-background hover:bg-muted/50 transition-colors"
-                            >
-                              <div className="flex items-center gap-4">
-                                <span className="text-xs font-bold text-muted-foreground w-16">
-                                  {t("simulator.arithmetic.multiplication.stepN", "Bit {{n}}", { n: step.bitIndex })}
+                    {/* Collapsible Steps */}
+                    <div className="space-y-2">
+                      {steps.map((step, idx) => (
+                        <div
+                          key={idx}
+                          className="border-border/40 overflow-hidden rounded-lg border"
+                        >
+                          <button
+                            onClick={() => toggleStep(idx)}
+                            className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors"
+                          >
+                            <div className="flex items-center gap-4">
+                              <span className="text-muted-foreground w-16 text-xs font-bold">
+                                {t(
+                                  "simulator.arithmetic.multiplication.stepN",
+                                  { n: step.bitIndex },
+                                )}
+                              </span>
+                              <div className="flex items-center gap-2 font-mono text-sm">
+                                <span
+                                  className={`flex h-6 w-6 items-center justify-center rounded ${step.isZero ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"}`}
+                                >
+                                  {step.bitValue}
                                 </span>
-                                <div className="flex items-center gap-2 font-mono text-sm">
-                                  <span className={`w-6 h-6 rounded flex items-center justify-center ${step.isZero ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'}`}>
-                                    {step.bitValue}
+                                {step.isZero ? (
+                                  <span className="text-muted-foreground">
+                                    {t(
+                                      "simulator.arithmetic.multiplication.skipShort",
+                                    )}
                                   </span>
-                                  {step.isZero ? (
-                                    <span className="text-muted-foreground">
-                                      {t("simulator.arithmetic.multiplication.skipShort", "× 0 → 0")}
-                                    </span>
-                                  ) : (
-                                    <span className="text-foreground">
-                                      × {valA} &lt;&lt; {step.shiftAmount}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              {expandedSteps.has(idx) ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </button>
-                            {expandedSteps.has(idx) && (
-                              <div className="p-3 bg-muted/30 border-t border-border/40">
-                                <p className="text-sm text-foreground">{step.explanation}</p>
-                                {!step.isZero && (
-                                  <div className="mt-2 p-2 bg-primary/5 rounded border border-primary/20 font-mono text-sm">
-                                    <span className="text-muted-foreground">= {step.termStr}</span>
-                                    <span className="text-muted-foreground mx-2">({step.decimalProduct} in Dezimal)</span>
-                                  </div>
+                                ) : (
+                                  <span className="text-foreground">
+                                    × {valA} &lt;&lt; {step.shiftAmount}
+                                  </span>
                                 )}
                               </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Summary */}
-                      <div className="bg-primary/10 border-l-4 border-primary p-4 rounded-r-md mt-4">
-                        <p className="text-sm text-foreground">
-                          <strong>{t("simulator.arithmetic.multiplication.partialProducts", "Partialprodukte werden addiert")}:</strong>
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1 font-mono">
-                          {partialSums.join(" + ") || "0"} = {finalSum}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Original Visual */}
-                  <div className="flex justify-center p-4 overflow-x-auto">
-                    <div className="font-mono text-lg font-medium tracking-widest leading-loose select-none bg-background p-6 rounded-lg border border-border/40 shadow-inner min-w-fit">
-                      
-                      {/* Header: A * B */}
-                      <div className="flex justify-end gap-2 border-b-2 border-foreground/30 pb-2 mb-2 whitespace-nowrap">
-                         <span>{valA}</span>
-                         <span className="text-primary mx-2">×</span>
-                         <span>{valB}</span>
-                      </div>
-
-                      {/* Steps */}
-                      <div className="flex flex-col items-end w-full">
-                         {steps.map((step, idx) => (
-                            <div key={idx} className={`flex items-center gap-4 w-full justify-end ${step.isZero ? 'opacity-30' : 'opacity-100'}`}>
-                               {idx < steps.length - 1 && <span className="opacity-0">+</span>}
-                               {idx === steps.length - 1 && <span className="text-primary">+</span>}
-                               <span className="text-right">{step.termStr}</span>
                             </div>
-                         ))}
-                      </div>
+                            {expandedSteps.has(String(idx)) ? (
+                              <ChevronDown className="text-muted-foreground h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="text-muted-foreground h-4 w-4" />
+                            )}
+                          </button>
+                          {expandedSteps.has(String(idx)) && (
+                            <div className="bg-muted/30 border-border/40 border-t p-3">
+                              <p className="text-foreground text-sm">
+                                {step.explanation}
+                              </p>
+                              {!step.isZero && (
+                                <div className="bg-primary/5 border-primary/20 mt-2 rounded border p-2 font-mono text-sm">
+                                  <span className="text-muted-foreground">
+                                    = {step.termStr}
+                                  </span>
+                                  <span className="text-muted-foreground mx-2">
+                                    ({step.decimalProduct} in Dezimal)
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
 
-                      {/* Result */}
-                      <div className="flex justify-end gap-2 border-t-2 border-foreground/30 pt-2 mt-2">
-                         <span className="text-primary font-bold">{finalSum}</span>
-                      </div>
-                      
-                      <div className="text-right text-xs text-muted-foreground mt-4 font-sans tracking-normal">
-                        {t("simulator.arithmetic.multiplication.inDecimal", "In Dezimal")}: {parseInt(valA, 2)} × {parseInt(valB, 2)} = {finalSumDec}
-                      </div>
+                    {/* Summary */}
+                    <div className="bg-primary/10 border-primary mt-4 rounded-r-md border-l-4 p-4">
+                      <p className="text-foreground text-sm">
+                        <strong>
+                          {t(
+                            "simulator.arithmetic.multiplication.partialProducts",
+                          )}
+                          :
+                        </strong>
+                      </p>
+                      <p className="text-muted-foreground mt-1 font-mono text-sm">
+                        {partialSums.join(" + ") || "0"} = {finalSum}
+                      </p>
                     </div>
                   </div>
-                </>
-            ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">{t("simulator.arithmetic.common.enterValidOperands", "Bitte gebe gültige Operanden ein.")}</p>
-            )}
+                )}
 
+                {/* Original Visual */}
+                <div className="flex justify-center overflow-x-auto p-4">
+                  <div className="bg-background border-border/40 min-w-fit rounded-lg border p-6 font-mono text-lg leading-loose font-medium tracking-widest shadow-inner select-none">
+                    {/* Header: A * B */}
+                    <div className="border-foreground/30 mb-2 flex justify-end gap-2 border-b-2 pb-2 whitespace-nowrap">
+                      <span>{valA}</span>
+                      <span className="text-primary mx-2">×</span>
+                      <span>{valB}</span>
+                    </div>
+
+                    {/* Steps */}
+                    <div className="flex w-full flex-col items-end">
+                      {steps.map((step, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex w-full items-center justify-end gap-4 ${step.isZero ? "opacity-30" : "opacity-100"}`}
+                        >
+                          {idx < steps.length - 1 && (
+                            <span className="opacity-0">+</span>
+                          )}
+                          {idx === steps.length - 1 && (
+                            <span className="text-primary">+</span>
+                          )}
+                          <span className="text-right">{step.termStr}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Result */}
+                    <div className="border-foreground/30 mt-2 flex justify-end gap-2 border-t-2 pt-2">
+                      <span className="text-primary font-bold">{finalSum}</span>
+                    </div>
+
+                    <div className="text-muted-foreground mt-4 text-right font-sans text-xs tracking-normal">
+                      {t("simulator.arithmetic.multiplication.inDecimal")}:{" "}
+                      {parseInt(valA, 2)} × {parseInt(valB, 2)} = {finalSumDec}
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground py-4 text-center text-sm">
+                {t("simulator.arithmetic.common.enterValidOperands")}
+              </p>
+            )}
           </div>
         )}
       </div>
