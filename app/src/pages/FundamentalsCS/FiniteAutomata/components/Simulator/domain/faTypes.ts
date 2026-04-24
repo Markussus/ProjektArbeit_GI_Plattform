@@ -41,4 +41,3 @@ export interface ProductionRule {
   /** optional non-terminal (right-linear: A → aB) */
   nextNonTerminal: string | null;
 }
-

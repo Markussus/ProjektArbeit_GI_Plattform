@@ -40,10 +40,7 @@ export function canStep(_program: FAProgram, runtime: FARuntime): boolean {
 /**
  * Execute a single step: read the current symbol, compute next states.
  */
-export function stepRuntime(
-  program: FAProgram,
-  runtime: FARuntime,
-): FARuntime {
+export function stepRuntime(program: FAProgram, runtime: FARuntime): FARuntime {
   if (!canStep(program, runtime)) {
     return runtime;
   }
@@ -132,10 +129,7 @@ function applyHaltCheck(program: FAProgram, runtime: FARuntime): FARuntime {
 /**
  * Compute epsilon closure for a set of states (NFA only).
  */
-export function epsilonClosure(
-  program: FAProgram,
-  states: string[],
-): string[] {
+export function epsilonClosure(program: FAProgram, states: string[]): string[] {
   const closure = new Set(states);
   const stack = [...states];
 
@@ -152,4 +146,3 @@ export function epsilonClosure(
 
   return [...closure];
 }
-
