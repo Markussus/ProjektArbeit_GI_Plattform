@@ -501,5 +501,203 @@
     "section2Text": "This area can later explain where to turn for questions or technical issues.",
     "section3Title": "Troubleshooting",
     "section3Text": "This section is intended as a placeholder for common issues, known problems, and simple solutions."
+  },
+  "fa": {
+    "editor": {
+      "manual": "Manual Editor",
+      "grammar": "From Grammar",
+      "generator": "Generator"
+    },
+    "generator": {
+      "title": "Generator",
+      "tooltip": "Describe a language and automatically build an automaton.",
+      "intro": "Turn a language description (regex, modulo, grammar) into an NFA/DFA. Pick a mode, edit the DSL, then generate.",
+      "dsl": "DSL input",
+      "tryThis": "Try this",
+      "generate": "Generate Automaton",
+      "auto": "Auto-generate on change",
+      "liveLabel": "Detected language",
+      "liveHint": "Keep typing — the DSL isn't complete yet.",
+      "parseHint": "DSL not parseable yet",
+      "error": "Could not generate",
+      "help": {
+        "title": "Supported formats"
+      },
+      "mode": {
+        "regex": {
+          "title": "Regex",
+          "blurb": "Describe strings with a pattern."
+        },
+        "modulo": {
+          "title": "Modulo",
+          "blurb": "Numeric languages. States represent remainders modulo a divisor."
+        },
+        "grammar": {
+          "title": "Grammar",
+          "blurb": "Right-linear productions like S → 0S | 1A. First LHS is the start symbol."
+        }
+      },
+      "quick": {
+        "label": "Quick examples",
+        "endsWith00": "Strings ending with \"00\"",
+        "divBy3": "Binary divisible by 3",
+        "divBy4": "Binary divisible by 4",
+        "containsAB": "Strings containing \"ab\"",
+        "oneOrMoreA": "One or more a's"
+      }
+    },
+    "config": {
+      "title": "Automaton Configuration",
+      "type": "Type",
+      "states": "States (comma-separated)",
+      "alphabet": "Alphabet (comma-separated)",
+      "startState": "Start State",
+      "acceptStates": "Accept States (comma-separated)",
+      "transitionTable": "Transition Table",
+      "inputWord": "Input Word",
+      "inputWordHelp": "Each character is treated as one input symbol.",
+      "apply": "Start Simulation"
+    },
+    "buildFromScratch": {
+      "title": "Build Your Own Automaton",
+      "description": "Start with a blank canvas and create your own DFA or NFA from scratch. Add states, define the alphabet, and build transitions step by step.",
+      "button": "Start Empty",
+      "hint": "You can switch between DFA and NFA mode at any time in the editor."
+    },
+    "examplesTab": {
+      "title": "Predefined Examples",
+      "subtitle": "Learn how finite automata work by studying these examples. Each one includes a step-by-step explanation of how and why it was built.",
+      "loadExample": "Load in Simulator",
+      "howItWorks": "How it works",
+      "stepLabel": "Step {{index}}",
+      "tryIt": "Try it with input:",
+      "buildOwn": "Or build your own"
+    },
+    "exercisesTab": {
+      "title": "Practice Exercises",
+      "subtitle": "Build each automaton yourself. Use hints if you get stuck — full solutions only if you ask.",
+      "start": "Start",
+      "resume": "Resume",
+      "reset": "Reset progress",
+      "status": {
+        "notStarted": "Not started",
+        "inProgress": "In progress",
+        "completed": "Completed"
+      },
+      "endsWith00": {
+        "title": "Strings ending with \"00\"",
+        "goal": "Build a DFA that accepts binary strings ending with two zeros.",
+        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are both 0 (e.g. \"00\", \"100\", \"1100\"). Single zeros or strings ending in 1 must be rejected.",
+        "hint1": "You need to remember how many trailing zeros you have just seen. Three states (0, 1, or 2 trailing zeros) are enough.",
+        "hint2": "From the \"two trailing zeros\" state, reading another 0 should stay there, but reading a 1 should jump back to \"zero trailing zeros\"."
+      },
+      "evenOnes": {
+        "title": "Even number of 1s",
+        "goal": "Accept binary strings containing an even number of 1s (including zero 1s).",
+        "description": "Design a DFA that tracks the parity of 1s seen so far. The empty string should be accepted (zero is even).",
+        "hint1": "You only need two states — one for \"even\" and one for \"odd\".",
+        "hint2": "Reading 0 never changes the parity, but reading 1 always flips it."
+      },
+      "noConsecOnes": {
+        "title": "No two consecutive 1s",
+        "goal": "Accept binary strings that never contain \"11\" as a substring.",
+        "description": "Design a DFA that rejects any string in which two 1s appear next to each other. Strings like \"0\", \"01\", \"010\" are accepted; \"11\", \"0110\" are rejected.",
+        "hint1": "Track whether the last symbol you read was a 1. Reading another 1 immediately after must lead to a dead state.",
+        "hint2": "A dead (trap) state has self-loops on every symbol and is not accepting."
+      },
+      "divBy3": {
+        "title": "Binary numbers divisible by 3",
+        "goal": "Accept binary strings whose decimal value is divisible by 3.",
+        "description": "Build a DFA that tracks the running remainder of the binary value modulo 3. Accept the states representing remainder 0.",
+        "hint1": "You only need three states — one for each possible remainder (0, 1, 2).",
+        "hint2": "When you are in state with remainder r and read bit b, the new remainder is (2·r + b) mod 3.",
+        "hint3": "The start state and the single accept state are both the same: remainder 0."
+      }
+    },
+    "exerciseWorkspace": {
+      "label": "Exercise",
+      "completed": "Completed",
+      "exit": "Exit exercise mode",
+      "check": "Check Solution",
+      "showHint": "Show hint ({{n}}/{{total}})",
+      "noMoreHints": "All hints revealed",
+      "showSolution": "Show solution",
+      "hintsHeader": "Hints",
+      "confirmTitle": "Reveal the full solution?",
+      "confirmBody": "Your current automaton will be replaced with the reference solution. You can still reset the exercise from the Exercises tab.",
+      "confirmYes": "Yes, show solution",
+      "confirmNo": "Keep trying",
+      "structuralFail": "Your automaton isn't valid yet",
+      "structuralHint": "Fix the highlighted configuration issues before we can compare against the solution.",
+      "passed": "All checks passed!",
+      "passedDetail": "{{n}} of {{total}} test strings accepted/rejected correctly.",
+      "failed": "Not matching the expected language",
+      "failedDetail": "{{passed}} of {{total}} test strings agreed, {{failed}} disagreed.",
+      "counterexample": "Counterexample:",
+      "expected": "expected",
+      "got": "got",
+      "accept": "accept",
+      "reject": "reject"
+    },
+    "examples": {
+      "endsWith01": {
+        "title": "Binary strings ending in 01",
+        "description": "A DFA that accepts all binary strings that end with the substring \"01\". This is one of the most common introductory DFA examples.",
+        "step1Title": "1. Define the goal",
+        "step1": "We want to accept exactly those binary strings that end with \"01\". The automaton must remember whether the last two symbols it read were \"0\" followed by \"1\".",
+        "step2Title": "2. Design the states",
+        "step2": "We need three states: q0 (start — haven't seen the start of \"01\" yet), q1 (just read a \"0\" — could be the first part of \"01\"), and q2 (just read \"01\" — accept state).",
+        "step3Title": "3. Build the transitions",
+        "step3": "From q0: reading \"0\" moves to q1 (potential start of \"01\"), reading \"1\" stays in q0. From q1: reading \"1\" moves to q2 (we found \"01\"!), reading \"0\" stays in q1 (new potential start). From q2: reading \"0\" moves to q1, reading \"1\" goes back to q0.",
+        "step4Title": "4. Why it works",
+        "step4": "The automaton always tracks how much of the pattern \"01\" has been matched so far. No matter how long the string is, it only needs 3 states because it only cares about the last two characters. This is the power of finite automata — they can recognize patterns with constant memory."
+      },
+      "evenOnes": {
+        "title": "Even number of 1s",
+        "description": "A DFA that accepts binary strings containing an even number of 1s (including zero 1s). A classic example of parity checking.",
+        "step1Title": "1. Define the goal",
+        "step1": "We want to accept strings where the count of '1' symbols is even (0, 2, 4, ...). The automaton just needs to track the parity (even or odd) of 1s seen so far — it doesn't need to count them exactly.",
+        "step2Title": "2. Design the states",
+        "step2": "Only two states are needed: 'even' (we have seen an even number of 1s) and 'odd' (we have seen an odd number of 1s). The start state is 'even' because zero 1s is even. The accept state is also 'even'.",
+        "step3Title": "3. Build the transitions",
+        "step3": "Reading a '0' never changes the parity, so both states loop back to themselves on '0'. Reading a '1' flips the parity: even→odd and odd→even. That's the entire automaton!"
+      },
+      "containsAba": {
+        "title": "Contains substring \"aba\"",
+        "description": "An NFA that accepts any string over {a, b} that contains \"aba\" as a substring anywhere within it. Demonstrates nondeterminism.",
+        "step1Title": "1. Define the goal",
+        "step1": "We want to accept any string that contains \"aba\" somewhere inside it. Before and after the pattern, any combination of 'a' and 'b' is allowed.",
+        "step2Title": "2. Why use an NFA?",
+        "step2": "An NFA is natural here because we don't know when \"aba\" starts. The NFA can \"guess\" nondeterministically — in state q0, when it reads 'a', it both stays in q0 (in case this isn't the start of the pattern) AND moves to q1 (in case it is). If any path leads to acceptance, the string is accepted.",
+        "step3Title": "3. Design the states",
+        "step3": "Four states: q0 (haven't started matching), q1 (matched \"a\"), q2 (matched \"ab\"), q3 (matched \"aba\" — accept state, stays here forever on any input).",
+        "step4Title": "4. How nondeterminism helps",
+        "step4": "In a DFA, we'd need to carefully track partial matches and overlaps. With the NFA, we simply \"try all possibilities\" at once. The simulator tracks all active states in parallel, showing how the NFA explores multiple paths simultaneously."
+      },
+      "epsilonNfa": {
+        "title": "NFA with ε-transitions",
+        "description": "An NFA that uses epsilon (ε) transitions — transitions that happen without reading any input symbol. Demonstrates spontaneous state changes.",
+        "step1Title": "1. What are ε-transitions?",
+        "step1": "An ε-transition allows the automaton to move from one state to another without consuming an input symbol. This means the automaton can be in multiple states simultaneously even before reading any input.",
+        "step2Title": "2. How ε-closure works",
+        "step2": "Before processing starts, we compute the ε-closure of the start state — all states reachable by following ε-transitions from q0. Here, q0 has an ε-transition to q1, so the initial active states are {q0, q1}.",
+        "step3Title": "3. Design of this automaton",
+        "step3": "q0 reads 'a's and can spontaneously jump to q1 via ε. q1 reads one 'b' and moves to q2. q2 spontaneously jumps to q3 via ε. q3 is the accept state and accepts any remaining input.",
+        "step4Title": "4. Why ε-transitions matter",
+        "step4": "ε-transitions make it easier to combine automata (e.g., for union or concatenation of languages). They don't add computational power — every NFA with ε-transitions can be converted to one without — but they make automaton construction more modular and intuitive."
+      },
+      "divisibleBy3": {
+        "title": "Binary numbers divisible by 3",
+        "description": "A DFA that accepts binary numbers whose decimal value is divisible by 3. An elegant example showing how automata can perform arithmetic.",
+        "step1Title": "1. Define the goal",
+        "step1": "We want to accept binary strings that represent numbers divisible by 3 (remainder 0 when divided by 3). For example: \"0\" (0), \"11\" (3), \"110\" (6), \"1001\" (9) should all be accepted.",
+        "step2Title": "2. The key insight",
+        "step2": "When reading a binary number left-to-right, each new bit doubles the current value and adds the new bit. So if the current value is V and we read bit b, the new value is 2V + b. We only care about V mod 3, which has just 3 possible values: 0, 1, or 2.",
+        "step3Title": "3. Build the states",
+        "step3": "Three states represent the three possible remainders: r0 (remainder 0 — accept state), r1 (remainder 1), r2 (remainder 2). The start state is r0 because we start with value 0, which has remainder 0.",
+        "step4Title": "4. Derive the transitions",
+        "step4": "For each state (remainder r) and input bit b: new remainder = (2r + b) mod 3. For example: from r1 reading '0': (2×1+0) mod 3 = 2 → go to r2. From r1 reading '1': (2×1+1) mod 3 = 0 → go to r0. This mathematical derivation gives us a complete, correct transition table."
+      }
+    }
   }
 }
