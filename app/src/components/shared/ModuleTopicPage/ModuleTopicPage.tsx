@@ -15,6 +15,10 @@ export interface ModuleExercisesTabProps {
   onOpenExerciseInSimulation: (exercise: Exercise) => void;
 }
 
+export interface ModuleExamplesTabProps {
+  onSwitchToSimulation: () => void;
+}
+
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
   isFocused: boolean;
@@ -26,7 +30,7 @@ interface ModuleTopicPageProps {
   descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
-  examplesTab: ComponentType;
+  examplesTab: ComponentType<ModuleExamplesTabProps>;
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
 }
@@ -88,7 +92,11 @@ export function ModuleTopicPage({
     }
 
     if (activeTab === "examples") {
-      return <ExamplesTab />;
+      return (
+        <ExamplesTab
+          onSwitchToSimulation={() => handleTabChange("simulation")}
+        />
+      );
     }
 
     if (activeTab === "simulation") {

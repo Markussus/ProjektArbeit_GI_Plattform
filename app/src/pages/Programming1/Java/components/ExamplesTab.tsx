@@ -1,5 +1,6 @@
 import { BookOpen, Code2, Repeat } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
 import type { TranslationKey } from "@/types/i18n";
 
 interface ExampleCardDefinition {
