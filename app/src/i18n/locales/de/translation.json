@@ -694,6 +694,91 @@
         "step4Title": "4. Übergänge herleiten",
         "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von r1 mit '0': (2×1+0) mod 3 = 2 → gehe zu r2."
       }
+    },
+    "batch": {
+      "title": "Stapeltest",
+      "placeholder": "Wörter eingeben, z.B.: \n101\n100\n11100",
+      "runAll": "Alle testen",
+      "clear": "Leeren",
+      "total": "gesamt",
+      "debugHint": "Klicken zum schrittweisen Debuggen",
+      "steps": "Schritte",
+      "autoFill": "Automatisch füllen",
+      "autoFillTooltip": "Alle Wörter der Länge {{n}} erzeugen"
+    },
+    "grammar": {
+      "title": "Reguläre Grammatik → Automat",
+      "nonTerminals": "Nichtterminale (kommagetrennt)",
+      "terminals": "Terminale (kommagetrennt)",
+      "startSymbol": "Startsymbol",
+      "productions": "Produktionsregeln (eine pro Zeile, z. B. S → aA)",
+      "convert": "In Automat umwandeln"
+    },
+    "help": {
+      "open": "Leitfaden öffnen",
+      "title": "Leitfaden für Endliche Automaten",
+      "close": "Leitfaden schließen",
+      "howToTitle": "So benutzen Sie diesen Simulator",
+      "howTo1": "Wählen Sie zwischen Manuellem Editor oder Aus Grammatik.",
+      "howTo2": "Konfigurieren Sie Zustände, Alphabet, Startzustand und Akzeptanzzustände.",
+      "howTo3": "Füllen Sie die Übergangstabelle aus (kommagetrennte Ziele für NFAs).",
+      "howTo4": "Geben Sie ein Eingabewort ein und klicken Sie auf 'Simulation starten'.",
+      "howTo5": "Steuern Sie die Simulation mit Play / Pause / Schritt.",
+      "dfaTitle": "DFA – Deterministischer Endlicher Automat",
+      "dfaText": "Ein DFA hat genau einen Übergang pro Zustand und Eingabesymbol. Es gibt zu jedem Zeitpunkt genau einen aktiven Zustand, und ε-Übergänge sind nicht erlaubt.",
+      "nfaTitle": "NFA – Nichtdeterministischer Endlicher Automat",
+      "nfaText": "Ein NFA kann mehrere Ziele für dasselbe Eingabesymbol haben und unterstützt ε-Übergänge. Der Simulator verfolgt alle erreichbaren Zustände parallel und akzeptiert ein Wort, wenn eines davon bei Ende der Eingabe ein Akzeptanzzustand ist.",
+      "grammarTitle": "Reguläre Grammatik → Automat",
+      "grammarText": "Eine rechtslineare reguläre Grammatik wird wie folgt in einen NFA umgewandelt:",
+      "grammarRule1": "wird zu einem Übergang A → B auf Symbol a.",
+      "grammarRule2": "wird zu einem Übergang A → qF (finaler Akzeptanzzustand) auf Symbol a.",
+      "grammarRule3": "Nichtterminale werden zu Zuständen, Terminale zu Alphabetsymbolen.",
+      "legendTitle": "Diagrammlegende",
+      "legendStart": "Startzustand",
+      "legendStartText": "markiert mit einem eingehenden Pfeil mit der Beschriftung 'start'.",
+      "legendAccept": "Akzeptanzzustand",
+      "legendAcceptText": "dargestellt mit einem Doppelkreis.",
+      "legendActive": "Aktiver Zustand",
+      "legendActiveText": "während der Ausführung in der Primärfarbe hervorgehoben."
+    },
+    "sim": {
+      "emptyWord": "Leeres Wort (ε)",
+      "inputWord": "Eingabewort",
+      "title": "Simulation",
+      "edit": "Konfiguration bearbeiten",
+      "stepHistory": "Schrittprotokoll",
+      "stepOf": "Schritt {{current}} von {{total}}",
+      "jumpToEnd": "Zum Ende springen",
+      "status": {
+        "label": "Status",
+        "error": "Fehler",
+        "running": "Läuft",
+        "accepted": "Akzeptiert ✓",
+        "rejected": "Abgelehnt ✗",
+        "halted": "Gestoppt",
+        "type": "Typ",
+        "step": "Schritt",
+        "activeStates": "Aktive Zustände",
+        "position": "Position"
+      },
+      "explanation": {
+        "reading": "Lese Symbol '{{symbol}}' an Position {{pos}}. Aktive Zustände: {{states}}",
+        "processing": "Verarbeitung...",
+        "accepted": "Das Wort wird akzeptiert. Die finalen Zustände {{states}} enthalten einen Akzeptanzzustand.",
+        "rejectedDead": "Das Wort wird abgelehnt. Keine erreichbaren Zustände (Sackgasse).",
+        "rejected": "Das Wort wird abgelehnt. Die finalen Zustände {{states}} enthalten keinen Akzeptanzzustand."
+      }
+    },
+    "validation": {
+      "statesEmpty": "Zustände dürfen nicht leer sein.",
+      "startStateMissing": "Der Startzustand ist nicht in der Zustandsmenge.",
+      "acceptStatesInvalid": "Ein Akzeptanzzustand ist nicht in der Zustandsmenge.",
+      "alphabetEmpty": "Das Alphabet darf nicht leer sein.",
+      "transitionSourceInvalid": "Ein Übergangsquellzustand ist ungültig.",
+      "transitionTargetInvalid": "Ein Übergangszielzustand ist ungültig.",
+      "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
+      "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
+      "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
     }
   }
 }

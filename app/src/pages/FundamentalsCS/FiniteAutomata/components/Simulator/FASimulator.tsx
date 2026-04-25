@@ -141,7 +141,7 @@ export function FASimulator() {
             </div>
 
             {editorMode === "manual" && (
-              <>
+              <div key="manual" className="fa-editor-panel flex flex-col gap-6">
                 <div className="bg-card rounded-xl border p-6 shadow-sm">
                   <FAConfigView editor={editor} />
                 </div>
@@ -173,17 +173,17 @@ export function FASimulator() {
                   <Play className="h-4 w-4 fill-current" />
                   {t("fa.config.apply", "Start Simulation")}
                 </button>
-              </>
+              </div>
             )}
 
             {editorMode === "grammar" && (
-              <div className="bg-card rounded-xl border p-6 shadow-sm">
+              <div key="grammar" className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm">
                 <FAGrammarInput onConvert={handleGrammarConvert} />
               </div>
             )}
 
             {editorMode === "generator" && (
-              <div className="bg-card rounded-xl border p-6 shadow-sm">
+              <div key="generator" className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm">
                 <FAGeneratorInput onConvert={handleGeneratorConvert} />
               </div>
             )}

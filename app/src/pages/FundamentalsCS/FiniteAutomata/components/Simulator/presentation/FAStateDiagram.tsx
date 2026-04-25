@@ -43,7 +43,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
   return (
     <div
-      className="fa-card overflow-hidden"
+      className="fa-card overflow-hidden flex flex-col h-full"
       style={{ background: "var(--fa-surface)" }}
     >
       <div
@@ -279,14 +279,14 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                     ? "var(--fa-cyan-dim)"
                     : hasViolation
                       ? "var(--fa-red-dim)"
-                      : "var(--fa-surface, #141414)"
+                      : "var(--fa-node-fill, var(--fa-surface, #141414))"
                 }
                 stroke={
                   isActive
                     ? "var(--fa-cyan)"
                     : hasViolation
                       ? "var(--fa-red)"
-                      : "var(--fa-border, rgba(255,255,255,0.08))"
+                      : "var(--fa-node-stroke, var(--fa-border, rgba(255,255,255,0.08)))"
                 }
                 strokeWidth={isActive ? 2.5 : 1.5}
                 style={{ transition: "all 0.3s" }}

@@ -93,8 +93,8 @@ export function FASimulationView({
         </div>
       </div>
 
-      {/* 3-panel layout */}
-      <div className="mb-4 flex flex-col gap-4 lg:flex-row">
+      {/* 3-panel layout — items-stretch keeps batch tester the same height as the state diagram */}
+      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Left: Controls + Status */}
         <div className="flex w-full flex-col gap-4 lg:w-1/4">
           <div className="fa-card p-3">
@@ -122,9 +122,13 @@ export function FASimulationView({
           <FAStateDiagram program={program} runtime={runtime} />
         </div>
 
-        {/* Right: Batch Tester */}
-        <div className="w-full lg:w-1/4">
-          <FABatchTester program={program} onSelectWord={onSelectBatchWord} />
+        {/* Right: Batch Tester — stretches to match the diagram height */}
+        <div className="flex w-full min-h-0 lg:w-1/4">
+          <FABatchTester
+            program={program}
+            defaultWordLen={runtime.inputWord.length}
+            onSelectWord={onSelectBatchWord}
+          />
         </div>
       </div>
 

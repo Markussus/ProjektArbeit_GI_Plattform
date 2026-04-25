@@ -698,6 +698,91 @@
         "step4Title": "4. Derive the transitions",
         "step4": "For each state (remainder r) and input bit b: new remainder = (2r + b) mod 3. For example: from r1 reading '0': (2×1+0) mod 3 = 2 → go to r2. From r1 reading '1': (2×1+1) mod 3 = 0 → go to r0. This mathematical derivation gives us a complete, correct transition table."
       }
+    },
+    "batch": {
+      "title": "Batch Testing",
+      "placeholder": "Enter words, e.g.: \n101\n100\n11100",
+      "runAll": "Run All",
+      "clear": "Clear",
+      "total": "total",
+      "debugHint": "Click to debug step-by-step",
+      "steps": "steps",
+      "autoFill": "Auto-fill",
+      "autoFillTooltip": "Generate all words of length {{n}}"
+    },
+    "grammar": {
+      "title": "Regular Grammar → Automaton",
+      "nonTerminals": "Non-Terminals (comma-separated)",
+      "terminals": "Terminals (comma-separated)",
+      "startSymbol": "Start Symbol",
+      "productions": "Production Rules (one per line, e.g. S → aA)",
+      "convert": "Convert to Automaton"
+    },
+    "help": {
+      "open": "Open guide",
+      "title": "Finite Automata Guide",
+      "close": "Close guide",
+      "howToTitle": "How to use this simulator",
+      "howTo1": "Choose between Manual Editor or From Grammar.",
+      "howTo2": "Configure states, alphabet, start state and accept states.",
+      "howTo3": "Fill the transition table (use comma-separated targets for NFAs).",
+      "howTo4": "Enter an input word and click 'Start Simulation'.",
+      "howTo5": "Use Play / Pause / Step controls to walk through the run.",
+      "dfaTitle": "DFA – Deterministic Finite Automaton",
+      "dfaText": "A DFA has exactly one transition per state and input symbol. There is exactly one active state at any time, and ε-transitions are not allowed.",
+      "nfaTitle": "NFA – Nondeterministic Finite Automaton",
+      "nfaText": "An NFA may have multiple targets for the same input symbol and supports ε-transitions. The simulator tracks all reachable states in parallel and accepts a word if any of them is an accept state when the input ends.",
+      "grammarTitle": "Regular Grammar → Automaton",
+      "grammarText": "A right-linear regular grammar is converted into an NFA as follows:",
+      "grammarRule1": "becomes a transition A → B on symbol a.",
+      "grammarRule2": "becomes a transition A → qF (final accept state) on symbol a.",
+      "grammarRule3": "Non-terminals become states, terminals become alphabet symbols.",
+      "legendTitle": "Diagram Legend",
+      "legendStart": "Start state",
+      "legendStartText": "marked with an incoming arrow labeled 'start'.",
+      "legendAccept": "Accept state",
+      "legendAcceptText": "drawn with a double circle.",
+      "legendActive": "Active state",
+      "legendActiveText": "highlighted in primary color during execution."
+    },
+    "sim": {
+      "emptyWord": "Empty word (ε)",
+      "inputWord": "Input Word",
+      "title": "Simulation",
+      "edit": "Edit Configuration",
+      "stepHistory": "Step History",
+      "stepOf": "Step {{current}} of {{total}}",
+      "jumpToEnd": "Jump to End",
+      "status": {
+        "label": "Status",
+        "error": "Error",
+        "running": "Running",
+        "accepted": "Accepted ✓",
+        "rejected": "Rejected ✗",
+        "halted": "Halted",
+        "type": "Type",
+        "step": "Step",
+        "activeStates": "Active States",
+        "position": "Position"
+      },
+      "explanation": {
+        "reading": "Reading symbol '{{symbol}}' at position {{pos}}. Active states: {{states}}",
+        "processing": "Processing...",
+        "accepted": "The word is accepted. Final states {{states}} include an accept state.",
+        "rejectedDead": "The word is rejected. No reachable states (dead end).",
+        "rejected": "The word is rejected. Final states {{states}} do not include an accept state."
+      }
+    },
+    "validation": {
+      "statesEmpty": "States must not be empty.",
+      "startStateMissing": "Start state is not in the state set.",
+      "acceptStatesInvalid": "An accept state is not in the state set.",
+      "alphabetEmpty": "Alphabet must not be empty.",
+      "transitionSourceInvalid": "A transition source state is invalid.",
+      "transitionTargetInvalid": "A transition target state is invalid.",
+      "transitionSymbolInvalid": "A transition symbol is not in the alphabet.",
+      "dfaNondeterministic": "DFA has nondeterministic transitions.",
+      "dfaEpsilon": "DFA must not have ε-transitions."
     }
   }
 }
