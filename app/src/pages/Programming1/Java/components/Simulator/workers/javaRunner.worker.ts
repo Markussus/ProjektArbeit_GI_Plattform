@@ -57,8 +57,15 @@ workerScope.onmessage = async (event: MessageEvent<JavaWorkerRequest>) => {
 
   const runtime = createJavaRuntime(requestId);
 
+  // Use `new Function` (indirect eval) to avoid bundler warnings.
+  // `runtime` is passed as an explicit parameter so student code can call it
+  // without needing direct access to this worker's lexical scope.
+  const runCode = new Function("runtime", artifacts.wrappedJavascript) as (
+    r: typeof runtime,
+  ) => Promise<void>;
+
   try {
-    await eval(artifacts.wrappedJavascript);
+    await runCode(runtime);
     workerScope.postMessage({
       type: "execution-completed",
       requestId,
@@ -95,8 +102,10 @@ workerScope.onmessage = async (event: MessageEvent<JavaWorkerRequest>) => {
  * browser globals so that student code cannot access the DOM or storage.
  */
 function buildRuntimeWrapper(javascript: string): string {
+  // `return` exposes the Promise to the `new Function(...)` caller so that
+  // `await runCode(runtime)` actually waits for the student code to finish.
   return [
-    "(async () => {",
+    "return (async () => {",
     '  "use strict";',
     "  const window = undefined;",
     "  const document = undefined;",
