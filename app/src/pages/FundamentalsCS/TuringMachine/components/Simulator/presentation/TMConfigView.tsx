@@ -10,6 +10,7 @@ import type {
   TMProgramIssueCode,
 } from "../domain/tmProgramValidation";
 import { TMGeneralSettings } from "./TMGeneralSettings";
+import { TMAlphabetPanel } from "./TMAlphabetPanel";
 import { TMHaltStatesPanel } from "./TMHaltStatesPanel";
 import { TMTransitionTableEditor } from "./TMTransitionTableEditor";
 
@@ -92,14 +93,26 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
             onRemoveColumn={handleRemoveColumn}
           />
 
-          <TMHaltStatesPanel
-            states={editor.draft.states}
-            initialState={editor.draft.initialState}
-            haltStates={editor.draft.haltStates}
-            disabled={editor.hasBlockingCellIssue}
-            onToggle={editor.handleToggleHaltState}
-            onAddHaltState={editor.handleAddHaltState}
-          />
+          <div className="flex flex-col gap-4">
+            <TMHaltStatesPanel
+              states={editor.draft.states}
+              initialState={editor.draft.initialState}
+              haltStates={editor.draft.haltStates}
+              disabled={editor.hasBlockingCellIssue}
+              onToggle={editor.handleToggleHaltState}
+              onAddHaltState={editor.handleAddHaltState}
+            />
+
+            <TMAlphabetPanel
+              title={t("tm.config.inputAlphabet")}
+              symbols={editor.draft.inputAlphabet}
+            />
+
+            <TMAlphabetPanel
+              title={t("tm.config.tapeAlphabet")}
+              symbols={orderedTapeAlphabet}
+            />
+          </div>
         </div>
       </div>
     </div>
