@@ -60,8 +60,8 @@ export function ExercisesTab({
     // ModuleTopicPage's state machine.
     onOpenExerciseInSimulation({
       id: exercise.id as never,
-      title: t(exercise.titleKey),
-      description: t(exercise.descriptionKey),
+      title: t(exercise.titleKey, exercise.id),
+      description: t(exercise.descriptionKey, ""),
       difficulty:
         exercise.difficulty === 1
           ? "easy"
