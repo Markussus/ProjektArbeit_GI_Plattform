@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { FAProgram } from "../domain/faTypes";
 
@@ -12,9 +13,14 @@ export function FATransitionTableEditor({
 }: FATransitionTableEditorProps) {
   const { t } = useTranslation();
 
+  const [showEpsilon, setShowEpsilon] = useState(false);
+
   const symbols = [...program.alphabet];
   if (program.type === "NFA") {
-    if (!symbols.includes("ε")) {
+    const hasEpsilon = Object.values(program.transitions).some(
+      (m) => m["ε"] && m["ε"].length > 0,
+    );
+    if ((showEpsilon || hasEpsilon) && !symbols.includes("ε")) {
       symbols.push("ε");
     }
   }
@@ -69,6 +75,22 @@ export function FATransitionTableEditor({
                 })}
               </tr>
             ))}
+            {program.type === "NFA" && !symbols.includes("ε") && (
+              <tr className="bg-muted/10 border-b last:border-b-0">
+                <td
+                  colSpan={program.states.length + 1}
+                  className="p-2 text-center"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowEpsilon(true)}
+                    className="text-primary hover:text-primary/80 text-xs font-semibold tracking-wide"
+                  >
+                    + {t("fa.config.addEpsilon", "Add ε-Transitions")}
+                  </button>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

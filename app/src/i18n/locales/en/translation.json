@@ -553,6 +553,7 @@
       "alphabet": "Alphabet (comma-separated)",
       "startState": "Start State",
       "acceptStates": "Accept States (comma-separated)",
+      "addEpsilon": "Add ε-Transitions",
       "transitionTable": "Transition Table",
       "inputWord": "Input Word",
       "inputWordHelp": "Each character is treated as one input symbol.",

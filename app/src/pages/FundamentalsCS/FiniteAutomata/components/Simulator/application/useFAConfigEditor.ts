@@ -10,6 +10,10 @@ import {
   buildTransitionTableHeaders,
   buildTransitionTableRows,
 } from "../adapters/faTableAdapter";
+import {
+  defaultDFAProgram,
+  defaultNFAProgram,
+} from "../config/defaultFAProgram";
 
 // --- Reducer ---
 
@@ -61,8 +65,27 @@ function pruneTransitions(
 
 function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
   switch (action.type) {
-    case "SET_AUTOMATON_TYPE":
-      return { ...state, type: action.payload };
+    case "SET_AUTOMATON_TYPE": {
+      const type = action.payload;
+      if (type === state.type) return state;
+
+      // If switching types and the current program is exactly the default, swap to the other default
+      const isDefaultDFA =
+        JSON.stringify({ ...state, type: "DFA" }) ===
+        JSON.stringify(defaultDFAProgram);
+      const isDefaultNFA =
+        JSON.stringify({ ...state, type: "NFA" }) ===
+        JSON.stringify(defaultNFAProgram);
+
+      if (type === "NFA" && isDefaultDFA) {
+        return JSON.parse(JSON.stringify(defaultNFAProgram));
+      }
+      if (type === "DFA" && isDefaultNFA) {
+        return JSON.parse(JSON.stringify(defaultDFAProgram));
+      }
+
+      return { ...state, type };
+    }
     case "SET_STATES": {
       const states = parseCSV(action.payload);
       const acceptStates = state.acceptStates.filter((s) => states.includes(s));

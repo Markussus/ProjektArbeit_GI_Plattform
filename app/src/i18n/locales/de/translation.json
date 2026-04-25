@@ -549,6 +549,7 @@
       "alphabet": "Alphabet (kommagetrennt)",
       "startState": "Startzustand",
       "acceptStates": "Akzeptierende Zustände (kommagetrennt)",
+      "addEpsilon": "ε-Übergänge hinzufügen",
       "transitionTable": "Übergangstabelle",
       "inputWord": "Eingabewort",
       "inputWordHelp": "Jedes Zeichen wird als ein Eingabesymbol behandelt.",

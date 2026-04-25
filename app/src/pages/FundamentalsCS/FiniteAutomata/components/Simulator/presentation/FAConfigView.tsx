@@ -1,7 +1,43 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { UseFAConfigEditorResult } from "../application/useFAConfigEditor";
 import type { FAProgramIssueCode } from "../domain/faProgramValidation";
 import { FATransitionTableEditor } from "./FATransitionTableEditor";
+
+function ArrayInput({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: {
+  value: string[];
+  onChange: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+}) {
+  const [localValue, setLocalValue] = useState(value.join(", "));
+  const [prevValue, setPrevValue] = useState(value);
+
+  // Derived state pattern: if the external value array structurally changes,
+  // we overwrite the local input state.
+  if (JSON.stringify(prevValue) !== JSON.stringify(value)) {
+    setLocalValue(value.join(", "));
+    setPrevValue(value);
+  }
+
+  return (
+    <input
+      type="text"
+      value={localValue}
+      onChange={(e) => {
+        setLocalValue(e.target.value);
+        onChange(e.target.value);
+      }}
+      className={className}
+      placeholder={placeholder}
+    />
+  );
+}
 
 export interface FAConfigViewProps {
   editor: UseFAConfigEditorResult;
@@ -90,10 +126,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           <label className={labelClass}>
             {t("fa.config.states", "States (comma-separated)")}
           </label>
-          <input
-            type="text"
-            value={editor.draft.states.join(", ")}
-            onChange={(e) => editor.setStates(e.target.value)}
+          <ArrayInput
+            value={editor.draft.states}
+            onChange={editor.setStates}
             className={inputClass}
             placeholder="s0, s1, s2"
           />
@@ -104,10 +139,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           <label className={labelClass}>
             {t("fa.config.alphabet", "Alphabet (comma-separated)")}
           </label>
-          <input
-            type="text"
-            value={editor.draft.alphabet.join(", ")}
-            onChange={(e) => editor.setAlphabet(e.target.value)}
+          <ArrayInput
+            value={editor.draft.alphabet}
+            onChange={editor.setAlphabet}
             className={inputClass}
             placeholder="a, b"
           />
@@ -136,10 +170,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           <label className={labelClass}>
             {t("fa.config.acceptStates", "Accept States (comma-separated)")}
           </label>
-          <input
-            type="text"
-            value={editor.draft.acceptStates.join(", ")}
-            onChange={(e) => editor.setAcceptStates(e.target.value)}
+          <ArrayInput
+            value={editor.draft.acceptStates}
+            onChange={editor.setAcceptStates}
             className={inputClass}
             placeholder="q2"
           />
