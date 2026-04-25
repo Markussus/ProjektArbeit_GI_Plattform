@@ -98,6 +98,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
             haltStates={editor.draft.haltStates}
             disabled={editor.hasBlockingCellIssue}
             onToggle={editor.handleToggleHaltState}
+            onAddHaltState={editor.handleAddHaltState}
           />
         </div>
       </div>

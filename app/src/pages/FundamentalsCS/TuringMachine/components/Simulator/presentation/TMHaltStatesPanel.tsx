@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { StateName } from "../domain/tmTypes";
@@ -7,6 +8,7 @@ export interface TMHaltStatesPanelProps {
   initialState: StateName;
   haltStates: StateName[];
   onToggle: (state: StateName, isHalting: boolean) => void;
+  onAddHaltState: (state: StateName) => void;
   disabled?: boolean;
 }
 
@@ -15,10 +17,26 @@ export function TMHaltStatesPanel({
   initialState,
   haltStates,
   onToggle,
+  onAddHaltState,
   disabled = false,
 }: TMHaltStatesPanelProps) {
   const { t } = useTranslation();
+  const [newState, setNewState] = useState("");
   const selectableStates = states.filter((state) => state !== initialState);
+  const commitNewState = useCallback(() => {
+    const trimmedState = newState.trim();
+
+    if (
+      trimmedState === "" ||
+      trimmedState === initialState ||
+      states.includes(trimmedState)
+    ) {
+      return;
+    }
+
+    onAddHaltState(trimmedState);
+    setNewState("");
+  }, [initialState, newState, onAddHaltState, states]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -60,6 +78,32 @@ export function TMHaltStatesPanel({
             {t("tm.config.noStates")}
           </span>
         )}
+
+        <div className="flex items-center gap-2 pt-1">
+          <span className="border-input bg-background flex h-4 w-4 shrink-0 items-center justify-center rounded border">
+            <Check className="h-3 w-3" />
+          </span>
+          <input
+            type="text"
+            value={newState}
+            onChange={(event) => setNewState(event.target.value)}
+            onBlur={commitNewState}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") {
+                return;
+              }
+
+              event.preventDefault();
+              commitNewState();
+            }}
+            disabled={disabled}
+            placeholder={t("tm.config.addHaltStatePlaceholder")}
+            aria-label={t("tm.config.addHaltState")}
+            className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"
+            autoComplete="off"
+            spellCheck="false"
+          />
+        </div>
       </div>
     </div>
   );

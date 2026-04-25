@@ -8,6 +8,7 @@ export type TMEditorAction =
   | { type: "set_initial_tape"; value: string }
   | { type: "set_initial_state"; state: StateName }
   | { type: "toggle_halt_state"; state: StateName; isHalting: boolean }
+  | { type: "add_halt_state"; state: StateName }
   | { type: "add_tape_symbol" }
   | { type: "remove_tape_symbol"; symbol: TapeSymbol }
   | {
@@ -41,6 +42,8 @@ export function tmEditorReducer(
       return updateInitialState(program, action.state);
     case "toggle_halt_state":
       return toggleHaltState(program, action.state, action.isHalting);
+    case "add_halt_state":
+      return addHaltState(program, action.state);
     case "add_tape_symbol":
       return addTapeSymbol(program);
     case "remove_tape_symbol":
@@ -90,6 +93,24 @@ function toggleHaltState(
     haltStates: isHalting
       ? [...new Set([...program.haltStates, state])]
       : program.haltStates.filter((haltState) => haltState !== state),
+  });
+}
+
+function addHaltState(program: TMProgram, state: StateName): TMProgram {
+  const normalizedState = state.trim();
+
+  if (
+    normalizedState === "" ||
+    normalizedState === program.initialState ||
+    program.states.includes(normalizedState)
+  ) {
+    return program;
+  }
+
+  return withDerivedInputAlphabet({
+    ...program,
+    states: [...program.states, normalizedState],
+    haltStates: [...new Set([...program.haltStates, normalizedState])],
   });
 }
 

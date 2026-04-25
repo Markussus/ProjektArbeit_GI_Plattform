@@ -17,10 +17,13 @@ export function buildTransitionTableHeaders(states: StateName[]): string[] {
   return ["\u03B4", ...states.map(formatState)];
 }
 
-export function buildTransitionTableRows(program: TMProgram): string[][] {
+export function buildTransitionTableRows(
+  program: TMProgram,
+  states: StateName[] = program.states,
+): string[][] {
   return getOrderedTapeAlphabet(program).map((symbol) => [
     symbol,
-    ...program.states.map((state) =>
+    ...states.map((state) =>
       formatTransition(program.transitions[symbol]?.[state]),
     ),
   ]);

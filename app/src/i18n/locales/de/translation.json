@@ -409,6 +409,8 @@
       "startState": "Startzustand",
       "haltStates": "Haltezustände",
       "haltStatesDesc": "Zustände als haltend markieren.",
+      "addHaltState": "Haltezustand hinzufügen",
+      "addHaltStatePlaceholder": "Haltezustand hinzufügen",
       "noStates": "Keine Zustände verfügbar",
       "transitionTable": "Übergangstabelle",
       "transitionFormat": "Format:",

@@ -413,6 +413,8 @@
       "startState": "Start State",
       "haltStates": "Halt States",
       "haltStatesDesc": "Mark states as halting.",
+      "addHaltState": "Add Halt State",
+      "addHaltStatePlaceholder": "Add halt state",
       "noStates": "No states available",
       "transitionTable": "Transition Table",
       "transitionFormat": "Format:",
