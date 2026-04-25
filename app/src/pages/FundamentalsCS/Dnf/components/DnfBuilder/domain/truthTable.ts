@@ -1,10 +1,9 @@
 import {
   collectExpressionVariables,
-  formatBooleanValue,
+  evaluateBooleanExpression,
   type BooleanExpression,
   type VariableAssignment,
 } from "./booleanExpression";
-import { evaluateBooleanExpression } from "./dnfEvaluator";
 
 export interface TruthTableRow {
   assignment: VariableAssignment;
@@ -31,10 +30,6 @@ export function generateTruthTable(
   });
 
   return { variables, rows };
-}
-
-export function formatTruthTableValue(value: boolean): "0" | "1" {
-  return formatBooleanValue(value);
 }
 
 function buildAssignment(

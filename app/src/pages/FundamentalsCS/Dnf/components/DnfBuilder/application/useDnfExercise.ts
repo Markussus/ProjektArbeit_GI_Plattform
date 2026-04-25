@@ -1,23 +1,14 @@
 import { useState } from "react";
+import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
-import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
-import type { TruthTable } from "../domain/truthTable";
-
-type DnfExerciseAnalysis =
-  | {
-      status: "valid";
-      truthTable: TruthTable;
-    }
-  | {
-      status: "invalid";
-    };
+import type { DnfBuilderAnalysis } from "./useDnfBuilder";
 
 interface UseDnfExerciseParams {
-  analysis: DnfExerciseAnalysis;
+  analysis: DnfBuilderAnalysis;
   isExerciseMode: boolean;
 }
 

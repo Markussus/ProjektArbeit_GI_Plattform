@@ -12,6 +12,8 @@ import { DnfInputPanel } from "./presentation/DnfInputPanel";
 import { DnfResultPanel } from "./presentation/DnfResultPanel";
 import { DnfTruthTableView } from "./presentation/DnfTruthTableView";
 
+const LARGE_VARIABLE_COUNT_THRESHOLD = 6;
+
 const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
   empty_expression: "dnf.builder.errors.emptyExpression",
   unexpected_character: "dnf.builder.errors.unexpectedCharacter",
@@ -19,8 +21,6 @@ const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
   unexpected_end: "dnf.builder.errors.unexpectedEnd",
   missing_closing_parenthesis: "dnf.builder.errors.missingClosingParenthesis",
 };
-
-const LARGE_VARIABLE_COUNT_THRESHOLD = 6;
 
 interface DnfBuilderProps {
   selectedExercise?: Exercise | null;

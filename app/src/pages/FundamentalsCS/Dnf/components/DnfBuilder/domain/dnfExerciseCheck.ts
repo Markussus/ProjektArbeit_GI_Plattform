@@ -1,9 +1,9 @@
 import {
   collectExpressionVariables,
+  evaluateBooleanExpression,
   type BooleanExpression,
   type VariableAssignment,
 } from "./booleanExpression";
-import { evaluateBooleanExpression } from "./dnfEvaluator";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
 import type { TruthTable } from "./truthTable";
 
