@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { evaluateBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfEvaluator";
+import {
+  evaluateBooleanExpression,
+  type BooleanExpression,
+} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+import {
+  formatBooleanInput,
+  normalizeBooleanOperatorAliases,
+} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanSyntax";
 import {
   deriveDnfFromTruthTable,
   formatDnfExpression,
@@ -10,11 +17,6 @@ import {
   generateTruthTable,
   type TruthTable,
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
-import type { BooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
-import {
-  formatBooleanInput,
-  normalizeBooleanOperatorAliases,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanSyntax";
 
 describe("DNF boolean logic", () => {
   it("parses and evaluates operator precedence", () => {
