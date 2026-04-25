@@ -693,6 +693,14 @@
         "step3": "Drei Zustände repräsentieren die drei möglichen Reste: s0 (Rest 0 — Akzeptanzzustand), s1 (Rest 1), s2 (Rest 2). Startzustand ist s0.",
         "step4Title": "4. Übergänge herleiten",
         "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
+      },
+      "lecture": {
+        "title": "Vorlesungsbeispiel",
+        "description": "Ein DFA aus der Vorlesungsübung, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1).",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach nichts mehr. Er lehnt leere Strings, Strings die mit '1' beginnen, oder Strings mit mehr als einer '1' ab.",
+        "step2Title": "2. Zustände entwerfen",
+        "step2": "s0 ist der Startzustand. Das Lesen einer '0' führt zu s1. Von s1 führt eine '1' zu s2 (Akzeptanzzustand). Jede andere Eingabe führt zu s3, einem \"Fangzustand\" (Trap State), da der String ungültig geworden ist."
       }
     },
     "batch": {

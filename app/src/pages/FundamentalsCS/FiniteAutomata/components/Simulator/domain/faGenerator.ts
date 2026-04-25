@@ -455,7 +455,7 @@ export function parseGeneratorDSL(source: string): GeneratorSpec {
     const alphabetRaw = fields.get("alphabet");
     if (!alphabetRaw) throw new Error("modulo: missing 'alphabet'");
     const alphabet = alphabetRaw
-      .replace(/^\{|\}$/g, "")
+      .replace(/^\{|}$/g, "")
       .split(",")
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
@@ -560,7 +560,7 @@ function parseGrammarDSL(input: GrammarDSLInput): RegularGrammar {
 
   const nonTerminals = input.nonTerminalsField
     ? input.nonTerminalsField
-        .replace(/^\{|\}$/g, "")
+        .replace(/^\{|}$/g, "")
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0)
@@ -568,7 +568,7 @@ function parseGrammarDSL(input: GrammarDSLInput): RegularGrammar {
 
   const terminals = input.terminalsField
     ? input.terminalsField
-        .replace(/^\{|\}$/g, "")
+        .replace(/^\{|}$/g, "")
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0)
@@ -704,7 +704,10 @@ export function generateWithInfo(spec: GeneratorSpec): {
   description: string;
 } {
   const program = generateAutomaton(spec);
-  const suggestedWord = spec.inputWord !== undefined ? spec.inputWord : findShortestAcceptedWord(program);
+  const suggestedWord =
+    spec.inputWord !== undefined
+      ? spec.inputWord
+      : findShortestAcceptedWord(program);
   return { program, suggestedWord, description: describeSpec(spec) };
 }
 

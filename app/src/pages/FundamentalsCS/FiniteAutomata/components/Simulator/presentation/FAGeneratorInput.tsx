@@ -33,7 +33,12 @@ const MODE_CARDS: ModeCard[] = [
     titleFallback: "Regex",
     blurbKey: "fa.generator.mode.regex.blurb",
     blurbFallback: "Describe strings with a pattern.",
-    example: ["type: regex", "value: (0|1)*00", "output: dfa", "input: 10100"].join("\n"),
+    example: [
+      "type: regex",
+      "value: (0|1)*00",
+      "output: dfa",
+      "input: 10100",
+    ].join("\n"),
   },
   {
     id: "modulo",
@@ -77,7 +82,9 @@ const QUICK_EXAMPLES: QuickExample[] = [
   {
     labelKey: "fa.generator.quick.endsWith00",
     labelFallback: 'Strings ending with "00"',
-    body: ["type: regex", "value: (0|1)*00", "output: dfa", "input: 1100"].join("\n"),
+    body: ["type: regex", "value: (0|1)*00", "output: dfa", "input: 1100"].join(
+      "\n",
+    ),
   },
   {
     labelKey: "fa.generator.quick.divBy3",
@@ -104,7 +111,12 @@ const QUICK_EXAMPLES: QuickExample[] = [
   {
     labelKey: "fa.generator.quick.containsAB",
     labelFallback: 'Strings containing "ab"',
-    body: ["type: regex", "value: (a|b)*ab(a|b)*", "output: dfa", "input: baba"].join("\n"),
+    body: [
+      "type: regex",
+      "value: (a|b)*ab(a|b)*",
+      "output: dfa",
+      "input: baba",
+    ].join("\n"),
   },
 ];
 

@@ -5,17 +5,12 @@ import {
   ChevronDown,
   ChevronRight,
   Play,
-  Plus,
   BookOpen,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import {
-  faExamples,
-  emptyFAProgram,
-  type FAExample,
-} from "./Simulator/config/faExamples";
+import { faExamples, type FAExample } from "./Simulator/config/faExamples";
 import type { FAProgram } from "./Simulator/domain/faTypes";
 import { useFAExampleStore } from "../store/faExampleStore";
 
@@ -68,38 +63,6 @@ export function ExamplesTab({ onSwitchToSimulation }: ModuleExamplesTabProps) {
             onLoad={handleLoad}
           />
         ))}
-      </div>
-
-      {/* Build from scratch card */}
-      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-        <div className="from-primary/5 border-b bg-gradient-to-r to-transparent px-5 py-3">
-          <h3 className="text-foreground flex items-center gap-2 text-sm font-bold">
-            <Plus className="h-4 w-4" />
-            {t("fa.buildFromScratch.title", "Build Your Own Automaton")}
-          </h3>
-        </div>
-        <div className="px-5 py-4">
-          <p className="text-muted-foreground text-sm">
-            {t(
-              "fa.buildFromScratch.description",
-              "Start with a blank canvas and create your own DFA or NFA from scratch.",
-            )}
-          </p>
-          <p className="text-muted-foreground mt-2 text-xs italic">
-            {t(
-              "fa.buildFromScratch.hint",
-              "You can switch between DFA and NFA mode at any time in the editor.",
-            )}
-          </p>
-          <button
-            type="button"
-            onClick={() => handleLoad(emptyFAProgram, "")}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
-          >
-            <Plus className="h-4 w-4" />
-            {t("fa.buildFromScratch.button", "Start Empty")}
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -192,7 +155,7 @@ function ExampleCard({
                   key={idx}
                   className="bg-muted/30 relative rounded-lg py-3 pr-4 pl-4"
                 >
-                  <div className="border-primary/30 absolute top-0 bottom-0 left-0 w-[3px] rounded-full border-l-[3px]" />
+                  <div className="border-primary/30 absolute top-0 bottom-0 left-0 w-0.75 rounded-full border-l-[3px]" />
                   <h5 className="text-foreground text-sm font-semibold">
                     {t(step.titleKey, `Step ${idx + 1}`)}
                   </h5>

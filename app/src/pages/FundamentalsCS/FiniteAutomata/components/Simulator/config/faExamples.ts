@@ -134,7 +134,6 @@ export const exampleContainsAba: FAExample = {
   ],
 };
 
-
 // ─── 5. DFA: Divisible by 3 (binary) ────────────────────────────────────────
 export const exampleDivisibleBy3: FAExample = {
   id: "divisible-by-3",
@@ -174,8 +173,41 @@ export const exampleDivisibleBy3: FAExample = {
   ],
 };
 
+// ─── 6. DFA: Lecture Example (0+1) ──────────────────────────────────────────
+export const exampleLecture: FAExample = {
+  id: "lecture-example",
+  titleKey: "fa.examples.lecture.title",
+  descriptionKey: "fa.examples.lecture.description",
+  type: "DFA",
+  program: {
+    type: "DFA",
+    states: ["s0", "s1", "s2", "s3"],
+    alphabet: ["0", "1"],
+    transitions: {
+      s0: { "0": ["s1"], "1": ["s3"] },
+      s1: { "0": ["s1"], "1": ["s2"] },
+      s2: { "0": ["s3"], "1": ["s3"] },
+      s3: { "0": ["s3"], "1": ["s3"] },
+    },
+    startState: "s0",
+    acceptStates: ["s2"],
+  },
+  inputWord: "0001",
+  steps: [
+    {
+      titleKey: "fa.examples.lecture.step1Title",
+      contentKey: "fa.examples.lecture.step1",
+    },
+    {
+      titleKey: "fa.examples.lecture.step2Title",
+      contentKey: "fa.examples.lecture.step2",
+    },
+  ],
+};
+
 /** All predefined examples */
 export const faExamples: FAExample[] = [
+  exampleLecture,
   exampleEndsWith01,
   exampleEvenOnes,
   exampleContainsAba,

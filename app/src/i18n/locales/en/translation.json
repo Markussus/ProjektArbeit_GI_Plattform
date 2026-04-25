@@ -697,6 +697,14 @@
         "step3": "Three states represent the three possible remainders: s0 (remainder 0 — accept state), s1 (remainder 1), s2 (remainder 2). The start state is s0 because we start with value 0, which has remainder 0.",
         "step4Title": "4. Derive the transitions",
         "step4": "For each state (remainder r) and input bit b: new remainder = (2r + b) mod 3. For example: from s1 reading '0': (2×1+0) mod 3 = 2 → go to s2. From s1 reading '1': (2×1+1) mod 3 = 0 → go to s0. This mathematical derivation gives us a complete, correct transition table."
+      },
+      "lecture": {
+        "title": "Lecture Example",
+        "description": "A DFA from the lecture exercise that accepts one or more '0's followed by exactly one '1' (Regex: 0+1).",
+        "step1Title": "1. Define the goal",
+        "step1": "The automaton requires at least one '0', followed by exactly one '1', and then nothing else. It rejects empty strings, strings starting with '1', or strings with more than one '1'.",
+        "step2Title": "2. Design the states",
+        "step2": "s0 is the start state. Reading '0' moves to s1 (we have our 0s). From s1, reading '1' moves to s2 (the accept state). Any other input leads to s3, which is a \"sink\" or \"trap\" state because the string is invalid."
       }
     },
     "batch": {

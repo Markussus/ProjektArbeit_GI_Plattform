@@ -163,8 +163,9 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
         <textarea
           value={productionText}
           onChange={(e) => setProductionText(e.target.value)}
-          className={`${inputClass} min-h-[120px] font-mono`}
+          className={`${inputClass} min-h-[160px] font-mono`}
           placeholder={"S → aA\nA → bB\nB → a"}
+          rows={7}
         />
       </div>
 
