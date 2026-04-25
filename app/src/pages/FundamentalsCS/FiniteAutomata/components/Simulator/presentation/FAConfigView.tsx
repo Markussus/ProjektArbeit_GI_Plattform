@@ -95,7 +95,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
             value={editor.draft.states.join(", ")}
             onChange={(e) => editor.setStates(e.target.value)}
             className={inputClass}
-            placeholder="q0, q1, q2"
+            placeholder="s0, s1, s2"
           />
         </div>
 

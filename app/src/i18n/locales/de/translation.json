@@ -642,9 +642,9 @@
         "step1Title": "1. Ziel definieren",
         "step1": "Wir wollen genau die Binärstrings akzeptieren, die mit \"01\" enden. Der Automat muss sich merken, ob die letzten zwei gelesenen Symbole \"0\" gefolgt von \"1\" waren.",
         "step2Title": "2. Zustände entwerfen",
-        "step2": "Wir brauchen drei Zustände: q0 (Start — noch kein Anfang von \"01\" gesehen), q1 (gerade eine \"0\" gelesen — könnte der erste Teil von \"01\" sein), und q2 (gerade \"01\" gelesen — Akzeptanzzustand).",
+        "step2": "Wir brauchen drei Zustände: s0 (Start — noch kein Anfang von \"01\" gesehen), s1 (gerade eine \"0\" gelesen — könnte der erste Teil von \"01\" sein), und s2 (gerade \"01\" gelesen — Akzeptanzzustand).",
         "step3Title": "3. Übergänge aufbauen",
-        "step3": "Von q0: \"0\" lesen geht zu q1 (möglicher Start von \"01\"), \"1\" lesen bleibt in q0. Von q1: \"1\" lesen geht zu q2 (\"01\" gefunden!), \"0\" lesen bleibt in q1. Von q2: \"0\" lesen geht zu q1, \"1\" lesen geht zurück zu q0.",
+        "step3": "Von s0: \"0\" lesen geht zu s1 (möglicher Start von \"01\"), \"1\" lesen bleibt in s0. Von s1: \"1\" lesen geht zu s2 (\"01\" gefunden!), \"0\" lesen bleibt in s1. Von s2: \"0\" lesen geht zu s1, \"1\" lesen geht zurück zu s0.",
         "step4Title": "4. Warum es funktioniert",
         "step4": "Der Automat verfolgt immer, wie viel des Musters \"01\" bisher übereinstimmt. Egal wie lang der String ist, er braucht nur 3 Zustände, weil er sich nur um die letzten zwei Zeichen kümmert."
       },
@@ -664,9 +664,9 @@
         "step1Title": "1. Ziel definieren",
         "step1": "Wir wollen jeden String akzeptieren, der irgendwo \"aba\" enthält. Vor und nach dem Muster ist jede Kombination von 'a' und 'b' erlaubt.",
         "step2Title": "2. Warum ein NFA?",
-        "step2": "Ein NFA ist hier natürlich, weil wir nicht wissen, wann \"aba\" beginnt. Der NFA kann nichtdeterministisch \"raten\" — in q0, wenn er 'a' liest, bleibt er sowohl in q0 als auch geht er zu q1.",
+        "step2": "Ein NFA ist hier natürlich, weil wir nicht wissen, wann \"aba\" beginnt. Der NFA kann nichtdeterministisch \"raten\" — in s0, wenn er 'a' liest, bleibt er sowohl in s0 als auch geht er zu s1.",
         "step3Title": "3. Zustände entwerfen",
-        "step3": "Vier Zustände: q0 (kein Match begonnen), q1 (\"a\" gematcht), q2 (\"ab\" gematcht), q3 (\"aba\" gematcht — Akzeptanzzustand, bleibt hier für immer).",
+        "step3": "Vier Zustände: s0 (kein Match begonnen), s1 (\"a\" gematcht), s2 (\"ab\" gematcht), s3 (\"aba\" gematcht — Akzeptanzzustand, bleibt hier für immer).",
         "step4Title": "4. Wie Nichtdeterminismus hilft",
         "step4": "Bei einem DFA müssten wir sorgfältig partielle Übereinstimmungen verfolgen. Mit dem NFA probieren wir einfach \"alle Möglichkeiten\" gleichzeitig aus."
       },
@@ -690,9 +690,9 @@
         "step2Title": "2. Die Schlüsselidee",
         "step2": "Beim Lesen einer Binärzahl von links nach rechts verdoppelt jedes neue Bit den aktuellen Wert und addiert das neue Bit. Wir müssen nur V mod 3 verfolgen, das nur 3 mögliche Werte hat: 0, 1, oder 2.",
         "step3Title": "3. Zustände aufbauen",
-        "step3": "Drei Zustände repräsentieren die drei möglichen Reste: r0 (Rest 0 — Akzeptanzzustand), r1 (Rest 1), r2 (Rest 2). Startzustand ist r0.",
+        "step3": "Drei Zustände repräsentieren die drei möglichen Reste: s0 (Rest 0 — Akzeptanzzustand), s1 (Rest 1), s2 (Rest 2). Startzustand ist s0.",
         "step4Title": "4. Übergänge herleiten",
-        "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von r1 mit '0': (2×1+0) mod 3 = 2 → gehe zu r2."
+        "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
       }
     },
     "batch": {

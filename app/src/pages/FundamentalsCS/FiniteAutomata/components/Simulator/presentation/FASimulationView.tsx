@@ -123,7 +123,7 @@ export function FASimulationView({
         </div>
 
         {/* Right: Batch Tester — stretches to match the diagram height */}
-        <div className="flex w-full min-h-0 lg:w-1/4">
+        <div className="flex min-h-0 w-full lg:w-1/4">
           <FABatchTester
             program={program}
             defaultWordLen={runtime.inputWord.length}

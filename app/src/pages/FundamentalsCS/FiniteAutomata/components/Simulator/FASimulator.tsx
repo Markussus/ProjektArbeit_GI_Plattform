@@ -177,13 +177,19 @@ export function FASimulator() {
             )}
 
             {editorMode === "grammar" && (
-              <div key="grammar" className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm">
+              <div
+                key="grammar"
+                className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm"
+              >
                 <FAGrammarInput onConvert={handleGrammarConvert} />
               </div>
             )}
 
             {editorMode === "generator" && (
-              <div key="generator" className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm">
+              <div
+                key="generator"
+                className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm"
+              >
                 <FAGeneratorInput onConvert={handleGeneratorConvert} />
               </div>
             )}

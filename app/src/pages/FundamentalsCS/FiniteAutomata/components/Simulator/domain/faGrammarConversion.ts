@@ -11,7 +11,7 @@ import type { FAProgram, RegularGrammar, FATransitionMap } from "./faTypes";
  * - Start symbol → start state
  */
 export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
-  const FINAL_STATE = "qF";
+  const FINAL_STATE = "sF";
 
   const states = [...grammar.nonTerminals];
   if (!states.includes(FINAL_STATE)) {

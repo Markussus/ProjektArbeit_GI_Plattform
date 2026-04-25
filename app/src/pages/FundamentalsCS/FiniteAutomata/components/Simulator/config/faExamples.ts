@@ -29,15 +29,15 @@ export const exampleEndsWith01: FAExample = {
   type: "DFA",
   program: {
     type: "DFA",
-    states: ["q0", "q1", "q2"],
+    states: ["s0", "s1", "s2"],
     alphabet: ["0", "1"],
     transitions: {
-      q0: { "0": ["q1"], "1": ["q0"] },
-      q1: { "0": ["q1"], "1": ["q2"] },
-      q2: { "0": ["q1"], "1": ["q0"] },
+      s0: { "0": ["s1"], "1": ["s0"] },
+      s1: { "0": ["s1"], "1": ["s2"] },
+      s2: { "0": ["s1"], "1": ["s0"] },
     },
-    startState: "q0",
-    acceptStates: ["q2"],
+    startState: "s0",
+    acceptStates: ["s2"],
   },
   inputWord: "1001",
   steps: [
@@ -102,16 +102,16 @@ export const exampleContainsAba: FAExample = {
   type: "NFA",
   program: {
     type: "NFA",
-    states: ["q0", "q1", "q2", "q3"],
+    states: ["s0", "s1", "s2", "s3"],
     alphabet: ["a", "b"],
     transitions: {
-      q0: { a: ["q0", "q1"], b: ["q0"] },
-      q1: { b: ["q2"] },
-      q2: { a: ["q3"] },
-      q3: { a: ["q3"], b: ["q3"] },
+      s0: { a: ["s0", "s1"], b: ["s0"] },
+      s1: { b: ["s2"] },
+      s2: { a: ["s3"] },
+      s3: { a: ["s3"], b: ["s3"] },
     },
-    startState: "q0",
-    acceptStates: ["q3"],
+    startState: "s0",
+    acceptStates: ["s3"],
   },
   inputWord: "baba",
   steps: [
@@ -134,45 +134,6 @@ export const exampleContainsAba: FAExample = {
   ],
 };
 
-// ─── 4. NFA with ε-transitions ──────────────────────────────────────────────
-export const exampleEpsilonNFA: FAExample = {
-  id: "epsilon-nfa",
-  titleKey: "fa.examples.epsilonNfa.title",
-  descriptionKey: "fa.examples.epsilonNfa.description",
-  type: "NFA",
-  program: {
-    type: "NFA",
-    states: ["q0", "q1", "q2", "q3"],
-    alphabet: ["a", "b"],
-    transitions: {
-      q0: { ε: ["q1"], a: ["q0"] },
-      q1: { b: ["q2"] },
-      q2: { ε: ["q3"] },
-      q3: { a: ["q3"], b: ["q3"] },
-    },
-    startState: "q0",
-    acceptStates: ["q3"],
-  },
-  inputWord: "aba",
-  steps: [
-    {
-      titleKey: "fa.examples.epsilonNfa.step1Title",
-      contentKey: "fa.examples.epsilonNfa.step1",
-    },
-    {
-      titleKey: "fa.examples.epsilonNfa.step2Title",
-      contentKey: "fa.examples.epsilonNfa.step2",
-    },
-    {
-      titleKey: "fa.examples.epsilonNfa.step3Title",
-      contentKey: "fa.examples.epsilonNfa.step3",
-    },
-    {
-      titleKey: "fa.examples.epsilonNfa.step4Title",
-      contentKey: "fa.examples.epsilonNfa.step4",
-    },
-  ],
-};
 
 // ─── 5. DFA: Divisible by 3 (binary) ────────────────────────────────────────
 export const exampleDivisibleBy3: FAExample = {
@@ -182,15 +143,15 @@ export const exampleDivisibleBy3: FAExample = {
   type: "DFA",
   program: {
     type: "DFA",
-    states: ["r0", "r1", "r2"],
+    states: ["s0", "s1", "s2"],
     alphabet: ["0", "1"],
     transitions: {
-      r0: { "0": ["r0"], "1": ["r1"] },
-      r1: { "0": ["r2"], "1": ["r0"] },
-      r2: { "0": ["r1"], "1": ["r2"] },
+      s0: { "0": ["s0"], "1": ["s1"] },
+      s1: { "0": ["s2"], "1": ["s0"] },
+      s2: { "0": ["s1"], "1": ["s2"] },
     },
-    startState: "r0",
-    acceptStates: ["r0"],
+    startState: "s0",
+    acceptStates: ["s0"],
   },
   inputWord: "110",
   steps: [
@@ -218,7 +179,6 @@ export const faExamples: FAExample[] = [
   exampleEndsWith01,
   exampleEvenOnes,
   exampleContainsAba,
-  exampleEpsilonNFA,
   exampleDivisibleBy3,
 ];
 

@@ -151,7 +151,7 @@ class ThompsonBuilder {
   private alphabet = new Set<string>();
 
   private newState(): string {
-    const name = `q${this.counter++}`;
+    const name = `s${this.counter++}`;
     this.transitions[name] = {};
     return name;
   }
@@ -276,10 +276,10 @@ function nfaToDfa(nfa: NFABuild): FAProgram {
 
   const startSet = epsilonClosure([nfa.startState]);
   const byKey = new Map<string, { set: Set<string>; name: string }>();
-  byKey.set(keyOf(startSet), { set: startSet, name: "q0" });
+  byKey.set(keyOf(startSet), { set: startSet, name: "s0" });
 
   const queue = [keyOf(startSet)];
-  const transitions: FATransitionMap = { q0: {} };
+  const transitions: FATransitionMap = { s0: {} };
   let counter = 1;
 
   while (queue.length > 0) {
@@ -291,7 +291,7 @@ function nfaToDfa(nfa: NFABuild): FAProgram {
       const nk = keyOf(next);
       let nextEntry = byKey.get(nk);
       if (!nextEntry) {
-        nextEntry = { set: next, name: `q${counter++}` };
+        nextEntry = { set: next, name: `s${counter++}` };
         byKey.set(nk, nextEntry);
         transitions[nextEntry.name] = {};
         queue.push(nk);
@@ -314,7 +314,7 @@ function nfaToDfa(nfa: NFABuild): FAProgram {
     states,
     alphabet: nfa.alphabet,
     transitions,
-    startState: "q0",
+    startState: "s0",
     acceptStates,
   };
 }
@@ -346,13 +346,13 @@ function moduloDfa(
   }
 
   const base = alphabet.length;
-  const states = Array.from({ length: divisor }, (_, i) => `r${i}`);
+  const states = Array.from({ length: divisor }, (_, i) => `s${i}`);
   const transitions: FATransitionMap = {};
   for (let i = 0; i < divisor; i++) {
-    transitions[`r${i}`] = {};
+    transitions[`s${i}`] = {};
     for (let v = 0; v < base; v++) {
       const next = (i * base + v) % divisor;
-      transitions[`r${i}`][alphabet[v]] = [`r${next}`];
+      transitions[`s${i}`][alphabet[v]] = [`s${next}`];
     }
   }
 
@@ -361,8 +361,8 @@ function moduloDfa(
     states,
     alphabet,
     transitions,
-    startState: "r0",
-    acceptStates: [`r${remainder}`],
+    startState: "s0",
+    acceptStates: [`s${remainder}`],
   };
 }
 
@@ -376,16 +376,19 @@ export type GeneratorSpec =
       pattern: string;
       /** "dfa" (default, subset-constructed) or "nfa" (Thompson output) */
       output: "dfa" | "nfa";
+      inputWord?: string;
     }
   | {
       type: "modulo";
       alphabet: string[];
       divisor: number;
       remainder: number;
+      inputWord?: string;
     }
   | {
       type: "grammar";
       grammar: RegularGrammar;
+      inputWord?: string;
     };
 
 /**
@@ -436,6 +439,8 @@ export function parseGeneratorDSL(source: string): GeneratorSpec {
     throw new Error("Missing required field 'type' (regex | modulo | grammar)");
   }
 
+  const inputWord = fields.get("input") ?? fields.get("inputword");
+
   if (type === "regex") {
     const pattern = fields.get("value") ?? fields.get("pattern");
     if (!pattern) throw new Error("regex: missing 'value' (the pattern)");
@@ -443,7 +448,7 @@ export function parseGeneratorDSL(source: string): GeneratorSpec {
     if (outputRaw !== "dfa" && outputRaw !== "nfa") {
       throw new Error("regex: 'output' must be 'dfa' or 'nfa'");
     }
-    return { type: "regex", pattern, output: outputRaw };
+    return { type: "regex", pattern, output: outputRaw, inputWord };
   }
 
   if (type === "modulo") {
@@ -470,7 +475,7 @@ export function parseGeneratorDSL(source: string): GeneratorSpec {
         `modulo: 'remainder' must be an integer in [0, ${divisor - 1}]`,
       );
     }
-    return { type: "modulo", alphabet, divisor, remainder };
+    return { type: "modulo", alphabet, divisor, remainder, inputWord };
   }
 
   if (type === "grammar") {
@@ -489,7 +494,7 @@ export function parseGeneratorDSL(source: string): GeneratorSpec {
     if (errs.length > 0) {
       throw new Error(`grammar: validation failed (${errs.join(", ")})`);
     }
-    return { type: "grammar", grammar };
+    return { type: "grammar", grammar, inputWord };
   }
 
   throw new Error(`Unknown type '${type}'. Supported: regex, modulo, grammar`);
@@ -699,7 +704,7 @@ export function generateWithInfo(spec: GeneratorSpec): {
   description: string;
 } {
   const program = generateAutomaton(spec);
-  const suggestedWord = findShortestAcceptedWord(program);
+  const suggestedWord = spec.inputWord !== undefined ? spec.inputWord : findShortestAcceptedWord(program);
   return { program, suggestedWord, description: describeSpec(spec) };
 }
 

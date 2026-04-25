@@ -646,9 +646,9 @@
         "step1Title": "1. Define the goal",
         "step1": "We want to accept exactly those binary strings that end with \"01\". The automaton must remember whether the last two symbols it read were \"0\" followed by \"1\".",
         "step2Title": "2. Design the states",
-        "step2": "We need three states: q0 (start — haven't seen the start of \"01\" yet), q1 (just read a \"0\" — could be the first part of \"01\"), and q2 (just read \"01\" — accept state).",
+        "step2": "We need three states: s0 (start — haven't seen the start of \"01\" yet), s1 (just read a \"0\" — could be the first part of \"01\"), and s2 (just read \"01\" — accept state).",
         "step3Title": "3. Build the transitions",
-        "step3": "From q0: reading \"0\" moves to q1 (potential start of \"01\"), reading \"1\" stays in q0. From q1: reading \"1\" moves to q2 (we found \"01\"!), reading \"0\" stays in q1 (new potential start). From q2: reading \"0\" moves to q1, reading \"1\" goes back to q0.",
+        "step3": "From s0: reading \"0\" moves to s1 (potential start of \"01\"), reading \"1\" stays in s0. From s1: reading \"1\" moves to s2 (we found \"01\"!), reading \"0\" stays in s1 (new potential start). From s2: reading \"0\" moves to s1, reading \"1\" goes back to s0.",
         "step4Title": "4. Why it works",
         "step4": "The automaton always tracks how much of the pattern \"01\" has been matched so far. No matter how long the string is, it only needs 3 states because it only cares about the last two characters. This is the power of finite automata — they can recognize patterns with constant memory."
       },
@@ -668,9 +668,9 @@
         "step1Title": "1. Define the goal",
         "step1": "We want to accept any string that contains \"aba\" somewhere inside it. Before and after the pattern, any combination of 'a' and 'b' is allowed.",
         "step2Title": "2. Why use an NFA?",
-        "step2": "An NFA is natural here because we don't know when \"aba\" starts. The NFA can \"guess\" nondeterministically — in state q0, when it reads 'a', it both stays in q0 (in case this isn't the start of the pattern) AND moves to q1 (in case it is). If any path leads to acceptance, the string is accepted.",
+        "step2": "An NFA is natural here because we don't know when \"aba\" starts. The NFA can \"guess\" nondeterministically — in state s0, when it reads 'a', it both stays in s0 (in case this isn't the start of the pattern) AND moves to s1 (in case it is). If any path leads to acceptance, the string is accepted.",
         "step3Title": "3. Design the states",
-        "step3": "Four states: q0 (haven't started matching), q1 (matched \"a\"), q2 (matched \"ab\"), q3 (matched \"aba\" — accept state, stays here forever on any input).",
+        "step3": "Four states: s0 (haven't started matching), s1 (matched \"a\"), s2 (matched \"ab\"), s3 (matched \"aba\" — accept state, stays here forever on any input).",
         "step4Title": "4. How nondeterminism helps",
         "step4": "In a DFA, we'd need to carefully track partial matches and overlaps. With the NFA, we simply \"try all possibilities\" at once. The simulator tracks all active states in parallel, showing how the NFA explores multiple paths simultaneously."
       },
@@ -694,9 +694,9 @@
         "step2Title": "2. The key insight",
         "step2": "When reading a binary number left-to-right, each new bit doubles the current value and adds the new bit. So if the current value is V and we read bit b, the new value is 2V + b. We only care about V mod 3, which has just 3 possible values: 0, 1, or 2.",
         "step3Title": "3. Build the states",
-        "step3": "Three states represent the three possible remainders: r0 (remainder 0 — accept state), r1 (remainder 1), r2 (remainder 2). The start state is r0 because we start with value 0, which has remainder 0.",
+        "step3": "Three states represent the three possible remainders: s0 (remainder 0 — accept state), s1 (remainder 1), s2 (remainder 2). The start state is s0 because we start with value 0, which has remainder 0.",
         "step4Title": "4. Derive the transitions",
-        "step4": "For each state (remainder r) and input bit b: new remainder = (2r + b) mod 3. For example: from r1 reading '0': (2×1+0) mod 3 = 2 → go to r2. From r1 reading '1': (2×1+1) mod 3 = 0 → go to r0. This mathematical derivation gives us a complete, correct transition table."
+        "step4": "For each state (remainder r) and input bit b: new remainder = (2r + b) mod 3. For example: from s1 reading '0': (2×1+0) mod 3 = 2 → go to s2. From s1 reading '1': (2×1+1) mod 3 = 0 → go to s0. This mathematical derivation gives us a complete, correct transition table."
       }
     },
     "batch": {

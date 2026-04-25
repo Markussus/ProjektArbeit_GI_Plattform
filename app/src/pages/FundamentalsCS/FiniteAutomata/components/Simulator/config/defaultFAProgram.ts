@@ -2,28 +2,28 @@ import type { FAProgram } from "../domain/faTypes";
 
 export const defaultDFAProgram: FAProgram = {
   type: "DFA",
-  states: ["q0", "q1", "q2"],
+  states: ["s0", "s1", "s2"],
   alphabet: ["a", "b"],
   transitions: {
-    q0: { a: ["q1"], b: ["q0"] },
-    q1: { a: ["q1"], b: ["q2"] },
-    q2: { a: ["q1"], b: ["q0"] },
+    s0: { a: ["s1"], b: ["s0"] },
+    s1: { a: ["s1"], b: ["s2"] },
+    s2: { a: ["s1"], b: ["s0"] },
   },
-  startState: "q0",
-  acceptStates: ["q2"],
+  startState: "s0",
+  acceptStates: ["s2"],
 };
 
 export const defaultNFAProgram: FAProgram = {
   type: "NFA",
-  states: ["q0", "q1", "q2"],
+  states: ["s0", "s1", "s2"],
   alphabet: ["a", "b"],
   transitions: {
-    q0: { a: ["q0", "q1"], b: ["q0"] },
-    q1: { b: ["q2"] },
-    q2: {},
+    s0: { a: ["s0", "s1"], b: ["s0"] },
+    s1: { b: ["s2"] },
+    s2: {},
   },
-  startState: "q0",
-  acceptStates: ["q2"],
+  startState: "s0",
+  acceptStates: ["s2"],
 };
 
 export const defaultInputWord = "aab";

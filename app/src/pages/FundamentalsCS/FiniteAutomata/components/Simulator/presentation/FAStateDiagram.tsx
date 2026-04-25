@@ -43,7 +43,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
   return (
     <div
-      className="fa-card overflow-hidden flex flex-col h-full"
+      className="fa-card flex h-full flex-col overflow-hidden"
       style={{ background: "var(--fa-surface)" }}
     >
       <div

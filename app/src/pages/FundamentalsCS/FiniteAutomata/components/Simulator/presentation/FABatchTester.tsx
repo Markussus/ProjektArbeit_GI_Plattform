@@ -36,7 +36,11 @@ interface FABatchTesterProps {
  * Stretches to match the state diagram height. Results scroll inside the
  * panel so the transition table is never pushed down.
  */
-export function FABatchTester({ program, defaultWordLen, onSelectWord }: FABatchTesterProps) {
+export function FABatchTester({
+  program,
+  defaultWordLen,
+  onSelectWord,
+}: FABatchTesterProps) {
   const { t } = useTranslation();
   const [rawInput, setRawInput] = useState("");
   const [results, setResults] = useState<FABatchResult[] | null>(null);
@@ -79,15 +83,26 @@ export function FABatchTester({ program, defaultWordLen, onSelectWord }: FABatch
       style={{ height: "100%", minHeight: 0, minWidth: "300px" }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center justify-between gap-2">
         <span className="fa-label">{t("fa.batch.title", "Batch Testing")}</span>
         {defaultWordLen !== undefined && program.alphabet.length > 0 && (
           <button
             type="button"
             className="fa-btn"
             onClick={handleAutoFill}
-            title={t("fa.batch.autoFillTooltip", "Generate all words of length {{n}}", { n: defaultWordLen })}
-            style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.75rem", padding: "0.2rem 0.5rem", whiteSpace: "nowrap" }}
+            title={t(
+              "fa.batch.autoFillTooltip",
+              "Generate all words of length {{n}}",
+              { n: defaultWordLen },
+            )}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: "0.75rem",
+              padding: "0.2rem 0.5rem",
+              whiteSpace: "nowrap",
+            }}
           >
             <Wand2 style={{ width: 12, height: 12 }} />
             {t("fa.batch.autoFill", "Auto-fill")}
@@ -110,17 +125,22 @@ export function FABatchTester({ program, defaultWordLen, onSelectWord }: FABatch
         />
       ) : (
         /* Scrollable results area — takes all remaining space */
-        <div className="flex flex-col gap-2" style={{ flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+        <div
+          className="flex flex-col gap-2"
+          style={{ flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}
+        >
           {/* Summary bar */}
           {summary && (
             <div
-              className="flex items-center gap-3 flex-shrink-0"
+              className="flex flex-shrink-0 items-center gap-3"
               style={{ fontSize: "0.75rem", fontWeight: 600 }}
             >
               <span style={{ color: "var(--fa-green)" }}>
                 ✅ {summary.accepted}
               </span>
-              <span style={{ color: "var(--fa-red)" }}>❌ {summary.rejected}</span>
+              <span style={{ color: "var(--fa-red)" }}>
+                ❌ {summary.rejected}
+              </span>
               <span style={{ color: "var(--fa-text-dim)" }}>
                 / {summary.total} {t("fa.batch.total", "total")}
               </span>
@@ -137,7 +157,7 @@ export function FABatchTester({ program, defaultWordLen, onSelectWord }: FABatch
                 key={i}
                 type="button"
                 onClick={() => onSelectWord?.(r.inputWord)}
-                className="flex items-center justify-between rounded-md px-3 py-1.5 text-left transition-colors flex-shrink-0"
+                className="flex flex-shrink-0 items-center justify-between rounded-md px-3 py-1.5 text-left transition-colors"
                 style={{
                   background: "var(--fa-surface)",
                   border: "1px solid var(--fa-border-subtle)",
@@ -184,27 +204,56 @@ export function FABatchTester({ program, defaultWordLen, onSelectWord }: FABatch
       )}
 
       {/* Action buttons — always at bottom */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center gap-1.5">
         <button
           type="button"
           className="fa-btn fa-btn-primary"
           onClick={handleRun}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, whiteSpace: "nowrap", flex: "1 1 0%", paddingInline: "0.4rem", overflow: "hidden" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            whiteSpace: "nowrap",
+            flex: "1 1 0%",
+            paddingInline: "0.4rem",
+            overflow: "hidden",
+          }}
           title={t("fa.batch.runAll", "Run All")}
         >
-          <Play style={{ width: 14, height: 14, fill: "currentcolor", flexShrink: 0 }} />
-          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{t("fa.batch.runAll", "Run All")}</span>
+          <Play
+            style={{
+              width: 14,
+              height: 14,
+              fill: "currentcolor",
+              flexShrink: 0,
+            }}
+          />
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            {t("fa.batch.runAll", "Run All")}
+          </span>
         </button>
         {results && (
           <button
             type="button"
             className="fa-btn"
             onClick={handleClear}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, whiteSpace: "nowrap", flex: "1 1 0%", paddingInline: "0.4rem", overflow: "hidden" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+              whiteSpace: "nowrap",
+              flex: "1 1 0%",
+              paddingInline: "0.4rem",
+              overflow: "hidden",
+            }}
             title={t("fa.batch.clear", "Clear")}
           >
             <RotateCcw style={{ width: 14, height: 14, flexShrink: 0 }} />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{t("fa.batch.clear", "Clear")}</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+              {t("fa.batch.clear", "Clear")}
+            </span>
           </button>
         )}
       </div>

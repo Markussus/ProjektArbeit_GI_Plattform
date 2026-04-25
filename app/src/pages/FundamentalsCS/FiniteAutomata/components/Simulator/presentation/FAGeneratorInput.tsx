@@ -33,7 +33,7 @@ const MODE_CARDS: ModeCard[] = [
     titleFallback: "Regex",
     blurbKey: "fa.generator.mode.regex.blurb",
     blurbFallback: "Describe strings with a pattern.",
-    example: ["type: regex", "value: (0|1)*00", "output: dfa"].join("\n"),
+    example: ["type: regex", "value: (0|1)*00", "output: dfa", "input: 10100"].join("\n"),
   },
   {
     id: "modulo",
@@ -47,6 +47,7 @@ const MODE_CARDS: ModeCard[] = [
       "alphabet: {0,1}",
       "divisor: 4",
       "remainder: 0",
+      "input: 1100",
     ].join("\n"),
   },
   {
@@ -61,6 +62,7 @@ const MODE_CARDS: ModeCard[] = [
       "productions:",
       "S -> 0S | 1A",
       "A -> 0A | 1",
+      "input: 010",
     ].join("\n"),
   },
 ];
@@ -75,7 +77,7 @@ const QUICK_EXAMPLES: QuickExample[] = [
   {
     labelKey: "fa.generator.quick.endsWith00",
     labelFallback: 'Strings ending with "00"',
-    body: ["type: regex", "value: (0|1)*00", "output: dfa"].join("\n"),
+    body: ["type: regex", "value: (0|1)*00", "output: dfa", "input: 1100"].join("\n"),
   },
   {
     labelKey: "fa.generator.quick.divBy3",
@@ -85,6 +87,7 @@ const QUICK_EXAMPLES: QuickExample[] = [
       "alphabet: {0,1}",
       "divisor: 3",
       "remainder: 0",
+      "input: 110",
     ].join("\n"),
   },
   {
@@ -95,17 +98,13 @@ const QUICK_EXAMPLES: QuickExample[] = [
       "alphabet: {0,1}",
       "divisor: 4",
       "remainder: 0",
+      "input: 100",
     ].join("\n"),
   },
   {
     labelKey: "fa.generator.quick.containsAB",
     labelFallback: 'Strings containing "ab"',
-    body: ["type: regex", "value: (a|b)*ab(a|b)*", "output: dfa"].join("\n"),
-  },
-  {
-    labelKey: "fa.generator.quick.oneOrMoreA",
-    labelFallback: "One or more a's",
-    body: ["type: regex", "value: a+", "output: nfa"].join("\n"),
+    body: ["type: regex", "value: (a|b)*ab(a|b)*", "output: dfa", "input: baba"].join("\n"),
   },
 ];
 
@@ -232,7 +231,7 @@ export function FAGeneratorInput({ onConvert }: FAGeneratorInputProps) {
             <button
               type="button"
               onClick={() => loadExample(card.example)}
-              className="bg-primary/10 text-primary hover:bg-primary/20 self-start rounded-md px-3 py-1 text-xs font-semibold"
+              className="bg-primary/10 text-primary hover:bg-primary/20 mt-auto self-start rounded-md px-3 py-1 text-xs font-semibold"
             >
               {t("fa.generator.tryThis", "Try this")}
             </button>
@@ -293,11 +292,13 @@ export function FAGeneratorInput({ onConvert }: FAGeneratorInputProps) {
             {`type: regex
   value:   regular expression         # supports ( ) | * + ? \\ ε
   output:  dfa | nfa                  # default: dfa
+  input:   test string                # optional: word to test in simulator
 
 type: modulo
   alphabet:  {0,1}                    # digit symbols, low to high
   divisor:   positive integer
   remainder: integer in [0, divisor)  # default: 0
+  input:     test string              # optional: word to test in simulator
 
 type: grammar
   productions:                        # right-linear only
