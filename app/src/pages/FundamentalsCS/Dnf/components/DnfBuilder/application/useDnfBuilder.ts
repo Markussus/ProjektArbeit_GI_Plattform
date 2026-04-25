@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
 import { DEFAULT_DNF_SOURCE, getDnfExerciseSource } from "../../../exercises";
+import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
 import type { DnfDerivation } from "../domain/dnfDerivation";
 import {
   deriveDnfFromTruthTable,
@@ -82,9 +83,13 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
     resetExercise();
   };
 
+  const updateSource = (value: string) => {
+    setSource(normalizeBooleanOperatorAliases(value));
+  };
+
   return {
     source,
-    setSource,
+    setSource: updateSource,
     analysis,
     examples: dnfExamples,
     isExerciseMode,

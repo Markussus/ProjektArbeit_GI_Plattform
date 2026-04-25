@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Lightbulb, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { DnfExample, DnfExampleId } from "../application/useDnfBuilder";
+import { formatBooleanInput } from "../domain/booleanSyntax";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 
 interface DnfInputPanelProps {
@@ -73,6 +74,9 @@ export function DnfInputPanel({
         id="dnf-expression-input"
         value={source}
         onChange={(event) => onSourceChange(event.target.value)}
+        onBlur={(event) =>
+          onSourceChange(formatBooleanInput(event.target.value))
+        }
         readOnly={isExerciseMode}
         spellCheck="false"
         className="border-border bg-card text-foreground focus:ring-ring mt-3 min-h-28 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed read-only:cursor-default read-only:opacity-80 focus:ring-2 focus:outline-none"

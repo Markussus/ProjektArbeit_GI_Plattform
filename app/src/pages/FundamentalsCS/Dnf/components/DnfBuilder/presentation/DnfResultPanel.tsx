@@ -1,11 +1,13 @@
 import { CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatDnfTerm, type DnfDerivation } from "../domain/dnfDerivation";
 
 interface DnfResultPanelProps {
   formattedDnf: string;
   variableCount: number;
   rowCount: number;
   trueRowCount: number;
+  derivation?: DnfDerivation;
 }
 
 export function DnfResultPanel({
@@ -13,8 +15,13 @@ export function DnfResultPanel({
   variableCount,
   rowCount,
   trueRowCount,
+  derivation,
 }: DnfResultPanelProps) {
   const { t } = useTranslation();
+  const terms =
+    derivation?.dnf.type === "terms"
+      ? derivation.dnf.terms.map(formatDnfTerm)
+      : null;
   const stats = [
     { label: t("dnf.builder.variables"), value: variableCount },
     { label: t("dnf.builder.rows"), value: rowCount },
@@ -37,9 +44,31 @@ export function DnfResultPanel({
         </div>
       </div>
 
-      <code className="border-border bg-card text-foreground mt-4 block rounded-md border p-3 font-mono text-sm leading-relaxed break-words">
-        {formattedDnf}
-      </code>
+      {terms && terms.length > 1 ? (
+        <div className="border-border bg-card mt-4 rounded-md border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {terms.map((term, index) => (
+              <span
+                key={`${term}-${index}`}
+                className="inline-flex items-center gap-2"
+              >
+                <span className="border-border bg-background rounded-md border px-2.5 py-1 font-mono text-sm">
+                  {term}
+                </span>
+                {index < terms.length - 1 && (
+                  <span className="text-muted-foreground font-mono text-sm">
+                    ∨
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <code className="border-border bg-card text-foreground mt-4 block rounded-md border p-3 font-mono text-sm leading-relaxed break-words">
+          {formattedDnf}
+        </code>
+      )}
 
       <div className="border-border text-muted-foreground mt-4 border-l-2 py-1 pl-3 text-xs leading-relaxed">
         {t("dnf.builder.resultRuleHint")}

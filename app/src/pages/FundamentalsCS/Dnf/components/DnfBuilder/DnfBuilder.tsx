@@ -66,8 +66,12 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
                   variableCount={builder.analysis.truthTable.variables.length}
                   rowCount={builder.analysis.truthTable.rows.length}
                   trueRowCount={builder.analysis.derivation.trueRows.length}
+                  derivation={builder.analysis.derivation}
                 />
-                <DnfDerivationSteps derivation={builder.analysis.derivation} />
+                <DnfDerivationSteps
+                  derivation={builder.analysis.derivation}
+                  truthTable={builder.analysis.truthTable}
+                />
                 <DnfTruthTableView display={display} />
               </>
             )}
@@ -97,6 +101,7 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
             variableCount={builder.analysis.truthTable.variables.length}
             rowCount={builder.analysis.truthTable.rows.length}
             trueRowCount={builder.analysis.derivation.trueRows.length}
+            derivation={builder.analysis.derivation}
           />
         ) : (
           <ParseErrorPanel issue={builder.analysis.issue} />
@@ -112,7 +117,10 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
               rowCount={builder.analysis.truthTable.rows.length}
             />
           )}
-          <DnfDerivationSteps derivation={builder.analysis.derivation} />
+          <DnfDerivationSteps
+            derivation={builder.analysis.derivation}
+            truthTable={builder.analysis.truthTable}
+          />
           <DnfTruthTableView display={display} />
         </>
       )}

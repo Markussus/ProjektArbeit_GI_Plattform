@@ -4,6 +4,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
+import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
 import type { TruthTable } from "../domain/truthTable";
 
 type DnfExerciseAnalysis =
@@ -50,7 +51,7 @@ export function useDnfExercise({
   };
 
   const updateDnfAnswer = (value: string) => {
-    setDnfAnswer(value);
+    setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setExerciseFeedback(null);
     setShowSolution(false);
   };

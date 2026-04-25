@@ -32,12 +32,15 @@ export interface DnfAnswerCheck {
   status: DnfAnswerStatus;
   issue?: DnfParseIssue;
   mismatchRows: DnfAnswerMismatch[];
+  missingTermRows: number[];
+  extraTermRows: number[];
 }
 
 export interface DnfExerciseCheckResult {
   truthTableIssues: TruthTableAnswerIssue[];
   unansweredRowCount: number;
   incorrectRowCount: number;
+  correctRowCount: number;
   dnf: DnfAnswerCheck;
   isCorrect: boolean;
 }
@@ -72,6 +75,7 @@ export function checkDnfExerciseAttempt(
     truthTableIssues,
     unansweredRowCount,
     incorrectRowCount: truthTableIssues.length - unansweredRowCount,
+    correctRowCount: table.rows.length - truthTableIssues.length,
     dnf,
     isCorrect: truthTableIssues.length === 0 && dnf.status === "correct",
   };
@@ -79,7 +83,12 @@ export function checkDnfExerciseAttempt(
 
 function checkDnfAnswer(table: TruthTable, source: string): DnfAnswerCheck {
   if (source.trim() === "") {
-    return { status: "empty", mismatchRows: [] };
+    return {
+      status: "empty",
+      mismatchRows: [],
+      missingTermRows: [],
+      extraTermRows: [],
+    };
   }
 
   const parseResult = parseBooleanExpression(source);
@@ -88,11 +97,20 @@ function checkDnfAnswer(table: TruthTable, source: string): DnfAnswerCheck {
       status: "syntax_error",
       issue: parseResult.issue,
       mismatchRows: [],
+      missingTermRows: [],
+      extraTermRows: [],
     };
   }
 
+  const termRows = getCanonicalTermRows(parseResult.expression, table);
+
   if (isCanonicalDnfForTable(parseResult.expression, table)) {
-    return { status: "correct", mismatchRows: [] };
+    return {
+      status: "correct",
+      mismatchRows: [],
+      missingTermRows: [],
+      extraTermRows: [],
+    };
   }
 
   const mismatchRows = compareExpressionWithTable(
@@ -104,6 +122,9 @@ function checkDnfAnswer(table: TruthTable, source: string): DnfAnswerCheck {
     status:
       mismatchRows.length === 0 ? "equivalent_not_canonical" : "not_equivalent",
     mismatchRows,
+    missingTermRows:
+      termRows === null ? [] : getMissingTermRows(table, termRows),
+    extraTermRows: termRows === null ? [] : getExtraTermRows(table, termRows),
   };
 }
 
@@ -174,6 +195,52 @@ function isCanonicalDnfForTable(
     actualKeys.size === termAssignments.length &&
     actualKeys.size === expectedKeys.size &&
     [...expectedKeys].every((key) => actualKeys.has(key))
+  );
+}
+
+function getCanonicalTermRows(
+  expression: BooleanExpression,
+  table: TruthTable,
+): number[] | null {
+  const rowIndexByKey = new Map(
+    table.rows.map((row, rowIndex) => [
+      getAssignmentKey(table.variables, row.assignment),
+      rowIndex,
+    ]),
+  );
+  const termAssignments = flattenByOperator(expression, "or").map((term) =>
+    extractCanonicalTermAssignment(term, table.variables),
+  );
+
+  if (termAssignments.some((assignment) => assignment === null)) {
+    return null;
+  }
+
+  return termAssignments.map((assignment) => {
+    const key = getAssignmentKey(
+      table.variables,
+      assignment as VariableAssignment,
+    );
+
+    return rowIndexByKey.get(key) ?? -1;
+  });
+}
+
+function getMissingTermRows(table: TruthTable, termRows: number[]): number[] {
+  const actualRows = new Set(termRows);
+
+  return table.rows.flatMap((row, rowIndex) => {
+    if (!row.result || actualRows.has(rowIndex)) {
+      return [];
+    }
+
+    return [rowIndex];
+  });
+}
+
+function getExtraTermRows(table: TruthTable, termRows: number[]): number[] {
+  return [...new Set(termRows)].filter(
+    (rowIndex) => rowIndex < 0 || !table.rows[rowIndex]?.result,
   );
 }
 

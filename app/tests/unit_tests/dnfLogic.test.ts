@@ -11,6 +11,10 @@ import {
   type TruthTable,
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 import type { BooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+import {
+  formatBooleanInput,
+  normalizeBooleanOperatorAliases,
+} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanSyntax";
 
 describe("DNF boolean logic", () => {
   it("parses and evaluates operator precedence", () => {
@@ -80,6 +84,13 @@ describe("DNF boolean logic", () => {
     expect(result.dnf.status).toBe("correct");
   });
 
+  it("normalizes keyboard operator aliases for display", () => {
+    expect(normalizeBooleanOperatorAliases("!a & (b | c)")).toBe(
+      "¬a ∧ (b ∨ c)",
+    );
+    expect(formatBooleanInput(" ! a   &   ( b | c ) ")).toBe("¬a ∧ (b ∨ c)");
+  });
+
   it("distinguishes equivalent expressions from canonical DNF answers", () => {
     const table = generateTruthTable(parse("(a | b) & c"));
     const result = checkDnfExerciseAttempt(
@@ -106,8 +117,10 @@ describe("DNF boolean logic", () => {
     expect(result.truthTableIssues).toEqual([
       { rowIndex: 3, expected: true, actual: false },
     ]);
+    expect(result.correctRowCount).toBe(7);
     expect(result.dnf.status).toBe("not_equivalent");
     expect(result.dnf.mismatchRows.map((row) => row.rowIndex)).toEqual([5, 7]);
+    expect(result.dnf.missingTermRows).toEqual([5, 7]);
   });
 });
 
