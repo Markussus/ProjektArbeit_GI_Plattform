@@ -408,7 +408,7 @@
       "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
       "startState": "Startzustand",
       "haltStates": "Haltezustände",
-      "haltStatesDesc": "Zustände als haltend markieren.",
+      "haltStatesDesc": "Haltezustände festlegen",
       "addHaltState": "Haltezustand hinzufügen",
       "addHaltStatePlaceholder": "Haltezustand hinzufügen",
       "inputAlphabet": "Eingabealphabet",
