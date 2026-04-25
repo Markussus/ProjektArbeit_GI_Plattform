@@ -4,8 +4,12 @@ import {
   deriveDnfFromTruthTable,
   formatDnfExpression,
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfDerivation";
+import { checkDnfExerciseAttempt } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfExerciseCheck";
 import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
-import { generateTruthTable } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+import {
+  generateTruthTable,
+  type TruthTable,
+} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 import type { BooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
 describe("DNF boolean logic", () => {
@@ -63,6 +67,48 @@ describe("DNF boolean logic", () => {
     expect(formatDnfExpression(falseDerivation.dnf)).toBe("0");
     expect(formatDnfExpression(trueDerivation.dnf)).toBe("1");
   });
+
+  it("checks a complete canonical DNF exercise answer", () => {
+    const table = generateTruthTable(parse("(a | b) & c"));
+    const result = checkDnfExerciseAttempt(
+      table,
+      getCorrectTruthTableAnswers(table),
+      "(!a & b & c) | (a & !b & c) | (a & b & c)",
+    );
+
+    expect(result.isCorrect).toBe(true);
+    expect(result.dnf.status).toBe("correct");
+  });
+
+  it("distinguishes equivalent expressions from canonical DNF answers", () => {
+    const table = generateTruthTable(parse("(a | b) & c"));
+    const result = checkDnfExerciseAttempt(
+      table,
+      getCorrectTruthTableAnswers(table),
+      "(a | b) & c",
+    );
+
+    expect(result.isCorrect).toBe(false);
+    expect(result.dnf.status).toBe("equivalent_not_canonical");
+  });
+
+  it("reports wrong truth-table rows and missing DNF terms", () => {
+    const table = generateTruthTable(parse("(a | b) & c"));
+    const truthTableAnswers = getCorrectTruthTableAnswers(table);
+    truthTableAnswers[3] = false;
+
+    const result = checkDnfExerciseAttempt(
+      table,
+      truthTableAnswers,
+      "(!a & b & c)",
+    );
+
+    expect(result.truthTableIssues).toEqual([
+      { rowIndex: 3, expected: true, actual: false },
+    ]);
+    expect(result.dnf.status).toBe("not_equivalent");
+    expect(result.dnf.mismatchRows.map((row) => row.rowIndex)).toEqual([5, 7]);
+  });
 });
 
 function parse(source: string): BooleanExpression {
@@ -73,4 +119,8 @@ function parse(source: string): BooleanExpression {
   }
 
   return result.expression;
+}
+
+function getCorrectTruthTableAnswers(table: TruthTable): boolean[] {
+  return table.rows.map((row) => row.result);
 }

@@ -1,0 +1,241 @@
+import {
+  collectExpressionVariables,
+  type BooleanExpression,
+  type VariableAssignment,
+} from "./booleanExpression";
+import { evaluateBooleanExpression } from "./dnfEvaluator";
+import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
+import type { TruthTable } from "./truthTable";
+
+export type TruthTableAnswer = boolean | null;
+
+export interface TruthTableAnswerIssue {
+  rowIndex: number;
+  expected: boolean;
+  actual: TruthTableAnswer;
+}
+
+export interface DnfAnswerMismatch {
+  rowIndex: number;
+  expected: boolean;
+  actual: boolean;
+}
+
+export type DnfAnswerStatus =
+  | "empty"
+  | "syntax_error"
+  | "correct"
+  | "equivalent_not_canonical"
+  | "not_equivalent";
+
+export interface DnfAnswerCheck {
+  status: DnfAnswerStatus;
+  issue?: DnfParseIssue;
+  mismatchRows: DnfAnswerMismatch[];
+}
+
+export interface DnfExerciseCheckResult {
+  truthTableIssues: TruthTableAnswerIssue[];
+  unansweredRowCount: number;
+  incorrectRowCount: number;
+  dnf: DnfAnswerCheck;
+  isCorrect: boolean;
+}
+
+export function checkDnfExerciseAttempt(
+  table: TruthTable,
+  truthTableAnswers: TruthTableAnswer[],
+  dnfAnswer: string,
+): DnfExerciseCheckResult {
+  const truthTableIssues = table.rows.flatMap((row, rowIndex) => {
+    const actual = truthTableAnswers[rowIndex] ?? null;
+
+    if (actual === row.result) {
+      return [];
+    }
+
+    return [
+      {
+        rowIndex,
+        expected: row.result,
+        actual,
+      },
+    ];
+  });
+
+  const dnf = checkDnfAnswer(table, dnfAnswer);
+  const unansweredRowCount = truthTableIssues.filter(
+    (issue) => issue.actual === null,
+  ).length;
+
+  return {
+    truthTableIssues,
+    unansweredRowCount,
+    incorrectRowCount: truthTableIssues.length - unansweredRowCount,
+    dnf,
+    isCorrect: truthTableIssues.length === 0 && dnf.status === "correct",
+  };
+}
+
+function checkDnfAnswer(table: TruthTable, source: string): DnfAnswerCheck {
+  if (source.trim() === "") {
+    return { status: "empty", mismatchRows: [] };
+  }
+
+  const parseResult = parseBooleanExpression(source);
+  if (!parseResult.ok) {
+    return {
+      status: "syntax_error",
+      issue: parseResult.issue,
+      mismatchRows: [],
+    };
+  }
+
+  if (isCanonicalDnfForTable(parseResult.expression, table)) {
+    return { status: "correct", mismatchRows: [] };
+  }
+
+  const mismatchRows = compareExpressionWithTable(
+    parseResult.expression,
+    table,
+  );
+
+  return {
+    status:
+      mismatchRows.length === 0 ? "equivalent_not_canonical" : "not_equivalent",
+    mismatchRows,
+  };
+}
+
+function compareExpressionWithTable(
+  expression: BooleanExpression,
+  table: TruthTable,
+): DnfAnswerMismatch[] {
+  const tableVariables = new Set(table.variables);
+  const expressionVariables = collectExpressionVariables(expression);
+
+  if (expressionVariables.some((variable) => !tableVariables.has(variable))) {
+    return table.rows.map((row, rowIndex) => ({
+      rowIndex,
+      expected: row.result,
+      actual: false,
+    }));
+  }
+
+  return table.rows.flatMap((row, rowIndex) => {
+    const actual = evaluateBooleanExpression(expression, row.assignment);
+
+    if (actual === row.result) {
+      return [];
+    }
+
+    return [
+      {
+        rowIndex,
+        expected: row.result,
+        actual,
+      },
+    ];
+  });
+}
+
+function isCanonicalDnfForTable(
+  expression: BooleanExpression,
+  table: TruthTable,
+): boolean {
+  const trueRows = table.rows.filter((row) => row.result);
+
+  if (expression.type === "constant") {
+    return table.rows.every((row) => row.result === expression.value);
+  }
+
+  if (trueRows.length === 0 || trueRows.length === table.rows.length) {
+    return false;
+  }
+
+  const expectedKeys = new Set(
+    trueRows.map((row) => getAssignmentKey(table.variables, row.assignment)),
+  );
+  const termAssignments = flattenByOperator(expression, "or").map((term) =>
+    extractCanonicalTermAssignment(term, table.variables),
+  );
+
+  if (termAssignments.some((assignment) => assignment === null)) {
+    return false;
+  }
+
+  const actualKeys = new Set(
+    termAssignments.map((assignment) =>
+      getAssignmentKey(table.variables, assignment as VariableAssignment),
+    ),
+  );
+
+  return (
+    actualKeys.size === termAssignments.length &&
+    actualKeys.size === expectedKeys.size &&
+    [...expectedKeys].every((key) => actualKeys.has(key))
+  );
+}
+
+function extractCanonicalTermAssignment(
+  expression: BooleanExpression,
+  variables: string[],
+): VariableAssignment | null {
+  const variableSet = new Set(variables);
+  const assignment: VariableAssignment = {};
+
+  for (const literal of flattenByOperator(expression, "and")) {
+    const extracted = extractLiteral(literal);
+
+    if (
+      !extracted ||
+      !variableSet.has(extracted.variable) ||
+      assignment[extracted.variable] !== undefined
+    ) {
+      return null;
+    }
+
+    assignment[extracted.variable] = extracted.value;
+  }
+
+  return Object.keys(assignment).length === variables.length
+    ? assignment
+    : null;
+}
+
+function extractLiteral(
+  expression: BooleanExpression,
+): { variable: string; value: boolean } | null {
+  if (expression.type === "variable") {
+    return { variable: expression.name, value: true };
+  }
+
+  if (expression.type === "not" && expression.operand.type === "variable") {
+    return { variable: expression.operand.name, value: false };
+  }
+
+  return null;
+}
+
+function flattenByOperator(
+  expression: BooleanExpression,
+  operator: "and" | "or",
+): BooleanExpression[] {
+  if (expression.type !== "binary" || expression.operator !== operator) {
+    return [expression];
+  }
+
+  return [
+    ...flattenByOperator(expression.left, operator),
+    ...flattenByOperator(expression.right, operator),
+  ];
+}
+
+function getAssignmentKey(
+  variables: string[],
+  assignment: VariableAssignment,
+): string {
+  return variables
+    .map((variable) => (assignment[variable] ? "1" : "0"))
+    .join("");
+}

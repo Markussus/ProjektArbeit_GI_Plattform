@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import type { TFunction } from "i18next";
-import { AlertTriangle, LockKeyhole } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Exercise } from "@/types/exercise";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
 import type { DnfParseIssue, DnfParseIssueCode } from "./domain/dnfParser";
 import { DnfDerivationSteps } from "./presentation/DnfDerivationSteps";
+import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
 import { DnfInputPanel } from "./presentation/DnfInputPanel";
 import { DnfResultPanel } from "./presentation/DnfResultPanel";
 import { DnfTruthTableView } from "./presentation/DnfTruthTableView";
@@ -39,6 +40,45 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
     );
   }, [builder.analysis, shouldShowSolution]);
 
+  if (builder.isExerciseMode) {
+    return (
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        {builder.analysis.status === "valid" ? (
+          <>
+            <DnfExerciseWorkspace
+              source={builder.source}
+              truthTable={builder.analysis.truthTable}
+              truthTableAnswers={builder.truthTableAnswers}
+              dnfAnswer={builder.dnfAnswer}
+              feedback={builder.exerciseFeedback}
+              showSolution={builder.showSolution}
+              onTruthTableAnswerChange={builder.setTruthTableAnswer}
+              onDnfAnswerChange={builder.setDnfAnswer}
+              onCheck={builder.checkExercise}
+              onReset={builder.reset}
+              onToggleSolution={builder.toggleSolution}
+            />
+
+            {shouldShowSolution && display && (
+              <>
+                <DnfResultPanel
+                  formattedDnf={builder.analysis.formattedDnf}
+                  variableCount={builder.analysis.truthTable.variables.length}
+                  rowCount={builder.analysis.truthTable.rows.length}
+                  trueRowCount={builder.analysis.derivation.trueRows.length}
+                />
+                <DnfDerivationSteps derivation={builder.analysis.derivation} />
+                <DnfTruthTableView display={display} />
+              </>
+            )}
+          </>
+        ) : (
+          <ParseErrorPanel issue={builder.analysis.issue} />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
@@ -51,9 +91,7 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
           onReset={builder.reset}
         />
 
-        {!shouldShowSolution ? (
-          <LockedSolutionPanel onShowSolution={builder.revealSolution} />
-        ) : builder.analysis.status === "valid" ? (
+        {builder.analysis.status === "valid" ? (
           <DnfResultPanel
             formattedDnf={builder.analysis.formattedDnf}
             variableCount={builder.analysis.truthTable.variables.length}
@@ -104,37 +142,6 @@ function LargeTruthTableWarning({
         })}
       </p>
     </div>
-  );
-}
-
-function LockedSolutionPanel({
-  onShowSolution,
-}: {
-  onShowSolution: () => void;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <section className="border-border bg-background/40 rounded-lg border p-6">
-      <div className="flex h-full min-h-64 flex-col items-center justify-center gap-4 text-center">
-        <LockKeyhole className="text-muted-foreground size-12 opacity-60" />
-        <div>
-          <h2 className="text-foreground text-lg font-semibold">
-            {t("dnf.builder.lockedTitle")}
-          </h2>
-          <p className="text-muted-foreground mt-2 max-w-md text-sm leading-relaxed">
-            {t("dnf.builder.lockedDesc")}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onShowSolution}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium shadow-sm transition-colors"
-        >
-          {t("dnf.builder.showSolution")}
-        </button>
-      </div>
-    </section>
   );
 }
 

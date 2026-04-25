@@ -6,6 +6,11 @@ import {
   formatDnfExpression,
 } from "../domain/dnfDerivation";
 import {
+  checkDnfExerciseAttempt,
+  type DnfExerciseCheckResult,
+  type TruthTableAnswer,
+} from "../domain/dnfExerciseCheck";
+import {
   parseBooleanExpression,
   type DnfParseIssue,
 } from "../domain/dnfParser";
@@ -53,6 +58,12 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
   const isExerciseMode = selectedExerciseId !== null;
   const [source, setSource] = useState(exerciseSource);
   const [showSolution, setShowSolution] = useState(!isExerciseMode);
+  const [truthTableAnswers, setTruthTableAnswers] = useState<
+    TruthTableAnswer[]
+  >([]);
+  const [dnfAnswer, setDnfAnswer] = useState("");
+  const [exerciseFeedback, setExerciseFeedback] =
+    useState<DnfExerciseCheckResult | null>(null);
 
   const analysis = useMemo<DnfBuilderAnalysis>(() => {
     const parseResult = parseBooleanExpression(source);
@@ -78,9 +89,52 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
   const reset = () => {
     setSource(isExerciseMode ? exerciseSource : DEFAULT_DNF_SOURCE);
     setShowSolution(!isExerciseMode);
+    setTruthTableAnswers([]);
+    setDnfAnswer("");
+    setExerciseFeedback(null);
   };
 
-  const loadExample = (expression: string) => setSource(expression);
+  const loadExample = (expression: string) => {
+    setSource(expression);
+    setExerciseFeedback(null);
+  };
+
+  const setTruthTableAnswer = (rowIndex: number, value: boolean) => {
+    setTruthTableAnswers((currentAnswers) => {
+      const nextAnswers = [...currentAnswers];
+      nextAnswers[rowIndex] = value;
+      return nextAnswers;
+    });
+    setExerciseFeedback(null);
+    setShowSolution(false);
+  };
+
+  const updateDnfAnswer = (value: string) => {
+    setDnfAnswer(value);
+    setExerciseFeedback(null);
+    setShowSolution(false);
+  };
+
+  const checkExercise = () => {
+    if (analysis.status !== "valid") {
+      return;
+    }
+
+    setExerciseFeedback(
+      checkDnfExerciseAttempt(
+        analysis.truthTable,
+        truthTableAnswers,
+        dnfAnswer,
+      ),
+    );
+  };
+
+  const normalizedTruthTableAnswers =
+    analysis.status === "valid"
+      ? analysis.truthTable.rows.map(
+          (_row, rowIndex) => truthTableAnswers[rowIndex] ?? null,
+        )
+      : [];
 
   return {
     source,
@@ -89,7 +143,13 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
     examples: dnfExamples,
     isExerciseMode,
     showSolution,
-    revealSolution: () => setShowSolution(true),
+    truthTableAnswers: normalizedTruthTableAnswers,
+    dnfAnswer,
+    exerciseFeedback,
+    setTruthTableAnswer,
+    setDnfAnswer: updateDnfAnswer,
+    checkExercise,
+    toggleSolution: () => setShowSolution((current) => !current),
     reset,
     loadExample,
   };
