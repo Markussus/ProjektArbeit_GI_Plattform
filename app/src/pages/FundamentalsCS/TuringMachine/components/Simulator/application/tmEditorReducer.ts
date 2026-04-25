@@ -1,5 +1,5 @@
 import { cloneJson } from "@/lib/utils";
-import { withDerivedInputAlphabet } from "../domain/tmProgram";
+import { deriveTapeAlphabet, withDerivedAlphabets } from "../domain/tmProgram";
 import type { TMProgram } from "../domain/tmProgram";
 import type { StateName, TapeSymbol, TMTransition } from "../domain/tmTypes";
 
@@ -34,7 +34,7 @@ export function tmEditorReducer(
     case "replace_program":
       return createProgramDraft(action.program);
     case "set_initial_tape":
-      return withDerivedInputAlphabet({
+      return withDerivedAlphabets({
         ...program,
         initialTape: action.value.split(""),
       });
@@ -69,7 +69,7 @@ export function tmEditorReducer(
 }
 
 export function createProgramDraft(program: TMProgram): TMProgram {
-  return withDerivedInputAlphabet(cloneJson(program));
+  return withDerivedAlphabets(cloneJson(program));
 }
 
 function updateInitialState(program: TMProgram, state: StateName): TMProgram {
@@ -77,7 +77,7 @@ function updateInitialState(program: TMProgram, state: StateName): TMProgram {
     return program;
   }
 
-  return withDerivedInputAlphabet({
+  return withDerivedAlphabets({
     ...program,
     initialState: state,
   });
@@ -88,7 +88,7 @@ function toggleHaltState(
   state: StateName,
   isHalting: boolean,
 ): TMProgram {
-  return withDerivedInputAlphabet({
+  return withDerivedAlphabets({
     ...program,
     haltStates: isHalting
       ? [...new Set([...program.haltStates, state])]
@@ -107,7 +107,7 @@ function addHaltState(program: TMProgram, state: StateName): TMProgram {
     return program;
   }
 
-  return withDerivedInputAlphabet({
+  return withDerivedAlphabets({
     ...program,
     states: [...program.states, normalizedState],
     haltStates: [...new Set([...program.haltStates, normalizedState])],
@@ -115,7 +115,7 @@ function addHaltState(program: TMProgram, state: StateName): TMProgram {
 }
 
 function addTapeSymbol(program: TMProgram): TMProgram {
-  return withDerivedInputAlphabet({
+  return withDerivedAlphabets({
     ...program,
     tapeAlphabet: [...program.tapeAlphabet, findNextTapeSymbol(program)],
   });
@@ -137,25 +137,10 @@ function removeTapeSymbol(
   nextProgram.tapeAlphabet = nextProgram.tapeAlphabet.filter(
     (symbol) => symbol !== symbolToRemove,
   );
-  nextProgram.initialTape = nextProgram.initialTape.map((symbol) =>
-    symbol === symbolToRemove ? nextProgram.blankSymbol : symbol,
-  );
 
   delete nextProgram.transitions[symbolToRemove];
 
-  for (const stateTransitions of Object.values(nextProgram.transitions)) {
-    for (const transition of Object.values(stateTransitions ?? {})) {
-      if (!transition) {
-        continue;
-      }
-
-      if (transition.writeSymbol === symbolToRemove) {
-        transition.writeSymbol = nextProgram.blankSymbol;
-      }
-    }
-  }
-
-  return withDerivedInputAlphabet(nextProgram);
+  return withDerivedAlphabets(nextProgram);
 }
 
 function renameTapeSymbol(
@@ -205,11 +190,11 @@ function renameTapeSymbol(
     }
   }
 
-  return withDerivedInputAlphabet(nextProgram);
+  return withDerivedAlphabets(nextProgram);
 }
 
 function addState(program: TMProgram): TMProgram {
-  return withDerivedInputAlphabet({
+  return withDerivedAlphabets({
     ...program,
     states: [...program.states, findNextStateName(program.states)],
   });
@@ -259,7 +244,7 @@ function removeState(program: TMProgram, stateToRemove: StateName): TMProgram {
     }
   }
 
-  return withDerivedInputAlphabet(nextProgram);
+  return withDerivedAlphabets(nextProgram);
 }
 
 function renameState(
@@ -312,7 +297,7 @@ function renameState(
     }
   }
 
-  return withDerivedInputAlphabet(nextProgram);
+  return withDerivedAlphabets(nextProgram);
 }
 
 function updateTransition(
@@ -333,10 +318,12 @@ function updateTransition(
     delete nextProgram.transitions[readSymbol]?.[currentState];
   }
 
-  return withDerivedInputAlphabet(nextProgram);
+  return withDerivedAlphabets(nextProgram);
 }
 
 function findNextTapeSymbol(program: TMProgram): TapeSymbol {
+  const usedSymbols = deriveTapeAlphabet(program);
+
   for (const [start, end] of [
     ["0", "9"],
     ["a", "z"],
@@ -348,7 +335,7 @@ function findNextTapeSymbol(program: TMProgram): TapeSymbol {
       charCode += 1
     ) {
       const symbol = String.fromCharCode(charCode);
-      if (!program.tapeAlphabet.includes(symbol)) {
+      if (!usedSymbols.includes(symbol)) {
         return symbol;
       }
     }

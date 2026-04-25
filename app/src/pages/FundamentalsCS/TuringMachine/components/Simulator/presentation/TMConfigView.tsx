@@ -5,6 +5,7 @@ import type {
   TMEditorCellIssueCode,
   UseTMConfigEditorResult,
 } from "../application/useTMConfigEditor";
+import { deriveTapeAlphabet } from "../domain/tmProgram";
 import type {
   TMProgramIssue,
   TMProgramIssueCode,
@@ -21,6 +22,10 @@ export interface TMConfigViewProps {
 export function TMConfigView({ editor }: TMConfigViewProps) {
   const { t } = useTranslation();
   const orderedTapeAlphabet = getOrderedTapeAlphabet(editor.draft);
+  const displayedTapeAlphabet = getOrderedTapeAlphabet({
+    blankSymbol: editor.draft.blankSymbol,
+    tapeAlphabet: deriveTapeAlphabet(editor.draft),
+  });
   const combinedError = [
     ...editor.validationIssues.map((issue) => translateProgramIssue(t, issue)),
     editor.blockingCellIssue
@@ -110,7 +115,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
 
             <TMAlphabetPanel
               title={t("tm.config.tapeAlphabet")}
-              symbols={orderedTapeAlphabet}
+              symbols={displayedTapeAlphabet}
             />
           </div>
         </div>

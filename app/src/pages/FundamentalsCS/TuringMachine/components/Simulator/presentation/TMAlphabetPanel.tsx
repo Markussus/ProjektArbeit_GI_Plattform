@@ -5,10 +5,7 @@ export interface TMAlphabetPanelProps {
   symbols: string[];
 }
 
-export function TMAlphabetPanel({
-  title,
-  symbols,
-}: TMAlphabetPanelProps) {
+export function TMAlphabetPanel({ title, symbols }: TMAlphabetPanelProps) {
   const { t } = useTranslation();
 
   return (
