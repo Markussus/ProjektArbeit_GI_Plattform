@@ -1,8 +1,4 @@
-export type JavaExecutionStage =
-  | "disinfect"
-  | "transpile"
-  | "runtime"
-  | "eval";
+export type JavaExecutionStage = "disinfect" | "transpile" | "runtime" | "eval";
 
 export type JavaExecutionIssueSeverity = "info" | "warning" | "error";
 

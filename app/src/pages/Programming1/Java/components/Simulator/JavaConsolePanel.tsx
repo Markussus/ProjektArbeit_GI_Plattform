@@ -40,7 +40,9 @@ export function JavaConsolePanel({
         />
 
         <div className="space-y-2">
-          <h4 className="text-xs font-semibold tracking-wide uppercase">Issues</h4>
+          <h4 className="text-xs font-semibold tracking-wide uppercase">
+            Issues
+          </h4>
           {snapshot.issues.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No diagnostics reported.

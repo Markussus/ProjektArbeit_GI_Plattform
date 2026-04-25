@@ -166,8 +166,7 @@ function checkUnsupportedFeatures(
 // Java → JavaScript transformation (regex-based, applied to the body only)
 // ---------------------------------------------------------------------------
 
-const JAVA_TYPE_PATTERN =
-  "(?:int|double|boolean|String|long|float|char)";
+const JAVA_TYPE_PATTERN = "(?:int|double|boolean|String|long|float|char)";
 
 const LEFTOVER_JAVA_DECLARATION = new RegExp(
   `\\b${JAVA_TYPE_PATTERN}(?:\\s*\\[\\s*\\])?\\s+[A-Za-z_]\\w*`,

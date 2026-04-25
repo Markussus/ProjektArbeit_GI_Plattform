@@ -7,13 +7,19 @@ import {
 } from "../../Simulator/domain/javaExecution";
 
 function createJavaWorker(): Worker {
-  return new Worker(new URL("../workers/javaRunner.worker.ts", import.meta.url), {
-    type: "module",
-  });
+  return new Worker(
+    new URL("../workers/javaRunner.worker.ts", import.meta.url),
+    {
+      type: "module",
+    },
+  );
 }
 
 function createRequestId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
 
