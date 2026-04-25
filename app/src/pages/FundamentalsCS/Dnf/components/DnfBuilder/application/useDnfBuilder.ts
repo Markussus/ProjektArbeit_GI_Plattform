@@ -1,29 +1,17 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
+import { DEFAULT_DNF_SOURCE, getDnfExerciseSource } from "../../../exercises";
 import type { DnfDerivation } from "../domain/dnfDerivation";
 import {
   deriveDnfFromTruthTable,
   formatDnfExpression,
 } from "../domain/dnfDerivation";
 import {
-  checkDnfExerciseAttempt,
-  type DnfExerciseCheckResult,
-  type TruthTableAnswer,
-} from "../domain/dnfExerciseCheck";
-import {
   parseBooleanExpression,
   type DnfParseIssue,
 } from "../domain/dnfParser";
 import { generateTruthTable, type TruthTable } from "../domain/truthTable";
-
-const DEFAULT_DNF_SOURCE = "a ∨ (b ∧ c)";
-
-const exerciseSourceById: Record<string, string> = {
-  "dnf.exercise1": "a ∨ (b ∧ c)",
-  "dnf.exercise2": "(a ∨ b) ∧ c",
-  "dnf.exercise3": "(¬x ∧ y) ∨ (x ∧ ¬y)",
-  "dnf.exercise4": "a ∨ (b ∧ c) ∨ ¬d",
-};
+import { useDnfExercise } from "./useDnfExercise";
 
 export type DnfExampleId = "lectureExample" | "alreadyDnf" | "xorExample";
 
@@ -53,17 +41,10 @@ export type DnfBuilderAnalysis =
 export function useDnfBuilder(selectedExercise?: Exercise | null) {
   const selectedExerciseId = selectedExercise?.id ?? null;
   const exerciseSource = selectedExerciseId
-    ? (exerciseSourceById[selectedExerciseId] ?? DEFAULT_DNF_SOURCE)
+    ? getDnfExerciseSource(selectedExerciseId)
     : DEFAULT_DNF_SOURCE;
   const isExerciseMode = selectedExerciseId !== null;
   const [source, setSource] = useState(exerciseSource);
-  const [showSolution, setShowSolution] = useState(!isExerciseMode);
-  const [truthTableAnswers, setTruthTableAnswers] = useState<
-    TruthTableAnswer[]
-  >([]);
-  const [dnfAnswer, setDnfAnswer] = useState("");
-  const [exerciseFeedback, setExerciseFeedback] =
-    useState<DnfExerciseCheckResult | null>(null);
 
   const analysis = useMemo<DnfBuilderAnalysis>(() => {
     const parseResult = parseBooleanExpression(source);
@@ -86,55 +67,20 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
     };
   }, [source]);
 
+  const { resetExercise, ...exerciseState } = useDnfExercise({
+    analysis,
+    isExerciseMode,
+  });
+
   const reset = () => {
     setSource(isExerciseMode ? exerciseSource : DEFAULT_DNF_SOURCE);
-    setShowSolution(!isExerciseMode);
-    setTruthTableAnswers([]);
-    setDnfAnswer("");
-    setExerciseFeedback(null);
+    resetExercise();
   };
 
   const loadExample = (expression: string) => {
     setSource(expression);
-    setExerciseFeedback(null);
+    resetExercise();
   };
-
-  const setTruthTableAnswer = (rowIndex: number, value: boolean) => {
-    setTruthTableAnswers((currentAnswers) => {
-      const nextAnswers = [...currentAnswers];
-      nextAnswers[rowIndex] = value;
-      return nextAnswers;
-    });
-    setExerciseFeedback(null);
-    setShowSolution(false);
-  };
-
-  const updateDnfAnswer = (value: string) => {
-    setDnfAnswer(value);
-    setExerciseFeedback(null);
-    setShowSolution(false);
-  };
-
-  const checkExercise = () => {
-    if (analysis.status !== "valid") {
-      return;
-    }
-
-    setExerciseFeedback(
-      checkDnfExerciseAttempt(
-        analysis.truthTable,
-        truthTableAnswers,
-        dnfAnswer,
-      ),
-    );
-  };
-
-  const normalizedTruthTableAnswers =
-    analysis.status === "valid"
-      ? analysis.truthTable.rows.map(
-          (_row, rowIndex) => truthTableAnswers[rowIndex] ?? null,
-        )
-      : [];
 
   return {
     source,
@@ -142,14 +88,7 @@ export function useDnfBuilder(selectedExercise?: Exercise | null) {
     analysis,
     examples: dnfExamples,
     isExerciseMode,
-    showSolution,
-    truthTableAnswers: normalizedTruthTableAnswers,
-    dnfAnswer,
-    exerciseFeedback,
-    setTruthTableAnswer,
-    setDnfAnswer: updateDnfAnswer,
-    checkExercise,
-    toggleSolution: () => setShowSolution((current) => !current),
+    ...exerciseState,
     reset,
     loadExample,
   };
