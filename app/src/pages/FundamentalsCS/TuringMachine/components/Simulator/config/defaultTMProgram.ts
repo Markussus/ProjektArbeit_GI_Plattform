@@ -5,7 +5,7 @@ import { DEFAULT_BLANK_SYMBOL } from "../domain/tmTypes";
 export const defaultTMProgram: TMProgram = withDerivedAlphabets({
   states: ["q0", "q1", "q2", "qS"],
   inputAlphabet: [],
-  tapeAlphabet: ["0", "1", "E", DEFAULT_BLANK_SYMBOL],
+  tapeAlphabet: ["0", "1", DEFAULT_BLANK_SYMBOL],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
   haltStates: ["qS"],
