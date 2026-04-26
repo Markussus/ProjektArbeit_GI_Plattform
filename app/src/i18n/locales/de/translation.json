@@ -565,6 +565,7 @@
       "title": "Vordefinierte Beispiele",
       "subtitle": "Lernen Sie, wie endliche Automaten funktionieren, indem Sie diese Beispiele studieren. Jedes enthält eine schrittweise Erklärung, wie und warum es aufgebaut ist.",
       "loadExample": "Im Simulator laden",
+      "variant": "Variante",
       "howItWorks": "So funktioniert es",
       "stepLabel": "Schritt {{index}}",
       "tryIt": "Ausprobieren mit Eingabe:",
@@ -702,6 +703,16 @@
         "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach nichts mehr. Er lehnt leere Strings, Strings die mit '1' beginnen, oder Strings mit mehr als einer '1' ab.",
         "step2Title": "2. Zustände entwerfen",
         "step2": "s0 ist der Startzustand. Das Lesen einer '0' führt zu s1. Von s1 führt eine '1' zu s2 (Akzeptanzzustand). Jede andere Eingabe führt zu s3, einem \"Fangzustand\" (Trap State), da der String ungültig geworden ist."
+      },
+      "grammar": {
+        "title": "Grammatik → Automat",
+        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Konstruiere einen endlichen Automaten für die reguläre Grammatik: G = {S → 0S | 0A, A → 1A | 1} über dem Alphabet Σ = {0, 1}. Diese Grammatik erzeugt erst '0'en, dann '1'en. Jedes Nichtterminalsymbol wird zu einem Zustand und jede Produktion zu einem Übergang.",
+        "step2Title": "2. NFA-Konstruktion",
+        "step2": "Überführung der Produktionen in Übergänge: (S → 0S) wird zu δ(S,0)=S; (S → 0A) wird zu δ(S,0)=A. Dies erzeugt Nichtdeterminismus im Zustand S bei der Eingabe '0'. Die Regel (A → 1) impliziert einen Übergang in einen dedizierten Akzeptanzzustand (sF). Ergebnis: Ein 3-Zustand-NFA {S, A, sF}.",
+        "step3Title": "3. DFA-Konstruktion",
+        "step3": "Wir gruppieren NFA-Zustände in Mengen, um genau einen Übergang pro Eingabe zu garantieren.\n1. Start bei q0 = {S}.\n2. δ(q0, 0) = {S, A} → neuer Zustand q1.\n3. δ(q0, 1) = ∅ → Fangzustand qD.\n4. δ(q1, 0) = {S, A} → Schleife zurück zu q1.\n5. δ(q1, 1) = {A, sF} → neuer Zustand q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → Schleife zurück zu q2.\nq2 ist der Akzeptanzzustand (enthält sF). qD ist ein toter Zustand (Fangzustand)."
       }
     },
     "batch": {

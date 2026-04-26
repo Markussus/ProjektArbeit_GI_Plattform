@@ -7,6 +7,7 @@ import {
   Play,
   BookOpen,
   Zap,
+  Book,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
@@ -82,6 +83,17 @@ function ExampleCard({
   onLoad: (program: FAProgram, inputWord: string) => void;
 }) {
   const { t } = useTranslation();
+  const hasBoth = !!example.secondVariant;
+  const [variantChoice, setVariantChoice] = useState<"NFA" | "DFA">("NFA");
+
+  const activeProgram =
+    hasBoth && variantChoice === "DFA" && example.secondVariant
+      ? example.secondVariant.program
+      : example.program;
+  const activeInputWord =
+    hasBoth && variantChoice === "DFA" && example.secondVariant
+      ? example.secondVariant.inputWord
+      : example.inputWord;
 
   const typeBadgeClass =
     example.type === "DFA"
@@ -97,10 +109,14 @@ function ExampleCard({
         className="hover:bg-muted/30 flex w-full items-center gap-4 px-5 py-4 text-left transition-colors"
       >
         <div className="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-          {example.type === "NFA" ? (
-            <Zap className="h-5 w-5" />
+          {hasBoth ? (
+            <div className="flex items-center gap-0.5">
+              <Book className="h-5 w-5 text-orange-500" />
+            </div>
+          ) : example.type === "NFA" ? (
+            <Zap className="h-5 w-5 text-purple-500" />
           ) : (
-            <GitBranch className="h-5 w-5" />
+            <GitBranch className="h-5 w-5 text-blue-500" />
           )}
         </div>
 
@@ -109,18 +125,30 @@ function ExampleCard({
             {t(example.titleKey, example.id)}
           </p>
           <div className="mt-1 flex items-center gap-2">
-            <span
-              className={cn(
-                "inline-flex rounded-md px-2 py-0.5 text-xs font-bold",
-                typeBadgeClass,
-              )}
-            >
-              {example.type}
-            </span>
+            {hasBoth ? (
+              <>
+                <span className="bg-module-orange-bg text-module-orange-fg inline-flex rounded-md px-2 py-0.5 text-xs font-bold">
+                  {"Grammatik"}
+                </span>
+                <span className="bg-module-purple-bg text-module-purple-fg inline-flex rounded-md px-2 py-0.5 text-xs font-bold">
+                  {"NFA"}
+                </span>
+                <span className="bg-module-blue-bg text-module-blue-fg inline-flex rounded-md px-2 py-0.5 text-xs font-bold">
+                  DFA
+                </span>
+              </>
+            ) : (
+              <span
+                className={cn(
+                  "inline-flex rounded-md px-2 py-0.5 text-xs font-bold",
+                  typeBadgeClass,
+                )}
+              >
+                {example.type}
+              </span>
+            )}
             <span className="text-muted-foreground text-xs">
-              {example.program.states.length}{" "}
-              {t("fa.config.states", "states").toLowerCase().split(" ")[0]} · Σ
-              = {"{"}
+              Σ = {"{"}
               {example.program.alphabet.join(", ")}
               {"}"}
             </span>
@@ -159,7 +187,7 @@ function ExampleCard({
                   <h5 className="text-foreground text-sm font-semibold">
                     {t(step.titleKey, `Step ${idx + 1}`)}
                   </h5>
-                  <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                  <p className="text-muted-foreground mt-1 text-sm leading-relaxed whitespace-pre-line">
                     {t(step.contentKey, "")}
                   </p>
                 </div>
@@ -167,25 +195,62 @@ function ExampleCard({
             </div>
           </div>
 
+          {/* Variant selector (grammar example only) */}
+          {hasBoth && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="text-muted-foreground text-xs font-medium">
+                {t("fa.examplesTab.variant", "Variant:")}
+              </span>
+              <div className="bg-muted flex gap-0.5 rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setVariantChoice("NFA")}
+                  className={cn(
+                    "rounded-md px-3 py-1 text-xs font-bold transition-colors",
+                    variantChoice === "NFA"
+                      ? "bg-module-purple-bg text-module-purple-fg"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  NFA
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVariantChoice("DFA")}
+                  className={cn(
+                    "rounded-md px-3 py-1 text-xs font-bold transition-colors",
+                    variantChoice === "DFA"
+                      ? "bg-module-blue-bg text-module-blue-fg"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  DFA
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Try it section */}
           <div className="bg-muted/20 mt-4 rounded-lg p-3">
             <p className="text-muted-foreground text-xs font-medium">
               {t("fa.examplesTab.tryIt", "Try it with input:")}{" "}
               <code className="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-xs">
-                {example.inputWord || "ε"}
+                {activeInputWord || "ε"}
               </code>
             </p>
           </div>
 
           {/* Load button */}
-          <button
-            type="button"
-            onClick={() => onLoad(example.program, example.inputWord)}
-            className="bg-brand text-brand-foreground mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all hover:opacity-90"
-          >
-            <Play className="h-4 w-4 fill-current" />
-            {t("fa.examplesTab.loadExample", "Load in Simulator")}
-          </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onLoad(activeProgram, activeInputWord)}
+              className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all hover:opacity-90"
+            >
+              <Play className="h-4 w-4 fill-current" />
+              {t("fa.examplesTab.loadExample", "Load in Simulator")}
+            </button>
+          </div>
         </div>
       )}
     </div>

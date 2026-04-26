@@ -569,6 +569,7 @@
       "title": "Predefined Examples",
       "subtitle": "Learn how finite automata work by studying these examples. Each one includes a step-by-step explanation of how and why it was built.",
       "loadExample": "Load in Simulator",
+      "variant": "Variant",
       "howItWorks": "How it works",
       "stepLabel": "Step {{index}}",
       "tryIt": "Try it with input:",
@@ -706,6 +707,16 @@
         "step1": "The automaton requires at least one '0', followed by exactly one '1', and then nothing else. It rejects empty strings, strings starting with '1', or strings with more than one '1'.",
         "step2Title": "2. Design the states",
         "step2": "s0 is the start state. Reading '0' moves to s1 (we have our 0s). From s1, reading '1' moves to s2 (the accept state). Any other input leads to s3, which is a \"sink\" or \"trap\" state because the string is invalid."
+      },
+      "grammar": {
+        "title": "Grammar → Automat",
+        "description": "The right-linear grammar G = {S → 0S | 0A, A → 1A | 1} is converted into an NFA and then into a minimal DFA via subset construction. Both recognize the language L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
+        "step1Title": "1. Define the goal",
+        "step1": "Construct a finite automaton for the regular grammar: G = {S → 0S | 0A, A → 1A | 1} over Σ = {0, 1}. This grammar generates '0's then '1's. Each non-terminal becomes a state, and each production becomes a transition.",
+        "step2Title": "2. NFA Construction",
+        "step2": "Map productions to transitions: (S → 0S) becomes δ(S,0)=S; (S → 0A) becomes δ(S,0)=A. This creates non-determinism at state S on input '0'. The rule (A → 1) implies a transition to a dedicated accept state (sF). Result: A 3-state NFA {S, A, sF}.",
+        "step3Title": "3. DFA Construction",
+        "step3": "We group NFA states into sets to ensure one transition per input.\n1. Start at q0 = {S}.\n2. Move on '0': δ(q0, 0) = {S, A} → new state q1.\n3. Move on '1': δ(q0, 1) = ∅ → sink state qD.\n4. δ(q1, 0) = {S, A} → loops back to q1.\n5. δ(q1, 1) = {A, sF} → new state q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → loops back to q2.\nq2 is the accept state (contains sF). qD is a dead/trap state."
       }
     },
     "batch": {
