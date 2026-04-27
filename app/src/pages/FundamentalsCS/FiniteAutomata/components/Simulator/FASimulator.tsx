@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Settings, Sparkles, Wand2, Play } from "lucide-react";
+import { Settings, Sparkles, Play } from "lucide-react";
 import { cloneJson } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
 import { useFASimulator } from "./application/useFASimulator";
@@ -9,14 +9,13 @@ import type { FAProgram } from "./domain/faTypes";
 import { FAConfigView } from "./presentation/FAConfigView";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
-import { FAGeneratorInput } from "./presentation/FAGeneratorInput";
 import { FAHelpButton } from "./presentation/FAHelpButton";
 import { FAExerciseWorkspacePanel } from "./presentation/FAExerciseWorkspacePanel";
 import { useFAExampleStore } from "../../store/faExampleStore";
 import { useFAExerciseStore } from "../../store/faExerciseStore";
 import { findFAExercise } from "../../exercises/faExerciseDefinitions";
 
-type EditorMode = "manual" | "grammar" | "generator";
+type EditorMode = "manual" | "grammar";
 
 export function FASimulator() {
   const { t } = useTranslation();
@@ -81,18 +80,6 @@ export function FASimulator() {
     setEditorMode("manual");
   };
 
-  const handleGeneratorConvert = (
-    converted: FAProgram,
-    suggestedInputWord?: string,
-  ) => {
-    setProgram(converted);
-    editor.resetToProgram(converted);
-    if (suggestedInputWord !== undefined) {
-      setInputWord(suggestedInputWord);
-    }
-    setEditorMode("manual");
-  };
-
   const handleLoadExerciseSolution = (solution: FAProgram) => {
     const cloned = cloneJson(solution);
     setProgram(cloned);
@@ -131,12 +118,6 @@ export function FASimulator() {
                 onClick={() => setEditorMode("grammar")}
                 icon={<Sparkles className="h-4 w-4" />}
                 label={t("fa.editor.grammar", "From Grammar")}
-              />
-              <ModeButton
-                active={editorMode === "generator"}
-                onClick={() => setEditorMode("generator")}
-                icon={<Wand2 className="h-4 w-4" />}
-                label={t("fa.editor.generator", "Generator")}
               />
             </div>
 
@@ -182,15 +163,6 @@ export function FASimulator() {
                 className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm"
               >
                 <FAGrammarInput onConvert={handleGrammarConvert} />
-              </div>
-            )}
-
-            {editorMode === "generator" && (
-              <div
-                key="generator"
-                className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm"
-              >
-                <FAGeneratorInput onConvert={handleGeneratorConvert} />
               </div>
             )}
           </div>

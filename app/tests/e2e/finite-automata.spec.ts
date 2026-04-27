@@ -47,10 +47,10 @@ test.describe("Finite Automata — Simulation tab", () => {
     ).toBeVisible();
   });
 
-  test("shows the Generator mode button", async ({ page }) => {
+  test("does not show a Generator mode button", async ({ page }) => {
     await expect(
-      page.getByRole("button", { name: /Generator/i }),
-    ).toBeVisible();
+      page.getByRole("button", { name: /^Generator$/i }),
+    ).toHaveCount(0);
   });
 
   test("renders the Transition Table heading", async ({ page }) => {
@@ -155,6 +155,55 @@ test.describe("Finite Automata — editor interactions", () => {
   }) => {
     await page.getByRole("button", { name: /From Grammar/i }).click();
     await page.getByRole("button", { name: /Manual Editor/i }).click();
+    await expect(page.getByText("Transition Table")).toBeVisible();
+  });
+});
+
+test.describe("Finite Automata — Grammar tab", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(FA_URL);
+    await page.getByRole("button", { name: "Simulation" }).click();
+    await page.getByRole("button", { name: /From Grammar/i }).click();
+  });
+
+  test("shows the Convert to Automaton button", async ({ page }) => {
+    await expect(
+      page.getByRole("button", { name: /Convert to Automaton/i }),
+    ).toBeVisible();
+  });
+
+  test("shows the Load Example button", async ({ page }) => {
+    await expect(
+      page.getByRole("button", { name: /Load Example/i }),
+    ).toBeVisible();
+  });
+
+  test("shows the Supported Formats section", async ({ page }) => {
+    await expect(page.getByText(/Supported Formats/i)).toBeVisible();
+  });
+
+  test("default grammar uses the simplified format", async ({ page }) => {
+    await expect(page.getByText(/Detected format/i)).toContainText(
+      /Simplified/i,
+    );
+  });
+
+  test("switching to structured format updates the detected label", async ({
+    page,
+  }) => {
+    const textarea = page.locator("#fa-grammar-productions");
+    await textarea.fill(
+      "type: grammar\nproductions:\nS -> 0S | 1A\nA -> 0A | 1",
+    );
+    await expect(page.getByText(/Detected format/i)).toContainText(
+      /Structured/i,
+    );
+  });
+
+  test("converts the default grammar and returns to the manual editor", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: /Convert to Automaton/i }).click();
     await expect(page.getByText("Transition Table")).toBeVisible();
   });
 });

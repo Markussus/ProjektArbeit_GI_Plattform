@@ -501,46 +501,7 @@
   "fa": {
     "editor": {
       "manual": "Manueller Editor",
-      "grammar": "Aus Grammatik",
-      "generator": "Generator"
-    },
-    "generator": {
-      "title": "Generator",
-      "tooltip": "Beschreibe eine Sprache und erzeuge automatisch einen Automaten.",
-      "intro": "Wandle eine Sprachbeschreibung (Regex, Modulo, Grammatik) in einen NFA/DFA um. Modus wählen, DSL bearbeiten, dann erzeugen.",
-      "dsl": "DSL-Eingabe",
-      "tryThis": "Ausprobieren",
-      "generate": "Automat erzeugen",
-      "auto": "Automatisch bei Änderung erzeugen",
-      "liveLabel": "Erkannte Sprache",
-      "liveHint": "Weiter tippen – die DSL ist noch nicht vollständig.",
-      "parseHint": "DSL noch nicht parsebar",
-      "error": "Erzeugung fehlgeschlagen",
-      "help": {
-        "title": "Unterstützte Formate"
-      },
-      "mode": {
-        "regex": {
-          "title": "Regex",
-          "blurb": "Beschreibe Zeichenketten mit einem Muster."
-        },
-        "modulo": {
-          "title": "Modulo",
-          "blurb": "Numerische Sprachen. Zustände sind Reste modulo eines Teilers."
-        },
-        "grammar": {
-          "title": "Grammatik",
-          "blurb": "Rechtslineare Produktionen wie S → 0S | 1A. Erste LHS ist Startsymbol."
-        }
-      },
-      "quick": {
-        "label": "Schnellbeispiele",
-        "endsWith00": "Zeichenketten, die auf \"00\" enden",
-        "divBy3": "Binär teilbar durch 3",
-        "divBy4": "Binär teilbar durch 4",
-        "containsAB": "Zeichenketten, die \"ab\" enthalten",
-        "oneOrMoreA": "Ein oder mehr a"
-      }
+      "grammar": "Aus Grammatik"
     },
     "config": {
       "title": "Automaten-Konfiguration",
@@ -728,11 +689,22 @@
     },
     "grammar": {
       "title": "Reguläre Grammatik → Automat",
-      "nonTerminals": "Nichtterminale (kommagetrennt)",
-      "terminals": "Terminale (kommagetrennt)",
-      "startSymbol": "Startsymbol",
-      "productions": "Produktionsregeln (eine pro Zeile, z. B. S → aA)",
-      "convert": "In Automat umwandeln"
+      "intro": "Geben Sie eine rechtslineare Grammatik ein. Das erste Nichtterminal links wird zum Startsymbol; Nichtterminale und Terminale werden aus den Produktionen abgeleitet.",
+      "productions": "Grammatik",
+      "productionsHint": "Eine Produktion pro Zeile. Zwei Formate werden unterstützt (automatische Erkennung).",
+      "convert": "In Automat umwandeln",
+      "loadExample": "Beispiel laden",
+      "supportedFormats": "Unterstützte Formate",
+      "format1Label": "Format 1 — vereinfacht",
+      "format2Label": "Format 2 — strukturiert",
+      "detectedFormat": "Erkanntes Format",
+      "format": {
+        "simple": "Vereinfacht",
+        "structured": "Strukturiert"
+      },
+      "parseError": "Grammatik noch nicht parsebar",
+      "epsilonHint": "Um das Symbol für das leere Wort (ε) einzufügen, können Sie es entweder kopieren und einfügen oder das Wort 'epsilon' tippen.",
+      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist."
     },
     "help": {
       "open": "Leitfaden öffnen",

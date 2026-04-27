@@ -1,180 +1,193 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type {
-  RegularGrammar,
-  ProductionRule,
-  FAProgram,
-} from "../domain/faTypes";
+import { AlertCircle, ChevronDown } from "lucide-react";
+import type { FAProgram } from "../domain/faTypes";
 import {
   grammarToAutomaton,
   validateRegularGrammar,
 } from "../domain/faGrammarConversion";
+import {
+  parseGrammarSource,
+  type ParseGrammarResult,
+} from "../domain/faGrammarParsing";
 
 interface FAGrammarInputProps {
   onConvert: (program: FAProgram) => void;
 }
 
-const defaultGrammar: RegularGrammar = {
-  nonTerminals: ["S", "A", "B"],
-  terminals: ["a", "b"],
-  startSymbol: "S",
-  productions: [
-    { lhs: "S", terminal: "a", nextNonTerminal: "A" },
-    { lhs: "S", terminal: "b", nextNonTerminal: "S" },
-    { lhs: "A", terminal: "a", nextNonTerminal: "B" },
-    { lhs: "A", terminal: "b", nextNonTerminal: "S" },
-    { lhs: "B", terminal: "a", nextNonTerminal: "B" },
-    { lhs: "B", terminal: "b", nextNonTerminal: null },
-  ],
-};
+const SIMPLE_EXAMPLE = ["S -> 0S | 1A", "A -> 0A | 1"].join("\n");
+
+const STRUCTURED_EXAMPLE = [
+  "type: grammar",
+  "productions:",
+  "S -> 0S | 1A",
+  "A -> 0A | 1",
+].join("\n");
+
+const DEFAULT_GRAMMAR_SOURCE = SIMPLE_EXAMPLE;
 
 export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
   const { t } = useTranslation();
-  const [nonTerminals, setNonTerminals] = useState(
-    defaultGrammar.nonTerminals.join(", "),
+  const [source, setSource] = useState(DEFAULT_GRAMMAR_SOURCE);
+  const [submitErrors, setSubmitErrors] = useState<string[]>([]);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  const parsed: ParseGrammarResult = useMemo(
+    () => parseGrammarSource(source),
+    [source],
   );
-  const [terminals, setTerminals] = useState(
-    defaultGrammar.terminals.join(", "),
-  );
-  const [startSymbol, setStartSymbol] = useState(defaultGrammar.startSymbol);
-  const [productionText, setProductionText] = useState(
-    defaultGrammar.productions
-      .map((p) => `${p.lhs} → ${p.terminal}${p.nextNonTerminal ?? ""}`)
-      .join("\n"),
-  );
-  const [errors, setErrors] = useState<string[]>([]);
-
-  const parseCSV = (s: string) =>
-    s
-      .split(",")
-      .map((x) => x.trim())
-      .filter((x) => x.length > 0);
-
-  const parseProductions = (text: string): ProductionRule[] => {
-    const rules: ProductionRule[] = [];
-    const lines = text
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-    for (const line of lines) {
-      // Parse "A → aB" or "A -> aB" or "A → a"
-      const match = line.match(/^(\S+)\s*(?:→|->)\s*(\S+)$/);
-      if (!match) continue;
-
-      const lhs = match[1];
-      const rhs = match[2];
-
-      if (rhs.length === 1) {
-        rules.push({ lhs, terminal: rhs, nextNonTerminal: null });
-      } else if (rhs.length === 2) {
-        rules.push({ lhs, terminal: rhs[0], nextNonTerminal: rhs[1] });
-      } else {
-        // Try to split: first char is terminal, rest is non-terminal
-        const terminal = rhs[0];
-        const nt = rhs.slice(1);
-        rules.push({ lhs, terminal, nextNonTerminal: nt });
-      }
-    }
-
-    return rules;
-  };
 
   const handleConvert = () => {
-    const grammar: RegularGrammar = {
-      nonTerminals: parseCSV(nonTerminals),
-      terminals: parseCSV(terminals),
-      startSymbol: startSymbol.trim(),
-      productions: parseProductions(productionText),
-    };
-
-    const validationErrors = validateRegularGrammar(grammar);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors.map((code) => t(`fa.grammar.${code}`, code)));
+    if (!parsed.ok) {
+      setSubmitErrors([parsed.error]);
       return;
     }
+    const validationErrors = validateRegularGrammar(parsed.grammar);
+    if (validationErrors.length > 0) {
+      setSubmitErrors(
+        validationErrors.map((code) => t(`fa.grammar.${code}`, code)),
+      );
+      return;
+    }
+    setSubmitErrors([]);
+    onConvert(grammarToAutomaton(parsed.grammar));
+  };
 
-    setErrors([]);
-    const automaton = grammarToAutomaton(grammar);
-    onConvert(automaton);
+  const handleLoadExample = () => {
+    setSource(SIMPLE_EXAMPLE);
+    setSubmitErrors([]);
   };
 
   const inputClass =
     "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none";
-  const labelClass = "text-sm font-medium";
+
+  const detectedFormatLabel = parsed.format
+    ? t(`fa.grammar.format.${parsed.format}`, parsed.format)
+    : null;
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-bold">
-        {t("fa.grammar.title", "Regular Grammar → Automaton")}
-      </h3>
+      <div>
+        <h3 className="text-sm font-bold">
+          {t("fa.grammar.title", "Regular Grammar → Automaton")}
+        </h3>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {t(
+            "fa.grammar.intro",
+            "Enter a right-linear grammar. The first non-terminal on the left becomes the start symbol; non-terminals and terminals are inferred from your productions.",
+          )}
+        </p>
+      </div>
 
-      {errors.length > 0 && (
-        <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm">
-          {errors.join("\n")}
+      {submitErrors.length > 0 && (
+        <div className="bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border border-current/30 px-3 py-2 text-sm">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div className="whitespace-pre-line">{submitErrors.join("\n")}</div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className={labelClass}>
-            {t("fa.grammar.nonTerminals", "Non-Terminals (comma-separated)")}
-          </label>
-          <input
-            type="text"
-            value={nonTerminals}
-            onChange={(e) => setNonTerminals(e.target.value)}
-            className={inputClass}
-            placeholder="S, A, B"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClass}>
-            {t("fa.grammar.terminals", "Terminals (comma-separated)")}
-          </label>
-          <input
-            type="text"
-            value={terminals}
-            onChange={(e) => setTerminals(e.target.value)}
-            className={inputClass}
-            placeholder="a, b"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClass}>
-            {t("fa.grammar.startSymbol", "Start Symbol")}
-          </label>
-          <input
-            type="text"
-            value={startSymbol}
-            onChange={(e) => setStartSymbol(e.target.value)}
-            className={inputClass}
-            placeholder="S"
-          />
-        </div>
-      </div>
-
       <div className="flex flex-col gap-1">
-        <label className={labelClass}>
-          {t(
-            "fa.grammar.productions",
-            "Production Rules (one per line, e.g. S → aA)",
+        <div className="flex items-center justify-between gap-2">
+          <label
+            className="text-sm font-medium"
+            htmlFor="fa-grammar-productions"
+          >
+            {t("fa.grammar.productions", "Grammar")}
+          </label>
+          {detectedFormatLabel && (
+            <span className="text-muted-foreground text-xs">
+              {t("fa.grammar.detectedFormat", "Detected format")}:{" "}
+              <span className="text-foreground font-medium">
+                {detectedFormatLabel}
+              </span>
+            </span>
           )}
-        </label>
+        </div>
         <textarea
-          value={productionText}
-          onChange={(e) => setProductionText(e.target.value)}
-          className={`${inputClass} min-h-[160px] font-mono`}
-          placeholder={"S → aA\nA → bB\nB → a"}
-          rows={7}
+          id="fa-grammar-productions"
+          value={source}
+          onChange={(e) => {
+            setSource(e.target.value);
+            setSubmitErrors([]);
+          }}
+          className={`${inputClass} min-h-[180px] font-mono`}
+          spellCheck={false}
+          placeholder={SIMPLE_EXAMPLE}
         />
+        <p className="text-muted-foreground text-xs">
+          {t(
+            "fa.grammar.productionsHint",
+            "One production per line. Two formats are supported (auto-detected).",
+          )}
+        </p>
       </div>
 
-      <button
-        onClick={handleConvert}
-        className="bg-brand text-brand-foreground self-start rounded-md px-4 py-2 hover:opacity-90"
+      {!parsed.ok && source.trim().length > 0 && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div>
+            <div className="text-xs font-semibold tracking-wide uppercase">
+              {t("fa.grammar.parseError", "Grammar not parseable yet")}
+            </div>
+            <div className="font-mono text-xs">{parsed.error}</div>
+          </div>
+        </div>
+      )}
+
+      <details
+        open={helpOpen}
+        onToggle={(e) => setHelpOpen((e.target as HTMLDetailsElement).open)}
+        className="bg-muted/30 rounded-md border"
       >
-        {t("fa.grammar.convert", "Convert to Automaton")}
-      </button>
+        <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm font-medium select-none">
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${helpOpen ? "" : "-rotate-90"}`}
+          />
+          {t("fa.grammar.supportedFormats", "Supported Formats")}
+        </summary>
+        <div className="flex flex-col gap-3 px-3 pb-3">
+          <div>
+            <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+              {t("fa.grammar.format1Label", "Format 1 — simplified")}
+            </div>
+            <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+              {SIMPLE_EXAMPLE}
+            </pre>
+          </div>
+          <div>
+            <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+              {t("fa.grammar.format2Label", "Format 2 — structured")}
+            </div>
+            <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+              {STRUCTURED_EXAMPLE}
+            </pre>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            {t(
+              "fa.grammar.epsilonHint",
+              "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
+            )}
+          </p>
+        </div>
+      </details>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={handleConvert}
+          disabled={!parsed.ok}
+          className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {t("fa.grammar.convert", "Convert to Automaton")}
+        </button>
+        <button
+          type="button"
+          onClick={handleLoadExample}
+          className="bg-muted hover:bg-muted/80 rounded-md px-3 py-2 text-sm font-medium"
+        >
+          {t("fa.grammar.loadExample", "Load Example")}
+        </button>
+      </div>
     </div>
   );
 }

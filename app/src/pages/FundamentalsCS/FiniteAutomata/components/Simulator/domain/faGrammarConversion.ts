@@ -8,13 +8,20 @@ import type { FAProgram, RegularGrammar, FATransitionMap } from "./faTypes";
  * - Terminals → alphabet symbols
  * - A → aB becomes transition(A, a) → B
  * - A → a  becomes transition(A, a) → FINAL (dedicated accept state)
+ * - A → ε  marks state A as accepting (no ε-transition is emitted —
+ *          all transitions in the result consume input symbols only)
  * - Start symbol → start state
  */
 export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
   const FINAL_STATE = "sF";
 
+  const epsilonProducers = new Set(grammar.epsilonProducingNonTerminals ?? []);
+  const needsFinalState = grammar.productions.some(
+    (r) => r.nextNonTerminal === null,
+  );
+
   const states = [...grammar.nonTerminals];
-  if (!states.includes(FINAL_STATE)) {
+  if (needsFinalState && !states.includes(FINAL_STATE)) {
     states.push(FINAL_STATE);
   }
 
@@ -26,7 +33,7 @@ export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
     transitions[state] = {};
   }
 
-  // Convert productions to transitions
+  // Convert productions to transitions (ε productions intentionally skipped)
   for (const rule of grammar.productions) {
     const from = rule.lhs;
     const symbol = rule.terminal;
@@ -52,6 +59,14 @@ export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
     }
   }
 
+  const acceptStates: string[] = [];
+  if (needsFinalState) acceptStates.push(FINAL_STATE);
+  for (const nt of grammar.nonTerminals) {
+    if (epsilonProducers.has(nt) && !acceptStates.includes(nt)) {
+      acceptStates.push(nt);
+    }
+  }
+
   // Determine if it's DFA or NFA
   let isDFA = true;
   for (const state of Object.keys(transitions)) {
@@ -70,7 +85,7 @@ export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
     alphabet,
     transitions,
     startState: grammar.startSymbol,
-    acceptStates: [FINAL_STATE],
+    acceptStates,
   };
 }
 
@@ -84,7 +99,9 @@ export function validateRegularGrammar(grammar: RegularGrammar): string[] {
     errors.push("grammar_no_nonterminals");
   }
 
-  if (grammar.terminals.length === 0) {
+  const hasEpsilonProductions =
+    (grammar.epsilonProducingNonTerminals?.length ?? 0) > 0;
+  if (grammar.terminals.length === 0 && !hasEpsilonProductions) {
     errors.push("grammar_no_terminals");
   }
 
@@ -104,6 +121,12 @@ export function validateRegularGrammar(grammar: RegularGrammar): string[] {
       !grammar.nonTerminals.includes(rule.nextNonTerminal)
     ) {
       errors.push("grammar_rhs_nonterminal_invalid");
+    }
+  }
+
+  for (const nt of grammar.epsilonProducingNonTerminals ?? []) {
+    if (!grammar.nonTerminals.includes(nt)) {
+      errors.push("grammar_epsilon_lhs_invalid");
     }
   }
 

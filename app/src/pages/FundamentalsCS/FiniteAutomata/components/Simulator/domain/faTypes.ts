@@ -32,6 +32,12 @@ export interface RegularGrammar {
   terminals: string[];
   startSymbol: string;
   productions: ProductionRule[];
+  /**
+   * Non-terminals that have an ε production (A → ε).
+   * Tracked separately because ε rules become accepting-state markers,
+   * not transitions, in the converted automaton.
+   */
+  epsilonProducingNonTerminals?: string[];
 }
 
 export interface ProductionRule {

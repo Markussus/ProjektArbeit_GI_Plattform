@@ -505,46 +505,7 @@
   "fa": {
     "editor": {
       "manual": "Manual Editor",
-      "grammar": "From Grammar",
-      "generator": "Generator"
-    },
-    "generator": {
-      "title": "Generator",
-      "tooltip": "Describe a language and automatically build an automaton.",
-      "intro": "Turn a language description (regex, modulo, grammar) into an NFA/DFA. Pick a mode, edit the DSL, then generate.",
-      "dsl": "DSL input",
-      "tryThis": "Try this",
-      "generate": "Generate Automaton",
-      "auto": "Auto-generate on change",
-      "liveLabel": "Detected language",
-      "liveHint": "Keep typing — the DSL isn't complete yet.",
-      "parseHint": "DSL not parseable yet",
-      "error": "Could not generate",
-      "help": {
-        "title": "Supported formats"
-      },
-      "mode": {
-        "regex": {
-          "title": "Regex",
-          "blurb": "Describe strings with a pattern."
-        },
-        "modulo": {
-          "title": "Modulo",
-          "blurb": "Numeric languages. States represent remainders modulo a divisor."
-        },
-        "grammar": {
-          "title": "Grammar",
-          "blurb": "Right-linear productions like S → 0S | 1A. First LHS is the start symbol."
-        }
-      },
-      "quick": {
-        "label": "Quick examples",
-        "endsWith00": "Strings ending with \"00\"",
-        "divBy3": "Binary divisible by 3",
-        "divBy4": "Binary divisible by 4",
-        "containsAB": "Strings containing \"ab\"",
-        "oneOrMoreA": "One or more a's"
-      }
+      "grammar": "From Grammar"
     },
     "config": {
       "title": "Automaton Configuration",
@@ -732,11 +693,22 @@
     },
     "grammar": {
       "title": "Regular Grammar → Automaton",
-      "nonTerminals": "Non-Terminals (comma-separated)",
-      "terminals": "Terminals (comma-separated)",
-      "startSymbol": "Start Symbol",
-      "productions": "Production Rules (one per line, e.g. S → aA)",
-      "convert": "Convert to Automaton"
+      "intro": "Enter a right-linear grammar. The first non-terminal on the left becomes the start symbol; non-terminals and terminals are inferred from your productions.",
+      "productions": "Grammar",
+      "productionsHint": "One production per line. Two formats are supported (auto-detected).",
+      "convert": "Convert to Automaton",
+      "loadExample": "Load Example",
+      "supportedFormats": "Supported Formats",
+      "format1Label": "Format 1 — simplified",
+      "format2Label": "Format 2 — structured",
+      "detectedFormat": "Detected format",
+      "format": {
+        "simple": "Simplified",
+        "structured": "Structured"
+      },
+      "parseError": "Grammar not parseable yet",
+      "epsilonHint": "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
+      "grammar_epsilon_lhs_invalid": "An ε production references a non-terminal that is not in the non-terminal set."
     },
     "help": {
       "open": "Open guide",
