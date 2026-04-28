@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -57,32 +58,44 @@ function stage(name) {
   console.log(`\n=== ${name} ===`);
 }
 
+function ensureDependenciesInstalled() {
+  const nodeModulesDir = path.join(process.cwd(), "node_modules");
+  const viteBin = path.join(
+    nodeModulesDir,
+    ".bin",
+    process.platform === "win32" ? "vite.cmd" : "vite",
+  );
+
+  if (fs.existsSync(nodeModulesDir) && fs.existsSync(viteBin)) {
+    return;
+  }
+
+  console.error("Missing local dependencies in node_modules.");
+  console.error("Run `npm ci --cache .npm --prefer-offline` once, then retry.");
+  process.exit(1);
+}
+
 stage("verify");
 run("node", ["--version"]);
 runNpm(["--version"]);
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
+ensureDependenciesInstalled();
 runNpx(["vite", "--version"]);
 runNpx(["vitest", "--version"]);
 runNpx(["playwright", "--version"]);
 runNpx(["lhci", "--version"]);
 
 stage("quality");
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
 runNpm(["run", "format:check"]);
 runNpm(["run", "lint"]);
 
 stage("unit");
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
 runNpm(["run", "test"]);
 
 stage("build");
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
 runNpm(["run", "build"]);
 
 stage("lighthouse");
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
 runNpm(["run", "lhci:ci"]);
 
 stage("e2e");
-runNpm(["ci", "--cache", ".npm", "--prefer-offline"]);
 runNpm(["run", "e2e:ci"]);

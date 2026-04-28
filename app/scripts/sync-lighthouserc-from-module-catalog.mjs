@@ -14,7 +14,7 @@ const moduleCatalogFile = path.join(
 );
 const outputFile = path.join(appRoot, "lighthouserc.json");
 
-const baseUrl = "http://127.0.0.1:4173";
+const baseUrl = "http://localhost:4173";
 const staticPaths = ["/", "/documentation", "/help", "/__lhci-not-found__"];
 const pathPattern = /path:\s*["'`]([^"'`]+)["'`]/g;
 
