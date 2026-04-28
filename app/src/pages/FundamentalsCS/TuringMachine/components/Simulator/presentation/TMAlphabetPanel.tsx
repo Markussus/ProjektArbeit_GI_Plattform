@@ -24,7 +24,7 @@ export function TMAlphabetPanel({ title, symbols }: TMAlphabetPanelProps) {
           ))
         ) : (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.noSymbols")}
+            {t("tm.config.alphabets.noSymbols")}
           </span>
         )}
       </div>

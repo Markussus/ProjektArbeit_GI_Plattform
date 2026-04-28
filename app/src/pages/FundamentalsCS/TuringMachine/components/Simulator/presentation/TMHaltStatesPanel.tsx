@@ -41,9 +41,11 @@ export function TMHaltStatesPanel({
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-2 min-h-[3.5rem]">
-        <h3 className="text-md font-semibold">{t("tm.config.haltStates")}</h3>
+        <h3 className="text-md font-semibold">
+          {t("tm.config.haltStates.haltStates")}
+        </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.haltStatesDesc")}
+          {t("tm.config.haltStates.haltStatesDesc")}
         </p>
       </div>
 
@@ -75,7 +77,7 @@ export function TMHaltStatesPanel({
 
         {selectableStates.length === 0 && (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.noStates")}
+            {t("tm.config.haltStates.noStates")}
           </span>
         )}
 
@@ -97,8 +99,8 @@ export function TMHaltStatesPanel({
               commitNewState();
             }}
             disabled={disabled}
-            placeholder={t("tm.config.addHaltStatePlaceholder")}
-            aria-label={t("tm.config.addHaltState")}
+            placeholder={t("tm.config.haltStates.addHaltStatePlaceholder")}
+            aria-label={t("tm.config.haltStates.addHaltState")}
             className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"
             autoComplete="off"
             spellCheck="false"

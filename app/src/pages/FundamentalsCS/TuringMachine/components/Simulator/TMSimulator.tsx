@@ -75,7 +75,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
           if (!isExerciseScenario) {
             return {
               rows: [],
-              error: t("tm.validation.exampleCheckUnavailable"),
+              error: t("tm.validation.summary.exampleCheckUnavailable"),
             };
           }
 
@@ -88,7 +88,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
           if (!validationProgramResult.ok) {
             return {
               rows: [],
-              error: t("tm.validation.checkInvalidProgram"),
+              error: t("tm.validation.summary.checkInvalidProgram"),
             };
           }
 
@@ -124,7 +124,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
               disabled={editor.hasBlockingCellIssue}
               className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {t("tm.config.apply")}
+              {t("tm.config.general.apply")}
             </button>
           </div>
         ) : (

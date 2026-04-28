@@ -41,12 +41,12 @@ export function TMTransitionTableEditor({
     <div className="flex min-w-0 flex-col gap-2">
       <div className="mb-2 min-h-[3.5rem]">
         <h3 className="text-md font-semibold">
-          {t("tm.config.transitionTable")}
+          {t("tm.config.transitionTable.transitionTable")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.transitionFormat")}{" "}
+          {t("tm.config.transitionTable.transitionFormat")}{" "}
           <code>(Next State, Write Symbol, Movement)</code>
-          {t("tm.config.transitionExample")}
+          {t("tm.config.transitionTable.transitionExample")}
         </p>
       </div>
 

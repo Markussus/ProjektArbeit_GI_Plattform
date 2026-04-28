@@ -70,13 +70,17 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
-        row.passed ? t("tm.validation.pass") : t("tm.validation.fail"),
-        row.input === "" ? t("tm.validation.emptyWord") : row.input,
-        row.output === "" ? t("tm.validation.emptyWord") : row.output,
+        row.passed
+          ? t("tm.validation.summary.pass")
+          : t("tm.validation.summary.fail"),
+        row.input === "" ? t("tm.validation.summary.emptyWord") : row.input,
+        row.output === "" ? t("tm.validation.summary.emptyWord") : row.output,
         row.expectedOutput === ""
-          ? t("tm.validation.emptyWord")
+          ? t("tm.validation.summary.emptyWord")
           : row.expectedOutput,
-        row.endedInValidHaltState ? t("tm.sim.yes") : t("tm.sim.no"),
+        row.endedInValidHaltState
+          ? t("tm.sim.status.yes")
+          : t("tm.sim.status.no"),
       ])
     : [];
 
@@ -97,7 +101,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <Popup
         open={checkResult !== null}
-        title={t("tm.validation.popupTitle")}
+        title={t("tm.validation.summary.popupTitle")}
         onClose={() => setCheckResult(null)}
       >
         <div className="space-y-4">

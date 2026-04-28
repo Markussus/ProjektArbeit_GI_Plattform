@@ -87,7 +87,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Exercises" }).click();
 
     const firstExerciseButton = page.getByRole("button", {
-      name: /Exercise 1: Invert a Binary Word/i,
+      name: /Exercise 1: Erase the Tape/i,
     });
 
     await firstExerciseButton.click();
@@ -102,11 +102,11 @@ test.describe("Turing Machine page", () => {
       page.getByText("Selected exercise", { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Invert a Binary Word", { exact: true }),
+      page.getByText("Erase the Tape", { exact: true }),
     ).toBeVisible();
     await expect(
       page.getByText(
-        "Build a machine that flips every 0 to 1 and every 1 to 0",
+        "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
       ),
     ).toBeVisible();
     await expect(
@@ -122,7 +122,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Load solution" }).click();
     await expect(
       page.getByPlaceholder("Enter input word (e.g., 1011)"),
-    ).toHaveValue("101001");
+    ).toHaveValue("10110");
 
     await page.getByRole("button", { name: "Check solution" }).click();
     await expect(

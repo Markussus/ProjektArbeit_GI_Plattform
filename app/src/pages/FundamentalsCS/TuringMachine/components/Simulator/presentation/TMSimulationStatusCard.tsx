@@ -26,20 +26,24 @@ export function TMSimulationStatusCard({
 
   return (
     <div className="bg-card mt-4 rounded-lg border p-4">
-      <h3 className="mb-2 font-semibold">{t("tm.sim.status")}</h3>
+      <h3 className="mb-2 font-semibold">{t("tm.sim.status.status")}</h3>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="text-muted-foreground">{t("tm.sim.state")}:</div>
+        <div className="text-muted-foreground">{t("tm.sim.status.state")}:</div>
         <div className="font-mono">{formatState(runtime.currentState)}</div>
 
-        <div className="text-muted-foreground">{t("tm.sim.symbol")}:</div>
+        <div className="text-muted-foreground">
+          {t("tm.sim.status.symbol")}:
+        </div>
         <div className="font-mono">{currentSymbol}</div>
 
-        <div className="text-muted-foreground">{t("tm.sim.step")}:</div>
+        <div className="text-muted-foreground">{t("tm.sim.status.step")}:</div>
         <div>{runtime.stepCount}</div>
 
-        <div className="text-muted-foreground">{t("tm.sim.halt")}:</div>
-        <div>{runtime.halted ? t("tm.sim.yes") : t("tm.sim.no")}</div>
+        <div className="text-muted-foreground">{t("tm.sim.status.halt")}:</div>
+        <div>
+          {runtime.halted ? t("tm.sim.status.yes") : t("tm.sim.status.no")}
+        </div>
       </div>
 
       {haltReasonMessage && (

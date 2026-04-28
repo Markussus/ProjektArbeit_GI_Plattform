@@ -41,7 +41,7 @@ export function TMGeneralSettings({
     <>
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          {t("tm.config.initialTape")}
+          {t("tm.config.general.initialTape")}
         </label>
         <input
           type="text"
@@ -49,19 +49,19 @@ export function TMGeneralSettings({
           value={program.initialTape.join("")}
           onChange={(event) => onInitialTapeChange(event.target.value)}
           disabled={disabled}
-          placeholder={t("tm.config.initialTapePlaceholder")}
+          placeholder={t("tm.config.general.initialTapePlaceholder")}
         />
       </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          {t("tm.config.startState")}
+          {t("tm.config.general.startState")}
         </label>
         <DropdownSelect
           value={program.initialState}
           options={startStateOptions}
           onChange={onInitialStateChange}
-          ariaLabel={t("tm.config.startState")}
+          ariaLabel={t("tm.config.general.startState")}
           disabled={disabled}
           triggerClassName="h-12 w-full px-3 py-2"
           menuClassName="right-0 left-0"
