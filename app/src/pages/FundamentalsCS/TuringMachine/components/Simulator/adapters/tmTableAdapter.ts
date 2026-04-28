@@ -63,5 +63,5 @@ function formatTransition(transition?: TMTransition): string {
     return "";
   }
 
-  return `(${transition.nextState}, ${transition.writeSymbol}, ${transition.movement})`;
+  return `(${formatState(transition.nextState)}, ${transition.writeSymbol}, ${transition.movement})`;
 }

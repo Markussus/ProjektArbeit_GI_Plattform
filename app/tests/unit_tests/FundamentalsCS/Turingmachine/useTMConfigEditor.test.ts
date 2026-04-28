@@ -38,7 +38,7 @@ describe("useTMConfigEditor", () => {
     expect(result.current.tableHeaders).toEqual(["δ", "q₀", "q₁"]);
     expect(result.current.displayRows).toEqual([
       ["_", "(qS, _, N)", ""],
-      ["0", "(q1, 1, R)", ""],
+      ["0", "(q₁, 1, R)", ""],
       ["1", "", "(qS, 0, L)"],
     ]);
     expect(result.current.validationIssues).toEqual([]);
@@ -139,7 +139,7 @@ describe("useTMConfigEditor", () => {
       writeSymbol: "1",
       movement: "R",
     });
-    expect(result.current.displayRows[0][2]).toBe("(q1, 1, R)");
+    expect(result.current.displayRows[0][2]).toBe("(q₁, 1, R)");
   });
 
   // Tests header, row, and column removal handlers, including ignored indices that should not mutate the draft.

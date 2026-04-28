@@ -75,8 +75,8 @@ describe("tmTableAdapter", () => {
     it("builds transition rows for the program states in ordered tape-symbol order", () => {
       expect(buildTransitionTableRows(createProgram())).toEqual([
         ["_", "(halt, _, N)", "", "", ""],
-        ["0", "(q1, 1, R)", "", "", ""],
-        ["1", "", "(q10, 0, L)", "", ""],
+        ["0", "(q₁, 1, R)", "", "", ""],
+        ["1", "", "(q₁₀, 0, L)", "", ""],
       ]);
     });
 
@@ -85,7 +85,7 @@ describe("tmTableAdapter", () => {
       expect(buildTransitionTableRows(createProgram(), ["q1"])).toEqual([
         ["_", ""],
         ["0", ""],
-        ["1", "(q10, 0, L)"],
+        ["1", "(q₁₀, 0, L)"],
       ]);
     });
   });

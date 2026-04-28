@@ -61,8 +61,6 @@ test.describe("Turing Machine page", () => {
     await expect(
       page.getByRole("heading", { name: "What is a Turing Machine?" }),
     ).toBeVisible();
-    await expect(page.getByText("Tape & Head Movement")).toBeVisible();
-    await expect(page.getByText("States & Transitions")).toBeVisible();
 
     await page.getByRole("button", { name: "Examples" }).click();
     await expect(

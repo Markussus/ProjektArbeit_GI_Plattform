@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:open": "vite --open",
+    "dev:open": "vite --open --port 4173",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -19,15 +19,15 @@
     "e2e-test": "playwright test",
     "e2e-test:open": "playwright test --ui",
     "e2e-test:report": "playwright show-report",
-    "preview:ci": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "preview:ci": "vite preview --host localhost --port 4173 --strictPort",
     "lhci:config": "node scripts/sync-lighthouserc-from-module-catalog.mjs",
     "lighthouse:ci": "lhci autorun",
-    "lhci": "npm run build && npm run lhci:config && start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci",
+    "lhci": "npm run build && npm run lhci:config && start-server-and-test preview:ci http://localhost:4173 lighthouse:ci",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "lhci:ci": "npm run lhci:config && start-server-and-test preview:ci http://127.0.0.1:4173 lighthouse:ci",
-    "e2e:ci": "start-server-and-test preview:ci http://127.0.0.1:4173 \"playwright test tests/e2e --project=chromium\"",
+    "lhci:ci": "npm run lhci:config && start-server-and-test preview:ci http://localhost:4173 lighthouse:ci",
+    "e2e:ci": "start-server-and-test preview:ci http://localhost:4173 \"playwright test tests/e2e --project=chromium\"",
     "pipeline:local": "node scripts/pipeline-local.mjs"
   },
   "dependencies": {
