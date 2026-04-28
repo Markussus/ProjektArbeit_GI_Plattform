@@ -41,19 +41,19 @@ export function IntegerConverter({
     if (!inputValue) return "";
     try {
       if (sourceBase === "dec")
-        return /^[0-9]+$/.test("inputValue")
-          ? BigInt("inputValue").toString(10)
+        return /^[0-9]+$/.test(inputValue)
+          ? BigInt(inputValue).toString(10)
           : "";
       if (sourceBase === "bin")
-        return /^[01]+$/.test("inputValue")
+        return /^[01]+$/.test(inputValue)
           ? BigInt("0b" + inputValue).toString(10)
           : "";
       if (sourceBase === "oct")
-        return /^[0-7]+$/.test("inputValue")
+        return /^[0-7]+$/.test(inputValue)
           ? BigInt("0o" + inputValue).toString(10)
           : "";
       if (sourceBase === "hex")
-        return /^[0-9A-Fa-f]+$/.test("inputValue")
+        return /^[0-9A-Fa-f]+$/.test(inputValue)
           ? BigInt("0x" + inputValue).toString(10)
           : "";
     } catch {
@@ -65,7 +65,7 @@ export function IntegerConverter({
   const targetValue = useMemo(() => {
     if (!decValue) return "";
     try {
-      const bigIntVal = BigInt("decValue");
+      const bigIntVal = BigInt(decValue);
       if (targetBase === "dec") return decValue;
       if (targetBase === "bin") return bigIntVal.toString(2);
       if (targetBase === "oct") return bigIntVal.toString(8);
@@ -90,8 +90,8 @@ export function IntegerConverter({
   const generateDivisionSteps = (targetVal: number) => {
     if (!decValue) return [];
     try {
-      let currentVal = BigInt("decValue");
-      const baseVal = BigInt("targetVal");
+      let currentVal = BigInt(decValue);
+      const baseVal = BigInt(targetVal);
       const steps = [];
 
       if (currentVal === 0n) {
@@ -122,7 +122,7 @@ export function IntegerConverter({
       const digitChar = cleanInput[i];
       const power = len - 1 - i;
       const digitVal = BigInt(parseInt(digitChar, sourceVal));
-      const termVal = digitVal * BigInt("sourceVal") ** BigInt("power");
+      const termVal = digitVal * BigInt(sourceVal) ** BigInt(power);
       steps.push({
         digit: digitChar,
         digitVal,
@@ -237,7 +237,7 @@ export function IntegerConverter({
               </div>
               <div className="w-[20px] text-center">=</div>
               <div className="w-[80px] text-right">
-                {step.value / BigInt("step.base")}
+                {step.value / BigInt(step.base)}
               </div>
               <div className="text-muted-foreground w-[85px] text-right whitespace-nowrap">
                 {t("simulator.numbers.remainder")}
