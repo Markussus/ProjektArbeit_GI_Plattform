@@ -59,26 +59,26 @@
     "concept2": "Zustände & Übergänge",
     "concept3": "Akzeptanz & Ablehnung",
     "concept4": "Church-Turing-These",
-    "exerciseEraseTape": "Band loeschen",
-    "exerciseEraseTapeDesc": "Bauen Sie eine Maschine, die das gesamte Eingabewort durch Blanks ersetzt und erst anhaelt, wenn das Band leer ist.",
-    "exerciseInvertBinaryWord": "Binaerwort invertieren",
-    "exerciseInvertBinaryWordDesc": "Bauen Sie eine Maschine, die jedes 0 in 1 und jedes 1 in 0 umwandelt und am ersten Blank anhaelt.",
-    "exerciseUnaryIncrement": "Unaeres Inkrement",
-    "exerciseUnaryIncrementDesc": "Bauen Sie eine Maschine, die an ein unaeres Wort genau eine weitere 1 anhaengt und dann anhaelt.",
+    "exerciseEraseTape": "Band löschen",
+    "exerciseEraseTapeDesc": "Bauen Sie eine Maschine, die das gesamte Eingabewort durch Blanks ersetzt und erst anhält, wenn das Band leer ist.",
+    "exerciseInvertBinaryWord": "Binärwort invertieren",
+    "exerciseInvertBinaryWordDesc": "Bauen Sie eine Maschine, die jedes 0 in 1 und jedes 1 in 0 umwandelt und am ersten Blank anhält.",
+    "exerciseUnaryIncrement": "Unäres Inkrement",
+    "exerciseUnaryIncrementDesc": "Bauen Sie eine Maschine, die an ein unäres Wort genau eine weitere 1 anhängt und dann anhält.",
     "exerciseDuplicateZeros": "Nullen verdoppeln",
     "exerciseDuplicateZerosDesc": "Konstruieren Sie eine Turingmaschine, die eine von zwei 1-en eingeschlossene Anzahl von 0-en auf dem Band verdoppelt. Beispiele: 101 -> 1001, 1001 -> 100001.",
-    "exerciseAddBinary": "Binaerzahlen addieren",
-    "exerciseAddBinaryDesc": "Konstruieren Sie eine Turingmaschine, die in der Lage ist, zwei Zahlen in Binaerdarstellung zu addieren. Zur Vereinfachung duerfen Sie Annahmen treffen. Beispielsweise koennen Sie definieren, dass der erste Summand (linkere) groesser als der zweite Summand ist oder der Lesekopf stets auf dem ersten Eingabesymbol steht. Oder zwischen den Zahlen ein bestimmtes Zeichen stehen muss.",
-    "exerciseCheckRegex": "Regulaeren Ausdruck pruefen",
-    "exerciseCheckRegexDesc": "Gegeben sei der regulaere Ausdruck R1 = (1(01)* | 0(10)*). Konstruieren Sie eine Turingmaschine, welche prueft, ob ein beliebiges Binaerwort durch den regulaeren Ausdruck R1 beschrieben werden kann. Nach der Ausfuehrung soll auf Ihrem Band entweder ein 't' fuer wahr oder ein 'f' fuer unwahr stehen. Beispiel: Die Eingabe 11001 kann nicht durch R1 dargestellt werden, auf dem Band steht ein 'f' und alles andere wurde entfernt.",
-    "exerciseBinaryIncrement": "Binaeres Inkrement",
-    "exerciseBinaryIncrementDesc": "Bauen Sie eine Maschine, die zu einer Binaerzahl auf dem Band 1 addiert und mit dem inkrementierten Ergebnis anhaelt.",
+    "exerciseAddBinary": "Binärzahlen addieren",
+    "exerciseAddBinaryDesc": "Konstruieren Sie eine Turingmaschine, die in der Lage ist, zwei Zahlen in Binärdarstellung zu addieren. Zur Vereinfachung dürfen Sie Annahmen treffen. Beispielsweise können Sie definieren, dass der erste Summand (linkere) größer als der zweite Summand ist oder der Lesekopf stets auf dem ersten Eingabesymbol steht. Oder zwischen den Zahlen ein bestimmtes Zeichen stehen muss.",
+    "exerciseCheckRegex": "Regulären Ausdruck prüfen",
+    "exerciseCheckRegexDesc": "Gegeben sei der reguläre Ausdruck R1 = (1(01)* | 0(10)*). Konstruieren Sie eine Turingmaschine, welche prüft, ob ein beliebiges Binärwort durch den regulären Ausdruck R1 beschrieben werden kann. Nach der Ausführung soll auf Ihrem Band entweder ein 't' für wahr oder ein 'f' für unwahr stehen. Beispiel: Die Eingabe 11001 kann nicht durch R1 dargestellt werden, auf dem Band steht ein 'f' und alles andere wurde entfernt.",
+    "exerciseBinaryIncrement": "Binäres Inkrement",
+    "exerciseBinaryIncrementDesc": "Bauen Sie eine Maschine, die zu einer Binärzahl auf dem Band 1 addiert und mit dem inkrementierten Ergebnis anhält.",
     "example1": "Beispiel: Bit-Invertierung",
-    "example1Desc": "Eine vollstaendige Maschine, die beim Durchlauf von links nach rechts jedes Bit eines Binaerworts invertiert.",
-    "example2": "Beispiel: Unaeres Inkrement",
-    "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unaeren Wortes laeuft und eine weitere 1 schreibt.",
-    "example3": "Beispiel: Binaeres Inkrement",
-    "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binaerwort um eins erhoeht."
+    "example1Desc": "Eine vollständige Maschine, die beim Durchlauf von links nach rechts jedes Bit eines Binärworts invertiert.",
+    "example2": "Beispiel: Unäres Inkrement",
+    "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unären Wortes läuft und eine weitere 1 schreibt.",
+    "example3": "Beispiel: Binäres Inkrement",
+    "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht."
   },
   "automata": {
     "title": "Endliche Automaten",
@@ -472,9 +472,9 @@
   },
   "tm": {
     "actions": {
-      "loadSolution": "Loesung laden",
-      "checkSolution": "Loesung pruefen",
-      "checkingSolution": "Pruefung laeuft..."
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft..."
     },
     "config": {
       "title": "Turingmaschinen-Konfiguration",
@@ -501,9 +501,9 @@
       "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
     },
     "validation": {
-      "checkInvalidProgram": "Die aktuelle Maschinenkonfiguration ist noch nicht gueltig.",
-      "exampleCheckUnavailable": "Beispiele benoetigen keine Loesungspruefung.",
-      "popupTitle": "Loesungspruefung",
+      "checkInvalidProgram": "Die aktuelle Maschinenkonfiguration ist noch nicht gültig.",
+      "exampleCheckUnavailable": "Beispiele benötigen keine Lösungsprüfung.",
+      "popupTitle": "Lösungsprüfung",
       "pass": "BESTANDEN",
       "fail": "FEHLER",
       "emptyWord": "<leer>",
@@ -512,7 +512,7 @@
         "input": "Eingabe",
         "output": "Ausgabe",
         "expectedOutput": "Erwartete Ausgabe",
-        "validHaltState": "Gueltiger Haltezustand"
+        "validHaltState": "Gültiger Haltezustand"
       },
       "statesEmpty": "Es muss mindestens ein Zustand definiert sein.",
       "initialStateMissing": "Der Startzustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
