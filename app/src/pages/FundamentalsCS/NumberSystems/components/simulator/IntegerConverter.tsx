@@ -26,6 +26,7 @@ export function IntegerConverter({
 
   useEffect(() => {
     if (isExerciseMode && initialValue) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSourceBase(initialBase);
       setInputValue(initialValue);
     }
