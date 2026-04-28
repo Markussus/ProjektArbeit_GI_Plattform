@@ -162,7 +162,7 @@ export function IntegerConverter({
               {steps.map((step, idx) => (
                 <div
                   key={idx}
-                  className="flex min-w-[60px] flex-col items-center"
+                  className="flex min-w-15 flex-col items-center"
                 >
                   <span className="text-xs">
                     {baseToNumber(sourceBase)}
@@ -190,7 +190,7 @@ export function IntegerConverter({
             ))}
           </div>
           <div className="text-foreground mt-2 flex flex-wrap items-center gap-1 leading-8">
-            <span className="w-[20px]">=</span>
+            <span className="w-5">=</span>
             {steps.map((step, idx) => (
               <span key={idx} className="flex items-center">
                 <span>{step.termVal.toString()}</span>
@@ -232,17 +232,17 @@ export function IntegerConverter({
         <div className="bg-background border-border/40 space-y-2 rounded-lg border p-4 font-mono text-sm shadow-inner">
           {steps.map((step, idx) => (
             <div key={idx} className="flex items-center gap-3">
-              <div className="w-[120px] text-right">
+              <div className="w-30 text-right">
                 {step.value.toString()} : {step.base}
               </div>
-              <div className="w-[20px] text-center">=</div>
-              <div className="w-[80px] text-right">
+              <div className="w-5 text-center">=</div>
+              <div className="w-20 text-right">
                 {step.value / BigInt(step.base)}
               </div>
-              <div className="text-muted-foreground w-[85px] text-right whitespace-nowrap">
+              <div className="text-muted-foreground w-21.25 text-right whitespace-nowrap">
                 {t("simulator.numbers.remainder")}
               </div>
-              <div className="text-primary w-[20px] text-right font-bold">
+              <div className="text-primary w-5 text-right font-bold">
                 {targetBase === "hex" && step.remainder > 9n
                   ? step.remainder.toString(16).toUpperCase()
                   : step.remainder.toString()}
@@ -250,7 +250,7 @@ export function IntegerConverter({
             </div>
           ))}
         </div>
-        <div className="mt-2 mt-4 flex justify-end text-sm font-semibold">
+        <div className="mt-4 flex justify-end text-sm font-semibold">
           <span className="bg-primary/10 text-primary flex items-center gap-2 rounded-md px-3 py-1">
             {t("simulator.numbers.result")}{" "}
             <span className="tracking-widest">{targetValue}</span>
@@ -328,7 +328,7 @@ export function IntegerConverter({
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                 {t("simulator.numbers.resultLabel")}
               </label>
-              <div className="text-primary bg-primary/5 border-primary/20 flex min-h-[54px] items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
+              <div className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
                 {!locked && decValue !== ""
                   ? targetValue
                   : locked
@@ -340,7 +340,7 @@ export function IntegerConverter({
         </div>
 
         {/* Dynamic Explanation Panel */}
-        <div className="bg-muted/30 border-border/50 max-h-[500px] overflow-auto rounded-xl border p-6 shadow-sm">
+        <div className="bg-muted/30 border-border/50 max-h-125 overflow-auto rounded-xl border p-6 shadow-sm">
           {locked ? (
             <div className="flex h-full flex-col items-center justify-center space-y-4 py-12 text-center">
               <LockKeyhole className="text-muted-foreground h-12 w-12 opacity-50" />
