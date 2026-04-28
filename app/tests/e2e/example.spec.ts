@@ -10,7 +10,7 @@ test("opens a guided DNF example in the simulation", async ({ page }) => {
   await page.goto("/fundamentals-cs/dnf");
 
   await page.getByRole("button", { name: /^Examples$/ }).click();
-  await expect(page.getByText("Guided lecture examples")).toBeVisible();
+  await expect(page.getByText("Lecture examples")).toBeVisible();
 
   await page
     .getByRole("button", { name: "Open in simulation" })

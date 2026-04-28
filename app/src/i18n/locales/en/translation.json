@@ -140,8 +140,8 @@
     "concept2": "Truth Tables",
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
-    "examplesTitle": "Guided lecture examples",
-    "examplesIntro": "Four lecture examples show compactly how rows with result 1 become the canonical DNF.",
+    "examplesTitle": "Lecture examples",
+    "examplesIntro": "Four examples show compactly how rows with result 1 become the canonical DNF.",
     "examples": {
       "openInSimulation": "Open in simulation",
       "labels": {
@@ -154,19 +154,19 @@
       "walkthroughs": {
         "lectureExpression": {
           "title": "Expression with an AND group",
-          "explanation": "The expression is true when a=1 or when b and c are both 1."
+          "explanation": "The expression is true when a=1 or b and c are both 1."
         },
         "parentheses": {
           "title": "Parentheses change the result",
-          "explanation": "Here c must be 1, and a=1 or b=1 must also hold."
+          "explanation": "Here c=1, and a=1 or b=1 must also hold."
         },
         "givenRows": {
           "title": "DNF from given 1-rows",
-          "explanation": "Each given 1-row is translated directly into one AND term."
+          "explanation": "Each 1-row is translated directly into one AND term."
         },
         "xor": {
           "title": "Half-adder sum as XOR",
-          "explanation": "The sum is 1 when exactly one of the two inputs is 1."
+          "explanation": "The sum is 1 when exactly one input is 1."
         }
       }
     },
@@ -199,6 +199,7 @@
       "insertOr": "Insert OR",
       "insertOpenParen": "Insert opening parenthesis",
       "insertCloseParen": "Insert closing parenthesis",
+      "quickStart": "Quick start",
       "clear": "Clear",
       "reset": "Reset",
       "examples": {

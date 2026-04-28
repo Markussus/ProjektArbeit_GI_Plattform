@@ -136,8 +136,8 @@
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
-    "examplesTitle": "Geführte Vorlesungsbeispiele",
-    "examplesIntro": "Vier Vorlesungsbeispiele zeigen kompakt, wie aus 1-Zeilen die kanonische DNF entsteht.",
+    "examplesTitle": "Vorlesungsbeispiele",
+    "examplesIntro": "Vier Beispiele zeigen kompakt, wie aus 1-Zeilen die kanonische DNF entsteht.",
     "examples": {
       "openInSimulation": "In Simulation öffnen",
       "labels": {
@@ -150,19 +150,19 @@
       "walkthroughs": {
         "lectureExpression": {
           "title": "Ausdruck mit UND-Klammer",
-          "explanation": "Wahr ist der Ausdruck bei a=1 oder wenn b und c gemeinsam 1 sind."
+          "explanation": "Wahr ist der Ausdruck bei a=1 oder wenn b und c beide 1 sind."
         },
         "parentheses": {
           "title": "Klammerung verändert das Ergebnis",
-          "explanation": "Hier muss c=1 sein und zusätzlich a=1 oder b=1 gelten."
+          "explanation": "Hier gilt c=1 und zusätzlich a=1 oder b=1."
         },
         "givenRows": {
           "title": "DNF aus gegebenen 1-Zeilen",
-          "explanation": "Jede vorgegebene 1-Zeile wird direkt in einen UND-Term übersetzt."
+          "explanation": "Jede 1-Zeile wird direkt in einen UND-Term übersetzt."
         },
         "xor": {
           "title": "Halbaddierer-Summe als XOR",
-          "explanation": "Die Summe ist 1, wenn genau einer der beiden Eingänge 1 ist."
+          "explanation": "Die Summe ist 1, wenn genau ein Eingang 1 ist."
         }
       }
     },
@@ -195,6 +195,7 @@
       "insertOr": "ODER einfügen",
       "insertOpenParen": "Öffnende Klammer einfügen",
       "insertCloseParen": "Schließende Klammer einfügen",
+      "quickStart": "Schnellstart",
       "clear": "Leeren",
       "reset": "Zurücksetzen",
       "examples": {

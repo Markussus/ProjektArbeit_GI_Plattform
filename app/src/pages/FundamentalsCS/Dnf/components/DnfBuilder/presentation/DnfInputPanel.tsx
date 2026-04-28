@@ -95,18 +95,23 @@ export function DnfInputPanel({
       />
 
       {!isExerciseMode && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {examples.map((example) => (
-            <button
-              key={example.id}
-              type="button"
-              onClick={() => onLoadExample(example.expression)}
-              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
-            >
-              <Lightbulb className="size-4" />
-              {t(exampleLabelKeyById[example.id] as never)}
-            </button>
-          ))}
+        <div className="mt-4">
+          <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
+            {t("dnf.builder.quickStart")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {examples.map((example) => (
+              <button
+                key={example.id}
+                type="button"
+                onClick={() => onLoadExample(example.expression)}
+                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+              >
+                <Lightbulb className="size-4" />
+                {t(exampleLabelKeyById[example.id] as never)}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </section>
