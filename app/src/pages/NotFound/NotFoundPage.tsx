@@ -26,7 +26,10 @@ export function NotFoundPage() {
                 </span>
               </div>
 
-              <h1 className="text-foreground mt-8 text-3xl font-bold tracking-tight md:text-5xl">
+              <h1
+                data-testid="not-found-title"
+                className="text-foreground mt-8 text-3xl font-bold tracking-tight md:text-5xl"
+              >
                 {t("notFound.title")}
               </h1>
 
@@ -36,7 +39,10 @@ export function NotFoundPage() {
 
               <p className="text-muted-foreground mt-3 text-sm">
                 {t("notFound.requestedUrl")}:{" "}
-                <span className="text-foreground font-medium">
+                <span
+                  data-testid="not-found-requested-path"
+                  className="text-foreground font-medium"
+                >
                   {location.pathname}
                 </span>
               </p>

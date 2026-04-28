@@ -27,7 +27,7 @@ export function HelpPage() {
   ];
 
   return (
-    <div className="p-8">
+    <div data-testid="help-page" className="p-8">
       <PageIntro
         eyebrow={t("help.label")}
         title={t("help.title")}

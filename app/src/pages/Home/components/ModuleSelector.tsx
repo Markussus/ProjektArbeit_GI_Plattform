@@ -19,6 +19,7 @@ export function ModuleSelector() {
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
+          data-testid="module-selector-trigger"
           className="hover:bg-muted/40 flex w-full items-center justify-between px-5 py-4 text-left"
         >
           <div className="flex items-center gap-3">
@@ -38,13 +39,19 @@ export function ModuleSelector() {
       </div>
 
       {isOpen && (
-        <div className="bg-card ring-foreground/10 absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-xl shadow-lg ring-1">
+        <div
+          data-testid="module-selector-menu"
+          className="bg-card ring-foreground/10 absolute top-full right-0 left-0 z-20 mt-2 overflow-hidden rounded-xl shadow-lg ring-1"
+        >
           <div className="max-h-[min(60vh,24rem)] overflow-y-auto">
             <div className="divide-border divide-y">
               {learningModules.map((module) => (
                 <Link
                   key={module.id}
                   to={module.path}
+                  data-testid={`module-selector-link-${module.id}`}
+                  data-module-id={module.id}
+                  data-module-path={module.path}
                   className="hover:bg-muted/40 flex items-center justify-between gap-4 px-5 py-4"
                 >
                   <div>
