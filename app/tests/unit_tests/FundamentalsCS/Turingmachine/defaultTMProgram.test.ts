@@ -12,7 +12,7 @@ describe("defaultTMProgram", () => {
 
   // Tests that the default program derives its input alphabet from the configured initial tape and keeps the expected blank symbol.
   it("contains the expected derived alphabet and blank symbol", () => {
-    expect(defaultTMProgram.inputAlphabet).toEqual(["1", "0"]);
+    expect(defaultTMProgram.inputAlphabet).toEqual(["0", "1"]);
     expect(defaultTMProgram.blankSymbol).toBe(DEFAULT_BLANK_SYMBOL);
   });
 });

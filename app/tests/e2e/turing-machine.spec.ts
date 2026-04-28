@@ -4,7 +4,7 @@ const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
 const DELTA = "\u03b4";
 const Q0_SUBSCRIPT = "q\u2080";
 const Q1_SUBSCRIPT = "q\u2081";
-const Q3_SUBSCRIPT = "q\u2083";
+const QH = "qH";
 const Q9_SUBSCRIPT = "q\u2089";
 
 async function gotoTuringMachinePage(page: Page) {
@@ -64,9 +64,12 @@ test.describe("Turing Machine page", () => {
 
     await page.getByRole("button", { name: "Examples" }).click();
     await expect(
-      page.getByText(
-        "Interactive examples for Turing Machines will be available here.",
-      ),
+      page.getByText("Current Examples", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: /Example 1: Example: Bit Flip/i,
+      }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Overview" }).click();
@@ -84,7 +87,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Exercises" }).click();
 
     const firstExerciseButton = page.getByRole("button", {
-      name: /Exercise 1: Basic Transition/i,
+      name: /Exercise 1: Invert a Binary Word/i,
     });
 
     await firstExerciseButton.click();
@@ -99,11 +102,40 @@ test.describe("Turing Machine page", () => {
       page.getByText("Selected exercise", { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Basic Transition", { exact: true }),
+      page.getByText("Invert a Binary Word", { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText("Design a simple TM transition table"),
+      page.getByText(
+        "Build a machine that flips every 0 to 1 and every 1 to 0",
+      ),
     ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Load solution" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Check solution" }),
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder("Enter input word (e.g., 1011)"),
+    ).toHaveValue("");
+
+    await page.getByRole("button", { name: "Load solution" }).click();
+    await expect(
+      page.getByPlaceholder("Enter input word (e.g., 1011)"),
+    ).toHaveValue("101001");
+
+    await page.getByRole("button", { name: "Check solution" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Solution check" }),
+    ).toBeVisible();
+    const solutionCheckDialog = page.getByRole("dialog");
+    await expect(
+      solutionCheckDialog.getByRole("table", { name: "Table view" }),
+    ).toContainText("Valid halt state");
+    await expect(
+      solutionCheckDialog.getByRole("table", { name: "Table view" }),
+    ).toContainText("PASS");
+    await page.getByRole("button", { name: "Close popup" }).click();
 
     const focusToggle = page.getByRole("button", {
       name: "Expand simulation",
@@ -137,11 +169,18 @@ test.describe("Turing Machine page", () => {
     await expect(initialTapeInput).toHaveValue("10102");
     await expect(page.getByText("2", { exact: true }).first()).toBeVisible();
 
+    await transitionTable(page)
+      .getByRole("button", { name: "Add column" })
+      .click();
+    await expect(getHeaderInput(page, 3)).toHaveValue(Q1_SUBSCRIPT);
+    await getHeaderInput(page, 3).fill("qAccept");
+    await expect(getHeaderInput(page, 3)).toHaveValue("qAccept");
+
     await page.getByRole("button", { name: "Start State" }).click();
-    await page.getByRole("option", { name: Q1_SUBSCRIPT }).click();
+    await page.getByRole("option", { name: "qAccept" }).click();
     await expect(
       page.getByRole("button", { name: "Start State" }),
-    ).toContainText(Q1_SUBSCRIPT);
+    ).toContainText("qAccept");
 
     const addHaltStateInput = page.getByRole("textbox", {
       name: "Add Halt State",
@@ -166,13 +205,6 @@ test.describe("Turing Machine page", () => {
     ).toHaveCount(4);
 
     await transitionTable(page)
-      .getByRole("button", { name: "Add column" })
-      .click();
-    await expect(getHeaderInput(page, 5)).toHaveValue(Q3_SUBSCRIPT);
-    await getHeaderInput(page, 5).fill("qAccept");
-    await expect(getHeaderInput(page, 5)).toHaveValue("qAccept");
-
-    await transitionTable(page)
       .getByRole("button", { name: "Remove row 4" })
       .click();
     await expect(
@@ -183,7 +215,7 @@ test.describe("Turing Machine page", () => {
       .getByRole("button", { name: "Remove column" })
       .last()
       .click();
-    await expect(getHeaderInput(page, 5)).toHaveCount(0);
+    await expect(getHeaderInput(page, 3)).toHaveCount(0);
 
     page.once("dialog", async (dialog) => {
       expect(dialog.message()).toBe("The blank symbol cannot be removed.");
@@ -246,7 +278,7 @@ test.describe("Turing Machine page", () => {
     ).toBeVisible();
     await expect(startSimulationButton).toBeDisabled();
 
-    await transitionCell.fill("(q1, 1, R)");
+    await transitionCell.fill("(qH, 1, R)");
     await transitionCell.blur();
     await expect(
       page.getByText(
@@ -255,14 +287,14 @@ test.describe("Turing Machine page", () => {
     ).toHaveCount(0);
     await expect(startSimulationButton).toBeEnabled();
 
-    await getHaltStatesPanel(page).locator("label", { hasText: "qS" }).click();
+    await getHaltStatesPanel(page).locator("label", { hasText: QH }).click();
     await startSimulationButton.click();
 
     await expect(
       page.getByText("At least one halt state must be defined."),
     ).toBeVisible();
 
-    await getHaltStatesPanel(page).locator("label", { hasText: "qS" }).click();
+    await getHaltStatesPanel(page).locator("label", { hasText: QH }).click();
     await startSimulationButton.click();
 
     await expect(
@@ -275,7 +307,14 @@ test.describe("Turing Machine page", () => {
     page,
   }) => {
     await gotoTuringMachinePage(page);
-    await openSimulationTab(page);
+
+    await page.getByRole("button", { name: "Examples" }).click();
+    await page
+      .getByRole("button", {
+        name: /Example 1: Example: Bit Flip/i,
+      })
+      .click();
+    await page.getByRole("button", { name: "Open in simulation" }).click();
 
     await page.getByRole("button", { name: "Start Simulation" }).click();
 
@@ -318,9 +357,12 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Step forward" }).click();
     await page.getByRole("button", { name: "Step forward" }).click();
     await page.getByRole("button", { name: "Step forward" }).click();
+    await page.getByRole("button", { name: "Step forward" }).click();
+    await page.getByRole("button", { name: "Step forward" }).click();
+    await page.getByRole("button", { name: "Step forward" }).click();
 
-    await expect(getStatusCard(page)).toContainText("qS");
-    await expect(getStatusCard(page)).toContainText("4");
+    await expect(getStatusCard(page)).toContainText(QH);
+    await expect(getStatusCard(page)).toContainText("7");
     await expect(getStatusCard(page)).toContainText("Yes");
 
     await page.getByRole("button", { name: "Reset" }).click();
