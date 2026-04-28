@@ -5,7 +5,7 @@ import { NegativeNumbers } from "./NegativeNumbers";
 import { IEEE754Converter } from "./IEEE754Converter";
 import { ArithmeticMode } from "./arithmetic";
 import type { Exercise } from "@/types/exercise";
-
+import { cn } from "@/lib/utils";
 type SimulatorMode = "integers" | "negative" | "ieee754" | "arithmetic";
 
 interface SimulatorProps {
@@ -57,47 +57,24 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
   return (
     <div className="flex h-full flex-col space-y-6">
       {/* Dashboard Navigation */}
-      <div className="border-border/50 flex flex-wrap gap-2 border-b pb-4">
-        <button
-          className={`rounded-md px-4 py-2 font-medium transition-colors ${
-            activeMode === "integers"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-          }`}
-          onClick={() => setActiveMode("integers")}
-        >
-          {t("simulator.tabs.integers")}
-        </button>
-        <button
-          className={`rounded-md px-4 py-2 font-medium transition-colors ${
-            activeMode === "negative"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-          }`}
-          onClick={() => setActiveMode("negative")}
-        >
-          {t("simulator.tabs.negative")}
-        </button>
-        <button
-          className={`rounded-md px-4 py-2 font-medium transition-colors ${
-            activeMode === "ieee754"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-          }`}
-          onClick={() => setActiveMode("ieee754")}
-        >
-          {t("simulator.tabs.ieee754")}
-        </button>
-        <button
-          className={`rounded-md px-4 py-2 font-medium transition-colors ${
-            activeMode === "arithmetic"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-          }`}
-          onClick={() => setActiveMode("arithmetic")}
-        >
-          {t("simulator.tabs.arithmetic")}
-        </button>
+      <div className="border-border flex gap-1 border-b">
+        {(["integers", "negative", "ieee754", "arithmetic"] as SimulatorMode[]).map((mode) => (
+          <button
+            key={mode}
+            className={cn(
+              "relative px-4 py-2.5 text-sm font-medium",
+              activeMode === mode
+                ? "text-tab-active"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+            onClick={() => setActiveMode(mode)}
+          >
+            {t(`simulator.tabs.${mode}`)}
+            {activeMode === mode && (
+              <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Simulator Content */}
