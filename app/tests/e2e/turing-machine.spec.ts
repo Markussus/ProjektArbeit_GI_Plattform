@@ -4,7 +4,7 @@ const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
 const DELTA = "\u03b4";
 const Q0_SUBSCRIPT = "q\u2080";
 const Q1_SUBSCRIPT = "q\u2081";
-const QH = "qH";
+const QS = "qS";
 const Q9_SUBSCRIPT = "q\u2089";
 
 async function gotoTuringMachinePage(page: Page) {
@@ -287,14 +287,28 @@ test.describe("Turing Machine page", () => {
     ).toHaveCount(0);
     await expect(startSimulationButton).toBeEnabled();
 
-    await getHaltStatesPanel(page).locator("label", { hasText: QH }).click();
+    await getHaltStatesPanel(page).locator("label", { hasText: QS }).click();
     await startSimulationButton.click();
 
     await expect(
       page.getByText("At least one halt state must be defined."),
     ).toBeVisible();
 
-    await getHaltStatesPanel(page).locator("label", { hasText: QH }).click();
+    await getHaltStatesPanel(page).locator("label", { hasText: QS }).click();
+
+    await page.getByPlaceholder("Enter input word (e.g., 1011)").fill("1");
+
+    const blankTransitionCell = getCellInput(page, 1, Q0_SUBSCRIPT);
+    await blankTransitionCell.fill("(qS, 1, N)");
+    await blankTransitionCell.blur();
+
+    await transitionCell.fill("");
+    await transitionCell.blur();
+
+    const unaryLoopCell = getCellInput(page, 3, Q0_SUBSCRIPT);
+    await unaryLoopCell.fill("(q0, 1, R)");
+    await unaryLoopCell.blur();
+
     await startSimulationButton.click();
 
     await expect(
@@ -361,7 +375,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Step forward" }).click();
     await page.getByRole("button", { name: "Step forward" }).click();
 
-    await expect(getStatusCard(page)).toContainText(QH);
+    await expect(getStatusCard(page)).toContainText(QS);
     await expect(getStatusCard(page)).toContainText("7");
     await expect(getStatusCard(page)).toContainText("Yes");
 

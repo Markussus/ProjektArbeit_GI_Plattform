@@ -37,25 +37,25 @@ export type TuringMachineScenario =
   | TuringMachineExampleScenario;
 
 export const emptyTuringMachineProgram = createProgram({
-  states: ["q0", "qH"],
+  states: ["q0", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["qH"],
+  haltStates: ["qS"],
   initialTape: [],
   transitions: {},
 });
 
 const bitFlipProgram = createProgram({
-  states: ["q0", "qH"],
+  states: ["q0", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["qH"],
+  haltStates: ["qS"],
   initialTape: "101001".split(""),
   transitions: {
     [DEFAULT_BLANK_SYMBOL]: {
-      q0: { nextState: "qH", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
     },
     "0": {
       q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
@@ -67,15 +67,15 @@ const bitFlipProgram = createProgram({
 });
 
 const unaryIncrementProgram = createProgram({
-  states: ["q0", "qH"],
+  states: ["q0", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "1"],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["qH"],
+  haltStates: ["qS"],
   initialTape: "111".split(""),
   transitions: {
     [DEFAULT_BLANK_SYMBOL]: {
-      q0: { nextState: "qH", writeSymbol: "1", movement: "N" },
+      q0: { nextState: "qS", writeSymbol: "1", movement: "N" },
     },
     "1": {
       q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
@@ -84,55 +84,47 @@ const unaryIncrementProgram = createProgram({
 });
 
 const binaryIncrementProgram = createProgram({
-  states: ["q0", "qCarry", "qH"],
+  states: ["q0", "q1", "q2", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["qH"],
-  initialTape: "1011".split(""),
+  haltStates: ["qS"],
+  initialTape: "1101".split(""),
   transitions: {
     [DEFAULT_BLANK_SYMBOL]: {
-      q0: {
-        nextState: "qCarry",
-        writeSymbol: DEFAULT_BLANK_SYMBOL,
-        movement: "L",
-      },
-      qCarry: { nextState: "qH", writeSymbol: "1", movement: "N" },
+      q0: { nextState: "q1", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q1: { nextState: "q2", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
     },
     "0": {
-      qCarry: { nextState: "qH", writeSymbol: "1", movement: "N" },
+      q0: { nextState: "q0", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "0", movement: "R" },
     },
     "1": {
       q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
-      qCarry: { nextState: "qCarry", writeSymbol: "0", movement: "L" },
+      q1: { nextState: "q1", writeSymbol: "0", movement: "L" },
+      q2: { nextState: "q2", writeSymbol: "1", movement: "R" },
     },
   },
 });
 
 const eraseTapeProgram = createProgram({
-  states: ["q0", "qH"],
+  states: ["q0", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
   blankSymbol: DEFAULT_BLANK_SYMBOL,
   initialState: "q0",
-  haltStates: ["qH"],
+  haltStates: ["qS"],
   initialTape: "10110".split(""),
   transitions: {
     [DEFAULT_BLANK_SYMBOL]: {
-      q0: { nextState: "qH", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
     },
     "0": {
-      q0: {
-        nextState: "q0",
-        writeSymbol: DEFAULT_BLANK_SYMBOL,
-        movement: "R",
-      },
+      q0: { nextState: "q0", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "R" },
     },
     "1": {
-      q0: {
-        nextState: "q0",
-        writeSymbol: DEFAULT_BLANK_SYMBOL,
-        movement: "R",
-      },
+      q0: { nextState: "q0", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "R" },
     },
   },
 });
@@ -151,6 +143,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = [
       { input: "0", expectedOutput: "1" },
       { input: "1", expectedOutput: "0" },
       { input: "1010", expectedOutput: "0101" },
+      { input: "0101", expectedOutput: "1010" },
       { input: "000111", expectedOutput: "111000" },
       { input: "1100101", expectedOutput: "0011010" },
     ],
@@ -196,6 +189,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = [
       { input: "1", expectedOutput: "10" },
       { input: "10", expectedOutput: "11" },
       { input: "1011", expectedOutput: "1100" },
+      { input: "1101", expectedOutput: "1110" },
       { input: "111", expectedOutput: "1000" },
       { input: "100111", expectedOutput: "101000" },
     ],
@@ -224,7 +218,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = [
     definition: {
       titleKey: "turing.exercise4",
       descriptionKey: "turing.exercise4Desc",
-      difficulty: "medium",
+      difficulty: "easy",
       icon: Eraser,
     },
   },
