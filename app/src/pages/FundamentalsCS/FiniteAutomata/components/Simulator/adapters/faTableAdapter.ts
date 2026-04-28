@@ -42,7 +42,9 @@ export function buildTransitionTableRows(program: FAProgram): string[][] {
 }
 
 /**
- * Get the active cell(s) in the transition table based on current runtime.
+ * Returns the cell to highlight: the (symbol, fromState) pair of the most
+ * recent transition taken — i.e. the same transition the graph highlights
+ * via its active edge. This keeps graph and table in lockstep.
  */
 export function getActiveTransitionCell(
   program: FAProgram,
@@ -50,13 +52,22 @@ export function getActiveTransitionCell(
     activeStates: string[];
     inputWord: string[];
     inputPosition: number;
+    transitionHistory: Array<{
+      fromStates: string[];
+      symbol: string;
+      toStates: string[];
+    }>;
   },
 ): { row: number; col: number } | null {
-  if (runtime.inputPosition >= runtime.inputWord.length) {
+  const lastTransition =
+    runtime.transitionHistory.length > 0
+      ? runtime.transitionHistory[runtime.transitionHistory.length - 1]
+      : null;
+
+  if (!lastTransition || lastTransition.fromStates.length === 0) {
     return null;
   }
 
-  const symbol = runtime.inputWord[runtime.inputPosition];
   const symbols = [...program.alphabet];
   if (program.type === "NFA") {
     const hasEpsilon = Object.values(program.transitions).some(
@@ -67,19 +78,13 @@ export function getActiveTransitionCell(
     }
   }
 
-  const rowIndex = symbols.indexOf(symbol);
+  const rowIndex = symbols.indexOf(lastTransition.symbol);
   if (rowIndex < 0) return null;
 
-  // For DFA, highlight the single active state column
-  // For NFA, highlight the first active state
-  if (runtime.activeStates.length > 0) {
-    const colIndex = program.states.indexOf(runtime.activeStates[0]);
-    if (colIndex >= 0) {
-      return { row: rowIndex, col: colIndex + 1 }; // +1 for symbol column
-    }
-  }
+  const colIndex = program.states.indexOf(lastTransition.fromStates[0]);
+  if (colIndex < 0) return null;
 
-  return null;
+  return { row: rowIndex, col: colIndex + 1 };
 }
 
 /**

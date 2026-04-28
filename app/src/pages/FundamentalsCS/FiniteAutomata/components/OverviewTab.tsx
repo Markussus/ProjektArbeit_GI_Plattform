@@ -1,19 +1,38 @@
 import { useTranslation } from "react-i18next";
 import {
-  Network,
-  Workflow,
-  GitBranch,
-  Sparkles,
   ListChecks,
   CheckCircle2,
+  Network,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-const conceptIcons = [Network, Workflow, GitBranch, Sparkles];
-
-function getConceptAccentClasses() {
-  return "bg-module-blue-bg text-module-blue-fg";
+interface ConceptItem {
+  icon: LucideIcon;
+  titleKey: string;
+  titleFallback: string;
+  descKey: string;
+  descFallback: string;
 }
+
+const concepts: ConceptItem[] = [
+  {
+    icon: Network,
+    titleKey: "automata.concept1",
+    titleFallback: "DFA & NFA",
+    descKey: "automata.concept1Desc",
+    descFallback:
+      "Build either type — the editor flags non-determinism in your transition table.",
+  },
+  {
+    icon: Sparkles,
+    titleKey: "automata.concept2",
+    titleFallback: "Grammar → Automaton",
+    descKey: "automata.concept2Desc",
+    descFallback:
+      "Paste a right-linear regular grammar and convert it to an NFA in one click.",
+  },
+];
 
 export function OverviewTab() {
   const { t } = useTranslation();
@@ -31,81 +50,40 @@ export function OverviewTab() {
         </p>
       </div>
 
-      {/* Concepts */}
+      {/* Key Concepts — each one maps to a simulator feature */}
       <div>
         <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("automata.concepts")}
+          {t("automata.concepts", "Key Concepts")}
         </h3>
-
         <div className="grid gap-3 sm:grid-cols-2">
-          {([1, 2, 3, 4] as const).map((num, i) => {
-            const Icon = conceptIcons[i];
-
-            return (
+          {concepts.map(
+            ({
+              icon: Icon,
+              titleKey,
+              titleFallback,
+              descKey,
+              descFallback,
+            }) => (
               <div
-                key={num}
-                className="bg-card ring-foreground/10 hover:ring-primary/40 flex items-center gap-3 rounded-lg p-4 ring-1 transition-all hover:shadow-md"
+                key={titleKey}
+                className="bg-card ring-foreground/10 flex items-start gap-3 rounded-lg p-4 ring-1"
               >
-                <div
-                  className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-md",
-                    getConceptAccentClasses(),
-                  )}
-                >
-                  <Icon className="size-4" />
+                <Icon className="text-primary mt-0.5 size-5 shrink-0" />
+                <div>
+                  <p className="text-foreground text-sm font-semibold">
+                    {t(titleKey, titleFallback)}
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs leading-snug">
+                    {t(descKey, descFallback)}
+                  </p>
                 </div>
-
-                <span className="text-foreground text-sm font-medium">
-                  {t(`automata.concept${num}`)}
-                </span>
               </div>
-            );
-          })}
+            ),
+          )}
         </div>
       </div>
 
-      {/* DFA vs NFA comparison */}
-      <div>
-        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("automata.comparison", "DFA vs. NFA")}
-        </h3>
-        <div className="grid gap-3 md:grid-cols-2">
-          <ComparisonCard
-            title="DFA"
-            subtitle={t(
-              "automata.dfaSubtitle",
-              "Deterministic Finite Automaton",
-            )}
-            items={[
-              t(
-                "automata.dfaPoint1",
-                "Exactly one transition per (state, symbol)",
-              ),
-              t("automata.dfaPoint2", "Exactly one active state at any time"),
-              t("automata.dfaPoint3", "No ε-transitions"),
-              t("automata.dfaPoint4", "Easy to simulate efficiently"),
-            ]}
-          />
-          <ComparisonCard
-            title="NFA"
-            subtitle={t(
-              "automata.nfaSubtitle",
-              "Nondeterministic Finite Automaton",
-            )}
-            items={[
-              t("automata.nfaPoint1", "Multiple targets per (state, symbol)"),
-              t(
-                "automata.nfaPoint2",
-                "Set of active states explored in parallel",
-              ),
-              t("automata.nfaPoint3", "Supports ε-transitions"),
-              t("automata.nfaPoint4", "Equivalent to DFA in expressive power"),
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* What you can do */}
+      {/* What you can do — strictly the features the simulator supports */}
       <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
         <h3 className="text-foreground mb-3 flex items-center gap-2 text-base font-semibold">
           <ListChecks className="text-primary size-5" />
@@ -123,11 +101,11 @@ export function OverviewTab() {
             ),
             t(
               "automata.feature3",
-              "Test input words with step-by-step execution",
+              "Step through an input word and watch the state diagram update",
             ),
             t(
               "automata.feature4",
-              "Watch the state diagram animate as the simulation runs",
+              "Batch-test multiple words and inspect accept/reject results",
             ),
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2 text-sm">
@@ -139,33 +117,4 @@ export function OverviewTab() {
       </div>
     </div>
   );
-}
-
-function ComparisonCard(props: ComparisonCardProps) {
-  const { title, subtitle, items } = props;
-  return (
-    <div className="bg-card ring-foreground/10 rounded-lg p-4 ring-1">
-      <div className="mb-3">
-        <h4 className="text-foreground text-base font-bold">{title}</h4>
-        <p className="text-muted-foreground text-xs">{subtitle}</p>
-      </div>
-      <ul className="space-y-1.5">
-        {items.map((item) => (
-          <li
-            key={item}
-            className="text-muted-foreground flex items-start gap-2 text-xs"
-          >
-            <span className="bg-primary/60 mt-1.5 size-1.5 shrink-0 rounded-full" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-interface ComparisonCardProps {
-  title: string;
-  subtitle: string;
-  items: string[];
 }

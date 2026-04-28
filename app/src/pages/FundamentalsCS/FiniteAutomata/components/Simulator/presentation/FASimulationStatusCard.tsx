@@ -77,11 +77,13 @@ export function FASimulationStatusCard({
   })();
 
   return (
-    <div className="fa-card p-4">
+    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4">
       <div className="flex flex-col gap-3">
         {/* Status header */}
         <div className="flex items-center justify-between">
-          <span className="fa-label">{t("fa.sim.status.label", "Status")}</span>
+          <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+            {t("fa.sim.status.label", "Status")}
+          </span>
           <span
             className="text-sm font-bold"
             style={{

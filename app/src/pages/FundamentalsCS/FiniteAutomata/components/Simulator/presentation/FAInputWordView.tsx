@@ -17,8 +17,10 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   }
 
   return (
-    <div className="fa-card p-3">
-      <span className="fa-label">{t("fa.sim.inputWord", "Input Word")}</span>
+    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+      <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+        {t("fa.sim.inputWord", "Input Word")}
+      </span>
       <div className="mt-2 flex items-center gap-1">
         {runtime.inputWord.map((symbol, index) => {
           const isRead = index < runtime.inputPosition;

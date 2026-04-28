@@ -107,21 +107,24 @@ describe("buildTransitionTableRows — NFA", () => {
 });
 
 describe("getActiveTransitionCell", () => {
-  it("returns null when all input has been consumed", () => {
-    const runtime = {
-      activeStates: ["s0"],
-      inputWord: ["a"],
-      inputPosition: 1,
-    };
-    expect(getActiveTransitionCell(defaultDFAProgram, runtime)).toBeNull();
-  });
-
-  it("returns the correct row and column for a DFA step", () => {
-    // s0 is at index 0 → col 1 (offset for symbol col); 'a' is at row 0
+  it("returns null when no step has been taken yet", () => {
     const runtime = {
       activeStates: ["s0"],
       inputWord: ["a"],
       inputPosition: 0,
+      transitionHistory: [],
+    };
+    expect(getActiveTransitionCell(defaultDFAProgram, runtime)).toBeNull();
+  });
+
+  it("returns the cell of the most recent transition (fromState, symbol)", () => {
+    const runtime = {
+      activeStates: ["s1"],
+      inputWord: ["a"],
+      inputPosition: 1,
+      transitionHistory: [
+        { fromStates: ["s0"], symbol: "a", toStates: ["s1"] },
+      ],
     };
     const cell = getActiveTransitionCell(defaultDFAProgram, runtime);
     expect(cell).not.toBeNull();
@@ -129,20 +132,22 @@ describe("getActiveTransitionCell", () => {
     expect(cell!.col).toBe(1); // s0 is first state → col 1
   });
 
-  it("returns null for an unrecognised symbol", () => {
+  it("returns null when the last transition's symbol is not in the table", () => {
     const runtime = {
-      activeStates: ["s0"],
+      activeStates: [],
       inputWord: ["z"],
-      inputPosition: 0,
+      inputPosition: 1,
+      transitionHistory: [{ fromStates: ["s0"], symbol: "z", toStates: [] }],
     };
     expect(getActiveTransitionCell(defaultDFAProgram, runtime)).toBeNull();
   });
 
-  it("returns null when activeStates is empty", () => {
+  it("returns null when the last transition has no fromStates", () => {
     const runtime = {
       activeStates: [],
       inputWord: ["a"],
-      inputPosition: 0,
+      inputPosition: 1,
+      transitionHistory: [{ fromStates: [], symbol: "a", toStates: [] }],
     };
     expect(getActiveTransitionCell(defaultDFAProgram, runtime)).toBeNull();
   });

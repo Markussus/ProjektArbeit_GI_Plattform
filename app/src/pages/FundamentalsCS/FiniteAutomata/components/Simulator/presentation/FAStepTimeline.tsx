@@ -1,23 +1,13 @@
 import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { SkipForward } from "lucide-react";
 import type { FARuntime } from "../domain/faRuntime";
 
 interface FAStepTimelineProps {
   runtime: FARuntime;
   onJumpToStep: (step: number) => void;
-  onJumpToEnd: () => void;
 }
 
-/**
- * Horizontal step-history timeline. Each step is a clickable dot.
- * The current step is highlighted with a cyan glow.
- */
-export function FAStepTimeline({
-  runtime,
-  onJumpToStep,
-  onJumpToEnd,
-}: FAStepTimelineProps) {
+export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentStep = runtime.stepCount;
@@ -45,29 +35,17 @@ export function FAStepTimeline({
   }));
 
   return (
-    <div className="fa-card p-3">
+    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
       <div className="mb-2 flex items-center justify-between">
-        <span className="fa-label">
+        <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
           {t("fa.sim.stepHistory", "Step History")}
         </span>
-        <div className="flex items-center gap-2">
-          <span style={{ color: "var(--fa-text-dim)", fontSize: "0.75rem" }}>
-            {t("fa.sim.stepOf", "Step {{current}} of {{total}}", {
-              current: currentStep,
-              total: runtime.inputWord.length,
-            })}
-          </span>
-          <button
-            type="button"
-            className="fa-btn"
-            onClick={onJumpToEnd}
-            disabled={runtime.halted}
-            title={t("fa.sim.jumpToEnd", "Jump to End")}
-            style={{ padding: "0.25rem 0.5rem", fontSize: "0.7rem" }}
-          >
-            <SkipForward style={{ width: 14, height: 14 }} />
-          </button>
-        </div>
+        <span style={{ color: "var(--fa-text-dim)", fontSize: "0.75rem" }}>
+          {t("fa.sim.stepOf", "Step {{current}} of {{total}}", {
+            current: currentStep,
+            total: runtime.inputWord.length,
+          })}
+        </span>
       </div>
 
       <div

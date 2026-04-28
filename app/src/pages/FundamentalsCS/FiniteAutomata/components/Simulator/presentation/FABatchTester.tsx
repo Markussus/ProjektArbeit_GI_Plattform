@@ -1,46 +1,16 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Play, RotateCcw, Wand2 } from "lucide-react";
+import { Play, RotateCcw } from "lucide-react";
 import { runBatch, type FABatchResult } from "../domain/faBatchRunner";
 import type { FAProgram } from "../domain/faTypes";
 
-const MAX_AUTOFILL = 64;
-
-function generateWords(alphabet: string[], length: number): string[] {
-  if (length === 0) return [""];
-  const results: string[] = [];
-  const stack: string[] = [""];
-  while (stack.length > 0 && results.length < MAX_AUTOFILL) {
-    const prefix = stack.pop()!;
-    if (prefix.length === length) {
-      results.push(prefix);
-    } else {
-      for (let i = alphabet.length - 1; i >= 0; i--) {
-        stack.push(prefix + alphabet[i]);
-      }
-    }
-  }
-  return results;
-}
-
 interface FABatchTesterProps {
   program: FAProgram;
-  /** Default word length used for auto-fill (matches the current input word length) */
-  defaultWordLen?: number;
   /** Called when user clicks a word to debug it step-by-step */
   onSelectWord?: (word: string) => void;
 }
 
-/**
- * Batch testing panel: enter multiple words, run them all, see pass/fail.
- * Stretches to match the state diagram height. Results scroll inside the
- * panel so the transition table is never pushed down.
- */
-export function FABatchTester({
-  program,
-  defaultWordLen,
-  onSelectWord,
-}: FABatchTesterProps) {
+export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
   const { t } = useTranslation();
   const [rawInput, setRawInput] = useState("");
   const [results, setResults] = useState<FABatchResult[] | null>(null);
@@ -60,13 +30,6 @@ export function FABatchTester({
     setResults(null);
   };
 
-  const handleAutoFill = () => {
-    if (defaultWordLen === undefined) return;
-    const words = generateWords(program.alphabet, defaultWordLen);
-    setRawInput(words.join("\n"));
-    setResults(null);
-  };
-
   const summary = useMemo(() => {
     if (!results) return null;
     const accepted = results.filter((r) => r.accepted).length;
@@ -79,41 +42,20 @@ export function FABatchTester({
 
   return (
     <div
-      className="fa-card flex flex-col gap-3 p-4"
+      className="flex flex-col gap-3 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4"
       style={{ height: "100%", minHeight: 0, minWidth: "300px" }}
     >
       {/* Header */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
-        <span className="fa-label">{t("fa.batch.title", "Batch Testing")}</span>
-        {defaultWordLen !== undefined && program.alphabet.length > 0 && (
-          <button
-            type="button"
-            className="fa-btn"
-            onClick={handleAutoFill}
-            title={t(
-              "fa.batch.autoFillTooltip",
-              "Generate all words of length {{n}}",
-              { n: defaultWordLen },
-            )}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              fontSize: "0.75rem",
-              padding: "0.2rem 0.5rem",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <Wand2 style={{ width: 12, height: 12 }} />
-            {t("fa.batch.autoFill", "Auto-fill")}
-          </button>
-        )}
+        <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+          {t("fa.batch.title", "Batch Testing")}
+        </span>
       </div>
 
       {/* Input area — hidden once results are shown */}
       {!results ? (
         <textarea
-          className="fa-textarea"
+          className="rounded-md border border-(--fa-border) bg-(--fa-surface) p-3 font-mono text-[0.8125rem] text-(--fa-text) transition-colors duration-200 outline-none placeholder:text-(--fa-text-dim) focus:border-(--fa-cyan)"
           rows={4}
           style={{ flex: "1 1 auto", minHeight: 80, resize: "none" }}
           value={rawInput}
@@ -207,7 +149,7 @@ export function FABatchTester({
       <div className="flex flex-shrink-0 items-center gap-1.5">
         <button
           type="button"
-          className="fa-btn fa-btn-primary"
+          className="cursor-pointer rounded-md border border-(--fa-cyan) bg-(--fa-cyan-dim) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-cyan) transition-all duration-200 hover:brightness-[1.15]"
           onClick={handleRun}
           style={{
             display: "flex",
@@ -236,7 +178,7 @@ export function FABatchTester({
         {results && (
           <button
             type="button"
-            className="fa-btn"
+            className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
             onClick={handleClear}
             style={{
               display: "flex",

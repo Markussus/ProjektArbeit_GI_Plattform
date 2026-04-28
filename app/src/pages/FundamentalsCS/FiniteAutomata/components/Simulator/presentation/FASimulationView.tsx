@@ -30,7 +30,6 @@ export interface FASimulationViewProps {
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
   onJumpToStep: (step: number) => void;
-  onJumpToEnd: () => void;
   /** Called when a batch-test word is clicked for step-by-step debugging */
   onSelectBatchWord?: (word: string) => void;
 }
@@ -49,7 +48,6 @@ export function FASimulationView({
   onReset,
   onSpeedChange,
   onJumpToStep,
-  onJumpToEnd,
   onSelectBatchWord,
 }: FASimulationViewProps) {
   const { t } = useTranslation();
@@ -65,16 +63,17 @@ export function FASimulationView({
   );
 
   return (
-    <div className="fa-neon">
+    <div className="rounded-[1rem] bg-(--fa-bg) p-6 text-(--fa-text)">
       {/* Top bar: title + edit button */}
       <div className="mb-4 flex items-center justify-between">
-        <h2
-          className="text-lg font-bold"
-          style={{ color: "var(--fa-text-bright)" }}
-        >
+        <h2 className="text-lg font-bold text-(--fa-text-bright)">
           {t("fa.sim.title", "Simulation")}
         </h2>
-        <button type="button" className="fa-btn" onClick={onEditConfig}>
+        <button
+          type="button"
+          className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
+          onClick={onEditConfig}
+        >
           {t("fa.sim.edit", "Edit Configuration")}
         </button>
       </div>
@@ -85,11 +84,7 @@ export function FASimulationView({
           <FAInputWordView runtime={runtime} />
         </div>
         <div className="flex-1">
-          <FAStepTimeline
-            runtime={runtime}
-            onJumpToStep={onJumpToStep}
-            onJumpToEnd={onJumpToEnd}
-          />
+          <FAStepTimeline runtime={runtime} onJumpToStep={onJumpToStep} />
         </div>
       </div>
 
@@ -97,7 +92,7 @@ export function FASimulationView({
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Left: Controls + Status */}
         <div className="flex w-full flex-col gap-4 lg:w-1/4">
-          <div className="fa-card p-3">
+          <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
             <SimulatorControls
               status={status}
               speed={speed}
@@ -124,22 +119,16 @@ export function FASimulationView({
 
         {/* Right: Batch Tester — stretches to match the diagram height */}
         <div className="flex min-h-0 w-full lg:w-1/4">
-          <FABatchTester
-            program={program}
-            defaultWordLen={runtime.inputWord.length}
-            onSelectWord={onSelectBatchWord}
-          />
+          <FABatchTester program={program} onSelectWord={onSelectBatchWord} />
         </div>
       </div>
 
-      {/* Transition Table */}
-      <div className="fa-card overflow-hidden p-0">
-        <TableView
-          headers={tableHeaders}
-          rows={tableRows}
-          activeCell={activeCell}
-        />
-      </div>
+      {/* Transition Table — reuses the same TableView highlighting as the TM */}
+      <TableView
+        headers={tableHeaders}
+        rows={tableRows}
+        activeCell={activeCell}
+      />
     </div>
   );
 }

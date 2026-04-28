@@ -9,7 +9,6 @@ import type { FAProgram } from "./domain/faTypes";
 import { FAConfigView } from "./presentation/FAConfigView";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
-import { FAHelpButton } from "./presentation/FAHelpButton";
 import { FAExerciseWorkspacePanel } from "./presentation/FAExerciseWorkspacePanel";
 import { useFAExampleStore } from "../../store/faExampleStore";
 import { useFAExerciseStore } from "../../store/faExerciseStore";
@@ -92,106 +91,104 @@ export function FASimulator() {
   };
 
   return (
-    <>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
-        {isEditMode ? (
-          <div className="flex flex-col gap-6">
-            {activeExercise && (
-              <FAExerciseWorkspacePanel
-                exercise={activeExercise}
-                studentProgram={editor.draft}
-                onLoadSolution={handleLoadExerciseSolution}
-                onExit={handleExitExercise}
-              />
-            )}
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
+      {isEditMode ? (
+        <div className="flex flex-col gap-6">
+          {activeExercise && (
+            <FAExerciseWorkspacePanel
+              exercise={activeExercise}
+              studentProgram={editor.draft}
+              onLoadSolution={handleLoadExerciseSolution}
+              onExit={handleExitExercise}
+            />
+          )}
 
-            {/* Mode Toggle */}
-            <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
-              <ModeButton
-                active={editorMode === "manual"}
-                onClick={() => setEditorMode("manual")}
-                icon={<Settings className="h-4 w-4" />}
-                label={t("fa.editor.manual", "Manual Editor")}
-              />
-              <ModeButton
-                active={editorMode === "grammar"}
-                onClick={() => setEditorMode("grammar")}
-                icon={<Sparkles className="h-4 w-4" />}
-                label={t("fa.editor.grammar", "From Grammar")}
-              />
-            </div>
-
-            {editorMode === "manual" && (
-              <div key="manual" className="fa-editor-panel flex flex-col gap-6">
-                <div className="bg-card rounded-xl border p-6 shadow-sm">
-                  <FAConfigView editor={editor} />
-                </div>
-
-                <div className="bg-card flex flex-col gap-3 rounded-xl border p-6 shadow-sm">
-                  <label className="text-sm font-semibold">
-                    {t("fa.config.inputWord", "Input Word")}
-                  </label>
-                  <input
-                    type="text"
-                    value={inputWord}
-                    onChange={(e) => setInputWord(e.target.value)}
-                    className="border-input bg-background focus:ring-primary w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
-                    placeholder="aab"
-                  />
-                  <p className="text-muted-foreground text-xs">
-                    {t(
-                      "fa.config.inputWordHelp",
-                      "Each character is treated as one input symbol.",
-                    )}
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleApplyProgram}
-                  disabled={!editor.isValid}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Play className="h-4 w-4 fill-current" />
-                  {t("fa.config.apply", "Start Simulation")}
-                </button>
-              </div>
-            )}
-
-            {editorMode === "grammar" && (
-              <div
-                key="grammar"
-                className="fa-editor-panel bg-card rounded-xl border p-6 shadow-sm"
-              >
-                <FAGrammarInput onConvert={handleGrammarConvert} />
-              </div>
-            )}
+          {/* Mode Toggle */}
+          <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
+            <ModeButton
+              active={editorMode === "manual"}
+              onClick={() => setEditorMode("manual")}
+              icon={<Settings className="h-4 w-4" />}
+              label={t("fa.editor.manual", "Manual Editor")}
+            />
+            <ModeButton
+              active={editorMode === "grammar"}
+              onClick={() => setEditorMode("grammar")}
+              icon={<Sparkles className="h-4 w-4" />}
+              label={t("fa.editor.grammar", "From Grammar")}
+            />
           </div>
-        ) : (
-          <FASimulationView
-            program={program}
-            runtime={simulation.runtime}
-            status={simulation.status}
-            speed={simulation.speed}
-            error={simulation.error}
-            onEditConfig={handleEditProgram}
-            onPlay={simulation.play}
-            onPause={simulation.pause}
-            onStep={simulation.step}
-            onStepBack={simulation.stepBack}
-            onReset={() => simulation.reset()}
-            onSpeedChange={simulation.setSpeed}
-            onJumpToStep={simulation.jumpToStep}
-            onJumpToEnd={simulation.jumpToEnd}
-            onSelectBatchWord={(word) => {
-              setInputWord(word);
-              simulation.reset({ program, inputWord: word.split("") });
-            }}
-          />
-        )}
-      </div>
 
-      <FAHelpButton />
-    </>
+          {editorMode === "manual" && (
+            <div
+              key="manual"
+              className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-6 duration-300"
+            >
+              <div className="bg-card rounded-xl border p-6 shadow-sm">
+                <FAConfigView editor={editor} />
+              </div>
+
+              <div className="bg-card flex flex-col gap-3 rounded-xl border p-6 shadow-sm">
+                <label className="text-sm font-semibold">
+                  {t("fa.config.inputWord", "Input Word")}
+                </label>
+                <input
+                  type="text"
+                  value={inputWord}
+                  onChange={(e) => setInputWord(e.target.value)}
+                  className="border-input bg-background focus:ring-primary w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
+                  placeholder="aab"
+                />
+                <p className="text-muted-foreground text-xs">
+                  {t(
+                    "fa.config.inputWordHelp",
+                    "Each character is treated as one input symbol.",
+                  )}
+                </p>
+              </div>
+
+              <button
+                onClick={handleApplyProgram}
+                disabled={!editor.isValid}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Play className="h-4 w-4 fill-current" />
+                {t("fa.config.apply", "Start Simulation")}
+              </button>
+            </div>
+          )}
+
+          {editorMode === "grammar" && (
+            <div
+              key="grammar"
+              className="bg-card animate-in fade-in slide-in-from-bottom-2 rounded-xl border p-6 shadow-sm duration-300"
+            >
+              <FAGrammarInput onConvert={handleGrammarConvert} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <FASimulationView
+          program={program}
+          runtime={simulation.runtime}
+          status={simulation.status}
+          speed={simulation.speed}
+          error={simulation.error}
+          onEditConfig={handleEditProgram}
+          onPlay={simulation.play}
+          onPause={simulation.pause}
+          onStep={simulation.step}
+          onStepBack={simulation.stepBack}
+          onReset={() => simulation.reset()}
+          onSpeedChange={simulation.setSpeed}
+          onJumpToStep={simulation.jumpToStep}
+          onSelectBatchWord={(word) => {
+            setInputWord(word);
+            simulation.reset({ program, inputWord: word.split("") });
+          }}
+        />
+      )}
+    </div>
   );
 }
 

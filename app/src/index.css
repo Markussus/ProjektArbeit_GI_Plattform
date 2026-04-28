@@ -155,6 +155,30 @@
   /* Active navigation */
   --nav-active-bg: oklch(0.97 0.02 55);
   --nav-active-fg: oklch(0.2 0 0);
+
+  /* Finite Automata accent palette — light theme */
+  --fa-bg: #f4f6fb;
+  --fa-surface: #ffffff;
+  --fa-surface-raised: #fafbff;
+  --fa-border: rgba(15, 23, 42, 0.12);
+  --fa-border-subtle: rgba(15, 23, 42, 0.06);
+
+  --fa-cyan: #0891b2;
+  --fa-cyan-dim: rgba(8, 145, 178, 0.14);
+  --fa-purple: #7c3aed;
+  --fa-purple-dim: rgba(124, 58, 237, 0.12);
+  --fa-green: #059669;
+  --fa-green-dim: rgba(5, 150, 105, 0.14);
+  --fa-red: #dc2626;
+  --fa-red-dim: rgba(220, 38, 38, 0.12);
+  --fa-amber: #d97706;
+
+  --fa-text: #1e293b;
+  --fa-text-dim: #64748b;
+  --fa-text-bright: #0f172a;
+
+  --fa-node-fill: #eef2ff;
+  --fa-node-stroke: rgba(99, 102, 241, 0.4);
 }
 
 .dark {
@@ -234,6 +258,30 @@
   /* Active navigation */
   --nav-active-bg: oklch(0.3 0.04 45 / 0.35);
   --nav-active-fg: oklch(0.985 0 0);
+
+  /* Finite Automata accent palette — dark theme */
+  --fa-bg: #0a0a0a;
+  --fa-surface: #141414;
+  --fa-surface-raised: #1a1a1a;
+  --fa-border: rgba(255, 255, 255, 0.08);
+  --fa-border-subtle: rgba(255, 255, 255, 0.04);
+
+  --fa-cyan: #00e5ff;
+  --fa-cyan-dim: rgba(0, 229, 255, 0.15);
+  --fa-purple: #b388ff;
+  --fa-purple-dim: rgba(179, 136, 255, 0.15);
+  --fa-green: #69f0ae;
+  --fa-green-dim: rgba(105, 240, 174, 0.15);
+  --fa-red: #ff5252;
+  --fa-red-dim: rgba(255, 82, 82, 0.15);
+  --fa-amber: #ffd740;
+
+  --fa-text: #e0e0e0;
+  --fa-text-dim: #888888;
+  --fa-text-bright: #ffffff;
+
+  --fa-node-fill: var(--fa-surface);
+  --fa-node-stroke: var(--fa-border);
 }
 
 @layer base {
@@ -250,212 +298,10 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* ──────────────────────────────────────────────────────────────
-   Finite Automata — Neon Theme (scoped to .fa-neon only)
-   Dark palette by default; light palette via :root:not(.dark)
-   ────────────────────────────────────────────────────────────── */
-.fa-neon {
-  --fa-bg: #0a0a0a;
-  --fa-surface: #141414;
-  --fa-surface-raised: #1a1a1a;
-  --fa-border: rgba(255, 255, 255, 0.08);
-  --fa-border-subtle: rgba(255, 255, 255, 0.04);
-
-  /* Neon palette */
-  --fa-cyan: #00e5ff;
-  --fa-cyan-dim: rgba(0, 229, 255, 0.15);
-  --fa-purple: #b388ff;
-  --fa-purple-dim: rgba(179, 136, 255, 0.15);
-  --fa-green: #69f0ae;
-  --fa-green-dim: rgba(105, 240, 174, 0.15);
-  --fa-red: #ff5252;
-  --fa-red-dim: rgba(255, 82, 82, 0.15);
-  --fa-amber: #ffd740;
-
-  /* Text */
-  --fa-text: #e0e0e0;
-  --fa-text-dim: #888888;
-  --fa-text-bright: #ffffff;
-
-  background: var(--fa-bg);
-  color: var(--fa-text);
-  border-radius: 1rem;
-  padding: 1.5rem;
-}
-
-/* Light neon palette — kicks in when .dark is NOT on <html> */
-:root:not(.dark) .fa-neon {
-  --fa-bg: #f4f6fb;
-  --fa-surface: #ffffff;
-  --fa-surface-raised: #fafbff;
-  --fa-border: rgba(15, 23, 42, 0.12);
-  --fa-border-subtle: rgba(15, 23, 42, 0.06);
-
-  /* Deeper neon tones for contrast on light surfaces */
-  --fa-cyan: #0891b2;
-  --fa-cyan-dim: rgba(8, 145, 178, 0.14);
-  --fa-purple: #7c3aed;
-  --fa-purple-dim: rgba(124, 58, 237, 0.12);
-  --fa-green: #059669;
-  --fa-green-dim: rgba(5, 150, 105, 0.14);
-  --fa-red: #dc2626;
-  --fa-red-dim: rgba(220, 38, 38, 0.12);
-  --fa-amber: #d97706;
-
-  --fa-text: #1e293b;
-  --fa-text-dim: #64748b;
-  --fa-text-bright: #0f172a;
-
-  /* State diagram nodes: soft indigo fill with visible border in light mode */
-  --fa-node-fill: #eef2ff;
-  --fa-node-stroke: rgba(99, 102, 241, 0.4);
-}
-
-/* Neon card surfaces */
-.fa-neon .fa-card {
-  background: var(--fa-surface);
-  border: 1px solid var(--fa-border);
-  border-radius: 0.75rem;
-}
-
-.fa-neon .fa-card-raised {
-  background: var(--fa-surface-raised);
-  border: 1px solid var(--fa-border);
-  border-radius: 0.75rem;
-}
-
-/* Glow animations */
-@keyframes fa-glow-pulse {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes fa-border-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 4px var(--fa-cyan),
-      inset 0 0 4px transparent;
-  }
-  50% {
-    box-shadow:
-      0 0 12px var(--fa-cyan),
-      inset 0 0 6px rgba(0, 229, 255, 0.05);
-  }
-}
-
-.fa-neon .fa-glow-cyan {
-  animation: fa-border-glow 2s ease-in-out infinite;
-}
-
-/* Neon button styles */
-.fa-neon .fa-btn {
-  background: var(--fa-surface-raised);
-  border: 1px solid var(--fa-border);
-  color: var(--fa-text);
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.fa-neon .fa-btn:hover {
-  border-color: var(--fa-cyan);
-  color: var(--fa-cyan);
-}
-
-.fa-neon .fa-btn-primary {
-  background: rgba(0, 229, 255, 0.12);
-  border-color: var(--fa-cyan);
-  color: var(--fa-cyan);
-}
-
-.fa-neon .fa-btn-primary:hover {
-  background: rgba(0, 229, 255, 0.22);
-}
-
-/* Neon input */
-.fa-neon .fa-input {
-  background: var(--fa-surface);
-  border: 1px solid var(--fa-border);
-  color: var(--fa-text);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.8125rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.fa-neon .fa-input:focus {
-  border-color: var(--fa-cyan);
-}
-
-.fa-neon .fa-input::placeholder {
-  color: var(--fa-text-dim);
-}
-
-/* Neon textarea */
-.fa-neon .fa-textarea {
-  background: var(--fa-surface);
-  border: 1px solid var(--fa-border);
-  color: var(--fa-text);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  font-size: 0.8125rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  outline: none;
-  resize: vertical;
-  transition: border-color 0.2s;
-}
-
-.fa-neon .fa-textarea:focus {
-  border-color: var(--fa-cyan);
-}
-
-.fa-neon .fa-textarea::placeholder {
-  color: var(--fa-text-dim);
-}
-
-/* Neon badge */
-.fa-neon .fa-badge-accepted {
-  background: var(--fa-green-dim);
-  color: var(--fa-green);
-  border: 1px solid rgba(105, 240, 174, 0.25);
-}
-
-.fa-neon .fa-badge-rejected {
-  background: var(--fa-red-dim);
-  color: var(--fa-red);
-  border: 1px solid rgba(255, 82, 82, 0.25);
-}
-
-.fa-neon .fa-label {
-  color: var(--fa-text-dim);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-@keyframes fa-fade-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fa-editor-panel {
-  animation: fa-fade-slide-in 0.3s ease-out forwards;
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+  animation-duration: 0s !important;
 }

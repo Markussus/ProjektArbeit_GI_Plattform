@@ -25,22 +25,13 @@ export function useFASimulator(program: FAProgram, inputWord: string) {
     reset(config);
   }, [config, reset]);
 
-  /** Jump to a specific step index by replaying from the beginning. */
   const jumpToStep = useCallback(
     (stepIndex: number) => {
       simulator.jumpToStep(stepIndex);
-      // Force the engine to pick up the new state by triggering a
-      // re-render. We do this via a targeted reset-like path.
       engine.forceStateRefresh();
     },
     [simulator, engine],
   );
-
-  /** Run the simulation to the very end (all input consumed). */
-  const jumpToEnd = useCallback(() => {
-    simulator.jumpToEnd();
-    engine.forceStateRefresh();
-  }, [simulator, engine]);
 
   return {
     runtime: engine.currentState,
@@ -54,8 +45,6 @@ export function useFASimulator(program: FAProgram, inputWord: string) {
     reset,
     setSpeed: engine.setSpeed,
     jumpToStep,
-    jumpToEnd,
-    /** Total number of steps taken so far (for timeline rendering) */
     totalSteps: engine.currentState.stepCount,
   };
 }
@@ -118,9 +107,6 @@ class FiniteAutomatonSimulator implements ISimulator<
     return this.runtime?.halted ?? false;
   }
 
-  /**
-   * Jump to a specific step by replaying from the initial state.
-   */
   public jumpToStep(targetStep: number): void {
     const { config } = this.getContext();
     const initial = createInitialRuntime(config.program, config.inputWord);
@@ -132,21 +118,6 @@ class FiniteAutomatonSimulator implements ISimulator<
       this.history.push(cloneJson(this.runtime));
       this.runtime = stepRuntime(config.program, this.runtime);
     }
-  }
-
-  /**
-   * Run the simulation to completion.
-   */
-  public jumpToEnd(): void {
-    const { config, runtime } = this.getContext();
-    if (runtime.halted) return;
-
-    let current = runtime;
-    while (!current.halted) {
-      this.history.push(cloneJson(current));
-      current = stepRuntime(config.program, current);
-    }
-    this.runtime = current;
   }
 
   private getContext(): { config: FASimulatorConfig; runtime: FARuntime } {

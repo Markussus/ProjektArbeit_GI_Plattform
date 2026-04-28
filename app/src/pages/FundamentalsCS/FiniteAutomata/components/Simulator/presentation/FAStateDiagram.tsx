@@ -75,10 +75,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
   const svgMaxHeight = isLargeGraph ? 560 : 440;
 
   return (
-    <div
-      className="fa-card flex h-full flex-col overflow-hidden"
-      style={{ background: "var(--fa-surface)" }}
-    >
+    <div className="flex h-full flex-col overflow-hidden rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface)">
       <div
         className="flex items-center justify-between gap-3 px-4 py-2"
         style={{
@@ -405,14 +402,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
         </svg>
 
         {/* Hint overlay for first-time discovery */}
-        <div
-          className="pointer-events-none absolute right-2 bottom-2 rounded px-2 py-0.5 text-[10px]"
-          style={{
-            color: "var(--fa-text-dim)",
-            background: "rgba(0,0,0,0.35)",
-            border: "1px solid var(--fa-border-subtle)",
-          }}
-        >
+        <div className="text-foreground bg-background/80 border-border pointer-events-none absolute right-2 bottom-2 rounded border px-2 py-0.5 text-[10px]">
           drag to pan · scroll to zoom · {Math.round(scale * 100)}%
         </div>
       </div>
