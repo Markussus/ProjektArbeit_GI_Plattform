@@ -63,14 +63,20 @@
     "concept2": "States & Transitions",
     "concept3": "Acceptance & Rejection",
     "concept4": "Church-Turing Thesis",
-    "exercise1": "Basic Transition",
-    "exercise1Desc": "Design a simple TM transition table",
-    "exercise2": "2-Tape TM Design",
-    "exercise2Desc": "Build a multi-tape Turing Machine",
-    "exercise3": "Busy Beaver Problem",
-    "exercise3Desc": "Find the maximum output for n-state TMs",
-    "exercise4": "The Halting Problem",
-    "exercise4Desc": "Prove undecidability of the halting problem"
+    "exercise1": "Invert a Binary Word",
+    "exercise1Desc": "Build a machine that flips every 0 to 1 and every 1 to 0, then halts on the first blank cell.",
+    "exercise2": "Unary Increment",
+    "exercise2Desc": "Build a machine that appends one additional 1 to the end of a unary word and then halts.",
+    "exercise3": "Binary Increment",
+    "exercise3Desc": "Build a machine that adds 1 to a binary number on the tape and halts with the incremented result.",
+    "exercise4": "Erase the Tape",
+    "exercise4Desc": "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
+    "example1": "Example: Bit Flip",
+    "example1Desc": "A complete machine that inverts every bit in a binary word while scanning from left to right.",
+    "example2": "Example: Unary Increment",
+    "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
+    "example3": "Example: Binary Increment",
+    "example3Desc": "A carry-based machine that increments a binary word by one."
   },
   "automata": {
     "title": "Finite Automata",
@@ -237,6 +243,11 @@
     "currentExercises": "Current Exercises",
     "openInSimulation": "Open in simulation"
   },
+  "example": {
+    "label": "Example {{index}}",
+    "currentExamples": "Current Examples",
+    "openInSimulation": "Open in simulation"
+  },
   "difficulty": {
     "easy": "EASY",
     "medium": "MEDIUM",
@@ -245,6 +256,7 @@
   "simulation": {
     "taskText": "Task text",
     "selectedExercise": "Selected exercise",
+    "selectedExample": "Selected example",
     "taskTextPlaceholder": "You can add the concrete task text here later.",
     "workspace": "Simulation",
     "expand": "Expand simulation",
@@ -457,6 +469,11 @@
     }
   },
   "tm": {
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
     "config": {
       "title": "Turing Machine Configuration",
       "apply": "Start Simulation",
@@ -482,6 +499,19 @@
       "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
     },
     "validation": {
+      "checkInvalidProgram": "The current machine configuration is not valid yet.",
+      "exampleCheckUnavailable": "Examples do not need solution checks.",
+      "popupTitle": "Solution check",
+      "pass": "PASS",
+      "fail": "FAIL",
+      "emptyWord": "<empty>",
+      "table": {
+        "passed": "Passed",
+        "input": "Input",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "validHaltState": "Valid halt state"
+      },
       "statesEmpty": "At least one state must be defined.",
       "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
       "haltStatesEmpty": "At least one halt state must be defined.",

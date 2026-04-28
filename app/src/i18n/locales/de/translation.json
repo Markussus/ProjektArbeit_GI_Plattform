@@ -59,14 +59,20 @@
     "concept2": "Zustände & Übergänge",
     "concept3": "Akzeptanz & Ablehnung",
     "concept4": "Church-Turing-These",
-    "exercise1": "Einfacher Übergang",
-    "exercise1Desc": "Entwerfen Sie eine einfache TM-Übergangstabelle",
-    "exercise2": "2-Band TM Entwurf",
-    "exercise2Desc": "Bauen Sie eine Mehrband-Turingmaschine",
-    "exercise3": "Fleißiger Biber Problem",
-    "exercise3Desc": "Finden Sie die maximale Ausgabe für n-Zustands-TMs",
-    "exercise4": "Das Halteproblem",
-    "exercise4Desc": "Beweisen Sie die Unentscheidbarkeit des Halteproblems"
+    "exercise1": "Binaerwort invertieren",
+    "exercise1Desc": "Bauen Sie eine Maschine, die jedes 0 in 1 und jedes 1 in 0 umwandelt und am ersten Blank anhaelt.",
+    "exercise2": "Unaeres Inkrement",
+    "exercise2Desc": "Bauen Sie eine Maschine, die an ein unaeres Wort genau eine weitere 1 anhaengt und dann anhaelt.",
+    "exercise3": "Binaeres Inkrement",
+    "exercise3Desc": "Bauen Sie eine Maschine, die zu einer Binaerzahl auf dem Band 1 addiert und mit dem inkrementierten Ergebnis anhaelt.",
+    "exercise4": "Band loeschen",
+    "exercise4Desc": "Bauen Sie eine Maschine, die das gesamte Eingabewort durch Blanks ersetzt und erst anhaelt, wenn das Band leer ist.",
+    "example1": "Beispiel: Bit-Invertierung",
+    "example1Desc": "Eine vollstaendige Maschine, die beim Durchlauf von links nach rechts jedes Bit eines Binaerworts invertiert.",
+    "example2": "Beispiel: Unaeres Inkrement",
+    "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unaeren Wortes laeuft und eine weitere 1 schreibt.",
+    "example3": "Beispiel: Binaeres Inkrement",
+    "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binaerwort um eins erhoeht."
   },
   "automata": {
     "title": "Endliche Automaten",
@@ -233,6 +239,11 @@
     "currentExercises": "Aktuelle Übungen",
     "openInSimulation": "In Simulation öffnen"
   },
+  "example": {
+    "label": "Beispiel {{index}}",
+    "currentExamples": "Aktuelle Beispiele",
+    "openInSimulation": "In Simulation öffnen"
+  },
   "difficulty": {
     "easy": "LEICHT",
     "medium": "MITTEL",
@@ -241,6 +252,7 @@
   "simulation": {
     "taskText": "Aufgabentext",
     "selectedExercise": "Ausgewählte Übung",
+    "selectedExample": "Ausgewähltes Beispiel",
     "taskTextPlaceholder": "Hier kannst du später den konkreten Aufgabentext einfügen.",
     "workspace": "Simulation",
     "expand": "Simulation vergrößern",
@@ -453,6 +465,11 @@
     }
   },
   "tm": {
+    "actions": {
+      "loadSolution": "Loesung laden",
+      "checkSolution": "Loesung pruefen",
+      "checkingSolution": "Pruefung laeuft..."
+    },
     "config": {
       "title": "Turingmaschinen-Konfiguration",
       "apply": "Simulation starten",
@@ -478,6 +495,19 @@
       "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
     },
     "validation": {
+      "checkInvalidProgram": "Die aktuelle Maschinenkonfiguration ist noch nicht gueltig.",
+      "exampleCheckUnavailable": "Beispiele benoetigen keine Loesungspruefung.",
+      "popupTitle": "Loesungspruefung",
+      "pass": "BESTANDEN",
+      "fail": "FEHLER",
+      "emptyWord": "<leer>",
+      "table": {
+        "passed": "Bestanden",
+        "input": "Eingabe",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "validHaltState": "Gueltiger Haltezustand"
+      },
       "statesEmpty": "Es muss mindestens ein Zustand definiert sein.",
       "initialStateMissing": "Der Startzustand '{{state}}' muss in der Zustandsmenge enthalten sein.",
       "haltStatesEmpty": "Es muss mindestens ein Haltezustand definiert sein.",

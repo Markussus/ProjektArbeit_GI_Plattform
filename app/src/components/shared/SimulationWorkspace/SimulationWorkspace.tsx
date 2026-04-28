@@ -2,10 +2,12 @@ import type { ReactNode } from "react";
 import { Maximize2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import type { Exercise } from "@/types/exercise";
+import type { Exercise, TopicItem } from "@/types/exercise";
 
 interface SimulationWorkspaceProps {
   selectedExercise: Exercise | null;
+  selectedItem?: TopicItem | null;
+  selectedItemActions?: ReactNode;
   emptyStateText: string;
   isFocused: boolean;
   onToggleFocus: () => void;
@@ -14,27 +16,42 @@ interface SimulationWorkspaceProps {
 
 export function SimulationWorkspace({
   selectedExercise,
+  selectedItem,
+  selectedItemActions,
   emptyStateText,
   isFocused,
   onToggleFocus,
   children,
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
+  const activeItem = selectedItem ?? selectedExercise;
+  const itemLabel =
+    activeItem?.kind === "example"
+      ? t("simulation.selectedExample")
+      : t("simulation.selectedExercise");
 
   return (
     <div className="space-y-4">
-      {selectedExercise && (
+      {activeItem && (
         <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-          <div className="min-w-0">
-            <p className="text-foreground text-sm font-semibold">
-              {t("simulation.selectedExercise")}
-            </p>
-            <p className="text-foreground mt-2 text-sm font-medium">
-              {selectedExercise.title}
-            </p>
-            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-              {selectedExercise.description}
-            </p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="min-w-0">
+              <p className="text-foreground text-sm font-semibold">
+                {itemLabel}
+              </p>
+              <p className="text-foreground mt-2 text-sm font-medium">
+                {activeItem.title}
+              </p>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                {activeItem.description}
+              </p>
+            </div>
+
+            {selectedItemActions && (
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                {selectedItemActions}
+              </div>
+            )}
           </div>
         </div>
       )}

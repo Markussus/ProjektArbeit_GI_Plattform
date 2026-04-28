@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle2, Lightbulb, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 
 const truthTableRows = [
   { assignment: "a=0, b=0, c=0", result: "0", term: null },
@@ -15,7 +16,8 @@ const truthTableRows = [
 const canonicalDnf =
   "(¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ ¬c) ∨ (a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ ¬c) ∨ (a ∧ b ∧ c)";
 
-export function ExamplesTab() {
+export function ExamplesTab(props: ModuleExamplesTabProps) {
+  void props;
   const { t } = useTranslation();
 
   return (
