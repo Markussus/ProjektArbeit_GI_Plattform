@@ -129,6 +129,142 @@ const eraseTapeProgram = createProgram({
   },
 });
 
+const duplicateZeros = createProgram({
+  states: ["q0", "q1", "q2", "q3", "q4", "q5", "qS"],
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "X", "Y"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "1001".split(""),
+
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q3: { nextState: "q4", writeSymbol: "1", movement: "L" },
+    },
+
+    "0": {
+      q1: { nextState: "q2", writeSymbol: "X", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "0", movement: "R" },
+      q4: { nextState: "q4", writeSymbol: "0", movement: "L" },
+      q5: { nextState: "q5", writeSymbol: "0", movement: "L" },
+    },
+
+    "1": {
+      q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
+      q1: { nextState: "q5", writeSymbol: "1", movement: "L" },
+      q2: { nextState: "q3", writeSymbol: "Y", movement: "R" },
+      q4: { nextState: "q1", writeSymbol: "1", movement: "R" },
+      q5: { nextState: "qS", writeSymbol: "1", movement: "N" },
+    },
+
+    "X": {
+      q1: { nextState: "q1", writeSymbol: "X", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "X", movement: "R" },
+      q4: { nextState: "q4", writeSymbol: "X", movement: "L" },
+      q5: { nextState: "q5", writeSymbol: "0", movement: "L" },
+    },
+
+    "Y": {
+      q1: { nextState: "q1", writeSymbol: "Y", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "Y", movement: "R" },
+      q4: { nextState: "q4", writeSymbol: "Y", movement: "L" },
+      q5: { nextState: "q5", writeSymbol: "0", movement: "L" },
+    },
+  },
+});
+
+const addBinary = createProgram({
+  states: ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "qS",],
+
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "+"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "101+11".split(""),
+
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q1: { nextState: "q7", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q2: { nextState: "q3", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q5: { nextState: "q6", writeSymbol: "1", movement: "R" },
+    },
+
+    "0": {
+      q0: { nextState: "q0", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "0", movement: "R" },
+      q3: { nextState: "q3", writeSymbol: "1", movement: "L" },
+      q4: { nextState: "q4", writeSymbol: "0", movement: "L" },
+      q5: { nextState: "q6", writeSymbol: "1", movement: "R" },
+      q6: { nextState: "q6", writeSymbol: "0", movement: "R" },
+      q7: { nextState: "q7", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+    },
+
+    "1": {
+      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "q2", writeSymbol: "1", movement: "R" },
+      q3: { nextState: "q4", writeSymbol: "0", movement: "L" },
+      q4: { nextState: "q4", writeSymbol: "1", movement: "L" },
+      q5: { nextState: "q5", writeSymbol: "0", movement: "L" },
+      q6: { nextState: "q6", writeSymbol: "1", movement: "R" },
+      q7: { nextState: "q7", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+    },
+
+    "+": {
+      q0: { nextState: "q1", writeSymbol: "+", movement: "R" },
+      q4: { nextState: "q5", writeSymbol: "+", movement: "L" },
+      q6: { nextState: "q1", writeSymbol: "+", movement: "R" },
+      q7: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+    },
+  },
+});
+
+const checkRegex = createProgram({
+  states: ["q0", "qA0", "qA1", "qB0", "qB1", "q3", "q4", "q5", "qS",],
+
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "t", "f"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "11001".split(""),
+
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q0: { nextState: "qS", writeSymbol: "f", movement: "N" },
+      qA1: { nextState: "q4", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      qA0: { nextState: "q5", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      qB0: { nextState: "q4", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      qB1: { nextState: "q5", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q3: { nextState: "q5", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q4: { nextState: "qS", writeSymbol: "t", movement: "N" },
+      q5: { nextState: "qS", writeSymbol: "f", movement: "N" },
+    },
+
+    "0": {
+      q0: { nextState: "qB0", writeSymbol: "0", movement: "R" },
+      qA1: { nextState: "qA0", writeSymbol: "0", movement: "R" },
+      qA0: { nextState: "q3", writeSymbol: "0", movement: "R" },
+      qB0: { nextState: "q3", writeSymbol: "0", movement: "R" },
+      qB1: { nextState: "qB0", writeSymbol: "0", movement: "R" },
+      q3: { nextState: "q3", writeSymbol: "0", movement: "R" },
+      q4: { nextState: "q4", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q5: { nextState: "q5", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+    },
+
+    "1": {
+      q0: { nextState: "qA1", writeSymbol: "1", movement: "R" },
+      qA1: { nextState: "q3", writeSymbol: "1", movement: "R" },
+      qA0: { nextState: "qA1", writeSymbol: "1", movement: "R" },
+      qB0: { nextState: "qB1", writeSymbol: "1", movement: "R" },
+      qB1: { nextState: "q3", writeSymbol: "1", movement: "R" },
+      q3: { nextState: "q3", writeSymbol: "1", movement: "R" },
+      q4: { nextState: "q4", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q5: { nextState: "q5", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+    },
+  },
+});
+
 export const turingMachineExercises: TuringMachineExerciseScenario[] = [
   {
     kind: "exercise",
@@ -194,6 +330,28 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = [
     definition: {
       titleKey: "turing.exerciseUnaryIncrement",
       descriptionKey: "turing.exerciseUnaryIncrementDesc",
+      difficulty: "easy",
+      icon: Plus,
+    },
+  },
+  {
+    kind: "exercise",
+    id: "turing.exerciseDuplicateZeros",
+    titleKey: "turing.exerciseDuplicateZeros",
+    descriptionKey: "turing.exerciseDuplicateZerosDesc",
+    starterProgram: emptyTuringMachineProgram,
+    solutionProgram: duplicateZeros,
+    program: emptyTuringMachineProgram,
+    validationCases: [
+      { input: "11", expectedOutput: "11" },
+      { input: "101", expectedOutput: "1001" },
+      { input: "1001", expectedOutput: "100001" },
+      { input: "10001", expectedOutput: "10000001" },
+      { input: "100001", expectedOutput: "1000000001" },
+    ],
+    definition: {
+      titleKey: "turing.exerciseDuplicateZeros",
+      descriptionKey: "turing.exerciseDuplicateZerosDesc",
       difficulty: "medium",
       icon: Plus,
     },
@@ -218,6 +376,54 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = [
     definition: {
       titleKey: "turing.exerciseBinaryIncrement",
       descriptionKey: "turing.exerciseBinaryIncrementDesc",
+      difficulty: "hard",
+      icon: Binary,
+    },
+  },
+  {
+    kind: "exercise",
+    id: "turing.exerciseAddBinary",
+    titleKey: "turing.exerciseAddBinary",
+    descriptionKey: "turing.exerciseAddBinaryDesc",
+    starterProgram: emptyTuringMachineProgram,
+    solutionProgram: addBinary,
+    program: emptyTuringMachineProgram,
+    validationCases: [
+      { input: "0+0", expectedOutput: "0" },
+      { input: "1+0", expectedOutput: "1" },
+      { input: "1+1", expectedOutput: "10" },
+      { input: "10+1", expectedOutput: "11" },
+      { input: "101+11", expectedOutput: "1000" },
+      { input: "111+1", expectedOutput: "1000" },
+      { input: "1001+10", expectedOutput: "1011" },
+    ],
+    definition: {
+      titleKey: "turing.exerciseAddBinary",
+      descriptionKey: "turing.exerciseAddBinaryDesc",
+      difficulty: "hard",
+      icon: Binary,
+    },
+  },
+  {
+    kind: "exercise",
+    id: "turing.exerciseCheckRegex",
+    titleKey: "turing.exerciseCheckRegex",
+    descriptionKey: "turing.exerciseCheckRegexDesc",
+    starterProgram: emptyTuringMachineProgram,
+    solutionProgram: checkRegex,
+    program: emptyTuringMachineProgram,
+    validationCases: [
+      { input: "", expectedOutput: "f" },
+      { input: "0", expectedOutput: "t" },
+      { input: "1", expectedOutput: "t" },
+      { input: "010", expectedOutput: "t" },
+      { input: "10101", expectedOutput: "t" },
+      { input: "11001", expectedOutput: "f" },
+      { input: "1001", expectedOutput: "f" },
+    ],
+    definition: {
+      titleKey: "turing.exerciseCheckRegex",
+      descriptionKey: "turing.exerciseCheckRegexDesc",
       difficulty: "hard",
       icon: Binary,
     },
