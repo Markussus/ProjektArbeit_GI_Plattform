@@ -17,6 +17,8 @@ export function ExamplesTab({
       id: example.titleKey,
       title: t(example.titleKey),
       description: t(example.descriptionKey),
+      titleKey: example.titleKey,
+      descriptionKey: example.descriptionKey,
       icon: example.icon,
       kind: "example",
     }),

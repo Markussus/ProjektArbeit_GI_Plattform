@@ -23,6 +23,8 @@ export function TopicExercisesTab({
     id: exercise.titleKey,
     title: t(exercise.titleKey),
     description: t(exercise.descriptionKey),
+    titleKey: exercise.titleKey,
+    descriptionKey: exercise.descriptionKey,
     difficulty: exercise.difficulty,
     icon: exercise.icon,
     kind: "exercise",

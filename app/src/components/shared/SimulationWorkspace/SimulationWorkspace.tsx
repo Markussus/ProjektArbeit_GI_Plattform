@@ -25,6 +25,12 @@ export function SimulationWorkspace({
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
   const activeItem = selectedItem ?? selectedExercise;
+  const activeItemTitle = activeItem?.titleKey
+    ? t(activeItem.titleKey)
+    : activeItem?.title;
+  const activeItemDescription = activeItem?.descriptionKey
+    ? t(activeItem.descriptionKey)
+    : activeItem?.description;
   const itemLabel =
     activeItem?.kind === "example"
       ? t("simulation.selectedExample")
@@ -40,10 +46,10 @@ export function SimulationWorkspace({
                 {itemLabel}
               </p>
               <p className="text-foreground mt-2 text-sm font-medium">
-                {activeItem.title}
+                {activeItemTitle}
               </p>
               <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                {activeItem.description}
+                {activeItemDescription}
               </p>
             </div>
 

@@ -8,6 +8,8 @@ interface BaseTopicItem {
   id: TranslationKey;
   title: string;
   description: string;
+  titleKey?: TranslationKey;
+  descriptionKey?: TranslationKey;
   icon: LucideIcon;
   kind: TopicItemKind;
 }

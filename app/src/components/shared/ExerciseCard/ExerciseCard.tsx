@@ -34,6 +34,10 @@ export function ExerciseCard({
   const { t } = useTranslation();
   const Icon = item.icon;
   const detailsId = useId();
+  const itemTitle = item.titleKey ? t(item.titleKey) : item.title;
+  const itemDescription = item.descriptionKey
+    ? t(item.descriptionKey)
+    : item.description;
   const itemLabel =
     item.kind === "example"
       ? t("example.label", { index: index + 1 })
@@ -70,7 +74,7 @@ export function ExerciseCard({
 
         <div className="min-w-0 flex-1">
           <p className="text-foreground text-sm font-semibold">
-            {itemLabel}: {item.title}
+            {itemLabel}: {itemTitle}
           </p>
 
           {item.kind === "exercise" && (
@@ -99,7 +103,7 @@ export function ExerciseCard({
         >
           <div className="pl-14">
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {item.description}
+              {itemDescription}
             </p>
 
             <div className="mt-4">
