@@ -32,9 +32,38 @@ export function IntegerConverter({
     }
   }, [isExerciseMode, initialValue, initialBase]);
 
+  const handleSourceBaseChange = (newBase: BaseType) => {
+    setSourceBase(newBase);
+    
+    let cleanV = inputValue;
+    if (newBase === "bin") cleanV = cleanV.replace(/[^01]/g, "");
+    else if (newBase === "oct") cleanV = cleanV.replace(/[^0-7]/g, "");
+    else if (newBase === "dec") cleanV = cleanV.replace(/[^0-9]/g, "");
+    else if (newBase === "hex") cleanV = cleanV.replace(/[^0-9A-Fa-f]/g, "");
+
+    const limits = { bin: 16, oct: 6, dec: 5, hex: 4 };
+    if (cleanV.length > limits[newBase]) {
+      cleanV = cleanV.slice(0, limits[newBase]);
+    }
+    
+    setInputValue(cleanV);
+  };
+
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;
-    setInputValue(v);
+
+    let cleanV = v;
+    if (sourceBase === "bin") cleanV = cleanV.replace(/[^01]/g, "");
+    else if (sourceBase === "oct") cleanV = cleanV.replace(/[^0-7]/g, "");
+    else if (sourceBase === "dec") cleanV = cleanV.replace(/[^0-9]/g, "");
+    else if (sourceBase === "hex") cleanV = cleanV.replace(/[^0-9A-Fa-f]/g, "");
+
+    const limits = { bin: 16, oct: 6, dec: 5, hex: 4 };
+    if (cleanV.length > limits[sourceBase]) {
+      cleanV = cleanV.slice(0, limits[sourceBase]);
+    }
+
+    setInputValue(cleanV);
   };
 
   const decValue = useMemo(() => {
@@ -276,7 +305,7 @@ export function IntegerConverter({
                 </label>
                 <select
                   value={sourceBase}
-                  onChange={(e) => setSourceBase(e.target.value as BaseType)}
+                  onChange={(e) => handleSourceBaseChange(e.target.value as BaseType)}
                   disabled={!!isExerciseMode && !showSolution}
                   className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
                 >
@@ -314,6 +343,11 @@ export function IntegerConverter({
                 onChange={(e) => handleInputChange(e.target.value)}
                 readOnly={locked}
                 placeholder="..."
+                maxLength={
+                  sourceBase === "bin" ? 16 :
+                  sourceBase === "oct" ? 6 :
+                  sourceBase === "dec" ? 5 : 4
+                }
                 className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
               />
               {inputValue !== "" && decValue === "" && (
