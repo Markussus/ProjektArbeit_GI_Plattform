@@ -1,6 +1,9 @@
-import { CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatDnfTerm, type DnfDerivation } from "../domain/dnfDerivation";
+
+const TERM_PREVIEW_LIMIT = 8;
 
 interface DnfResultPanelProps {
   formattedDnf: string;
@@ -18,10 +21,22 @@ export function DnfResultPanel({
   derivation,
 }: DnfResultPanelProps) {
   const { t } = useTranslation();
+  const [showAllTerms, setShowAllTerms] = useState(false);
   const terms =
     derivation?.dnf.type === "terms"
       ? derivation.dnf.terms.map(formatDnfTerm)
       : null;
+  const shouldPreviewTerms = Boolean(
+    terms && terms.length > TERM_PREVIEW_LIMIT,
+  );
+  const visibleTerms =
+    terms && shouldPreviewTerms && !showAllTerms
+      ? terms.slice(0, TERM_PREVIEW_LIMIT)
+      : terms;
+  const hiddenTermCount =
+    terms && shouldPreviewTerms && !showAllTerms
+      ? terms.length - TERM_PREVIEW_LIMIT
+      : 0;
   const stats = [
     { label: t("dnf.builder.variables"), value: variableCount },
     { label: t("dnf.builder.rows"), value: rowCount },
@@ -44,10 +59,24 @@ export function DnfResultPanel({
         </div>
       </div>
 
-      {terms && terms.length > 1 ? (
+      {terms && terms.length > 1 && visibleTerms ? (
         <div className="border-border bg-card mt-4 rounded-md border p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {terms.map((term, index) => (
+          {shouldPreviewTerms && (
+            <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+              {t("dnf.builder.longDnfPreview", {
+                shown: visibleTerms.length,
+                total: terms.length,
+              })}
+            </p>
+          )}
+          <div
+            className={`flex flex-wrap items-center gap-2 ${
+              shouldPreviewTerms && showAllTerms
+                ? "max-h-72 overflow-y-auto pr-1"
+                : ""
+            }`}
+          >
+            {visibleTerms.map((term, index) => (
               <span
                 key={`${term}-${index}`}
                 className="inline-flex items-center gap-2"
@@ -55,7 +84,7 @@ export function DnfResultPanel({
                 <span className="border-border bg-background rounded-md border px-2.5 py-1 font-mono text-sm">
                   {term}
                 </span>
-                {index < terms.length - 1 && (
+                {index < visibleTerms.length - 1 && (
                   <span className="text-muted-foreground font-mono text-sm">
                     ∨
                   </span>
@@ -63,6 +92,27 @@ export function DnfResultPanel({
               </span>
             ))}
           </div>
+          {hiddenTermCount > 0 && (
+            <p className="text-muted-foreground mt-3 text-xs">
+              {t("dnf.builder.hiddenTerms", { count: hiddenTermCount })}
+            </p>
+          )}
+          {shouldPreviewTerms && (
+            <button
+              type="button"
+              onClick={() => setShowAllTerms((current) => !current)}
+              className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+            >
+              {showAllTerms ? (
+                <ChevronUp className="size-4" />
+              ) : (
+                <ChevronDown className="size-4" />
+              )}
+              {showAllTerms
+                ? t("dnf.builder.showFewerTerms")
+                : t("dnf.builder.showAllTerms", { count: terms.length })}
+            </button>
+          )}
         </div>
       ) : (
         <code className="border-border bg-card text-foreground mt-4 block rounded-md border p-3 font-mono text-sm leading-relaxed break-words">

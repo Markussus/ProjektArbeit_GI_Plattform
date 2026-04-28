@@ -140,8 +140,36 @@
     "concept2": "Truth Tables",
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
-    "examplesTitle": "Example: from expression to DNF",
-    "examplesIntro": "The key idea is the translation from the truth table. Each row with result 1 becomes exactly one AND term.",
+    "examplesTitle": "Guided lecture examples",
+    "examplesIntro": "Four lecture examples show compactly how rows with result 1 become the canonical DNF.",
+    "examples": {
+      "openInSimulation": "Open in simulation",
+      "labels": {
+        "expression": "Expression",
+        "givenRows": "Given 1-rows",
+        "oneRows": "Relevant 1-rows",
+        "terms": "AND terms",
+        "canonicalDnf": "Canonical DNF"
+      },
+      "walkthroughs": {
+        "lectureExpression": {
+          "title": "Expression with an AND group",
+          "explanation": "The expression is true when a=1 or when b and c are both 1."
+        },
+        "parentheses": {
+          "title": "Parentheses change the result",
+          "explanation": "Here c must be 1, and a=1 or b=1 must also hold."
+        },
+        "givenRows": {
+          "title": "DNF from given 1-rows",
+          "explanation": "Each given 1-row is translated directly into one AND term."
+        },
+        "xor": {
+          "title": "Half-adder sum as XOR",
+          "explanation": "The sum is 1 when exactly one of the two inputs is 1."
+        }
+      }
+    },
     "exampleExpressionTitle": "Start expression",
     "exampleExpressionText": "The expression is true as soon as a is true or b and c are true together.",
     "exampleTableTitle": "Truth table with DNF selection",
@@ -163,7 +191,7 @@
     "builder": {
       "inputTitle": "Boolean expression",
       "inputHint": "Use variables, 0/1, parentheses, and the operators ¬, ∧, ∨.",
-      "keyboardAliases": "Keyboard aliases: ! = ¬, & = ∧, | = ∨.",
+      "keyboardAliases": "Keyboard aliases: ! or ~ = ¬, & or && = ∧, | or || = ∨.",
       "inputLabel": "Boolean expression input",
       "operatorHelp": "Operators:",
       "insertNot": "Insert negation",
@@ -171,6 +199,7 @@
       "insertOr": "Insert OR",
       "insertOpenParen": "Insert opening parenthesis",
       "insertCloseParen": "Insert closing parenthesis",
+      "clear": "Clear",
       "reset": "Reset",
       "examples": {
         "lectureExample": "Lecture example",
@@ -239,8 +268,16 @@
       "resultTitle": "Canonical DNF",
       "resultHint": "Each highlighted row contributes one AND term.",
       "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",
+      "emptyStateTitle": "Ready for an expression",
+      "emptyStateDesc": "Enter a boolean expression to generate the truth table, derivation, and canonical DNF.",
+      "variableLimitTitle": "Too many variables",
+      "variableLimitDesc": "The expression contains {{variables}} variables. Use at most {{max}} variables so the truth table and canonical DNF can be calculated reliably in the browser.",
+      "longDnfPreview": "The canonical DNF has {{total}} terms. The first {{shown}} terms are shown initially.",
+      "hiddenTerms": "{{count}} more terms hidden.",
+      "showAllTerms": "Show all {{count}} terms",
+      "showFewerTerms": "Show fewer terms",
       "largeTableTitle": "Large truth table",
-      "largeTableDesc": "With {{variables}} variables the table has {{rows}} rows. The canonical DNF stays correct but quickly becomes hard to read. Two to four variables are usually enough for learning.",
+      "largeTableDesc": "With {{variables}} variables the table has {{rows}} rows; {{trueRows}} of them produce a DNF term. Large results are shown as a preview first.",
       "variables": "Variables",
       "rows": "Table rows",
       "oneRows": "Rows with result 1",
@@ -249,10 +286,18 @@
       "showSolution": "Show solution",
       "derivationTitle": "Derivation",
       "derivationHint": "Only truth-table rows with result 1 are transformed into terms and then joined with OR.",
+      "derivationPreview": "The derivation has {{total}} steps. The first {{shown}} steps are shown initially.",
+      "showAllSteps": "Show all {{count}} steps",
+      "showFewerSteps": "Show fewer steps",
       "derivationRowLabel": "Row {{row}}",
       "derivationTautology": "Every row evaluates to 1, so the clean DNF is the constant 1.",
       "derivationContradiction": "No row evaluates to 1, so the clean DNF is the constant 0.",
       "truthTableTitle": "Truth table",
+      "truthTableRow": "Row",
+      "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
+      "truthTableFull": "Full table with {{total}} rows. This area stays scrollable.",
+      "showFullTable": "Show full table",
+      "showCompactTable": "Show compact table",
       "truthTableNoVariables": "Expression",
       "truthTableResult": "Result",
       "truthTableTerm": "DNF term",

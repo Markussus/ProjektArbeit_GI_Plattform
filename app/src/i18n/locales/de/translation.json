@@ -136,8 +136,36 @@
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
-    "examplesTitle": "Beispiel: aus Ausdruck wird DNF",
-    "examplesIntro": "Der wichtigste Gedanke ist die Übersetzung aus der Wahrheitstabelle. Jede Zeile mit Ergebnis 1 wird zu genau einem UND-Term.",
+    "examplesTitle": "Geführte Vorlesungsbeispiele",
+    "examplesIntro": "Vier Vorlesungsbeispiele zeigen kompakt, wie aus 1-Zeilen die kanonische DNF entsteht.",
+    "examples": {
+      "openInSimulation": "In Simulation öffnen",
+      "labels": {
+        "expression": "Ausdruck",
+        "givenRows": "Gegebene 1-Zeilen",
+        "oneRows": "Relevante 1-Zeilen",
+        "terms": "UND-Terme",
+        "canonicalDnf": "Kanonische DNF"
+      },
+      "walkthroughs": {
+        "lectureExpression": {
+          "title": "Ausdruck mit UND-Klammer",
+          "explanation": "Wahr ist der Ausdruck bei a=1 oder wenn b und c gemeinsam 1 sind."
+        },
+        "parentheses": {
+          "title": "Klammerung verändert das Ergebnis",
+          "explanation": "Hier muss c=1 sein und zusätzlich a=1 oder b=1 gelten."
+        },
+        "givenRows": {
+          "title": "DNF aus gegebenen 1-Zeilen",
+          "explanation": "Jede vorgegebene 1-Zeile wird direkt in einen UND-Term übersetzt."
+        },
+        "xor": {
+          "title": "Halbaddierer-Summe als XOR",
+          "explanation": "Die Summe ist 1, wenn genau einer der beiden Eingänge 1 ist."
+        }
+      }
+    },
     "exampleExpressionTitle": "Startausdruck",
     "exampleExpressionText": "Der Ausdruck ist wahr, sobald a wahr ist oder b und c gemeinsam wahr sind.",
     "exampleTableTitle": "Wahrheitstabelle mit DNF-Auswahl",
@@ -159,7 +187,7 @@
     "builder": {
       "inputTitle": "Boolescher Ausdruck",
       "inputHint": "Nutzen Sie Variablen, 0/1, Klammern und die Operatoren ¬, ∧, ∨.",
-      "keyboardAliases": "Tastatur-Aliase: ! = ¬, & = ∧, | = ∨.",
+      "keyboardAliases": "Tastatur-Aliase: ! oder ~ = ¬, & oder && = ∧, | oder || = ∨.",
       "inputLabel": "Eingabe für booleschen Ausdruck",
       "operatorHelp": "Operatoren:",
       "insertNot": "Negation einfügen",
@@ -167,6 +195,7 @@
       "insertOr": "ODER einfügen",
       "insertOpenParen": "Öffnende Klammer einfügen",
       "insertCloseParen": "Schließende Klammer einfügen",
+      "clear": "Leeren",
       "reset": "Zurücksetzen",
       "examples": {
         "lectureExample": "Vorlesungsbeispiel",
@@ -235,8 +264,16 @@
       "resultTitle": "Kanonische DNF",
       "resultHint": "Jede markierte Zeile liefert einen UND-Term.",
       "resultRuleHint": "Merksatz: 0 → Variable negieren, 1 → Variable übernehmen. Nur Zeilen mit Ergebnis 1 werden zu Termen und mit ∨ verknüpft.",
+      "emptyStateTitle": "Bereit für einen Ausdruck",
+      "emptyStateDesc": "Gib einen booleschen Ausdruck ein, um Wahrheitstabelle, Herleitung und kanonische DNF zu erzeugen.",
+      "variableLimitTitle": "Zu viele Variablen",
+      "variableLimitDesc": "Der Ausdruck enthält {{variables}} Variablen. Bitte nutze höchstens {{max}} Variablen, damit Wahrheitstabelle und kanonische DNF im Browser zuverlässig berechnet werden können.",
+      "longDnfPreview": "Die kanonische DNF hat {{total}} Terme. Es werden zunächst {{shown}} Terme angezeigt.",
+      "hiddenTerms": "{{count}} weitere Terme ausgeblendet.",
+      "showAllTerms": "Alle {{count}} Terme anzeigen",
+      "showFewerTerms": "Weniger Terme anzeigen",
       "largeTableTitle": "Große Wahrheitstabelle",
-      "largeTableDesc": "Mit {{variables}} Variablen hat die Tabelle {{rows}} Zeilen. Die kanonische DNF bleibt korrekt, wird aber schnell unübersichtlich. Für das Lernen reichen in der Regel 2 bis 4 Variablen.",
+      "largeTableDesc": "Mit {{variables}} Variablen hat die Tabelle {{rows}} Zeilen; davon liefern {{trueRows}} Zeilen einen DNF-Term. Große Ergebnisse werden zunächst als Vorschau angezeigt.",
       "variables": "Variablen",
       "rows": "Tabellenzeilen",
       "oneRows": "1-Zeilen",
@@ -245,10 +282,18 @@
       "showSolution": "Lösung anzeigen",
       "derivationTitle": "Herleitung",
       "derivationHint": "Nur Wahrheitstabellen-Zeilen mit Ergebnis 1 werden in Terme übersetzt und anschließend mit ODER verknüpft.",
+      "derivationPreview": "Die Herleitung hat {{total}} Schritte. Es werden zunächst {{shown}} Schritte angezeigt.",
+      "showAllSteps": "Alle {{count}} Schritte anzeigen",
+      "showFewerSteps": "Weniger Schritte anzeigen",
       "derivationRowLabel": "Zeile {{row}}",
       "derivationTautology": "Jede Zeile ergibt 1, daher ist die saubere DNF die Konstante 1.",
       "derivationContradiction": "Keine Zeile ergibt 1, daher ist die saubere DNF die Konstante 0.",
       "truthTableTitle": "Wahrheitstabelle",
+      "truthTableRow": "Zeile",
+      "truthTablePreview": "Große Tabelle: Es werden zuerst {{shown}} relevante Zeilen angezeigt. Insgesamt: {{total}} Zeilen, davon {{oneRows}} 1-Zeilen.",
+      "truthTableFull": "Volle Tabelle mit {{total}} Zeilen. Der Bereich bleibt scrollbar.",
+      "showFullTable": "Volle Tabelle anzeigen",
+      "showCompactTable": "Kompakte Tabelle anzeigen",
       "truthTableNoVariables": "Ausdruck",
       "truthTableResult": "Ergebnis",
       "truthTableTerm": "DNF-Term",

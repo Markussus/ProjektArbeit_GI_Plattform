@@ -1,34 +1,34 @@
 import { useMemo } from "react";
-import type { TFunction } from "i18next";
-import { AlertTriangle } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import type { Exercise } from "@/types/exercise";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
-import type { DnfParseIssue, DnfParseIssueCode } from "./domain/dnfParser";
 import { DnfDerivationSteps } from "./presentation/DnfDerivationSteps";
 import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
 import { DnfInputPanel } from "./presentation/DnfInputPanel";
 import { DnfResultPanel } from "./presentation/DnfResultPanel";
+import {
+  EmptyExpressionPanel,
+  LargeTruthTableWarning,
+  ParseErrorPanel,
+  VariableLimitPanel,
+} from "./presentation/DnfStatusPanels";
 import { DnfTruthTableView } from "./presentation/DnfTruthTableView";
 
-const LARGE_VARIABLE_COUNT_THRESHOLD = 6;
-
-const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
-  empty_expression: "dnf.builder.errors.emptyExpression",
-  unexpected_character: "dnf.builder.errors.unexpectedCharacter",
-  unexpected_token: "dnf.builder.errors.unexpectedToken",
-  unexpected_end: "dnf.builder.errors.unexpectedEnd",
-  missing_closing_parenthesis: "dnf.builder.errors.missingClosingParenthesis",
-};
+const LARGE_VARIABLE_COUNT_THRESHOLD = 5;
+const LARGE_TRUE_ROW_COUNT_THRESHOLD = 12;
 
 interface DnfBuilderProps {
   selectedExercise?: Exercise | null;
+  initialSource?: string | null;
 }
 
-export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
-  const builder = useDnfBuilder(selectedExercise);
+export function DnfBuilder({
+  selectedExercise,
+  initialSource,
+}: DnfBuilderProps) {
+  const builder = useDnfBuilder(selectedExercise, initialSource);
   const shouldShowSolution = !builder.isExerciseMode || builder.showSolution;
+  const isEmptySource = builder.source.trim().length === 0;
   const display = useMemo(() => {
     if (!shouldShowSolution || builder.analysis.status !== "valid") {
       return null;
@@ -76,6 +76,11 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
               </>
             )}
           </>
+        ) : builder.analysis.status === "too_many_variables" ? (
+          <VariableLimitPanel
+            variableCount={builder.analysis.variableCount}
+            maxVariableCount={builder.analysis.maxVariableCount}
+          />
         ) : (
           <ParseErrorPanel issue={builder.analysis.issue} />
         )}
@@ -93,6 +98,7 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
           onSourceChange={builder.setSource}
           onLoadExample={builder.loadExample}
           onReset={builder.reset}
+          onClear={builder.clearSource}
         />
 
         {builder.analysis.status === "valid" ? (
@@ -103,6 +109,13 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
             trueRowCount={builder.analysis.derivation.trueRows.length}
             derivation={builder.analysis.derivation}
           />
+        ) : isEmptySource ? (
+          <EmptyExpressionPanel />
+        ) : builder.analysis.status === "too_many_variables" ? (
+          <VariableLimitPanel
+            variableCount={builder.analysis.variableCount}
+            maxVariableCount={builder.analysis.maxVariableCount}
+          />
         ) : (
           <ParseErrorPanel issue={builder.analysis.issue} />
         )}
@@ -110,11 +123,14 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
 
       {shouldShowSolution && builder.analysis.status === "valid" && display && (
         <>
-          {builder.analysis.truthTable.variables.length >=
-            LARGE_VARIABLE_COUNT_THRESHOLD && (
+          {(builder.analysis.truthTable.variables.length >=
+            LARGE_VARIABLE_COUNT_THRESHOLD ||
+            builder.analysis.derivation.trueRows.length >
+              LARGE_TRUE_ROW_COUNT_THRESHOLD) && (
             <LargeTruthTableWarning
               variableCount={builder.analysis.truthTable.variables.length}
               rowCount={builder.analysis.truthTable.rows.length}
+              trueRowCount={builder.analysis.derivation.trueRows.length}
             />
           )}
           <DnfDerivationSteps
@@ -126,59 +142,4 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
       )}
     </div>
   );
-}
-
-function LargeTruthTableWarning({
-  variableCount,
-  rowCount,
-}: {
-  variableCount: number;
-  rowCount: number;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
-      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
-        <AlertTriangle className="h-5 w-5" />
-        {t("dnf.builder.largeTableTitle")}
-      </h3>
-      <p className="text-sm leading-relaxed text-amber-800 dark:text-amber-300/80">
-        {t("dnf.builder.largeTableDesc", {
-          variables: variableCount,
-          rows: rowCount,
-        })}
-      </p>
-    </div>
-  );
-}
-
-function ParseErrorPanel({ issue }: { issue: DnfParseIssue }) {
-  const { t } = useTranslation();
-
-  return (
-    <section className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-4">
-      <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 size-5 shrink-0" />
-        <div>
-          <h2 className="text-lg font-semibold">
-            {t("dnf.builder.errors.title")}
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed">
-            {translateParseIssue(t, issue)}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function translateParseIssue(t: TFunction, issue: DnfParseIssue): string {
-  return t(
-    parseIssueKeyByCode[issue.code] as never,
-    {
-      index: issue.index + 1,
-      value: issue.value ?? "",
-    } as never,
-  ) as unknown as string;
 }

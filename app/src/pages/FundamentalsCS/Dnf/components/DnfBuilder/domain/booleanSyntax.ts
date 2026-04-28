@@ -1,5 +1,8 @@
 export function normalizeBooleanOperatorAliases(source: string): string {
-  return source.replaceAll("!", "¬").replaceAll("&", "∧").replaceAll("|", "∨");
+  return source
+    .replace(/[!~]/g, "¬")
+    .replace(/&&?/g, "∧")
+    .replace(/\|\|?/g, "∨");
 }
 
 export function formatBooleanInput(source: string): string {

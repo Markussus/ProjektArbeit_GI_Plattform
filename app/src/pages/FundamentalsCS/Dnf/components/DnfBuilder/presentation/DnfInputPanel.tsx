@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { Lightbulb, RotateCcw } from "lucide-react";
+import { Eraser, Lightbulb, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { DnfExample, DnfExampleId } from "../application/useDnfBuilder";
+import type { DnfExample, DnfExampleId } from "../config/dnfExamples";
 import { formatBooleanInput } from "../domain/booleanSyntax";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 
@@ -12,6 +12,7 @@ interface DnfInputPanelProps {
   onSourceChange: (source: string) => void;
   onLoadExample: (source: string) => void;
   onReset: () => void;
+  onClear: () => void;
 }
 
 const exampleLabelKeyById: Record<DnfExampleId, string> = {
@@ -27,6 +28,7 @@ export function DnfInputPanel({
   onSourceChange,
   onLoadExample,
   onReset,
+  onClear,
 }: DnfInputPanelProps) {
   const { t } = useTranslation();
   const sourceInputRef = useRef<HTMLTextAreaElement>(null);
@@ -47,14 +49,24 @@ export function DnfInputPanel({
         </div>
 
         {!isExerciseMode && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
-          >
-            <RotateCcw className="size-4" />
-            {t("dnf.builder.reset")}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onClear}
+              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+            >
+              <Eraser className="size-4" />
+              {t("dnf.builder.clear")}
+            </button>
+            <button
+              type="button"
+              onClick={onReset}
+              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+            >
+              <RotateCcw className="size-4" />
+              {t("dnf.builder.reset")}
+            </button>
+          </div>
         )}
       </div>
 

@@ -5,7 +5,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
-import type { DnfBuilderAnalysis } from "./useDnfBuilder";
+import type { DnfBuilderAnalysis } from "./dnfAnalysis";
 
 interface UseDnfExerciseParams {
   analysis: DnfBuilderAnalysis;

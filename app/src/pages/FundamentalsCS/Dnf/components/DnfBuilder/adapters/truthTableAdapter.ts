@@ -7,6 +7,7 @@ import {
 import type { TruthTable } from "../domain/truthTable";
 
 export interface TruthTableDisplayRow {
+  rowNumber: number;
   assignmentValues: string[];
   result: string;
   term: string;
@@ -27,7 +28,7 @@ export function buildTruthTableDisplay(
 
   return {
     variableHeaders: table.variables,
-    rows: table.rows.map((row) => {
+    rows: table.rows.map((row, rowIndex) => {
       const isContributing = row.result;
       const term = getRowTerm(derivation, isContributing, termIndex);
 
@@ -36,6 +37,7 @@ export function buildTruthTableDisplay(
       }
 
       return {
+        rowNumber: rowIndex + 1,
         assignmentValues: table.variables.map((variable) =>
           formatBooleanValue(row.assignment[variable]),
         ),

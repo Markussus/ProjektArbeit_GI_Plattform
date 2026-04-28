@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { buildTruthTableDisplay } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/adapters/truthTableAdapter";
 import {
+  analyzeDnfSource,
+  MAX_DNF_VARIABLE_COUNT,
+} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/application/dnfAnalysis";
+import {
   collectExpressionVariables,
   evaluateBooleanExpression,
   type BooleanExpression,
@@ -99,6 +103,13 @@ describe("DNF boolean logic", () => {
     expect(formatBooleanInput(" ! a   &   ( b | c ) ")).toBe("¬a ∧ (b ∨ c)");
   });
 
+  it("normalizes multi-character keyboard operator aliases for display", () => {
+    expect(normalizeBooleanOperatorAliases("~a && (b || c)")).toBe(
+      "¬a ∧ (b ∨ c)",
+    );
+    expect(formatBooleanInput(" ~ a   &&   ( b || c ) ")).toBe("¬a ∧ (b ∨ c)");
+  });
+
   it("distinguishes equivalent expressions from canonical DNF answers", () => {
     const table = generateTruthTable(parse("(a | b) & c"));
     const result = checkDnfExerciseAttempt(
@@ -195,6 +206,21 @@ describe("Truth table generation", () => {
     const table = generateTruthTable(parse("a ∨ (b ∧ c) ∨ ¬d"));
 
     expect(table.rows).toHaveLength(16);
+  });
+
+  it("guards analysis before generating very large truth tables", () => {
+    const source = Array.from(
+      { length: MAX_DNF_VARIABLE_COUNT + 1 },
+      (_value, index) => `x${index + 1}`,
+    ).join(" ∨ ");
+
+    const analysis = analyzeDnfSource(source);
+
+    expect(analysis).toEqual({
+      status: "too_many_variables",
+      variableCount: MAX_DNF_VARIABLE_COUNT + 1,
+      maxVariableCount: MAX_DNF_VARIABLE_COUNT,
+    });
   });
 });
 
