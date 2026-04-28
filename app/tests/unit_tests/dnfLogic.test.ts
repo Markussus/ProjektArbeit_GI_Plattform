@@ -110,6 +110,17 @@ describe("DNF boolean logic", () => {
     expect(formatBooleanInput(" ~ a   &&   ( b || c ) ")).toBe("¬a ∧ (b ∨ c)");
   });
 
+  it("evaluates negated grouped expressions", () => {
+    const expression = parse("!(a & b)");
+
+    expect(evaluateBooleanExpression(expression, { a: true, b: true })).toBe(
+      false,
+    );
+    expect(evaluateBooleanExpression(expression, { a: true, b: false })).toBe(
+      true,
+    );
+  });
+
   it("distinguishes equivalent expressions from canonical DNF answers", () => {
     const table = generateTruthTable(parse("(a | b) & c"));
     const result = checkDnfExerciseAttempt(
@@ -222,6 +233,25 @@ describe("Truth table generation", () => {
       maxVariableCount: MAX_DNF_VARIABLE_COUNT,
     });
   });
+
+  it("allows analysis at the configured variable limit", () => {
+    const source = Array.from(
+      { length: MAX_DNF_VARIABLE_COUNT },
+      (_value, index) => `x${index + 1}`,
+    ).join(" ∧ ");
+
+    const analysis = analyzeDnfSource(source);
+
+    expect(analysis.status).toBe("valid");
+    if (analysis.status === "valid") {
+      expect(analysis.truthTable.variables).toHaveLength(
+        MAX_DNF_VARIABLE_COUNT,
+      );
+      expect(analysis.truthTable.rows).toHaveLength(
+        2 ** MAX_DNF_VARIABLE_COUNT,
+      );
+    }
+  });
 });
 
 describe("DNF derivation edge cases", () => {
@@ -332,6 +362,66 @@ describe("DNF exercise check edge cases", () => {
     expect(result.dnf.mismatchRows.map((row) => row.rowIndex)).toEqual([6]);
   });
 
+  it("accepts canonical DNF terms in any order", () => {
+    const table = generateTruthTable(parse("a ∨ b"));
+
+    const result = checkDnfExerciseAttempt(
+      table,
+      getCorrectTruthTableAnswers(table),
+      "(a & b) | (a & !b) | (!a & b)",
+    );
+
+    expect(result.isCorrect).toBe(true);
+    expect(result.dnf.status).toBe("correct");
+  });
+
+  it("rejects duplicated canonical terms as not canonical", () => {
+    const table = generateTruthTable(parse("a ∨ b"));
+
+    const result = checkDnfExerciseAttempt(
+      table,
+      getCorrectTruthTableAnswers(table),
+      "(!a & b) | (a & !b) | (a & b) | (a & b)",
+    );
+
+    expect(result.isCorrect).toBe(false);
+    expect(result.dnf.status).toBe("equivalent_not_canonical");
+  });
+
+  it("rejects answers with variables outside the source table", () => {
+    const table = generateTruthTable(parse("a ∨ b"));
+
+    const result = checkDnfExerciseAttempt(
+      table,
+      getCorrectTruthTableAnswers(table),
+      "a | z",
+    );
+
+    expect(result.isCorrect).toBe(false);
+    expect(result.dnf.status).toBe("not_equivalent");
+    expect(result.dnf.mismatchRows).toHaveLength(table.rows.length);
+  });
+
+  it("accepts constant canonical answers for tautology and contradiction", () => {
+    const tautologyTable = generateTruthTable(parse("a | !a"));
+    const contradictionTable = generateTruthTable(parse("a & !a"));
+
+    expect(
+      checkDnfExerciseAttempt(
+        tautologyTable,
+        getCorrectTruthTableAnswers(tautologyTable),
+        "1",
+      ).isCorrect,
+    ).toBe(true);
+    expect(
+      checkDnfExerciseAttempt(
+        contradictionTable,
+        getCorrectTruthTableAnswers(contradictionTable),
+        "0",
+      ).isCorrect,
+    ).toBe(true);
+  });
+
   it("treats partial-variable terms as equivalent but not canonical", () => {
     const table = generateTruthTable(parse("(a | b) & c"));
 
@@ -368,12 +458,14 @@ describe("Truth table display adapter", () => {
     expect(display.trueRowCount).toBe(5);
 
     const lastRow = display.rows[7];
+    expect(lastRow.rowNumber).toBe(8);
     expect(lastRow.assignmentValues).toEqual(["1", "1", "1"]);
     expect(lastRow.result).toBe("1");
     expect(lastRow.term).toBe("(a ∧ b ∧ c)");
     expect(lastRow.isContributing).toBe(true);
 
     const firstRow = display.rows[0];
+    expect(firstRow.rowNumber).toBe(1);
     expect(firstRow.term).toBe("");
     expect(firstRow.isContributing).toBe(false);
   });
