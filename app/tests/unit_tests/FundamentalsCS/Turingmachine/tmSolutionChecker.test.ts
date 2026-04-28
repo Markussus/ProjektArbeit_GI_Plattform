@@ -20,7 +20,7 @@ describe("tmSolutionChecker", () => {
 
   // Tests that a starter exercise machine without transitions fails the validation and reports that it did not end in a valid halt state.
   it("reports invalid halt outcomes for an unfinished starter machine", () => {
-    const exercise = turingMachineExercises[0];
+    const exercise = turingMachineExercises[1];
     const result = runTMValidation(exercise.starterProgram, [
       exercise.validationCases[1],
     ]);
