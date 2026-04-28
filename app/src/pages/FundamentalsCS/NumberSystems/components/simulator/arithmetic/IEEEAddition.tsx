@@ -56,8 +56,8 @@ export function IEEEAddition({
   };
 
   const { parsed, steps, result, shiftSteps } = useMemo(() => {
-    const numA = parseFloat("valA");
-    const numB = parseFloat("valB");
+    const numA = parseFloat(valA);
+    const numB = parseFloat(valB);
 
     if (isNaN(numA) || isNaN(numB)) {
       return { parsed: null, steps: null, result: null, shiftSteps: [] };
