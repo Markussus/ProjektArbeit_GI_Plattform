@@ -1,5 +1,5 @@
 import type { TMValidationCase } from "../../../scenarios";
-import { TuringMachineSimulator } from "./TuringMachineSimulator";
+import { TuringMachineSimulator } from "./tmSimulator.ts";
 import type { TMProgram } from "../domain/tmProgram";
 
 export interface TMValidationResultRow {

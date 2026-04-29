@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useSimulationEngine } from "@/hooks/useSimulationEngine";
 import type { TMProgram } from "../domain/tmProgram";
-import { TuringMachineSimulator } from "./TuringMachineSimulator";
+import { TuringMachineSimulator } from "./tmSimulator.ts";
 
 export function useTMSimulator(program: TMProgram) {
   const simulator = useMemo(() => new TuringMachineSimulator(), []);
