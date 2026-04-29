@@ -56,8 +56,11 @@ export function TMSimulationView({
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
+    <div
+      ref={responsiveBoundaryRef}
+      className="mx-auto flex w-full max-w-6xl flex-col gap-8"
+    >
+      <div className="flex w-full items-center justify-between">
         <h2 className="text-xl font-bold">{t("tm.sim.screen.title")}</h2>
         <button
           onClick={onEditConfig}
@@ -77,7 +80,7 @@ export function TMSimulationView({
         />
       </div>
 
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 sm:flex-row sm:flex-wrap sm:items-start sm:justify-center">
+      <div className="flex w-full flex-col items-center gap-6 sm:flex-row sm:flex-wrap sm:items-start sm:justify-center">
         <div className="flex w-full max-w-md flex-col gap-4 sm:w-96 sm:flex-none">
           <SimulatorControls
             status={status}

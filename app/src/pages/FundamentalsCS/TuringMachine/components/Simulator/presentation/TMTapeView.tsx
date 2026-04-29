@@ -134,8 +134,9 @@ export function TMTapeView({
   useLayoutEffect(() => {
     const headIndicator = headIndicatorRef.current;
     const focusedCell = focusedCellRef.current;
+    const tapeViewport = tapeViewportRef.current;
 
-    if (!headIndicator || !focusedCell) {
+    if (!headIndicator || !focusedCell || !tapeViewport) {
       if (headIndicator) {
         headIndicator.style.opacity = "0";
       }
@@ -143,8 +144,13 @@ export function TMTapeView({
       return;
     }
 
+    const viewportRect = tapeViewport.getBoundingClientRect();
+    const focusedCellRect = focusedCell.getBoundingClientRect();
+    const focusedCellCenterPx =
+      focusedCellRect.left - viewportRect.left + focusedCellRect.width / 2;
+
     headIndicator.style.opacity = "1";
-    headIndicator.style.transform = `translateX(${focusedCell.offsetLeft + focusedCell.offsetWidth / 2}px) translateX(-50%)`;
+    headIndicator.style.transform = `translateX(${focusedCellCenterPx}px) translateX(-50%)`;
   }, [cells]);
 
   useLayoutEffect(() => {
@@ -265,23 +271,20 @@ export function TMTapeView({
   }, [effectiveWindowRadius, startIndex, transitionDurationMs]);
 
   return (
-    <div
-      ref={tapeViewportRef}
-      className={cn("flex w-full justify-center py-10", className)}
-    >
-      <div className="relative flex flex-col items-center justify-center">
-        <div className="relative">
-          <div
-            ref={headIndicatorRef}
-            className="text-primary pointer-events-none absolute -top-10 left-0 z-20 opacity-0 transition-all ease-out"
-            style={headIndicatorStyle}
-          >
-            <ArrowDown className="h-5 w-5 drop-shadow-sm" />
-          </div>
+    <div ref={tapeViewportRef} className={cn("w-full py-10", className)}>
+      <div className="relative w-full">
+        <div
+          ref={headIndicatorRef}
+          className="text-primary pointer-events-none absolute -top-10 left-0 z-20 opacity-0 transition-all ease-out"
+          style={headIndicatorStyle}
+        >
+          <ArrowDown className="h-5 w-5 drop-shadow-sm" />
+        </div>
 
+        <div className="bg-muted/30 w-full rounded-xl border px-4 pt-4 pb-8 shadow-inner">
           <div
             ref={tapeTrackRef}
-            className="bg-muted/30 flex gap-1 overflow-visible rounded-xl border px-4 pt-4 pb-8 shadow-inner transition-transform ease-out"
+            className="mx-auto flex w-max gap-1 overflow-visible transition-transform ease-out"
           >
             {cells.map((cell) => (
               <div
