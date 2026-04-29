@@ -130,7 +130,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
             value={editor.draft.states}
             onChange={editor.setStates}
             className={inputClass}
-            placeholder="s0, s1, s2"
+            placeholder="S0, S1, S2"
           />
         </div>
 
@@ -174,7 +174,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
             value={editor.draft.acceptStates}
             onChange={editor.setAcceptStates}
             className={inputClass}
-            placeholder="q2"
+            placeholder="S2"
           />
         </div>
       </div>

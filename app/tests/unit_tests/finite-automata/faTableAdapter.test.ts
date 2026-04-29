@@ -61,9 +61,9 @@ describe("buildTransitionTableRows — DFA", () => {
   it("renders a single target state as its name", () => {
     const rows = buildTransitionTableRows(defaultDFAProgram);
     const rowA = rows.find((r) => r[0] === "a")!;
-    // s0 -a-> s1
-    const s0ColIndex = defaultDFAProgram.states.indexOf("s0") + 1;
-    expect(rowA[s0ColIndex]).toBe("s1");
+    // S0 -a-> S1
+    const s0ColIndex = defaultDFAProgram.states.indexOf("S0") + 1;
+    expect(rowA[s0ColIndex]).toBe("S1");
   });
 
   it("renders a missing transition as '–'", () => {
@@ -88,11 +88,11 @@ describe("buildTransitionTableRows — DFA", () => {
 });
 
 describe("buildTransitionTableRows — NFA", () => {
-  it("renders multiple targets as {s0, s1} notation", () => {
+  it("renders multiple targets as {S0, S1} notation", () => {
     const rows = buildTransitionTableRows(defaultNFAProgram);
     const rowA = rows.find((r) => r[0] === "a")!;
-    const s0ColIndex = defaultNFAProgram.states.indexOf("s0") + 1;
-    expect(rowA[s0ColIndex]).toBe("{s0, s1}");
+    const s0ColIndex = defaultNFAProgram.states.indexOf("S0") + 1;
+    expect(rowA[s0ColIndex]).toBe("{S0, S1}");
   });
 
   it("includes epsilon row when epsilon transitions exist", () => {
@@ -119,17 +119,17 @@ describe("getActiveTransitionCell", () => {
 
   it("returns the cell of the most recent transition (fromState, symbol)", () => {
     const runtime = {
-      activeStates: ["s1"],
+      activeStates: ["S1"],
       inputWord: ["a"],
       inputPosition: 1,
       transitionHistory: [
-        { fromStates: ["s0"], symbol: "a", toStates: ["s1"] },
+        { fromStates: ["S0"], symbol: "a", toStates: ["S1"] },
       ],
     };
     const cell = getActiveTransitionCell(defaultDFAProgram, runtime);
     expect(cell).not.toBeNull();
     expect(cell!.row).toBe(0); // 'a' is first symbol
-    expect(cell!.col).toBe(1); // s0 is first state → col 1
+    expect(cell!.col).toBe(1); // S0 is first state → col 1
   });
 
   it("returns null when the last transition's symbol is not in the table", () => {
@@ -155,8 +155,8 @@ describe("getActiveTransitionCell", () => {
 
 describe("getActiveColumns", () => {
   it("returns column indices offset by 1 for each active state", () => {
-    // s0 = index 0 → col 1; s2 = index 2 → col 3
-    const cols = getActiveColumns(defaultDFAProgram, ["s0", "s2"]);
+    // S0 = index 0 → col 1; S2 = index 2 → col 3
+    const cols = getActiveColumns(defaultDFAProgram, ["S0", "S2"]);
     expect(cols).toContain(1);
     expect(cols).toContain(3);
   });
@@ -171,7 +171,7 @@ describe("getActiveColumns", () => {
   });
 
   it("returns one entry per active state", () => {
-    const cols = getActiveColumns(defaultDFAProgram, ["s0", "s1"]);
+    const cols = getActiveColumns(defaultDFAProgram, ["S0", "S1"]);
     expect(cols).toHaveLength(2);
   });
 });

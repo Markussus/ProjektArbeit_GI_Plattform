@@ -557,6 +557,13 @@
         "inProgress": "In Bearbeitung",
         "completed": "Abgeschlossen"
       },
+      "endsWith01": {
+        "title": "Wörter, die mit \"01\" enden",
+        "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit \"01\" enden.",
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden.",
+        "hint1": "Verfolgen Sie, wie viel des Musters \"01\" Sie bereits gesehen haben. Drei Zustände reichen: nichts, gerade eine 0 gesehen, gerade \"01\" gesehen.",
+        "hint2": "Aus dem Akzeptanzzustand sollte eine 0 in den Zustand \"gerade 0 gesehen\" zurückfallen (Muster könnte erneut starten), und eine 1 zurück auf \"nichts\" gehen."
+      },
       "endsWith00": {
         "title": "Wörter, die mit \"00\" enden",
         "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit zwei Nullen enden.",
@@ -592,7 +599,8 @@
       "completed": "Abgeschlossen",
       "exit": "Aufgabenmodus verlassen",
       "check": "Lösung prüfen",
-      "showHint": "Hinweis anzeigen ({{n}}/{{total}})",
+      "showHint": "Hinweis",
+      "hintsUsed": "{{used}}/{{total}} Hinweise benutzt",
       "noMoreHints": "Alle Hinweise angezeigt",
       "showSolution": "Lösung anzeigen",
       "hintsHeader": "Hinweise",
@@ -610,7 +618,13 @@
       "expected": "erwartet",
       "got": "erhalten",
       "accept": "akzeptieren",
-      "reject": "ablehnen"
+      "reject": "ablehnen",
+      "exampleWordsHeader": "Probiere diese Wörter",
+      "exampleWordsHint": "Klicke ein Wort an, um es als Eingabe zu laden und durch den Automaten laufen zu lassen.",
+      "exampleAccept": "Akzeptiert",
+      "exampleReject": "Abgelehnt",
+      "unbuiltTitle": "Bau zuerst deinen Automaten",
+      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'."
     },
     "examples": {
       "endsWith01": {

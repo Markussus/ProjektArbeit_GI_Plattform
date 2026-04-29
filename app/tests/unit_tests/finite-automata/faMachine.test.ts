@@ -181,8 +181,8 @@ describe("stepRuntime", () => {
 
 describe("epsilonClosure", () => {
   it("returns the same state when there are no epsilon transitions", () => {
-    const closure = epsilonClosure(defaultDFAProgram, ["s0"]);
-    expect(closure).toEqual(["s0"]);
+    const closure = epsilonClosure(defaultDFAProgram, ["S0"]);
+    expect(closure).toEqual(["S0"]);
   });
 
   it("follows a single epsilon transition", () => {

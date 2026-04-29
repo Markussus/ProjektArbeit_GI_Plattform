@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { faExamples, type FAExample } from "./Simulator/config/faExamples";
 import type { FAProgram } from "./Simulator/domain/faTypes";
-import { useFAExampleStore } from "../store/faExampleStore";
+import { useFASimulatorStore } from "../store/faSimulatorStore";
 
 export function ExamplesTab({ onSwitchToSimulation }: ModuleExamplesTabProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const loadExample = useFAExampleStore((s) => s.loadExample);
+  const loadExample = useFASimulatorStore((s) => s.loadExample);
 
   const toggle = (id: string) =>
     setExpandedId((prev) => (prev === id ? null : id));

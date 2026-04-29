@@ -58,21 +58,21 @@ test.describe("Finite Automata — Simulation tab", () => {
   });
 
   test("renders the default DFA states as column headers", async ({ page }) => {
-    // defaultDFAProgram states: s0, s1, s2
-    await expect(page.getByRole("columnheader", { name: /s0/ })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /s1/ })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /s2/ })).toBeVisible();
+    // defaultDFAProgram states: S0, S1, S2
+    await expect(page.getByRole("columnheader", { name: /S0/ })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /S1/ })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /S2/ })).toBeVisible();
   });
 
   test("marks the start state with →", async ({ page }) => {
     await expect(
-      page.getByRole("columnheader", { name: /s0.*→/ }),
+      page.getByRole("columnheader", { name: /S0.*→/ }),
     ).toBeVisible();
   });
 
   test("marks the accept state with *", async ({ page }) => {
     await expect(
-      page.getByRole("columnheader", { name: /s2.*\*/ }),
+      page.getByRole("columnheader", { name: /S2.*\*/ }),
     ).toBeVisible();
   });
 
@@ -87,14 +87,14 @@ test.describe("Finite Automata — Simulation tab", () => {
   test("pre-fills transition inputs with the default DFA transitions", async ({
     page,
   }) => {
-    // δ(s0, a) = s1
-    const input = page.getByLabel("δ(s0, a)");
-    await expect(input).toHaveValue("s1");
+    // δ(S0, a) = S1
+    const input = page.getByLabel("δ(S0, a)");
+    await expect(input).toHaveValue("S1");
   });
 
-  test("pre-fills δ(s1, b) = s2", async ({ page }) => {
-    const input = page.getByLabel("δ(s1, b)");
-    await expect(input).toHaveValue("s2");
+  test("pre-fills δ(S1, b) = S2", async ({ page }) => {
+    const input = page.getByLabel("δ(S1, b)");
+    await expect(input).toHaveValue("S2");
   });
 
   test("shows the Input Word field with default value 'aab'", async ({
@@ -118,14 +118,14 @@ test.describe("Finite Automata — editor interactions", () => {
   });
 
   test("allows editing a transition input", async ({ page }) => {
-    const input = page.getByLabel("δ(s0, a)");
+    const input = page.getByLabel("δ(S0, a)");
     await input.clear();
-    await input.fill("s2");
-    await expect(input).toHaveValue("s2");
+    await input.fill("S2");
+    await expect(input).toHaveValue("S2");
   });
 
   test("allows clearing a transition", async ({ page }) => {
-    const input = page.getByLabel("δ(s0, b)");
+    const input = page.getByLabel("δ(S0, b)");
     await input.clear();
     await expect(input).toHaveValue("");
   });

@@ -1,23 +1,32 @@
+import type { LucideIcon } from "lucide-react";
+import { Binary, Flag, Hash, Sigma, Target } from "lucide-react";
+import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
+import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
 
-export type FADifficulty = 1 | 2 | 3;
-
-export interface FAExerciseDefinition {
-  /** Stable id — used for localStorage progress keys. */
+export interface FAExerciseDefinition extends ExerciseDefinition {
+  /** Stable id used internally for store lookups. */
   id: string;
-  titleKey: string;
-  goalKey: string;
-  descriptionKey: string;
-  difficulty: FADifficulty;
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
+  goalKey: TranslationKey;
+  difficulty: ExerciseDifficulty;
+  icon: LucideIcon;
   alphabet: string[];
   /** The reference automaton that defines the target language. */
   solution: FAProgram;
   /** Hints in order of increasing specificity. */
-  hintKeys: string[];
-  /** Starter program loaded when the user clicks "Start". */
+  hintKeys: TranslationKey[];
+  /** Starter program loaded when the user clicks "Open in simulation". */
   starter: FAProgram;
   /** Max length for enumerated test strings. Default 4. */
   maxTestLen?: number;
+  /** Example words shown alongside the revealed solution to help the user
+   *  verify and explore the automaton interactively. */
+  exampleWords?: {
+    accept: string[];
+    reject: string[];
+  };
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -27,79 +36,96 @@ export interface FAExerciseDefinition {
 function emptyStarter(alphabet: string[]): FAProgram {
   return {
     type: "DFA",
-    states: ["q0"],
+    states: ["S0"],
     alphabet,
-    transitions: { q0: {} },
-    startState: "q0",
+    transitions: { S0: {} },
+    startState: "S0",
     acceptStates: [],
   };
 }
 
 /* ────────────────────────────────────────────────────────────
-   Exercise 1 — ⭐ Strings ending with "00"
+   Exercise — Strings ending with "01"
+   ──────────────────────────────────────────────────────────── */
+
+const endsWith01Solution: FAProgram = {
+  type: "DFA",
+  states: ["S0", "S1", "S2"],
+  alphabet: ["0", "1"],
+  transitions: {
+    S0: { "0": ["S1"], "1": ["S0"] },
+    S1: { "0": ["S1"], "1": ["S2"] },
+    S2: { "0": ["S1"], "1": ["S0"] },
+  },
+  startState: "S0",
+  acceptStates: ["S2"],
+};
+
+/* ────────────────────────────────────────────────────────────
+   Exercise — Strings ending with "00"
    ──────────────────────────────────────────────────────────── */
 
 const endsWith00Solution: FAProgram = {
   type: "DFA",
-  states: ["q0", "q1", "q2"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    q0: { "0": ["q1"], "1": ["q0"] },
-    q1: { "0": ["q2"], "1": ["q0"] },
-    q2: { "0": ["q2"], "1": ["q0"] },
+    S0: { "0": ["S1"], "1": ["S0"] },
+    S1: { "0": ["S2"], "1": ["S0"] },
+    S2: { "0": ["S2"], "1": ["S0"] },
   },
-  startState: "q0",
-  acceptStates: ["q2"],
+  startState: "S0",
+  acceptStates: ["S2"],
 };
 
 /* ────────────────────────────────────────────────────────────
-   Exercise 2 — ⭐⭐ Even number of 1s
+   Exercise — Even number of 1s
    ──────────────────────────────────────────────────────────── */
 
 const evenOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["even", "odd"],
+  states: ["S0", "S1"],
   alphabet: ["0", "1"],
   transitions: {
-    even: { "0": ["even"], "1": ["odd"] },
-    odd: { "0": ["odd"], "1": ["even"] },
+    S0: { "0": ["S0"], "1": ["S1"] },
+    S1: { "0": ["S1"], "1": ["S0"] },
   },
-  startState: "even",
-  acceptStates: ["even"],
+  startState: "S0",
+  acceptStates: ["S0"],
 };
 
 /* ────────────────────────────────────────────────────────────
-   Exercise 3 — ⭐⭐ No two consecutive 1s
+   Exercise — No two consecutive 1s
    ──────────────────────────────────────────────────────────── */
 
 const noConsecutiveOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["ok", "justSawOne", "dead"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    ok: { "0": ["ok"], "1": ["justSawOne"] },
-    justSawOne: { "0": ["ok"], "1": ["dead"] },
-    dead: { "0": ["dead"], "1": ["dead"] },
+    S0: { "0": ["S0"], "1": ["S1"] },
+    S1: { "0": ["S0"], "1": ["S2"] },
+    S2: { "0": ["S2"], "1": ["S2"] },
   },
-  startState: "ok",
-  acceptStates: ["ok", "justSawOne"],
+  startState: "S0",
+  acceptStates: ["S0", "S1"],
 };
 
 /* ────────────────────────────────────────────────────────────
-   Exercise 4 — ⭐⭐⭐ Binary numbers divisible by 3
+   Exercise — Binary numbers divisible by 3
    ──────────────────────────────────────────────────────────── */
 
 const divisibleBy3Solution: FAProgram = {
   type: "DFA",
-  states: ["r0", "r1", "r2"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    r0: { "0": ["r0"], "1": ["r1"] },
-    r1: { "0": ["r2"], "1": ["r0"] },
-    r2: { "0": ["r1"], "1": ["r2"] },
+    S0: { "0": ["S0"], "1": ["S1"] },
+    S1: { "0": ["S2"], "1": ["S0"] },
+    S2: { "0": ["S1"], "1": ["S2"] },
   },
-  startState: "r0",
-  acceptStates: ["r0"],
+  startState: "S0",
+  acceptStates: ["S0"],
 };
 
 /* ────────────────────────────────────────────────────────────
@@ -108,11 +134,31 @@ const divisibleBy3Solution: FAProgram = {
 
 export const faExercises: FAExerciseDefinition[] = [
   {
+    id: "ends-with-01",
+    titleKey: "fa.exercisesTab.endsWith01.title",
+    goalKey: "fa.exercisesTab.endsWith01.goal",
+    descriptionKey: "fa.exercisesTab.endsWith01.description",
+    difficulty: "easy",
+    icon: Flag,
+    alphabet: ["0", "1"],
+    solution: endsWith01Solution,
+    hintKeys: [
+      "fa.exercisesTab.endsWith01.hint1",
+      "fa.exercisesTab.endsWith01.hint2",
+    ],
+    starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["1001", "01", "001", "101", "1101"],
+      reject: ["0", "1", "10", "11", "100", "010"],
+    },
+  },
+  {
     id: "ends-with-00",
     titleKey: "fa.exercisesTab.endsWith00.title",
     goalKey: "fa.exercisesTab.endsWith00.goal",
     descriptionKey: "fa.exercisesTab.endsWith00.description",
-    difficulty: 1,
+    difficulty: "easy",
+    icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith00Solution,
     hintKeys: [
@@ -120,13 +166,18 @@ export const faExercises: FAExerciseDefinition[] = [
       "fa.exercisesTab.endsWith00.hint2",
     ],
     starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["1100", "00", "100", "0100"],
+      reject: ["0", "1", "01", "11"],
+    },
   },
   {
     id: "even-ones",
     titleKey: "fa.exercisesTab.evenOnes.title",
     goalKey: "fa.exercisesTab.evenOnes.goal",
     descriptionKey: "fa.exercisesTab.evenOnes.description",
-    difficulty: 2,
+    difficulty: "medium",
+    icon: Sigma,
     alphabet: ["0", "1"],
     solution: evenOnesSolution,
     hintKeys: [
@@ -134,13 +185,18 @@ export const faExercises: FAExerciseDefinition[] = [
       "fa.exercisesTab.evenOnes.hint2",
     ],
     starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["1100", "11", "00", "0110", "0000"],
+      reject: ["1", "10", "111", "0010"],
+    },
   },
   {
     id: "no-consecutive-ones",
     titleKey: "fa.exercisesTab.noConsecOnes.title",
     goalKey: "fa.exercisesTab.noConsecOnes.goal",
     descriptionKey: "fa.exercisesTab.noConsecOnes.description",
-    difficulty: 2,
+    difficulty: "medium",
+    icon: Binary,
     alphabet: ["0", "1"],
     solution: noConsecutiveOnesSolution,
     hintKeys: [
@@ -148,13 +204,18 @@ export const faExercises: FAExerciseDefinition[] = [
       "fa.exercisesTab.noConsecOnes.hint2",
     ],
     starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["10101", "0", "1", "01", "010"],
+      reject: ["11", "0110", "0011", "111"],
+    },
   },
   {
     id: "divisible-by-3",
     titleKey: "fa.exercisesTab.divBy3.title",
     goalKey: "fa.exercisesTab.divBy3.goal",
     descriptionKey: "fa.exercisesTab.divBy3.description",
-    difficulty: 3,
+    difficulty: "hard",
+    icon: Hash,
     alphabet: ["0", "1"],
     solution: divisibleBy3Solution,
     hintKeys: [
@@ -164,9 +225,13 @@ export const faExercises: FAExerciseDefinition[] = [
     ],
     starter: emptyStarter(["0", "1"]),
     maxTestLen: 5,
+    exampleWords: {
+      accept: ["1001", "0", "11", "110", "1100"],
+      reject: ["1", "10", "100", "111", "1010"],
+    },
   },
 ];
 
 export function findFAExercise(id: string): FAExerciseDefinition | undefined {
-  return faExercises.find((e) => e.id === id);
+  return faExercises.find((e) => e.id === id || e.titleKey === id);
 }

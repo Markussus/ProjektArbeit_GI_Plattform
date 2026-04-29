@@ -9,10 +9,7 @@ import type { FAProgram } from "./domain/faTypes";
 import { FAConfigView } from "./presentation/FAConfigView";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
-import { FAExerciseWorkspacePanel } from "./presentation/FAExerciseWorkspacePanel";
-import { useFAExampleStore } from "../../store/faExampleStore";
-import { useFAExerciseStore } from "../../store/faExerciseStore";
-import { findFAExercise } from "../../exercises/faExerciseDefinitions";
+import { useFASimulatorStore } from "../../store/faSimulatorStore";
 
 type EditorMode = "manual" | "grammar";
 
@@ -28,17 +25,30 @@ export function FASimulator() {
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
 
-  // Consume pending example from the store (loaded via ExamplesTab)
-  const pendingProgram = useFAExampleStore((s) => s.pendingProgram);
-  const pendingInputWord = useFAExampleStore((s) => s.pendingInputWord);
-  const consumePending = useFAExampleStore((s) => s.consumePending);
+  // Consume pending example from the store (loaded via ExamplesTab or by the
+  // exercise panel revealing a solution).
+  const pendingProgram = useFASimulatorStore((s) => s.pendingProgram);
+  const pendingInputWord = useFASimulatorStore((s) => s.pendingInputWord);
+  const consumePending = useFASimulatorStore((s) => s.consumePending);
 
-  // Exercise mode — when set, we render the workspace panel above the editor.
-  const activeExerciseId = useFAExerciseStore((s) => s.activeExerciseId);
-  const setActiveExercise = useFAExerciseStore((s) => s.setActiveExercise);
-  const activeExercise = activeExerciseId
-    ? findFAExercise(activeExerciseId)
-    : undefined;
+  // The exercise panel (rendered at the SimulationTab level) requests
+  // input-word changes via this override channel — no program reload.
+  const pendingInputWordOverride = useFASimulatorStore(
+    (s) => s.pendingInputWordOverride,
+  );
+  const consumePendingInputWord = useFASimulatorStore(
+    (s) => s.consumePendingInputWord,
+  );
+
+  // Publish the simulator's current program so the lifted exercise panel can
+  // validate against it. While editing this is the in-flight draft; while
+  // simulating it is the committed program.
+  const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
+  const exposedStudentProgram = isEditMode ? editor.draft : program;
+  useEffect(() => {
+    setStudentProgram(exposedStudentProgram);
+    return () => setStudentProgram(null);
+  }, [exposedStudentProgram, setStudentProgram]);
 
   // Track which pending program has already been applied to avoid double-processing.
   const [prevPendingProgram, setPrevPendingProgram] =
@@ -60,6 +70,24 @@ export function FASimulator() {
     }
   }, [pendingProgram, consumePending]);
 
+  const [prevPendingWordOverride, setPrevPendingWordOverride] = useState<
+    string | null
+  >(null);
+
+  if (
+    pendingInputWordOverride !== null &&
+    pendingInputWordOverride !== prevPendingWordOverride
+  ) {
+    setPrevPendingWordOverride(pendingInputWordOverride);
+    setInputWord(pendingInputWordOverride);
+  }
+
+  useEffect(() => {
+    if (pendingInputWordOverride !== null) {
+      consumePendingInputWord();
+    }
+  }, [pendingInputWordOverride, consumePendingInputWord]);
+
   const handleApplyProgram = () => {
     const result = editor.applyProgram();
     if (!result.ok) return;
@@ -79,30 +107,10 @@ export function FASimulator() {
     setEditorMode("manual");
   };
 
-  const handleLoadExerciseSolution = (solution: FAProgram) => {
-    const cloned = cloneJson(solution);
-    setProgram(cloned);
-    editor.resetToProgram(cloned);
-    setEditorMode("manual");
-  };
-
-  const handleExitExercise = () => {
-    setActiveExercise(null);
-  };
-
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
       {isEditMode ? (
         <div className="flex flex-col gap-6">
-          {activeExercise && (
-            <FAExerciseWorkspacePanel
-              exercise={activeExercise}
-              studentProgram={editor.draft}
-              onLoadSolution={handleLoadExerciseSolution}
-              onExit={handleExitExercise}
-            />
-          )}
-
           {/* Mode Toggle */}
           <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
             <ModeButton

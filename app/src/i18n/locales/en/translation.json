@@ -561,6 +561,13 @@
         "inProgress": "In progress",
         "completed": "Completed"
       },
+      "endsWith01": {
+        "title": "Strings ending with \"01\"",
+        "goal": "Build a DFA that accepts binary strings ending with \"01\".",
+        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are \"0\" followed by \"1\" (e.g. \"01\", \"101\", \"1001\"). Strings ending in any other pattern must be rejected.",
+        "hint1": "Track how much of the pattern \"01\" you have matched so far. Three states are enough: nothing, just saw a 0, just saw \"01\".",
+        "hint2": "From the accept state, reading a 0 should fall back to \"just saw a 0\" (you might still be on track), and reading a 1 should reset to \"nothing\"."
+      },
       "endsWith00": {
         "title": "Strings ending with \"00\"",
         "goal": "Build a DFA that accepts binary strings ending with two zeros.",
@@ -596,7 +603,8 @@
       "completed": "Completed",
       "exit": "Exit exercise mode",
       "check": "Check Solution",
-      "showHint": "Show hint ({{n}}/{{total}})",
+      "showHint": "Hint",
+      "hintsUsed": "{{used}}/{{total}} Hints Used",
       "noMoreHints": "All hints revealed",
       "showSolution": "Show solution",
       "hintsHeader": "Hints",
@@ -614,7 +622,13 @@
       "expected": "expected",
       "got": "got",
       "accept": "accept",
-      "reject": "reject"
+      "reject": "reject",
+      "exampleWordsHeader": "Try these words",
+      "exampleWordsHint": "Click a word to load it as the input and run it through the automaton.",
+      "exampleAccept": "Accepted",
+      "exampleReject": "Rejected",
+      "unbuiltTitle": "Build your automaton first",
+      "unbuiltBody": "Add states, transitions, and at least one accept state, then run Check Solution again."
     },
     "examples": {
       "endsWith01": {

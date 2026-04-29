@@ -24,20 +24,20 @@ describe("defaultDFAProgram — structure", () => {
     expect(defaultDFAProgram.type).toBe("DFA");
   });
 
-  it("has exactly 3 states: s0, s1, s2", () => {
-    expect(defaultDFAProgram.states).toEqual(["s0", "s1", "s2"]);
+  it("has exactly 3 states: S0, S1, S2", () => {
+    expect(defaultDFAProgram.states).toEqual(["S0", "S1", "S2"]);
   });
 
   it("has alphabet [a, b]", () => {
     expect(defaultDFAProgram.alphabet).toEqual(["a", "b"]);
   });
 
-  it("has s0 as start state", () => {
-    expect(defaultDFAProgram.startState).toBe("s0");
+  it("has S0 as start state", () => {
+    expect(defaultDFAProgram.startState).toBe("S0");
   });
 
-  it("has s2 as the only accept state", () => {
-    expect(defaultDFAProgram.acceptStates).toEqual(["s2"]);
+  it("has S2 as the only accept state", () => {
+    expect(defaultDFAProgram.acceptStates).toEqual(["S2"]);
   });
 
   it("has a transition entry for every state", () => {
@@ -90,28 +90,28 @@ describe("defaultNFAProgram — structure", () => {
     expect(defaultNFAProgram.type).toBe("NFA");
   });
 
-  it("has exactly 3 states: s0, s1, s2", () => {
-    expect(defaultNFAProgram.states).toEqual(["s0", "s1", "s2"]);
+  it("has exactly 3 states: S0, S1, S2", () => {
+    expect(defaultNFAProgram.states).toEqual(["S0", "S1", "S2"]);
   });
 
   it("has alphabet [a, b]", () => {
     expect(defaultNFAProgram.alphabet).toEqual(["a", "b"]);
   });
 
-  it("has s0 as start state", () => {
-    expect(defaultNFAProgram.startState).toBe("s0");
+  it("has S0 as start state", () => {
+    expect(defaultNFAProgram.startState).toBe("S0");
   });
 
-  it("has s2 as the only accept state", () => {
-    expect(defaultNFAProgram.acceptStates).toEqual(["s2"]);
+  it("has S2 as the only accept state", () => {
+    expect(defaultNFAProgram.acceptStates).toEqual(["S2"]);
   });
 
   it("passes validation (no issues)", () => {
     expect(isFAProgramValid(defaultNFAProgram)).toBe(true);
   });
 
-  it("has non-deterministic choice on 'a' from s0", () => {
-    const targets = defaultNFAProgram.transitions["s0"]["a"];
+  it("has non-deterministic choice on 'a' from S0", () => {
+    const targets = defaultNFAProgram.transitions["S0"]["a"];
     expect(targets.length).toBeGreaterThan(1);
   });
 });

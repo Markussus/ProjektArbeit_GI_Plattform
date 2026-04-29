@@ -83,9 +83,9 @@ describe("FATransitionTableEditor — DFA rendering", () => {
   });
 
   it("inputs show existing transition targets as pre-filled values", () => {
-    // s0 -a-> s1
-    const input = screen.getByLabelText("δ(s0, a)");
-    expect((input as HTMLInputElement).value).toBe("s1");
+    // S0 -a-> S1
+    const input = screen.getByLabelText("δ(S0, a)");
+    expect((input as HTMLInputElement).value).toBe("S1");
   });
 
   it("does not render the epsilon toggle button for a DFA", () => {
@@ -110,7 +110,7 @@ describe("FATransitionTableEditor — NFA rendering", () => {
   it("adds the epsilon row when the toggle button is clicked", () => {
     const btn = screen.getByText(/Add ε-Transitions/);
     fireEvent.click(btn);
-    expect(screen.getByLabelText("δ(s0, ε)")).toBeInTheDocument();
+    expect(screen.getByLabelText("δ(S0, ε)")).toBeInTheDocument();
   });
 
   it("hides the epsilon button after clicking it", () => {
@@ -126,7 +126,7 @@ describe("FATransitionTableEditor — NFA with existing epsilon transitions", ()
       ...defaultNFAProgram,
       transitions: {
         ...defaultNFAProgram.transitions,
-        s0: { ...defaultNFAProgram.transitions["s0"], [EPSILON]: ["s1"] },
+        S0: { ...defaultNFAProgram.transitions["S0"], [EPSILON]: ["S1"] },
       },
     };
     render(
@@ -135,7 +135,7 @@ describe("FATransitionTableEditor — NFA with existing epsilon transitions", ()
         onTransitionChange={noop}
       />,
     );
-    expect(screen.getByLabelText("δ(s0, ε)")).toBeInTheDocument();
+    expect(screen.getByLabelText("δ(S0, ε)")).toBeInTheDocument();
   });
 });
 
@@ -148,9 +148,9 @@ describe("FATransitionTableEditor — onTransitionChange callback", () => {
         onTransitionChange={onChange}
       />,
     );
-    const input = getByLabelText("δ(s0, a)");
-    fireEvent.change(input, { target: { value: "s1, s2" } });
-    expect(onChange).toHaveBeenCalledWith("s0", "a", "s1, s2");
+    const input = getByLabelText("δ(S0, a)");
+    fireEvent.change(input, { target: { value: "S1, S2" } });
+    expect(onChange).toHaveBeenCalledWith("S0", "a", "S1, S2");
   });
 
   it("is called exactly once per change event", () => {
@@ -161,9 +161,9 @@ describe("FATransitionTableEditor — onTransitionChange callback", () => {
         onTransitionChange={onChange}
       />,
     );
-    // δ(s0, b) currently has value "s0"; change to "s1" to produce a real change
-    const input = getByLabelText("δ(s0, b)");
-    fireEvent.change(input, { target: { value: "s1" } });
+    // δ(S0, b) currently has value "S0"; change to "S1" to produce a real change
+    const input = getByLabelText("δ(S0, b)");
+    fireEvent.change(input, { target: { value: "S1" } });
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 });

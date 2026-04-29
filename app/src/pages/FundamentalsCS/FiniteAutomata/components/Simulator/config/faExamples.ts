@@ -29,80 +29,7 @@ export interface FAExampleStep {
   contentKey: string;
 }
 
-// ─── 1. Simple DFA: Strings ending in "01" ─────────────────────────────────
-export const exampleEndsWith01: FAExample = {
-  id: "ends-with-01",
-  titleKey: "fa.examples.endsWith01.title",
-  descriptionKey: "fa.examples.endsWith01.description",
-  type: "DFA",
-  program: {
-    type: "DFA",
-    states: ["s0", "s1", "s2"],
-    alphabet: ["0", "1"],
-    transitions: {
-      s0: { "0": ["s1"], "1": ["s0"] },
-      s1: { "0": ["s1"], "1": ["s2"] },
-      s2: { "0": ["s1"], "1": ["s0"] },
-    },
-    startState: "s0",
-    acceptStates: ["s2"],
-  },
-  inputWord: "1001",
-  steps: [
-    {
-      titleKey: "fa.examples.endsWith01.step1Title",
-      contentKey: "fa.examples.endsWith01.step1",
-    },
-    {
-      titleKey: "fa.examples.endsWith01.step2Title",
-      contentKey: "fa.examples.endsWith01.step2",
-    },
-    {
-      titleKey: "fa.examples.endsWith01.step3Title",
-      contentKey: "fa.examples.endsWith01.step3",
-    },
-    {
-      titleKey: "fa.examples.endsWith01.step4Title",
-      contentKey: "fa.examples.endsWith01.step4",
-    },
-  ],
-};
-
-// ─── 2. DFA: Even number of 1s ─────────────────────────────────────────────
-export const exampleEvenOnes: FAExample = {
-  id: "even-ones",
-  titleKey: "fa.examples.evenOnes.title",
-  descriptionKey: "fa.examples.evenOnes.description",
-  type: "DFA",
-  program: {
-    type: "DFA",
-    states: ["even", "odd"],
-    alphabet: ["0", "1"],
-    transitions: {
-      even: { "0": ["even"], "1": ["odd"] },
-      odd: { "0": ["odd"], "1": ["even"] },
-    },
-    startState: "even",
-    acceptStates: ["even"],
-  },
-  inputWord: "1101",
-  steps: [
-    {
-      titleKey: "fa.examples.evenOnes.step1Title",
-      contentKey: "fa.examples.evenOnes.step1",
-    },
-    {
-      titleKey: "fa.examples.evenOnes.step2Title",
-      contentKey: "fa.examples.evenOnes.step2",
-    },
-    {
-      titleKey: "fa.examples.evenOnes.step3Title",
-      contentKey: "fa.examples.evenOnes.step3",
-    },
-  ],
-};
-
-// ─── 3. NFA: Contains substring "aba" ───────────────────────────────────────
+// ─── NFA: Contains substring "aba" ──────────────────────────────────────────
 export const exampleContainsAba: FAExample = {
   id: "contains-aba",
   titleKey: "fa.examples.containsAba.title",
@@ -110,16 +37,16 @@ export const exampleContainsAba: FAExample = {
   type: "NFA",
   program: {
     type: "NFA",
-    states: ["s0", "s1", "s2", "s3"],
+    states: ["S0", "S1", "S2", "S3"],
     alphabet: ["a", "b"],
     transitions: {
-      s0: { a: ["s0", "s1"], b: ["s0"] },
-      s1: { b: ["s2"] },
-      s2: { a: ["s3"] },
-      s3: { a: ["s3"], b: ["s3"] },
+      S0: { a: ["S0", "S1"], b: ["S0"] },
+      S1: { b: ["S2"] },
+      S2: { a: ["S3"] },
+      S3: { a: ["S3"], b: ["S3"] },
     },
-    startState: "s0",
-    acceptStates: ["s3"],
+    startState: "S0",
+    acceptStates: ["S3"],
   },
   inputWord: "baba",
   steps: [
@@ -142,46 +69,7 @@ export const exampleContainsAba: FAExample = {
   ],
 };
 
-// ─── 5. DFA: Divisible by 3 (binary) ────────────────────────────────────────
-export const exampleDivisibleBy3: FAExample = {
-  id: "divisible-by-3",
-  titleKey: "fa.examples.divisibleBy3.title",
-  descriptionKey: "fa.examples.divisibleBy3.description",
-  type: "DFA",
-  program: {
-    type: "DFA",
-    states: ["s0", "s1", "s2"],
-    alphabet: ["0", "1"],
-    transitions: {
-      s0: { "0": ["s0"], "1": ["s1"] },
-      s1: { "0": ["s2"], "1": ["s0"] },
-      s2: { "0": ["s1"], "1": ["s2"] },
-    },
-    startState: "s0",
-    acceptStates: ["s0"],
-  },
-  inputWord: "110",
-  steps: [
-    {
-      titleKey: "fa.examples.divisibleBy3.step1Title",
-      contentKey: "fa.examples.divisibleBy3.step1",
-    },
-    {
-      titleKey: "fa.examples.divisibleBy3.step2Title",
-      contentKey: "fa.examples.divisibleBy3.step2",
-    },
-    {
-      titleKey: "fa.examples.divisibleBy3.step3Title",
-      contentKey: "fa.examples.divisibleBy3.step3",
-    },
-    {
-      titleKey: "fa.examples.divisibleBy3.step4Title",
-      contentKey: "fa.examples.divisibleBy3.step4",
-    },
-  ],
-};
-
-// ─── 6. DFA: Lecture Example (0+1) ──────────────────────────────────────────
+// ─── DFA: Lecture Example (0+1) ─────────────────────────────────────────────
 export const exampleLecture: FAExample = {
   id: "lecture-example",
   titleKey: "fa.examples.lecture.title",
@@ -189,16 +77,16 @@ export const exampleLecture: FAExample = {
   type: "DFA",
   program: {
     type: "DFA",
-    states: ["s0", "s1", "s2", "s3"],
+    states: ["S0", "S1", "S2", "S3"],
     alphabet: ["0", "1"],
     transitions: {
-      s0: { "0": ["s1"], "1": ["s3"] },
-      s1: { "0": ["s1"], "1": ["s2"] },
-      s2: { "0": ["s3"], "1": ["s3"] },
-      s3: { "0": ["s3"], "1": ["s3"] },
+      S0: { "0": ["S1"], "1": ["S3"] },
+      S1: { "0": ["S1"], "1": ["S2"] },
+      S2: { "0": ["S3"], "1": ["S3"] },
+      S3: { "0": ["S3"], "1": ["S3"] },
     },
-    startState: "s0",
-    acceptStates: ["s2"],
+    startState: "S0",
+    acceptStates: ["S2"],
   },
   inputWord: "0001",
   steps: [
@@ -213,7 +101,7 @@ export const exampleLecture: FAExample = {
   ],
 };
 
-// ─── 7. Grammar → NFA | DFA ──────────────────────────────────
+// ─── Grammar → NFA | DFA ────────────────────────────────────────────────────
 export const exampleGrammar: FAExample = {
   id: "grammar-example",
   titleKey: "fa.examples.grammar.title",
@@ -269,8 +157,5 @@ export const exampleGrammar: FAExample = {
 export const faExamples: FAExample[] = [
   exampleLecture,
   exampleGrammar,
-  exampleEndsWith01,
-  exampleEvenOnes,
   exampleContainsAba,
-  exampleDivisibleBy3,
 ];
