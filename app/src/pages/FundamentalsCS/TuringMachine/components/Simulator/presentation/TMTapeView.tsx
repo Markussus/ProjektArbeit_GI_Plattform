@@ -7,13 +7,14 @@ import {
 } from "react";
 import { ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const HEAD_WINDOW_TRANSITION_RATIO = 0.6;
-const MIN_TRANSITION_MS = 120;
-const MAX_TRANSITION_MS = 600;
-const NO_ANIMATION_THRESHOLD_MS = 140;
-const MAX_ANIMATED_TAPE_SHIFT_CELLS = 1;
-const DEFAULT_HEAD_WINDOW_RADIUS = 5;
+import {
+  buildTapeCells,
+  DEFAULT_HEAD_WINDOW_RADIUS,
+  getResponsiveWindowRadius,
+  getTapeTransitionDurationMs,
+  resolveTapeViewport,
+  shouldAnimateTapeShift,
+} from "./tmTapeViewLogic.ts";
 
 export interface TMTapeViewProps {
   tape: Record<number, string>;
@@ -49,31 +50,17 @@ export function TMTapeView({
   const maxWindowRadius = Math.max(windowRadius, 0);
   const [responsiveWindowRadius, setResponsiveWindowRadius] =
     useState(maxWindowRadius);
-  const effectiveWindowRadius = Math.min(
-    responsiveWindowRadius,
-    maxWindowRadius,
+  const { effectiveWindowRadius, startIndex, endIndex } = useMemo(
+    () =>
+      resolveTapeViewport(
+        headPosition,
+        windowRadius,
+        headWindowRadius,
+        responsiveWindowRadius,
+      ),
+    [headPosition, headWindowRadius, responsiveWindowRadius, windowRadius],
   );
-  const effectiveHeadWindowRadius = Math.min(
-    Math.max(headWindowRadius, 0),
-    effectiveWindowRadius,
-  );
-  const headViewportOffset = Math.max(
-    -effectiveHeadWindowRadius,
-    Math.min(headPosition, effectiveHeadWindowRadius),
-  );
-  const viewportCenter = headPosition - headViewportOffset;
-  const startIndex = viewportCenter - effectiveWindowRadius;
-  const endIndex = viewportCenter + effectiveWindowRadius;
-  const transitionDurationMs =
-    stepDurationMs <= NO_ANIMATION_THRESHOLD_MS
-      ? 0
-      : Math.min(
-          MAX_TRANSITION_MS,
-          Math.max(
-            MIN_TRANSITION_MS,
-            Math.round(stepDurationMs * HEAD_WINDOW_TRANSITION_RATIO),
-          ),
-        );
+  const transitionDurationMs = getTapeTransitionDurationMs(stepDurationMs);
   const transitionStyle = {
     transitionDuration: `${transitionDurationMs}ms`,
   };
@@ -112,24 +99,10 @@ export function TMTapeView({
     };
   }, [responsiveBoundaryRef]);
 
-  const cells = useMemo(() => {
-    const result = [];
-
-    for (let index = startIndex; index <= endIndex; index += 1) {
-      const symbol =
-        tape[index] !== undefined && tape[index] !== null
-          ? tape[index]
-          : blankSymbol;
-
-      result.push({
-        index,
-        value: symbol === "" ? blankSymbol : symbol,
-        isFocused: index === headPosition,
-      });
-    }
-
-    return result;
-  }, [blankSymbol, endIndex, headPosition, startIndex, tape]);
+  const cells = useMemo(
+    () => buildTapeCells(tape, headPosition, blankSymbol, startIndex, endIndex),
+    [blankSymbol, endIndex, headPosition, startIndex, tape],
+  );
 
   useLayoutEffect(() => {
     const headIndicator = headIndicatorRef.current;
@@ -170,22 +143,17 @@ export function TMTapeView({
     const cellPitchPx = secondCell
       ? secondCell.offsetLeft - firstCell.offsetLeft
       : cellWidthPx;
-    if (cellWidthPx <= 0 || cellPitchPx <= 0) {
-      return;
-    }
-
     const baseWidthPx =
       tapeTrack.offsetWidth -
       cellWidthPx -
       Math.max(0, totalCells - 1) * cellPitchPx;
-    const maxVisibleCells = Math.max(
-      1,
-      Math.floor((viewportWidth - baseWidthPx - cellWidthPx) / cellPitchPx) + 1,
-    );
-    const nextRadius = Math.min(
+    const nextRadius = getResponsiveWindowRadius({
+      viewportWidth,
+      baseWidthPx,
+      cellWidthPx,
+      cellPitchPx,
       maxWindowRadius,
-      Math.floor((maxVisibleCells - 1) / 2),
-    );
+    });
 
     if (nextRadius !== effectiveWindowRadius) {
       setResponsiveWindowRadius(nextRadius);
@@ -224,11 +192,7 @@ export function TMTapeView({
     const shiftedCells = startIndex - previousStartIndex;
     previousStartIndexRef.current = startIndex;
 
-    if (
-      shiftedCells === 0 ||
-      Math.abs(shiftedCells) > MAX_ANIMATED_TAPE_SHIFT_CELLS ||
-      transitionDurationMs === 0
-    ) {
+    if (!shouldAnimateTapeShift(shiftedCells, transitionDurationMs)) {
       tapeTrack.style.transitionDuration = "0ms";
       tapeTrack.style.transform = "translateX(0px)";
       return;

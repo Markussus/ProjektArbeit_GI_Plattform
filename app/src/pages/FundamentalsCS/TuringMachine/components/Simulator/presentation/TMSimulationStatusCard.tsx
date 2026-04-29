@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatTMStateName } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 import type { TMRuntime } from "../domain/tmRuntime";
 import { readCurrentSymbol } from "../domain/tmMachine";
@@ -19,7 +20,7 @@ export function TMSimulationStatusCard({
   const haltReasonMessage =
     runtime.haltReason?.type === "missing_transition"
       ? t("tm.sim.haltReason.missingTransition", {
-          state: formatState(runtime.haltReason.state),
+          state: formatTMStateName(runtime.haltReason.state),
           symbol: runtime.haltReason.symbol,
         })
       : null;
@@ -30,7 +31,9 @@ export function TMSimulationStatusCard({
 
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div className="text-muted-foreground">{t("tm.sim.status.state")}:</div>
-        <div className="font-mono">{formatState(runtime.currentState)}</div>
+        <div className="font-mono">
+          {formatTMStateName(runtime.currentState)}
+        </div>
 
         <div className="text-muted-foreground">
           {t("tm.sim.status.symbol")}:
@@ -59,13 +62,4 @@ export function TMSimulationStatusCard({
       )}
     </div>
   );
-}
-
-function formatState(state: string): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
 }

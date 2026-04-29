@@ -154,6 +154,72 @@ test.describe("Turing Machine page", () => {
     ).toBeVisible();
   });
 
+  // Tests the validation regression where the currently edited tape must not limit which symbols are accepted during solution checking.
+  test("checks a loaded solution successfully even after the editor tape is cleared", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+
+    await page.getByRole("button", { name: "Exercises" }).click();
+    await page
+      .getByRole("button", {
+        name: /Exercise 2: Invert a Binary Word/i,
+      })
+      .click();
+    await page.getByRole("button", { name: "Open in simulation" }).click();
+
+    await page.getByRole("button", { name: "Load solution" }).click();
+    await page.getByPlaceholder("Enter input word (e.g., 1011)").fill("");
+    await page.getByRole("button", { name: "Check solution" }).click();
+
+    const solutionCheckDialog = page.getByRole("dialog");
+    const validationTable = solutionCheckDialog.getByRole("table", {
+      name: "Table view",
+    });
+
+    await expect(
+      page.getByRole("heading", { name: "Solution check" }),
+    ).toBeVisible();
+    await expect(
+      solutionCheckDialog.getByText("Invalid TM program"),
+    ).toHaveCount(0);
+    await expect(validationTable).toContainText("PASS");
+    await expect(validationTable).not.toContainText("FAIL");
+  });
+
+  // Tests that solution grading now requires a valid halt state instead of treating matching output alone as a PASS.
+  test("fails solution checks that end with a missing transition even when the tape output matches", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+
+    await page.getByRole("button", { name: "Exercises" }).click();
+    await page
+      .getByRole("button", {
+        name: /Exercise 1: Erase the Tape/i,
+      })
+      .click();
+    await page.getByRole("button", { name: "Open in simulation" }).click();
+
+    await page.getByRole("button", { name: "Load solution" }).click();
+    const blankTransitionCell = getCellInput(page, 1, Q0_SUBSCRIPT);
+    await blankTransitionCell.fill("");
+    await blankTransitionCell.blur();
+    await page.getByRole("button", { name: "Check solution" }).click();
+
+    const solutionCheckDialog = page.getByRole("dialog");
+    const validationTable = solutionCheckDialog.getByRole("table", {
+      name: "Table view",
+    });
+
+    await expect(
+      page.getByRole("heading", { name: "Solution check" }),
+    ).toBeVisible();
+    await expect(validationTable).toContainText("FAIL");
+    await expect(validationTable).toContainText("No");
+    await expect(validationTable).not.toContainText("PASS");
+  });
+
   // Tests the configuration editor controls for tape input, state selection, halt states, row/column management, and protected removal alerts.
   test("edits the machine configuration through the visible editor controls", async ({
     page,

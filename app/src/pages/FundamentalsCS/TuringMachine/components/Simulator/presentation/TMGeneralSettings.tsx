@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
+import { formatTMStateName } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 
 export interface TMGeneralSettingsProps {
@@ -26,7 +27,7 @@ export function TMGeneralSettings({
   const startStateOptions = useMemo(() => {
     return selectableStates.map((state) => {
       const label = (
-        <span className="font-mono text-lg">{formatState(state)}</span>
+        <span className="font-mono text-lg">{formatTMStateName(state)}</span>
       );
 
       return {
@@ -69,13 +70,4 @@ export function TMGeneralSettings({
       </div>
     </>
   );
-}
-
-function formatState(state: string): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
 }

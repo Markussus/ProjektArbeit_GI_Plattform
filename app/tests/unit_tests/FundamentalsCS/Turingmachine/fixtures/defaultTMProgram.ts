@@ -1,6 +1,6 @@
-import { withDerivedAlphabets } from "../domain/tmProgram";
-import type { TMProgram } from "../domain/tmProgram";
-import { DEFAULT_BLANK_SYMBOL } from "../domain/tmTypes";
+import { withDerivedAlphabets } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
+import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
+import { DEFAULT_BLANK_SYMBOL } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmTypes";
 
 export const defaultTMProgram: TMProgram = withDerivedAlphabets({
   states: ["q0", "qS"],

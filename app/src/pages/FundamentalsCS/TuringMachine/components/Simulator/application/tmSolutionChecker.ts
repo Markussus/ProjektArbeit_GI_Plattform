@@ -1,5 +1,6 @@
 import type { TMValidationCase } from "../../../scenarios";
 import { TuringMachineSimulator } from "./tmSimulator.ts";
+import { withDerivedAlphabets } from "../domain/tmProgram";
 import type { TMProgram } from "../domain/tmProgram";
 
 export interface TMValidationResultRow {
@@ -38,10 +39,10 @@ function runValidationCase(
   maxSteps: number,
 ): TMValidationResultRow {
   const simulator = new TuringMachineSimulator();
-  const programForInput: TMProgram = {
+  const programForInput: TMProgram = withDerivedAlphabets({
     ...program,
     initialTape: validationCase.input.split(""),
-  };
+  });
 
   try {
     simulator.initialize(programForInput);
@@ -67,13 +68,14 @@ function runValidationCase(
       simulator.getConfig().blankSymbol,
       runtime.tape,
     );
+    const endedInValidHaltState = runtime.haltReason?.type === "halt_state";
 
     return {
-      passed: output === validationCase.expectedOutput,
+      passed: output === validationCase.expectedOutput && endedInValidHaltState,
       input: validationCase.input,
       output,
       expectedOutput: validationCase.expectedOutput,
-      endedInValidHaltState: runtime.haltReason?.type === "halt_state",
+      endedInValidHaltState,
     };
   } catch (error) {
     return {

@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatTMStateName } from "../domain/tmFormatting";
 import type { StateName } from "../domain/tmTypes";
 
 export interface TMHaltStatesPanelProps {
@@ -70,7 +71,7 @@ export function TMHaltStatesPanel({
                   <Check className="text-brand-foreground h-3 w-3" />
                 )}
               </span>
-              <span className="font-mono">{formatState(state)}</span>
+              <span className="font-mono">{formatTMStateName(state)}</span>
             </label>
           );
         })}
@@ -109,13 +110,4 @@ export function TMHaltStatesPanel({
       </div>
     </div>
   );
-}
-
-function formatState(state: string): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
 }

@@ -1,8 +1,9 @@
 import type { TablePosition } from "@/components/shared/TableVisual/TableView";
 import { readCurrentSymbol } from "../domain/tmMachine";
+import { formatTMStateName, formatTMTransition } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 import type { TMRuntime } from "../domain/tmRuntime";
-import type { StateName, TapeSymbol, TMTransition } from "../domain/tmTypes";
+import type { StateName, TapeSymbol } from "../domain/tmTypes";
 
 export function getOrderedTapeAlphabet(
   program: Pick<TMProgram, "blankSymbol" | "tapeAlphabet">,
@@ -14,7 +15,7 @@ export function getOrderedTapeAlphabet(
 }
 
 export function buildTransitionTableHeaders(states: StateName[]): string[] {
-  return ["\u03B4", ...states.map(formatState)];
+  return ["\u03B4", ...states.map(formatTMStateName)];
 }
 
 export function buildTransitionTableRows(
@@ -24,7 +25,7 @@ export function buildTransitionTableRows(
   return getOrderedTapeAlphabet(program).map((symbol) => [
     symbol,
     ...states.map((state) =>
-      formatTransition(program.transitions[symbol]?.[state]),
+      formatTMTransition(program.transitions[symbol]?.[state]),
     ),
   ]);
 }
@@ -47,21 +48,4 @@ export function getActiveTransitionCell(
   }
 
   return { row: symbolIndex, col: stateIndex + 1 };
-}
-
-function formatState(state: StateName): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
-}
-
-function formatTransition(transition?: TMTransition): string {
-  if (!transition) {
-    return "";
-  }
-
-  return `(${formatState(transition.nextState)}, ${transition.writeSymbol}, ${transition.movement})`;
 }

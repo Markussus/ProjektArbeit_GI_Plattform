@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultTMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/config/defaultTMProgram";
 import { validateTMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgramValidation";
 import { DEFAULT_BLANK_SYMBOL } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmTypes";
+import { defaultTMProgram } from "./fixtures/defaultTMProgram";
 
 describe("defaultTMProgram", () => {
   // Tests that the shipped default program is internally valid and ready for the simulator without editor repairs.
