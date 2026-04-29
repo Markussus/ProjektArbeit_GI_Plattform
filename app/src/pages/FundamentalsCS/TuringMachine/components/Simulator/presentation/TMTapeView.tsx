@@ -49,17 +49,21 @@ export function TMTapeView({
   const maxWindowRadius = Math.max(windowRadius, 0);
   const [responsiveWindowRadius, setResponsiveWindowRadius] =
     useState(maxWindowRadius);
+  const effectiveWindowRadius = Math.min(
+    responsiveWindowRadius,
+    maxWindowRadius,
+  );
   const effectiveHeadWindowRadius = Math.min(
     Math.max(headWindowRadius, 0),
-    responsiveWindowRadius,
+    effectiveWindowRadius,
   );
   const headViewportOffset = Math.max(
     -effectiveHeadWindowRadius,
     Math.min(headPosition, effectiveHeadWindowRadius),
   );
   const viewportCenter = headPosition - headViewportOffset;
-  const startIndex = viewportCenter - responsiveWindowRadius;
-  const endIndex = viewportCenter + responsiveWindowRadius;
+  const startIndex = viewportCenter - effectiveWindowRadius;
+  const endIndex = viewportCenter + effectiveWindowRadius;
   const transitionDurationMs =
     stepDurationMs <= NO_ANIMATION_THRESHOLD_MS
       ? 0
@@ -107,12 +111,6 @@ export function TMTapeView({
       resizeObserver.disconnect();
     };
   }, [responsiveBoundaryRef]);
-
-  useLayoutEffect(() => {
-    setResponsiveWindowRadius((currentRadius) =>
-      currentRadius > maxWindowRadius ? maxWindowRadius : currentRadius,
-    );
-  }, [maxWindowRadius]);
 
   const cells = useMemo(() => {
     const result = [];
@@ -176,40 +174,39 @@ export function TMTapeView({
       Math.max(0, totalCells - 1) * cellPitchPx;
     const maxVisibleCells = Math.max(
       1,
-      Math.floor((viewportWidth - baseWidthPx - cellWidthPx) / cellPitchPx) +
-        1,
+      Math.floor((viewportWidth - baseWidthPx - cellWidthPx) / cellPitchPx) + 1,
     );
     const nextRadius = Math.min(
       maxWindowRadius,
       Math.floor((maxVisibleCells - 1) / 2),
     );
 
-    if (nextRadius !== responsiveWindowRadius) {
+    if (nextRadius !== effectiveWindowRadius) {
       setResponsiveWindowRadius(nextRadius);
     }
-  }, [maxWindowRadius, responsiveWindowRadius, viewportWidth, cells]);
+  }, [effectiveWindowRadius, maxWindowRadius, viewportWidth, cells]);
 
   useLayoutEffect(() => {
     const tapeTrack = tapeTrackRef.current;
     if (!tapeTrack) {
       previousStartIndexRef.current = startIndex;
-      previousWindowRadiusRef.current = responsiveWindowRadius;
+      previousWindowRadiusRef.current = effectiveWindowRadius;
       return;
     }
 
     if (previousStartIndexRef.current === null) {
       previousStartIndexRef.current = startIndex;
-      previousWindowRadiusRef.current = responsiveWindowRadius;
+      previousWindowRadiusRef.current = effectiveWindowRadius;
       tapeTrack.style.transitionDuration = "0ms";
       tapeTrack.style.transform = "translateX(0px)";
       return;
     }
 
     const previousWindowRadius = previousWindowRadiusRef.current;
-    previousWindowRadiusRef.current = responsiveWindowRadius;
+    previousWindowRadiusRef.current = effectiveWindowRadius;
     if (
       previousWindowRadius !== null &&
-      previousWindowRadius !== responsiveWindowRadius
+      previousWindowRadius !== effectiveWindowRadius
     ) {
       previousStartIndexRef.current = startIndex;
       tapeTrack.style.transitionDuration = "0ms";
@@ -265,7 +262,7 @@ export function TMTapeView({
         tapeShiftFrameRef.current = null;
       }
     };
-  }, [responsiveWindowRadius, startIndex, transitionDurationMs]);
+  }, [effectiveWindowRadius, startIndex, transitionDurationMs]);
 
   return (
     <div
