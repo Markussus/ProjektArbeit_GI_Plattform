@@ -25,7 +25,7 @@ export function TMSimulationStatusCard({
       : null;
 
   return (
-    <div className="bg-card mt-4 rounded-lg border p-4">
+    <div className="bg-card w-full max-w-md rounded-lg border p-4">
       <h3 className="mb-2 font-semibold">{t("tm.sim.status.status")}</h3>
 
       <div className="grid grid-cols-2 gap-2 text-sm">

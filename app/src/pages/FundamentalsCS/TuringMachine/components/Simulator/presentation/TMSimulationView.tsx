@@ -77,8 +77,8 @@ export function TMSimulationView({
         />
       </div>
 
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 lg:flex-row">
-        <div className="flex w-full flex-col gap-4 lg:w-1/3">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 sm:flex-row sm:flex-wrap sm:items-start sm:justify-center">
+        <div className="flex w-full max-w-md flex-col gap-4 sm:w-96 sm:flex-none">
           <SimulatorControls
             status={status}
             speed={speed}
@@ -97,7 +97,7 @@ export function TMSimulationView({
           />
         </div>
 
-        <div className="w-full lg:w-2/3">
+        <div className="w-full max-w-full sm:w-auto sm:flex-none">
           <TableView
             headers={tableHeaders}
             rows={tableRows}
