@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cloneJson, cn } from "@/lib/utils";
 import {
@@ -34,6 +34,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
     );
     const [program, setProgram] = useState<TMProgram>(() => scenarioProgram);
     const [isEditMode, setIsEditMode] = useState(true);
+    const simulationBoundaryRef = useRef<HTMLDivElement | null>(null);
     const editor = useTMConfigEditor(program);
     const simulation = useTMSimulator(program);
     const isExerciseScenario = scenario?.kind === "exercise";
@@ -113,7 +114,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
       <div
         className={cn(
           "mx-auto flex w-full flex-col gap-6 p-4",
-          isEditMode ? "max-w-none" : "max-w-5xl",
+          isEditMode ? "max-w-none" : "max-w-7xl",
         )}
       >
         {isEditMode ? (
@@ -134,6 +135,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
             status={simulation.status}
             speed={simulation.speed}
             error={simulation.error}
+            responsiveBoundaryRef={simulationBoundaryRef}
             onEditConfig={handleEditProgram}
             onPlay={simulation.play}
             onPause={simulation.pause}

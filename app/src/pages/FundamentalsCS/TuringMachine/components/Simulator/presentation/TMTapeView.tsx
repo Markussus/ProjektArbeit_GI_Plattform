@@ -1,4 +1,10 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +22,7 @@ export interface TMTapeViewProps {
   windowRadius?: number;
   headWindowRadius?: number;
   blankSymbol?: string;
+  responsiveBoundaryRef?: RefObject<HTMLDivElement | null>;
   className?: string;
   cellClassName?: string;
 }
@@ -27,25 +34,32 @@ export function TMTapeView({
   windowRadius = 10,
   headWindowRadius = DEFAULT_HEAD_WINDOW_RADIUS,
   blankSymbol = " ",
+  responsiveBoundaryRef,
   className,
   cellClassName,
 }: TMTapeViewProps) {
   const headIndicatorRef = useRef<HTMLDivElement | null>(null);
+  const tapeViewportRef = useRef<HTMLDivElement | null>(null);
   const tapeTrackRef = useRef<HTMLDivElement | null>(null);
   const focusedCellRef = useRef<HTMLDivElement | null>(null);
   const previousStartIndexRef = useRef<number | null>(null);
+  const previousWindowRadiusRef = useRef<number | null>(null);
   const tapeShiftFrameRef = useRef<number | null>(null);
+  const [viewportWidth, setViewportWidth] = useState<number | null>(null);
+  const maxWindowRadius = Math.max(windowRadius, 0);
+  const [responsiveWindowRadius, setResponsiveWindowRadius] =
+    useState(maxWindowRadius);
   const effectiveHeadWindowRadius = Math.min(
     Math.max(headWindowRadius, 0),
-    windowRadius,
+    responsiveWindowRadius,
   );
   const headViewportOffset = Math.max(
     -effectiveHeadWindowRadius,
     Math.min(headPosition, effectiveHeadWindowRadius),
   );
   const viewportCenter = headPosition - headViewportOffset;
-  const startIndex = viewportCenter - windowRadius;
-  const endIndex = viewportCenter + windowRadius;
+  const startIndex = viewportCenter - responsiveWindowRadius;
+  const endIndex = viewportCenter + responsiveWindowRadius;
   const transitionDurationMs =
     stepDurationMs <= NO_ANIMATION_THRESHOLD_MS
       ? 0
@@ -62,6 +76,43 @@ export function TMTapeView({
   const headIndicatorStyle = {
     transitionDuration: `${transitionDurationMs}ms`,
   };
+
+  useLayoutEffect(() => {
+    const observedElement =
+      responsiveBoundaryRef?.current ?? tapeViewportRef.current;
+    if (!observedElement) {
+      return;
+    }
+
+    const updateViewportWidth = () => {
+      const computedStyle = window.getComputedStyle(observedElement);
+      const horizontalPaddingPx =
+        Number.parseFloat(computedStyle.paddingLeft) +
+        Number.parseFloat(computedStyle.paddingRight);
+
+      setViewportWidth(
+        Math.max(0, observedElement.clientWidth - horizontalPaddingPx),
+      );
+    };
+
+    updateViewportWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateViewportWidth();
+    });
+
+    resizeObserver.observe(observedElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [responsiveBoundaryRef]);
+
+  useLayoutEffect(() => {
+    setResponsiveWindowRadius((currentRadius) =>
+      currentRadius > maxWindowRadius ? maxWindowRadius : currentRadius,
+    );
+  }, [maxWindowRadius]);
 
   const cells = useMemo(() => {
     const result = [];
@@ -100,12 +151,66 @@ export function TMTapeView({
 
   useLayoutEffect(() => {
     const tapeTrack = tapeTrackRef.current;
+    if (!tapeTrack || viewportWidth === null) {
+      return;
+    }
+
+    const totalCells = tapeTrack.children.length;
+    const firstCell = tapeTrack.children.item(0) as HTMLElement | null;
+    const secondCell = tapeTrack.children.item(1) as HTMLElement | null;
+    if (!firstCell) {
+      return;
+    }
+
+    const cellWidthPx = firstCell.offsetWidth;
+    const cellPitchPx = secondCell
+      ? secondCell.offsetLeft - firstCell.offsetLeft
+      : cellWidthPx;
+    if (cellWidthPx <= 0 || cellPitchPx <= 0) {
+      return;
+    }
+
+    const baseWidthPx =
+      tapeTrack.offsetWidth -
+      cellWidthPx -
+      Math.max(0, totalCells - 1) * cellPitchPx;
+    const maxVisibleCells = Math.max(
+      1,
+      Math.floor((viewportWidth - baseWidthPx - cellWidthPx) / cellPitchPx) +
+        1,
+    );
+    const nextRadius = Math.min(
+      maxWindowRadius,
+      Math.floor((maxVisibleCells - 1) / 2),
+    );
+
+    if (nextRadius !== responsiveWindowRadius) {
+      setResponsiveWindowRadius(nextRadius);
+    }
+  }, [maxWindowRadius, responsiveWindowRadius, viewportWidth, cells]);
+
+  useLayoutEffect(() => {
+    const tapeTrack = tapeTrackRef.current;
     if (!tapeTrack) {
       previousStartIndexRef.current = startIndex;
+      previousWindowRadiusRef.current = responsiveWindowRadius;
       return;
     }
 
     if (previousStartIndexRef.current === null) {
+      previousStartIndexRef.current = startIndex;
+      previousWindowRadiusRef.current = responsiveWindowRadius;
+      tapeTrack.style.transitionDuration = "0ms";
+      tapeTrack.style.transform = "translateX(0px)";
+      return;
+    }
+
+    const previousWindowRadius = previousWindowRadiusRef.current;
+    previousWindowRadiusRef.current = responsiveWindowRadius;
+    if (
+      previousWindowRadius !== null &&
+      previousWindowRadius !== responsiveWindowRadius
+    ) {
       previousStartIndexRef.current = startIndex;
       tapeTrack.style.transitionDuration = "0ms";
       tapeTrack.style.transform = "translateX(0px)";
@@ -160,10 +265,13 @@ export function TMTapeView({
         tapeShiftFrameRef.current = null;
       }
     };
-  }, [startIndex, transitionDurationMs]);
+  }, [responsiveWindowRadius, startIndex, transitionDurationMs]);
 
   return (
-    <div className={cn("flex w-full justify-center py-10", className)}>
+    <div
+      ref={tapeViewportRef}
+      className={cn("flex w-full justify-center py-10", className)}
+    >
       <div className="relative flex flex-col items-center justify-center">
         <div className="relative">
           <div
