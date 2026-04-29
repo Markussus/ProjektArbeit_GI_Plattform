@@ -97,7 +97,7 @@ export function TMSimulationView({
           />
         </div>
 
-        <div className="w-full max-w-full sm:w-auto sm:flex-none">
+        <div className="w-full max-w-full sm:min-w-[20rem] sm:flex-1">
           <TableView
             headers={tableHeaders}
             rows={tableRows}
