@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import {
   Info,
   LockKeyhole,
@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface IEEEAdditionProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -37,7 +38,7 @@ export function IEEEAddition({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
-}: IEEEAdditionProps) {
+  renderModeSelector}: IEEEAdditionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState("13.37");
   const [valB, setValB] = useState("2.5");
@@ -176,6 +177,7 @@ export function IEEEAddition({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.ieee754.inputA")}
@@ -250,6 +252,7 @@ export function IEEEAddition({
 
             {showStepByStep && !steps.msg && (
               <div className="space-y-4">
+          {renderModeSelector}
                 {/* Step 1: Denormalize */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">

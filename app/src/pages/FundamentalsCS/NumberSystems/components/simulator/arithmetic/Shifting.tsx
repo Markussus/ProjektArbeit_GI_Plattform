@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface ShiftingProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -30,7 +31,7 @@ export function Shifting({
   showSolution = true,
   onShowSolution,
   initialA,
-}: ShiftingProps) {
+  renderModeSelector}: ShiftingProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "1101");
   const [shiftAmount, setShiftAmount] = useState<number>(2);
@@ -202,6 +203,7 @@ export function Shifting({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.shifting.binaryNumber")}

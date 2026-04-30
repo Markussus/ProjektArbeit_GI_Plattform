@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import {
   Info,
   LockKeyhole,
@@ -9,6 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface MultiplicationProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -32,7 +33,7 @@ export function Multiplication({
   onShowSolution,
   initialA,
   initialB,
-}: MultiplicationProps) {
+  renderModeSelector}: MultiplicationProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "1101");
   const [valB, setValB] = useState(initialB || "101");
@@ -133,6 +134,7 @@ export function Multiplication({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.multiplication.multiplier")}

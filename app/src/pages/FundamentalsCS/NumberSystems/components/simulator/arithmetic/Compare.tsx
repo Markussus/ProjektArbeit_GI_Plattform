@@ -9,6 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface CompareProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -32,7 +33,7 @@ export function Compare({
   onShowSolution,
   initialA,
   initialB,
-}: CompareProps) {
+  renderModeSelector}: CompareProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "10110");
   const [valB, setValB] = useState(initialB || "10011");
@@ -145,6 +146,7 @@ export function Compare({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.common.operandA")}

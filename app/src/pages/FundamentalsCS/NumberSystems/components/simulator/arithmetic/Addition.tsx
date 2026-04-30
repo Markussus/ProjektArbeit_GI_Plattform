@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface AdditionProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -33,7 +34,7 @@ export function Addition({
   onShowSolution,
   initialA,
   initialB,
-}: AdditionProps) {
+  renderModeSelector}: AdditionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "01100101");
   const [valB, setValB] = useState(initialB || "00111100");
@@ -141,6 +142,7 @@ export function Addition({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.common.operandA")}

@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface SubtractionProps {
+  renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
@@ -50,7 +51,7 @@ export function Subtraction({
   onShowSolution,
   initialA,
   initialB,
-}: SubtractionProps) {
+  renderModeSelector}: SubtractionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "00101010");
   const [valB, setValB] = useState(initialB || "00001010");
@@ -239,6 +240,7 @@ export function Subtraction({
         </div>
 
         <div className="space-y-4">
+          {renderModeSelector}
           <div className={locked ? "opacity-60" : ""}>
             <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
               {t("simulator.arithmetic.subtraction.minuend")}
@@ -309,6 +311,7 @@ export function Subtraction({
 
             {showStepByStep && (
               <div className="space-y-4">
+          {renderModeSelector}
                 {/* Step 1: Ones Complement */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">
