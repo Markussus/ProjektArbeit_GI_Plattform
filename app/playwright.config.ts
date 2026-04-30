@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
+const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:4173";
+const useManagedPreview = process.env.PLAYWRIGHT_MANAGED_PREVIEW === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -9,14 +11,16 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
   reporter: "html",
-  webServer: {
-    command: "npm run preview:ci",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: !isCI,
-    timeout: 120 * 1000,
-  },
+  webServer: useManagedPreview
+    ? undefined
+    : {
+        command: "npm run preview:ci",
+        url: baseUrl,
+        reuseExistingServer: !isCI,
+        timeout: 120 * 1000,
+      },
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: baseUrl,
     trace: "on-first-retry",
   },
   projects: [
