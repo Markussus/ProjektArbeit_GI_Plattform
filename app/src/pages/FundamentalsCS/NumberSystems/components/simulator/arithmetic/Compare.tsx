@@ -1,10 +1,5 @@
 import { useState, useMemo, type ReactNode } from "react";
-import {
-  Search,
-  List,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { Search, List, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
@@ -33,7 +28,8 @@ export function Compare({
   onShowSolution,
   initialA,
   initialB,
-  renderModeSelector}: CompareProps) {
+  renderModeSelector,
+}: CompareProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "10110");
   const [valB, setValB] = useState(initialB || "10011");
@@ -178,7 +174,9 @@ export function Compare({
       <div className="bg-muted/30 border-border/50 overflow-auto rounded-xl border p-6 shadow-sm">
         {locked ? (
           <ExerciseValidationPanel
-            expectedResult={result === "eq" ? "=" : result === "greater" ? ">" : "<"}
+            expectedResult={
+              result === "eq" ? "=" : result === "greater" ? ">" : "<"
+            }
             onShowSolution={onShowSolution!}
             placeholder="z.B. > oder < oder ="
           />

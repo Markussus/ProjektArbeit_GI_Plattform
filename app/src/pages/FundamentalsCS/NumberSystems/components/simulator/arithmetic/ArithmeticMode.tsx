@@ -47,11 +47,26 @@ export function ArithmeticMode({
       <DropdownSelect
         value={activeSubMode}
         options={[
-          { value: "addition", label: t("simulator.arithmetic.modes.addition") },
-          { value: "subtraction", label: t("simulator.arithmetic.modes.subtraction") },
-          { value: "multiplication", label: t("simulator.arithmetic.modes.multiplication") },
-          { value: "division", label: t("simulator.arithmetic.modes.division") },
-          { value: "shifting", label: t("simulator.arithmetic.modes.shifting") },
+          {
+            value: "addition",
+            label: t("simulator.arithmetic.modes.addition"),
+          },
+          {
+            value: "subtraction",
+            label: t("simulator.arithmetic.modes.subtraction"),
+          },
+          {
+            value: "multiplication",
+            label: t("simulator.arithmetic.modes.multiplication"),
+          },
+          {
+            value: "division",
+            label: t("simulator.arithmetic.modes.division"),
+          },
+          {
+            value: "shifting",
+            label: t("simulator.arithmetic.modes.shifting"),
+          },
           { value: "ieee754", label: t("simulator.arithmetic.modes.ieee754") },
           { value: "compare", label: t("simulator.arithmetic.modes.compare") },
         ]}

@@ -1,10 +1,5 @@
 import { useState, useMemo, type ReactNode } from "react";
-import {
-  Info,
-  List,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { Info, List, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
@@ -33,7 +28,8 @@ export function Multiplication({
   onShowSolution,
   initialA,
   initialB,
-  renderModeSelector}: MultiplicationProps) {
+  renderModeSelector,
+}: MultiplicationProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "1101");
   const [valB, setValB] = useState(initialB || "101");

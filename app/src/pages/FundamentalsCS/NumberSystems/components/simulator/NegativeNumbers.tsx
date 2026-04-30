@@ -132,7 +132,7 @@ export function NegativeNumbers({
         </div>
 
         {/* Dynamic Explanation Panel */}
-        <div className="bg-muted/30 border-border/50 max-h-[500px] overflow-auto rounded-xl border p-6 shadow-sm">
+        <div className="bg-muted/30 border-border/50 max-h-125 overflow-auto rounded-xl border p-6 shadow-sm">
           {locked ? (
             <ExerciseValidationPanel
               expectedResult={twosComplement}
@@ -236,7 +236,7 @@ export function NegativeNumbers({
                             {onesComplement}
                           </div>
                           <div className="text-muted-foreground/70">+ 1</div>
-                          <div className="bg-primary/30 my-1 h-[1px] w-4/5"></div>
+                          <div className="bg-primary/30 my-1 h-px w-4/5"></div>
                           <div className="text-primary font-bold">
                             {twosComplement}
                           </div>

@@ -31,7 +31,8 @@ export function Shifting({
   showSolution = true,
   onShowSolution,
   initialA,
-  renderModeSelector}: ShiftingProps) {
+  renderModeSelector,
+}: ShiftingProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "1101");
   const [shiftAmount, setShiftAmount] = useState<number>(2);

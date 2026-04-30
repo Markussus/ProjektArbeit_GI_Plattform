@@ -265,12 +265,25 @@ export function IEEE754Converter({
           {locked ? (
             <ExerciseValidationPanel
               expectedResult={
-                converterMode === "decToIeee" 
-                  ? (isNaNVal ? ["NaN", "nan"] : [sign + exponent + mantissa, `${sign} ${exponent} ${mantissa}`])
-                  : (isNaNVal ? ["NaN", "nan"] : Object.is(floatVal, -0) ? ["-0", "0"] : [floatVal.toString()])
+                converterMode === "decToIeee"
+                  ? isNaNVal
+                    ? ["NaN", "nan"]
+                    : [
+                        sign + exponent + mantissa,
+                        `${sign} ${exponent} ${mantissa}`,
+                      ]
+                  : isNaNVal
+                    ? ["NaN", "nan"]
+                    : Object.is(floatVal, -0)
+                      ? ["-0", "0"]
+                      : [floatVal.toString()]
               }
               onShowSolution={onShowSolution!}
-              placeholder={converterMode === "decToIeee" ? "z.B. 0 10000000 0000000..." : "z.B. 12.5"}
+              placeholder={
+                converterMode === "decToIeee"
+                  ? "z.B. 0 10000000 0000000..."
+                  : "z.B. 12.5"
+              }
             />
           ) : (
             <>

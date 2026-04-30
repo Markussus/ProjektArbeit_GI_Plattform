@@ -34,7 +34,8 @@ export function Addition({
   onShowSolution,
   initialA,
   initialB,
-  renderModeSelector}: AdditionProps) {
+  renderModeSelector,
+}: AdditionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "01100101");
   const [valB, setValB] = useState(initialB || "00111100");

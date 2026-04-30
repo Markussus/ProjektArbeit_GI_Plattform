@@ -38,7 +38,8 @@ export function IEEEAddition({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
-  renderModeSelector}: IEEEAdditionProps) {
+  renderModeSelector,
+}: IEEEAdditionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState("13.37");
   const [valB, setValB] = useState("2.5");
@@ -240,7 +241,7 @@ export function IEEEAddition({
 
             {showStepByStep && !steps.msg && (
               <div className="space-y-4">
-          {renderModeSelector}
+                {renderModeSelector}
                 {/* Step 1: Denormalize */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">

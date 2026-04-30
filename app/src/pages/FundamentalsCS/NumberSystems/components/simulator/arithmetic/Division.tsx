@@ -1,10 +1,5 @@
 import { useState, useMemo, type ReactNode } from "react";
-import {
-  Info,
-  List,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { Info, List, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
@@ -34,7 +29,8 @@ export function Division({
   onShowSolution,
   initialA,
   initialB,
-  renderModeSelector}: DivisionProps) {
+  renderModeSelector,
+}: DivisionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "11010");
   const [valB, setValB] = useState(initialB || "101");
@@ -174,9 +170,13 @@ export function Division({
         {locked ? (
           <ExerciseValidationPanel
             expectedResult={
-              remainder === "0" 
-                ? quotient 
-                : [quotient, `${quotient}R${remainder}`, `${quotient}Rest${remainder}`]
+              remainder === "0"
+                ? quotient
+                : [
+                    quotient,
+                    `${quotient}R${remainder}`,
+                    `${quotient}Rest${remainder}`,
+                  ]
             }
             onShowSolution={onShowSolution!}
             placeholder={remainder === "0" ? "z.B. 10" : "z.B. 10 Rest 1"}

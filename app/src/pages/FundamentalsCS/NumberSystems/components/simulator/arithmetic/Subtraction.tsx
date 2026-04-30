@@ -51,7 +51,8 @@ export function Subtraction({
   onShowSolution,
   initialA,
   initialB,
-  renderModeSelector}: SubtractionProps) {
+  renderModeSelector,
+}: SubtractionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "00101010");
   const [valB, setValB] = useState(initialB || "00001010");
@@ -299,7 +300,7 @@ export function Subtraction({
 
             {showStepByStep && (
               <div className="space-y-4">
-          {renderModeSelector}
+                {renderModeSelector}
                 {/* Step 1: Ones Complement */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">

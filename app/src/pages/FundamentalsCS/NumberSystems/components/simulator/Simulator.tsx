@@ -22,12 +22,26 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
 
   // Initial values for converters when launched via exercise
   const [initialValue, setInitialValue] = useState<string>("");
-  const [initialBase, setInitialBase] = useState<"dec" | "bin" | "oct" | "hex">("dec");
-  const [initialTargetBase, setInitialTargetBase] = useState<"dec" | "bin" | "oct" | "hex">("bin");
+  const [initialBase, setInitialBase] = useState<"dec" | "bin" | "oct" | "hex">(
+    "dec",
+  );
+  const [initialTargetBase, setInitialTargetBase] = useState<
+    "dec" | "bin" | "oct" | "hex"
+  >("bin");
   const [initialValueA, setInitialValueA] = useState<string>("");
   const [initialValueB, setInitialValueB] = useState<string>("");
-  const [initialSubMode, setInitialSubMode] = useState<"addition" | "subtraction" | "multiplication" | "division" | "shifting" | "ieee754" | "compare">("addition");
-  const [initialConverterMode, setInitialConverterMode] = useState<"decToIeee" | "ieeeToDec">("decToIeee");
+  const [initialSubMode, setInitialSubMode] = useState<
+    | "addition"
+    | "subtraction"
+    | "multiplication"
+    | "division"
+    | "shifting"
+    | "ieee754"
+    | "compare"
+  >("addition");
+  const [initialConverterMode, setInitialConverterMode] = useState<
+    "decToIeee" | "ieeeToDec"
+  >("decToIeee");
 
   useEffect(() => {
     if (selectedExercise) {
@@ -35,7 +49,8 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
       setIsExerciseMode(true);
       setShowSolution(false);
 
-      const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+      const randInt = (min: number, max: number) =>
+        Math.floor(Math.random() * (max - min + 1)) + min;
       const decToBin = (n: number) => n.toString(2);
 
       // Match exercise id using prefix/contains or exact matching logic based on data.
@@ -53,23 +68,31 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
         setActiveMode("integers");
         setInitialBase("bin");
         setInitialTargetBase(Math.random() > 0.5 ? "hex" : "oct");
-        setInitialValue(Array.from({length:8}, () => Math.random() < 0.5 ? '1' : '0').join(''));
+        setInitialValue(
+          Array.from({ length: 8 }, () =>
+            Math.random() < 0.5 ? "1" : "0",
+          ).join(""),
+        );
       } else if (selectedExercise.id === "number.ex_u04_octToHex") {
         setActiveMode("integers");
         setInitialBase("oct");
         setInitialTargetBase("hex");
-        setInitialValue(randInt(64, 511).toString(8).padStart(3, '0'));
+        setInitialValue(randInt(64, 511).toString(8).padStart(3, "0"));
       } else if (selectedExercise.id === "number.ex_u04_hexToBin") {
         setActiveMode("integers");
         setInitialBase("hex");
         setInitialTargetBase("bin");
-        setInitialValue(randInt(16, 255).toString(16).toUpperCase().padStart(2, '0'));
+        setInitialValue(
+          randInt(16, 255).toString(16).toUpperCase().padStart(2, "0"),
+        );
       } else if (selectedExercise.id === "number.ex_u05_floatToBin") {
         setActiveMode("ieee754");
         setInitialConverterMode("decToIeee");
         const wholes = randInt(-20, 20);
         const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
-        setInitialValue((wholes + fracs[randInt(0, fracs.length - 1)]).toString());
+        setInitialValue(
+          (wholes + fracs[randInt(0, fracs.length - 1)]).toString(),
+        );
       } else if (selectedExercise.id === "number.ex_u05_ieeeEncode") {
         setActiveMode("ieee754");
         setInitialConverterMode("decToIeee");
@@ -77,15 +100,17 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
       } else if (selectedExercise.id === "number.ex_u05_ieeeDecode") {
         setActiveMode("ieee754");
         setInitialConverterMode("ieeeToDec");
-        const sign = Math.random() < 0.5 ? '1' : '0';
-        const exp = randInt(1, 254).toString(2).padStart(8, '0');
-        const mant = Array.from({length:23}, () => Math.random() < 0.5 ? '1' : '0').join('');
+        const sign = Math.random() < 0.5 ? "1" : "0";
+        const exp = randInt(1, 254).toString(2).padStart(8, "0");
+        const mant = Array.from({ length: 23 }, () =>
+          Math.random() < 0.5 ? "1" : "0",
+        ).join("");
         setInitialValue(sign + exp + mant);
       } else if (selectedExercise.id === "number.ex_u06_addSub") {
         setActiveMode("arithmetic");
         setInitialSubMode(Math.random() > 0.5 ? "addition" : "subtraction");
-        setInitialValueA(decToBin(randInt(10, 100)).padStart(8, '0'));
-        setInitialValueB(decToBin(randInt(10, 100)).padStart(8, '0'));
+        setInitialValueA(decToBin(randInt(10, 100)).padStart(8, "0"));
+        setInitialValueB(decToBin(randInt(10, 100)).padStart(8, "0"));
       } else if (selectedExercise.id === "number.ex_u06_mult") {
         setActiveMode("arithmetic");
         setInitialSubMode("multiplication");
@@ -102,14 +127,16 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
     <div className="flex h-full flex-col space-y-6">
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
-        {(["integers", "negative", "ieee754", "arithmetic"] as SimulatorMode[]).map((mode) => (
+        {(
+          ["integers", "negative", "ieee754", "arithmetic"] as SimulatorMode[]
+        ).map((mode) => (
           <button
             key={mode}
             className={cn(
               "relative px-4 py-2.5 text-sm font-medium",
               activeMode === mode
                 ? "text-tab-active"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
             onClick={() => setActiveMode(mode)}
           >
@@ -125,7 +152,11 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
       <div className="flex-1 overflow-auto">
         {activeMode === "integers" && (
           <IntegerConverter
-            key={selectedExercise?.id ? `${selectedExercise.id}-${initialValue}` : "free-int"}
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValue}`
+                : "free-int"
+            }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
@@ -136,7 +167,11 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
         )}
         {activeMode === "negative" && (
           <NegativeNumbers
-            key={selectedExercise?.id ? `${selectedExercise.id}-${initialValue}` : "free-neg"}
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValue}`
+                : "free-neg"
+            }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
@@ -145,7 +180,11 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
         )}
         {activeMode === "ieee754" && (
           <IEEE754Converter
-            key={selectedExercise?.id ? `${selectedExercise.id}-${initialValue}` : "free-ieee"}
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValue}`
+                : "free-ieee"
+            }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
@@ -155,11 +194,24 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
         )}
         {activeMode === "arithmetic" && (
           <ArithmeticMode
-            key={selectedExercise?.id ? `${selectedExercise.id}-${initialValueA}-${initialValueB}` : "free-arith"}
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValueA}-${initialValueB}`
+                : "free-arith"
+            }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
-            initialMode={initialSubMode as "addition" | "subtraction" | "multiplication" | "division" | "shifting" | "ieee754" | "compare"}
+            initialMode={
+              initialSubMode as
+                | "addition"
+                | "subtraction"
+                | "multiplication"
+                | "division"
+                | "shifting"
+                | "ieee754"
+                | "compare"
+            }
             initialValueA={initialValueA}
             initialValueB={initialValueB}
           />

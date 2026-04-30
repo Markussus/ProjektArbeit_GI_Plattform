@@ -39,7 +39,7 @@ export function IntegerConverter({
 
   const handleSourceBaseChange = (newBase: BaseType) => {
     setSourceBase(newBase);
-    
+
     let cleanV = inputValue;
     if (newBase === "bin") cleanV = cleanV.replace(/[^01]/g, "");
     else if (newBase === "oct") cleanV = cleanV.replace(/[^0-7]/g, "");
@@ -50,7 +50,7 @@ export function IntegerConverter({
     if (cleanV.length > limits[newBase]) {
       cleanV = cleanV.slice(0, limits[newBase]);
     }
-    
+
     setInputValue(cleanV);
   };
 
@@ -194,10 +194,7 @@ export function IntegerConverter({
           {isBin && (
             <div className="text-muted-foreground border-border/40 mb-2 flex gap-2 border-b pb-2">
               {steps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className="flex min-w-15 flex-col items-center"
-                >
+                <div key={idx} className="flex min-w-15 flex-col items-center">
                   <span className="text-xs">
                     {baseToNumber(sourceBase)}
                     <sup>{step.power}</sup>
@@ -355,9 +352,13 @@ export function IntegerConverter({
                 readOnly={locked}
                 placeholder="..."
                 maxLength={
-                  sourceBase === "bin" ? 16 :
-                  sourceBase === "oct" ? 6 :
-                  sourceBase === "dec" ? 5 : 4
+                  sourceBase === "bin"
+                    ? 16
+                    : sourceBase === "oct"
+                      ? 6
+                      : sourceBase === "dec"
+                        ? 5
+                        : 4
                 }
                 className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
               />
