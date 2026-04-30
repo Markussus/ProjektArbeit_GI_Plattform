@@ -15,13 +15,8 @@ export interface ModuleExercisesTabProps {
   onOpenExerciseInSimulation: (exercise: Exercise) => void;
 }
 
-export interface ModuleExamplesTabProps {
-  onOpenExpressionInSimulation: (source: string) => void;
-}
-
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
-  initialSource?: string | null;
   isFocused: boolean;
   onToggleFocus: () => void;
 }
@@ -31,7 +26,7 @@ interface ModuleTopicPageProps {
   descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
-  examplesTab: ComponentType<ModuleExamplesTabProps>;
+  examplesTab: ComponentType;
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
 }
@@ -53,10 +48,8 @@ export function ModuleTopicPage({
     setActiveTab,
     selectedExercise,
     simulationExercise,
-    simulationSource,
     selectExercise,
     openInSimulation,
-    openSourceInSimulation,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -95,16 +88,13 @@ export function ModuleTopicPage({
     }
 
     if (activeTab === "examples") {
-      return (
-        <ExamplesTab onOpenExpressionInSimulation={openSourceInSimulation} />
-      );
+      return <ExamplesTab />;
     }
 
     if (activeTab === "simulation") {
       return (
         <SimulationTab
           selectedExercise={simulationExercise}
-          initialSource={simulationSource}
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
         />

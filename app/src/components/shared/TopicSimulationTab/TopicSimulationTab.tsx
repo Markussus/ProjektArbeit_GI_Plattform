@@ -7,7 +7,6 @@ import type { TranslationKey } from "@/types/i18n";
 interface TopicSimulationTabProps {
   emptyStateTextKey: TranslationKey;
   selectedExercise: Exercise | null;
-  initialSource?: string | null;
   isFocused: boolean;
   onToggleFocus: () => void;
   children?: ReactNode;

@@ -11,49 +11,6 @@ const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
   missing_closing_parenthesis: "dnf.builder.errors.missingClosingParenthesis",
 };
 
-export function LargeTruthTableWarning({
-  variableCount,
-  rowCount,
-  trueRowCount,
-}: {
-  variableCount: number;
-  rowCount: number;
-  trueRowCount: number;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
-      <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
-        <AlertTriangle className="h-5 w-5" />
-        {t("dnf.builder.largeTableTitle")}
-      </h3>
-      <p className="text-sm leading-relaxed text-amber-800 dark:text-amber-300/80">
-        {t("dnf.builder.largeTableDesc", {
-          variables: variableCount,
-          rows: rowCount,
-          trueRows: trueRowCount,
-        })}
-      </p>
-    </div>
-  );
-}
-
-export function EmptyExpressionPanel() {
-  const { t } = useTranslation();
-
-  return (
-    <section className="border-border bg-background/40 rounded-lg border p-4">
-      <h2 className="text-foreground text-lg font-semibold">
-        {t("dnf.builder.emptyStateTitle")}
-      </h2>
-      <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-        {t("dnf.builder.emptyStateDesc")}
-      </p>
-    </section>
-  );
-}
-
 export function VariableLimitPanel({
   variableCount,
   maxVariableCount,

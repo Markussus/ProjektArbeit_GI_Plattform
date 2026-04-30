@@ -21,6 +21,7 @@ interface DnfExerciseWorkspaceProps {
   showSolution: boolean;
   resultHeader: string;
   requiresTruthTableAnswers: boolean;
+  canAlwaysShowSolution?: boolean;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
@@ -37,6 +38,7 @@ export function DnfExerciseWorkspace({
   showSolution,
   resultHeader,
   requiresTruthTableAnswers,
+  canAlwaysShowSolution = false,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
@@ -53,7 +55,7 @@ export function DnfExerciseWorkspace({
     (answer) => answer !== null,
   ).length;
   const hasDnfAttempt = dnfAnswer.trim().length > 0;
-  const canShowSolution = feedback !== null;
+  const canShowSolution = canAlwaysShowSolution || feedback !== null;
 
   const focusResultRow = (rowIndex: number) => {
     const nextRow =

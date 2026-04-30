@@ -11,7 +11,6 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   const [simulationExercise, setSimulationExercise] = useState<Exercise | null>(
     null,
   );
-  const [simulationSource, setSimulationSource] = useState<string | null>(null);
 
   const selectExercise = (exercise: Exercise) => {
     // A stable exercise id avoids losing the selection when labels change due to i18n.
@@ -21,13 +20,6 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   const openInSimulation = (exercise: Exercise) => {
     setSelectedExercise(exercise);
     setSimulationExercise(exercise);
-    setSimulationSource(null);
-    setActiveTab("simulation");
-  };
-
-  const openSourceInSimulation = (source: string) => {
-    setSimulationExercise(null);
-    setSimulationSource(source);
     setActiveTab("simulation");
   };
 
@@ -36,9 +28,7 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
     setActiveTab,
     selectedExercise,
     simulationExercise,
-    simulationSource,
     selectExercise,
     openInSimulation,
-    openSourceInSimulation,
   };
 }

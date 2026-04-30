@@ -3,7 +3,7 @@ import type { TranslationKey } from "@/types/i18n";
 export type DnfWalkthroughExampleId =
   | "lecture-expression"
   | "parentheses"
-  | "given-one-rows"
+  | "negation"
   | "xor";
 
 export interface DnfWalkthroughExample {
@@ -15,7 +15,6 @@ export interface DnfWalkthroughExample {
   oneRows: string[];
   terms: string[];
   canonicalDnf: string;
-  simulationSource: string;
 }
 
 export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
@@ -41,7 +40,6 @@ export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
     ],
     canonicalDnf:
       "(¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ ¬c) ∨ (a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ ¬c) ∨ (a ∧ b ∧ c)",
-    simulationSource: "a ∨ (b ∧ c)",
   },
   {
     id: "parentheses",
@@ -52,18 +50,16 @@ export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
     oneRows: ["a=0, b=1, c=1", "a=1, b=0, c=1", "a=1, b=1, c=1"],
     terms: ["¬a ∧ b ∧ c", "a ∧ ¬b ∧ c", "a ∧ b ∧ c"],
     canonicalDnf: "(¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ c)",
-    simulationSource: "(a ∨ b) ∧ c",
   },
   {
-    id: "given-one-rows",
-    titleKey: "dnf.examples.walkthroughs.givenRows.title",
-    expressionLabelKey: "dnf.examples.labels.givenRows",
-    expression: "000 und 111",
-    explanationKey: "dnf.examples.walkthroughs.givenRows.explanation",
-    oneRows: ["a=0, b=0, c=0", "a=1, b=1, c=1"],
-    terms: ["¬a ∧ ¬b ∧ ¬c", "a ∧ b ∧ c"],
-    canonicalDnf: "(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)",
-    simulationSource: "(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)",
+    id: "negation",
+    titleKey: "dnf.examples.walkthroughs.negation.title",
+    expressionLabelKey: "dnf.examples.labels.expression",
+    expression: "¬a ∧ (b ∨ c)",
+    explanationKey: "dnf.examples.walkthroughs.negation.explanation",
+    oneRows: ["a=0, b=0, c=1", "a=0, b=1, c=0", "a=0, b=1, c=1"],
+    terms: ["¬a ∧ ¬b ∧ c", "¬a ∧ b ∧ ¬c", "¬a ∧ b ∧ c"],
+    canonicalDnf: "(¬a ∧ ¬b ∧ c) ∨ (¬a ∧ b ∧ ¬c) ∨ (¬a ∧ b ∧ c)",
   },
   {
     id: "xor",
@@ -74,6 +70,5 @@ export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
     oneRows: ["x=0, y=1", "x=1, y=0"],
     terms: ["¬x ∧ y", "x ∧ ¬y"],
     canonicalDnf: "(¬x ∧ y) ∨ (x ∧ ¬y)",
-    simulationSource: "(¬x ∧ y) ∨ (x ∧ ¬y)",
   },
 ];

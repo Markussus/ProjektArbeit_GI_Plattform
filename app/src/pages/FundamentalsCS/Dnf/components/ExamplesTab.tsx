@@ -1,6 +1,5 @@
-import { ArrowRight, BookOpen, CheckCircle2, Table2 } from "lucide-react";
+import { ArrowRight, Ban, BookOpen, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { cn } from "@/lib/utils";
 import {
   dnfWalkthroughExamples,
@@ -11,13 +10,11 @@ import {
 const iconByExampleId: Record<DnfWalkthroughExampleId, typeof BookOpen> = {
   "lecture-expression": BookOpen,
   parentheses: Table2,
-  "given-one-rows": CheckCircle2,
+  negation: Ban,
   xor: ArrowRight,
 };
 
-export function ExamplesTab({
-  onOpenExpressionInSimulation,
-}: ModuleExamplesTabProps) {
+export function ExamplesTab() {
   const { t } = useTranslation();
 
   return (
@@ -33,24 +30,14 @@ export function ExamplesTab({
 
       <div className="grid gap-4 xl:grid-cols-2">
         {dnfWalkthroughExamples.map((example) => (
-          <WalkthroughCard
-            key={example.id}
-            example={example}
-            onOpenExpressionInSimulation={onOpenExpressionInSimulation}
-          />
+          <WalkthroughCard key={example.id} example={example} />
         ))}
       </div>
     </div>
   );
 }
 
-function WalkthroughCard({
-  example,
-  onOpenExpressionInSimulation,
-}: {
-  example: DnfWalkthroughExample;
-  onOpenExpressionInSimulation: (source: string) => void;
-}) {
+function WalkthroughCard({ example }: { example: DnfWalkthroughExample }) {
   const { t } = useTranslation();
   const Icon = iconByExampleId[example.id];
 
@@ -93,15 +80,6 @@ function WalkthroughCard({
           variant="result"
         />
       </div>
-
-      <button
-        type="button"
-        onClick={() => onOpenExpressionInSimulation(example.simulationSource)}
-        className="border-border hover:bg-muted mt-5 inline-flex w-fit items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
-      >
-        <ArrowRight className="size-4" />
-        {t("dnf.examples.openInSimulation")}
-      </button>
     </article>
   );
 }
