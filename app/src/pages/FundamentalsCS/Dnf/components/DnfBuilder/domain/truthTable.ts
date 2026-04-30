@@ -1,10 +1,9 @@
 import {
   collectExpressionVariables,
-  formatBooleanValue,
+  evaluateBooleanExpression,
   type BooleanExpression,
   type VariableAssignment,
 } from "./booleanExpression";
-import { evaluateBooleanExpression } from "./dnfEvaluator";
 
 export interface TruthTableRow {
   assignment: VariableAssignment;
@@ -14,6 +13,27 @@ export interface TruthTableRow {
 export interface TruthTable {
   variables: string[];
   rows: TruthTableRow[];
+}
+
+export function createTruthTableFromResults(
+  variables: string[],
+  results: boolean[],
+): TruthTable {
+  const expectedRowCount = 2 ** variables.length;
+
+  if (results.length !== expectedRowCount) {
+    throw new Error(
+      `Expected ${expectedRowCount} truth-table result values, received ${results.length}.`,
+    );
+  }
+
+  return {
+    variables,
+    rows: results.map((result, rowIndex) => ({
+      assignment: buildAssignment(variables, rowIndex),
+      result,
+    })),
+  };
 }
 
 export function generateTruthTable(
@@ -31,10 +51,6 @@ export function generateTruthTable(
   });
 
   return { variables, rows };
-}
-
-export function formatTruthTableValue(value: boolean): "0" | "1" {
-  return formatBooleanValue(value);
 }
 
 function buildAssignment(

@@ -1,12 +1,13 @@
+import { formatBooleanValue } from "../domain/booleanExpression";
 import {
   formatDnfExpression,
   formatDnfTerm,
   type DnfDerivation,
 } from "../domain/dnfDerivation";
 import type { TruthTable } from "../domain/truthTable";
-import { formatTruthTableValue } from "../domain/truthTable";
 
 export interface TruthTableDisplayRow {
+  rowNumber: number;
   assignmentValues: string[];
   result: string;
   term: string;
@@ -27,7 +28,7 @@ export function buildTruthTableDisplay(
 
   return {
     variableHeaders: table.variables,
-    rows: table.rows.map((row) => {
+    rows: table.rows.map((row, rowIndex) => {
       const isContributing = row.result;
       const term = getRowTerm(derivation, isContributing, termIndex);
 
@@ -36,10 +37,11 @@ export function buildTruthTableDisplay(
       }
 
       return {
+        rowNumber: rowIndex + 1,
         assignmentValues: table.variables.map((variable) =>
-          formatTruthTableValue(row.assignment[variable]),
+          formatBooleanValue(row.assignment[variable]),
         ),
-        result: formatTruthTableValue(row.result),
+        result: formatBooleanValue(row.result),
         term,
         isContributing,
       };

@@ -27,6 +27,34 @@ export function collectExpressionVariables(
   return [...variables].sort((left, right) => left.localeCompare(right));
 }
 
+export function evaluateBooleanExpression(
+  expression: BooleanExpression,
+  assignment: VariableAssignment,
+): boolean {
+  switch (expression.type) {
+    case "constant":
+      return expression.value;
+    case "variable": {
+      const value = assignment[expression.name];
+
+      if (value === undefined) {
+        throw new Error(
+          `Missing boolean value for variable '${expression.name}'.`,
+        );
+      }
+
+      return value;
+    }
+    case "not":
+      return !evaluateBooleanExpression(expression.operand, assignment);
+    case "binary": {
+      const left = evaluateBooleanExpression(expression.left, assignment);
+      const right = evaluateBooleanExpression(expression.right, assignment);
+      return expression.operator === "and" ? left && right : left || right;
+    }
+  }
+}
+
 export function formatBooleanValue(value: boolean): "0" | "1" {
   return value ? "1" : "0";
 }

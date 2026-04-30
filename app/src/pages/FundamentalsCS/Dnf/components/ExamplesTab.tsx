@@ -1,19 +1,18 @@
-import { ArrowRight, CheckCircle2, Lightbulb, Table2 } from "lucide-react";
+import { ArrowRight, Ban, BookOpen, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import {
+  dnfWalkthroughExamples,
+  type DnfWalkthroughExample,
+  type DnfWalkthroughExampleId,
+} from "../examples/walkthroughExamples";
 
-const truthTableRows = [
-  { assignment: "a=0, b=0, c=0", result: "0", term: null },
-  { assignment: "a=0, b=0, c=1", result: "0", term: null },
-  { assignment: "a=0, b=1, c=0", result: "0", term: null },
-  { assignment: "a=0, b=1, c=1", result: "1", term: "¬a ∧ b ∧ c" },
-  { assignment: "a=1, b=0, c=0", result: "1", term: "a ∧ ¬b ∧ ¬c" },
-  { assignment: "a=1, b=0, c=1", result: "1", term: "a ∧ ¬b ∧ c" },
-  { assignment: "a=1, b=1, c=0", result: "1", term: "a ∧ b ∧ ¬c" },
-  { assignment: "a=1, b=1, c=1", result: "1", term: "a ∧ b ∧ c" },
-];
-
-const canonicalDnf =
-  "(¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ ¬c) ∨ (a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ ¬c) ∨ (a ∧ b ∧ c)";
+const iconByExampleId: Record<DnfWalkthroughExampleId, typeof BookOpen> = {
+  "lecture-expression": BookOpen,
+  parentheses: Table2,
+  negation: Ban,
+  xor: ArrowRight,
+};
 
 export function ExamplesTab() {
   const { t } = useTranslation();
@@ -29,104 +28,123 @@ export function ExamplesTab() {
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-        <section className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-              <Lightbulb className="size-4" />
-            </div>
-            <h3 className="text-foreground text-base font-semibold">
-              {t("dnf.exampleExpressionTitle")}
-            </h3>
-          </div>
+      <div className="grid gap-4 xl:grid-cols-2">
+        {dnfWalkthroughExamples.map((example) => (
+          <WalkthroughCard key={example.id} example={example} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-          <code className="border-border bg-background/60 mt-4 block rounded-lg border p-3 font-mono text-sm">
-            a ∨ (b ∧ c)
-          </code>
+function WalkthroughCard({ example }: { example: DnfWalkthroughExample }) {
+  const { t } = useTranslation();
+  const Icon = iconByExampleId[example.id];
 
-          <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-            {t("dnf.exampleExpressionText")}
+  return (
+    <article className="bg-card ring-foreground/10 flex flex-col rounded-xl p-5 ring-1">
+      <div className="flex items-start gap-3">
+        <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
+          <Icon className="size-4" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-foreground text-base font-semibold">
+            {t(example.titleKey)}
+          </h3>
+          <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+            {t(example.explanationKey)}
           </p>
-        </section>
-
-        <section className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-              <Table2 className="size-4" />
-            </div>
-            <h3 className="text-foreground text-base font-semibold">
-              {t("dnf.exampleTableTitle")}
-            </h3>
-          </div>
-
-          <div className="border-border mt-4 overflow-hidden rounded-lg border">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-muted/60 text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">
-                    {t("dnf.exampleAssignment")}
-                  </th>
-                  <th className="px-3 py-2 font-medium">
-                    {t("dnf.exampleResult")}
-                  </th>
-                  <th className="px-3 py-2 font-medium">
-                    {t("dnf.exampleTerm")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {truthTableRows.map((row) => (
-                  <tr
-                    key={row.assignment}
-                    className={`border-border border-t ${
-                      row.result === "0"
-                        ? "text-muted-foreground bg-muted/20"
-                        : "text-foreground"
-                    }`}
-                  >
-                    <td className="px-3 py-2 font-mono">{row.assignment}</td>
-                    <td className="px-3 py-2 font-mono">{row.result}</td>
-                    <td className="px-3 py-2 font-mono">
-                      {row.term ?? t("dnf.exampleIgnored")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <section className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-              <ArrowRight className="size-4" />
-            </div>
-            <h3 className="text-foreground text-base font-semibold">
-              {t("dnf.exampleResultTitle")}
-            </h3>
-          </div>
+      <div className="mt-4 space-y-4">
+        <LabeledCode
+          label={t(example.expressionLabelKey)}
+          value={example.expression}
+        />
 
-          <code className="border-border bg-background/60 mt-4 block rounded-lg border p-3 font-mono text-sm leading-relaxed">
-            {canonicalDnf}
-          </code>
-        </section>
+        <ExampleList
+          title={t("dnf.examples.labels.oneRows")}
+          items={example.oneRows}
+        />
 
-        <section className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-              <CheckCircle2 className="size-4" />
-            </div>
-            <h3 className="text-foreground text-base font-semibold">
-              {t("dnf.exampleRuleTitle")}
-            </h3>
-          </div>
+        <ExampleList
+          title={t("dnf.examples.labels.terms")}
+          items={example.terms}
+          tone="muted"
+        />
 
-          <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
-            {t("dnf.exampleRuleText")}
-          </p>
-        </section>
+        <LabeledCode
+          label={t("dnf.examples.labels.canonicalDnf")}
+          value={example.canonicalDnf}
+          variant="result"
+        />
+      </div>
+    </article>
+  );
+}
+
+function LabeledCode({
+  label,
+  value,
+  variant = "default",
+}: {
+  label: string;
+  value: string;
+  variant?: "default" | "result";
+}) {
+  return (
+    <div>
+      <p
+        className={cn(
+          "text-xs font-semibold tracking-wide uppercase",
+          variant === "result" ? "text-foreground" : "text-muted-foreground",
+        )}
+      >
+        {label}
+      </p>
+      <code
+        className={cn(
+          "text-foreground mt-2 block overflow-x-auto rounded-md border p-3 font-mono text-sm leading-relaxed [overflow-wrap:anywhere] break-words whitespace-pre-wrap",
+          variant === "result"
+            ? "border-module-rose-fg/20 bg-module-rose-bg/40"
+            : "border-border bg-background/60",
+        )}
+      >
+        {value}
+      </code>
+    </div>
+  );
+}
+
+function ExampleList({
+  title,
+  items,
+  tone = "default",
+}: {
+  title: string;
+  items: string[];
+  tone?: "default" | "muted";
+}) {
+  return (
+    <div>
+      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+        {title}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {items.map((item) => (
+          <span
+            key={item}
+            className={cn(
+              "border-border rounded-md border px-2.5 py-1 font-mono text-sm",
+              tone === "muted"
+                ? "bg-muted/30 text-muted-foreground"
+                : "bg-background/60 text-foreground",
+            )}
+          >
+            {item}
+          </span>
+        ))}
       </div>
     </div>
   );

@@ -69,7 +69,10 @@ export function formatDnfTerm(term: DnfTerm): string {
   return `(${formattedLiterals.join(" ∧ ")})`;
 }
 
-function createDnfTerm(variables: string[], row: TruthTableRow): DnfTerm {
+export function createDnfTerm(
+  variables: string[],
+  row: TruthTableRow,
+): DnfTerm {
   return {
     literals: variables.map((variable) => ({
       variable,
