@@ -52,6 +52,8 @@ export function DnfBuilder({
               dnfAnswer={builder.dnfAnswer}
               feedback={builder.exerciseFeedback}
               showSolution={builder.showSolution}
+              resultHeader={builder.resultHeader}
+              requiresTruthTableAnswers={builder.requiresTruthTableAnswers}
               onTruthTableAnswerChange={builder.setTruthTableAnswer}
               onDnfAnswerChange={builder.setDnfAnswer}
               onCheck={builder.checkExercise}
@@ -72,7 +74,10 @@ export function DnfBuilder({
                   derivation={builder.analysis.derivation}
                   truthTable={builder.analysis.truthTable}
                 />
-                <DnfTruthTableView display={display} />
+                <DnfTruthTableView
+                  display={display}
+                  resultHeader={builder.resultHeader}
+                />
               </>
             )}
           </>
@@ -137,7 +142,10 @@ export function DnfBuilder({
             derivation={builder.analysis.derivation}
             truthTable={builder.analysis.truthTable}
           />
-          <DnfTruthTableView display={display} />
+          <DnfTruthTableView
+            display={display}
+            resultHeader={builder.resultHeader}
+          />
         </>
       )}
     </div>

@@ -19,6 +19,8 @@ interface DnfExerciseWorkspaceProps {
   dnfAnswer: string;
   feedback: DnfExerciseCheckResult | null;
   showSolution: boolean;
+  resultHeader: string;
+  requiresTruthTableAnswers: boolean;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
@@ -33,6 +35,8 @@ export function DnfExerciseWorkspace({
   dnfAnswer,
   feedback,
   showSolution,
+  resultHeader,
+  requiresTruthTableAnswers,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
@@ -106,11 +110,19 @@ export function DnfExerciseWorkspace({
         <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.65fr)]">
           <div>
             <p className="text-muted-foreground text-sm">
-              {t("dnf.builder.exercise.given")}
+              {requiresTruthTableAnswers
+                ? t("dnf.builder.exercise.given")
+                : t("dnf.builder.exercise.givenTruthTable")}
             </p>
-            <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-3 font-mono text-sm">
-              {source}
-            </code>
+            {requiresTruthTableAnswers ? (
+              <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-3 font-mono text-sm">
+                {source}
+              </code>
+            ) : (
+              <div className="border-border bg-card text-foreground mt-2 rounded-md border p-3 text-sm leading-relaxed">
+                {t("dnf.builder.exercise.findExpressionFromTable")}
+              </div>
+            )}
           </div>
           <div className="border-border bg-card/50 rounded-md border p-3">
             <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
@@ -122,7 +134,9 @@ export function DnfExerciseWorkspace({
                   1
                 </span>
                 <span className="text-foreground">
-                  {t("dnf.builder.exercise.instructionStepTable")}
+                  {requiresTruthTableAnswers
+                    ? t("dnf.builder.exercise.instructionStepTable")
+                    : t("dnf.builder.exercise.instructionStepOneRows")}
                 </span>
               </li>
               <li className="flex gap-2">
@@ -130,7 +144,9 @@ export function DnfExerciseWorkspace({
                   2
                 </span>
                 <span className="text-foreground">
-                  {t("dnf.builder.exercise.instructionStepDnf")}
+                  {requiresTruthTableAnswers
+                    ? t("dnf.builder.exercise.instructionStepDnf")
+                    : t("dnf.builder.exercise.instructionStepDnfFromTable")}
                 </span>
               </li>
             </ol>
@@ -146,7 +162,9 @@ export function DnfExerciseWorkspace({
                 {t("dnf.builder.exercise.tableTitle")}
               </h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                {t("dnf.builder.exercise.tableHint")}
+                {requiresTruthTableAnswers
+                  ? t("dnf.builder.exercise.tableHint")
+                  : t("dnf.builder.exercise.tableHintGiven")}
               </p>
             </div>
           </div>
@@ -171,7 +189,7 @@ export function DnfExerciseWorkspace({
                     </th>
                   ))}
                   <th scope="col" className="px-3 py-2 text-left font-semibold">
-                    {t("dnf.builder.truthTableResult")}
+                    <code className="font-mono text-sm">{resultHeader}</code>
                   </th>
                 </tr>
               </thead>
@@ -206,46 +224,52 @@ export function DnfExerciseWorkspace({
                         </td>
                       ))}
                       <td className="px-3 py-2">
-                        <div
-                          ref={(element) => {
-                            resultRowRefs.current[rowIndex] = element;
-                          }}
-                          tabIndex={0}
-                          role="group"
-                          aria-label={t(
-                            "dnf.builder.exercise.resultGroupLabel",
-                            { row: rowIndex + 1 },
-                          )}
-                          onKeyDown={(event) =>
-                            handleResultKeyDown(event, rowIndex)
-                          }
-                          className="focus:ring-ring grid w-full max-w-36 grid-cols-2 gap-2 rounded-md focus:ring-2 focus:outline-none"
-                        >
-                          {[false, true].map((value) => (
-                            <button
-                              key={String(value)}
-                              type="button"
-                              aria-pressed={answer === value}
-                              aria-label={t(
-                                "dnf.builder.exercise.resultButtonLabel",
-                                {
-                                  row: rowIndex + 1,
-                                  value: formatBooleanValue(value),
-                                },
-                              )}
-                              onClick={() =>
-                                updateTruthTableAnswer(rowIndex, value)
-                              }
-                              className={cn(
-                                "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
-                                answer === value &&
-                                  "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
-                              )}
-                            >
-                              {formatBooleanValue(value)}
-                            </button>
-                          ))}
-                        </div>
+                        {requiresTruthTableAnswers ? (
+                          <div
+                            ref={(element) => {
+                              resultRowRefs.current[rowIndex] = element;
+                            }}
+                            tabIndex={0}
+                            role="group"
+                            aria-label={t(
+                              "dnf.builder.exercise.resultGroupLabel",
+                              { row: rowIndex + 1 },
+                            )}
+                            onKeyDown={(event) =>
+                              handleResultKeyDown(event, rowIndex)
+                            }
+                            className="focus:ring-ring grid w-full max-w-36 grid-cols-2 gap-2 rounded-md focus:ring-2 focus:outline-none"
+                          >
+                            {[false, true].map((value) => (
+                              <button
+                                key={String(value)}
+                                type="button"
+                                aria-pressed={answer === value}
+                                aria-label={t(
+                                  "dnf.builder.exercise.resultButtonLabel",
+                                  {
+                                    row: rowIndex + 1,
+                                    value: formatBooleanValue(value),
+                                  },
+                                )}
+                                onClick={() =>
+                                  updateTruthTableAnswer(rowIndex, value)
+                                }
+                                className={cn(
+                                  "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
+                                  answer === value &&
+                                    "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
+                                )}
+                              >
+                                {formatBooleanValue(value)}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="bg-card border-border inline-flex min-h-9 min-w-12 items-center justify-center rounded-md border px-3 font-mono text-sm font-semibold">
+                            {formatBooleanValue(row.result)}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -326,6 +350,7 @@ export function DnfExerciseWorkspace({
           answeredRowCount={answeredRowCount}
           totalRowCount={truthTable.rows.length}
           hasDnfAnswer={hasDnfAttempt}
+          isTruthTableProvided={!requiresTruthTableAnswers}
         />
       </div>
     </div>

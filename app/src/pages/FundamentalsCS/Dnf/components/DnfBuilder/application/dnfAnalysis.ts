@@ -50,6 +50,21 @@ export function analyzeDnfSource(source: string): DnfBuilderAnalysis {
   }
 
   const truthTable = generateTruthTable(parseResult.expression, variables);
+
+  return analyzeDnfTruthTable(truthTable);
+}
+
+export function analyzeDnfTruthTable(
+  truthTable: TruthTable,
+): DnfBuilderAnalysis {
+  if (truthTable.variables.length > MAX_DNF_VARIABLE_COUNT) {
+    return {
+      status: "too_many_variables",
+      variableCount: truthTable.variables.length,
+      maxVariableCount: MAX_DNF_VARIABLE_COUNT,
+    };
+  }
+
   const derivation = deriveDnfFromTruthTable(truthTable);
 
   return {

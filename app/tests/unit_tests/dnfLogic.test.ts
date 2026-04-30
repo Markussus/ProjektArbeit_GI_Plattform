@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildTruthTableDisplay } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/adapters/truthTableAdapter";
 import {
+  analyzeDnfTruthTable,
   analyzeDnfSource,
   MAX_DNF_VARIABLE_COUNT,
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/application/dnfAnalysis";
@@ -24,6 +25,7 @@ import {
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfExerciseCheck";
 import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 import {
+  createTruthTableFromResults,
   generateTruthTable,
   type TruthTable,
 } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
@@ -84,6 +86,19 @@ describe("DNF boolean logic", () => {
     expect(formatDnfExpression(trueDerivation.dnf)).toBe("1");
   });
 
+  it("builds a DNF directly from a given truth-table result column", () => {
+    const table = createTruthTableFromResults(
+      ["a", "b", "c"],
+      [false, false, true, false, true, true, false, false],
+    );
+    const analysis = analyzeDnfTruthTable(table);
+
+    expect(analysis.status).toBe("valid");
+    expect(analysis.status === "valid" ? analysis.formattedDnf : "").toBe(
+      "(¬a ∧ b ∧ ¬c) ∨ (a ∧ ¬b ∧ ¬c) ∨ (a ∧ ¬b ∧ c)",
+    );
+  });
+
   it("checks a complete canonical DNF exercise answer", () => {
     const table = generateTruthTable(parse("(a | b) & c"));
     const result = checkDnfExerciseAttempt(
@@ -94,6 +109,24 @@ describe("DNF boolean logic", () => {
 
     expect(result.isCorrect).toBe(true);
     expect(result.dnf.status).toBe("correct");
+  });
+
+  it("checks truth-table-to-DNF exercises without requiring editable table answers", () => {
+    const table = createTruthTableFromResults(
+      ["a", "b", "c"],
+      [false, false, true, false, true, true, false, false],
+    );
+    const result = checkDnfExerciseAttempt(
+      table,
+      [],
+      "(¬a ∧ b ∧ ¬c) ∨ (a ∧ ¬b ∧ ¬c) ∨ (a ∧ ¬b ∧ c)",
+      { checkTruthTable: false },
+    );
+
+    expect(result.truthTableIssues).toEqual([]);
+    expect(result.correctRowCount).toBe(8);
+    expect(result.dnf.status).toBe("correct");
+    expect(result.isCorrect).toBe(true);
   });
 
   it("normalizes keyboard operator aliases for display", () => {

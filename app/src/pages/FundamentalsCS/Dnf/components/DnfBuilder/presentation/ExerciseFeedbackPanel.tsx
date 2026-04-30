@@ -11,6 +11,7 @@ interface ExerciseFeedbackPanelProps {
   answeredRowCount: number;
   totalRowCount: number;
   hasDnfAnswer: boolean;
+  isTruthTableProvided?: boolean;
 }
 
 export function ExerciseFeedbackPanel({
@@ -19,6 +20,7 @@ export function ExerciseFeedbackPanel({
   answeredRowCount,
   totalRowCount,
   hasDnfAnswer,
+  isTruthTableProvided = false,
 }: ExerciseFeedbackPanelProps) {
   const { t } = useTranslation();
 
@@ -34,7 +36,9 @@ export function ExerciseFeedbackPanel({
               {t("dnf.builder.exercise.feedbackTitle")}
             </h2>
             <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-              {t("dnf.builder.exercise.notChecked")}
+              {isTruthTableProvided
+                ? t("dnf.builder.exercise.notCheckedDnfOnly")
+                : t("dnf.builder.exercise.notChecked")}
             </p>
           </div>
         </div>
@@ -44,10 +48,12 @@ export function ExerciseFeedbackPanel({
               {t("dnf.builder.exercise.progressTable")}
             </dt>
             <dd className="text-foreground font-medium">
-              {t("dnf.builder.exercise.progressTableValue", {
-                answered: answeredRowCount,
-                total: totalRowCount,
-              })}
+              {isTruthTableProvided
+                ? t("dnf.builder.exercise.progressTableProvided")
+                : t("dnf.builder.exercise.progressTableValue", {
+                    answered: answeredRowCount,
+                    total: totalRowCount,
+                  })}
             </dd>
           </div>
           <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">
@@ -86,6 +92,7 @@ export function ExerciseFeedbackPanel({
           totalRowCount={totalRowCount}
           truthTable={truthTable}
           hasTruthTableReady={hasTruthTableReady}
+          isTruthTableProvided={isTruthTableProvided}
         />
       </aside>
     );
@@ -101,6 +108,7 @@ export function ExerciseFeedbackPanel({
         totalRowCount={totalRowCount}
         truthTable={truthTable}
         hasTruthTableReady={hasTruthTableReady}
+        isTruthTableProvided={isTruthTableProvided}
       />
       <ul className="mt-4 space-y-3 text-sm leading-relaxed">
         {buildFeedbackItems(feedback, truthTable, hasDnfAnswer, t).map(
@@ -134,11 +142,13 @@ function FeedbackSummary({
   totalRowCount,
   truthTable,
   hasTruthTableReady,
+  isTruthTableProvided,
 }: {
   feedback: DnfExerciseCheckResult;
   totalRowCount: number;
   truthTable: TruthTable;
   hasTruthTableReady: boolean;
+  isTruthTableProvided: boolean;
 }) {
   const { t } = useTranslation();
   const oneRows = truthTable.rows.flatMap((row, rowIndex) =>
@@ -152,10 +162,12 @@ function FeedbackSummary({
           {t("dnf.builder.exercise.progressTable")}
         </dt>
         <dd className="text-foreground font-medium">
-          {t("dnf.builder.exercise.tableCorrectValue", {
-            correct: feedback.correctRowCount,
-            total: totalRowCount,
-          })}
+          {isTruthTableProvided
+            ? t("dnf.builder.exercise.progressTableProvided")
+            : t("dnf.builder.exercise.tableCorrectValue", {
+                correct: feedback.correctRowCount,
+                total: totalRowCount,
+              })}
         </dd>
       </div>
       <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">

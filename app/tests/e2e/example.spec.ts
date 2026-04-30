@@ -59,3 +59,25 @@ test("covers DNF simulation safeguards for large and invalid inputs", async ({
   await page.getByRole("button", { name: "Clear" }).click();
   await expect(page.getByText("Ready for an expression")).toBeVisible();
 });
+
+test("solves a DNF exercise from a given truth table", async ({ page }) => {
+  await page.goto("/fundamentals-cs/dnf");
+
+  await page.getByRole("button", { name: /^Exercises$/ }).click();
+  await page
+    .getByRole("button", {
+      name: /Exercise 5: Boolean polynomial from truth table/,
+    })
+    .click();
+  await page.getByRole("button", { name: "Open in simulation" }).click();
+
+  await expect(page.getByText("Given the truth table:")).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "???" })).toBeVisible();
+
+  await page
+    .locator("#dnf-exercise-answer")
+    .fill("(!a & b & !c) | (a & !b & !c) | (a & !b & c)");
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+
+  await expect(page.getByText("All correct")).toBeVisible();
+});

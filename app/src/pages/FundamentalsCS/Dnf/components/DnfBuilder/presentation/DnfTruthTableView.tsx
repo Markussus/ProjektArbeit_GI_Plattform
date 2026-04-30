@@ -8,9 +8,13 @@ const TABLE_PREVIEW_ROW_LIMIT = 32;
 
 interface DnfTruthTableViewProps {
   display: TruthTableDisplay;
+  resultHeader?: string;
 }
 
-export function DnfTruthTableView({ display }: DnfTruthTableViewProps) {
+export function DnfTruthTableView({
+  display,
+  resultHeader,
+}: DnfTruthTableViewProps) {
   const { t } = useTranslation();
   const [showAllRows, setShowAllRows] = useState(false);
   const isLargeTable = display.rows.length >= TABLE_PREVIEW_ROW_LIMIT;
@@ -99,7 +103,9 @@ export function DnfTruthTableView({ display }: DnfTruthTableViewProps) {
                 scope="col"
                 className="border-border border-r px-3 py-2 text-left font-semibold"
               >
-                {t("dnf.builder.truthTableResult")}
+                <code className="font-mono text-sm">
+                  {resultHeader ?? t("dnf.builder.truthTableResult")}
+                </code>
               </th>
               <th scope="col" className="px-3 py-2 text-left font-semibold">
                 {t("dnf.builder.truthTableTerm")}

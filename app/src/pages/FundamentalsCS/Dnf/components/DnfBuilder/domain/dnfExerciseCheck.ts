@@ -45,26 +45,34 @@ export interface DnfExerciseCheckResult {
   isCorrect: boolean;
 }
 
+export interface DnfExerciseCheckOptions {
+  checkTruthTable?: boolean;
+}
+
 export function checkDnfExerciseAttempt(
   table: TruthTable,
   truthTableAnswers: TruthTableAnswer[],
   dnfAnswer: string,
+  options: DnfExerciseCheckOptions = {},
 ): DnfExerciseCheckResult {
-  const truthTableIssues = table.rows.flatMap((row, rowIndex) => {
-    const actual = truthTableAnswers[rowIndex] ?? null;
+  const shouldCheckTruthTable = options.checkTruthTable ?? true;
+  const truthTableIssues = shouldCheckTruthTable
+    ? table.rows.flatMap((row, rowIndex) => {
+        const actual = truthTableAnswers[rowIndex] ?? null;
 
-    if (actual === row.result) {
-      return [];
-    }
+        if (actual === row.result) {
+          return [];
+        }
 
-    return [
-      {
-        rowIndex,
-        expected: row.result,
-        actual,
-      },
-    ];
-  });
+        return [
+          {
+            rowIndex,
+            expected: row.result,
+            actual,
+          },
+        ];
+      })
+    : [];
 
   const dnf = checkDnfAnswer(table, dnfAnswer);
   const unansweredRowCount = truthTableIssues.filter(

@@ -10,11 +10,13 @@ import type { DnfBuilderAnalysis } from "./dnfAnalysis";
 interface UseDnfExerciseParams {
   analysis: DnfBuilderAnalysis;
   isExerciseMode: boolean;
+  requiresTruthTableAnswers: boolean;
 }
 
 export function useDnfExercise({
   analysis,
   isExerciseMode,
+  requiresTruthTableAnswers,
 }: UseDnfExerciseParams) {
   const [showSolution, setShowSolution] = useState(!isExerciseMode);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
@@ -57,14 +59,17 @@ export function useDnfExercise({
         analysis.truthTable,
         truthTableAnswers,
         dnfAnswer,
+        { checkTruthTable: requiresTruthTableAnswers },
       ),
     );
   };
 
   const normalizedTruthTableAnswers =
     analysis.status === "valid"
-      ? analysis.truthTable.rows.map(
-          (_row, rowIndex) => truthTableAnswers[rowIndex] ?? null,
+      ? analysis.truthTable.rows.map((row, rowIndex) =>
+          requiresTruthTableAnswers
+            ? (truthTableAnswers[rowIndex] ?? null)
+            : row.result,
         )
       : [];
 

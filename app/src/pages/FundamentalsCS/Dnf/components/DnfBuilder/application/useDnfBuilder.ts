@@ -1,9 +1,13 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
-import { DEFAULT_DNF_SOURCE, getDnfExerciseSource } from "../../../exercises";
+import {
+  DEFAULT_DNF_SOURCE,
+  getDnfExerciseDefinition,
+  getDnfExerciseSource,
+} from "../../../exercises";
 import { dnfExamples } from "../config/dnfExamples";
 import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
-import { analyzeDnfSource } from "./dnfAnalysis";
+import { analyzeDnfSource, analyzeDnfTruthTable } from "./dnfAnalysis";
 import { useDnfExercise } from "./useDnfExercise";
 
 export function useDnfBuilder(
@@ -11,17 +15,29 @@ export function useDnfBuilder(
   initialSource?: string | null,
 ) {
   const selectedExerciseId = selectedExercise?.id ?? null;
+  const exerciseDefinition = getDnfExerciseDefinition(selectedExerciseId);
   const exerciseSource = selectedExerciseId
     ? getDnfExerciseSource(selectedExerciseId)
     : (initialSource ?? DEFAULT_DNF_SOURCE);
   const isExerciseMode = selectedExerciseId !== null;
+  const exerciseMode = exerciseDefinition?.mode ?? "expression_to_truth_table";
+  const requiresTruthTableAnswers =
+    exerciseMode === "expression_to_truth_table";
   const [source, setSource] = useState(exerciseSource);
+  const resultHeader = exerciseMode === "truth_table_to_dnf" ? "???" : source;
 
-  const analysis = useMemo(() => analyzeDnfSource(source), [source]);
+  const analysis = useMemo(() => {
+    if (exerciseDefinition?.mode === "truth_table_to_dnf") {
+      return analyzeDnfTruthTable(exerciseDefinition.truthTable);
+    }
+
+    return analyzeDnfSource(source);
+  }, [exerciseDefinition, source]);
 
   const { resetExercise, ...exerciseState } = useDnfExercise({
     analysis,
     isExerciseMode,
+    requiresTruthTableAnswers,
   });
 
   const reset = () => {
@@ -49,6 +65,9 @@ export function useDnfBuilder(
     analysis,
     examples: dnfExamples,
     isExerciseMode,
+    exerciseMode,
+    requiresTruthTableAnswers,
+    resultHeader,
     ...exerciseState,
     reset,
     loadExample,
