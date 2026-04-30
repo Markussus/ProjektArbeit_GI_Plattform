@@ -57,7 +57,7 @@ test.describe("Java page", () => {
       await expect(page.getByTestId(appTestIds.javaSimulator)).toBeVisible();
       await expect(
         page.getByTestId(appTestIds.simulationSelectedExercise),
-      ).toContainText(/Array sortieren|Sort an array/u);
+      ).toContainText(/Array sortieren|Sort an array/);
       await expect(page.getByTestId(appTestIds.javaEditorPanel)).toBeVisible();
     });
   });
