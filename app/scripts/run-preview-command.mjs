@@ -1,12 +1,18 @@
 import { spawn } from "node:child_process";
 import net from "node:net";
+import path from "node:path";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const HOST = "127.0.0.1";
 const isWindows = process.platform === "win32";
-const npmCommand = isWindows ? "npm.cmd" : "npm";
-const npxCommand = isWindows ? "npx.cmd" : "npx";
+const nodeBinDir = path.dirname(process.execPath);
+const npmCli = isWindows
+  ? path.join(nodeBinDir, "node_modules", "npm", "bin", "npm-cli.js")
+  : null;
+const npxCli = isWindows
+  ? path.join(nodeBinDir, "node_modules", "npm", "bin", "npx-cli.js")
+  : null;
 
 const tasks = {
   e2e: {
@@ -15,8 +21,10 @@ const tasks = {
       PLAYWRIGHT_MANAGED_PREVIEW: "1",
     }),
     command: [
-      npxCommand,
-      ["playwright", "test", "tests/e2e", "--project=chromium"],
+      isWindows ? process.execPath : "npx",
+      isWindows && npxCli
+        ? [npxCli, "playwright", "test", "tests/e2e", "--project=chromium"]
+        : ["playwright", "test", "tests/e2e", "--project=chromium"],
     ],
   },
   lhci: {
@@ -24,11 +32,32 @@ const tasks = {
       LHCI_BASE_URL: baseUrl,
     }),
     steps: [
-      [npmCommand, ["run", "lhci:config"]],
-      [npmCommand, ["run", "lighthouse:ci"]],
+      [
+        isWindows ? process.execPath : "npm",
+        isWindows && npmCli
+          ? [npmCli, "run", "lhci:config"]
+          : ["run", "lhci:config"],
+      ],
+      [
+        isWindows ? process.execPath : "npm",
+        isWindows && npmCli
+          ? [npmCli, "run", "lighthouse:ci"]
+          : ["run", "lighthouse:ci"],
+      ],
     ],
   },
 };
+
+function getPreviewCommand(port) {
+  if (isWindows && npmCli) {
+    return [
+      process.execPath,
+      [npmCli, "run", "preview:ci", "--", "--port", String(port)],
+    ];
+  }
+
+  return ["npm", ["run", "preview:ci", "--", "--port", String(port)]];
+}
 
 function getTaskName() {
   const taskArg = process.argv
@@ -149,11 +178,8 @@ async function main() {
     BASE_URL: baseUrl,
     PORT: String(port),
   };
-  const preview = spawnCommand(
-    npmCommand,
-    ["run", "preview:ci", "--", "--port", String(port)],
-    sharedEnv,
-  );
+  const [previewCommand, previewArgs] = getPreviewCommand(port);
+  const preview = spawnCommand(previewCommand, previewArgs, sharedEnv);
 
   try {
     await waitForServer(baseUrl);
