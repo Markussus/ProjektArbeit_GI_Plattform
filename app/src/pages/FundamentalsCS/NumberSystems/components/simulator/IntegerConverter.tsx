@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Info, LockKeyhole, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 
 type BaseType = "dec" | "bin" | "oct" | "hex";
 
@@ -303,33 +304,39 @@ export function IntegerConverter({
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                   {t("simulator.numbers.fromBase")}
                 </label>
-                <select
+                <DropdownSelect
                   value={sourceBase}
-                  onChange={(e) => handleSourceBaseChange(e.target.value as BaseType)}
+                  options={[
+                    { value: "dec", label: t("simulator.numbers.decimal") },
+                    { value: "bin", label: t("simulator.numbers.binary") },
+                    { value: "oct", label: t("simulator.numbers.octal") },
+                    { value: "hex", label: t("simulator.numbers.hex") },
+                  ]}
+                  onChange={handleSourceBaseChange}
+                  ariaLabel={t("simulator.numbers.fromBase")}
                   disabled={!!isExerciseMode && !showSolution}
-                  className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
-                >
-                  <option value="dec">{t("simulator.numbers.decimal")}</option>
-                  <option value="bin">{t("simulator.numbers.binary")}</option>
-                  <option value="oct">{t("simulator.numbers.octal")}</option>
-                  <option value="hex">{t("simulator.numbers.hex")}</option>
-                </select>
+                  triggerClassName="w-full px-3 py-2 text-sm font-normal"
+                  menuClassName="w-full"
+                />
               </div>
               <div>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                   {t("simulator.numbers.toBase")}
                 </label>
-                <select
+                <DropdownSelect
                   value={targetBase}
-                  onChange={(e) => setTargetBase(e.target.value as BaseType)}
+                  options={[
+                    { value: "dec", label: t("simulator.numbers.decimal") },
+                    { value: "bin", label: t("simulator.numbers.binary") },
+                    { value: "oct", label: t("simulator.numbers.octal") },
+                    { value: "hex", label: t("simulator.numbers.hex") },
+                  ]}
+                  onChange={setTargetBase}
+                  ariaLabel={t("simulator.numbers.toBase")}
                   disabled={!!isExerciseMode && !showSolution}
-                  className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
-                >
-                  <option value="dec">{t("simulator.numbers.decimal")}</option>
-                  <option value="bin">{t("simulator.numbers.binary")}</option>
-                  <option value="oct">{t("simulator.numbers.octal")}</option>
-                  <option value="hex">{t("simulator.numbers.hex")}</option>
-                </select>
+                  triggerClassName="w-full px-3 py-2 text-sm font-normal"
+                  menuClassName="w-full"
+                />
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { Addition } from "./Addition";
 import { Subtraction } from "./Subtraction";
 import { Multiplication } from "./Multiplication";
@@ -45,36 +46,25 @@ export function ArithmeticMode({
         <label className="text-foreground text-sm font-medium whitespace-nowrap">
           {t("simulator.arithmetic.selectMode")}:
         </label>
-        <select
-          value={activeSubMode}
-          onChange={(e) =>
-            setActiveSubMode(e.target.value as ArithmeticModeType)
-          }
-          disabled={!!isExerciseMode && !showSolution}
-          className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50 sm:w-auto"
-        >
-          <option value="addition">
-            {t("simulator.arithmetic.modes.addition")}
-          </option>
-          <option value="subtraction">
-            {t("simulator.arithmetic.modes.subtraction")}
-          </option>
-          <option value="multiplication">
-            {t("simulator.arithmetic.modes.multiplication")}
-          </option>
-          <option value="division">
-            {t("simulator.arithmetic.modes.division")}
-          </option>
-          <option value="shifting">
-            {t("simulator.arithmetic.modes.shifting")}
-          </option>
-          <option value="ieee754">
-            {t("simulator.arithmetic.modes.ieee754")}
-          </option>
-          <option value="compare">
-            {t("simulator.arithmetic.modes.compare")}
-          </option>
-        </select>
+        <div className="w-full sm:w-auto sm:min-w-48">
+          <DropdownSelect
+            value={activeSubMode}
+            options={[
+              { value: "addition", label: t("simulator.arithmetic.modes.addition") },
+              { value: "subtraction", label: t("simulator.arithmetic.modes.subtraction") },
+              { value: "multiplication", label: t("simulator.arithmetic.modes.multiplication") },
+              { value: "division", label: t("simulator.arithmetic.modes.division") },
+              { value: "shifting", label: t("simulator.arithmetic.modes.shifting") },
+              { value: "ieee754", label: t("simulator.arithmetic.modes.ieee754") },
+              { value: "compare", label: t("simulator.arithmetic.modes.compare") },
+            ]}
+            onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
+            ariaLabel={t("simulator.arithmetic.selectMode")}
+            disabled={!!isExerciseMode && !showSolution}
+            triggerClassName="w-full px-3 py-2 text-sm font-normal"
+            menuClassName="w-full sm:min-w-48"
+          />
+        </div>
       </div>
 
       {/* Render Active Operation Component */}
