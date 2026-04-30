@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Info, LockKeyhole } from "lucide-react";
+import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
 interface NegativeNumbersProps {
   isExerciseMode?: boolean;
@@ -133,23 +134,11 @@ export function NegativeNumbers({
         {/* Dynamic Explanation Panel */}
         <div className="bg-muted/30 border-border/50 max-h-[500px] overflow-auto rounded-xl border p-6 shadow-sm">
           {locked ? (
-            <div className="flex h-full flex-col items-center justify-center space-y-4 py-12 text-center">
-              <LockKeyhole className="text-muted-foreground h-12 w-12 opacity-50" />
-              <div>
-                <p className="text-foreground mb-1 font-medium">
-                  {t("simulator.numbers.lockedTitle")}
-                </p>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  {t("simulator.numbers.lockedDesc")}
-                </p>
-              </div>
-              <button
-                onClick={onShowSolution}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 font-medium shadow-sm transition-colors"
-              >
-                {t("simulator.numbers.showSolution")}
-              </button>
-            </div>
+            <ExerciseValidationPanel
+              expectedResult={twosComplement}
+              onShowSolution={onShowSolution!}
+              placeholder="z.B. 11110001"
+            />
           ) : (
             <>
               <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">

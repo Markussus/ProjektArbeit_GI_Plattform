@@ -488,6 +488,14 @@
       "fractionSum": "Sum of fractional powers",
       "step4FinalCalc": "4. Final Calculation of all components",
       "finalFormulaDesc": "For the final decimal number, the sign, actual mantissa, and exponent factor are multiplied together:"
+    },
+    "validation": {
+      "title": "Verify Result",
+      "enterSolution": "Enter your final result here...",
+      "verify": "Verify Solution",
+      "showSolution": "Show Solution (Skip)",
+      "correct": "Correct! The solution has been unlocked.",
+      "incorrect": "The result is incorrect. Please try again!"
     }
   },
   "tm": {

@@ -484,6 +484,14 @@
         "stepResultLess": "An Position {{pos}}: A hat 0, B hat 1 → A ist kleiner als B.",
         "stepEqual": "Position {{pos}}: Beide Bits sind {{bit}}, weiter zum nächsten Bit."
       }
+    },
+    "validation": {
+      "title": "Ergebnis überprüfen",
+      "enterSolution": "Geben Sie hier Ihr Endergebnis ein...",
+      "verify": "Lösung überprüfen",
+      "showSolution": "Lösung anzeigen (Überspringen)",
+      "correct": "Korrekt! Die Lösung wurde freigeschaltet.",
+      "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!"
     }
   },
   "tm": {
