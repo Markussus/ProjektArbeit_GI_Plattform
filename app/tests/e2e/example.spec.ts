@@ -33,7 +33,7 @@ test("covers DNF simulation safeguards for large and invalid inputs", async ({
   await input.fill("~a && (b || c)");
   await input.blur();
 
-  await expect(input).toHaveValue("~a && (b || c)");
+  await expect(input).toHaveValue("¬a ∧ (b ∨ c)");
   await page.getByRole("button", { name: "Evaluate" }).click();
   await page.getByRole("button", { name: "Show solution as hint" }).click();
   await expect(
