@@ -1,0 +1,145 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { CheckCircle2, XCircle, KeyRound, Eye } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface ExerciseValidationPanelProps {
+  expectedResult: string | string[];
+  onShowSolution: () => void;
+  inputType?: "text" | "number";
+  placeholder?: string;
+  className?: string;
+}
+
+export function ExerciseValidationPanel({
+  expectedResult,
+  onShowSolution,
+  inputType = "text",
+  placeholder,
+  className,
+}: ExerciseValidationPanelProps) {
+  const { t } = useTranslation("translation");
+  const [inputValue, setInputValue] = useState("");
+  const [validationState, setValidationState] = useState<
+    "idle" | "correct" | "incorrect"
+  >("idle");
+
+  const handleVerify = () => {
+    const cleanUser = inputValue.replace(/\s/g, "").toLowerCase().trim();
+
+    // Support multiple valid formats if an array is passed
+    const expectedArray = Array.isArray(expectedResult)
+      ? expectedResult
+      : [expectedResult];
+
+    const isCorrect = expectedArray.some(
+      (exp) => exp.replace(/\s/g, "").toLowerCase().trim() === cleanUser,
+    );
+
+    if (isCorrect) {
+      setValidationState("correct");
+      // Give the user a brief moment to see the success message before unlocking
+      setTimeout(() => {
+        onShowSolution();
+      }, 1500);
+    } else {
+      setValidationState("incorrect");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleVerify();
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "bg-card border-border/50 overflow-hidden rounded-xl border shadow-sm",
+        className,
+      )}
+    >
+      <div className="bg-muted/30 border-border/50 border-b p-4">
+        <h3 className="text-foreground flex items-center gap-2 font-semibold">
+          <KeyRound className="text-primary h-5 w-5" />
+          {t("simulator.validation.title", "Ergebnis überprüfen")}
+        </h3>
+      </div>
+
+      <div className="space-y-6 p-6">
+        <div>
+          <label className="text-muted-foreground mb-2 block text-sm font-medium">
+            {t(
+              "simulator.validation.enterSolution",
+              "Geben Sie hier Ihr Endergebnis ein...",
+            )}
+          </label>
+          <input
+            type={inputType}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              if (validationState === "incorrect") {
+                setValidationState("idle");
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder || "z.B. 10110010"}
+            className={cn(
+              "bg-background w-full rounded-md border px-4 py-3 font-mono text-sm transition-colors focus:outline-none",
+              validationState === "incorrect"
+                ? "border-destructive focus:border-destructive focus:ring-destructive/20 focus:ring-1"
+                : validationState === "correct"
+                  ? "border-green-500 bg-green-50/50 text-green-600 focus:border-green-500 dark:bg-green-500/10"
+                  : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1",
+            )}
+            disabled={validationState === "correct"}
+          />
+        </div>
+
+        {validationState === "incorrect" && (
+          <div className="text-destructive bg-destructive/10 animate-in fade-in zoom-in-95 flex items-start gap-2 rounded-md p-3 text-sm">
+            <XCircle className="h-5 w-5 shrink-0" />
+            <p>
+              {t(
+                "simulator.validation.incorrect",
+                "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!",
+              )}
+            </p>
+          </div>
+        )}
+
+        {validationState === "correct" && (
+          <div className="animate-in fade-in zoom-in-95 flex items-start gap-2 rounded-md bg-green-500/10 p-3 text-sm text-green-600 dark:text-green-400">
+            <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <p>
+              {t(
+                "simulator.validation.correct",
+                "Korrekt! Die Lösung wurde freigeschaltet.",
+              )}
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          <button
+            onClick={handleVerify}
+            disabled={!inputValue.trim() || validationState === "correct"}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium transition-colors disabled:pointer-events-none disabled:opacity-50"
+          >
+            {t("simulator.validation.verify", "Lösung überprüfen")}
+          </button>
+
+          <button
+            onClick={onShowSolution}
+            className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium transition-colors sm:flex-none"
+          >
+            <Eye className="h-4 w-4" />
+            {t("simulator.validation.showSolution", "Lösung anzeigen")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
