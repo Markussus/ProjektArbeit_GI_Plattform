@@ -52,6 +52,14 @@ function JavaSimulatorSession({
     reset();
   }, [exerciseId, reset]);
 
+  const handleImportCode = useCallback(
+    (nextCode: string) => {
+      setCode(nextCode);
+      reset();
+    },
+    [reset],
+  );
+
   return (
     <div className="flex h-full flex-col gap-4">
       <JavaEditorPanel
@@ -60,6 +68,7 @@ function JavaSimulatorSession({
         isFocused={isFocused}
         onCodeChange={setCode}
         onResetCode={handleResetCode}
+        onImportCode={handleImportCode}
       />
 
       <ExecutionControls

@@ -250,6 +250,16 @@
     "expand": "Expand simulation",
     "exitFocus": "Exit simulation focus",
     "close": "Close",
+    "transfer": {
+      "title": "Import / Export",
+      "placeholder": "Paste a transfer string here or generate one via export",
+      "copy": "Copy string",
+      "export": "Export",
+      "import": "Import",
+      "copied": "String copied to clipboard.",
+      "importSuccess": "String loaded successfully.",
+      "importError": "String could not be loaded."
+    },
     "emptyStates": {
       "turing": "The Turing Machine simulator will be available here.",
       "automata": "The Finite Automata simulator will be available here.",

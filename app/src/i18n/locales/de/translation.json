@@ -246,6 +246,16 @@
     "expand": "Simulation vergrößern",
     "exitFocus": "Simulationsfokus verlassen",
     "close": "Schließen",
+    "transfer": {
+      "title": "Import / Export",
+      "placeholder": "Transfer-String hier einfügen oder per Export erzeugen",
+      "copy": "String kopieren",
+      "export": "Export",
+      "import": "Import",
+      "copied": "String in die Zwischenablage kopiert.",
+      "importSuccess": "String erfolgreich geladen.",
+      "importError": "String konnte nicht geladen werden."
+    },
     "emptyStates": {
       "turing": "Der Turingmaschinen-Simulator wird hier verfügbar sein.",
       "automata": "Der Automatensimulator wird hier verfügbar sein.",

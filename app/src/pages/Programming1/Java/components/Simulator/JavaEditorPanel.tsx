@@ -1,7 +1,9 @@
 import { lazy, Suspense } from "react";
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
+import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 
@@ -11,6 +13,7 @@ export interface JavaEditorPanelProps {
   isFocused: boolean;
   onCodeChange: (nextCode: string) => void;
   onResetCode: () => void;
+  onImportCode: (nextCode: string) => void;
 }
 
 export function JavaEditorPanel({
@@ -19,6 +22,7 @@ export function JavaEditorPanel({
   isFocused,
   onCodeChange,
   onResetCode,
+  onImportCode,
 }: JavaEditorPanelProps) {
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
@@ -70,6 +74,12 @@ export function JavaEditorPanel({
           />
         </Suspense>
       </div>
+
+      <SimulatorStringTransferBox
+        value={code}
+        codec={javaCodeTransferCodec}
+        onLoad={onImportCode}
+      />
     </div>
   );
 }
