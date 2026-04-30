@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { Info, AlertTriangle, LockKeyhole } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Info, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
 interface IEEE754ConverterProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
   initialValue?: string;
+  initialConverterMode?: "decToIeee" | "ieeeToDec";
 }
 
 export function IEEE754Converter({
@@ -14,14 +16,21 @@ export function IEEE754Converter({
   showSolution = true,
   onShowSolution,
   initialValue = "",
+  initialConverterMode = "decToIeee",
 }: IEEE754ConverterProps) {
   const { t } = useTranslation("translation");
-  const [inputValue, setInputValue] = useState<string>(() =>
-    isExerciseMode && initialValue ? initialValue : "12.5",
-  );
+  const [inputValue, setInputValue] = useState<string>("12.5");
   const [converterMode, setConverterMode] = useState<"decToIeee" | "ieeeToDec">(
-    "decToIeee",
+    initialConverterMode,
   );
+
+  useEffect(() => {
+    if (isExerciseMode && initialValue) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInputValue(initialValue);
+      setConverterMode(initialConverterMode);
+    }
+  }, [isExerciseMode, initialValue, initialConverterMode]);
 
   // PARSE LOGIC
   const cleanBinary = inputValue.replace(/[^01]/g, "");
@@ -107,10 +116,7 @@ export function IEEE754Converter({
           <div className="bg-card border-border/50 rounded-xl border p-6 shadow-sm">
             <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <h3 className="text-foreground text-lg font-semibold">
-                {t(
-                  "simulator.numbers.ieeeTitle",
-                  "IEEE 754 (Single Precision, 32-bit)",
-                )}
+                {t("simulator.numbers.ieeeTitle")}
               </h3>
 
               <div className="bg-muted mb-2 flex shrink-0 rounded-md p-1 sm:mb-0">
@@ -121,7 +127,7 @@ export function IEEE754Converter({
                   }}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {t("simulator.numbers.modeDecToIeee", "Dezimal zu IEEE")}
+                  {t("simulator.numbers.modeDecToIeee")}
                 </button>
                 <button
                   onClick={() => {
@@ -130,7 +136,7 @@ export function IEEE754Converter({
                   }}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {t("simulator.numbers.modeIeeeToDec", "IEEE zu Dezimal")}
+                  {t("simulator.numbers.modeIeeeToDec")}
                 </button>
               </div>
             </div>
@@ -139,14 +145,8 @@ export function IEEE754Converter({
               <div className={locked ? "opacity-60" : ""}>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                   {converterMode === "decToIeee"
-                    ? t(
-                        "simulator.numbers.decInputFloat",
-                        "Dezimalzahl (z.B. 12.5, Infinity, -0)",
-                      )
-                    : t(
-                        "simulator.numbers.ieeeInputFormat",
-                        "32-Bit Binärstring (0en und 1en)",
-                      )}
+                    ? t("simulator.numbers.decInputFloat")
+                    : t("simulator.numbers.ieeeInputFormat")}
                 </label>
                 <div
                   className={`bg-background relative flex items-center border ${locked ? "border-input bg-muted pointer-events-none" : "border-input focus-within:border-primary focus-within:ring-primary/20 focus-within:ring-1"} overflow-hidden rounded-md`}
@@ -169,8 +169,8 @@ export function IEEE754Converter({
               <div className="space-y-2">
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wider uppercase">
                   {converterMode === "decToIeee"
-                    ? t("simulator.numbers.resultUpper", "ERGEBNIS")
-                    : t("simulator.numbers.decResultUpper", "DEZIMALWERT")}
+                    ? t("simulator.numbers.resultUpper")
+                    : t("simulator.numbers.decResultUpper")}
                 </div>
 
                 {converterMode === "decToIeee" ? (
@@ -208,10 +208,7 @@ export function IEEE754Converter({
                     <div className="text-muted-foreground py-4 text-sm">
                       {locked
                         ? "--------"
-                        : t(
-                            "simulator.numbers.enterValidNumber",
-                            "Bitte eine gültige Zahl eingeben.",
-                          )}
+                        : t("simulator.numbers.enterValidNumber")}
                     </div>
                   )
                 ) : // IEEE TO DEC RESULT DISPLAY
@@ -227,10 +224,7 @@ export function IEEE754Converter({
                   <div className="text-muted-foreground py-4 text-sm">
                     {locked
                       ? "--------"
-                      : t(
-                          "simulator.numbers.enterValid32Bit",
-                          "Bitte genau 32 Bits (0 oder 1) eingeben.",
-                        )}
+                      : t("simulator.numbers.enterValid32Bit")}
                   </div>
                 )}
               </div>
@@ -241,43 +235,25 @@ export function IEEE754Converter({
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 shadow-sm">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
                 <AlertTriangle className="h-5 w-5" />
-                {t(
-                  "simulator.numbers.specialCase",
-                  "Sonderfall / Special Case",
-                )}
+                {t("simulator.numbers.specialCase")}
               </h3>
               <div className="text-sm text-amber-800 dark:text-amber-300/80">
                 {isZero && (
                   <p>
-                    <strong>
-                      {t("simulator.numbers.zero", "Null (Zero):")}
-                    </strong>{" "}
-                    {t(
-                      "simulator.numbers.zeroDesc",
-                      "Exponent und Mantisse sind logisch 0. Es gibt eine +0 und -0, je nach Vorzeichen-Bit.",
-                    )}
+                    <strong>{t("simulator.numbers.zero")}</strong>{" "}
+                    {t("simulator.numbers.zeroDesc")}
                   </p>
                 )}
                 {isInf && (
                   <p>
-                    <strong>
-                      {t("simulator.numbers.infinity", "Unendlich (Infinity):")}
-                    </strong>{" "}
-                    {t(
-                      "simulator.numbers.infDesc",
-                      "Exponent besteht nur aus Einsen (255), Mantisse ist 0. Vorzeichen entscheidet über +Inf oder -Inf.",
-                    )}
+                    <strong>{t("simulator.numbers.infinity")}</strong>{" "}
+                    {t("simulator.numbers.infDesc")}
                   </p>
                 )}
                 {isNaNVal && (
                   <p>
-                    <strong>
-                      {t("simulator.numbers.nan", "Not a Number (NaN):")}
-                    </strong>{" "}
-                    {t(
-                      "simulator.numbers.nanDesc",
-                      "Exponent besteht nur aus Einsen (255), Mantisse ist ungleich 0. Repräsentiert ungültige Operationen wie 0/0.",
-                    )}
+                    <strong>{t("simulator.numbers.nan")}</strong>{" "}
+                    {t("simulator.numbers.nanDesc")}
                   </p>
                 )}
               </div>
@@ -285,66 +261,58 @@ export function IEEE754Converter({
           )}
         </div>
 
-        {/* Dynamic Explanation Panel */}
         <div className="bg-muted/30 border-border/50 max-h-200 overflow-auto rounded-xl border p-6 shadow-sm xl:max-h-150">
           {locked ? (
-            <div className="flex h-full flex-col items-center justify-center space-y-4 py-12 text-center">
-              <LockKeyhole className="text-muted-foreground h-12 w-12 opacity-50" />
-              <div>
-                <p className="text-foreground mb-1 font-medium">
-                  {t("simulator.numbers.lockedTitle", "Lösung gesperrt")}
-                </p>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  {t(
-                    "simulator.numbers.lockedDesc",
-                    "Klicke auf den Button, um das Ergebnis und den Rechenweg anzuzeigen.",
-                  )}
-                </p>
-              </div>
-              <button
-                onClick={onShowSolution}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 font-medium shadow-sm transition-colors"
-              >
-                {t("simulator.numbers.showSolution", "Lösung anzeigen")}
-              </button>
-            </div>
+            <ExerciseValidationPanel
+              expectedResult={
+                converterMode === "decToIeee"
+                  ? isNaNVal
+                    ? ["NaN", "nan"]
+                    : [
+                        sign + exponent + mantissa,
+                        `${sign} ${exponent} ${mantissa}`,
+                      ]
+                  : isNaNVal
+                    ? ["NaN", "nan"]
+                    : Object.is(floatVal, -0)
+                      ? ["-0", "0"]
+                      : [floatVal.toString()]
+              }
+              onShowSolution={onShowSolution!}
+              placeholder={
+                converterMode === "decToIeee"
+                  ? "z.B. 0 10000000 0000000..."
+                  : "z.B. 12.5"
+              }
+            />
           ) : (
             <>
               <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
                 <Info className="text-primary h-5 w-5" />
-                {t("simulator.numbers.conceptPath", "Rechenweg & Konzept")}
+                {t("simulator.numbers.conceptPath")}
               </h3>
 
               {!isValid && !isNaNVal ? (
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    "simulator.numbers.enterValueForExp",
-                    "Gültige Zahl eingeben für Erklärung.",
-                  )}
+                  {t("simulator.numbers.enterValueForExp")}
                 </p>
               ) : isSpecial || isNaNVal ? (
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    "simulator.numbers.specialCaseNoMath",
-                    "Für Sonderfälle gibt es keinen regulären Rechenweg durch Normierung. Die Repräsentation ist im Standard fest definiert (siehe Sonderfall-Box links).",
-                  )}
+                  {t("simulator.numbers.specialCaseNoMath")}
                 </p>
               ) : converterMode === "decToIeee" ? (
                 // EXISTING DEC TO IEEE EXPLANATION
                 <div className="space-y-6">
                   <div className="space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                      {t("simulator.numbers.step1Sign", "1. Vorzeichen (Sign)")}
+                      {t("simulator.numbers.step1Sign")}
                     </div>
                     <div className="bg-background flex items-center justify-between rounded-lg border border-blue-500/20 p-4 shadow-inner">
                       <span className="text-muted-foreground text-sm">
-                        {t(
-                          "simulator.numbers.isNegative",
-                          "Ist die Zahl negativ?",
-                        )}{" "}
+                        {t("simulator.numbers.isNegative")}{" "}
                         {floatVal < 0
-                          ? t("simulator.numbers.yes", "Ja")
-                          : t("simulator.numbers.no", "Nein")}
+                          ? t("simulator.numbers.yes")
+                          : t("simulator.numbers.no")}
                       </span>
                       <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400">
                         {sign}
@@ -354,18 +322,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="text-foreground mt-4 mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t(
-                        "simulator.numbers.step2Norm",
-                        "2. Binäre Basis-Konvertierung & Normierung",
-                      )}
+                      {t("simulator.numbers.step2Norm")}
                     </div>
                     <div className="bg-background border-border/40 text-muted-foreground space-y-2 rounded-lg border p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.normDesc",
-                          "Umwandlung der Zahl in Binärform und Verschiebung des Kommas, bis genau eine 1 vor dem Komma steht.",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.normDesc")}</p>
                       <div className="bg-muted/50 border-border/40 text-foreground mt-2 rounded border p-2 text-center font-mono">
                         X.X &rarr;{" "}
                         <span className="text-primary font-bold">1</span>.XXX
@@ -375,26 +335,19 @@ export function IEEE754Converter({
                         </sup>
                       </div>
                       <p className="text-primary border-primary mt-2 border-l-2 pl-2 text-xs font-medium">
-                        {t(
-                          "simulator.numbers.normSubDesc",
-                          "Das Komma wurde so verschoben, dass der Exponent y = {{val}} beträgt.",
-                          { val: expVal - 127 },
-                        )}
+                        {t("simulator.numbers.normSubDesc", {
+                          val: expVal - 127,
+                        })}
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-4 space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-green-600 uppercase dark:text-green-400">
-                      {t("simulator.numbers.step3Exp", "3. Exponent (Bias)")}
+                      {t("simulator.numbers.step3Exp")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-green-500/20 p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.biasDesc",
-                          "Der IEEE 754 Standard fügt einen Bias von 127 zum tatsächlichen Exponenten hinzu, um negative Exponenten ohne Vorzeichen speichern zu können.",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.biasDesc")}</p>
                       <div className="bg-muted/50 flex items-center justify-center gap-4 rounded p-2 font-mono">
                         <span>{expVal - 127}</span>
                         <span>+</span>
@@ -405,7 +358,7 @@ export function IEEE754Converter({
                         </span>
                       </div>
                       <p className="text-center">
-                        {t("simulator.numbers.binaryMode", "Binär:")}{" "}
+                        {t("simulator.numbers.binaryMode")}{" "}
                         <strong className="tracking-widest text-green-600 dark:text-green-400">
                           {exponent}
                         </strong>
@@ -415,29 +368,13 @@ export function IEEE754Converter({
 
                   <div className="mt-4 space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-orange-600 uppercase dark:text-orange-400">
-                      {t(
-                        "simulator.numbers.step4Mantissa",
-                        "4. Mantisse & Hidden Bit",
-                      )}
+                      {t("simulator.numbers.step4Mantissa")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.mantissaDesc",
-                          "Die Mantisse speichert die Nachkommastellen nach der Normierung.",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.mantissaDesc")}</p>
                       <p className="border-l-2 border-orange-500/50 pl-2 text-xs">
-                        <strong>
-                          {t(
-                            "simulator.numbers.hiddenBitTitle",
-                            "Das Hidden Bit:",
-                          )}
-                        </strong>{" "}
-                        {t(
-                          "simulator.numbers.hiddenBitDesc",
-                          "Da durch die Normierung immer eine 1 vor dem Komma steht (außer bei 0), wird diese 1 nicht abgespeichert, um 1 Bit Platz zu sparen.",
-                        )}
+                        <strong>{t("simulator.numbers.hiddenBitTitle")}</strong>{" "}
+                        {t("simulator.numbers.hiddenBitDesc")}
                       </p>
                       <p className="bg-muted/50 mt-2 rounded p-2 text-center font-mono tracking-widest break-all text-orange-600 dark:text-orange-400">
                         {mantissa}
@@ -450,17 +387,14 @@ export function IEEE754Converter({
                 <div className="space-y-6">
                   <div className="space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                      {t("simulator.numbers.step1Sign", "1. Vorzeichen (Sign)")}
+                      {t("simulator.numbers.step1Sign")}
                     </div>
                     <div className="bg-background flex items-center justify-between rounded-lg border border-blue-500/20 p-4 shadow-inner">
                       <span className="text-muted-foreground text-sm">
-                        {t(
-                          "simulator.numbers.isNegative",
-                          "Ist die Zahl negativ?",
-                        )}{" "}
+                        {t("simulator.numbers.isNegative")}{" "}
                         {sign === "1"
-                          ? t("simulator.numbers.yes", "Ja")
-                          : t("simulator.numbers.no", "Nein")}
+                          ? t("simulator.numbers.yes")
+                          : t("simulator.numbers.no")}
                       </span>
                       <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400">
                         {sign}
@@ -470,18 +404,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="mt-4 mb-2 text-xs font-semibold tracking-wider text-green-600 uppercase dark:text-green-400">
-                      {t(
-                        "simulator.numbers.step2ExpExtract",
-                        "2. Exponenten-Wert extrahieren",
-                      )}
+                      {t("simulator.numbers.step2ExpExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground rounded-lg border border-green-500/20 p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.expBinToDecDesc",
-                          "Der 8-Bit Exponent wird als positive ganze Zahl (Unsigned) gelesen und die Bias (127) abgezogen:",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.expBinToDecDesc")}</p>
                       <div className="bg-muted/50 mt-2 flex flex-col justify-center gap-2 rounded p-2 text-center font-mono">
                         <span className="font-bold tracking-widest text-green-600 dark:text-green-400">
                           {exponent}₂
@@ -502,18 +428,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="mt-4 mb-2 text-xs font-semibold tracking-wider text-orange-600 uppercase dark:text-orange-400">
-                      {t(
-                        "simulator.numbers.step3MantExtract",
-                        "3. Mantisse (Nachkommastellen) auflösen",
-                      )}
+                      {t("simulator.numbers.step3MantExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.mantissaBinToDecDesc",
-                          "Der reale Mantissen-Wert errechnet sich aus dem impliziten 'Hidden Bit' (1 + Bruchwert). Jedes Bit n nach dem Komma wird mit 2^(-n) multipliziert:",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.mantissaBinToDecDesc")}</p>
                       <div className="bg-muted/50 mt-2 w-full truncate rounded p-2 text-center font-mono tracking-widest text-orange-600 dark:text-orange-400">
                         1.{mantissa}
                       </div>
@@ -535,11 +453,7 @@ export function IEEE754Converter({
 
                       <div className="border-border/40 mt-2 flex flex-col items-center justify-center gap-1 border-t pt-2">
                         <span className="text-xs">
-                          {t(
-                            "simulator.numbers.fractionSum",
-                            "Summe der gebrochenen Potenzen",
-                          )}
-                          : {sumOfFractions}
+                          {t("simulator.numbers.fractionSum")}: {sumOfFractions}
                         </span>
                         <span className="text-foreground font-bold">
                           = 1.0 + {sumOfFractions} = {1 + sumOfFractions}
@@ -550,18 +464,10 @@ export function IEEE754Converter({
 
                   <div className="mt-4 space-y-1">
                     <div className="text-primary mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t(
-                        "simulator.numbers.step4FinalCalc",
-                        "4. Finale Verrechnung aller Komponenten",
-                      )}
+                      {t("simulator.numbers.step4FinalCalc")}
                     </div>
                     <div className="bg-background border-primary/20 text-muted-foreground space-y-2 rounded-lg border p-4 text-sm shadow-inner">
-                      <p>
-                        {t(
-                          "simulator.numbers.finalFormulaDesc",
-                          "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
-                        )}
-                      </p>
+                      <p>{t("simulator.numbers.finalFormulaDesc")}</p>
                       <div className="bg-muted/50 mt-2 flex flex-wrap items-center justify-center gap-4 rounded p-3 font-mono">
                         <span>
                           (-1)

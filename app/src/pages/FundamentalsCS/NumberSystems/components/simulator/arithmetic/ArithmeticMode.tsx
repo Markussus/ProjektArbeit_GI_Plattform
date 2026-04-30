@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { Addition } from "./Addition";
 import { Subtraction } from "./Subtraction";
 import { Multiplication } from "./Multiplication";
@@ -38,48 +39,48 @@ export function ArithmeticMode({
   const [activeSubMode, setActiveSubMode] =
     useState<ArithmeticModeType>(initialMode);
 
+  const modeSelector = (
+    <div>
+      <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
+        {t("simulator.arithmetic.selectMode")}
+      </label>
+      <DropdownSelect
+        value={activeSubMode}
+        options={[
+          {
+            value: "addition",
+            label: t("simulator.arithmetic.modes.addition"),
+          },
+          {
+            value: "subtraction",
+            label: t("simulator.arithmetic.modes.subtraction"),
+          },
+          {
+            value: "multiplication",
+            label: t("simulator.arithmetic.modes.multiplication"),
+          },
+          {
+            value: "division",
+            label: t("simulator.arithmetic.modes.division"),
+          },
+          {
+            value: "shifting",
+            label: t("simulator.arithmetic.modes.shifting"),
+          },
+          { value: "ieee754", label: t("simulator.arithmetic.modes.ieee754") },
+          { value: "compare", label: t("simulator.arithmetic.modes.compare") },
+        ]}
+        onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
+        ariaLabel={t("simulator.arithmetic.selectMode")}
+        disabled={!!isExerciseMode && !showSolution}
+        triggerClassName="w-full px-3 py-2 text-sm font-normal"
+        menuClassName="w-full"
+      />
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Sub-Mode Selector */}
-      <div className="bg-card border-border/50 flex flex-col justify-between gap-4 rounded-xl border p-4 shadow-sm sm:flex-row sm:items-center">
-        <label className="text-foreground text-sm font-medium whitespace-nowrap">
-          {t("simulator.arithmetic.selectMode", "Rechenoperation wählen")}:
-        </label>
-        <select
-          value={activeSubMode}
-          onChange={(e) =>
-            setActiveSubMode(e.target.value as ArithmeticModeType)
-          }
-          disabled={!!isExerciseMode && !showSolution}
-          className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50 sm:w-auto"
-        >
-          <option value="addition">
-            {t("simulator.arithmetic.modes.addition", "Addition")}
-          </option>
-          <option value="subtraction">
-            {t(
-              "simulator.arithmetic.modes.subtraction",
-              "Subtraktion via 2er-Komplement",
-            )}
-          </option>
-          <option value="multiplication">
-            {t("simulator.arithmetic.modes.multiplication", "Multiplikation")}
-          </option>
-          <option value="division">
-            {t("simulator.arithmetic.modes.division", "Division")}
-          </option>
-          <option value="shifting">
-            {t("simulator.arithmetic.modes.shifting", "Bit-Shifting")}
-          </option>
-          <option value="ieee754">
-            {t("simulator.arithmetic.modes.ieee754", "IEEE 754 Addition")}
-          </option>
-          <option value="compare">
-            {t("simulator.arithmetic.modes.compare", "Vergleich (Bit für Bit)")}
-          </option>
-        </select>
-      </div>
-
       {/* Render Active Operation Component */}
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         {activeSubMode === "addition" && (
@@ -89,6 +90,7 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             initialA={initialValueA}
             initialB={initialValueB}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "subtraction" && (
@@ -98,6 +100,7 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             initialA={initialValueA}
             initialB={initialValueB}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "multiplication" && (
@@ -107,6 +110,7 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             initialA={initialValueA}
             initialB={initialValueB}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "division" && (
@@ -116,6 +120,7 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             initialA={initialValueA}
             initialB={initialValueB}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "shifting" && (
@@ -124,6 +129,7 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             initialA={initialValueA}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "ieee754" && (
@@ -131,6 +137,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            renderModeSelector={modeSelector}
           />
         )}
         {activeSubMode === "compare" && (
@@ -140,6 +147,7 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             initialA={initialValueA}
             initialB={initialValueB}
+            renderModeSelector={modeSelector}
           />
         )}
       </div>

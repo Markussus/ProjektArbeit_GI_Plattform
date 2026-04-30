@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
-import { Info, LockKeyhole, ArrowRight } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
+import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
 type BaseType = "dec" | "bin" | "oct" | "hex";
 
@@ -10,6 +12,7 @@ interface IntegerConverterProps {
   onShowSolution?: () => void;
   initialValue?: string;
   initialBase?: BaseType;
+  initialTargetBase?: BaseType;
 }
 
 export function IntegerConverter({
@@ -18,19 +21,54 @@ export function IntegerConverter({
   onShowSolution,
   initialValue = "",
   initialBase = "dec",
+  initialTargetBase = "bin",
 }: IntegerConverterProps) {
   const { t } = useTranslation("translation");
-  const [sourceBase, setSourceBase] = useState<BaseType>(() =>
-    isExerciseMode && initialValue ? initialBase : "dec",
-  );
+  const [sourceBase, setSourceBase] = useState<BaseType>("dec");
   const [targetBase, setTargetBase] = useState<BaseType>("bin");
-  const [inputValue, setInputValue] = useState<string>(() =>
-    isExerciseMode && initialValue ? initialValue : "255",
-  );
+  const [inputValue, setInputValue] = useState<string>("255");
+
+  useEffect(() => {
+    if (isExerciseMode && initialValue) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSourceBase(initialBase);
+      setTargetBase(initialTargetBase);
+      setInputValue(initialValue);
+    }
+  }, [isExerciseMode, initialValue, initialBase, initialTargetBase]);
+
+  const handleSourceBaseChange = (newBase: BaseType) => {
+    setSourceBase(newBase);
+
+    let cleanV = inputValue;
+    if (newBase === "bin") cleanV = cleanV.replace(/[^01]/g, "");
+    else if (newBase === "oct") cleanV = cleanV.replace(/[^0-7]/g, "");
+    else if (newBase === "dec") cleanV = cleanV.replace(/[^0-9]/g, "");
+    else if (newBase === "hex") cleanV = cleanV.replace(/[^0-9A-Fa-f]/g, "");
+
+    const limits = { bin: 16, oct: 6, dec: 5, hex: 4 };
+    if (cleanV.length > limits[newBase]) {
+      cleanV = cleanV.slice(0, limits[newBase]);
+    }
+
+    setInputValue(cleanV);
+  };
 
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;
-    setInputValue(v);
+
+    let cleanV = v;
+    if (sourceBase === "bin") cleanV = cleanV.replace(/[^01]/g, "");
+    else if (sourceBase === "oct") cleanV = cleanV.replace(/[^0-7]/g, "");
+    else if (sourceBase === "dec") cleanV = cleanV.replace(/[^0-9]/g, "");
+    else if (sourceBase === "hex") cleanV = cleanV.replace(/[^0-9A-Fa-f]/g, "");
+
+    const limits = { bin: 16, oct: 6, dec: 5, hex: 4 };
+    if (cleanV.length > limits[sourceBase]) {
+      cleanV = cleanV.slice(0, limits[sourceBase]);
+    }
+
+    setInputValue(cleanV);
   };
 
   const decValue = useMemo(() => {
@@ -75,12 +113,10 @@ export function IntegerConverter({
   const baseToNumber = (base: BaseType) =>
     base === "dec" ? 10 : base === "bin" ? 2 : base === "oct" ? 8 : 16;
   const baseLabel = (base: BaseType) => {
-    if (base === "dec")
-      return t("simulator.numbers.decimal", "Dezimal (Basis 10)");
-    if (base === "bin") return t("simulator.numbers.binary", "Binär (Basis 2)");
-    if (base === "oct") return t("simulator.numbers.octal", "Oktal (Basis 8)");
-    if (base === "hex")
-      return t("simulator.numbers.hex", "Hexadezimal (Basis 16)");
+    if (base === "dec") return t("simulator.numbers.decimal");
+    if (base === "bin") return t("simulator.numbers.binary");
+    if (base === "oct") return t("simulator.numbers.octal");
+    if (base === "hex") return t("simulator.numbers.hex");
     return "";
   };
 
@@ -144,32 +180,21 @@ export function IntegerConverter({
       <div className="space-y-3">
         <p className="text-foreground text-sm font-medium">
           {isBin
-            ? t(
-                "simulator.numbers.binToDec",
-                "Binär zu Dezimal (Summe der Potenzen)",
-              )
-            : `${baseLabel(sourceBase)} ${t("simulator.numbers.toDec", "zu Dezimal")}`}
+            ? t("simulator.numbers.binToDec")
+            : `${baseLabel(sourceBase)} ${t("simulator.numbers.toDec")}`}
         </p>
         <p className="text-muted-foreground mb-2 text-xs">
           {isBin
-            ? t(
-                "simulator.numbers.binToDecDesc",
-                "Jede Ziffer wird mit der entsprechenden Potenz der Basis 2 multipliziert und addiert.",
-              )
-            : t(
-                "simulator.numbers.otherToDecDesc",
-                "Die Konvertierung funktioniert analog mit der Summe der Potenzen zur Basis {{base}}.",
-                { base: baseToNumber(sourceBase) },
-              )}
+            ? t("simulator.numbers.binToDecDesc")
+            : t("simulator.numbers.otherToDecDesc", {
+                base: baseToNumber(sourceBase),
+              })}
         </p>
         <div className="bg-background border-border/40 space-y-2 overflow-x-auto rounded-lg border p-4 font-mono text-sm whitespace-nowrap shadow-inner">
           {isBin && (
             <div className="text-muted-foreground border-border/40 mb-2 flex gap-2 border-b pb-2">
               {steps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className="flex min-w-[60px] flex-col items-center"
-                >
+                <div key={idx} className="flex min-w-15 flex-col items-center">
                   <span className="text-xs">
                     {baseToNumber(sourceBase)}
                     <sup>{step.power}</sup>
@@ -196,7 +221,7 @@ export function IntegerConverter({
             ))}
           </div>
           <div className="text-foreground mt-2 flex flex-wrap items-center gap-1 leading-8">
-            <span className="w-[20px]">=</span>
+            <span className="w-5">=</span>
             {steps.map((step, idx) => (
               <span key={idx} className="flex items-center">
                 <span>{step.termVal.toString()}</span>
@@ -223,34 +248,32 @@ export function IntegerConverter({
       <div className="space-y-3">
         <p className="text-foreground text-sm font-medium">
           {targetBase === "bin"
-            ? t(
-                "simulator.numbers.decToBin",
-                "Dezimal zu Binär (Division durch 2)",
-              )
-            : `Dezimal zu ${baseLabel(targetBase)}`}
+            ? t("simulator.numbers.decToBin")
+            : t("simulator.numbers.decToTarget", {
+                target: String(baseLabel(targetBase)),
+              })}
         </p>
         <p className="text-muted-foreground mb-2 text-xs">
           {targetBase === "bin"
-            ? t(
-                "simulator.numbers.decToBinDesc",
-                "Die Zahl wird fortlaufend durch die Basis 2 geteilt. Die Reste, von unten nach oben gelesen, ergeben die Binärzahl.",
-              )
-            : `Die Zahl wird fortlaufend durch die Basis ${baseToNumber(targetBase)} geteilt. Die Reste, von unten nach oben gelesen, ergeben das Resultat.`}
+            ? t("simulator.numbers.decToBinDesc")
+            : t("simulator.numbers.divByBaseDesc", {
+                base: Number(baseToNumber(targetBase)),
+              })}
         </p>
         <div className="bg-background border-border/40 space-y-2 rounded-lg border p-4 font-mono text-sm shadow-inner">
           {steps.map((step, idx) => (
             <div key={idx} className="flex items-center gap-3">
-              <div className="w-[120px] text-right">
+              <div className="w-30 text-right">
                 {step.value.toString()} : {step.base}
               </div>
-              <div className="w-[20px] text-center">=</div>
-              <div className="w-[80px] text-right">
+              <div className="w-5 text-center">=</div>
+              <div className="w-20 text-right">
                 {step.value / BigInt(step.base)}
               </div>
-              <div className="text-muted-foreground w-[85px] text-right whitespace-nowrap">
-                {t("simulator.numbers.remainder", "Rest")}
+              <div className="text-muted-foreground w-21.25 text-right whitespace-nowrap">
+                {t("simulator.numbers.remainder")}
               </div>
-              <div className="text-primary w-[20px] text-right font-bold">
+              <div className="text-primary w-5 text-right font-bold">
                 {targetBase === "hex" && step.remainder > 9n
                   ? step.remainder.toString(16).toUpperCase()
                   : step.remainder.toString()}
@@ -258,9 +281,9 @@ export function IntegerConverter({
             </div>
           ))}
         </div>
-        <div className="mt-2 mt-4 flex justify-end text-sm font-semibold">
+        <div className="mt-4 flex justify-end text-sm font-semibold">
           <span className="bg-primary/10 text-primary flex items-center gap-2 rounded-md px-3 py-1">
-            {t("simulator.numbers.result", "Ergebnis:")}{" "}
+            {t("simulator.numbers.result")}{" "}
             <span className="tracking-widest">{targetValue}</span>
           </span>
         </div>
@@ -274,63 +297,53 @@ export function IntegerConverter({
         {/* Converter Inputs */}
         <div className="bg-card border-border/50 rounded-xl border p-6 shadow-sm">
           <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
-            {t("simulator.numbers.converter", "Konverter")}
+            {t("simulator.numbers.converter")}
           </h3>
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                  {t("simulator.numbers.fromBase", "Von System")}
+                  {t("simulator.numbers.fromBase")}
                 </label>
-                <select
+                <DropdownSelect
                   value={sourceBase}
-                  onChange={(e) => setSourceBase(e.target.value as BaseType)}
+                  options={[
+                    { value: "dec", label: t("simulator.numbers.decimal") },
+                    { value: "bin", label: t("simulator.numbers.binary") },
+                    { value: "oct", label: t("simulator.numbers.octal") },
+                    { value: "hex", label: t("simulator.numbers.hex") },
+                  ]}
+                  onChange={handleSourceBaseChange}
+                  ariaLabel={t("simulator.numbers.fromBase")}
                   disabled={!!isExerciseMode && !showSolution}
-                  className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
-                >
-                  <option value="dec">
-                    {t("simulator.numbers.decimal", "Dezimal (Basis 10)")}
-                  </option>
-                  <option value="bin">
-                    {t("simulator.numbers.binary", "Binär (Basis 2)")}
-                  </option>
-                  <option value="oct">
-                    {t("simulator.numbers.octal", "Oktal (Basis 8)")}
-                  </option>
-                  <option value="hex">
-                    {t("simulator.numbers.hex", "Hexadezimal (Basis 16)")}
-                  </option>
-                </select>
+                  triggerClassName="w-full px-3 py-2 text-sm font-normal"
+                  menuClassName="w-full"
+                />
               </div>
               <div>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                  {t("simulator.numbers.toBase", "Nach System")}
+                  {t("simulator.numbers.toBase")}
                 </label>
-                <select
+                <DropdownSelect
                   value={targetBase}
-                  onChange={(e) => setTargetBase(e.target.value as BaseType)}
+                  options={[
+                    { value: "dec", label: t("simulator.numbers.decimal") },
+                    { value: "bin", label: t("simulator.numbers.binary") },
+                    { value: "oct", label: t("simulator.numbers.octal") },
+                    { value: "hex", label: t("simulator.numbers.hex") },
+                  ]}
+                  onChange={setTargetBase}
+                  ariaLabel={t("simulator.numbers.toBase")}
                   disabled={!!isExerciseMode && !showSolution}
-                  className="bg-background border-input focus:ring-primary/50 text-foreground w-full rounded-md border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
-                >
-                  <option value="dec">
-                    {t("simulator.numbers.decimal", "Dezimal (Basis 10)")}
-                  </option>
-                  <option value="bin">
-                    {t("simulator.numbers.binary", "Binär (Basis 2)")}
-                  </option>
-                  <option value="oct">
-                    {t("simulator.numbers.octal", "Oktal (Basis 8)")}
-                  </option>
-                  <option value="hex">
-                    {t("simulator.numbers.hex", "Hexadezimal (Basis 16)")}
-                  </option>
-                </select>
+                  triggerClassName="w-full px-3 py-2 text-sm font-normal"
+                  menuClassName="w-full"
+                />
               </div>
             </div>
 
             <div className={locked ? "opacity-60" : ""}>
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                {t("simulator.numbers.valueLabel", "Eingabewert")}
+                {t("simulator.numbers.valueLabel")}
               </label>
               <input
                 type="text"
@@ -338,14 +351,20 @@ export function IntegerConverter({
                 onChange={(e) => handleInputChange(e.target.value)}
                 readOnly={locked}
                 placeholder="..."
+                maxLength={
+                  sourceBase === "bin"
+                    ? 16
+                    : sourceBase === "oct"
+                      ? 6
+                      : sourceBase === "dec"
+                        ? 5
+                        : 4
+                }
                 className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
               />
               {inputValue !== "" && decValue === "" && (
                 <p className="text-destructive mt-1 text-xs">
-                  {t(
-                    "simulator.numbers.invalidInputBase",
-                    "Ungültige Eingabe für die Basis",
-                  )}{" "}
+                  {t("simulator.numbers.invalidInputBase")}{" "}
                   {baseToNumber(sourceBase)}.
                 </p>
               )}
@@ -353,9 +372,9 @@ export function IntegerConverter({
 
             <div className="border-border/40 border-t pt-4">
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                {t("simulator.numbers.resultLabel", "Ergebnis:")}
+                {t("simulator.numbers.resultLabel")}
               </label>
-              <div className="text-primary bg-primary/5 border-primary/20 flex min-h-[54px] items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
+              <div className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
                 {!locked && decValue !== ""
                   ? targetValue
                   : locked
@@ -367,60 +386,34 @@ export function IntegerConverter({
         </div>
 
         {/* Dynamic Explanation Panel */}
-        <div className="bg-muted/30 border-border/50 max-h-[500px] overflow-auto rounded-xl border p-6 shadow-sm">
+        <div className="bg-muted/30 border-border/50 max-h-125 overflow-auto rounded-xl border p-6 shadow-sm">
           {locked ? (
-            <div className="flex h-full flex-col items-center justify-center space-y-4 py-12 text-center">
-              <LockKeyhole className="text-muted-foreground h-12 w-12 opacity-50" />
-              <div>
-                <p className="text-foreground mb-1 font-medium">
-                  {t("simulator.numbers.lockedTitle", "Lösung gesperrt")}
-                </p>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  {t(
-                    "simulator.numbers.lockedDesc",
-                    "Klicke auf den Button, um das Ergebnis und den Rechenweg anzuzeigen.",
-                  )}
-                </p>
-              </div>
-              <button
-                onClick={onShowSolution}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 font-medium shadow-sm transition-colors"
-              >
-                {t("simulator.numbers.showSolution", "Lösung anzeigen")}
-              </button>
-            </div>
+            <ExerciseValidationPanel
+              expectedResult={targetValue}
+              onShowSolution={onShowSolution!}
+              placeholder={`z.B. ${targetBase === "bin" ? "10110" : targetBase === "hex" ? "2A" : "42"}`}
+            />
           ) : (
             <>
               <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
                 <Info className="text-primary h-5 w-5" />
-                {t("simulator.numbers.explanation", "Erklärungsmodus")}
+                {t("simulator.numbers.explanation")}
               </h3>
 
               {!decValue ? (
                 <p className="text-muted-foreground text-sm">
-                  {t(
-                    "simulator.numbers.enterValue",
-                    "Geben Sie eine Zahl ein, um den Rechenweg zu sehen.",
-                  )}
+                  {t("simulator.numbers.enterValue")}
                 </p>
               ) : sourceBase === targetBase ? (
                 <div className="text-muted-foreground flex flex-col items-center justify-center py-8">
                   <ArrowRight className="mb-2 h-8 w-8 opacity-20" />
-                  <p className="text-sm">
-                    {t(
-                      "simulator.numbers.sameBase",
-                      "Die Eingabe- und Zielbasis sind identisch.",
-                    )}
-                  </p>
+                  <p className="text-sm">{t("simulator.numbers.sameBase")}</p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {showToDecSteps && showFromDecSteps && (
                     <div className="bg-popover/50 border-primary text-muted-foreground rounded-r-md border-l-4 p-3 text-sm">
-                      {t(
-                        "simulator.numbers.nonDecConvHint",
-                        "Die Konvertierung zwischen zwei nicht-dezimalen Systemen erfolgt am einfachsten über den Zwischenschritt der Umrechnung zum Dezimalsystem.",
-                      )}
+                      {t("simulator.numbers.nonDecConvHint")}
                     </div>
                   )}
 
@@ -428,10 +421,7 @@ export function IntegerConverter({
                     <div>
                       {showFromDecSteps && (
                         <h4 className="text-muted-foreground border-border/50 mb-3 border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                          {t(
-                            "simulator.numbers.step1TempDec",
-                            "Schritt 1: Zu Dezimal konvertieren",
-                          )}
+                          {t("simulator.numbers.step1TempDec")}
                         </h4>
                       )}
                       {renderToDec()}
@@ -446,10 +436,7 @@ export function IntegerConverter({
                     <div>
                       {showToDecSteps && (
                         <h4 className="text-muted-foreground border-border/50 mb-3 border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                          {t(
-                            "simulator.numbers.step2TempTarget",
-                            "Schritt 2: In das Zielsystem konvertieren",
-                          )}
+                          {t("simulator.numbers.step2TempTarget")}
                         </h4>
                       )}
                       {renderFromDec()}
