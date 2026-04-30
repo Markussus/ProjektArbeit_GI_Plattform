@@ -74,6 +74,8 @@ export function ExpressionBuilder() {
           />
           <textarea
             ref={inputRef}
+            id="dnf-expression-input"
+            aria-label={t("dnf.builder.inputTitle")}
             value={inputValue}
             onChange={(event) => handleSourceChange(event.target.value)}
             onBlur={(event) =>
