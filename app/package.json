@@ -17,7 +17,7 @@
     "preview": "vite preview",
     "build:preview:open": "tsc -b && vite build && vite preview --open",
     "e2e-test": "playwright test",
-    "e2e-tesjt:open": "playwright test --ui",
+    "e2e-test:open": "playwright test --ui",
     "e2e-test:report": "playwright show-report",
     "preview:ci": "vite preview --host 127.0.0.1 --strictPort",
     "lhci:config": "node scripts/sync-lighthouserc-from-module-catalog.mjs",
