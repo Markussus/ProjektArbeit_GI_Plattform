@@ -1,0 +1,200 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{berichtvorlage}[02.04.2026 Schlanke Vorlage für Berichte]
+
+% --- Notwendige Pakete ---
+\RequirePackage[T1]{fontenc}
+\RequirePackage[ngerman]{babel}
+\RequirePackage[a4paper,margin=20mm]{geometry}
+\RequirePackage{lmodern}
+\RequirePackage{parskip}
+\RequirePackage{fancyhdr}
+\RequirePackage[hidelinks,hypertexnames=false]{hyperref}
+
+% --- Gliederung bis Ebene 4 (section ... subparagraph) ---
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+% \paragraph und \subparagraph als Block-Ueberschriften statt Run-In
+\makeatletter
+\renewcommand\paragraph{%
+	\@startsection{paragraph}{4}{\z@}%
+		{3.25ex \@plus 1ex \@minus .2ex}%
+		{1.5ex \@plus .2ex}%
+		{\normalfont\normalsize\bfseries}%
+}
+\renewcommand\subparagraph{%
+	\@startsection{subparagraph}{5}{\z@}%
+		{3.25ex \@plus 1ex \@minus .2ex}%
+		{1.5ex \@plus .2ex}%
+		{\normalfont\normalsize\bfseries}%
+}
+\makeatother
+
+% --- Header / Footer: je 3 Spalten, einzeln setzbar ---
+\makeatletter
+\newcommand{\PBV@HeaderLeft}{}
+\newcommand{\PBV@HeaderCenter}{}
+\newcommand{\PBV@HeaderRight}{}
+\newcommand{\PBV@FooterLeft}{}
+\newcommand{\PBV@FooterCenter}{}
+\newcommand{\PBV@FooterRight}{}
+
+\newif\ifPBV@HeaderCenterSet
+\newif\ifPBV@FooterCenterSet
+\PBV@HeaderCenterSetfalse
+\PBV@FooterCenterSetfalse
+
+\newcommand{\setheaderleft}[1]{\gdef\PBV@HeaderLeft{#1}}
+\newcommand{\setheadercenter}[1]{\gdef\PBV@HeaderCenter{#1}\global\PBV@HeaderCenterSettrue}
+\newcommand{\setheaderright}[1]{\gdef\PBV@HeaderRight{#1}}
+\newcommand{\setfooterleft}[1]{\gdef\PBV@FooterLeft{#1}}
+\newcommand{\setfootercenter}[1]{\gdef\PBV@FooterCenter{#1}\global\PBV@FooterCenterSettrue}
+\newcommand{\setfooterright}[1]{\gdef\PBV@FooterRight{#1}}
+
+\newcommand{\theauthor}{\@author}
+\newcommand{\thetitle}{\@title}
+\newcommand{\thedate}{\@date}
+
+\newcommand{\PBV@ThreePartLine}[3]{%
+	\makebox[\headwidth][l]{%
+		\begin{tabular*}{\headwidth}{@{}l@{\extracolsep{\fill}}c r@{}}#1&#2&#3\end{tabular*}%
+	}%
+}
+
+\newcommand{\PBV@ApplyPageStyle}{%
+	\fancyhf{}%
+	\fancyhead[C]{\PBV@ThreePartLine{\PBV@HeaderLeft}{\PBV@HeaderCenter}{\PBV@HeaderRight}}%
+	\fancyfoot[C]{\PBV@ThreePartLine{\PBV@FooterLeft}{\PBV@FooterCenter}{\PBV@FooterRight}}%
+	\setlength{\headheight}{24pt}
+	\renewcommand{\headrulewidth}{0.4pt}%
+	\renewcommand{\footrulewidth}{0pt}%
+}
+
+\fancypagestyle{pbvstyle}{\PBV@ApplyPageStyle}
+\fancypagestyle{plain}{\PBV@ApplyPageStyle}
+
+\AtBeginDocument{%
+	\ifPBV@HeaderCenterSet\else
+		\gdef\PBV@HeaderCenter{\theauthor}%
+	\fi
+	\ifPBV@FooterCenterSet\else
+		\gdef\PBV@FooterCenter{\thepage}%
+	\fi
+	\pagestyle{pbvstyle}%
+}
+\makeatother
+
+% --- Standardtitelseite ---
+
+\renewcommand{\maketitle}{%
+	\begin{center}
+		\vspace*{12em}
+		{\LARGE\bfseries \thetitle \par}
+		\vspace{5em}
+		{\large \theauthor \par}
+		\vspace{1em}
+		{\large \thedate \par}
+	\end{center}
+}
+
+% --- Gliederungsbefehl: Ebene 0..4, optional sternfoermig, optional mit TOC-Eintrag ---
+% Verwendung:
+%	\subNsection{0}{Titel}				-> nummerierte section
+%	\subNsection{1}{Titel}				-> nummerierte subsection
+%	\subNsection*{2}{Titel}				-> unnummerierte subsubsection, nicht im TOC
+%	\subNsection*[toc]{3}{Titel}		-> unnummerierte paragraph, aber im TOC mit Link
+
+\newcommand{\PBVsubNnumbered}[2]{%
+	\ifcase#1
+		\section{#2}%
+	\or
+		\subsection{#2}%
+	\or
+		\subsubsection{#2}%
+	\or
+		\paragraph{#2}%
+	\or
+		\subparagraph{#2}%
+	\else
+		\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+	\fi
+}
+
+\newcommand{\PBVsubNstarred}[3]{%
+	\def\PBVtocarg{#3}%
+	\def\PBVtocflag{toc}%
+	\ifx\PBVtocarg\PBVtocflag
+		\phantomsection
+		\ifcase#1
+			\section*{#2}\addcontentsline{toc}{section}{#2}%
+		\or
+			\subsection*{#2}\addcontentsline{toc}{subsection}{#2}%
+		\or
+			\subsubsection*{#2}\addcontentsline{toc}{subsubsection}{#2}%
+		\or
+			\paragraph*{#2}\addcontentsline{toc}{paragraph}{#2}%
+		\or
+			\subparagraph*{#2}\addcontentsline{toc}{subparagraph}{#2}%
+		\else
+			\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+		\fi
+	\else
+		\if\relax\detokenize{#3}\relax
+			\ifcase#1
+				\section*{#2}%
+			\or
+				\subsection*{#2}%
+			\or
+				\subsubsection*{#2}%
+			\or
+				\paragraph*{#2}%
+			\or
+				\subparagraph*{#2}%
+			\else
+				\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+			\fi
+		\else
+			\PackageError{berichtvorlage}{Ungueltige Option '#3'}{Erlaubt ist nur [toc] oder keine Option.}%
+		\fi
+	\fi
+}
+
+\NewDocumentCommand{\subNsection}{s O{} m m}{%
+	\IfBooleanTF{#1}
+		{\PBVsubNstarred{#3}{#4}{#2}}%
+		{\PBVsubNnumbered{#3}{#4}}%
+}
+
+% --- Dokumentbereiche mit Seitenzahlschema ---
+\newenvironment{Cover}{%
+	\clearpage
+	\pagestyle{empty}%
+	\pagenumbering{gobble}%
+}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+}
+
+\newenvironment{PreContent}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{roman}%
+	\setcounter{page}{1}%
+}{%
+}
+
+\newenvironment{Content}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{arabic}%
+	\setcounter{page}{1}%
+}{%
+}
+
+\newenvironment{PostContent}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{roman}%
+	\setcounter{page}{1}%
+}{%
+}

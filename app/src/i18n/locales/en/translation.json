@@ -53,25 +53,6 @@
     "mooreDesc": "Sequential circuit design & state machines",
     "dnfDesc": "Disjunctive Normal Form & boolean algebra"
   },
-  "turing": {
-    "title": "Turing Machines",
-    "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed.",
-    "overviewTitle": "What is a Turing Machine?",
-    "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
-    "concepts": "Key Concepts",
-    "concept1": "Tape & Head Movement",
-    "concept2": "States & Transitions",
-    "concept3": "Acceptance & Rejection",
-    "concept4": "Church-Turing Thesis",
-    "exercise1": "Basic Transition",
-    "exercise1Desc": "Design a simple TM transition table",
-    "exercise2": "2-Tape TM Design",
-    "exercise2Desc": "Build a multi-tape Turing Machine",
-    "exercise3": "Busy Beaver Problem",
-    "exercise3Desc": "Find the maximum output for n-state TMs",
-    "exercise4": "The Halting Problem",
-    "exercise4Desc": "Prove undecidability of the halting problem"
-  },
   "automata": {
     "title": "Finite Automata",
     "description": "Study deterministic and non-deterministic finite automata. Learn how to design, minimize, and convert between different automata representations.",
@@ -360,6 +341,11 @@
     "currentExercises": "Current Exercises",
     "openInSimulation": "Open in simulation"
   },
+  "example": {
+    "label": "Example {{index}}",
+    "currentExamples": "Current Examples",
+    "openInSimulation": "Open in simulation"
+  },
   "difficulty": {
     "easy": "EASY",
     "medium": "MEDIUM",
@@ -368,6 +354,7 @@
   "simulation": {
     "taskText": "Task text",
     "selectedExercise": "Selected exercise",
+    "selectedExample": "Selected example",
     "taskTextPlaceholder": "You can add the concrete task text here later.",
     "workspace": "Simulation",
     "expand": "Expand simulation",
@@ -672,51 +659,129 @@
     }
   },
   "tm": {
+    "topic": {
+      "title": "Turing Machines",
+      "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed."
+    },
+    "overview": {
+      "overviewTitle": "What is a Turing Machine?",
+      "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
+      "concepts": "Key Concepts",
+      "concept1": "Tape & Head Movement",
+      "concept2": "States & Transitions",
+      "concept3": "Acceptance & Rejection",
+      "concept4": "Church-Turing Thesis"
+    },
+    "exercises": {
+      "exerciseEraseTape": "Erase the Tape",
+      "exerciseEraseTapeDesc": "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
+      "exerciseInvertBinaryWord": "Invert a Binary Word",
+      "exerciseInvertBinaryWordDesc": "Build a machine that flips every 0 to 1 and every 1 to 0, then halts on the first blank cell.",
+      "exerciseUnaryIncrement": "Unary Increment",
+      "exerciseUnaryIncrementDesc": "Build a machine that appends one additional 1 to the end of a unary word and then halts.",
+      "exerciseDuplicateZeros": "Duplicate Zeros",
+      "exerciseDuplicateZerosDesc": "Construct a Turing machine that doubles the number of 0s on the tape when they are enclosed by two 1s. Examples: 101 -> 1001, 1001 -> 100001.",
+      "exerciseAddBinary": "Add Binary Numbers",
+      "exerciseAddBinaryDesc": "Construct a Turing machine that is able to add two numbers in binary representation. To simplify the task, you may make assumptions. For example, you may define that the first addend (the left one) is greater than the second addend, that the read head always starts on the first input symbol, or that a specific symbol must appear between the numbers.",
+      "exerciseCheckRegex": "Check a Regular Expression",
+      "exerciseCheckRegexDesc": "Given the regular expression R1 = (1(01)* | 0(10)*) construct a Turing machine that checks whether an arbitrary binary word can be described by R1. After execution, the tape must contain either a 't' for true or an 'f' for false. Example: The input 11001 cannot be represented by R1, so the tape contains an 'f' and everything else has been removed.",
+      "exerciseBinaryIncrement": "Binary Increment",
+      "exerciseBinaryIncrementDesc": "Build a machine that adds 1 to a binary number on the tape and halts with the incremented result."
+    },
+    "examples": {
+      "example1": "Example: Bit Flip",
+      "example1Desc": "A complete machine that inverts every bit in a binary word while scanning from left to right.",
+      "example2": "Example: Unary Increment",
+      "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
+      "example3": "Example: Binary Increment",
+      "example3Desc": "A carry-based machine that increments a binary word by one."
+    },
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
     "config": {
-      "title": "Turing Machine Configuration",
-      "apply": "Start Simulation",
-      "initialTape": "Initial Tape Word",
-      "initialTapePlaceholder": "Enter input word (e.g., 1011)",
-      "startState": "Start State",
-      "haltStates": "Halt States",
-      "haltStatesDesc": "Mark states as halting.",
-      "noStates": "No states available",
-      "transitionTable": "Transition Table",
-      "transitionFormat": "Format:",
-      "transitionExample": " e.g., (q1, 0, R)",
-      "cannotRemoveBlank": "The blank symbol cannot be removed.",
-      "cannotRemoveSymbolColumn": "The symbol column cannot be removed.",
-      "cannotRemoveLastState": "At least one state column must remain.",
-      "symbolSingleChar": "Tape symbols must consist of exactly one character.",
-      "symbolDuplicate": "This tape symbol already exists in the transition table.",
-      "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
+      "general": {
+        "title": "Turing Machine Configuration",
+        "apply": "Start Simulation",
+        "initialTape": "Initial Tape Word",
+        "initialTapePlaceholder": "Enter input word (e.g., 1011)",
+        "startState": "Start State"
+      },
+      "haltStates": {
+        "haltStates": "Halt States",
+        "haltStatesDesc": "Mark states as halting.",
+        "addHaltState": "Add Halt State",
+        "addHaltStatePlaceholder": "Add halt state",
+        "noStates": "No states available"
+      },
+      "alphabets": {
+        "inputAlphabet": "Input Alphabet",
+        "tapeAlphabet": "Tape Alphabet",
+        "noSymbols": "No symbols available"
+      },
+      "transitionTable": {
+        "transitionTable": "Transition Table",
+        "transitionFormat": "Format:",
+        "transitionExample": " e.g., (q1, 0, R)"
+      },
+      "editing": {
+        "cannotRemoveBlank": "The blank symbol cannot be removed.",
+        "cannotRemoveSymbolColumn": "The symbol column cannot be removed.",
+        "cannotRemoveLastState": "At least one state column must remain.",
+        "symbolSingleChar": "Tape symbols must consist of exactly one character.",
+        "symbolDuplicate": "This tape symbol already exists in the transition table.",
+        "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
+      }
     },
     "validation": {
-      "statesEmpty": "At least one state must be defined.",
-      "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
-      "haltStatesEmpty": "At least one halt state must be defined.",
-      "haltStateMissing": "The halt state '{{state}}' must exist in the set of states.",
-      "blankSymbolMissing": "The blank symbol '{{symbol}}' must be part of the tape alphabet.",
-      "blankSymbolInvalid": "The blank symbol '{{symbol}}' must consist of exactly one character.",
-      "tapeSymbolInvalid": "Tape alphabet symbol '{{symbol}}' must consist of exactly one character.",
-      "initialTapeInvalidSymbol": "Initial tape symbol '{{symbol}}' must be part of the input alphabet and consist of exactly one character.",
-      "transitionReadSymbolMissing": "A transition is defined for read symbol '{{symbol}}', but this symbol is not part of the tape alphabet.",
-      "transitionReadSymbolInvalid": "Transition read symbol '{{symbol}}' must consist of exactly one character.",
-      "transitionStateMissing": "A transition is defined for state '{{state}}', but this state is not part of the set of states.",
-      "transitionNextStateMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' points to unknown next state '{{nextState}}'.",
-      "transitionWriteSymbolMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' writes unknown symbol '{{writeSymbol}}'.",
-      "transitionWriteSymbolInvalid": "Transition from state '{{state}}' on symbol '{{symbol}}' must write exactly one character."
+      "summary": {
+        "checkInvalidProgram": "The current machine configuration is not valid yet.",
+        "exampleCheckUnavailable": "Examples do not need solution checks.",
+        "popupTitle": "Solution check",
+        "pass": "PASS",
+        "fail": "FAIL",
+        "emptyWord": "<empty>"
+      },
+      "table": {
+        "passed": "Passed",
+        "input": "Input",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "validHaltState": "Valid halt state"
+      },
+      "program": {
+        "statesEmpty": "At least one state must be defined.",
+        "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
+        "haltStatesEmpty": "At least one halt state must be defined.",
+        "haltStateMissing": "The halt state '{{state}}' must exist in the set of states.",
+        "blankSymbolMissing": "The blank symbol '{{symbol}}' must be part of the tape alphabet.",
+        "blankSymbolInvalid": "The blank symbol '{{symbol}}' must consist of exactly one character.",
+        "tapeSymbolInvalid": "Tape alphabet symbol '{{symbol}}' must consist of exactly one character.",
+        "initialTapeInvalidSymbol": "Initial tape symbol '{{symbol}}' must be part of the input alphabet and consist of exactly one character.",
+        "transitionReadSymbolMissing": "A transition is defined for read symbol '{{symbol}}', but this symbol is not part of the tape alphabet.",
+        "transitionReadSymbolInvalid": "Transition read symbol '{{symbol}}' must consist of exactly one character.",
+        "transitionStateMissing": "A transition is defined for state '{{state}}', but this state is not part of the set of states.",
+        "transitionNextStateMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' points to unknown next state '{{nextState}}'.",
+        "transitionWriteSymbolMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' writes unknown symbol '{{writeSymbol}}'.",
+        "transitionWriteSymbolInvalid": "Transition from state '{{state}}' on symbol '{{symbol}}' must write exactly one character."
+      }
     },
     "sim": {
-      "title": "Turing Machine Simulator",
-      "edit": "Edit Configuration",
-      "status": "Status",
-      "state": "Current State",
-      "symbol": "Current Symbol",
-      "step": "Step",
-      "halt": "Halted",
-      "yes": "Yes",
-      "no": "No",
+      "screen": {
+        "title": "Turing Machine Simulator",
+        "edit": "Edit Configuration"
+      },
+      "status": {
+        "status": "Status",
+        "state": "Current State",
+        "symbol": "Current Symbol",
+        "step": "Step",
+        "halt": "Halted",
+        "yes": "Yes",
+        "no": "No"
+      },
       "haltReason": {
         "missingTransition": "No transition is defined for state '{{state}}' and symbol '{{symbol}}'."
       }

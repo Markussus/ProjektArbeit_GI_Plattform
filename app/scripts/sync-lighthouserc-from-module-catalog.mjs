@@ -51,7 +51,8 @@ const config = {
       settings: {
         preset: "desktop",
         onlyCategories: ["performance"],
-        chromeFlags: "--no-sandbox",
+        chromeFlags:
+          "--no-sandbox --user-data-dir=./.lighthouseci/chrome-profile",
       },
     },
     assert: {

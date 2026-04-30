@@ -6,7 +6,7 @@ import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
-import type { Exercise } from "@/types/exercise";
+import type { Example, Exercise, TopicItem } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 
 export interface ModuleExercisesTabProps {
@@ -15,8 +15,15 @@ export interface ModuleExercisesTabProps {
   onOpenExerciseInSimulation: (exercise: Exercise) => void;
 }
 
+export interface ModuleExamplesTabProps {
+  selectedExample: Example | null;
+  onSelectExample: (example: Example) => void;
+  onOpenExampleInSimulation: (example: Example) => void;
+}
+
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
+  selectedItem: TopicItem | null;
   isFocused: boolean;
   onToggleFocus: () => void;
 }
@@ -26,7 +33,7 @@ interface ModuleTopicPageProps {
   descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
-  examplesTab: ComponentType;
+  examplesTab: ComponentType<ModuleExamplesTabProps>;
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
 }
@@ -47,9 +54,13 @@ export function ModuleTopicPage({
     activeTab,
     setActiveTab,
     selectedExercise,
+    selectedExample,
     simulationExercise,
+    simulationItem,
     selectExercise,
     openInSimulation,
+    selectExample,
+    openExampleInSimulation,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -88,13 +99,20 @@ export function ModuleTopicPage({
     }
 
     if (activeTab === "examples") {
-      return <ExamplesTab />;
+      return (
+        <ExamplesTab
+          selectedExample={selectedExample}
+          onSelectExample={selectExample}
+          onOpenExampleInSimulation={openExampleInSimulation}
+        />
+      );
     }
 
     if (activeTab === "simulation") {
       return (
         <SimulationTab
           selectedExercise={simulationExercise}
+          selectedItem={simulationItem}
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
         />

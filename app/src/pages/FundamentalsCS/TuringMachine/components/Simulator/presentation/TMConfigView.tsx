@@ -5,11 +5,13 @@ import type {
   TMEditorCellIssueCode,
   UseTMConfigEditorResult,
 } from "../application/useTMConfigEditor";
+import { deriveTapeAlphabet } from "../domain/tmProgram";
 import type {
   TMProgramIssue,
   TMProgramIssueCode,
 } from "../domain/tmProgramValidation";
 import { TMGeneralSettings } from "./TMGeneralSettings";
+import { TMAlphabetPanel } from "./TMAlphabetPanel";
 import { TMHaltStatesPanel } from "./TMHaltStatesPanel";
 import { TMTransitionTableEditor } from "./TMTransitionTableEditor";
 
@@ -20,6 +22,10 @@ export interface TMConfigViewProps {
 export function TMConfigView({ editor }: TMConfigViewProps) {
   const { t } = useTranslation();
   const orderedTapeAlphabet = getOrderedTapeAlphabet(editor.draft);
+  const displayedTapeAlphabet = getOrderedTapeAlphabet({
+    blankSymbol: editor.draft.blankSymbol,
+    tapeAlphabet: deriveTapeAlphabet(editor.draft),
+  });
   const combinedError = [
     ...editor.validationIssues.map((issue) => translateProgramIssue(t, issue)),
     editor.blockingCellIssue
@@ -36,7 +42,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
     }
 
     if (symbol === editor.draft.blankSymbol) {
-      alert(t("tm.config.cannotRemoveBlank"));
+      alert(t("tm.config.editing.cannotRemoveBlank"));
       return;
     }
 
@@ -45,12 +51,12 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
 
   const handleRemoveColumn = (colIndex: number) => {
     if (colIndex === 0) {
-      alert(t("tm.config.cannotRemoveSymbolColumn"));
+      alert(t("tm.config.editing.cannotRemoveSymbolColumn"));
       return;
     }
 
     if (editor.draft.states.length <= 1) {
-      alert(t("tm.config.cannotRemoveLastState"));
+      alert(t("tm.config.editing.cannotRemoveLastState"));
       return;
     }
 
@@ -60,7 +66,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="space-y-4 lg:mx-auto lg:w-max lg:max-w-full">
-        <h2 className="text-lg font-bold">{t("tm.config.title")}</h2>
+        <h2 className="text-lg font-bold">{t("tm.config.general.title")}</h2>
 
         {combinedError && (
           <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">
@@ -92,13 +98,26 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
             onRemoveColumn={handleRemoveColumn}
           />
 
-          <TMHaltStatesPanel
-            states={editor.draft.states}
-            initialState={editor.draft.initialState}
-            haltStates={editor.draft.haltStates}
-            disabled={editor.hasBlockingCellIssue}
-            onToggle={editor.handleToggleHaltState}
-          />
+          <div className="flex flex-col gap-4">
+            <TMHaltStatesPanel
+              states={editor.draft.states}
+              initialState={editor.draft.initialState}
+              haltStates={editor.draft.haltStates}
+              disabled={editor.hasBlockingCellIssue}
+              onToggle={editor.handleToggleHaltState}
+              onAddHaltState={editor.handleAddHaltState}
+            />
+
+            <TMAlphabetPanel
+              title={t("tm.config.alphabets.inputAlphabet")}
+              symbols={editor.draft.inputAlphabet}
+            />
+
+            <TMAlphabetPanel
+              title={t("tm.config.alphabets.tapeAlphabet")}
+              symbols={displayedTapeAlphabet}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -107,34 +126,38 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
 
 function translateCellIssue(t: TFunction, code: TMEditorCellIssueCode): string {
   if (code === "symbol_single_char") {
-    return t("tm.config.symbolSingleChar");
+    return t("tm.config.editing.symbolSingleChar");
   }
 
   if (code === "symbol_duplicate") {
-    return t("tm.config.symbolDuplicate");
+    return t("tm.config.editing.symbolDuplicate");
   }
 
-  return t("tm.config.transitionCellInvalid");
+  return t("tm.config.editing.transitionCellInvalid");
 }
 
 function translateProgramIssue(t: TFunction, issue: TMProgramIssue): string {
   const keyByCode: Record<TMProgramIssueCode, string> = {
-    states_empty: "tm.validation.statesEmpty",
-    initial_state_missing: "tm.validation.initialStateMissing",
-    halt_states_empty: "tm.validation.haltStatesEmpty",
-    halt_state_missing: "tm.validation.haltStateMissing",
-    blank_symbol_missing: "tm.validation.blankSymbolMissing",
-    blank_symbol_invalid: "tm.validation.blankSymbolInvalid",
-    tape_symbol_invalid: "tm.validation.tapeSymbolInvalid",
-    initial_tape_invalid_symbol: "tm.validation.initialTapeInvalidSymbol",
-    transition_read_symbol_missing: "tm.validation.transitionReadSymbolMissing",
-    transition_read_symbol_invalid: "tm.validation.transitionReadSymbolInvalid",
-    transition_state_missing: "tm.validation.transitionStateMissing",
-    transition_next_state_missing: "tm.validation.transitionNextStateMissing",
+    states_empty: "tm.validation.program.statesEmpty",
+    initial_state_missing: "tm.validation.program.initialStateMissing",
+    halt_states_empty: "tm.validation.program.haltStatesEmpty",
+    halt_state_missing: "tm.validation.program.haltStateMissing",
+    blank_symbol_missing: "tm.validation.program.blankSymbolMissing",
+    blank_symbol_invalid: "tm.validation.program.blankSymbolInvalid",
+    tape_symbol_invalid: "tm.validation.program.tapeSymbolInvalid",
+    initial_tape_invalid_symbol:
+      "tm.validation.program.initialTapeInvalidSymbol",
+    transition_read_symbol_missing:
+      "tm.validation.program.transitionReadSymbolMissing",
+    transition_read_symbol_invalid:
+      "tm.validation.program.transitionReadSymbolInvalid",
+    transition_state_missing: "tm.validation.program.transitionStateMissing",
+    transition_next_state_missing:
+      "tm.validation.program.transitionNextStateMissing",
     transition_write_symbol_missing:
-      "tm.validation.transitionWriteSymbolMissing",
+      "tm.validation.program.transitionWriteSymbolMissing",
     transition_write_symbol_invalid:
-      "tm.validation.transitionWriteSymbolInvalid",
+      "tm.validation.program.transitionWriteSymbolInvalid",
   };
 
   return t(

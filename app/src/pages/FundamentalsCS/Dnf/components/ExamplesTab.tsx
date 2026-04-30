@@ -1,12 +1,12 @@
 import { ArrowRight, Ban, BookOpen, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { cn } from "@/lib/utils";
 import {
   dnfWalkthroughExamples,
   type DnfWalkthroughExample,
   type DnfWalkthroughExampleId,
 } from "../examples/walkthroughExamples";
-
 const iconByExampleId: Record<DnfWalkthroughExampleId, typeof BookOpen> = {
   "lecture-expression": BookOpen,
   parentheses: Table2,
@@ -14,7 +14,8 @@ const iconByExampleId: Record<DnfWalkthroughExampleId, typeof BookOpen> = {
   xor: ArrowRight,
 };
 
-export function ExamplesTab() {
+export function ExamplesTab(props: ModuleExamplesTabProps) {
+  void props;
   const { t } = useTranslation();
 
   return (
