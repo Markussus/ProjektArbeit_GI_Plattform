@@ -10,6 +10,9 @@ export interface ExecutionControlsProps {
   runLabel?: string;
   stopLabel?: string;
   className?: string;
+  runTestId?: string;
+  stopTestId?: string;
+  phaseTestId?: string;
 }
 
 export function ExecutionControls({
@@ -21,6 +24,9 @@ export function ExecutionControls({
   runLabel = "Run",
   stopLabel = "Stop",
   className,
+  runTestId,
+  stopTestId,
+  phaseTestId,
 }: ExecutionControlsProps) {
   const isRunning = phase === "running";
 
@@ -36,6 +42,7 @@ export function ExecutionControls({
           type="button"
           onClick={onRun}
           disabled={!canRun}
+          data-testid={runTestId}
           className={cn(
             "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
             "bg-brand text-brand-foreground hover:opacity-90",
@@ -50,6 +57,7 @@ export function ExecutionControls({
           type="button"
           onClick={onStop}
           disabled={!canStop}
+          data-testid={stopTestId}
           className={cn(
             "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors",
             "border-input bg-background hover:bg-accent hover:text-accent-foreground",
@@ -62,6 +70,7 @@ export function ExecutionControls({
       </div>
 
       <span
+        data-testid={phaseTestId}
         className={cn(
           "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase",
           isRunning

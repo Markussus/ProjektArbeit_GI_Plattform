@@ -24,7 +24,10 @@ export function SimulationWorkspace({
   return (
     <div className="space-y-4">
       {selectedExercise && (
-        <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
+        <div
+          data-testid="simulation-selected-exercise"
+          className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
+        >
           <div className="min-w-0">
             <p className="text-foreground text-sm font-semibold">
               {t("simulation.selectedExercise")}
@@ -40,6 +43,7 @@ export function SimulationWorkspace({
       )}
 
       <div
+        data-testid="simulation-workspace"
         className={cn(
           "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
@@ -49,6 +53,7 @@ export function SimulationWorkspace({
           <button
             type="button"
             onClick={onToggleFocus}
+            data-testid="simulation-focus-toggle"
             aria-pressed={isFocused}
             aria-label={
               isFocused ? t("simulation.exitFocus") : t("simulation.expand")

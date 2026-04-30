@@ -9,6 +9,7 @@ export interface SimulatorStringTransferBoxProps<TValue> {
   codec: ISimulatorTransferCodec<TValue>;
   onLoad: (value: TValue) => void;
   className?: string;
+  testIdPrefix?: string;
 }
 
 export function SimulatorStringTransferBox<TValue>({
@@ -16,6 +17,7 @@ export function SimulatorStringTransferBox<TValue>({
   codec,
   onLoad,
   className,
+  testIdPrefix,
 }: SimulatorStringTransferBoxProps<TValue>) {
   const { t } = useTranslation();
   const [textValue, setTextValue] = useState("");
@@ -92,6 +94,7 @@ export function SimulatorStringTransferBox<TValue>({
 
   return (
     <section
+      data-testid={testIdPrefix ? `${testIdPrefix}-root` : undefined}
       className={cn(
         "bg-card ring-foreground/10 flex w-full flex-col gap-4 rounded-xl p-4 ring-1",
         className,
@@ -101,6 +104,7 @@ export function SimulatorStringTransferBox<TValue>({
         <div className="relative min-w-0 flex-1">
           <input
             type="text"
+            data-testid={testIdPrefix ? `${testIdPrefix}-input` : undefined}
             value={inputDisplayValue}
             onChange={(event) => {
               if (isShowingCopyFeedback) {
@@ -132,6 +136,7 @@ export function SimulatorStringTransferBox<TValue>({
             onClick={() => {
               void handleCopy();
             }}
+            data-testid={testIdPrefix ? `${testIdPrefix}-copy` : undefined}
             disabled={!hasText}
             aria-label={t("simulation.transfer.copy")}
             title={t("simulation.transfer.copy")}
@@ -145,6 +150,7 @@ export function SimulatorStringTransferBox<TValue>({
           <button
             type="button"
             onClick={handleGenerate}
+            data-testid={testIdPrefix ? `${testIdPrefix}-export` : undefined}
             disabled={hasManualInput}
             className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -155,6 +161,7 @@ export function SimulatorStringTransferBox<TValue>({
           <button
             type="button"
             onClick={handleLoad}
+            data-testid={testIdPrefix ? `${testIdPrefix}-import` : undefined}
             disabled={!hasManualInput}
             className="bg-secondary text-secondary-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -165,7 +172,12 @@ export function SimulatorStringTransferBox<TValue>({
       </div>
 
       {feedbackKey && feedbackKey !== "simulation.transfer.copied" && (
-        <p className={cn("text-xs", feedbackToneClassName)}>{t(feedbackKey)}</p>
+        <p
+          data-testid={testIdPrefix ? `${testIdPrefix}-status` : undefined}
+          className={cn("text-xs", feedbackToneClassName)}
+        >
+          {t(feedbackKey)}
+        </p>
       )}
     </section>
   );

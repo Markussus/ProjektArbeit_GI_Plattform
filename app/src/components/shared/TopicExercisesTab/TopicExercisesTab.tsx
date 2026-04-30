@@ -40,6 +40,7 @@ export function TopicExercisesTab({
             key={exercise.id}
             exercise={exercise}
             index={index}
+            testIdPrefix={`exercise-card-${exercise.id}`}
             isSelected={selectedExercise?.id === exercise.id}
             onSelect={() => onSelectExercise(exercise)}
             onOpen={() => onOpenExerciseInSimulation(exercise)}

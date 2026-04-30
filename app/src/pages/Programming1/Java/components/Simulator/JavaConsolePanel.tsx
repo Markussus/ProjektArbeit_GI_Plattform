@@ -16,6 +16,7 @@ export function JavaConsolePanel({
 
   return (
     <div
+      data-testid="java-console-panel"
       className={cn(
         "bg-card text-card-foreground rounded-xl border shadow-sm",
         className,
@@ -31,15 +32,17 @@ export function JavaConsolePanel({
           title="stdout"
           content={stdout}
           emptyText="Program output appears here."
+          testId="java-console-stdout"
         />
         <ConsoleSection
           title="stderr"
           content={stderr}
           emptyText="Runtime errors appear here."
           tone="error"
+          testId="java-console-stderr"
         />
 
-        <div className="space-y-2">
+        <div data-testid="java-console-issues" className="space-y-2">
           <h4 className="text-xs font-semibold tracking-wide uppercase">
             Issues
           </h4>
@@ -83,6 +86,7 @@ interface ConsoleSectionProps {
   content: string;
   emptyText: string;
   tone?: "default" | "error";
+  testId: string;
 }
 
 function ConsoleSection({
@@ -90,11 +94,13 @@ function ConsoleSection({
   content,
   emptyText,
   tone = "default",
+  testId,
 }: ConsoleSectionProps) {
   return (
     <div className="space-y-2">
       <h4 className="text-xs font-semibold tracking-wide uppercase">{title}</h4>
       <pre
+        data-testid={testId}
         className={cn(
           "min-h-24 overflow-x-auto rounded-lg border px-3 py-3 text-sm whitespace-pre-wrap",
           tone === "error"

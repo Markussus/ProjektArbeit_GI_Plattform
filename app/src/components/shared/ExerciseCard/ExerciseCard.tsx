@@ -10,6 +10,7 @@ interface ExerciseCardProps {
   isSelected?: boolean;
   onSelect?: () => void;
   onOpen?: () => void;
+  testIdPrefix?: string;
 }
 
 const difficultyTextColors = {
@@ -30,6 +31,7 @@ export function ExerciseCard({
   isSelected = false,
   onSelect,
   onOpen,
+  testIdPrefix,
 }: ExerciseCardProps) {
   const { t } = useTranslation();
   const Icon = exercise.icon;
@@ -47,6 +49,7 @@ export function ExerciseCard({
         type="button"
         onClick={onSelect}
         onDoubleClick={onOpen}
+        data-testid={testIdPrefix ? `${testIdPrefix}-select` : undefined}
         aria-expanded={isSelected}
         aria-controls={detailsId}
         className={cn(
@@ -94,6 +97,7 @@ export function ExerciseCard({
               <button
                 type="button"
                 onClick={onOpen}
+                data-testid={testIdPrefix ? `${testIdPrefix}-open` : undefined}
                 className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
               >
                 {t("exercise.openInSimulation")}

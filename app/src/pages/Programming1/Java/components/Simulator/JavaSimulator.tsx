@@ -61,7 +61,7 @@ function JavaSimulatorSession({
   );
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div data-testid="java-simulator" className="flex h-full flex-col gap-4">
       <JavaEditorPanel
         code={code}
         fileName={fileName}
@@ -79,6 +79,9 @@ function JavaSimulatorSession({
         canStop={snapshot.phase === "running"}
         runLabel={t("simulation.controls.play", "Run")}
         stopLabel={t("simulation.controls.stop", "Stop")}
+        runTestId="java-run-button"
+        stopTestId="java-stop-button"
+        phaseTestId="java-execution-phase"
       />
 
       <JavaConsolePanel snapshot={snapshot} className="flex-1" />

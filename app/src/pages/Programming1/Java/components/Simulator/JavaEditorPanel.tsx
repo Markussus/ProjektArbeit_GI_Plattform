@@ -28,7 +28,7 @@ export function JavaEditorPanel({
   const { resolvedTheme } = useTheme();
 
   return (
-    <div className="space-y-4">
+    <div data-testid="java-editor-panel" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
@@ -40,6 +40,7 @@ export function JavaEditorPanel({
         <button
           type="button"
           onClick={onResetCode}
+          data-testid="java-reset-button"
           className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
         >
           <RotateCcw className="size-4" />
@@ -47,7 +48,10 @@ export function JavaEditorPanel({
         </button>
       </div>
 
-      <div className="ring-foreground/10 overflow-hidden rounded-xl ring-1">
+      <div
+        data-testid="java-editor-container"
+        className="ring-foreground/10 overflow-hidden rounded-xl ring-1"
+      >
         <Suspense
           fallback={
             <div className="bg-card text-muted-foreground flex h-[28rem] items-center justify-center p-4 text-sm">
@@ -79,6 +83,7 @@ export function JavaEditorPanel({
         value={code}
         codec={javaCodeTransferCodec}
         onLoad={onImportCode}
+        testIdPrefix="java-transfer"
       />
     </div>
   );
