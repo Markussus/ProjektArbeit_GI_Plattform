@@ -7,6 +7,7 @@ interface IEEE754ConverterProps {
   showSolution?: boolean;
   onShowSolution?: () => void;
   initialValue?: string;
+  initialConverterMode?: "decToIeee" | "ieeeToDec";
 }
 
 export function IEEE754Converter({
@@ -14,19 +15,21 @@ export function IEEE754Converter({
   showSolution = true,
   onShowSolution,
   initialValue = "",
+  initialConverterMode = "decToIeee",
 }: IEEE754ConverterProps) {
   const { t } = useTranslation("translation");
   const [inputValue, setInputValue] = useState<string>("12.5");
   const [converterMode, setConverterMode] = useState<"decToIeee" | "ieeeToDec">(
-    "decToIeee",
+    initialConverterMode,
   );
 
   useEffect(() => {
     if (isExerciseMode && initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(initialValue);
+      setConverterMode(initialConverterMode);
     }
-  }, [isExerciseMode, initialValue]);
+  }, [isExerciseMode, initialValue, initialConverterMode]);
 
   // PARSE LOGIC
   const cleanBinary = inputValue.replace(/[^01]/g, "");

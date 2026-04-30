@@ -11,6 +11,7 @@ interface IntegerConverterProps {
   onShowSolution?: () => void;
   initialValue?: string;
   initialBase?: BaseType;
+  initialTargetBase?: BaseType;
 }
 
 export function IntegerConverter({
@@ -19,6 +20,7 @@ export function IntegerConverter({
   onShowSolution,
   initialValue = "",
   initialBase = "dec",
+  initialTargetBase = "bin",
 }: IntegerConverterProps) {
   const { t } = useTranslation("translation");
   const [sourceBase, setSourceBase] = useState<BaseType>("dec");
@@ -29,9 +31,10 @@ export function IntegerConverter({
     if (isExerciseMode && initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSourceBase(initialBase);
+      setTargetBase(initialTargetBase);
       setInputValue(initialValue);
     }
-  }, [isExerciseMode, initialValue, initialBase]);
+  }, [isExerciseMode, initialValue, initialBase, initialTargetBase]);
 
   const handleSourceBaseChange = (newBase: BaseType) => {
     setSourceBase(newBase);
