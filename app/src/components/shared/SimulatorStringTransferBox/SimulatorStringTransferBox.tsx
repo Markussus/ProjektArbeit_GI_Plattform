@@ -101,44 +101,44 @@ export function SimulatorStringTransferBox<TValue>({
         <div className="relative min-w-0 flex-1">
           <input
             type="text"
-          value={inputDisplayValue}
-          onChange={(event) => {
-            if (isShowingCopyFeedback) {
-              return;
-            }
+            value={inputDisplayValue}
+            onChange={(event) => {
+              if (isShowingCopyFeedback) {
+                return;
+              }
 
-            const nextValue = event.target.value;
-            setTextValue(nextValue);
-            setInputMode(nextValue.trim().length === 0 ? "empty" : "manual");
-          }}
-          onPaste={() => {
-            if (isShowingCopyFeedback) {
-              return;
-            }
+              const nextValue = event.target.value;
+              setTextValue(nextValue);
+              setInputMode(nextValue.trim().length === 0 ? "empty" : "manual");
+            }}
+            onPaste={() => {
+              if (isShowingCopyFeedback) {
+                return;
+              }
 
-            if (trimmedValue.length > 0) {
-              setInputMode("manual");
-            }
-          }}
-          placeholder={t("simulation.transfer.placeholder")}
-          className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none focus-visible:ring-2"
-          spellCheck={false}
-          autoComplete="off"
-          readOnly={isShowingCopyFeedback}
-        />
+              if (trimmedValue.length > 0) {
+                setInputMode("manual");
+              }
+            }}
+            placeholder={t("simulation.transfer.placeholder")}
+            className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none focus-visible:ring-2"
+            spellCheck={false}
+            autoComplete="off"
+            readOnly={isShowingCopyFeedback}
+          />
 
-        <button
-          type="button"
-          onClick={() => {
-            void handleCopy();
-          }}
-          disabled={!hasText}
-          aria-label={t("simulation.transfer.copy")}
-          title={t("simulation.transfer.copy")}
-          className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-3 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md border disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:outline-none"
-        >
-          <Clipboard className="size-4" />
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              void handleCopy();
+            }}
+            disabled={!hasText}
+            aria-label={t("simulation.transfer.copy")}
+            title={t("simulation.transfer.copy")}
+            className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-3 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Clipboard className="size-4" />
+          </button>
         </div>
 
         <div className="flex items-center justify-end gap-2">
@@ -165,9 +165,7 @@ export function SimulatorStringTransferBox<TValue>({
       </div>
 
       {feedbackKey && feedbackKey !== "simulation.transfer.copied" && (
-        <p className={cn("text-xs", feedbackToneClassName)}>
-          {t(feedbackKey)}
-        </p>
+        <p className={cn("text-xs", feedbackToneClassName)}>{t(feedbackKey)}</p>
       )}
     </section>
   );
