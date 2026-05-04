@@ -41,7 +41,7 @@ function filterInput(value: string, mode: ValidationInputMode): string {
       return value.replace(/[^0-9A-Fa-f]/g, "");
     case "float":
       // Dezimalzahl mit optionalem Vorzeichen und Komma/Punkt
-      return value.replace(/[^0-9.\-]/g, "");
+      return value.replace(/[^0-9.-]/g, "");
     case "ieee-binary":
       // Binäre Bits und Leerzeichen (für "0 10000010 10100000...")
       return value.replace(/[^01 ]/g, "");

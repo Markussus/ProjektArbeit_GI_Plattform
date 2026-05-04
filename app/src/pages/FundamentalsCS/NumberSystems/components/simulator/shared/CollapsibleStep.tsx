@@ -24,7 +24,9 @@ export function CollapsibleStep({
   className = "",
 }: CollapsibleStepProps) {
   return (
-    <div className={`border-border/40 overflow-hidden rounded-lg border ${className}`}>
+    <div
+      className={`border-border/40 overflow-hidden rounded-lg border ${className}`}
+    >
       <button
         onClick={onToggle}
         className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors"

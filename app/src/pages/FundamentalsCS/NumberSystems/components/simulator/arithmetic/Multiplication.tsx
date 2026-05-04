@@ -171,7 +171,10 @@ export function Multiplication({
                           header={
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
-                                {t("simulator.arithmetic.multiplication.stepN", { n: step.bitIndex })}
+                                {t(
+                                  "simulator.arithmetic.multiplication.stepN",
+                                  { n: step.bitIndex },
+                                )}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
                                 <span
@@ -181,7 +184,9 @@ export function Multiplication({
                                 </span>
                                 {step.isZero ? (
                                   <span className="text-muted-foreground">
-                                    {t("simulator.arithmetic.multiplication.skipShort")}
+                                    {t(
+                                      "simulator.arithmetic.multiplication.skipShort",
+                                    )}
                                   </span>
                                 ) : (
                                   <span className="text-foreground">
@@ -192,10 +197,14 @@ export function Multiplication({
                             </>
                           }
                         >
-                          <p className="text-foreground text-sm">{step.explanation}</p>
+                          <p className="text-foreground text-sm">
+                            {step.explanation}
+                          </p>
                           {!step.isZero && (
                             <div className="bg-primary/5 border-primary/20 mt-2 rounded border p-2 font-mono text-sm">
-                              <span className="text-muted-foreground">= {step.termStr}</span>
+                              <span className="text-muted-foreground">
+                                = {step.termStr}
+                              </span>
                               <span className="text-muted-foreground mx-2">
                                 ({step.decimalProduct} in Dezimal)
                               </span>
@@ -209,7 +218,10 @@ export function Multiplication({
                     <div className="bg-primary/10 border-primary mt-4 rounded-r-md border-l-4 p-4">
                       <p className="text-foreground text-sm">
                         <strong>
-                          {t("simulator.arithmetic.multiplication.partialProducts")}:
+                          {t(
+                            "simulator.arithmetic.multiplication.partialProducts",
+                          )}
+                          :
                         </strong>
                       </p>
                       <p className="text-muted-foreground mt-1 font-mono text-sm">
@@ -233,8 +245,12 @@ export function Multiplication({
                           key={idx}
                           className={`flex w-full items-center justify-end gap-4 ${step.isZero ? "opacity-30" : "opacity-100"}`}
                         >
-                          {idx < steps.length - 1 && <span className="opacity-0">+</span>}
-                          {idx === steps.length - 1 && <span className="text-primary">+</span>}
+                          {idx < steps.length - 1 && (
+                            <span className="opacity-0">+</span>
+                          )}
+                          {idx === steps.length - 1 && (
+                            <span className="text-primary">+</span>
+                          )}
                           <span className="text-right">{step.termStr}</span>
                         </div>
                       ))}

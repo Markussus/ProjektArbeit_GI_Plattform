@@ -172,24 +172,36 @@ export function Addition({
                 <div className="mb-4 flex justify-center">
                   <div className="text-muted-foreground bg-background border-border/40 flex gap-2 rounded border p-2 font-mono text-xs">
                     <div className="flex items-center gap-1">
-                      <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">A</span>
+                      <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">
+                        A
+                      </span>
                       <span>{t("simulator.arithmetic.addition.legendA")}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">B</span>
+                      <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">
+                        B
+                      </span>
                       <span>{t("simulator.arithmetic.addition.legendB")}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">C</span>
+                      <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">
+                        C
+                      </span>
                       <span>{t("simulator.arithmetic.addition.legendC")}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded">S</span>
+                      <span className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded">
+                        S
+                      </span>
                       <span>{t("simulator.arithmetic.addition.legendS")}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded">→</span>
-                      <span>{t("simulator.arithmetic.addition.legendOut")}</span>
+                      <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded">
+                        →
+                      </span>
+                      <span>
+                        {t("simulator.arithmetic.addition.legendOut")}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -204,27 +216,43 @@ export function Addition({
                       header={
                         <>
                           <span className="text-muted-foreground text-xs font-bold">
-                            {t("simulator.arithmetic.addition.bitPos", { pos: step.position })}
+                            {t("simulator.arithmetic.addition.bitPos", {
+                              pos: step.position,
+                            })}
                           </span>
                           <div className="flex items-center gap-1 font-mono text-sm">
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">{step.bitA}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">
+                              {step.bitA}
+                            </span>
                             <span>+</span>
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">{step.bitB}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">
+                              {step.bitB}
+                            </span>
                             <span>+</span>
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">{step.carryIn}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">
+                              {step.carryIn}
+                            </span>
                             <span>=</span>
-                            <span className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded font-bold">{step.sum}</span>
+                            <span className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded font-bold">
+                              {step.sum}
+                            </span>
                             {step.carryOut > 0 && (
                               <>
-                                <span className="text-muted-foreground mx-1">→</span>
-                                <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded font-bold">{step.carryOut}</span>
+                                <span className="text-muted-foreground mx-1">
+                                  →
+                                </span>
+                                <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded font-bold">
+                                  {step.carryOut}
+                                </span>
                               </>
                             )}
                           </div>
                         </>
                       }
                     >
-                      <p className="text-foreground text-sm">{step.explanation}</p>
+                      <p className="text-foreground text-sm">
+                        {step.explanation}
+                      </p>
                     </CollapsibleStep>
                   ))}
                 </div>
@@ -258,7 +286,9 @@ export function Addition({
                   <span className="w-4 text-center" />
                   <span className="mr-2 w-4 text-center" />
                   {padA.split("").map((b, i) => (
-                    <span key={`a-${i}`} className="w-4 text-center">{b}</span>
+                    <span key={`a-${i}`} className="w-4 text-center">
+                      {b}
+                    </span>
                   ))}
                 </div>
                 {/* Pad B */}
@@ -266,7 +296,9 @@ export function Addition({
                   <span className="text-primary mr-2 w-4 text-center">+</span>
                   <span className="w-4 text-center" />
                   {padB.split("").map((b, i) => (
-                    <span key={`b-${i}`} className="w-4 text-center">{b}</span>
+                    <span key={`b-${i}`} className="w-4 text-center">
+                      {b}
+                    </span>
                   ))}
                 </div>
                 {/* Sum */}
@@ -278,7 +310,12 @@ export function Addition({
                     {carries[0]}
                   </span>
                   {sum.split("").map((b, i) => (
-                    <span key={`s-${i}`} className="text-primary w-4 text-center font-bold">{b}</span>
+                    <span
+                      key={`s-${i}`}
+                      className="text-primary w-4 text-center font-bold"
+                    >
+                      {b}
+                    </span>
                   ))}
                 </div>
               </div>

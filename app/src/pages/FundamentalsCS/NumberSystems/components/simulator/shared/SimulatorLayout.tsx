@@ -11,7 +11,10 @@ interface SimulatorLayoutProps {
  * Zwei-Spalten-Grid-Layout für alle Arithmetic-Simulator-Komponenten.
  * Links: Eingabefelder. Rechts: Ergebnis oder Validation.
  */
-export function SimulatorLayout({ inputPanel, resultPanel }: SimulatorLayoutProps) {
+export function SimulatorLayout({
+  inputPanel,
+  resultPanel,
+}: SimulatorLayoutProps) {
   return (
     <div className="animate-in fade-in zoom-in-95 grid w-full grid-cols-1 gap-6 duration-300 md:grid-cols-2">
       {/* Input Panel */}

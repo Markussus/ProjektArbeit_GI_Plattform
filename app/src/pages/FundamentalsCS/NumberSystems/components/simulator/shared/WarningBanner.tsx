@@ -15,7 +15,9 @@ const VARIANT_STYLES: Record<
 > = {
   destructive: {
     wrapper: "bg-destructive/10 border-destructive",
-    icon: <AlertTriangle className="text-destructive mt-0.5 h-5 w-5 shrink-0" />,
+    icon: (
+      <AlertTriangle className="text-destructive mt-0.5 h-5 w-5 shrink-0" />
+    ),
     titleClass: "text-destructive-foreground",
     textClass: "text-destructive-foreground",
   },
@@ -37,7 +39,11 @@ const VARIANT_STYLES: Record<
  * Wiederverwendbares Warning/Info-Banner mit linkem farbigen Border.
  * Varianten: "destructive" (rot), "warning" (orange), "info" (grau).
  */
-export function WarningBanner({ variant, title, children }: WarningBannerProps) {
+export function WarningBanner({
+  variant,
+  title,
+  children,
+}: WarningBannerProps) {
   const styles = VARIANT_STYLES[variant];
   return (
     <div

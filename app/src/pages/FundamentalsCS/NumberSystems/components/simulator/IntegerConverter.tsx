@@ -396,12 +396,14 @@ export function IntegerConverter({
               onShowSolution={onShowSolution!}
               onExitExercise={onExitExercise}
               inputMode={
-                ({
-                  bin: "binary",
-                  oct: "octal",
-                  dec: "decimal",
-                  hex: "hex",
-                } as Record<string, ValidationInputMode>)[targetBase] ?? "text"
+                (
+                  {
+                    bin: "binary",
+                    oct: "octal",
+                    dec: "decimal",
+                    hex: "hex",
+                  } as Record<string, ValidationInputMode>
+                )[targetBase] ?? "text"
               }
               placeholder={`z.B. ${targetBase === "bin" ? "10110" : targetBase === "hex" ? "2A" : "42"}`}
             />

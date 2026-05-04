@@ -282,7 +282,9 @@ export function IEEE754Converter({
               }
               onShowSolution={onShowSolution!}
               onExitExercise={onExitExercise}
-              inputMode={converterMode === "decToIeee" ? "ieee-binary" : "float"}
+              inputMode={
+                converterMode === "decToIeee" ? "ieee-binary" : "float"
+              }
               placeholder={
                 converterMode === "decToIeee"
                   ? "z.B. 0 10000000 0000000..."

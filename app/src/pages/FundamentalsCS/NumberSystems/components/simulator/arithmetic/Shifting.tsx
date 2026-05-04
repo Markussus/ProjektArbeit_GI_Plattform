@@ -67,7 +67,9 @@ export function Shifting({
         steps.push({
           step: 0,
           binary: valA,
-          description: t("simulator.arithmetic.shifting.stepOriginal", { val: valA }),
+          description: t("simulator.arithmetic.shifting.stepOriginal", {
+            val: valA,
+          }),
           highlightedBit: null,
           newBit: null,
         });
@@ -77,7 +79,9 @@ export function Shifting({
           steps.push({
             step: i + 1,
             binary: currentResult,
-            description: t("simulator.arithmetic.shifting.stepLeftShift", { count: i + 1 }),
+            description: t("simulator.arithmetic.shifting.stepLeftShift", {
+              count: i + 1,
+            }),
             highlightedBit: valA.length + i,
             newBit: "0",
           });
@@ -87,7 +91,9 @@ export function Shifting({
           steps.push({
             step: 5,
             binary: valA + "0".repeat(shiftAmount),
-            description: t("simulator.arithmetic.shifting.stepLeftComplete", { count: shiftAmount }),
+            description: t("simulator.arithmetic.shifting.stepLeftComplete", {
+              count: shiftAmount,
+            }),
             highlightedBit: null,
             newBit: null,
           });
@@ -98,14 +104,18 @@ export function Shifting({
           steps.push({
             step: 0,
             binary: valA,
-            description: t("simulator.arithmetic.shifting.stepOriginal", { val: valA }),
+            description: t("simulator.arithmetic.shifting.stepOriginal", {
+              val: valA,
+            }),
             highlightedBit: null,
             newBit: null,
           });
           steps.push({
             step: 1,
             binary: "0",
-            description: t("simulator.arithmetic.shifting.stepRightZero", { count: shiftAmount }),
+            description: t("simulator.arithmetic.shifting.stepRightZero", {
+              count: shiftAmount,
+            }),
             highlightedBit: null,
             newBit: null,
           });
@@ -117,7 +127,9 @@ export function Shifting({
           steps.push({
             step: 0,
             binary: valA,
-            description: t("simulator.arithmetic.shifting.stepOriginal", { val: valA }),
+            description: t("simulator.arithmetic.shifting.stepOriginal", {
+              val: valA,
+            }),
             highlightedBit: null,
             newBit: null,
           });
@@ -128,7 +140,9 @@ export function Shifting({
             steps.push({
               step: i + 1,
               binary: remaining + "X".repeat(i + 1),
-              description: t("simulator.arithmetic.shifting.stepRightShift", { bit }),
+              description: t("simulator.arithmetic.shifting.stepRightShift", {
+                bit,
+              }),
               highlightedBit: valA.length - 1 - i,
               newBit: null,
             });
@@ -138,7 +152,10 @@ export function Shifting({
             steps.push({
               step: 5,
               binary: valA.slice(0, valA.length - shiftAmount),
-              description: t("simulator.arithmetic.shifting.stepRightComplete", { count: shiftAmount }),
+              description: t(
+                "simulator.arithmetic.shifting.stepRightComplete",
+                { count: shiftAmount },
+              ),
               highlightedBit: null,
               newBit: null,
             });
@@ -254,7 +271,9 @@ export function Shifting({
                           header={
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
-                                {t("simulator.arithmetic.shifting.stepN", { n: step.step })}
+                                {t("simulator.arithmetic.shifting.stepN", {
+                                  n: step.step,
+                                })}
                               </span>
                               <div className="font-mono text-lg tracking-widest">
                                 {step.binary.split("").map((char, charIdx) => (
@@ -273,17 +292,22 @@ export function Shifting({
                                 ))}
                               </div>
                               {direction === "left" && step.newBit && (
-                                <span className="text-muted-foreground text-xs">+{step.newBit}</span>
-                              )}
-                              {direction === "right" && step.highlightedBit !== null && (
-                                <span className="text-destructive text-xs">
-                                  -{step.binary[step.highlightedBit] || ""}
+                                <span className="text-muted-foreground text-xs">
+                                  +{step.newBit}
                                 </span>
                               )}
+                              {direction === "right" &&
+                                step.highlightedBit !== null && (
+                                  <span className="text-destructive text-xs">
+                                    -{step.binary[step.highlightedBit] || ""}
+                                  </span>
+                                )}
                             </>
                           }
                         >
-                          <p className="text-foreground text-sm">{step.description}</p>
+                          <p className="text-foreground text-sm">
+                            {step.description}
+                          </p>
                         </CollapsibleStep>
                       ))}
                     </div>
@@ -300,7 +324,12 @@ export function Shifting({
                           </span>
                           <div className="tracking-widest">
                             {valA.split("").map((b, i) => (
-                              <span key={i} className="border-border/20 inline-block h-8 w-6 rounded border text-center">{b}</span>
+                              <span
+                                key={i}
+                                className="border-border/20 inline-block h-8 w-6 rounded border text-center"
+                              >
+                                {b}
+                              </span>
                             ))}
                           </div>
                         </div>
@@ -323,7 +352,8 @@ export function Shifting({
                                 className={`border-border/20 inline-block h-8 w-6 rounded border text-center ${
                                   direction === "left" && i >= valA.length
                                     ? "bg-primary/10 text-primary"
-                                    : direction === "right" && i >= resultStr.length
+                                    : direction === "right" &&
+                                        i >= resultStr.length
                                       ? "bg-destructive/10 text-destructive/50"
                                       : ""
                                 }`}
@@ -349,12 +379,16 @@ export function Shifting({
 
                 <div className="bg-primary/10 border-primary mt-6 w-full rounded-r-md border-l-4 p-4">
                   <p className="text-foreground mb-2 text-sm">
-                    <strong className="mb-1 block">{t("simulator.arithmetic.shifting.mathMeaning")}</strong>
+                    <strong className="mb-1 block">
+                      {t("simulator.arithmetic.shifting.mathMeaning")}
+                    </strong>
                     {explanation}
                   </p>
                   <div className="text-muted-foreground border-primary/20 mt-2 border-t pt-2 font-mono text-xs">
                     {direction === "left" ? (
-                      <span>{decimalBefore} × 2^{shiftAmount} = {decimalAfter}</span>
+                      <span>
+                        {decimalBefore} × 2^{shiftAmount} = {decimalAfter}
+                      </span>
                     ) : (
                       <span>
                         {decimalBefore} : 2^{shiftAmount} = {decimalAfter}{" "}

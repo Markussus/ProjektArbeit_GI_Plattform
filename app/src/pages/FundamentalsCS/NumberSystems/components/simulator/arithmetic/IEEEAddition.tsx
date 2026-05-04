@@ -105,7 +105,10 @@ export function IEEEAddition({
     let smaller = parsedB;
     let swapped = false;
 
-    if (parsedB.exp > parsedA.exp || (parsedB.exp === parsedA.exp && numB > numA)) {
+    if (
+      parsedB.exp > parsedA.exp ||
+      (parsedB.exp === parsedA.exp && numB > numA)
+    ) {
       larger = parsedB;
       smaller = parsedA;
       swapped = true;
@@ -114,7 +117,10 @@ export function IEEEAddition({
     const expDiff = larger.exp - smaller.exp;
     const shiftVal = Math.min(expDiff, 24);
     const smallerMantissaFull = smaller.hiddenBit + smaller.mantissaBits;
-    const shiftedSmaller = ("0".repeat(shiftVal) + smallerMantissaFull).slice(0, 24);
+    const shiftedSmaller = ("0".repeat(shiftVal) + smallerMantissaFull).slice(
+      0,
+      24,
+    );
 
     const shiftSteps: IEEEShiftStep[] = [];
     for (let i = 0; i < shiftVal; i++) {
@@ -122,7 +128,9 @@ export function IEEEAddition({
         position: i,
         originalMantissa: smallerMantissaFull.slice(i, i + 8) || "",
         shiftedMantissa: shiftedSmaller.slice(i, i + 8) || "",
-        explanation: t("simulator.arithmetic.ieee754.shiftBitDesc", { n: i + 1 }),
+        explanation: t("simulator.arithmetic.ieee754.shiftBitDesc", {
+          n: i + 1,
+        }),
       });
     }
 
@@ -163,13 +171,17 @@ export function IEEEAddition({
             <BinaryInput
               label={t("simulator.arithmetic.ieee754.inputA")}
               value={valA}
-              onChange={(val) => { if (!locked) setValA(val); }}
+              onChange={(val) => {
+                if (!locked) setValA(val);
+              }}
               locked={locked}
             />
             <BinaryInput
               label={t("simulator.arithmetic.ieee754.inputB")}
               value={valB}
-              onChange={(val) => { if (!locked) setValB(val); }}
+              onChange={(val) => {
+                if (!locked) setValB(val);
+              }}
               locked={locked}
             />
           </div>
@@ -205,24 +217,40 @@ export function IEEEAddition({
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10 text-xs">A</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10 text-xs">
+                        A
+                      </span>
                       <span className="font-mono">
                         <span className="text-primary">{parsed.A.signBit}</span>
                         <span className="mx-1">{parsed.A.expBits}</span>
-                        <span className="text-muted-foreground">{parsed.A.mantissaBits.slice(0, 8)}</span>
-                        <span className="text-muted-foreground/50">{parsed.A.mantissaBits.slice(8)}</span>
+                        <span className="text-muted-foreground">
+                          {parsed.A.mantissaBits.slice(0, 8)}
+                        </span>
+                        <span className="text-muted-foreground/50">
+                          {parsed.A.mantissaBits.slice(8)}
+                        </span>
                       </span>
-                      <span className="text-muted-foreground text-xs">Exp: {parsed.A.expDec}</span>
+                      <span className="text-muted-foreground text-xs">
+                        Exp: {parsed.A.expDec}
+                      </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10 text-xs">B</span>
+                      <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10 text-xs">
+                        B
+                      </span>
                       <span className="font-mono">
                         <span className="text-primary">{parsed.B.signBit}</span>
                         <span className="mx-1">{parsed.B.expBits}</span>
-                        <span className="text-muted-foreground">{parsed.B.mantissaBits.slice(0, 8)}</span>
-                        <span className="text-muted-foreground/50">{parsed.B.mantissaBits.slice(8)}</span>
+                        <span className="text-muted-foreground">
+                          {parsed.B.mantissaBits.slice(0, 8)}
+                        </span>
+                        <span className="text-muted-foreground/50">
+                          {parsed.B.mantissaBits.slice(8)}
+                        </span>
                       </span>
-                      <span className="text-muted-foreground text-xs">Exp: {parsed.B.expDec}</span>
+                      <span className="text-muted-foreground text-xs">
+                        Exp: {parsed.B.expDec}
+                      </span>
                     </div>
                     <div className="border-border/40 border-t pt-3">
                       <p className="text-muted-foreground mb-2 text-xs">
@@ -233,12 +261,16 @@ export function IEEEAddition({
                         })}
                       </p>
                       <p className="text-muted-foreground mb-2 text-xs">
-                        {t("simulator.arithmetic.ieee754.shiftDesc", { diff: steps.denorm?.diff })}
+                        {t("simulator.arithmetic.ieee754.shiftDesc", {
+                          diff: steps.denorm?.diff,
+                        })}
                       </p>
                       {shiftSteps.length > 0 && (
                         <div className="mt-3 space-y-2">
                           <p className="text-muted-foreground text-xs font-semibold">
-                            {t("simulator.arithmetic.ieee754.shiftVisualization")}
+                            {t(
+                              "simulator.arithmetic.ieee754.shiftVisualization",
+                            )}
                           </p>
                           {shiftSteps.map((step, idx) => (
                             <CollapsibleStep
@@ -248,16 +280,23 @@ export function IEEEAddition({
                               header={
                                 <div className="flex items-center gap-2 font-mono text-xs">
                                   <span className="text-muted-foreground w-16">
-                                    {t("simulator.arithmetic.ieee754.shiftN", { n: idx + 1 })}
+                                    {t("simulator.arithmetic.ieee754.shiftN", {
+                                      n: idx + 1,
+                                    })}
                                   </span>
                                   <span className="text-muted-foreground">
-                                    1.{steps.denorm?.shiftedMantissa.slice(0, 8)}
+                                    1.
+                                    {steps.denorm?.shiftedMantissa.slice(0, 8)}
                                   </span>
-                                  <span className="text-muted-foreground/50">...</span>
+                                  <span className="text-muted-foreground/50">
+                                    ...
+                                  </span>
                                 </div>
                               }
                             >
-                              <p className="text-muted-foreground text-xs">{step.explanation}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {step.explanation}
+                              </p>
                             </CollapsibleStep>
                           ))}
                         </div>
@@ -272,12 +311,18 @@ export function IEEEAddition({
                     {t("simulator.arithmetic.ieee754.step2")}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    {t("simulator.arithmetic.ieee754.addDesc", { exp: steps.denorm?.largerExpDec })}
+                    {t("simulator.arithmetic.ieee754.addDesc", {
+                      exp: steps.denorm?.largerExpDec,
+                    })}
                   </p>
                   <div className="bg-primary/5 border-primary/20 mt-3 rounded border p-2 font-mono text-sm">
-                    <span className="text-muted-foreground">1.{parsed.A.mantissaBits.slice(0, 12)}...</span>
+                    <span className="text-muted-foreground">
+                      1.{parsed.A.mantissaBits.slice(0, 12)}...
+                    </span>
                     <span className="text-primary mx-2">+</span>
-                    <span className="text-muted-foreground">0.{steps.denorm?.shiftedMantissa.slice(0, 12)}...</span>
+                    <span className="text-muted-foreground">
+                      0.{steps.denorm?.shiftedMantissa.slice(0, 12)}...
+                    </span>
                     <ArrowRight className="mx-2 inline-block h-4 w-4" />
                     <span className="text-primary font-bold">
                       = 1.{steps.renorm?.resParsed.mantissaBits.slice(0, 12)}...
@@ -298,8 +343,12 @@ export function IEEEAddition({
                       {t("simulator.arithmetic.ieee754.signExpMant")}
                     </span>
                     <div className="font-mono">
-                      <span className="text-lg font-bold">{steps.renorm?.resParsed.signBit}</span>
-                      <span className="text-primary mx-2 text-lg">{steps.renorm?.resParsed.expBits}</span>
+                      <span className="text-lg font-bold">
+                        {steps.renorm?.resParsed.signBit}
+                      </span>
+                      <span className="text-primary mx-2 text-lg">
+                        {steps.renorm?.resParsed.expBits}
+                      </span>
                       <span className="text-foreground text-lg">
                         {steps.renorm?.resParsed.mantissaBits.slice(0, 16)}
                         <span className="text-muted-foreground/50">
@@ -329,12 +378,18 @@ export function IEEEAddition({
                     })}
                   </p>
                   <p className="text-muted-foreground font-sans text-xs">
-                    {t("simulator.arithmetic.ieee754.shiftDesc", { diff: steps.denorm?.diff })}
+                    {t("simulator.arithmetic.ieee754.shiftDesc", {
+                      diff: steps.denorm?.diff,
+                    })}
                   </p>
                   <div className="pt-2">
-                    <span className="mr-2 line-through opacity-50">1.{parsed.B.mantissaBits}</span>
+                    <span className="mr-2 line-through opacity-50">
+                      1.{parsed.B.mantissaBits}
+                    </span>
                     <ArrowRight className="text-primary mx-2 inline-block h-4 w-4" />
-                    <span className="text-primary font-bold">0.{steps.denorm?.shiftedMantissa.slice(1)}</span>
+                    <span className="text-primary font-bold">
+                      0.{steps.denorm?.shiftedMantissa.slice(1)}
+                    </span>
                   </div>
                 </div>
 
@@ -344,7 +399,9 @@ export function IEEEAddition({
                     {t("simulator.arithmetic.ieee754.step2")}
                   </p>
                   <p className="text-muted-foreground font-sans text-xs">
-                    {t("simulator.arithmetic.ieee754.expAligned", { exp: steps.denorm?.largerExpDec })}
+                    {t("simulator.arithmetic.ieee754.expAligned", {
+                      exp: steps.denorm?.largerExpDec,
+                    })}
                   </p>
                 </div>
 
@@ -361,9 +418,15 @@ export function IEEEAddition({
                       {t("simulator.arithmetic.ieee754.signExpMant")}
                     </span>
                     <div>
-                      <span className="font-bold">{steps.renorm?.resParsed.sign}</span>
-                      <span className="text-primary mx-2">{steps.renorm?.resParsed.expBits}</span>
-                      <span className="text-foreground">{steps.renorm?.resParsed.mantissaBits}</span>
+                      <span className="font-bold">
+                        {steps.renorm?.resParsed.sign}
+                      </span>
+                      <span className="text-primary mx-2">
+                        {steps.renorm?.resParsed.expBits}
+                      </span>
+                      <span className="text-foreground">
+                        {steps.renorm?.resParsed.mantissaBits}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -372,7 +435,8 @@ export function IEEEAddition({
 
             <div className="border-border/50 flex justify-start border-t pt-4 text-sm font-semibold">
               <span className="bg-primary/10 text-primary flex items-center gap-2 rounded-md px-3 py-1">
-                {t("simulator.arithmetic.ieee754.decimalResult")}: {result.sumDec}
+                {t("simulator.arithmetic.ieee754.decimalResult")}:{" "}
+                {result.sumDec}
               </span>
             </div>
           </div>

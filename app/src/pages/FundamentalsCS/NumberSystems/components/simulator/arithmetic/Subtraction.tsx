@@ -149,16 +149,24 @@ export function Subtraction({
 
       let explanation = "";
       if (bitA === 0 && bitB === 0 && cIn === 0) {
-        explanation = t("simulator.arithmetic.subtraction.add0", { pos: 7 - i });
+        explanation = t("simulator.arithmetic.subtraction.add0", {
+          pos: 7 - i,
+        });
       } else if (
         (bitA === 1 && bitB === 0 && cIn === 1) ||
         (bitA === 0 && bitB === 1 && cIn === 1)
       ) {
-        explanation = t("simulator.arithmetic.subtraction.add1", { pos: 7 - i });
+        explanation = t("simulator.arithmetic.subtraction.add1", {
+          pos: 7 - i,
+        });
       } else if (bitA === 1 && bitB === 1 && cIn === 0) {
-        explanation = t("simulator.arithmetic.subtraction.add2", { pos: 7 - i });
+        explanation = t("simulator.arithmetic.subtraction.add2", {
+          pos: 7 - i,
+        });
       } else if (bitA === 1 && bitB === 1 && cIn === 1) {
-        explanation = t("simulator.arithmetic.subtraction.add3", { pos: 7 - i });
+        explanation = t("simulator.arithmetic.subtraction.add3", {
+          pos: 7 - i,
+        });
       } else {
         explanation = t("simulator.arithmetic.subtraction.add4", {
           pos: 7 - i,
@@ -259,9 +267,14 @@ export function Subtraction({
                   </p>
                   <div className="space-y-2">
                     {onesSteps.map((step, idx) => (
-                      <div key={idx} className="flex items-center gap-4 font-mono text-sm">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-4 font-mono text-sm"
+                      >
                         <span className="text-muted-foreground w-16 text-xs">
-                          {t("simulator.arithmetic.subtraction.bitN", { n: step.position })}
+                          {t("simulator.arithmetic.subtraction.bitN", {
+                            n: step.position,
+                          })}
                         </span>
                         <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">
                           {step.originalBit}
@@ -277,7 +290,9 @@ export function Subtraction({
                     <span className="text-muted-foreground text-sm">
                       {t("simulator.arithmetic.subtraction.onesResult")}
                     </span>
-                    <span className="text-destructive font-mono font-bold">{onesComp}</span>
+                    <span className="text-destructive font-mono font-bold">
+                      {onesComp}
+                    </span>
                   </div>
                 </div>
 
@@ -295,7 +310,9 @@ export function Subtraction({
                         header={
                           <div className="flex items-center gap-4 font-mono text-sm">
                             <span className="text-muted-foreground w-16 text-xs">
-                              {t("simulator.arithmetic.subtraction.bitN", { n: step.position })}
+                              {t("simulator.arithmetic.subtraction.bitN", {
+                                n: step.position,
+                              })}
                             </span>
                             <span className="bg-destructive/10 text-destructive flex h-6 w-8 items-center justify-center rounded">
                               {step.currentBit}
@@ -310,7 +327,9 @@ export function Subtraction({
                             </span>
                             {step.carryOut > 0 && (
                               <>
-                                <span className="text-muted-foreground mx-1">→</span>
+                                <span className="text-muted-foreground mx-1">
+                                  →
+                                </span>
                                 <span className="bg-destructive/10 text-destructive flex h-6 w-8 items-center justify-center rounded">
                                   {step.carryOut}
                                 </span>
@@ -319,7 +338,9 @@ export function Subtraction({
                           </div>
                         }
                       >
-                        <p className="text-muted-foreground text-xs">{step.explanation}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {step.explanation}
+                        </p>
                       </CollapsibleStep>
                     ))}
                   </div>
@@ -327,7 +348,9 @@ export function Subtraction({
                     <span className="text-muted-foreground text-sm">
                       {t("simulator.arithmetic.subtraction.twosResult")}
                     </span>
-                    <span className="text-primary font-mono font-bold">{twosComp}</span>
+                    <span className="text-primary font-mono font-bold">
+                      {twosComp}
+                    </span>
                   </div>
                 </div>
 
@@ -345,25 +368,41 @@ export function Subtraction({
                         header={
                           <div className="flex items-center gap-2 font-mono text-sm">
                             <span className="text-muted-foreground w-16 text-xs">
-                              {t("simulator.arithmetic.subtraction.bitN", { n: step.position })}
+                              {t("simulator.arithmetic.subtraction.bitN", {
+                                n: step.position,
+                              })}
                             </span>
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">{step.bitA}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">
+                              {step.bitA}
+                            </span>
                             <span>+</span>
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">{step.bitB}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">
+                              {step.bitB}
+                            </span>
                             <span>+</span>
-                            <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">{step.carryIn}</span>
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">
+                              {step.carryIn}
+                            </span>
                             <span>=</span>
-                            <span className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded font-bold">{step.sum}</span>
+                            <span className="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded font-bold">
+                              {step.sum}
+                            </span>
                             {step.carryOut > 0 && (
                               <>
-                                <span className="text-muted-foreground mx-1">→</span>
-                                <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded">{step.carryOut}</span>
+                                <span className="text-muted-foreground mx-1">
+                                  →
+                                </span>
+                                <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded">
+                                  {step.carryOut}
+                                </span>
                               </>
                             )}
                           </div>
                         }
                       >
-                        <p className="text-muted-foreground text-xs">{step.explanation}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {step.explanation}
+                        </p>
                       </CollapsibleStep>
                     ))}
                   </div>
@@ -380,7 +419,9 @@ export function Subtraction({
                 <div className="flex gap-4">
                   <span className="opacity-50">{padB}</span>
                   <ArrowRight className="h-4 w-4 opacity-50" />
-                  <span className="text-destructive font-semibold">{onesComp}</span>
+                  <span className="text-destructive font-semibold">
+                    {onesComp}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
@@ -388,7 +429,9 @@ export function Subtraction({
                   {t("simulator.arithmetic.subtraction.step2")}
                 </p>
                 <div className="flex gap-4">
-                  <span className="text-destructive opacity-50">{onesComp}</span>
+                  <span className="text-destructive opacity-50">
+                    {onesComp}
+                  </span>
                   <span className="text-primary opacity-50">+ 00000001</span>
                   <ArrowRight className="h-4 w-4 opacity-50" />
                   <span className="text-primary font-bold">{twosComp}</span>
@@ -406,30 +449,46 @@ export function Subtraction({
                   <span className="w-4" />
                   <span className="mr-2 w-4" />
                   {carries.slice(0, 8).map((c, i) => (
-                    <span key={i} className={`w-4 text-center ${c ? "font-bold opacity-100" : "opacity-20"}`}>{c}</span>
+                    <span
+                      key={i}
+                      className={`w-4 text-center ${c ? "font-bold opacity-100" : "opacity-20"}`}
+                    >
+                      {c}
+                    </span>
                   ))}
                 </div>
                 <div className="flex gap-2">
                   <span className="w-4 text-center" />
                   <span className="mr-2 w-4 text-center" />
                   {padA.split("").map((b, i) => (
-                    <span key={`a-${i}`} className="w-4 text-center">{b}</span>
+                    <span key={`a-${i}`} className="w-4 text-center">
+                      {b}
+                    </span>
                   ))}
                 </div>
                 <div className="border-foreground/30 mb-2 flex gap-2 border-b-2 pb-2">
                   <span className="text-primary mr-2 w-4 text-center">+</span>
                   <span className="w-4 text-center" />
                   {twosComp.split("").map((b, i) => (
-                    <span key={`b-${i}`} className="w-4 text-center">{b}</span>
+                    <span key={`b-${i}`} className="w-4 text-center">
+                      {b}
+                    </span>
                   ))}
                 </div>
                 <div className="flex gap-2">
                   <span className="w-4 text-center" />
-                  <span className={`mr-2 w-4 text-center ${carryOut ? "text-destructive font-bold" : "text-muted-foreground opacity-20"}`}>
+                  <span
+                    className={`mr-2 w-4 text-center ${carryOut ? "text-destructive font-bold" : "text-muted-foreground opacity-20"}`}
+                  >
                     {carries[0]}
                   </span>
                   {sum.split("").map((b, i) => (
-                    <span key={`s-${i}`} className="text-primary w-4 text-center font-bold">{b}</span>
+                    <span
+                      key={`s-${i}`}
+                      className="text-primary w-4 text-center font-bold"
+                    >
+                      {b}
+                    </span>
                   ))}
                 </div>
               </div>

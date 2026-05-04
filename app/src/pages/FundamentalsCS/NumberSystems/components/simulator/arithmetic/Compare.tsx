@@ -50,7 +50,13 @@ export function Compare({
 
   const { padA, padB, diffIndex, result, compareSteps } = useMemo(() => {
     if (!valA || !valB)
-      return { padA: "", padB: "", diffIndex: -1, result: "eq", compareSteps: [] };
+      return {
+        padA: "",
+        padB: "",
+        diffIndex: -1,
+        result: "eq",
+        compareSteps: [],
+      };
 
     const maxLen = Math.max(valA.length, valB.length);
     const pA = valA.padStart(maxLen, "0");
@@ -71,22 +77,43 @@ export function Compare({
         dIndex = i;
         res = bitA === "1" ? "greater" : "less";
         if (bitA === "1") {
-          explanation = t("simulator.arithmetic.compare.stepResultGreater", { pos: i });
+          explanation = t("simulator.arithmetic.compare.stepResultGreater", {
+            pos: i,
+          });
           stepResult = "greater";
         } else {
-          explanation = t("simulator.arithmetic.compare.stepResultLess", { pos: i });
+          explanation = t("simulator.arithmetic.compare.stepResultLess", {
+            pos: i,
+          });
           stepResult = "less";
         }
       } else {
-        explanation = t("simulator.arithmetic.compare.stepEqual", { pos: i, bit: bitA });
+        explanation = t("simulator.arithmetic.compare.stepEqual", {
+          pos: i,
+          bit: bitA,
+        });
       }
 
-      steps.push({ step: i, position: i, bitA, bitB, equal, result: stepResult, explanation });
+      steps.push({
+        step: i,
+        position: i,
+        bitA,
+        bitB,
+        equal,
+        result: stepResult,
+        explanation,
+      });
 
       if (!equal) break;
     }
 
-    return { padA: pA, padB: pB, diffIndex: dIndex, result: res, compareSteps: steps };
+    return {
+      padA: pA,
+      padB: pB,
+      diffIndex: dIndex,
+      result: res,
+      compareSteps: steps,
+    };
   }, [valA, valB, t]);
 
   return (
@@ -121,7 +148,9 @@ export function Compare({
       resultPanel={
         locked ? (
           <ExerciseValidationPanel
-            expectedResult={result === "eq" ? "=" : result === "greater" ? ">" : "<"}
+            expectedResult={
+              result === "eq" ? "=" : result === "greater" ? ">" : "<"
+            }
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
             inputMode="compare"
@@ -157,13 +186,17 @@ export function Compare({
                           <span className="text-muted-foreground">A:</span>{" "}
                           <span className="text-foreground">{valA}</span>
                           <span className="text-muted-foreground ml-2">→</span>
-                          <span className="text-primary ml-2 font-bold">{padA}</span>
+                          <span className="text-primary ml-2 font-bold">
+                            {padA}
+                          </span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">B:</span>{" "}
                           <span className="text-foreground">{valB}</span>
                           <span className="text-muted-foreground ml-2">→</span>
-                          <span className="text-primary ml-2 font-bold">{padB}</span>
+                          <span className="text-primary ml-2 font-bold">
+                            {padB}
+                          </span>
                         </div>
                       </div>
                       {valA.length !== padA.length && (
@@ -189,14 +222,24 @@ export function Compare({
                           header={
                             <>
                               <span className="text-muted-foreground w-20 text-xs font-bold">
-                                {t("simulator.arithmetic.compare.posN", { n: step.position })}
+                                {t("simulator.arithmetic.compare.posN", {
+                                  n: step.position,
+                                })}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
-                                <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">{step.bitA}</span>
-                                <span className="text-muted-foreground">
-                                  {step.equal ? "=" : step.result === "greater" ? ">" : "<"}
+                                <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">
+                                  {step.bitA}
                                 </span>
-                                <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10">{step.bitB}</span>
+                                <span className="text-muted-foreground">
+                                  {step.equal
+                                    ? "="
+                                    : step.result === "greater"
+                                      ? ">"
+                                      : "<"}
+                                </span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10">
+                                  {step.bitB}
+                                </span>
                                 {step.result && (
                                   <span
                                     className={`ml-2 rounded px-2 py-1 text-xs ${
@@ -206,18 +249,26 @@ export function Compare({
                                     }`}
                                   >
                                     {step.result === "greater"
-                                      ? t("simulator.arithmetic.compare.AgreaterB")
-                                      : t("simulator.arithmetic.compare.AlessB")}
+                                      ? t(
+                                          "simulator.arithmetic.compare.AgreaterB",
+                                        )
+                                      : t(
+                                          "simulator.arithmetic.compare.AlessB",
+                                        )}
                                   </span>
                                 )}
                               </div>
                             </>
                           }
                         >
-                          <p className="text-foreground text-sm">{step.explanation}</p>
+                          <p className="text-foreground text-sm">
+                            {step.explanation}
+                          </p>
                           {step.result && (
                             <p className="text-muted-foreground border-border/40 mt-2 border-t pt-2 text-sm">
-                              {t("simulator.arithmetic.compare.finalResultNote")}
+                              {t(
+                                "simulator.arithmetic.compare.finalResultNote",
+                              )}
                             </p>
                           )}
                         </CollapsibleStep>
@@ -246,7 +297,9 @@ export function Compare({
                     <div className="flex justify-center p-4">
                       <div className="bg-background border-border/40 flex min-w-fit flex-col items-center overflow-x-auto rounded-lg border p-6 font-mono text-xl leading-loose font-medium tracking-widest shadow-inner select-none md:text-2xl">
                         <div className="flex gap-2">
-                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">A</span>
+                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">
+                            A
+                          </span>
                           {padA.split("").map((bit, i) => (
                             <span
                               key={`a-${i}`}
@@ -269,12 +322,18 @@ export function Compare({
                                     : "text-muted-foreground"
                               }`}
                             >
-                              {i === diffIndex ? (result === "greater" ? ">" : "<") : "="}
+                              {i === diffIndex
+                                ? result === "greater"
+                                  ? ">"
+                                  : "<"
+                                : "="}
                             </span>
                           ))}
                         </div>
                         <div className="flex gap-2">
-                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">B</span>
+                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">
+                            B
+                          </span>
                           {padB.split("").map((bit, i) => (
                             <span
                               key={`b-${i}`}

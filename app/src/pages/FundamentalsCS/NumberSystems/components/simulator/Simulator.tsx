@@ -16,7 +16,10 @@ interface SimulatorProps {
   onExitExercise?: () => void;
 }
 
-export function Simulator({ selectedExercise, onExitExercise }: SimulatorProps) {
+export function Simulator({
+  selectedExercise,
+  onExitExercise,
+}: SimulatorProps) {
   const { t } = useTranslation("translation");
   const [activeMode, setActiveMode] = useState<SimulatorMode>("integers");
 

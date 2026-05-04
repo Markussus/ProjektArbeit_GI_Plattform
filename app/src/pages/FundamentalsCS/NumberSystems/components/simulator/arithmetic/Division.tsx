@@ -189,7 +189,9 @@ export function Division({
                           header={
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
-                                {t("simulator.arithmetic.division.stepN", { n: step.step + 1 })}
+                                {t("simulator.arithmetic.division.stepN", {
+                                  n: step.step + 1,
+                                })}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
                                 <span
@@ -199,21 +201,37 @@ export function Division({
                                 </span>
                                 <span className="text-muted-foreground">
                                   {step.isOne
-                                    ? t("simulator.arithmetic.division.appendOneShort")
-                                    : t("simulator.arithmetic.division.appendZeroShort")}
+                                    ? t(
+                                        "simulator.arithmetic.division.appendOneShort",
+                                      )
+                                    : t(
+                                        "simulator.arithmetic.division.appendZeroShort",
+                                      )}
                                 </span>
                               </div>
                             </>
                           }
                         >
-                          <p className="text-foreground text-sm">{step.explanation}</p>
+                          <p className="text-foreground text-sm">
+                            {step.explanation}
+                          </p>
                           {step.isOne && (
                             <div className="bg-destructive/5 border-destructive/20 mt-2 rounded border p-2 font-mono text-sm">
-                              <span className="text-muted-foreground">{step.currentStr}</span>
-                              <span className="text-muted-foreground mx-2">-</span>
-                              <span className="text-destructive">{step.subtracted}</span>
-                              <span className="text-muted-foreground mx-2">=</span>
-                              <span className="text-primary font-bold">{step.remainderAfter}</span>
+                              <span className="text-muted-foreground">
+                                {step.currentStr}
+                              </span>
+                              <span className="text-muted-foreground mx-2">
+                                -
+                              </span>
+                              <span className="text-destructive">
+                                {step.subtracted}
+                              </span>
+                              <span className="text-muted-foreground mx-2">
+                                =
+                              </span>
+                              <span className="text-primary font-bold">
+                                {step.remainderAfter}
+                              </span>
                             </div>
                           )}
                         </CollapsibleStep>
@@ -223,10 +241,16 @@ export function Division({
                     {/* Summary */}
                     <div className="bg-primary/10 border-primary mt-4 rounded-r-md border-l-4 p-4">
                       <p className="text-foreground text-sm">
-                        <strong>{t("simulator.arithmetic.division.quotient")}:</strong> {quotient}
+                        <strong>
+                          {t("simulator.arithmetic.division.quotient")}:
+                        </strong>{" "}
+                        {quotient}
                       </p>
                       <p className="text-foreground mt-1 text-sm">
-                        <strong>{t("simulator.arithmetic.division.remainder")}:</strong> {remainder}
+                        <strong>
+                          {t("simulator.arithmetic.division.remainder")}:
+                        </strong>{" "}
+                        {remainder}
                       </p>
                     </div>
                   </div>
@@ -246,15 +270,23 @@ export function Division({
                       {steps.map((step, idx) => (
                         <div key={idx} className="flex w-full gap-4">
                           <div className="border-muted/50 flex flex-col items-end border-l-2 pl-2">
-                            <span className="text-foreground">{step.currentStr}</span>
-                            <span className={`${step.isOne ? "text-destructive" : "text-muted-foreground opacity-50"}`}>
+                            <span className="text-foreground">
+                              {step.currentStr}
+                            </span>
+                            <span
+                              className={`${step.isOne ? "text-destructive" : "text-muted-foreground opacity-50"}`}
+                            >
                               - {step.subtracted}
                             </span>
                           </div>
                           <div className="text-muted-foreground flex h-full items-center pt-4 text-sm">
                             {step.isOne
-                              ? t("simulator.arithmetic.division.appendOneShort")
-                              : t("simulator.arithmetic.division.appendZeroShort")}
+                              ? t(
+                                  "simulator.arithmetic.division.appendOneShort",
+                                )
+                              : t(
+                                  "simulator.arithmetic.division.appendZeroShort",
+                                )}
                           </div>
                         </div>
                       ))}
