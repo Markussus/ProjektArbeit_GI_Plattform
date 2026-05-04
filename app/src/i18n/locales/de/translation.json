@@ -1,4 +1,9 @@
 {
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen"
+  },
   "app": {
     "title": "THWS - Traingscenter"
   },
@@ -491,7 +496,14 @@
       "verify": "Lösung überprüfen",
       "showSolution": "Lösung anzeigen (Überspringen)",
       "correct": "Korrekt! Die Lösung wurde freigeschaltet.",
-      "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!"
+      "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!",
+      "exitExerciseButton": "Übungsmodus verlassen",
+      "exitExerciseTitle": "Übungsmodus verlassen?",
+      "exitExerciseDesc": "Dein Fortschritt in dieser Übung geht verloren. Bist du sicher, dass du den Übungsmodus verlassen möchtest?",
+      "exitExerciseConfirm": "Verlassen",
+      "exitTabTitle": "Tab wechseln?",
+      "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs wird die aktuelle Übung beendet und dein Fortschritt geht verloren.",
+      "exitTabConfirm": "Tab wechseln"
     }
   },
   "tm": {

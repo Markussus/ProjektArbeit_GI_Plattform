@@ -1,4 +1,9 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
   "app": {
     "title": "THWS - Traing Center"
   },
@@ -495,7 +500,14 @@
       "verify": "Verify Solution",
       "showSolution": "Show Solution (Skip)",
       "correct": "Correct! The solution has been unlocked.",
-      "incorrect": "The result is incorrect. Please try again!"
+      "incorrect": "The result is incorrect. Please try again!",
+      "exitExerciseButton": "Exit Exercise Mode",
+      "exitExerciseTitle": "Exit Exercise Mode?",
+      "exitExerciseDesc": "Your progress on this exercise will be lost. Are you sure you want to leave the exercise mode?",
+      "exitExerciseConfirm": "Exit",
+      "exitTabTitle": "Switch Tab?",
+      "exitTabDesc": "You are currently in exercise mode. Switching tabs will end the current exercise and your progress will be lost.",
+      "exitTabConfirm": "Switch Tab"
     }
   },
   "tm": {

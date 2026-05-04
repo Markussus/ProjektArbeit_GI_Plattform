@@ -1,16 +1,16 @@
-import { useState, useMemo, type ReactNode } from "react";
-import { Search, List, ChevronDown, ChevronRight } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
-
-interface CompareProps {
-  renderModeSelector?: ReactNode;
-  isExerciseMode?: boolean;
-  showSolution?: boolean;
-  onShowSolution?: () => void;
-  initialA?: string;
-  initialB?: string;
-}
+import type { BaseArithmeticProps } from "./types";
+import {
+  SimulatorLayout,
+  BinaryInput,
+  StepByStepToggle,
+  CollapsibleStep,
+  ResultSectionHeader,
+  useToggleSet,
+} from "../shared";
 
 interface CompareStep {
   step: number;
@@ -26,17 +26,16 @@ export function Compare({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialA,
   initialB,
   renderModeSelector,
-}: CompareProps) {
+}: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "10110");
   const [valB, setValB] = useState(initialB || "10011");
   const [showStepByStep, setShowStepByStep] = useState(false);
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(
-    new Set(["0", "1", "2"]),
-  );
+  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
 
   const locked = !!isExerciseMode && !showSolution;
 
@@ -51,13 +50,7 @@ export function Compare({
 
   const { padA, padB, diffIndex, result, compareSteps } = useMemo(() => {
     if (!valA || !valB)
-      return {
-        padA: "",
-        padB: "",
-        diffIndex: -1,
-        result: "eq",
-        compareSteps: [],
-      };
+      return { padA: "", padB: "", diffIndex: -1, result: "eq", compareSteps: [] };
 
     const maxLen = Math.max(valA.length, valB.length);
     const pA = valA.padStart(maxLen, "0");
@@ -78,130 +71,75 @@ export function Compare({
         dIndex = i;
         res = bitA === "1" ? "greater" : "less";
         if (bitA === "1") {
-          explanation = t("simulator.arithmetic.compare.stepResultGreater", {
-            pos: i,
-          });
+          explanation = t("simulator.arithmetic.compare.stepResultGreater", { pos: i });
           stepResult = "greater";
         } else {
-          explanation = t("simulator.arithmetic.compare.stepResultLess", {
-            pos: i,
-          });
+          explanation = t("simulator.arithmetic.compare.stepResultLess", { pos: i });
           stepResult = "less";
         }
       } else {
-        explanation = t("simulator.arithmetic.compare.stepEqual", {
-          pos: i,
-          bit: bitA,
-        });
+        explanation = t("simulator.arithmetic.compare.stepEqual", { pos: i, bit: bitA });
       }
 
-      steps.push({
-        step: i,
-        position: i,
-        bitA,
-        bitB,
-        equal,
-        result: stepResult,
-        explanation,
-      });
+      steps.push({ step: i, position: i, bitA, bitB, equal, result: stepResult, explanation });
 
       if (!equal) break;
     }
 
-    return {
-      padA: pA,
-      padB: pB,
-      diffIndex: dIndex,
-      result: res,
-      compareSteps: steps,
-    };
+    return { padA: pA, padB: pB, diffIndex: dIndex, result: res, compareSteps: steps };
   }, [valA, valB, t]);
 
-  const toggleStep = (index: number) => {
-    const newExpanded = new Set(expandedSteps);
-    const key = String(index);
-    if (newExpanded.has(key)) {
-      newExpanded.delete(key);
-    } else {
-      newExpanded.add(key);
-    }
-    setExpandedSteps(newExpanded);
-  };
-
   return (
-    <div className="animate-in fade-in zoom-in-95 grid w-full grid-cols-1 gap-6 duration-300 md:grid-cols-2">
-      {/* Inputs */}
-      <div className="bg-card border-border/50 space-y-6 rounded-xl border p-6 shadow-sm">
-        <div>
-          <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-            {t("simulator.arithmetic.common.operands")}
-          </h3>
-          <p className="text-muted-foreground mb-4 text-sm">
-            {t("simulator.arithmetic.compare.desc")}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {renderModeSelector}
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.common.operandA")}
-            </label>
-            <input
-              type="text"
+    <SimulatorLayout
+      inputPanel={
+        <>
+          <div>
+            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
+              {t("simulator.arithmetic.common.operands")}
+            </h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {t("simulator.arithmetic.compare.desc")}
+            </p>
+          </div>
+          <div className="space-y-4">
+            {renderModeSelector}
+            <BinaryInput
+              label={t("simulator.arithmetic.common.operandA")}
               value={valA}
-              onChange={(e) => handleInputA(e.target.value)}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              onChange={handleInputA}
+              locked={locked}
             />
-          </div>
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.common.operandB")}
-            </label>
-            <input
-              type="text"
+            <BinaryInput
+              label={t("simulator.arithmetic.common.operandB")}
               value={valB}
-              onChange={(e) => handleInputB(e.target.value)}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              onChange={handleInputB}
+              locked={locked}
             />
           </div>
-        </div>
-      </div>
-
-      {/* Logic / Dashboard Panel */}
-      <div className="bg-muted/30 border-border/50 overflow-auto rounded-xl border p-6 shadow-sm">
-        {locked ? (
+        </>
+      }
+      resultPanel={
+        locked ? (
           <ExerciseValidationPanel
-            expectedResult={
-              result === "eq" ? "=" : result === "greater" ? ">" : "<"
-            }
+            expectedResult={result === "eq" ? "=" : result === "greater" ? ">" : "<"}
             onShowSolution={onShowSolution!}
+            onExitExercise={onExitExercise}
             placeholder="z.B. > oder < oder ="
           />
         ) : (
           <div className="space-y-6">
-            <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
-              <Search className="text-primary h-5 w-5" />
-              {t("simulator.arithmetic.compare.visualCompare")}
-            </h3>
+            <ResultSectionHeader
+              icon={<Search className="text-primary h-5 w-5" />}
+              title={t("simulator.arithmetic.compare.visualCompare")}
+            />
 
             {valA && valB ? (
               <div className="space-y-6">
-                {/* Step-by-Step Toggle */}
-                <button
-                  onClick={() => setShowStepByStep(!showStepByStep)}
-                  className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
-                >
-                  <List className="h-4 w-4" />
-                  {t("simulator.arithmetic.common.showStepByStep")}
-                  {showStepByStep ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </button>
+                <StepByStepToggle
+                  open={showStepByStep}
+                  onToggle={() => setShowStepByStep(!showStepByStep)}
+                  className="mb-0"
+                />
 
                 {showStepByStep && compareSteps.length > 0 && (
                   <div className="space-y-3">
@@ -218,17 +156,13 @@ export function Compare({
                           <span className="text-muted-foreground">A:</span>{" "}
                           <span className="text-foreground">{valA}</span>
                           <span className="text-muted-foreground ml-2">→</span>
-                          <span className="text-primary ml-2 font-bold">
-                            {padA}
-                          </span>
+                          <span className="text-primary ml-2 font-bold">{padA}</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">B:</span>{" "}
                           <span className="text-foreground">{valB}</span>
                           <span className="text-muted-foreground ml-2">→</span>
-                          <span className="text-primary ml-2 font-bold">
-                            {padB}
-                          </span>
+                          <span className="text-primary ml-2 font-bold">{padB}</span>
                         </div>
                       </div>
                       {valA.length !== padA.length && (
@@ -247,34 +181,21 @@ export function Compare({
 
                     <div className="space-y-2">
                       {compareSteps.map((step, idx) => (
-                        <div
+                        <CollapsibleStep
                           key={idx}
-                          className="border-border/40 overflow-hidden rounded-lg border"
-                        >
-                          <button
-                            onClick={() => toggleStep(idx)}
-                            className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors"
-                          >
-                            <div className="flex items-center gap-4">
+                          isOpen={expanded.has(String(idx))}
+                          onToggle={() => toggle(String(idx))}
+                          header={
+                            <>
                               <span className="text-muted-foreground w-20 text-xs font-bold">
-                                {t("simulator.arithmetic.compare.posN", {
-                                  n: step.position,
-                                })}
+                                {t("simulator.arithmetic.compare.posN", { n: step.position })}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
-                                <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">
-                                  {step.bitA}
-                                </span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">{step.bitA}</span>
                                 <span className="text-muted-foreground">
-                                  {step.equal
-                                    ? "="
-                                    : step.result === "greater"
-                                      ? ">"
-                                      : "<"}
+                                  {step.equal ? "=" : step.result === "greater" ? ">" : "<"}
                                 </span>
-                                <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10">
-                                  {step.bitB}
-                                </span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10">{step.bitB}</span>
                                 {step.result && (
                                   <span
                                     className={`ml-2 rounded px-2 py-1 text-xs ${
@@ -284,37 +205,21 @@ export function Compare({
                                     }`}
                                   >
                                     {step.result === "greater"
-                                      ? t(
-                                          "simulator.arithmetic.compare.AgreaterB",
-                                        )
-                                      : t(
-                                          "simulator.arithmetic.compare.AlessB",
-                                        )}
+                                      ? t("simulator.arithmetic.compare.AgreaterB")
+                                      : t("simulator.arithmetic.compare.AlessB")}
                                   </span>
                                 )}
                               </div>
-                            </div>
-                            {expandedSteps.has(String(idx)) ? (
-                              <ChevronDown className="text-muted-foreground h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="text-muted-foreground h-4 w-4" />
-                            )}
-                          </button>
-                          {expandedSteps.has(String(idx)) && (
-                            <div className="bg-muted/30 border-border/40 border-t p-3">
-                              <p className="text-foreground text-sm">
-                                {step.explanation}
-                              </p>
-                              {step.result && (
-                                <p className="text-muted-foreground border-border/40 mt-2 border-t pt-2 text-sm">
-                                  {t(
-                                    "simulator.arithmetic.compare.finalResultNote",
-                                  )}
-                                </p>
-                              )}
-                            </div>
+                            </>
+                          }
+                        >
+                          <p className="text-foreground text-sm">{step.explanation}</p>
+                          {step.result && (
+                            <p className="text-muted-foreground border-border/40 mt-2 border-t pt-2 text-sm">
+                              {t("simulator.arithmetic.compare.finalResultNote")}
+                            </p>
                           )}
-                        </div>
+                        </CollapsibleStep>
                       ))}
                     </div>
 
@@ -340,9 +245,7 @@ export function Compare({
                     <div className="flex justify-center p-4">
                       <div className="bg-background border-border/40 flex min-w-fit flex-col items-center overflow-x-auto rounded-lg border p-6 font-mono text-xl leading-loose font-medium tracking-widest shadow-inner select-none md:text-2xl">
                         <div className="flex gap-2">
-                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">
-                            A
-                          </span>
+                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">A</span>
                           {padA.split("").map((bit, i) => (
                             <span
                               key={`a-${i}`}
@@ -352,27 +255,25 @@ export function Compare({
                             </span>
                           ))}
                         </div>
-
                         <div className="my-2 flex gap-2">
                           <span className="mr-4 w-8" />
                           {padA.split("").map((_, i) => (
                             <span
                               key={`op-${i}`}
-                              className={`flex w-6 items-center justify-center text-sm ${i === diffIndex ? "text-primary" : diffIndex !== -1 && i > diffIndex ? "opacity-0" : "text-muted-foreground"}`}
+                              className={`flex w-6 items-center justify-center text-sm ${
+                                i === diffIndex
+                                  ? "text-primary"
+                                  : diffIndex !== -1 && i > diffIndex
+                                    ? "opacity-0"
+                                    : "text-muted-foreground"
+                              }`}
                             >
-                              {i === diffIndex
-                                ? result === "greater"
-                                  ? ">"
-                                  : "<"
-                                : "="}
+                              {i === diffIndex ? (result === "greater" ? ">" : "<") : "="}
                             </span>
                           ))}
                         </div>
-
                         <div className="flex gap-2">
-                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">
-                            B
-                          </span>
+                          <span className="text-muted-foreground my-auto mr-4 w-8 text-right font-sans text-sm tracking-normal uppercase">B</span>
                           {padB.split("").map((bit, i) => (
                             <span
                               key={`b-${i}`}
@@ -403,8 +304,8 @@ export function Compare({
               </p>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }

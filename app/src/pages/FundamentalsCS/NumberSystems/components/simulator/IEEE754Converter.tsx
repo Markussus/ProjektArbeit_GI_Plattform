@@ -7,6 +7,7 @@ interface IEEE754ConverterProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
   initialConverterMode?: "decToIeee" | "ieeeToDec";
 }
@@ -15,6 +16,7 @@ export function IEEE754Converter({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
   initialConverterMode = "decToIeee",
 }: IEEE754ConverterProps) {
@@ -279,6 +281,7 @@ export function IEEE754Converter({
                       : [floatVal.toString()]
               }
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
               placeholder={
                 converterMode === "decToIeee"
                   ? "z.B. 0 10000000 0000000..."

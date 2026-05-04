@@ -22,6 +22,7 @@ interface ArithmeticModeProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialMode?: ArithmeticModeType;
   initialValueA?: string;
   initialValueB?: string;
@@ -31,6 +32,7 @@ export function ArithmeticMode({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialMode = "addition",
   initialValueA,
   initialValueB,
@@ -88,6 +90,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             initialB={initialValueB}
             renderModeSelector={modeSelector}
@@ -98,6 +101,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             initialB={initialValueB}
             renderModeSelector={modeSelector}
@@ -108,6 +112,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             initialB={initialValueB}
             renderModeSelector={modeSelector}
@@ -118,6 +123,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             initialB={initialValueB}
             renderModeSelector={modeSelector}
@@ -128,6 +134,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             renderModeSelector={modeSelector}
           />
@@ -137,6 +144,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             renderModeSelector={modeSelector}
           />
         )}
@@ -145,6 +153,7 @@ export function ArithmeticMode({
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={onShowSolution}
+            onExitExercise={onExitExercise}
             initialA={initialValueA}
             initialB={initialValueB}
             renderModeSelector={modeSelector}

@@ -10,6 +10,7 @@ interface IntegerConverterProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
   initialBase?: BaseType;
   initialTargetBase?: BaseType;
@@ -19,6 +20,7 @@ export function IntegerConverter({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
   initialBase = "dec",
   initialTargetBase = "bin",
@@ -391,6 +393,7 @@ export function IntegerConverter({
             <ExerciseValidationPanel
               expectedResult={targetValue}
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
               placeholder={`z.B. ${targetBase === "bin" ? "10110" : targetBase === "hex" ? "2A" : "42"}`}
             />
           ) : (

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
 import type { Exercise } from "@/types/exercise";
@@ -19,6 +20,8 @@ export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
   isFocused: boolean;
   onToggleFocus: () => void;
+  /** Callback um den Übungsmodus vollständig zu verlassen (setzt simulationExercise auf null) */
+  onExitExercise?: () => void;
 }
 
 interface ModuleTopicPageProps {
@@ -43,6 +46,11 @@ export function ModuleTopicPage({
   const { t } = useTranslation();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
+
+  // Tab-Wechsel Confirm Dialog state
+  const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
+  const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
+
   const {
     activeTab,
     setActiveTab,
@@ -50,26 +58,62 @@ export function ModuleTopicPage({
     simulationExercise,
     selectExercise,
     openInSimulation,
+    clearSimulationExercise,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
     setIsSimulationFocused((prev) => {
       const next = !prev;
       if (next) {
-        // Focus mode is meant to maximize the workspace, so the sidebar is
-        // collapsed proactively instead of waiting for a separate user action.
         setSidebarCollapsed(true);
       }
       return next;
     });
   };
 
+  /** Verlässt den Übungsmodus: räumt simulationExercise + selectedExercise auf */
+  const handleExitExercise = () => {
+    clearSimulationExercise();
+  };
+
+  /**
+   * Tab-Klick Handler.
+   * - Wenn Übung aktiv und User auf einen anderen Tab wechseln will → Warnung.
+   * - Wenn User den aktiven Simulation-Tab nochmal tippt während Übung aktiv → Warnung zum Verlassen.
+   */
   const handleTabChange = (tab: ModuleTabId) => {
+    const exerciseIsActive = !!simulationExercise;
+
+    if (exerciseIsActive && tab !== activeTab) {
+      // Wechsel zu anderem Tab – Warnung
+      setPendingTab(tab);
+      setShowTabExitConfirm(true);
+      return;
+    }
+
+    if (exerciseIsActive && tab === activeTab && tab === "simulation") {
+      // Simulation-Tab nochmal anklicken während Übung aktiv → Verlassen-Warnung
+      setPendingTab(null);
+      setShowTabExitConfirm(true);
+      return;
+    }
+
+    applyTabChange(tab);
+  };
+
+  const applyTabChange = (tab: ModuleTabId) => {
     setActiveTab(tab);
     if (tab !== "simulation") {
-      // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
+  };
+
+  const handleTabExitConfirm = () => {
+    setShowTabExitConfirm(false);
+    clearSimulationExercise();
+    const target = pendingTab ?? activeTab;
+    setPendingTab(null);
+    applyTabChange(target);
   };
 
   const renderActiveTab = () => {
@@ -97,6 +141,7 @@ export function ModuleTopicPage({
           selectedExercise={simulationExercise}
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
+          onExitExercise={simulationExercise ? handleExitExercise : undefined}
         />
       );
     }
@@ -122,6 +167,20 @@ export function ModuleTopicPage({
       />
 
       {renderActiveTab()}
+
+      {/* Übungsmodus-Verlassen Bestätigungsdialog (Tab-Wechsel) */}
+      <ConfirmDialog
+        isOpen={showTabExitConfirm}
+        title={t("simulator.validation.exitTabTitle")}
+        description={t("simulator.validation.exitTabDesc")}
+        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        onConfirm={handleTabExitConfirm}
+        onCancel={() => {
+          setShowTabExitConfirm(false);
+          setPendingTab(null);
+        }}
+        variant="warning"
+      />
     </div>
   );
 }

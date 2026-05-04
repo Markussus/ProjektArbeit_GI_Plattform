@@ -7,6 +7,7 @@ interface NegativeNumbersProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
 }
 
@@ -14,6 +15,7 @@ export function NegativeNumbers({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
 }: NegativeNumbersProps) {
   const { t } = useTranslation("translation");
@@ -54,7 +56,6 @@ export function NegativeNumbers({
       }
       onesComplement = ones;
 
-      // Twos complement: invert and add 1
       let twos = "";
       let carry = 1;
       for (let i = 7; i >= 0; i--) {
@@ -137,6 +138,7 @@ export function NegativeNumbers({
             <ExerciseValidationPanel
               expectedResult={twosComplement}
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
               placeholder="z.B. 11110001"
             />
           ) : (
@@ -174,9 +176,7 @@ export function NegativeNumbers({
                         {t("simulator.numbers.step1Abs")}
                       </div>
                       <p className="text-muted-foreground mb-2 text-xs">
-                        {t("simulator.numbers.positive8Bit", {
-                          val: Math.abs(parsed),
-                        })}
+                        {t("simulator.numbers.positive8Bit", { val: Math.abs(parsed) })}
                       </p>
                       <div className="text-foreground bg-muted/50 rounded py-2 text-center font-mono text-lg tracking-[0.25em]">
                         {positiveBin}
@@ -196,9 +196,7 @@ export function NegativeNumbers({
                         </p>
                         <div className="bg-primary/10 flex justify-center rounded py-2 text-center font-mono text-lg tracking-[0.25em]">
                           <span className="text-destructive font-bold">1</span>
-                          <span className="text-primary">
-                            {positiveBin.substring(1)}
-                          </span>
+                          <span className="text-primary">{positiveBin.substring(1)}</span>
                         </div>
                       </div>
                     )}
@@ -232,14 +230,10 @@ export function NegativeNumbers({
                           {t("simulator.numbers.addToOnes")}
                         </p>
                         <div className="bg-primary/10 flex flex-col items-center rounded py-2 font-mono text-lg tracking-[0.25em]">
-                          <div className="text-orange-500">
-                            {onesComplement}
-                          </div>
+                          <div className="text-orange-500">{onesComplement}</div>
                           <div className="text-muted-foreground/70">+ 1</div>
                           <div className="bg-primary/30 my-1 h-px w-4/5"></div>
-                          <div className="text-primary font-bold">
-                            {twosComplement}
-                          </div>
+                          <div className="text-primary font-bold">{twosComplement}</div>
                         </div>
                       </div>
                     )}
@@ -254,6 +248,7 @@ export function NegativeNumbers({
   );
 }
 
+// ResultRow bleibt lokal – sehr spezifisch für NegativeNumbers
 function ResultRow({
   label,
   value,
