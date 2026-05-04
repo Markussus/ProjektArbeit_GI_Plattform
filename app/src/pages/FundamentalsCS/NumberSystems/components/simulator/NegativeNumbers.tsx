@@ -139,6 +139,7 @@ export function NegativeNumbers({
               expectedResult={twosComplement}
               onShowSolution={onShowSolution!}
               onExitExercise={onExitExercise}
+              inputMode="binary"
               placeholder="z.B. 11110001"
             />
           ) : (

@@ -235,6 +235,7 @@ export function Subtraction({
             expectedResult={sum}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="binary"
             placeholder="z.B. 00100000"
           />
         ) : (

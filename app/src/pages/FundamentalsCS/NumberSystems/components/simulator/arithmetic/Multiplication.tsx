@@ -139,6 +139,7 @@ export function Multiplication({
             expectedResult={finalSum}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="binary"
             placeholder="z.B. 1000001"
           />
         ) : (

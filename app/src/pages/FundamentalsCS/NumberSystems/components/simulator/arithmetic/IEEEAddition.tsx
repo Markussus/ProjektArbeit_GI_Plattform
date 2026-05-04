@@ -181,6 +181,7 @@ export function IEEEAddition({
             expectedResult={result?.binStr || ""}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="ieee-binary"
             placeholder="z.B. 0 10000010 1010100..."
           />
         ) : parsed && steps && result ? (

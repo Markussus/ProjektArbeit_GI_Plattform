@@ -147,6 +147,7 @@ export function Addition({
             expectedResult={sum}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="binary"
             placeholder="z.B. 10100011"
           />
         ) : (

@@ -4,11 +4,67 @@ import { CheckCircle2, XCircle, KeyRound, Eye, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 
+/**
+ * Bestimmt welche Zeichen im Lösungseingabefeld erlaubt sind.
+ *
+ * | Wert           | Erlaubte Zeichen                                  | Einsatz                            |
+ * |----------------|---------------------------------------------------|------------------------------------|
+ * | "binary"       | 0, 1                                              | Alle Binär-Arithmetik, NegNumbers  |
+ * | "octal"        | 0-7                                               | Oktal-Konverter                    |
+ * | "decimal"      | 0-9                                               | Dezimal-Konverter                  |
+ * | "hex"          | 0-9, A-F (Groß/Klein)                             | Hex-Konverter                      |
+ * | "float"        | 0-9, ., -, (für IEEE754-Dezimalergebnis)          | IEEEToDec-Ergebnis                 |
+ * | "ieee-binary"  | 0, 1, Leerzeichen                                 | IEEE-Binary-String-Eingabe         |
+ * | "compare"      | <, >, =                                           | Compare-Modul                      |
+ * | "text"         | keine Einschränkung                               | Division (gemischtes Format)       |
+ */
+export type ValidationInputMode =
+  | "binary"
+  | "octal"
+  | "decimal"
+  | "hex"
+  | "float"
+  | "ieee-binary"
+  | "compare"
+  | "text";
+
+/** Filtert eine Zeichenkette basierend auf dem erlaubten `mode`. */
+function filterInput(value: string, mode: ValidationInputMode): string {
+  switch (mode) {
+    case "binary":
+      return value.replace(/[^01]/g, "");
+    case "octal":
+      return value.replace(/[^0-7]/g, "");
+    case "decimal":
+      return value.replace(/[^0-9]/g, "");
+    case "hex":
+      return value.replace(/[^0-9A-Fa-f]/g, "");
+    case "float":
+      // Dezimalzahl mit optionalem Vorzeichen und Komma/Punkt
+      return value.replace(/[^0-9.\-]/g, "");
+    case "ieee-binary":
+      // Binäre Bits und Leerzeichen (für "0 10000010 10100000...")
+      return value.replace(/[^01 ]/g, "");
+    case "compare":
+      // Nur Vergleichssymbole
+      return value.replace(/[^<>=]/g, "");
+    case "text":
+    default:
+      return value;
+  }
+}
+
 interface ExerciseValidationPanelProps {
   expectedResult: string | string[];
   onShowSolution: () => void;
   /** Callback für "Übungsmodus verlassen" – wenn nicht angegeben, wird der Button nicht gezeigt */
   onExitExercise?: () => void;
+  /**
+   * Einschränkung der erlaubten Eingabezeichen.
+   * Entspricht dem Zahlenformat der gesuchten Antwort (z. B. "binary", "hex").
+   * @default "text"
+   */
+  inputMode?: ValidationInputMode;
   inputType?: "text" | "number";
   placeholder?: string;
   className?: string;
@@ -18,6 +74,7 @@ export function ExerciseValidationPanel({
   expectedResult,
   onShowSolution,
   onExitExercise,
+  inputMode = "text",
   inputType = "text",
   placeholder,
   className,
@@ -32,7 +89,6 @@ export function ExerciseValidationPanel({
   const handleVerify = () => {
     const cleanUser = inputValue.replace(/\s/g, "").toLowerCase().trim();
 
-    // Support multiple valid formats if an array is passed
     const expectedArray = Array.isArray(expectedResult)
       ? expectedResult
       : [expectedResult];
@@ -43,7 +99,6 @@ export function ExerciseValidationPanel({
 
     if (isCorrect) {
       setValidationState("correct");
-      // Give the user a brief moment to see the success message before unlocking
       setTimeout(() => {
         onShowSolution();
       }, 1500);
@@ -55,6 +110,14 @@ export function ExerciseValidationPanel({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleVerify();
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filtered = filterInput(e.target.value, inputMode);
+    setInputValue(filtered);
+    if (validationState === "incorrect") {
+      setValidationState("idle");
     }
   };
 
@@ -84,12 +147,7 @@ export function ExerciseValidationPanel({
             <input
               type={inputType}
               value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                if (validationState === "incorrect") {
-                  setValidationState("idle");
-                }
-              }}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder={placeholder || "z.B. 10110010"}
               className={cn(

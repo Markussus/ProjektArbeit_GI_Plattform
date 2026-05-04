@@ -3,6 +3,7 @@ import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { ValidationInputMode } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
 type BaseType = "dec" | "bin" | "oct" | "hex";
 
@@ -394,6 +395,14 @@ export function IntegerConverter({
               expectedResult={targetValue}
               onShowSolution={onShowSolution!}
               onExitExercise={onExitExercise}
+              inputMode={
+                ({
+                  bin: "binary",
+                  oct: "octal",
+                  dec: "decimal",
+                  hex: "hex",
+                } as Record<string, ValidationInputMode>)[targetBase] ?? "text"
+              }
               placeholder={`z.B. ${targetBase === "bin" ? "10110" : targetBase === "hex" ? "2A" : "42"}`}
             />
           ) : (

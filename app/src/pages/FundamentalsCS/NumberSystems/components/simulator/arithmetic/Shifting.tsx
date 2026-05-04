@@ -219,6 +219,7 @@ export function Shifting({
             expectedResult={resultStr}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="binary"
             placeholder="z.B. 110100"
           />
         ) : (

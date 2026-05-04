@@ -124,6 +124,7 @@ export function Compare({
             expectedResult={result === "eq" ? "=" : result === "greater" ? ">" : "<"}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
+            inputMode="compare"
             placeholder="z.B. > oder < oder ="
           />
         ) : (
