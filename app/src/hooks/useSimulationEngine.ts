@@ -113,6 +113,22 @@ export function useSimulationEngine<TConfig, TState>(
     };
   }, [status, speed, handleStep]);
 
+  /**
+   * TODO: NEEDS TO BE REMOVED !!!!!!!!!!!!! @Kristian
+   * Re-read the simulator's current state and sync it to React state.
+   * Used when the simulator was mutated externally (e.g. jumpToStep).
+   */
+  const forceStateRefresh = useCallback(() => {
+    try {
+      setCurrentState(simulator.getCurrentState());
+      setStatus(simulator.isFinished() ? "IDLE" : "PAUSED");
+      setError(null);
+    } catch (err) {
+      setStatus("ERROR");
+      setError(err instanceof Error ? err : new Error(String(err)));
+    }
+  }, [simulator]);
+
   return {
     status,
     speed,
@@ -124,5 +140,6 @@ export function useSimulationEngine<TConfig, TState>(
     stepBack: handleStepBack,
     reset,
     setSpeed,
+    forceStateRefresh,
   };
 }
