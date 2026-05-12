@@ -9,7 +9,12 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 
-type SimulatorMode = "integers" | "negative" | "fractional" | "ieee754" | "arithmetic";
+type SimulatorMode =
+  | "integers"
+  | "negative"
+  | "fractional"
+  | "ieee754"
+  | "arithmetic";
 
 interface SimulatorProps {
   selectedExercise?: Exercise | null;
@@ -57,9 +62,10 @@ export function Simulator({
 
   useEffect(() => {
     if (selectedExercise) {
+      const isExample = selectedExercise.id.includes(".example");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsExerciseMode(true);
-      setShowSolution(false);
+      setIsExerciseMode(!isExample);
+      setShowSolution(isExample);
 
       const randInt = (min: number, max: number) =>
         Math.floor(Math.random() * (max - min + 1)) + min;
@@ -127,10 +133,77 @@ export function Simulator({
         setInitialSubMode("multiplication");
         setInitialValueA(decToBin(randInt(8, 15)));
         setInitialValueB(decToBin(randInt(16, 31)));
+      } else if (selectedExercise.id === "number.example_u03_1") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("26"); // Picked 26 as an example
+      } else if (selectedExercise.id === "number.example_u03_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("110010"); // 50
+        setInitialValueB("1101"); // 13
+      } else if (selectedExercise.id === "number.example_u04_1") {
+        setActiveMode("integers");
+        setInitialBase("bin");
+        setInitialTargetBase("hex");
+        setInitialValue("01111010");
+      } else if (selectedExercise.id === "number.example_u04_2") {
+        setActiveMode("integers");
+        setInitialBase("bin");
+        setInitialTargetBase("oct");
+        setInitialValue("00111100");
+      } else if (selectedExercise.id === "number.example_u04_3") {
+        setActiveMode("integers");
+        setInitialBase("oct");
+        setInitialTargetBase("hex");
+        setInitialValue("760");
+      } else if (selectedExercise.id === "number.example_u04_4") {
+        setActiveMode("integers");
+        setInitialBase("hex");
+        setInitialTargetBase("bin");
+        setInitialValue("7F");
+      } else if (selectedExercise.id === "number.example_u05_1") {
+        setActiveMode("fractional");
+        setInitialValue("10.5");
+      } else if (selectedExercise.id === "number.example_u05_2") {
+        // Unnormalized is fractional converter, normalized is IEEE without bias? IEEE is normalized
+        setActiveMode("fractional");
+        setInitialValue("3.375");
+      } else if (selectedExercise.id === "number.example_u05_3") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("-4.4375");
+      } else if (selectedExercise.id === "number.example_u05_4") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("ieeeToDec");
+        setInitialValue("01000001010101000000000000000000"); // padded with zeros
+      } else if (selectedExercise.id === "number.example_u06_1_add") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("01101101");
+        setInitialValueB("00100111");
+      } else if (selectedExercise.id === "number.example_u06_1_sub") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("01101101");
+        setInitialValueB("00100111");
+      } else if (selectedExercise.id === "number.example_u06_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("multiplication");
+        setInitialValueA("1011");
+        setInitialValueB("11001");
       }
     } else {
       setIsExerciseMode(false);
-      setShowSolution(true); // Free simulator mode
+      setShowSolution(true);
+      setInitialValue("");
+      setInitialBase("dec");
+      setInitialTargetBase("bin");
+      setInitialValueA("");
+      setInitialValueB("");
+      setInitialSubMode("addition");
+      setInitialConverterMode("decToIeee");
     }
   }, [selectedExercise]);
 
@@ -171,7 +244,13 @@ export function Simulator({
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
         {(
-          ["integers", "fractional", "negative", "ieee754", "arithmetic"] as SimulatorMode[]
+          [
+            "integers",
+            "fractional",
+            "negative",
+            "ieee754",
+            "arithmetic",
+          ] as SimulatorMode[]
         ).map((mode) => (
           <button
             key={mode}

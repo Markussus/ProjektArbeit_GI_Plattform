@@ -10,6 +10,7 @@ interface ExerciseCardProps {
   isSelected?: boolean;
   onSelect?: () => void;
   onOpen?: () => void;
+  variant?: "exercise" | "example";
 }
 
 const difficultyTextColors = {
@@ -30,17 +31,19 @@ export function ExerciseCard({
   isSelected = false,
   onSelect,
   onOpen,
+  variant = "exercise",
 }: ExerciseCardProps) {
   const { t } = useTranslation();
   const Icon = exercise.icon;
   const detailsId = useId();
+  const isExample = variant === "example";
 
   return (
     <div
       className={cn(
         "border-border border-b last:border-b-0",
         isSelected && "border-l-[3px]",
-        isSelected && difficultyBorderColors[exercise.difficulty],
+        isSelected && !isExample && difficultyBorderColors[exercise.difficulty],
       )}
     >
       <button
@@ -60,17 +63,22 @@ export function ExerciseCard({
 
         <div className="min-w-0 flex-1">
           <p className="text-foreground text-sm font-semibold">
-            {t("exercise.label", { index: index + 1 })}: {exercise.title}
+            {isExample
+              ? `${t("example.label", { index: index + 1 })}: ${exercise.title}`
+              : `${t("exercise.label", { index: index + 1 })}: ${exercise.title}`}
           </p>
 
-          <p
-            className={cn(
-              "text-xs font-bold tracking-wider uppercase",
-              difficultyTextColors[exercise.difficulty],
-            )}
-          >
-            {t("exercise.difficulty")}: {t(`difficulty.${exercise.difficulty}`)}
-          </p>
+          {!isExample && (
+            <p
+              className={cn(
+                "text-xs font-bold tracking-wider uppercase",
+                difficultyTextColors[exercise.difficulty],
+              )}
+            >
+              {t("exercise.difficulty")}:{" "}
+              {t(`difficulty.${exercise.difficulty}`)}
+            </p>
+          )}
         </div>
 
         {isSelected ? (

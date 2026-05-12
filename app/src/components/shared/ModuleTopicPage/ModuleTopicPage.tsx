@@ -16,6 +16,10 @@ export interface ModuleExercisesTabProps {
   onOpenExerciseInSimulation: (exercise: Exercise) => void;
 }
 
+export interface ModuleExamplesTabProps {
+  onOpenExampleInSimulation?: (exercise: Exercise) => void;
+}
+
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
   isFocused: boolean;
@@ -29,7 +33,7 @@ interface ModuleTopicPageProps {
   descriptionKey: TranslationKey;
   overviewTab: ComponentType;
   exercisesTab: ComponentType<ModuleExercisesTabProps>;
-  examplesTab: ComponentType;
+  examplesTab: ComponentType<ModuleExamplesTabProps>;
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
 }
@@ -82,7 +86,8 @@ export function ModuleTopicPage({
    * - Wenn User den aktiven Simulation-Tab nochmal tippt während Übung aktiv → Warnung zum Verlassen.
    */
   const handleTabChange = (tab: ModuleTabId) => {
-    const exerciseIsActive = !!simulationExercise;
+    const exerciseIsActive =
+      !!simulationExercise && !simulationExercise.id.includes(".example");
 
     if (exerciseIsActive && tab !== activeTab) {
       // Wechsel zu anderem Tab – Warnung
@@ -132,7 +137,7 @@ export function ModuleTopicPage({
     }
 
     if (activeTab === "examples") {
-      return <ExamplesTab />;
+      return <ExamplesTab onOpenExampleInSimulation={openInSimulation} />;
     }
 
     if (activeTab === "simulation") {

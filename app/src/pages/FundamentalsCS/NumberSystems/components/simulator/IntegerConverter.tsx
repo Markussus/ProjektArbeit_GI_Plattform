@@ -32,13 +32,13 @@ export function IntegerConverter({
   const [inputValue, setInputValue] = useState<string>("255");
 
   useEffect(() => {
-    if (isExerciseMode && initialValue) {
+    if (initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSourceBase(initialBase);
       setTargetBase(initialTargetBase);
       setInputValue(initialValue);
     }
-  }, [isExerciseMode, initialValue, initialBase, initialTargetBase]);
+  }, [initialValue, initialBase, initialTargetBase]);
 
   const handleSourceBaseChange = (newBase: BaseType) => {
     setSourceBase(newBase);

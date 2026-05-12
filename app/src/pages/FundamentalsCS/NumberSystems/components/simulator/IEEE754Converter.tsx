@@ -27,12 +27,12 @@ export function IEEE754Converter({
   );
 
   useEffect(() => {
-    if (isExerciseMode && initialValue) {
+    if (initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(initialValue);
       setConverterMode(initialConverterMode);
     }
-  }, [isExerciseMode, initialValue, initialConverterMode]);
+  }, [initialValue, initialConverterMode]);
 
   // PARSE LOGIC
   const cleanBinary = inputValue.replace(/[^01]/g, "");
