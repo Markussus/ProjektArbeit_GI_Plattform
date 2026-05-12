@@ -35,7 +35,7 @@ export function BinaryInput({
         max={max}
         onChange={(e) => onChange(e.target.value)}
         readOnly={locked}
-        className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${
+        className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest focus:outline-none ${
           locked
             ? "bg-muted border-input pointer-events-none"
             : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"

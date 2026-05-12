@@ -151,7 +151,7 @@ export function ExerciseValidationPanel({
               onKeyDown={handleKeyDown}
               placeholder={placeholder || "z.B. 10110010"}
               className={cn(
-                "bg-background w-full rounded-md border px-4 py-3 font-mono text-sm transition-colors focus:outline-none",
+                "bg-background w-full rounded-md border px-4 py-3 font-mono text-sm focus:outline-none",
                 validationState === "incorrect"
                   ? "border-destructive focus:border-destructive focus:ring-destructive/20 focus:ring-1"
                   : validationState === "correct"
@@ -190,14 +190,14 @@ export function ExerciseValidationPanel({
             <button
               onClick={handleVerify}
               disabled={!inputValue.trim() || validationState === "correct"}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium transition-colors disabled:pointer-events-none disabled:opacity-50"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium disabled:pointer-events-none disabled:opacity-50"
             >
               {t("simulator.validation.verify", "Lösung überprüfen")}
             </button>
 
             <button
               onClick={onShowSolution}
-              className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium transition-colors sm:flex-none"
+              className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium sm:flex-none"
             >
               <Eye className="h-4 w-4" />
               {t("simulator.validation.showSolution", "Lösung anzeigen")}
@@ -209,7 +209,7 @@ export function ExerciseValidationPanel({
             <div className="border-border/40 border-t pt-4">
               <button
                 onClick={() => setShowExitConfirm(true)}
-                className="text-muted-foreground hover:text-destructive hover:border-destructive/30 flex w-full items-center justify-center gap-2 rounded-md border border-transparent px-4 py-2 text-sm font-medium transition-colors"
+                className="text-muted-foreground hover:text-destructive hover:border-destructive/30 flex w-full items-center justify-center gap-2 rounded-md border border-transparent px-4 py-2 text-sm font-medium"
               >
                 <LogOut className="h-4 w-4" />
                 {t("simulator.validation.exitExerciseButton")}

@@ -52,7 +52,7 @@ export function ConfirmDialog({
         {/* Close button */}
         <button
           onClick={onCancel}
-          className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-md p-1 transition-colors"
+          className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-md p-1"
           aria-label={t("common.close")}
         >
           <X className="h-4 w-4" />
@@ -77,13 +77,13 @@ export function ConfirmDialog({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="bg-muted hover:bg-muted/80 text-foreground flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors"
+            className="bg-muted hover:bg-muted/80 text-foreground flex-1 rounded-md px-4 py-2 text-sm font-medium"
           >
             {cancelLabel ?? t("common.cancel")}
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors ${
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium text-white ${
               isDestructive
                 ? "bg-destructive hover:bg-destructive/90"
                 : "bg-orange-500 hover:bg-orange-600"

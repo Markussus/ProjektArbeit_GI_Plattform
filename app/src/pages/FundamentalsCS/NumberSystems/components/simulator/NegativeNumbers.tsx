@@ -275,7 +275,7 @@ function ResultRow({
     <button
       onClick={valid ? onClick : undefined}
       disabled={!valid || !onClick}
-      className={`w-full rounded-lg border p-3 text-left transition-colors ${highlight ? "border-primary bg-primary/5 ring-primary/20 ring-1" : "border-border/40 bg-background hover:border-primary/50 cursor-pointer"} ${(!valid || !onClick) && "hover:border-border/40 cursor-not-allowed opacity-50"}`}
+      className={`w-full rounded-lg border p-3 text-left ${highlight ? "border-primary bg-primary/5 ring-primary/20 ring-1" : "border-border/40 bg-background hover:border-primary/50 cursor-pointer"} ${(!valid || !onClick) && "hover:border-border/40 cursor-not-allowed opacity-50"}`}
     >
       <div className="text-muted-foreground mb-1 text-xs">{label}</div>
       <div

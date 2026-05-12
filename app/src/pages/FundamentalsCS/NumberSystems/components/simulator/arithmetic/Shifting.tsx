@@ -214,13 +214,13 @@ export function Shifting({
                 <div className="bg-muted flex rounded-md p-1">
                   <button
                     onClick={() => setDirection("left")}
-                    className={`flex flex-1 items-center justify-center rounded p-1 transition-colors ${direction === "left" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex flex-1 items-center justify-center rounded p-1 ${direction === "left" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <ChevronsLeft className="mr-1 h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setDirection("right")}
-                    className={`flex flex-1 items-center justify-center rounded p-1 transition-colors ${direction === "right" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex flex-1 items-center justify-center rounded p-1 ${direction === "right" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <ChevronsRight className="mr-1 h-4 w-4" />
                   </button>

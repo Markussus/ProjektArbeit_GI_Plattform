@@ -20,7 +20,7 @@ export function StepByStepToggle({
   return (
     <button
       onClick={onToggle}
-      className={`text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium transition-colors ${className}`}
+      className={`text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium ${className}`}
     >
       <List className="h-4 w-4" />
       {t("simulator.arithmetic.common.showStepByStep")}

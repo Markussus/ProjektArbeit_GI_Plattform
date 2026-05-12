@@ -29,7 +29,7 @@ export function CollapsibleStep({
     >
       <button
         onClick={onToggle}
-        className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors"
+        className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-4">{header}</div>
         {isOpen ? (

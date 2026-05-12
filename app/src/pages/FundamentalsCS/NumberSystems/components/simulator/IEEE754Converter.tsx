@@ -127,7 +127,7 @@ export function IEEE754Converter({
                     setConverterMode("decToIeee");
                     setInputValue("12.5");
                   }}
-                  className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   {t("simulator.numbers.modeDecToIeee")}
                 </button>
@@ -136,7 +136,7 @@ export function IEEE754Converter({
                     setConverterMode("ieeeToDec");
                     setInputValue("0 10000010 10010000000000000000000");
                   }}
-                  className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   {t("simulator.numbers.modeIeeeToDec")}
                 </button>
