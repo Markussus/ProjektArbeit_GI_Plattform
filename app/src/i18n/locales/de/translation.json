@@ -51,14 +51,28 @@
   },
   "automata": {
     "title": "Endliche Automaten",
-    "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Lernen Sie, wie man verschiedene Automaten entwirft, minimiert und konvertiert.",
+    "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Erstellen Sie DFAs und NFAs, konvertieren Sie reguläre Grammatiken und durchlaufen Sie Eingabewörter Schritt für Schritt.",
     "overviewTitle": "Was sind Endliche Automaten?",
     "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke.",
     "concepts": "Schlüsselkonzepte",
     "concept1": "DFA & NFA",
-    "concept2": "Reguläre Sprachen",
-    "concept3": "Zustandsminimierung",
-    "concept4": "NFA zu DFA Konvertierung",
+    "concept1Desc": "Beide Typen können erstellt werden – der Editor markiert Nichtdeterminismus in Ihrer Übergangstabelle.",
+    "concept2": "Grammatik → Automat",
+    "concept2Desc": "Fügen Sie eine rechtslineare reguläre Grammatik ein und wandeln Sie sie mit einem Klick in einen NFA um.",
+    "comparison": "DFA vs. NFA",
+    "dfaSubtitle": "Deterministischer Endlicher Automat",
+    "dfaPoint1": "Genau ein Übergang pro (Zustand, Symbol)",
+    "dfaPoint2": "Genau ein aktiver Zustand zu jeder Zeit",
+    "dfaPoint3": "Keine ε-Übergänge",
+    "nfaSubtitle": "Nichtdeterministischer Endlicher Automat",
+    "nfaPoint1": "Mehrere Ziele pro (Zustand, Symbol)",
+    "nfaPoint2": "Menge aktiver Zustände, parallel verfolgt",
+    "nfaPoint3": "Unterstützt ε-Übergänge",
+    "whatYouCanDo": "Was Sie hier tun können",
+    "feature1": "DFAs und NFAs visuell mit einer Übergangstabelle erstellen",
+    "feature2": "Eine rechtslineare reguläre Grammatik in einen Automaten umwandeln",
+    "feature3": "Ein Eingabewort schrittweise durchlaufen und das Zustandsdiagramm beobachten",
+    "feature4": "Mehrere Wörter im Stapeltest prüfen und Akzeptanz/Ablehnung einsehen",
     "exercise1": "DFA erstellen",
     "exercise1Desc": "Erstellen Sie einen DFA, der Zeichenketten akzeptiert, die auf '01' enden",
     "exercise2": "NFA Entwurf",
@@ -829,5 +843,264 @@
     "section2Text": "Hier kann zukünftig erklärt werden, an wen man sich bei Fragen oder technischen Problemen wenden kann.",
     "section3Title": "Fehlerbehebung",
     "section3Text": "Dieser Bereich ist als Platzhalter für häufige Probleme, bekannte Fehler und einfache Lösungswege gedacht."
+  },
+  "fa": {
+    "editor": {
+      "manual": "Manueller Editor",
+      "grammar": "Aus Grammatik"
+    },
+    "config": {
+      "title": "Automaten-Konfiguration",
+      "type": "Typ",
+      "states": "Zustände (kommagetrennt)",
+      "alphabet": "Alphabet (kommagetrennt)",
+      "startState": "Startzustand",
+      "acceptStates": "Akzeptierende Zustände (kommagetrennt)",
+      "addEpsilon": "ε-Übergänge hinzufügen",
+      "transitionTable": "Übergangstabelle",
+      "inputWord": "Eingabewort",
+      "inputWordHelp": "Jedes Zeichen wird als ein Eingabesymbol behandelt.",
+      "apply": "Simulation starten"
+    },
+    "buildFromScratch": {
+      "title": "Eigenen Automaten bauen",
+      "description": "Beginnen Sie mit einer leeren Vorlage und erstellen Sie Ihren eigenen DFA oder NFA von Grund auf. Fügen Sie Zustände hinzu, definieren Sie das Alphabet und erstellen Sie Übergänge Schritt für Schritt.",
+      "button": "Leer starten",
+      "hint": "Sie können jederzeit im Editor zwischen DFA- und NFA-Modus wechseln."
+    },
+    "examplesTab": {
+      "title": "Vordefinierte Beispiele",
+      "subtitle": "Lernen Sie, wie endliche Automaten funktionieren, indem Sie diese Beispiele studieren. Jedes enthält eine schrittweise Erklärung, wie und warum es aufgebaut ist.",
+      "loadExample": "Im Simulator laden",
+      "variant": "Variante",
+      "howItWorks": "So funktioniert es",
+      "stepLabel": "Schritt {{index}}",
+      "tryIt": "Ausprobieren mit Eingabe:",
+      "buildOwn": "Oder eigenen bauen"
+    },
+    "exercisesTab": {
+      "title": "Übungsaufgaben",
+      "subtitle": "Bauen Sie jeden Automaten selbst. Nutzen Sie Hinweise, wenn Sie nicht weiterkommen — die vollständige Lösung wird nur auf Wunsch angezeigt.",
+      "start": "Starten",
+      "resume": "Fortsetzen",
+      "reset": "Fortschritt zurücksetzen",
+      "status": {
+        "notStarted": "Nicht begonnen",
+        "inProgress": "In Bearbeitung",
+        "completed": "Abgeschlossen"
+      },
+      "endsWith01": {
+        "title": "Wörter, die mit \"01\" enden",
+        "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit \"01\" enden.",
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden.",
+        "hint1": "Verfolgen Sie, wie viel des Musters \"01\" Sie bereits gesehen haben. Drei Zustände reichen: nichts, gerade eine 0 gesehen, gerade \"01\" gesehen.",
+        "hint2": "Aus dem Akzeptanzzustand sollte eine 0 in den Zustand \"gerade 0 gesehen\" zurückfallen (Muster könnte erneut starten), und eine 1 zurück auf \"nichts\" gehen."
+      },
+      "endsWith00": {
+        "title": "Wörter, die mit \"00\" enden",
+        "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit zwei Nullen enden.",
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden.",
+        "hint1": "Sie müssen sich merken, wie viele abschließende Nullen Sie gerade gesehen haben. Drei Zustände (0, 1 oder 2 abschließende Nullen) reichen aus.",
+        "hint2": "Aus dem Zustand \"zwei abschließende Nullen\" sollte eine weitere 0 dort bleiben, eine 1 aber zurück zu \"keine abschließende Null\" springen."
+      },
+      "evenOnes": {
+        "title": "Gerade Anzahl von 1en",
+        "goal": "Akzeptieren Sie binäre Wörter mit einer geraden Anzahl von 1en (einschließlich null).",
+        "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade).",
+        "hint1": "Sie benötigen nur zwei Zustände — einen für \"gerade\" und einen für \"ungerade\".",
+        "hint2": "Das Lesen einer 0 ändert die Parität nie, das Lesen einer 1 kippt sie immer."
+      },
+      "noConsecOnes": {
+        "title": "Keine zwei aufeinanderfolgenden 1en",
+        "goal": "Akzeptieren Sie binäre Wörter, die nie \"11\" als Teilwort enthalten.",
+        "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt.",
+        "hint1": "Merken Sie sich, ob das zuletzt gelesene Symbol eine 1 war. Eine weitere 1 direkt danach muss in einen Fallen-Zustand führen.",
+        "hint2": "Ein Fallen-Zustand (Trap) hat Selbstschleifen auf jedem Symbol und ist nicht akzeptierend."
+      },
+      "divBy3": {
+        "title": "Binärzahlen teilbar durch 3",
+        "goal": "Akzeptieren Sie binäre Wörter, deren Dezimalwert durch 3 teilbar ist.",
+        "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren.",
+        "hint1": "Sie benötigen nur drei Zustände — einen pro möglichem Rest (0, 1, 2).",
+        "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
+        "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
+      }
+    },
+    "exerciseWorkspace": {
+      "label": "Aufgabe",
+      "completed": "Abgeschlossen",
+      "exit": "Aufgabenmodus verlassen",
+      "check": "Lösung prüfen",
+      "showHint": "Hinweis",
+      "hintsUsed": "{{used}}/{{total}} Hinweise benutzt",
+      "noMoreHints": "Alle Hinweise angezeigt",
+      "showSolution": "Lösung anzeigen",
+      "hintsHeader": "Hinweise",
+      "confirmTitle": "Vollständige Lösung anzeigen?",
+      "confirmBody": "Ihr aktueller Automat wird durch die Referenzlösung ersetzt. Sie können die Aufgabe jederzeit aus dem Tab „Übungen“ zurücksetzen.",
+      "confirmYes": "Ja, Lösung anzeigen",
+      "confirmNo": "Weiter versuchen",
+      "structuralFail": "Ihr Automat ist noch nicht gültig",
+      "structuralHint": "Beheben Sie die markierten Konfigurationsprobleme, bevor wir mit der Lösung vergleichen können.",
+      "passed": "Alle Tests bestanden!",
+      "passedDetail": "{{n}} von {{total}} Testwörtern korrekt akzeptiert/abgelehnt.",
+      "failed": "Entspricht nicht der erwarteten Sprache",
+      "failedDetail": "{{passed}} von {{total}} Testwörtern stimmten überein, {{failed}} nicht.",
+      "counterexample": "Gegenbeispiel:",
+      "expected": "erwartet",
+      "got": "erhalten",
+      "accept": "akzeptieren",
+      "reject": "ablehnen",
+      "exampleWordsHeader": "Probiere diese Wörter",
+      "exampleWordsHint": "Klicke ein Wort an, um es als Eingabe zu laden und durch den Automaten laufen zu lassen.",
+      "exampleAccept": "Akzeptiert",
+      "exampleReject": "Abgelehnt",
+      "unbuiltTitle": "Bau zuerst deinen Automaten",
+      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'."
+    },
+    "examples": {
+      "endsWith01": {
+        "title": "Binärstrings die auf 01 enden",
+        "description": "Ein DFA, der alle Binärstrings akzeptiert, die mit \"01\" enden. Eines der häufigsten einführenden DFA-Beispiele.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Wir wollen genau die Binärstrings akzeptieren, die mit \"01\" enden. Der Automat muss sich merken, ob die letzten zwei gelesenen Symbole \"0\" gefolgt von \"1\" waren.",
+        "step2Title": "2. Zustände entwerfen",
+        "step2": "Wir brauchen drei Zustände: s0 (Start — noch kein Anfang von \"01\" gesehen), s1 (gerade eine \"0\" gelesen — könnte der erste Teil von \"01\" sein), und s2 (gerade \"01\" gelesen — Akzeptanzzustand).",
+        "step3Title": "3. Übergänge aufbauen",
+        "step3": "Von s0: \"0\" lesen geht zu s1 (möglicher Start von \"01\"), \"1\" lesen bleibt in s0. Von s1: \"1\" lesen geht zu s2 (\"01\" gefunden!), \"0\" lesen bleibt in s1. Von s2: \"0\" lesen geht zu s1, \"1\" lesen geht zurück zu s0.",
+        "step4Title": "4. Warum es funktioniert",
+        "step4": "Der Automat verfolgt immer, wie viel des Musters \"01\" bisher übereinstimmt. Egal wie lang der String ist, er braucht nur 3 Zustände, weil er sich nur um die letzten zwei Zeichen kümmert."
+      },
+      "evenOnes": {
+        "title": "Gerade Anzahl von 1en",
+        "description": "Ein DFA, der Binärstrings mit einer geraden Anzahl von 1en akzeptiert (einschließlich null 1en). Ein klassisches Paritätsbeispiel.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Wir wollen Strings akzeptieren, bei denen die Anzahl der '1'-Symbole gerade ist (0, 2, 4, ...). Der Automat muss nur die Parität (gerade oder ungerade) der bisher gesehenen 1en verfolgen.",
+        "step2Title": "2. Zustände entwerfen",
+        "step2": "Nur zwei Zustände nötig: 'even' (gerade Anzahl gesehen) und 'odd' (ungerade Anzahl gesehen). Startzustand ist 'even', da null 1en gerade ist. Akzeptanzzustand ist ebenfalls 'even'.",
+        "step3Title": "3. Übergänge aufbauen",
+        "step3": "Eine '0' ändert die Parität nie, also bleiben beide Zustände bei '0' bei sich. Eine '1' wechselt die Parität: even→odd und odd→even. Das ist der gesamte Automat!"
+      },
+      "containsAba": {
+        "title": "Enthält Teilwort \"aba\"",
+        "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Wir wollen jeden String akzeptieren, der irgendwo \"aba\" enthält. Vor und nach dem Muster ist jede Kombination von 'a' und 'b' erlaubt.",
+        "step2Title": "2. Warum ein NFA?",
+        "step2": "Ein NFA ist hier natürlich, weil wir nicht wissen, wann \"aba\" beginnt. Der NFA kann nichtdeterministisch \"raten\" — in s0, wenn er 'a' liest, bleibt er sowohl in s0 als auch geht er zu s1.",
+        "step3Title": "3. Zustände entwerfen",
+        "step3": "Vier Zustände: s0 (kein Match begonnen), s1 (\"a\" gematcht), s2 (\"ab\" gematcht), s3 (\"aba\" gematcht — Akzeptanzzustand, bleibt hier für immer).",
+        "step4Title": "4. Wie Nichtdeterminismus hilft",
+        "step4": "Bei einem DFA müssten wir sorgfältig partielle Übereinstimmungen verfolgen. Mit dem NFA probieren wir einfach \"alle Möglichkeiten\" gleichzeitig aus."
+      },
+      "epsilonNfa": {
+        "title": "NFA mit ε-Übergängen",
+        "description": "Ein NFA, der Epsilon-Übergänge verwendet — Übergänge ohne Eingabesymbol. Demonstriert spontane Zustandswechsel.",
+        "step1Title": "1. Was sind ε-Übergänge?",
+        "step1": "Ein ε-Übergang erlaubt dem Automaten, von einem Zustand in einen anderen zu wechseln, ohne ein Eingabesymbol zu verbrauchen. Der Automat kann in mehreren Zuständen gleichzeitig sein.",
+        "step2Title": "2. Wie ε-Abschluss funktioniert",
+        "step2": "Vor der Verarbeitung berechnen wir den ε-Abschluss des Startzustands — alle durch ε-Übergänge erreichbaren Zustände. Hier hat q0 einen ε-Übergang zu q1, also sind die Anfangszustände {q0, q1}.",
+        "step3Title": "3. Aufbau dieses Automaten",
+        "step3": "q0 liest 'a' und kann spontan über ε zu q1 springen. q1 liest ein 'b' und geht zu q2. q2 springt spontan über ε zu q3. q3 ist der Akzeptanzzustand.",
+        "step4Title": "4. Warum ε-Übergänge wichtig sind",
+        "step4": "ε-Übergänge erleichtern das Kombinieren von Automaten (z.B. für Vereinigung oder Verkettung von Sprachen). Sie fügen keine Berechnungskraft hinzu, machen aber die Konstruktion modularer."
+      },
+      "divisibleBy3": {
+        "title": "Durch 3 teilbare Binärzahlen",
+        "description": "Ein DFA, der Binärzahlen akzeptiert, deren Dezimalwert durch 3 teilbar ist. Ein elegantes Beispiel für arithmetische Automaten.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Wir wollen Binärstrings akzeptieren, die Zahlen darstellen, die durch 3 teilbar sind (Rest 0 bei Division durch 3). Zum Beispiel: \"0\" (0), \"11\" (3), \"110\" (6), \"1001\" (9).",
+        "step2Title": "2. Die Schlüsselidee",
+        "step2": "Beim Lesen einer Binärzahl von links nach rechts verdoppelt jedes neue Bit den aktuellen Wert und addiert das neue Bit. Wir müssen nur V mod 3 verfolgen, das nur 3 mögliche Werte hat: 0, 1, oder 2.",
+        "step3Title": "3. Zustände aufbauen",
+        "step3": "Drei Zustände repräsentieren die drei möglichen Reste: s0 (Rest 0 — Akzeptanzzustand), s1 (Rest 1), s2 (Rest 2). Startzustand ist s0.",
+        "step4Title": "4. Übergänge herleiten",
+        "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
+      },
+      "lecture": {
+        "title": "Vorlesungsbeispiel",
+        "description": "Ein DFA aus der Vorlesungsübung, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1).",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach nichts mehr. Er lehnt leere Strings, Strings die mit '1' beginnen, oder Strings mit mehr als einer '1' ab.",
+        "step2Title": "2. Zustände entwerfen",
+        "step2": "s0 ist der Startzustand. Das Lesen einer '0' führt zu s1. Von s1 führt eine '1' zu s2 (Akzeptanzzustand). Jede andere Eingabe führt zu s3, einem \"Fangzustand\" (Trap State), da der String ungültig geworden ist."
+      },
+      "grammar": {
+        "title": "Grammatik → Automat",
+        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Konstruiere einen endlichen Automaten für die reguläre Grammatik: G = {S → 0S | 0A, A → 1A | 1} über dem Alphabet Σ = {0, 1}. Diese Grammatik erzeugt erst '0'en, dann '1'en. Jedes Nichtterminalsymbol wird zu einem Zustand und jede Produktion zu einem Übergang.",
+        "step2Title": "2. NFA-Konstruktion",
+        "step2": "Überführung der Produktionen in Übergänge: (S → 0S) wird zu δ(S,0)=S; (S → 0A) wird zu δ(S,0)=A. Dies erzeugt Nichtdeterminismus im Zustand S bei der Eingabe '0'. Die Regel (A → 1) impliziert einen Übergang in einen dedizierten Akzeptanzzustand (sF). Ergebnis: Ein 3-Zustand-NFA {S, A, sF}.",
+        "step3Title": "3. DFA-Konstruktion",
+        "step3": "Wir gruppieren NFA-Zustände in Mengen, um genau einen Übergang pro Eingabe zu garantieren.\n1. Start bei q0 = {S}.\n2. δ(q0, 0) = {S, A} → neuer Zustand q1.\n3. δ(q0, 1) = ∅ → Fangzustand qD.\n4. δ(q1, 0) = {S, A} → Schleife zurück zu q1.\n5. δ(q1, 1) = {A, sF} → neuer Zustand q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → Schleife zurück zu q2.\nq2 ist der Akzeptanzzustand (enthält sF). qD ist ein toter Zustand (Fangzustand)."
+      }
+    },
+    "batch": {
+      "title": "Stapeltest",
+      "placeholder": "Wörter eingeben, z.B.: \n101\n100\n11100",
+      "runAll": "Alle testen",
+      "clear": "Leeren",
+      "total": "gesamt",
+      "debugHint": "Klicken zum schrittweisen Debuggen",
+      "steps": "Schritte"
+    },
+    "grammar": {
+      "title": "Reguläre Grammatik → Automat",
+      "intro": "Geben Sie eine rechtslineare Grammatik ein. Das erste Nichtterminal links wird zum Startsymbol; Nichtterminale und Terminale werden aus den Produktionen abgeleitet.",
+      "productions": "Grammatik",
+      "productionsHint": "Eine Produktion pro Zeile. Zwei Formate werden unterstützt (automatische Erkennung).",
+      "convert": "In Automat umwandeln",
+      "loadExample": "Beispiel laden",
+      "supportedFormats": "Unterstützte Formate",
+      "format1Label": "Format 1 — vereinfacht",
+      "format2Label": "Format 2 — strukturiert",
+      "detectedFormat": "Erkanntes Format",
+      "format": {
+        "simple": "Vereinfacht",
+        "structured": "Strukturiert"
+      },
+      "parseError": "Grammatik noch nicht parsebar",
+      "epsilonHint": "Um das Symbol für das leere Wort (ε) einzufügen, können Sie es entweder kopieren und einfügen oder das Wort 'epsilon' tippen.",
+      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist."
+    },
+    "sim": {
+      "emptyWord": "Leeres Wort (ε)",
+      "inputWord": "Eingabewort",
+      "title": "Simulation",
+      "edit": "Konfiguration bearbeiten",
+      "stepHistory": "Schrittprotokoll",
+      "stepOf": "Schritt {{current}} von {{total}}",
+      "status": {
+        "label": "Status",
+        "error": "Fehler",
+        "running": "Läuft",
+        "accepted": "Akzeptiert ✓",
+        "rejected": "Abgelehnt ✗",
+        "halted": "Gestoppt",
+        "type": "Typ",
+        "step": "Schritt",
+        "activeStates": "Aktive Zustände",
+        "position": "Position"
+      },
+      "explanation": {
+        "reading": "Lese Symbol '{{symbol}}' an Position {{pos}}. Aktive Zustände: {{states}}",
+        "processing": "Verarbeitung...",
+        "accepted": "Das Wort wird akzeptiert. Die finalen Zustände {{states}} enthalten einen Akzeptanzzustand.",
+        "rejectedDead": "Das Wort wird abgelehnt. Keine erreichbaren Zustände (Sackgasse).",
+        "rejected": "Das Wort wird abgelehnt. Die finalen Zustände {{states}} enthalten keinen Akzeptanzzustand."
+      }
+    },
+    "validation": {
+      "statesEmpty": "Zustände dürfen nicht leer sein.",
+      "startStateMissing": "Der Startzustand ist nicht in der Zustandsmenge.",
+      "acceptStatesInvalid": "Ein Akzeptanzzustand ist nicht in der Zustandsmenge.",
+      "alphabetEmpty": "Das Alphabet darf nicht leer sein.",
+      "transitionSourceInvalid": "Ein Übergangsquellzustand ist ungültig.",
+      "transitionTargetInvalid": "Ein Übergangszielzustand ist ungültig.",
+      "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
+      "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
+      "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+    }
   }
 }
