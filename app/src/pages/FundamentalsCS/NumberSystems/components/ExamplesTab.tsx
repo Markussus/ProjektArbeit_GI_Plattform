@@ -3,7 +3,7 @@ import { BookOpen, Hash, Binary, Calculator } from "lucide-react";
 import { useState } from "react";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { numberSystemsExamples } from "../examples";
-import type { Exercise } from "@/types/exercise";
+import type { Example } from "@/types/exercise";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { ExerciseDefinition } from "@/types/exercise";
 
@@ -37,16 +37,16 @@ export function ExamplesTab({
   onOpenExampleInSimulation,
 }: ModuleExamplesTabProps) {
   const { t } = useTranslation();
-  const [selectedExample, setSelectedExample] = useState<Exercise | null>(null);
+  const [selectedExample, setSelectedExample] = useState<Example | null>(null);
 
   const groups = getExampleGroup(numberSystemsExamples);
 
-  const selectExample = (exercise: Exercise) => {
-    setSelectedExample((prev) => (prev?.id === exercise.id ? null : exercise));
+  const selectExample = (example: Example) => {
+    setSelectedExample((prev) => (prev?.id === example.id ? null : example));
   };
 
-  const openExample = (exercise: Exercise) => {
-    onOpenExampleInSimulation?.(exercise);
+  const openExample = (example: Example) => {
+    onOpenExampleInSimulation?.(example);
   };
 
   return (
@@ -77,22 +77,21 @@ export function ExamplesTab({
             </h3>
             <div>
               {groupExamples.map((def, index) => {
-                const exercise: Exercise = {
+                const example: Example = {
                   id: def.titleKey,
                   title: t(def.titleKey),
                   description: t(def.descriptionKey),
-                  difficulty: def.difficulty,
                   icon: def.icon,
+                  kind: "example",
                 };
                 return (
                   <ExerciseCard
-                    key={exercise.id}
-                    exercise={exercise}
+                    key={example.id}
+                    item={example}
                     index={index}
-                    variant="example"
-                    isSelected={selectedExample?.id === exercise.id}
-                    onSelect={() => selectExample(exercise)}
-                    onOpen={() => openExample(exercise)}
+                    isSelected={selectedExample?.id === example.id}
+                    onSelect={() => selectExample(example)}
+                    onOpen={() => openExample(example)}
                   />
                 );
               })}

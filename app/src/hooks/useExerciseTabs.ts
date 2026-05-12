@@ -53,5 +53,6 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
     openInSimulation,
     selectExample,
     openExampleInSimulation,
+    clearSimulationExercise,
   };
 }

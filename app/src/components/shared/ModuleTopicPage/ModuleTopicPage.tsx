@@ -7,7 +7,7 @@ import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
-import type { Exercise } from "@/types/exercise";
+import type { Example, Exercise, TopicItem } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 
 export interface ModuleExercisesTabProps {
@@ -24,8 +24,10 @@ export interface ModuleExamplesTabProps {
 
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
+  selectedItem?: TopicItem | null;
   isFocused: boolean;
   onToggleFocus: () => void;
+  onExitExercise?: () => void;
 }
 
 interface ModuleTopicPageProps {
@@ -51,7 +53,6 @@ export function ModuleTopicPage({
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
 
-  // Tab-Wechsel Confirm Dialog state
   const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
 
@@ -64,6 +65,9 @@ export function ModuleTopicPage({
     simulationItem,
     selectExercise,
     openInSimulation,
+    selectExample,
+    openExampleInSimulation,
+    clearSimulationExercise,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -78,29 +82,21 @@ export function ModuleTopicPage({
     });
   };
 
-  /** Verlässt den Übungsmodus: räumt simulationExercise + selectedExercise auf */
   const handleExitExercise = () => {
     clearSimulationExercise();
   };
 
-  /**
-   * Tab-Klick Handler.
-   * - Wenn Übung aktiv und User auf einen anderen Tab wechseln will → Warnung.
-   * - Wenn User den aktiven Simulation-Tab nochmal tippt während Übung aktiv → Warnung zum Verlassen.
-   */
   const handleTabChange = (tab: ModuleTabId) => {
     const exerciseIsActive =
       !!simulationExercise && !simulationExercise.id.includes(".example");
 
     if (exerciseIsActive && tab !== activeTab) {
-      // Wechsel zu anderem Tab – Warnung
       setPendingTab(tab);
       setShowTabExitConfirm(true);
       return;
     }
 
     if (exerciseIsActive && tab === activeTab && tab === "simulation") {
-      // Simulation-Tab nochmal anklicken während Übung aktiv → Verlassen-Warnung
       setPendingTab(null);
       setShowTabExitConfirm(true);
       return;
@@ -154,6 +150,7 @@ export function ModuleTopicPage({
       return (
         <SimulationTab
           selectedExercise={simulationExercise}
+          selectedItem={simulationItem}
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
           onExitExercise={simulationExercise ? handleExitExercise : undefined}
@@ -183,7 +180,6 @@ export function ModuleTopicPage({
 
       {renderActiveTab()}
 
-      {/* Übungsmodus-Verlassen Bestätigungsdialog (Tab-Wechsel) */}
       <ConfirmDialog
         isOpen={showTabExitConfirm}
         title={t("simulator.validation.exitTabTitle")}
