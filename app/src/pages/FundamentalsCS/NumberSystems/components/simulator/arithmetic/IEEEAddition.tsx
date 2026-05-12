@@ -1,19 +1,23 @@
-import { useState, useMemo, type ReactNode } from "react";
-import {
-  Info,
-  ArrowRight,
-  List,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { useState, useMemo } from "react";
+import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { ReactNode } from "react";
+import {
+  SimulatorLayout,
+  BinaryInput,
+  StepByStepToggle,
+  CollapsibleStep,
+  ResultSectionHeader,
+  useToggleSet,
+} from "../shared";
 
 interface IEEEAdditionProps {
   renderModeSelector?: ReactNode;
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
 }
 
 interface IEEEParsedValue {
@@ -38,15 +42,14 @@ export function IEEEAddition({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   renderModeSelector,
 }: IEEEAdditionProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState("13.37");
   const [valB, setValB] = useState("2.5");
   const [showStepByStep, setShowStepByStep] = useState(false);
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(
-    new Set(["0", "1", "2"]),
-  );
+  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
 
   const locked = !!isExerciseMode && !showSolution;
 
@@ -144,110 +147,74 @@ export function IEEEAddition({
           smallerExpDec: smaller.exp - 127,
           shiftedMantissa: shiftedSmaller,
         },
-        renorm: {
-          resParsed,
-        },
+        renorm: { resParsed },
       },
       result: { sumDec: resultNum, binStr: resBin },
       shiftSteps,
     };
   }, [valA, valB, t]);
 
-  const toggleStep = (index: number) => {
-    const newExpanded = new Set(expandedSteps);
-    const key = String(index);
-    if (newExpanded.has(key)) {
-      newExpanded.delete(key);
-    } else {
-      newExpanded.add(key);
-    }
-    setExpandedSteps(newExpanded);
-  };
-
   return (
-    <div className="animate-in fade-in zoom-in-95 grid w-full grid-cols-1 gap-6 duration-300 md:grid-cols-2">
-      {/* Inputs */}
-      <div className="bg-card border-border/50 space-y-6 rounded-xl border p-6 shadow-sm">
-        <div>
-          <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-            {t("simulator.arithmetic.ieee754.floatingPoint")}
-          </h3>
-          <p className="text-muted-foreground mb-4 text-sm">
-            {t("simulator.arithmetic.ieee754.desc")}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {renderModeSelector}
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.ieee754.inputA")}
-            </label>
-            <input
-              type="text"
+    <SimulatorLayout
+      inputPanel={
+        <>
+          <div>
+            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
+              {t("simulator.arithmetic.ieee754.floatingPoint")}
+            </h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {t("simulator.arithmetic.ieee754.desc")}
+            </p>
+          </div>
+          <div className="space-y-4">
+            {renderModeSelector}
+            <BinaryInput
+              label={t("simulator.arithmetic.ieee754.inputA")}
               value={valA}
-              onChange={(e) => {
-                if (!locked) setValA(e.target.value);
+              onChange={(val) => {
+                if (!locked) setValA(val);
               }}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              locked={locked}
             />
-          </div>
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.ieee754.inputB")}
-            </label>
-            <input
-              type="text"
+            <BinaryInput
+              label={t("simulator.arithmetic.ieee754.inputB")}
               value={valB}
-              onChange={(e) => {
-                if (!locked) setValB(e.target.value);
+              onChange={(val) => {
+                if (!locked) setValB(val);
               }}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              locked={locked}
             />
           </div>
-        </div>
-      </div>
-
-      {/* Logic / Dashboard Panel */}
-      <div className="bg-muted/30 border-border/50 overflow-auto rounded-xl border p-6 shadow-sm">
-        {locked ? (
+        </>
+      }
+      resultPanel={
+        locked ? (
           <ExerciseValidationPanel
             expectedResult={result?.binStr || ""}
             onShowSolution={onShowSolution!}
+            onExitExercise={onExitExercise}
+            inputMode="ieee-binary"
             placeholder="z.B. 0 10000010 1010100..."
           />
         ) : parsed && steps && result ? (
           <div className="space-y-6">
-            <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
-              <Info className="text-primary h-5 w-5" />
-              {t("simulator.arithmetic.ieee754.threeSteps")}
-            </h3>
+            <ResultSectionHeader
+              icon={<Info className="text-primary h-5 w-5" />}
+              title={t("simulator.arithmetic.ieee754.threeSteps")}
+            />
 
-            {/* Step-by-Step Toggle */}
-            <button
-              onClick={() => setShowStepByStep(!showStepByStep)}
-              className="text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium transition-colors"
-            >
-              <List className="h-4 w-4" />
-              {t("simulator.arithmetic.common.showStepByStep")}
-              {showStepByStep ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </button>
+            <StepByStepToggle
+              open={showStepByStep}
+              onToggle={() => setShowStepByStep(!showStepByStep)}
+            />
 
             {showStepByStep && !steps.msg && (
               <div className="space-y-4">
-                {renderModeSelector}
                 {/* Step 1: Denormalize */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">
                     {t("simulator.arithmetic.ieee754.step1")}
                   </p>
-
                   <div className="space-y-3">
                     <div className="flex items-center gap-4 text-sm">
                       <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10 text-xs">
@@ -267,7 +234,6 @@ export function IEEEAddition({
                         Exp: {parsed.A.expDec}
                       </span>
                     </div>
-
                     <div className="flex items-center gap-4 text-sm">
                       <span className="flex h-8 w-8 items-center justify-center rounded bg-green-500/10 text-xs">
                         B
@@ -286,7 +252,6 @@ export function IEEEAddition({
                         Exp: {parsed.B.expDec}
                       </span>
                     </div>
-
                     <div className="border-border/40 border-t pt-3">
                       <p className="text-muted-foreground mb-2 text-xs">
                         {t("simulator.arithmetic.ieee754.expDiffDesc", {
@@ -300,7 +265,6 @@ export function IEEEAddition({
                           diff: steps.denorm?.diff,
                         })}
                       </p>
-
                       {shiftSteps.length > 0 && (
                         <div className="mt-3 space-y-2">
                           <p className="text-muted-foreground text-xs font-semibold">
@@ -309,14 +273,11 @@ export function IEEEAddition({
                             )}
                           </p>
                           {shiftSteps.map((step, idx) => (
-                            <div
+                            <CollapsibleStep
                               key={idx}
-                              className="border-border/30 overflow-hidden rounded border"
-                            >
-                              <button
-                                onClick={() => toggleStep(idx)}
-                                className="bg-muted/30 hover:bg-muted/50 flex w-full items-center justify-between p-2 transition-colors"
-                              >
+                              isOpen={expanded.has(String(idx))}
+                              onToggle={() => toggle(String(idx))}
+                              header={
                                 <div className="flex items-center gap-2 font-mono text-xs">
                                   <span className="text-muted-foreground w-16">
                                     {t("simulator.arithmetic.ieee754.shiftN", {
@@ -331,20 +292,12 @@ export function IEEEAddition({
                                     ...
                                   </span>
                                 </div>
-                                {expandedSteps.has(String(idx)) ? (
-                                  <ChevronDown className="h-4 w-4" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4" />
-                                )}
-                              </button>
-                              {expandedSteps.has(String(idx)) && (
-                                <div className="bg-muted/20 border-border/30 border-t p-2">
-                                  <p className="text-muted-foreground text-xs">
-                                    {step.explanation}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
+                              }
+                            >
+                              <p className="text-muted-foreground text-xs">
+                                {step.explanation}
+                              </p>
+                            </CollapsibleStep>
                           ))}
                         </div>
                       )}
@@ -491,8 +444,8 @@ export function IEEEAddition({
           <p className="text-muted-foreground py-4 text-center text-sm">
             {t("simulator.arithmetic.common.enterValidOperands")}
           </p>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }

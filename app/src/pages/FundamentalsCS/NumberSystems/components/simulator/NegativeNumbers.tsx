@@ -7,6 +7,7 @@ interface NegativeNumbersProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
 }
 
@@ -14,6 +15,7 @@ export function NegativeNumbers({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
 }: NegativeNumbersProps) {
   const { t } = useTranslation("translation");
@@ -54,7 +56,6 @@ export function NegativeNumbers({
       }
       onesComplement = ones;
 
-      // Twos complement: invert and add 1
       let twos = "";
       let carry = 1;
       for (let i = 7; i >= 0; i--) {
@@ -137,6 +138,8 @@ export function NegativeNumbers({
             <ExerciseValidationPanel
               expectedResult={twosComplement}
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
+              inputMode="binary"
               placeholder="z.B. 11110001"
             />
           ) : (
@@ -254,6 +257,7 @@ export function NegativeNumbers({
   );
 }
 
+// ResultRow bleibt lokal – sehr spezifisch für NegativeNumbers
 function ResultRow({
   label,
   value,
@@ -271,7 +275,7 @@ function ResultRow({
     <button
       onClick={valid ? onClick : undefined}
       disabled={!valid || !onClick}
-      className={`w-full rounded-lg border p-3 text-left transition-colors ${highlight ? "border-primary bg-primary/5 ring-primary/20 ring-1" : "border-border/40 bg-background hover:border-primary/50 cursor-pointer"} ${(!valid || !onClick) && "hover:border-border/40 cursor-not-allowed opacity-50"}`}
+      className={`w-full rounded-lg border p-3 text-left ${highlight ? "border-primary bg-primary/5 ring-primary/20 ring-1" : "border-border/40 bg-background hover:border-primary/50 cursor-pointer"} ${(!valid || !onClick) && "hover:border-border/40 cursor-not-allowed opacity-50"}`}
     >
       <div className="text-muted-foreground mb-1 text-xs">{label}</div>
       <div

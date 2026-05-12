@@ -3,6 +3,7 @@ import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { ValidationInputMode } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
 type BaseType = "dec" | "bin" | "oct" | "hex";
 
@@ -10,6 +11,7 @@ interface IntegerConverterProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
   initialBase?: BaseType;
   initialTargetBase?: BaseType;
@@ -19,6 +21,7 @@ export function IntegerConverter({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
   initialBase = "dec",
   initialTargetBase = "bin",
@@ -29,13 +32,13 @@ export function IntegerConverter({
   const [inputValue, setInputValue] = useState<string>("255");
 
   useEffect(() => {
-    if (isExerciseMode && initialValue) {
+    if (initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSourceBase(initialBase);
       setTargetBase(initialTargetBase);
       setInputValue(initialValue);
     }
-  }, [isExerciseMode, initialValue, initialBase, initialTargetBase]);
+  }, [initialValue, initialBase, initialTargetBase]);
 
   const handleSourceBaseChange = (newBase: BaseType) => {
     setSourceBase(newBase);
@@ -360,7 +363,7 @@ export function IntegerConverter({
                         ? 5
                         : 4
                 }
-                className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full rounded-md border px-3 py-2 font-mono text-sm transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+                className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full rounded-md border px-3 py-2 font-mono text-sm focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
               />
               {inputValue !== "" && decValue === "" && (
                 <p className="text-destructive mt-1 text-xs">
@@ -391,6 +394,17 @@ export function IntegerConverter({
             <ExerciseValidationPanel
               expectedResult={targetValue}
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
+              inputMode={
+                (
+                  {
+                    bin: "binary",
+                    oct: "octal",
+                    dec: "decimal",
+                    hex: "hex",
+                  } as Record<string, ValidationInputMode>
+                )[targetBase] ?? "text"
+              }
               placeholder={`z.B. ${targetBase === "bin" ? "10110" : targetBase === "hex" ? "2A" : "42"}`}
             />
           ) : (

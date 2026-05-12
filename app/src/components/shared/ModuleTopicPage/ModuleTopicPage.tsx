@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
 import type { Example, Exercise, TopicItem } from "@/types/exercise";
@@ -23,9 +24,10 @@ export interface ModuleExamplesTabProps {
 
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
-  selectedItem: TopicItem | null;
+  selectedItem?: TopicItem | null;
   isFocused: boolean;
   onToggleFocus: () => void;
+  onExitExercise?: () => void;
 }
 
 interface ModuleTopicPageProps {
@@ -50,6 +52,10 @@ export function ModuleTopicPage({
   const { t } = useTranslation();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
+
+  const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
+  const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
+
   const {
     activeTab,
     setActiveTab,
@@ -61,6 +67,7 @@ export function ModuleTopicPage({
     openInSimulation,
     selectExample,
     openExampleInSimulation,
+    clearSimulationExercise,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -75,12 +82,43 @@ export function ModuleTopicPage({
     });
   };
 
+  const handleExitExercise = () => {
+    clearSimulationExercise();
+  };
+
   const handleTabChange = (tab: ModuleTabId) => {
+    const exerciseIsActive =
+      !!simulationExercise && !simulationExercise.id.includes(".example");
+
+    if (exerciseIsActive && tab !== activeTab) {
+      setPendingTab(tab);
+      setShowTabExitConfirm(true);
+      return;
+    }
+
+    if (exerciseIsActive && tab === activeTab && tab === "simulation") {
+      setPendingTab(null);
+      setShowTabExitConfirm(true);
+      return;
+    }
+
+    applyTabChange(tab);
+  };
+
+  const applyTabChange = (tab: ModuleTabId) => {
     setActiveTab(tab);
     if (tab !== "simulation") {
       // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
+  };
+
+  const handleTabExitConfirm = () => {
+    setShowTabExitConfirm(false);
+    clearSimulationExercise();
+    const target = pendingTab ?? activeTab;
+    setPendingTab(null);
+    applyTabChange(target);
   };
 
   const renderActiveTab = () => {
@@ -115,6 +153,7 @@ export function ModuleTopicPage({
           selectedItem={simulationItem}
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
+          onExitExercise={simulationExercise ? handleExitExercise : undefined}
         />
       );
     }
@@ -140,6 +179,19 @@ export function ModuleTopicPage({
       />
 
       {renderActiveTab()}
+
+      <ConfirmDialog
+        isOpen={showTabExitConfirm}
+        title={t("simulator.validation.exitTabTitle")}
+        description={t("simulator.validation.exitTabDesc")}
+        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        onConfirm={handleTabExitConfirm}
+        onCancel={() => {
+          setShowTabExitConfirm(false);
+          setPendingTab(null);
+        }}
+        variant="warning"
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ interface IEEE754ConverterProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
+  onExitExercise?: () => void;
   initialValue?: string;
   initialConverterMode?: "decToIeee" | "ieeeToDec";
 }
@@ -15,6 +16,7 @@ export function IEEE754Converter({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialValue = "",
   initialConverterMode = "decToIeee",
 }: IEEE754ConverterProps) {
@@ -25,12 +27,12 @@ export function IEEE754Converter({
   );
 
   useEffect(() => {
-    if (isExerciseMode && initialValue) {
+    if (initialValue) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(initialValue);
       setConverterMode(initialConverterMode);
     }
-  }, [isExerciseMode, initialValue, initialConverterMode]);
+  }, [initialValue, initialConverterMode]);
 
   // PARSE LOGIC
   const cleanBinary = inputValue.replace(/[^01]/g, "");
@@ -125,7 +127,7 @@ export function IEEE754Converter({
                     setConverterMode("decToIeee");
                     setInputValue("12.5");
                   }}
-                  className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   {t("simulator.numbers.modeDecToIeee")}
                 </button>
@@ -134,7 +136,7 @@ export function IEEE754Converter({
                     setConverterMode("ieeeToDec");
                     setInputValue("0 10000010 10010000000000000000000");
                   }}
-                  className={`rounded-sm px-3 py-1.5 text-xs font-medium transition-colors ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   {t("simulator.numbers.modeIeeeToDec")}
                 </button>
@@ -279,6 +281,10 @@ export function IEEE754Converter({
                       : [floatVal.toString()]
               }
               onShowSolution={onShowSolution!}
+              onExitExercise={onExitExercise}
+              inputMode={
+                converterMode === "decToIeee" ? "ieee-binary" : "float"
+              }
               placeholder={
                 converterMode === "decToIeee"
                   ? "z.B. 0 10000000 0000000..."

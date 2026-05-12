@@ -1,16 +1,16 @@
-import { useState, useMemo, type ReactNode } from "react";
-import { Info, List, ChevronDown, ChevronRight } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
-
-interface DivisionProps {
-  renderModeSelector?: ReactNode;
-  isExerciseMode?: boolean;
-  showSolution?: boolean;
-  onShowSolution?: () => void;
-  initialA?: string;
-  initialB?: string;
-}
+import type { BaseArithmeticProps } from "./types";
+import {
+  SimulatorLayout,
+  BinaryInput,
+  StepByStepToggle,
+  CollapsibleStep,
+  ResultSectionHeader,
+  useToggleSet,
+} from "../shared";
 
 interface DivisionStep {
   step: number;
@@ -27,17 +27,16 @@ export function Division({
   isExerciseMode,
   showSolution = true,
   onShowSolution,
+  onExitExercise,
   initialA,
   initialB,
   renderModeSelector,
-}: DivisionProps) {
+}: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
   const [valA, setValA] = useState(initialA || "11010");
   const [valB, setValB] = useState(initialB || "101");
   const [showStepByStep, setShowStepByStep] = useState(false);
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(
-    new Set(["0", "1", "2"]),
-  );
+  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
 
   const locked = !!isExerciseMode && !showSolution;
 
@@ -76,7 +75,7 @@ export function Division({
           subtracted: valB,
           isOne: true,
           quotientBit: "1",
-          remainderAfter: remainderAfter,
+          remainderAfter,
           explanation: t("simulator.arithmetic.division.stepDesc", {
             n: i + 1,
             current: currentStr.replace(/^0+/, "") || "0",
@@ -112,62 +111,37 @@ export function Division({
     };
   }, [valA, valB, t]);
 
-  const toggleStep = (index: number) => {
-    const newExpanded = new Set(expandedSteps);
-    const key = String(index);
-    if (newExpanded.has(key)) {
-      newExpanded.delete(key);
-    } else {
-      newExpanded.add(key);
-    }
-    setExpandedSteps(newExpanded);
-  };
-
   return (
-    <div className="animate-in fade-in zoom-in-95 grid w-full grid-cols-1 gap-6 duration-300 md:grid-cols-2">
-      {/* Inputs */}
-      <div className="bg-card border-border/50 space-y-6 rounded-xl border p-6 shadow-sm">
-        <div>
-          <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-            {t("simulator.arithmetic.common.operands")}
-          </h3>
-          <p className="text-muted-foreground mb-4 text-sm">
-            {t("simulator.arithmetic.division.desc")}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {renderModeSelector}
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.division.dividend")}
-            </label>
-            <input
-              type="text"
+    <SimulatorLayout
+      inputPanel={
+        <>
+          <div>
+            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
+              {t("simulator.arithmetic.common.operands")}
+            </h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {t("simulator.arithmetic.division.desc")}
+            </p>
+          </div>
+          <div className="space-y-4">
+            {renderModeSelector}
+            <BinaryInput
+              label={t("simulator.arithmetic.division.dividend")}
               value={valA}
-              onChange={(e) => handleInputA(e.target.value)}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              onChange={handleInputA}
+              locked={locked}
             />
-          </div>
-          <div className={locked ? "opacity-60" : ""}>
-            <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-              {t("simulator.arithmetic.division.divisor")}
-            </label>
-            <input
-              type="text"
+            <BinaryInput
+              label={t("simulator.arithmetic.division.divisor")}
               value={valB}
-              onChange={(e) => handleInputB(e.target.value)}
-              readOnly={locked}
-              className={`bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm tracking-widest transition-colors focus:outline-none ${locked ? "bg-muted border-input pointer-events-none" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1"}`}
+              onChange={handleInputB}
+              locked={locked}
             />
           </div>
-        </div>
-      </div>
-
-      {/* Logic / Dashboard Panel */}
-      <div className="bg-muted/30 border-border/50 overflow-auto rounded-xl border p-6 shadow-sm">
-        {locked ? (
+        </>
+      }
+      resultPanel={
+        locked ? (
           <ExerciseValidationPanel
             expectedResult={
               remainder === "0"
@@ -179,14 +153,15 @@ export function Division({
                   ]
             }
             onShowSolution={onShowSolution!}
+            onExitExercise={onExitExercise}
             placeholder={remainder === "0" ? "z.B. 10" : "z.B. 10 Rest 1"}
           />
         ) : (
           <div className="space-y-6">
-            <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
-              <Info className="text-primary h-5 w-5" />
-              {t("simulator.arithmetic.common.stepsResult")}
-            </h3>
+            <ResultSectionHeader
+              icon={<Info className="text-primary h-5 w-5" />}
+              title={t("simulator.arithmetic.common.stepsResult")}
+            />
 
             {isZeroDiv ? (
               <p className="text-destructive py-4 text-sm font-semibold">
@@ -194,19 +169,10 @@ export function Division({
               </p>
             ) : valA && valB ? (
               <>
-                {/* Step-by-Step Toggle */}
-                <button
-                  onClick={() => setShowStepByStep(!showStepByStep)}
-                  className="text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium transition-colors"
-                >
-                  <List className="h-4 w-4" />
-                  {t("simulator.arithmetic.common.showStepByStep")}
-                  {showStepByStep ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </button>
+                <StepByStepToggle
+                  open={showStepByStep}
+                  onToggle={() => setShowStepByStep(!showStepByStep)}
+                />
 
                 {showStepByStep && steps.length > 0 && (
                   <div className="mb-6 space-y-3">
@@ -214,18 +180,14 @@ export function Division({
                       {t("simulator.arithmetic.division.stepByStepTitle")}
                     </div>
 
-                    {/* Collapsible Steps */}
                     <div className="space-y-2">
                       {steps.map((step, idx) => (
-                        <div
+                        <CollapsibleStep
                           key={idx}
-                          className="border-border/40 overflow-hidden rounded-lg border"
-                        >
-                          <button
-                            onClick={() => toggleStep(idx)}
-                            className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors"
-                          >
-                            <div className="flex items-center gap-4">
+                          isOpen={expanded.has(String(idx))}
+                          onToggle={() => toggle(String(idx))}
+                          header={
+                            <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
                                 {t("simulator.arithmetic.division.stepN", {
                                   n: step.step + 1,
@@ -247,40 +209,32 @@ export function Division({
                                       )}
                                 </span>
                               </div>
-                            </div>
-                            {expandedSteps.has(String(idx)) ? (
-                              <ChevronDown className="text-muted-foreground h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="text-muted-foreground h-4 w-4" />
-                            )}
-                          </button>
-                          {expandedSteps.has(String(idx)) && (
-                            <div className="bg-muted/30 border-border/40 border-t p-3">
-                              <p className="text-foreground text-sm">
-                                {step.explanation}
-                              </p>
-                              {step.isOne && (
-                                <div className="bg-destructive/5 border-destructive/20 mt-2 rounded border p-2 font-mono text-sm">
-                                  <span className="text-muted-foreground">
-                                    {step.currentStr}
-                                  </span>
-                                  <span className="text-muted-foreground mx-2">
-                                    -
-                                  </span>
-                                  <span className="text-destructive">
-                                    {step.subtracted}
-                                  </span>
-                                  <span className="text-muted-foreground mx-2">
-                                    =
-                                  </span>
-                                  <span className="text-primary font-bold">
-                                    {step.remainderAfter}
-                                  </span>
-                                </div>
-                              )}
+                            </>
+                          }
+                        >
+                          <p className="text-foreground text-sm">
+                            {step.explanation}
+                          </p>
+                          {step.isOne && (
+                            <div className="bg-destructive/5 border-destructive/20 mt-2 rounded border p-2 font-mono text-sm">
+                              <span className="text-muted-foreground">
+                                {step.currentStr}
+                              </span>
+                              <span className="text-muted-foreground mx-2">
+                                -
+                              </span>
+                              <span className="text-destructive">
+                                {step.subtracted}
+                              </span>
+                              <span className="text-muted-foreground mx-2">
+                                =
+                              </span>
+                              <span className="text-primary font-bold">
+                                {step.remainderAfter}
+                              </span>
                             </div>
                           )}
-                        </div>
+                        </CollapsibleStep>
                       ))}
                     </div>
 
@@ -302,10 +256,9 @@ export function Division({
                   </div>
                 )}
 
-                {/* Original Visual */}
+                {/* Visual */}
                 <div className="flex justify-center overflow-x-auto p-4">
                   <div className="bg-background border-border/40 min-w-fit rounded-lg border p-6 font-mono text-lg leading-loose font-medium tracking-widest shadow-inner select-none">
-                    {/* Header */}
                     <div className="border-foreground/30 mb-4 flex justify-start gap-2 border-b-2 pb-2 whitespace-nowrap">
                       <span>{valA}</span>
                       <span className="text-primary mx-2">:</span>
@@ -313,8 +266,6 @@ export function Division({
                       <span className="text-primary mx-2">=</span>
                       <span className="text-primary font-bold">{quotient}</span>
                     </div>
-
-                    {/* Steps visualized */}
                     <div className="flex w-full flex-col items-start space-y-1 whitespace-nowrap">
                       {steps.map((step, idx) => (
                         <div key={idx} className="flex w-full gap-4">
@@ -340,15 +291,12 @@ export function Division({
                         </div>
                       ))}
                     </div>
-
-                    {/* Result */}
                     <div className="border-foreground/30 mt-6 flex justify-start gap-2 border-t-2 pt-4">
                       <span className="text-muted-foreground">
                         {t("simulator.arithmetic.division.remainder")}
                       </span>
                       <span className="font-bold">{remainder}</span>
                     </div>
-
                     <div className="text-muted-foreground mt-4 text-left font-sans text-xs tracking-normal">
                       {t("simulator.arithmetic.division.inDecimal")}:{" "}
                       {parseInt(valA, 2)} : {parseInt(valB, 2)} ={" "}
@@ -363,8 +311,8 @@ export function Division({
               </p>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }

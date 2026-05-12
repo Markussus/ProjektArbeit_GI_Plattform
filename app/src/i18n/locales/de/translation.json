@@ -1,4 +1,9 @@
 {
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen"
+  },
   "app": {
     "title": "THWS - Traingscenter"
   },
@@ -112,7 +117,33 @@
     "ex_u06_addSubDesc": "Führe Addition und Zweierkomplement-Subtraktion durch.",
     "ex_u06_mult": "Multiplikation",
     "ex_u06_multDesc": "Multipliziere zwei Binärzahlen stellenweise.",
-    "examplesFallback": "Interaktive Beispiele für Zahlensysteme werden hier verfügbar sein."
+    "examplesFallback": "Interaktive Beispiele für Zahlensysteme werden hier verfügbar sein.",
+    "example_u03_1": "Dezimal → Binär",
+    "example_u03_1_desc": "Rechnen Sie die Dezimalzahl 26 in eine Binärzahl um.",
+    "example_u03_2": "Binäre Addition (50 + 13)",
+    "example_u03_2_desc": "Addieren Sie die Zahlen 50 und 13 als Binärzahlen.",
+    "example_u04_1": "Binär → Hex",
+    "example_u04_1_desc": "Stellen Sie die Binärzahl 01111010 als Hexadezimalzahl dar.",
+    "example_u04_2": "Binär → Oktal",
+    "example_u04_2_desc": "Stellen Sie die Binärzahl 0011 1100 als Oktalzahl dar.",
+    "example_u04_3": "Oktal → Hex",
+    "example_u04_3_desc": "Stellen Sie die Oktalzahl 760 als Hexadezimalzahl dar.",
+    "example_u04_4": "Hex → Binär",
+    "example_u04_4_desc": "Stellen Sie die Hexadezimalzahl 7F als Binärzahl dar.",
+    "example_u05_1": "Gleitkomma 10.5 → Binär",
+    "example_u05_1_desc": "Rechnen Sie die Dezimalzahl 10.5 in eine binäre Gleitkommazahl um.",
+    "example_u05_2": "Gleitkomma 3.375 → Binär (normiert)",
+    "example_u05_2_desc": "Stellen Sie die Dezimalzahl 3.375 als normierte binäre Gleitkommazahl dar.",
+    "example_u05_3": "IEEE 754 Kodierung (-4.4375)",
+    "example_u05_3_desc": "Stellen Sie die Zahl -4.4375 im IEEE 754 32-Bit Format dar.",
+    "example_u05_4": "IEEE 754 Dekodierung",
+    "example_u05_4_desc": "Dekodieren Sie die 32-Bit IEEE 754 Bitfolge 01000001010101000000000000000000.",
+    "example_u06_1_add": "Binäre Addition (01101101 + 00100111)",
+    "example_u06_1_add_desc": "Addieren Sie 01101101 und 00100111 im Binärsystem.",
+    "example_u06_1_sub": "Binäre Subtraktion (01101101 - 00100111)",
+    "example_u06_1_sub_desc": "Subtrahieren Sie 00100111 von 01101101 im Binärsystem.",
+    "example_u06_2": "Binäre Multiplikation (1011 × 11001)",
+    "example_u06_2_desc": "Multiplizieren Sie 1011 und 11001 im Binärsystem."
   },
   "moore": {
     "title": "Moore & Mealy Automaten",
@@ -393,6 +424,7 @@
     "tabs": {
       "integers": "Ganzzahlen",
       "negative": "Negative Zahlen",
+      "fractional": "Kommazahlen",
       "ieee754": "IEEE 754 (32-bit)",
       "arithmetic": "Arithmetik"
     },
@@ -489,7 +521,40 @@
       "fractionSum": "Summe der gebrochenen Potenzen",
       "step4FinalCalc": "4. Finale Verrechnung aller Komponenten",
       "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
-      "decToTarget": "Dezimal zu {{target}}"
+      "examplesTitle": "Beispiel-Aufgaben",
+      "examplesDesc": "Hier finden Sie zusätzliche Beispiel-Übungen zu den verschiedenen Units:",
+      "unit03": "Unit 03: Wie werden Zahlen im Computer dargestellt?",
+      "unit03_ex1": "Übung 1: Rechnen Sie die folgenden Dezimalzahlen in Binärzahlen um: 1, 5, 7, 26, 63.",
+      "unit03_ex2": "Übung 2: Addieren Sie die Zahlen 50 und 13 als Binärzahlen.",
+      "unit04": "Unit 04: Weitere Zahlensysteme (Oktal und Hexadezimal)",
+      "unit04_ex1": "Übung 1 (Binär nach Hex): Stellen Sie die Zahl 01111010 als Hex-Zahl dar.",
+      "unit04_ex2": "Übung 2 (Binär nach Oktal): Stellen Sie die Zahl 0011 1100 als Oktal-Zahl dar.",
+      "unit04_ex3": "Übung 3 (Oktal nach Hex): Stellen Sie die Zahl 760 als Hex-Zahl dar. Benutzen Sie das Binärformat als Zwischenschritt.",
+      "unit04_ex4": "Übung 4 (Hex nach Binär): Stellen Sie die Zahl 7F als Binärzahl dar.",
+      "unit05": "Unit 05: Codierung von reellen Zahlen",
+      "unit05_ex1": "Übung 1 (Umrechnung): Rechnen Sie die Zahl 10.5 in eine binäre Gleitkommazahl um.",
+      "unit05_ex2": "Übung 2 (Umrechnung und Normierung): Stellen Sie bitte die dezimale Zahl 3.375 als normierte binäre Gleitkommazahl dar. Rechnen Sie erst die ganze Zahl vor dem Komma um, rechnen Sie dann die Zahl nach dem Komma um und normieren Sie erst dann die (binäre) Zahl.",
+      "unit05_ex3": "Übung 3 (IEEE 754 Format): Stellen Sie die Zahl -4.4375 im IEEE 754 Format (32 Bit) dar.",
+      "unit05_ex4": "Übung 4 (IEEE 754 in eine Dezimalzahl umrechnen): Welche Zahl wird mit folgender Bit-Folge codiert? 0 1000 0010 1 0101 000 ... 0.",
+      "unit06": "Unit 06: Binärarithmetik",
+      "unit06_ex1_title": "Übung 1 (Addition und Subtraktion): Führen Sie die folgenden Rechnungen durch:",
+      "unit06_ex1_add": "Addition: 0110 1101 + 0010 0111.",
+      "unit06_ex1_sub": "Subtraktion: 0110 1101 - 0010 0111.",
+      "unit06_ex2": "Übung 2 (Multiplikation und Division): Berechnen Sie 1011 × 11001.",
+      "decToTarget": "Dezimal zu {{target}}",
+      "fracTitle": "Kommazahlen zu Binär (Unnormiert)",
+      "fracDesc": "Eine Dezimalzahl mit Nachkommastellen (z.B. 10.5) wird aufgeteilt. Der ganzzahlige Teil wird durch 2 geteilt, der Nachkommateil mit 2 multipliziert.",
+      "fracIntPart": "Ganzzahliger Teil:",
+      "fracFractPart": "Nachkomma-Teil:",
+      "fracMultBy2": "Mit 2 multiplizieren:",
+      "fracResult": "Zusammengesetztes Ergebnis:",
+      "fracModeDecToBin": "Dezimal zu Binär",
+      "fracModeBinToDec": "Binär zu Dezimal",
+      "fracBinToDecTitle": "Binär zu Kommazahlen (Unnormiert)",
+      "fracBinToDecDesc": "Eine Binärzahl mit Komma (z.B. 1010.1) wird aufgeteilt. Für den ganzzahligen Teil werden positive 2er-Potenzen summiert, für den Nachkommateil negative 2er-Potenzen.",
+      "fracSumPowers": "Summe der Potenzen",
+      "fracSumInt": "Ganzzahliger Teil (Summe der positiven Potenzen)",
+      "fracSumFrac": "Nachkomma-Teil (Summe der negativen Potenzen)"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",
@@ -665,7 +730,14 @@
       "verify": "Lösung überprüfen",
       "showSolution": "Lösung anzeigen (Überspringen)",
       "correct": "Korrekt! Die Lösung wurde freigeschaltet.",
-      "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!"
+      "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!",
+      "exitExerciseButton": "Übungsmodus verlassen",
+      "exitExerciseTitle": "Übungsmodus verlassen?",
+      "exitExerciseDesc": "Dein Fortschritt in dieser Übung geht verloren. Bist du sicher, dass du den Übungsmodus verlassen möchtest?",
+      "exitExerciseConfirm": "Verlassen",
+      "exitTabTitle": "Tab wechseln?",
+      "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs wird die aktuelle Übung beendet und dein Fortschritt geht verloren.",
+      "exitTabConfirm": "Tab wechseln"
     }
   },
   "tm": {
@@ -712,38 +784,23 @@
       "checkingSolution": "Prüfung läuft..."
     },
     "config": {
-      "general": {
-        "title": "Turingmaschinen-Konfiguration",
-        "apply": "Simulation starten",
-        "initialTape": "Anfangsbandwort",
-        "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
-        "startState": "Startzustand"
-      },
-      "haltStates": {
-        "haltStates": "Haltezustände",
-        "haltStatesDesc": "Haltezustände festlegen",
-        "addHaltState": "Haltezustand hinzufügen",
-        "addHaltStatePlaceholder": "Haltezustand hinzufügen",
-        "noStates": "Keine Zustände verfügbar"
-      },
-      "alphabets": {
-        "inputAlphabet": "Eingabealphabet",
-        "tapeAlphabet": "Bandalphabet",
-        "noSymbols": "Keine Symbole verfügbar"
-      },
-      "transitionTable": {
-        "transitionTable": "Übergangstabelle",
-        "transitionFormat": "Format:",
-        "transitionExample": " z. B. (q1, 0, R)"
-      },
-      "editing": {
-        "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
-        "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
-        "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
-        "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
-        "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
-        "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
-      }
+      "title": "Turingmaschinen-Konfiguration",
+      "apply": "Simulation starten",
+      "initialTape": "Anfangsbandwort",
+      "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
+      "startState": "Startzustand",
+      "haltStates": "Haltezustände",
+      "haltStatesDesc": "Zustände als haltend markieren.",
+      "noStates": "Keine Zustände verfügbar",
+      "transitionTable": "Übergangstabelle",
+      "transitionFormat": "Format:",
+      "transitionExample": " z. B. (q1, 0, R)",
+      "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
+      "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
+      "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
+      "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
+      "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
+      "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
     },
     "validation": {
       "summary": {

@@ -3,22 +3,39 @@ import { useTranslation } from "react-i18next";
 import { IntegerConverter } from "./IntegerConverter";
 import { NegativeNumbers } from "./NegativeNumbers";
 import { IEEE754Converter } from "./IEEE754Converter";
+import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
-type SimulatorMode = "integers" | "negative" | "ieee754" | "arithmetic";
+
+type SimulatorMode =
+  | "integers"
+  | "negative"
+  | "fractional"
+  | "ieee754"
+  | "arithmetic";
 
 interface SimulatorProps {
   selectedExercise?: Exercise | null;
+  /** Callback zum Verlassen des Übungsmodus auf Seite des Elternelementes */
+  onExitExercise?: () => void;
 }
 
-export function Simulator({ selectedExercise }: SimulatorProps) {
+export function Simulator({
+  selectedExercise,
+  onExitExercise,
+}: SimulatorProps) {
   const { t } = useTranslation("translation");
   const [activeMode, setActiveMode] = useState<SimulatorMode>("integers");
 
   // Exercise mode states
   const [isExerciseMode, setIsExerciseMode] = useState(false);
   const [showSolution, setShowSolution] = useState(true);
+
+  // Tab-change confirm dialog state
+  const [pendingMode, setPendingMode] = useState<SimulatorMode | null>(null);
+  const [showTabConfirm, setShowTabConfirm] = useState(false);
 
   // Initial values for converters when launched via exercise
   const [initialValue, setInitialValue] = useState<string>("");
@@ -45,9 +62,10 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
 
   useEffect(() => {
     if (selectedExercise) {
+      const isExample = selectedExercise.id.includes(".example");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsExerciseMode(true);
-      setShowSolution(false);
+      setIsExerciseMode(!isExample);
+      setShowSolution(isExample);
 
       const randInt = (min: number, max: number) =>
         Math.floor(Math.random() * (max - min + 1)) + min;
@@ -86,8 +104,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
           randInt(16, 255).toString(16).toUpperCase().padStart(2, "0"),
         );
       } else if (selectedExercise.id === "number.ex_u05_floatToBin") {
-        setActiveMode("ieee754");
-        setInitialConverterMode("decToIeee");
+        setActiveMode("fractional");
         const wholes = randInt(-20, 20);
         const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
         setInitialValue(
@@ -116,19 +133,124 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
         setInitialSubMode("multiplication");
         setInitialValueA(decToBin(randInt(8, 15)));
         setInitialValueB(decToBin(randInt(16, 31)));
+      } else if (selectedExercise.id === "number.example_u03_1") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("26"); // Picked 26 as an example
+      } else if (selectedExercise.id === "number.example_u03_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("110010"); // 50
+        setInitialValueB("1101"); // 13
+      } else if (selectedExercise.id === "number.example_u04_1") {
+        setActiveMode("integers");
+        setInitialBase("bin");
+        setInitialTargetBase("hex");
+        setInitialValue("01111010");
+      } else if (selectedExercise.id === "number.example_u04_2") {
+        setActiveMode("integers");
+        setInitialBase("bin");
+        setInitialTargetBase("oct");
+        setInitialValue("00111100");
+      } else if (selectedExercise.id === "number.example_u04_3") {
+        setActiveMode("integers");
+        setInitialBase("oct");
+        setInitialTargetBase("hex");
+        setInitialValue("760");
+      } else if (selectedExercise.id === "number.example_u04_4") {
+        setActiveMode("integers");
+        setInitialBase("hex");
+        setInitialTargetBase("bin");
+        setInitialValue("7F");
+      } else if (selectedExercise.id === "number.example_u05_1") {
+        setActiveMode("fractional");
+        setInitialValue("10.5");
+      } else if (selectedExercise.id === "number.example_u05_2") {
+        // Unnormalized is fractional converter, normalized is IEEE without bias? IEEE is normalized
+        setActiveMode("fractional");
+        setInitialValue("3.375");
+      } else if (selectedExercise.id === "number.example_u05_3") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("-4.4375");
+      } else if (selectedExercise.id === "number.example_u05_4") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("ieeeToDec");
+        setInitialValue("01000001010101000000000000000000"); // padded with zeros
+      } else if (selectedExercise.id === "number.example_u06_1_add") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("01101101");
+        setInitialValueB("00100111");
+      } else if (selectedExercise.id === "number.example_u06_1_sub") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("01101101");
+        setInitialValueB("00100111");
+      } else if (selectedExercise.id === "number.example_u06_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("multiplication");
+        setInitialValueA("1011");
+        setInitialValueB("11001");
       }
     } else {
       setIsExerciseMode(false);
-      setShowSolution(true); // Free simulator mode
+      setShowSolution(true);
+      setInitialValue("");
+      setInitialBase("dec");
+      setInitialTargetBase("bin");
+      setInitialValueA("");
+      setInitialValueB("");
+      setInitialSubMode("addition");
+      setInitialConverterMode("decToIeee");
     }
   }, [selectedExercise]);
+
+  /** Verlässt den Übungsmodus vollständig: lokaler State + übergeordneter State */
+  const handleExitExercise = () => {
+    setIsExerciseMode(false);
+    setShowSolution(true);
+    // Elternelement (ModuleTopicPage) informieren → simulationExercise wird genullt
+    onExitExercise?.();
+  };
+
+  /**
+   * Tab-Click Handler: Wenn im Übungsmodus, Dialog anzeigen.
+   * Andernfalls direkt wechseln.
+   */
+  const handleTabClick = (mode: SimulatorMode) => {
+    if (mode === activeMode) return;
+    if (isExerciseMode && !showSolution) {
+      setPendingMode(mode);
+      setShowTabConfirm(true);
+    } else {
+      setActiveMode(mode);
+    }
+  };
+
+  /** Bestätigter Tab-Wechsel: Übungsmodus verlassen + Tab wechseln */
+  const handleTabConfirm = () => {
+    setShowTabConfirm(false);
+    handleExitExercise();
+    if (pendingMode) {
+      setActiveMode(pendingMode);
+      setPendingMode(null);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col space-y-6">
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
         {(
-          ["integers", "negative", "ieee754", "arithmetic"] as SimulatorMode[]
+          [
+            "integers",
+            "fractional",
+            "negative",
+            "ieee754",
+            "arithmetic",
+          ] as SimulatorMode[]
         ).map((mode) => (
           <button
             key={mode}
@@ -138,7 +260,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
                 ? "text-tab-active"
                 : "text-muted-foreground hover:text-foreground",
             )}
-            onClick={() => setActiveMode(mode)}
+            onClick={() => handleTabClick(mode)}
           >
             {t(`simulator.tabs.${mode}`)}
             {activeMode === mode && (
@@ -160,6 +282,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
             initialBase={initialBase}
             initialTargetBase={initialTargetBase}
@@ -175,6 +298,21 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
+            initialValue={initialValue}
+          />
+        )}
+        {activeMode === "fractional" && (
+          <FractionalConverter
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValue}`
+                : "free-frac"
+            }
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
           />
         )}
@@ -188,6 +326,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
           />
@@ -202,6 +341,7 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialMode={
               initialSubMode as
                 | "addition"
@@ -217,6 +357,20 @@ export function Simulator({ selectedExercise }: SimulatorProps) {
           />
         )}
       </div>
+
+      {/* Tab-Wechsel Bestätigungsdialog */}
+      <ConfirmDialog
+        isOpen={showTabConfirm}
+        title={t("simulator.validation.exitTabTitle")}
+        description={t("simulator.validation.exitTabDesc")}
+        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        onConfirm={handleTabConfirm}
+        onCancel={() => {
+          setShowTabConfirm(false);
+          setPendingMode(null);
+        }}
+        variant="warning"
+      />
     </div>
   );
 }

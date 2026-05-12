@@ -37,6 +37,11 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
     setActiveTab("simulation");
   };
 
+  const clearSimulationExercise = () => {
+    setSimulationExercise(null);
+    setSelectedExercise(null);
+  };
+
   return {
     activeTab,
     setActiveTab,
@@ -48,5 +53,6 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
     openInSimulation,
     selectExample,
     openExampleInSimulation,
+    clearSimulationExercise,
   };
 }
