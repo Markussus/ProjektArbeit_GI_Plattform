@@ -58,25 +58,6 @@
     "mooreDesc": "Sequential circuit design & state machines",
     "dnfDesc": "Disjunctive Normal Form & boolean algebra"
   },
-  "turing": {
-    "title": "Turing Machines",
-    "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed.",
-    "overviewTitle": "What is a Turing Machine?",
-    "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
-    "concepts": "Key Concepts",
-    "concept1": "Tape & Head Movement",
-    "concept2": "States & Transitions",
-    "concept3": "Acceptance & Rejection",
-    "concept4": "Church-Turing Thesis",
-    "exercise1": "Basic Transition",
-    "exercise1Desc": "Design a simple TM transition table",
-    "exercise2": "2-Tape TM Design",
-    "exercise2Desc": "Build a multi-tape Turing Machine",
-    "exercise3": "Busy Beaver Problem",
-    "exercise3Desc": "Find the maximum output for n-state TMs",
-    "exercise4": "The Halting Problem",
-    "exercise4Desc": "Prove undecidability of the halting problem"
-  },
   "automata": {
     "title": "Finite Automata",
     "description": "Study deterministic and non-deterministic finite automata. Learn how to design, minimize, and convert between different automata representations.",
@@ -175,22 +156,185 @@
   },
   "dnf": {
     "title": "Disjunctive Normal Form",
-    "description": "Learn to convert boolean expressions into DNF. Practice with truth tables, Karnaugh maps, and logical simplification techniques.",
+    "description": "Learn how boolean expressions are evaluated with truth tables and how the Disjunctive Normal Form is derived from the rows with result 1.",
     "overviewTitle": "What is DNF?",
-    "overviewText": "Disjunctive Normal Form (DNF) is a standardized way of writing boolean expressions as a disjunction (OR) of conjunctions (AND). Every boolean function can be expressed in DNF, making it a universal representation for logical circuits and decision-making systems.",
+    "overviewText": "Disjunctive Normal Form (DNF) writes a boolean expression as OR-linked AND terms. In the lecture style, each truth-table row with result 1 contributes exactly one term.",
     "concepts": "Key Concepts",
-    "concept1": "Minterms & Maxterms",
+    "concept1": "Boolean polynomials",
     "concept2": "Truth Tables",
-    "concept3": "Karnaugh Maps",
-    "concept4": "Boolean Simplification",
-    "exercise1": "Truth Table to DNF",
-    "exercise1Desc": "Derive the DNF from a given truth table",
-    "exercise2": "Karnaugh Map",
-    "exercise2Desc": "Simplify a boolean function using K-maps",
-    "exercise3": "DNF to Circuit",
-    "exercise3Desc": "Draw the logic circuit for a given DNF",
-    "exercise4": "Multi-Variable DNF",
-    "exercise4Desc": "Handle expressions with 4+ variables"
+    "concept3": "Rows with result 1",
+    "concept4": "Logic gates",
+    "examplesTitle": "Lecture examples",
+    "examplesIntro": "Four examples show compactly how rows with result 1 become the DNF.",
+    "examples": {
+      "openInSimulation": "Open in simulation",
+      "labels": {
+        "expression": "Expression",
+        "oneRows": "Relevant 1-rows",
+        "terms": "AND terms",
+        "canonicalDnf": "DNF"
+      },
+      "walkthroughs": {
+        "lectureExpression": {
+          "title": "Expression with an AND group",
+          "explanation": "The expression is true when a=1 or b and c are both 1."
+        },
+        "parentheses": {
+          "title": "Parentheses change the result",
+          "explanation": "Here c=1, and a=1 or b=1 must also hold."
+        },
+        "negation": {
+          "title": "Negation restricts the true rows",
+          "explanation": "Because ¬a is set, only rows with a=0 can be true. Additionally, b or c must equal 1."
+        },
+        "xor": {
+          "title": "Half-adder sum as XOR",
+          "explanation": "The sum is 1 when exactly one input is 1."
+        }
+      }
+    },
+    "exampleExpressionTitle": "Start expression",
+    "exampleExpressionText": "The expression is true as soon as a is true or b and c are true together.",
+    "exampleTableTitle": "Truth table with DNF selection",
+    "exampleAssignment": "Assignment",
+    "exampleResult": "Result",
+    "exampleTerm": "DNF term",
+    "exampleIgnored": "ignored",
+    "exampleResultTitle": "DNF",
+    "exampleRuleTitle": "Rule of thumb",
+    "exampleRuleText": "If the value is 1, keep the variable as-is; if the value is 0, negate it. This makes each AND term describe exactly one matching table row.",
+    "exercise1": "Evaluate expression and derive DNF",
+    "exercise1Desc": "Fill in the truth table and build the DNF from all 1-rows",
+    "exercise2": "Compare parentheses and build DNF",
+    "exercise2Desc": "Evaluate the parenthesized expression and derive the DNF from it",
+    "exercise3": "Half-adder sum as DNF",
+    "exercise3Desc": "Check the XOR polynomial from the lecture through the truth table",
+    "exercise4": "Multi-variable expression as DNF",
+    "exercise4Desc": "Evaluate an expression with four variables and build the DNF",
+    "exercise5": "Boolean polynomial from truth table",
+    "exercise5Desc": "Create the boolean polynomial in DNF from a given truth table",
+    "exprBuilder": {
+      "evaluate": "Evaluate",
+      "newExpression": "Enter a different expression"
+    },
+    "builder": {
+      "inputTitle": "Boolean expression",
+      "inputHint": "Use variables, 0/1, parentheses, and the operators ¬, ∧, ∨.",
+      "keyboardAliases": "Keyboard aliases: ! or ~ = ¬, & or && = ∧, | or || = ∨.",
+      "operatorHelp": "Operators:",
+      "insertNot": "Insert negation",
+      "insertAnd": "Insert AND",
+      "insertOr": "Insert OR",
+      "insertOpenParen": "Insert opening parenthesis",
+      "insertCloseParen": "Insert closing parenthesis",
+      "clear": "Clear",
+      "reset": "Reset",
+      "exercise": {
+        "taskTitle": "Exercise task",
+        "given": "Given the boolean expression:",
+        "givenTruthTable": "Given the truth table:",
+        "findExpressionFromTable": "Find the boolean polynomial in disjunctive normal form.",
+        "stepsTitle": "Workflow",
+        "instructionStepTable": "Fill in the truth table.",
+        "instructionStepDnf": "Build one AND term from each 1-row and join the terms with ∨.",
+        "instructionStepOneRows": "Consider only the rows with result 1.",
+        "instructionStepDnfFromTable": "Build one AND term for each 1-row and join them with ∨.",
+        "tableTitle": "Workspace",
+        "tableHint": "Choose the result value 0 or 1 for each row. With keyboard focus, use 0/1 and the arrow keys.",
+        "tableHintGiven": "The result column is given. Derive the DNF from it.",
+        "rowHeader": "Row",
+        "resultGroupLabel": "Result for row {{row}}",
+        "resultButtonLabel": "Row {{row}}: choose result {{value}}",
+        "dnfLabel": "DNF",
+        "dnfHint": "Rule: each 1-row contributes exactly one AND term containing all variables.",
+        "dnfPlaceholder": "e.g. (¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ c)",
+        "check": "Check",
+        "feedbackTitle": "Feedback",
+        "notChecked": "Not checked yet. Fill in the table, enter the DNF, and click Check.",
+        "notCheckedDnfOnly": "Not checked yet. Enter the DNF for the given truth table and click Check.",
+        "progressTable": "Truth table",
+        "progressTableValue": "{{answered}} / {{total}} rows answered",
+        "progressTableProvided": "given",
+        "progressDnf": "DNF input",
+        "progressDnfReady": "present",
+        "progressDnfMissing": "still empty",
+        "tableCorrectValue": "{{correct}} / {{total}} rows correct",
+        "dnfStatus": {
+          "deferred": "waiting for table",
+          "empty": "missing",
+          "syntax_error": "check syntax",
+          "correct": "correct",
+          "equivalent_not_canonical": "equivalent, wrong form",
+          "not_equivalent": "does not match"
+        },
+        "oneRowsLabel": "1-rows for the DNF",
+        "noOneRows": "none",
+        "correctTitle": "All correct",
+        "correctDesc": "Truth table and DNF match the task.",
+        "tableIncomplete": "{{count}} table row(s) are still empty.",
+        "tableWrongRows": "These table row(s) are wrong: {{rows}}.",
+        "dnfEmpty": "The DNF input is still missing.",
+        "dnfSyntax": "The DNF input cannot be parsed.",
+        "dnfEquivalentNotCanonical": "The input describes the same function, but is not built as a DNF from the rows with result 1 — each 1-row requires exactly one AND term.",
+        "dnfMissingTerms": "The DNF is missing {{count}} term(s) for row(s): {{rows}}.",
+        "dnfExpectedTerms": "Expected missing terms: {{terms}}.",
+        "dnfExtraTerms": "The DNF contains term(s) that do not belong to a 1-row: {{rows}}.",
+        "dnfExtraTermDetails": "These term(s) would turn on 0-rows: {{terms}}.",
+        "dnfWrongRows": "The DNF does not match these table row(s): {{rows}}.",
+        "dnfDeferredUntilTable": "The DNF is checked in detail only after the truth table is complete and correct.",
+        "tipTitle": "Tip",
+        "tipCompleteTable": "The DNF can only be checked meaningfully after every table row has an answer.",
+        "tipTableRows": "Check the highlighted table rows first. The DNF is derived from the correct 1-rows.",
+        "tipStartDnf": "For each row with result 1, write one AND term containing all variables.",
+        "tipSyntax": "Use parentheses and the operators ¬, ∧, ∨ or the aliases !, &, |.",
+        "tipCanonical": "Each AND term must contain every variable exactly once — either as-is or negated.",
+        "tipMissingTerms": "Compare the table's 1-rows with the AND terms in your DNF.",
+        "tipCompareRows": "Evaluate your DNF on the listed rows and compare the result with the table.",
+        "solutionHint": "The full solution can now be shown as the final hint.",
+        "showSolutionHelp": "Show solution as hint",
+        "solutionAfterCheck": "Solution after check",
+        "hideSolution": "Hide solution"
+      },
+      "resultTitle": "DNF",
+      "resultHint": "Each highlighted row contributes one AND term.",
+      "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",
+      "variableLimitTitle": "Too many variables",
+      "variableLimitDesc": "The expression contains {{variables}} variables. Use at most {{max}} variables so the truth table and DNF can be calculated reliably in the browser.",
+      "longDnfPreview": "The DNF has {{total}} terms. The first {{shown}} terms are shown initially.",
+      "hiddenTerms": "{{count}} more terms hidden.",
+      "showAllTerms": "Show all {{count}} terms",
+      "showFewerTerms": "Show fewer terms",
+      "variables": "Variables",
+      "rows": "Table rows",
+      "oneRows": "Rows with result 1",
+      "derivationTitle": "Derivation",
+      "derivationHint": "Only truth-table rows with result 1 are transformed into terms and then joined with OR.",
+      "derivationPreview": "The derivation has {{total}} steps. The first {{shown}} steps are shown initially.",
+      "showAllSteps": "Show all {{count}} steps",
+      "showFewerSteps": "Show fewer steps",
+      "derivationRowLabel": "Row {{row}}",
+      "derivationTautology": "Every row evaluates to 1, so the clean DNF is the constant 1.",
+      "derivationContradiction": "No row evaluates to 1, so the clean DNF is the constant 0.",
+      "truthTableTitle": "Truth table",
+      "truthTableRow": "Row",
+      "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
+      "truthTableFull": "Full table with {{total}} rows. This area stays scrollable.",
+      "showFullTable": "Show full table",
+      "showCompactTable": "Show compact table",
+      "truthTableNoVariables": "Expression",
+      "truthTableResult": "Result",
+      "truthTableTerm": "DNF term",
+      "truthTableConstant": "constant",
+      "truthTableIgnored": "-",
+      "errors": {
+        "title": "Expression cannot be parsed",
+        "emptyExpression": "Enter a boolean expression first.",
+        "unexpectedCharacter": "Unexpected character '{{value}}' at position {{index}}.",
+        "unexpectedToken": "Unexpected token '{{value}}' at position {{index}}.",
+        "unexpectedEnd": "The expression ends too early at position {{index}}.",
+        "missingClosingParenthesis": "A closing parenthesis is missing near position {{index}}."
+      }
+    }
   },
   "java": {
     "title": "Java Programming",
@@ -229,7 +373,9 @@
     "openInSimulation": "Open in simulation"
   },
   "example": {
-    "label": "Example {{index}}"
+    "label": "Example {{index}}",
+    "currentExamples": "Current Examples",
+    "openInSimulation": "Open in simulation"
   },
   "difficulty": {
     "easy": "EASY",
@@ -239,11 +385,22 @@
   "simulation": {
     "taskText": "Task text",
     "selectedExercise": "Selected exercise",
+    "selectedExample": "Selected example",
     "taskTextPlaceholder": "You can add the concrete task text here later.",
     "workspace": "Simulation",
     "expand": "Expand simulation",
     "exitFocus": "Exit simulation focus",
     "close": "Close",
+    "transfer": {
+      "title": "Import / Export",
+      "placeholder": "Paste a transfer string here or generate one via export",
+      "copy": "Copy string",
+      "export": "Export",
+      "import": "Import",
+      "copied": "String copied to clipboard.",
+      "importSuccess": "String loaded successfully.",
+      "importError": "String could not be loaded."
+    },
     "emptyStates": {
       "turing": "The Turing Machine simulator will be available here.",
       "automata": "The Finite Automata simulator will be available here.",
@@ -574,51 +731,129 @@
     }
   },
   "tm": {
+    "topic": {
+      "title": "Turing Machines",
+      "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed."
+    },
+    "overview": {
+      "overviewTitle": "What is a Turing Machine?",
+      "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
+      "concepts": "Key Concepts",
+      "concept1": "Tape & Head Movement",
+      "concept2": "States & Transitions",
+      "concept3": "Acceptance & Rejection",
+      "concept4": "Church-Turing Thesis"
+    },
+    "exercises": {
+      "exerciseEraseTape": "Erase the Tape",
+      "exerciseEraseTapeDesc": "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
+      "exerciseInvertBinaryWord": "Invert a Binary Word",
+      "exerciseInvertBinaryWordDesc": "Build a machine that flips every 0 to 1 and every 1 to 0, then halts on the first blank cell.",
+      "exerciseUnaryIncrement": "Unary Increment",
+      "exerciseUnaryIncrementDesc": "Build a machine that appends one additional 1 to the end of a unary word and then halts.",
+      "exerciseDuplicateZeros": "Duplicate Zeros",
+      "exerciseDuplicateZerosDesc": "Construct a Turing machine that doubles the number of 0s on the tape when they are enclosed by two 1s. Examples: 101 -> 1001, 1001 -> 100001.",
+      "exerciseAddBinary": "Add Binary Numbers",
+      "exerciseAddBinaryDesc": "Construct a Turing machine that is able to add two numbers in binary representation. To simplify the task, you may make assumptions. For example, you may define that the first addend (the left one) is greater than the second addend, that the read head always starts on the first input symbol, or that a specific symbol must appear between the numbers.",
+      "exerciseCheckRegex": "Check a Regular Expression",
+      "exerciseCheckRegexDesc": "Given the regular expression R1 = (1(01)* | 0(10)*) construct a Turing machine that checks whether an arbitrary binary word can be described by R1. After execution, the tape must contain either a 't' for true or an 'f' for false. Example: The input 11001 cannot be represented by R1, so the tape contains an 'f' and everything else has been removed.",
+      "exerciseBinaryIncrement": "Binary Increment",
+      "exerciseBinaryIncrementDesc": "Build a machine that adds 1 to a binary number on the tape and halts with the incremented result."
+    },
+    "examples": {
+      "example1": "Example: Bit Flip",
+      "example1Desc": "A complete machine that inverts every bit in a binary word while scanning from left to right.",
+      "example2": "Example: Unary Increment",
+      "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
+      "example3": "Example: Binary Increment",
+      "example3Desc": "A carry-based machine that increments a binary word by one."
+    },
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
     "config": {
-      "title": "Turing Machine Configuration",
-      "apply": "Start Simulation",
-      "initialTape": "Initial Tape Word",
-      "initialTapePlaceholder": "Enter input word (e.g., 1011)",
-      "startState": "Start State",
-      "haltStates": "Halt States",
-      "haltStatesDesc": "Mark states as halting.",
-      "noStates": "No states available",
-      "transitionTable": "Transition Table",
-      "transitionFormat": "Format:",
-      "transitionExample": " e.g., (q1, 0, R)",
-      "cannotRemoveBlank": "The blank symbol cannot be removed.",
-      "cannotRemoveSymbolColumn": "The symbol column cannot be removed.",
-      "cannotRemoveLastState": "At least one state column must remain.",
-      "symbolSingleChar": "Tape symbols must consist of exactly one character.",
-      "symbolDuplicate": "This tape symbol already exists in the transition table.",
-      "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
+      "general": {
+        "title": "Turing Machine Configuration",
+        "apply": "Start Simulation",
+        "initialTape": "Initial Tape Word",
+        "initialTapePlaceholder": "Enter input word (e.g., 1011)",
+        "startState": "Start State"
+      },
+      "haltStates": {
+        "haltStates": "Halt States",
+        "haltStatesDesc": "Mark states as halting.",
+        "addHaltState": "Add Halt State",
+        "addHaltStatePlaceholder": "Add halt state",
+        "noStates": "No states available"
+      },
+      "alphabets": {
+        "inputAlphabet": "Input Alphabet",
+        "tapeAlphabet": "Tape Alphabet",
+        "noSymbols": "No symbols available"
+      },
+      "transitionTable": {
+        "transitionTable": "Transition Table",
+        "transitionFormat": "Format:",
+        "transitionExample": " e.g., (q1, 0, R)"
+      },
+      "editing": {
+        "cannotRemoveBlank": "The blank symbol cannot be removed.",
+        "cannotRemoveSymbolColumn": "The symbol column cannot be removed.",
+        "cannotRemoveLastState": "At least one state column must remain.",
+        "symbolSingleChar": "Tape symbols must consist of exactly one character.",
+        "symbolDuplicate": "This tape symbol already exists in the transition table.",
+        "transitionCellInvalid": "Transitions must use the format (Next State, Write Symbol, Movement) and the write symbol must be exactly one character."
+      }
     },
     "validation": {
-      "statesEmpty": "At least one state must be defined.",
-      "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
-      "haltStatesEmpty": "At least one halt state must be defined.",
-      "haltStateMissing": "The halt state '{{state}}' must exist in the set of states.",
-      "blankSymbolMissing": "The blank symbol '{{symbol}}' must be part of the tape alphabet.",
-      "blankSymbolInvalid": "The blank symbol '{{symbol}}' must consist of exactly one character.",
-      "tapeSymbolInvalid": "Tape alphabet symbol '{{symbol}}' must consist of exactly one character.",
-      "initialTapeInvalidSymbol": "Initial tape symbol '{{symbol}}' must be part of the input alphabet and consist of exactly one character.",
-      "transitionReadSymbolMissing": "A transition is defined for read symbol '{{symbol}}', but this symbol is not part of the tape alphabet.",
-      "transitionReadSymbolInvalid": "Transition read symbol '{{symbol}}' must consist of exactly one character.",
-      "transitionStateMissing": "A transition is defined for state '{{state}}', but this state is not part of the set of states.",
-      "transitionNextStateMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' points to unknown next state '{{nextState}}'.",
-      "transitionWriteSymbolMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' writes unknown symbol '{{writeSymbol}}'.",
-      "transitionWriteSymbolInvalid": "Transition from state '{{state}}' on symbol '{{symbol}}' must write exactly one character."
+      "summary": {
+        "checkInvalidProgram": "The current machine configuration is not valid yet.",
+        "exampleCheckUnavailable": "Examples do not need solution checks.",
+        "popupTitle": "Solution check",
+        "pass": "PASS",
+        "fail": "FAIL",
+        "emptyWord": "<empty>"
+      },
+      "table": {
+        "passed": "Passed",
+        "input": "Input",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "validHaltState": "Valid halt state"
+      },
+      "program": {
+        "statesEmpty": "At least one state must be defined.",
+        "initialStateMissing": "The initial state '{{state}}' must exist in the set of states.",
+        "haltStatesEmpty": "At least one halt state must be defined.",
+        "haltStateMissing": "The halt state '{{state}}' must exist in the set of states.",
+        "blankSymbolMissing": "The blank symbol '{{symbol}}' must be part of the tape alphabet.",
+        "blankSymbolInvalid": "The blank symbol '{{symbol}}' must consist of exactly one character.",
+        "tapeSymbolInvalid": "Tape alphabet symbol '{{symbol}}' must consist of exactly one character.",
+        "initialTapeInvalidSymbol": "Initial tape symbol '{{symbol}}' must be part of the input alphabet and consist of exactly one character.",
+        "transitionReadSymbolMissing": "A transition is defined for read symbol '{{symbol}}', but this symbol is not part of the tape alphabet.",
+        "transitionReadSymbolInvalid": "Transition read symbol '{{symbol}}' must consist of exactly one character.",
+        "transitionStateMissing": "A transition is defined for state '{{state}}', but this state is not part of the set of states.",
+        "transitionNextStateMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' points to unknown next state '{{nextState}}'.",
+        "transitionWriteSymbolMissing": "Transition from state '{{state}}' on symbol '{{symbol}}' writes unknown symbol '{{writeSymbol}}'.",
+        "transitionWriteSymbolInvalid": "Transition from state '{{state}}' on symbol '{{symbol}}' must write exactly one character."
+      }
     },
     "sim": {
-      "title": "Turing Machine Simulator",
-      "edit": "Edit Configuration",
-      "status": "Status",
-      "state": "Current State",
-      "symbol": "Current Symbol",
-      "step": "Step",
-      "halt": "Halted",
-      "yes": "Yes",
-      "no": "No",
+      "screen": {
+        "title": "Turing Machine Simulator",
+        "edit": "Edit Configuration"
+      },
+      "status": {
+        "status": "Status",
+        "state": "Current State",
+        "symbol": "Current Symbol",
+        "step": "Step",
+        "halt": "Halted",
+        "yes": "Yes",
+        "no": "No"
+      },
       "haltReason": {
         "missingTransition": "No transition is defined for state '{{state}}' and symbol '{{symbol}}'."
       }

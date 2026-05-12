@@ -1,149 +1,47 @@
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+import {
+  ADD_ACTION_BUTTON_CLASS,
+  ADD_ROW_BUTTON_CLASS,
+  BODY_CELL_ACTIVE_CLASS,
+  BODY_CELL_CLASS,
+  BODY_CELL_INVALID_CLASS,
+  BODY_CELL_SECONDARY_CLASS,
+  BODY_ROW_ACTIVE_CLASS,
+  BODY_ROW_CLASS,
+  CELL_INPUT_CLASS,
+  CELL_INPUT_INVALID_CLASS,
+  DEFAULT_DATA_COLUMN_WIDTH_CLASS,
+  DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
+  getColumnWidthClassName,
+  getMaxCols,
+  getTableCellState,
+  HEADER_CELL_ACTIVE_CLASS,
+  HEADER_CELL_CLASS,
+  HEADER_CONTENT_CLASS,
+  HEADER_INPUT_CLASS,
+  HEADER_ROW_CLASS,
+  HOVER_ACTION_BUTTON_CLASS,
+  normalizeHeaders,
+  READ_ONLY_CELL_CLASS,
+  ROW_ACTION_BUTTON_CLASS,
+  syncActiveCellIntoView,
+  TABLE_CLASS,
+  TABLE_CONTAINER_CLASS,
+  type TableViewProps,
+} from "./TableView.logic";
 
-const TABLE_CONTAINER_CLASS =
-  "bg-card text-card-foreground w-full overflow-x-auto rounded-lg border shadow-sm";
-const TABLE_CLASS = "w-full border-collapse text-sm";
-const HEADER_ROW_CLASS = "bg-muted/50 border-b";
-const HEADER_CELL_CLASS =
-  "group relative border-r p-3 text-left align-middle font-semibold last:border-r-0";
-const HEADER_CELL_ACTIVE_CLASS = "bg-primary/20 text-foreground";
-const HEADER_INPUT_CLASS =
-  "focus:ring-primary -ml-1 w-full rounded border-none bg-transparent px-1 text-sm font-semibold focus:ring-1 focus:outline-none";
-const HEADER_CONTENT_CLASS = "flex min-w-15 items-center justify-between gap-1";
-const BODY_ROW_CLASS = "group border-b transition-colors last:border-b-0";
-const BODY_ROW_ACTIVE_CLASS = "bg-primary/10";
-const BODY_CELL_CLASS =
-  "relative border-r p-2 align-middle transition-all last:border-r-0";
-const BODY_CELL_ACTIVE_CLASS =
-  "bg-primary/30 ring-primary z-10 font-medium ring-2 ring-inset";
-const BODY_CELL_SECONDARY_CLASS = "bg-primary/5";
-const BODY_CELL_INVALID_CLASS =
-  "bg-destructive/10 ring-destructive z-10 ring-2 ring-inset";
-const CELL_INPUT_CLASS =
-  "focus:ring-primary hover:bg-muted/50 focus:bg-background w-full rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50";
-const CELL_INPUT_INVALID_CLASS = "text-destructive focus:ring-destructive";
-const READ_ONLY_CELL_CLASS =
-  "flex min-h-7 items-center truncate px-2 py-1 font-mono text-sm";
-const HOVER_ACTION_BUTTON_CLASS =
-  "text-destructive hover:bg-destructive/10 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40";
-const ROW_ACTION_BUTTON_CLASS =
-  "text-destructive hover:bg-destructive/10 mx-auto flex w-full items-center justify-center rounded p-1.5 opacity-0 transition-opacity group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40";
-const ADD_ACTION_BUTTON_CLASS =
-  "text-muted-foreground hover:text-primary hover:bg-primary/10 flex h-full min-h-8 w-full items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-40";
-const ADD_ROW_BUTTON_CLASS =
-  "text-muted-foreground hover:text-primary hover:bg-primary/5 border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed px-3 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-40";
-
-export interface TablePosition {
-  row: number;
-  col: number;
-}
-
-export type TableEditMode = "none" | "cells" | "all";
-
-export interface TableViewProps {
-  /** Array of column headers */
-  headers: string[];
-  /** 2D Array of table rows/cells */
-  rows: string[][];
-  /** Highlight a specific cell */
-  activeCell?: TablePosition | null;
-  /** Highlight an entire row */
-  activeRow?: number | null;
-  /** Highlight an entire column */
-  activeCol?: number | null;
-  /** Edit mode for the table: read-only, cells only, or cells plus headers */
-  editMode?: TableEditMode;
-  /** Callback when cell text changes */
-  onCellChange?: (rowIndex: number, colIndex: number, value: string) => void;
-  /** Callback when a cell loses focus */
-  onCellBlur?: (rowIndex: number, colIndex: number) => void;
-  /** Callback when header text changes */
-  onHeaderChange?: (colIndex: number, value: string) => void;
-  /** Mark a specific cell as invalid */
-  invalidCell?: TablePosition | null;
-  /** Explicitly allow editing for specific cells, even if the table is otherwise read-only */
-  isCellEditable?: (rowIndex: number, colIndex: number) => boolean;
-  /** Disable editing for specific cells */
-  isCellDisabled?: (rowIndex: number, colIndex: number) => boolean;
-  /** Can new rows be added by the user? */
-  canAddRow?: boolean;
-  onAddRow?: () => void;
-  disableAddRow?: boolean;
-  /** Can rows be removed by the user? */
-  canRemoveRow?: boolean;
-  onRemoveRow?: (rowIndex: number) => void;
-  disableRemoveRow?: boolean;
-  /** Can new columns be added by the user? */
-  canAddColumn?: boolean;
-  onAddColumn?: () => void;
-  disableAddColumn?: boolean;
-  /** Can columns be removed by the user? */
-  canRemoveColumn?: boolean;
-  onRemoveColumn?: (colIndex: number) => void;
-  disableRemoveColumn?: boolean;
-  className?: string;
-  tableClassName?: string;
-}
-
-interface TableCellState {
-  value: string;
-  isInvalid: boolean;
-  canEdit: boolean;
-  disabled: boolean;
-  highlightSpecific: boolean;
-  highlightSecondary: boolean;
-}
-
-function getMaxCols(headers: string[], rows: string[][]): number {
-  return Math.max(headers.length, ...rows.map((row) => row.length));
-}
-
-function normalizeHeaders(headers: string[], maxCols: number): string[] {
-  return Array.from({ length: maxCols }, (_, index) => headers[index] ?? "");
-}
-
-function getTableCellState({
-  row,
-  rowIndex,
-  colIndex,
-  activeCell,
-  activeCol,
-  invalidCell,
-  cellsEditable,
-  isCellEditable,
-  isCellDisabled,
-}: {
-  row: string[];
-  rowIndex: number;
-  colIndex: number;
-  activeCell?: TablePosition | null;
-  activeCol?: number | null;
-  invalidCell?: TablePosition | null;
-  cellsEditable: boolean;
-  isCellEditable?: (rowIndex: number, colIndex: number) => boolean;
-  isCellDisabled?: (rowIndex: number, colIndex: number) => boolean;
-}): TableCellState {
-  const value = row[colIndex] || "";
-  const isInvalid =
-    invalidCell?.row === rowIndex && invalidCell?.col === colIndex;
-  const isActive = activeCell?.row === rowIndex && activeCell?.col === colIndex;
-  const isColumnActive = activeCol === colIndex;
-  const explicitlyEditable = isCellEditable?.(rowIndex, colIndex) ?? false;
-  const disabled =
-    !explicitlyEditable && (isCellDisabled?.(rowIndex, colIndex) ?? false);
-
-  return {
-    value,
-    isInvalid,
-    canEdit: cellsEditable || explicitlyEditable,
-    disabled,
-    highlightSpecific: isActive,
-    highlightSecondary: !isActive && isColumnActive,
-  };
-}
+export {
+  DEFAULT_DATA_COLUMN_WIDTH_CLASS,
+  DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
+} from "./TableView.logic";
+export type {
+  TableEditMode,
+  TablePosition,
+  TableViewProps,
+} from "./TableView.logic";
 
 export function TableView({
   headers,
@@ -170,10 +68,13 @@ export function TableView({
   canRemoveColumn = false,
   onRemoveColumn,
   disableRemoveColumn = false,
+  firstColumnWidthClassName = DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
+  dataColumnWidthClassName = DEFAULT_DATA_COLUMN_WIDTH_CLASS,
   className,
   tableClassName,
 }: TableViewProps) {
   const { t } = useTranslation();
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const maxCols = useMemo(() => {
     return getMaxCols(headers, rows);
@@ -226,6 +127,15 @@ export function TableView({
       },
     );
 
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    syncActiveCellIntoView(container, activeCell);
+  }, [activeCell, maxCols, rows.length]);
+
   const renderHeaderCell = (header: string, colIndex: number) => {
     const isColActive = activeCol === colIndex;
     const headerLabel = getColumnLabel(header, colIndex);
@@ -236,6 +146,11 @@ export function TableView({
         scope="col"
         className={cn(
           HEADER_CELL_CLASS,
+          getColumnWidthClassName(
+            colIndex,
+            firstColumnWidthClassName,
+            dataColumnWidthClassName,
+          ),
           isColActive && HEADER_CELL_ACTIVE_CLASS,
         )}
       >
@@ -353,8 +268,15 @@ export function TableView({
     return (
       <td
         key={`cell-${rowIndex}-${colIndex}`}
+        data-table-row={rowIndex}
+        data-table-col={colIndex}
         className={cn(
           BODY_CELL_CLASS,
+          getColumnWidthClassName(
+            colIndex,
+            firstColumnWidthClassName,
+            dataColumnWidthClassName,
+          ),
           cellState.highlightSpecific && BODY_CELL_ACTIVE_CLASS,
           cellState.highlightSecondary && BODY_CELL_SECONDARY_CLASS,
           cellState.isInvalid && BODY_CELL_INVALID_CLASS,
@@ -385,7 +307,7 @@ export function TableView({
   };
 
   return (
-    <div className={cn(TABLE_CONTAINER_CLASS, className)}>
+    <div ref={containerRef} className={cn(TABLE_CONTAINER_CLASS, className)}>
       <table
         aria-label={labels.table}
         className={cn(TABLE_CLASS, tableClassName)}

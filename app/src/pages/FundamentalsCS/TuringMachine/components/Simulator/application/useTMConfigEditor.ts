@@ -46,6 +46,7 @@ export interface UseTMConfigEditorResult {
   handleInitialTapeChange: (value: string) => void;
   handleInitialStateChange: (state: string) => void;
   handleToggleHaltState: (state: string, isHalting: boolean) => void;
+  handleAddHaltState: (state: string) => void;
   handleCellChange: (rowIndex: number, colIndex: number, value: string) => void;
   handleCellBlur: (rowIndex: number, colIndex: number) => void;
   handleHeaderChange: (colIndex: number, value: string) => void;
@@ -78,11 +79,18 @@ export function useTMConfigEditor(
     () => getOrderedTapeAlphabet(draft),
     [draft],
   );
-  const tableHeaders = useMemo(
-    () => buildTransitionTableHeaders(draft.states),
-    [draft.states],
+  const transitionTableStates = useMemo(
+    () => draft.states.filter((state) => !draft.haltStates.includes(state)),
+    [draft.haltStates, draft.states],
   );
-  const committedRows = useMemo(() => buildTransitionTableRows(draft), [draft]);
+  const tableHeaders = useMemo(
+    () => buildTransitionTableHeaders(transitionTableStates),
+    [transitionTableStates],
+  );
+  const committedRows = useMemo(
+    () => buildTransitionTableRows(draft, transitionTableStates),
+    [draft, transitionTableStates],
+  );
   const displayRows = useMemo(() => {
     return committedRows.map((row, rowIndex) =>
       row.map((cell, colIndex) => {
@@ -124,6 +132,16 @@ export function useTMConfigEditor(
         type: "toggle_halt_state",
         state,
         isHalting,
+      });
+    },
+    [dispatchEditorAction],
+  );
+
+  const handleAddHaltState = useCallback(
+    (state: string) => {
+      dispatchEditorAction({
+        type: "add_halt_state",
+        state,
       });
     },
     [dispatchEditorAction],
@@ -171,8 +189,8 @@ export function useTMConfigEditor(
       if (value !== currentValue) {
         commitCellChange(
           dispatchEditorAction,
-          draft,
           orderedTapeAlphabet,
+          transitionTableStates,
           rowIndex,
           colIndex,
           value,
@@ -202,6 +220,7 @@ export function useTMConfigEditor(
       dispatchEditorAction,
       draft,
       orderedTapeAlphabet,
+      transitionTableStates,
     ],
   );
 
@@ -211,7 +230,7 @@ export function useTMConfigEditor(
         return;
       }
 
-      const currentState = draft.states[colIndex - 1];
+      const currentState = transitionTableStates[colIndex - 1];
       const nextState = value.trim();
 
       if (
@@ -228,7 +247,7 @@ export function useTMConfigEditor(
         nextState,
       });
     },
-    [dispatchEditorAction, draft.states],
+    [dispatchEditorAction, draft.states, transitionTableStates],
   );
 
   const handleAddRow = useCallback(() => {
@@ -256,7 +275,7 @@ export function useTMConfigEditor(
 
   const handleRemoveColumn = useCallback(
     (colIndex: number) => {
-      const state = draft.states[colIndex - 1];
+      const state = transitionTableStates[colIndex - 1];
       if (!state) {
         return;
       }
@@ -266,7 +285,7 @@ export function useTMConfigEditor(
         state,
       });
     },
-    [dispatchEditorAction, draft.states],
+    [dispatchEditorAction, transitionTableStates],
   );
 
   const isCellEditable = useCallback(
@@ -330,6 +349,7 @@ export function useTMConfigEditor(
     handleInitialTapeChange,
     handleInitialStateChange,
     handleToggleHaltState,
+    handleAddHaltState,
     handleCellChange,
     handleCellBlur,
     handleHeaderChange,
@@ -346,8 +366,8 @@ export function useTMConfigEditor(
 
 function commitCellChange(
   dispatch: (action: TMEditorAction) => void,
-  draft: TMProgram,
   orderedTapeAlphabet: string[],
+  transitionTableStates: string[],
   rowIndex: number,
   colIndex: number,
   value: string,
@@ -366,7 +386,7 @@ function commitCellChange(
     return;
   }
 
-  const state = draft.states[colIndex - 1];
+  const state = transitionTableStates[colIndex - 1];
   if (!state) {
     return;
   }

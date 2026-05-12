@@ -38,6 +38,7 @@ Simulator/
     tmRuntime.ts
     tmMachine.ts
     tmProgramValidation.ts
+    tmFormatting.ts
 
   application/
     useTMSimulator.ts
@@ -55,9 +56,6 @@ Simulator/
     TMTransitionTableEditor.tsx
     TMSimulationStatusCard.tsx
     TMTapeView.tsx
-
-  config/
-    defaultTMProgram.ts
 ```
 
 Important:

@@ -2,15 +2,15 @@ import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Exercise } from "@/types/exercise";
+import type { TopicItem } from "@/types/exercise";
 
 interface ExerciseCardProps {
-  exercise: Exercise;
+  item: TopicItem;
   index: number;
   isSelected?: boolean;
   onSelect?: () => void;
   onOpen?: () => void;
-  variant?: "exercise" | "example";
+  testIdPrefix?: string;
 }
 
 const difficultyTextColors = {
@@ -26,30 +26,44 @@ const difficultyBorderColors = {
 };
 
 export function ExerciseCard({
-  exercise,
+  item,
   index,
   isSelected = false,
   onSelect,
   onOpen,
-  variant = "exercise",
+  testIdPrefix,
 }: ExerciseCardProps) {
   const { t } = useTranslation();
-  const Icon = exercise.icon;
+  const Icon = item.icon;
   const detailsId = useId();
-  const isExample = variant === "example";
+  const itemTitle = item.titleKey ? t(item.titleKey) : item.title;
+  const itemDescription = item.descriptionKey
+    ? t(item.descriptionKey)
+    : item.description;
+  const itemLabel =
+    item.kind === "example"
+      ? t("example.label", { index: index + 1 })
+      : t("exercise.label", { index: index + 1 });
+  const openLabel =
+    item.kind === "example"
+      ? t("example.openInSimulation")
+      : t("exercise.openInSimulation");
 
   return (
     <div
       className={cn(
         "border-border border-b last:border-b-0",
         isSelected && "border-l-[3px]",
-        isSelected && !isExample && difficultyBorderColors[exercise.difficulty],
+        isSelected &&
+          item.kind === "exercise" &&
+          difficultyBorderColors[item.difficulty],
       )}
     >
       <button
         type="button"
         onClick={onSelect}
         onDoubleClick={onOpen}
+        data-testid={testIdPrefix ? `${testIdPrefix}-select` : undefined}
         aria-expanded={isSelected}
         aria-controls={detailsId}
         className={cn(
@@ -63,20 +77,17 @@ export function ExerciseCard({
 
         <div className="min-w-0 flex-1">
           <p className="text-foreground text-sm font-semibold">
-            {isExample
-              ? `${t("example.label", { index: index + 1 })}: ${exercise.title}`
-              : `${t("exercise.label", { index: index + 1 })}: ${exercise.title}`}
+            {itemLabel}: {itemTitle}
           </p>
 
-          {!isExample && (
+          {item.kind === "exercise" && (
             <p
               className={cn(
                 "text-xs font-bold tracking-wider uppercase",
-                difficultyTextColors[exercise.difficulty],
+                difficultyTextColors[item.difficulty],
               )}
             >
-              {t("exercise.difficulty")}:{" "}
-              {t(`difficulty.${exercise.difficulty}`)}
+              {t("exercise.difficulty")}: {t(`difficulty.${item.difficulty}`)}
             </p>
           )}
         </div>
@@ -95,16 +106,17 @@ export function ExerciseCard({
         >
           <div className="pl-14">
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {exercise.description}
+              {itemDescription}
             </p>
 
             <div className="mt-4">
               <button
                 type="button"
                 onClick={onOpen}
+                data-testid={testIdPrefix ? `${testIdPrefix}-open` : undefined}
                 className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
               >
-                {t("exercise.openInSimulation")}
+                {openLabel}
               </button>
             </div>
           </div>

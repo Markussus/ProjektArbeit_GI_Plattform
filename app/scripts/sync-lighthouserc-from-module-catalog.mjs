@@ -14,7 +14,7 @@ const moduleCatalogFile = path.join(
 );
 const outputFile = path.join(appRoot, "lighthouserc.json");
 
-const baseUrl = "http://127.0.0.1:4173";
+const baseUrl = process.env.LHCI_BASE_URL ?? "http://127.0.0.1:4173";
 const staticPaths = ["/", "/documentation", "/help", "/__lhci-not-found__"];
 const pathPattern = /path:\s*["'`]([^"'`]+)["'`]/g;
 
@@ -51,7 +51,8 @@ const config = {
       settings: {
         preset: "desktop",
         onlyCategories: ["performance"],
-        chromeFlags: "--no-sandbox",
+        chromeFlags:
+          "--no-sandbox --user-data-dir=./.lighthouseci/chrome-profile",
       },
     },
     assert: {

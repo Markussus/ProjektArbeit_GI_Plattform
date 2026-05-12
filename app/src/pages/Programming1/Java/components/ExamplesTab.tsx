@@ -1,5 +1,6 @@
 import { BookOpen, Code2, Repeat } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { TranslationKey } from "@/types/i18n";
 
 interface ExampleCardDefinition {
@@ -38,7 +39,8 @@ System.out.println(Arrays.toString(numbers));`,
   },
 ];
 
-export function ExamplesTab() {
+export function ExamplesTab(props: ModuleExamplesTabProps) {
+  void props;
   const { t } = useTranslation();
 
   return (

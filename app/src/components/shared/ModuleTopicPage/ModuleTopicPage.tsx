@@ -17,15 +17,15 @@ export interface ModuleExercisesTabProps {
 }
 
 export interface ModuleExamplesTabProps {
-  onOpenExampleInSimulation?: (exercise: Exercise) => void;
+  selectedExample: Example | null;
+  onSelectExample: (example: Example) => void;
+  onOpenExampleInSimulation: (example: Example) => void;
 }
 
 export interface ModuleSimulationTabProps {
   selectedExercise: Exercise | null;
   isFocused: boolean;
   onToggleFocus: () => void;
-  /** Callback um den Übungsmodus vollständig zu verlassen (setzt simulationExercise auf null) */
-  onExitExercise?: () => void;
 }
 
 interface ModuleTopicPageProps {
@@ -59,16 +59,19 @@ export function ModuleTopicPage({
     activeTab,
     setActiveTab,
     selectedExercise,
+    selectedExample,
     simulationExercise,
+    simulationItem,
     selectExercise,
     openInSimulation,
-    clearSimulationExercise,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
     setIsSimulationFocused((prev) => {
       const next = !prev;
       if (next) {
+        // Focus mode is meant to maximize the workspace, so the sidebar is
+        // collapsed proactively instead of waiting for a separate user action.
         setSidebarCollapsed(true);
       }
       return next;
@@ -109,6 +112,7 @@ export function ModuleTopicPage({
   const applyTabChange = (tab: ModuleTabId) => {
     setActiveTab(tab);
     if (tab !== "simulation") {
+      // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
   };
@@ -137,7 +141,13 @@ export function ModuleTopicPage({
     }
 
     if (activeTab === "examples") {
-      return <ExamplesTab onOpenExampleInSimulation={openInSimulation} />;
+      return (
+        <ExamplesTab
+          selectedExample={selectedExample}
+          onSelectExample={selectExample}
+          onOpenExampleInSimulation={openExampleInSimulation}
+        />
+      );
     }
 
     if (activeTab === "simulation") {

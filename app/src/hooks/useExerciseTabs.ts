@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Exercise } from "@/types/exercise";
+import type { Example, Exercise, TopicItem } from "@/types/exercise";
 
 export type ModuleTabId = "overview" | "exercises" | "examples" | "simulation";
 
@@ -8,9 +8,11 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null,
   );
+  const [selectedExample, setSelectedExample] = useState<Example | null>(null);
   const [simulationExercise, setSimulationExercise] = useState<Exercise | null>(
     null,
   );
+  const [simulationItem, setSimulationItem] = useState<TopicItem | null>(null);
 
   const selectExercise = (exercise: Exercise) => {
     // A stable exercise id avoids losing the selection when labels change due to i18n.
@@ -20,6 +22,18 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   const openInSimulation = (exercise: Exercise) => {
     setSelectedExercise(exercise);
     setSimulationExercise(exercise);
+    setSimulationItem(exercise);
+    setActiveTab("simulation");
+  };
+
+  const selectExample = (example: Example) => {
+    setSelectedExample((prev) => (prev?.id === example.id ? null : example));
+  };
+
+  const openExampleInSimulation = (example: Example) => {
+    setSelectedExample(example);
+    setSimulationItem(example);
+    setSimulationExercise(null);
     setActiveTab("simulation");
   };
 
@@ -32,9 +46,12 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
     activeTab,
     setActiveTab,
     selectedExercise,
+    selectedExample,
     simulationExercise,
+    simulationItem,
     selectExercise,
     openInSimulation,
-    clearSimulationExercise,
+    selectExample,
+    openExampleInSimulation,
   };
 }

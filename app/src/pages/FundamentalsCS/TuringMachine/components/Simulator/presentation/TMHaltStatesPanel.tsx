@@ -1,5 +1,7 @@
+import { useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatTMStateName } from "../domain/tmFormatting";
 import type { StateName } from "../domain/tmTypes";
 
 export interface TMHaltStatesPanelProps {
@@ -7,6 +9,7 @@ export interface TMHaltStatesPanelProps {
   initialState: StateName;
   haltStates: StateName[];
   onToggle: (state: StateName, isHalting: boolean) => void;
+  onAddHaltState: (state: StateName) => void;
   disabled?: boolean;
 }
 
@@ -15,17 +18,35 @@ export function TMHaltStatesPanel({
   initialState,
   haltStates,
   onToggle,
+  onAddHaltState,
   disabled = false,
 }: TMHaltStatesPanelProps) {
   const { t } = useTranslation();
+  const [newState, setNewState] = useState("");
   const selectableStates = states.filter((state) => state !== initialState);
+  const commitNewState = useCallback(() => {
+    const trimmedState = newState.trim();
+
+    if (
+      trimmedState === "" ||
+      trimmedState === initialState ||
+      states.includes(trimmedState)
+    ) {
+      return;
+    }
+
+    onAddHaltState(trimmedState);
+    setNewState("");
+  }, [initialState, newState, onAddHaltState, states]);
 
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-2 min-h-[3.5rem]">
-        <h3 className="text-md font-semibold">{t("tm.config.haltStates")}</h3>
+        <h3 className="text-md font-semibold">
+          {t("tm.config.haltStates.haltStates")}
+        </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.haltStatesDesc")}
+          {t("tm.config.haltStates.haltStatesDesc")}
         </p>
       </div>
 
@@ -50,26 +71,43 @@ export function TMHaltStatesPanel({
                   <Check className="text-brand-foreground h-3 w-3" />
                 )}
               </span>
-              <span className="font-mono">{formatState(state)}</span>
+              <span className="font-mono">{formatTMStateName(state)}</span>
             </label>
           );
         })}
 
         {selectableStates.length === 0 && (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.noStates")}
+            {t("tm.config.haltStates.noStates")}
           </span>
         )}
+
+        <div className="flex items-center gap-2 pt-1">
+          <span className="border-input bg-background flex h-4 w-4 shrink-0 items-center justify-center rounded border">
+            <Check className="h-3 w-3" />
+          </span>
+          <input
+            type="text"
+            value={newState}
+            onChange={(event) => setNewState(event.target.value)}
+            onBlur={commitNewState}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") {
+                return;
+              }
+
+              event.preventDefault();
+              commitNewState();
+            }}
+            disabled={disabled}
+            placeholder={t("tm.config.haltStates.addHaltStatePlaceholder")}
+            aria-label={t("tm.config.haltStates.addHaltState")}
+            className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"
+            autoComplete="off"
+            spellCheck="false"
+          />
+        </div>
       </div>
     </div>
   );
-}
-
-function formatState(state: string): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
 }

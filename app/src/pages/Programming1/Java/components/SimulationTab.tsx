@@ -1,6 +1,6 @@
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import { JavaMonacoEditor } from "./JavaMonacoEditor";
+import { JavaSimulator } from "./Simulator/JavaSimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   return (
@@ -8,7 +8,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       {...props}
       emptyStateTextKey="simulation.emptyStates.java"
     >
-      <JavaMonacoEditor
+      <JavaSimulator
         selectedExercise={props.selectedExercise}
         isFocused={props.isFocused}
       />
