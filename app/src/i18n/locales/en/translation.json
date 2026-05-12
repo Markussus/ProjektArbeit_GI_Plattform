@@ -228,6 +228,7 @@
     "tabs": {
       "integers": "Integers",
       "negative": "Negative Numbers",
+      "fractional": "Fractional",
       "ieee754": "IEEE 754 (32-bit)",
       "arithmetic": "Arithmetic"
     },
@@ -492,7 +493,13 @@
       "mantissaBinToDecDesc": "The actual mantissa value is calculated using the implicit 'hidden bit' (1 + fraction value). Each bit n after the comma is multiplied by 2^(-n):",
       "fractionSum": "Sum of fractional powers",
       "step4FinalCalc": "4. Final Calculation of all components",
-      "finalFormulaDesc": "For the final decimal number, the sign, actual mantissa, and exponent factor are multiplied together:"
+      "finalFormulaDesc": "For the final decimal number, the sign, true mantissa, and exponent factor are multiplied:",
+      "fracTitle": "Fractional to Binary (Unnormalized)",
+      "fracDesc": "A decimal number with fractions (e.g. 10.5) is split. The integer part is repeatedly divided by 2, the fractional part is repeatedly multiplied by 2.",
+      "fracIntPart": "Integer Part:",
+      "fracFractPart": "Fractional Part:",
+      "fracMultBy2": "Multiply by 2:",
+      "fracResult": "Combined Result:"
     },
     "validation": {
       "title": "Verify Result",

@@ -224,6 +224,7 @@
     "tabs": {
       "integers": "Ganzzahlen",
       "negative": "Negative Zahlen",
+      "fractional": "Kommazahlen",
       "ieee754": "IEEE 754 (32-bit)",
       "arithmetic": "Arithmetik"
     },
@@ -320,7 +321,13 @@
       "fractionSum": "Summe der gebrochenen Potenzen",
       "step4FinalCalc": "4. Finale Verrechnung aller Komponenten",
       "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
-      "decToTarget": "Dezimal zu {{target}}"
+      "decToTarget": "Dezimal zu {{target}}",
+      "fracTitle": "Kommazahlen zu Binär (Unnormiert)",
+      "fracDesc": "Eine Dezimalzahl mit Nachkommastellen (z.B. 10.5) wird aufgeteilt. Der ganzzahlige Teil wird durch 2 geteilt, der Nachkommateil mit 2 multipliziert.",
+      "fracIntPart": "Ganzzahliger Teil:",
+      "fracFractPart": "Nachkomma-Teil:",
+      "fracMultBy2": "Mit 2 multiplizieren:",
+      "fracResult": "Zusammengesetztes Ergebnis:"
     },
     "arithmetic": {
       "selectMode": "Rechenoperation wählen",

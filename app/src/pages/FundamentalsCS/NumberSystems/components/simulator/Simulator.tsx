@@ -3,12 +3,13 @@ import { useTranslation } from "react-i18next";
 import { IntegerConverter } from "./IntegerConverter";
 import { NegativeNumbers } from "./NegativeNumbers";
 import { IEEE754Converter } from "./IEEE754Converter";
+import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 
-type SimulatorMode = "integers" | "negative" | "ieee754" | "arithmetic";
+type SimulatorMode = "integers" | "negative" | "fractional" | "ieee754" | "arithmetic";
 
 interface SimulatorProps {
   selectedExercise?: Exercise | null;
@@ -97,8 +98,7 @@ export function Simulator({
           randInt(16, 255).toString(16).toUpperCase().padStart(2, "0"),
         );
       } else if (selectedExercise.id === "number.ex_u05_floatToBin") {
-        setActiveMode("ieee754");
-        setInitialConverterMode("decToIeee");
+        setActiveMode("fractional");
         const wholes = randInt(-20, 20);
         const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
         setInitialValue(
@@ -171,7 +171,7 @@ export function Simulator({
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
         {(
-          ["integers", "negative", "ieee754", "arithmetic"] as SimulatorMode[]
+          ["integers", "fractional", "negative", "ieee754", "arithmetic"] as SimulatorMode[]
         ).map((mode) => (
           <button
             key={mode}
@@ -215,6 +215,20 @@ export function Simulator({
               selectedExercise?.id
                 ? `${selectedExercise.id}-${initialValue}`
                 : "free-neg"
+            }
+            isExerciseMode={isExerciseMode}
+            showSolution={showSolution}
+            onShowSolution={() => setShowSolution(true)}
+            onExitExercise={isExerciseMode ? handleExitExercise : undefined}
+            initialValue={initialValue}
+          />
+        )}
+        {activeMode === "fractional" && (
+          <FractionalConverter
+            key={
+              selectedExercise?.id
+                ? `${selectedExercise.id}-${initialValue}`
+                : "free-frac"
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
