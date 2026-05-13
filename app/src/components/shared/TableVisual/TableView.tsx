@@ -72,6 +72,7 @@ export function TableView({
   dataColumnWidthClassName = DEFAULT_DATA_COLUMN_WIDTH_CLASS,
   className,
   tableClassName,
+  disableActiveCellAutoScroll = false,
 }: TableViewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -128,13 +129,16 @@ export function TableView({
     );
 
   useLayoutEffect(() => {
+    if (disableActiveCellAutoScroll) {
+      return;
+    }
     const container = containerRef.current;
     if (!container) {
       return;
     }
 
     syncActiveCellIntoView(container, activeCell);
-  }, [activeCell, maxCols, rows.length]);
+  }, [activeCell, maxCols, rows.length, disableActiveCellAutoScroll]);
 
   const renderHeaderCell = (header: string, colIndex: number) => {
     const isColActive = activeCol === colIndex;

@@ -72,6 +72,12 @@ export interface TableViewProps {
   dataColumnWidthClassName?: string;
   className?: string;
   tableClassName?: string;
+  /**
+   * If true, the table will NOT auto-scroll the active cell into view when
+   * activeCell changes. The active cell is still highlighted; only the
+   * camera/scroll movement is suppressed. Default false (legacy behavior).
+   */
+  disableActiveCellAutoScroll?: boolean;
 }
 
 export interface TableCellState {

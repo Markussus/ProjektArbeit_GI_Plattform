@@ -78,20 +78,24 @@ export function FASimulationView({
         </button>
       </div>
 
-      {/* Input word + step timeline row */}
+      {/* Input word + step timeline row.
+          `min-w-0` on each column lets the flex children shrink so a long input
+          word can scroll inside its own panel without blowing out the row. */}
       <div className="mb-4 flex flex-col gap-3 lg:flex-row">
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <FAInputWordView runtime={runtime} />
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <FAStepTimeline runtime={runtime} onJumpToStep={onJumpToStep} />
         </div>
       </div>
 
-      {/* 3-panel layout — items-stretch keeps batch tester the same height as the state diagram */}
+      {/* 3-panel layout — items-stretch keeps batch tester the same height as the state diagram.
+          `min-w-0` on each column prevents a wide child (long batch result, big diagram)
+          from forcing the row to grow past the viewport. */}
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Left: Controls + Status */}
-        <div className="flex w-full flex-col gap-4 lg:w-1/4">
+        <div className="flex w-full min-w-0 flex-col gap-4 lg:w-1/4">
           <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
             <SimulatorControls
               status={status}
@@ -113,21 +117,31 @@ export function FASimulationView({
         </div>
 
         {/* Center: State Diagram (larger) */}
-        <div className="w-full lg:w-1/2">
+        <div className="w-full min-w-0 lg:w-1/2">
           <FAStateDiagram program={program} runtime={runtime} />
         </div>
 
         {/* Right: Batch Tester — stretches to match the diagram height */}
-        <div className="flex min-h-0 w-full lg:w-1/4">
+        <div className="flex min-h-0 w-full min-w-0 lg:w-1/4">
           <FABatchTester program={program} onSelectWord={onSelectBatchWord} />
         </div>
       </div>
 
-      {/* Transition Table — reuses the same TableView highlighting as the TM */}
+      {/* Transition Table — reuses the same TableView highlighting as the TM.
+          Override the TM-tuned width defaults so the FA table stretches to fill
+          its container with auto-sized columns, matching the finite-automata
+          branch's layout. The active cell is still highlighted, but
+          disableActiveCellAutoScroll keeps the camera fully under user control —
+          the table never scrolls itself during stepping. */}
       <TableView
         headers={tableHeaders}
         rows={tableRows}
         activeCell={activeCell}
+        className="w-full"
+        tableClassName="w-full table-auto"
+        firstColumnWidthClassName=""
+        dataColumnWidthClassName=""
+        disableActiveCellAutoScroll
       />
     </div>
   );

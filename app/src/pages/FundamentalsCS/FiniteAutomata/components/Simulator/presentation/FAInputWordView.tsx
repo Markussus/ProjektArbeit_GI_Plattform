@@ -17,11 +17,21 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   }
 
   return (
-    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
-      <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
-        {t("fa.sim.inputWord", "Input Word")}
-      </span>
-      <div className="mt-2 flex items-center gap-1">
+    <div className="min-w-0 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+          {t("fa.sim.inputWord", "Input Word")}
+        </span>
+        <span className="text-[0.65rem] font-medium text-(--fa-text-dim)">
+          {t("fa.sim.inputWordLength", "{{count}} symbols", {
+            count: runtime.inputWord.length,
+          })}
+        </span>
+      </div>
+      <div
+        className="flex items-center gap-1 overflow-x-auto pb-1"
+        style={{ scrollbarWidth: "thin" }}
+      >
         {runtime.inputWord.map((symbol, index) => {
           const isRead = index < runtime.inputPosition;
           const isCurrent = index === runtime.inputPosition && !runtime.halted;
@@ -34,6 +44,7 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
               style={{
                 width: 36,
                 height: 36,
+                flexShrink: 0,
                 borderRadius: "0.375rem",
                 transition: "all 0.3s",
                 ...(isCurrent
