@@ -90,9 +90,6 @@ export function FASimulationView({
         </div>
       </div>
 
-      {/* 3-panel layout — items-stretch keeps batch tester the same height as the state diagram.
-          `min-w-0` on each column prevents a wide child (long batch result, big diagram)
-          from forcing the row to grow past the viewport. */}
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Left: Controls + Status */}
         <div className="flex w-full min-w-0 flex-col gap-4 lg:w-1/4">
@@ -127,12 +124,6 @@ export function FASimulationView({
         </div>
       </div>
 
-      {/* Transition Table — reuses the same TableView highlighting as the TM.
-          Override the TM-tuned width defaults so the FA table stretches to fill
-          its container with auto-sized columns, matching the finite-automata
-          branch's layout. The active cell is still highlighted, but
-          disableActiveCellAutoScroll keeps the camera fully under user control —
-          the table never scrolls itself during stepping. */}
       <TableView
         headers={tableHeaders}
         rows={tableRows}
