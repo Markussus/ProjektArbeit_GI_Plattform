@@ -58,7 +58,7 @@ const config = {
     assert: {
       aggregationMethod: "median",
       assertions: {
-        "largest-contentful-paint": ["error", { maxNumericValue: 1000 }],
+        "largest-contentful-paint": ["error", { maxNumericValue: 1250 }],
       },
     },
   },

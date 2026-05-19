@@ -148,10 +148,19 @@ test.describe("Turing Machine page", () => {
       page.getByRole("heading", { name: "Turing Machines" }),
     ).toBeHidden();
 
+    const overviewHeading = page.getByRole("heading", {
+      name: "What is a Turing Machine?",
+    });
+    const switchTabHeading = page.getByRole("heading", {
+      name: "Switch Tab?",
+    });
+
     await page.getByRole("button", { name: "Overview" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Turing Machines" }),
-    ).toBeVisible();
+    if (!(await overviewHeading.isVisible())) {
+      await expect(switchTabHeading).toBeVisible();
+      await page.getByRole("button", { name: "Switch Tab" }).click();
+    }
+    await expect(overviewHeading).toBeVisible();
   });
 
   // Tests the validation regression where the currently edited tape must not limit which symbols are accepted during solution checking.
