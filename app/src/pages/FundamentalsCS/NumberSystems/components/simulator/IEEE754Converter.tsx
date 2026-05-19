@@ -181,7 +181,10 @@ export function IEEE754Converter({
                 {converterMode === "decToIeee" ? (
                   // DEC TO IEEE RESULT BLOCKS
                   !locked && (isValid || isNaNVal) ? (
-                    <div data-testid="ns-ieee-result" className="bg-background border-border/40 flex shrink-0 overflow-hidden rounded-lg border">
+                    <div
+                      data-testid="ns-ieee-result"
+                      className="bg-background border-border/40 flex shrink-0 overflow-hidden rounded-lg border"
+                    >
                       <div className="border-border/40 flex flex-col items-center border-r bg-blue-500/10 px-3 py-3">
                         <span className="mb-1 text-[10px] font-bold text-blue-600 dark:text-blue-400">
                           SIGN
@@ -218,7 +221,10 @@ export function IEEE754Converter({
                   )
                 ) : // IEEE TO DEC RESULT DISPLAY
                 !locked && isValid ? (
-                  <div data-testid="ns-ieee-result" className="bg-background border-border/40 flex items-center justify-center overflow-hidden rounded-lg border p-6 font-mono text-2xl font-bold tracking-wider">
+                  <div
+                    data-testid="ns-ieee-result"
+                    className="bg-background border-border/40 flex items-center justify-center overflow-hidden rounded-lg border p-6 font-mono text-2xl font-bold tracking-wider"
+                  >
                     {isNaNVal
                       ? "NaN"
                       : Object.is(floatVal, -0)

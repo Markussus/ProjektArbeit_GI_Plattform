@@ -2,8 +2,8 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Simulator } from "../../../../src/pages/FundamentalsCS/NumberSystems/components/simulator/Simulator";
-import type { Exercise } from "../../../../src/types/exercise";
+import { Simulator } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/Simulator.tsx";
+import type { Exercise } from "@/types/exercise.ts";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -52,9 +52,7 @@ vi.mock(
 vi.mock(
   "../../../../src/pages/FundamentalsCS/NumberSystems/components/simulator/FractionalConverter",
   () => ({
-    FractionalConverter: () => (
-      <div data-testid="mock-fractional-converter" />
-    ),
+    FractionalConverter: () => <div data-testid="mock-fractional-converter" />,
   }),
 );
 
@@ -100,26 +98,23 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  "@/components/shared/ConfirmDialog/ConfirmDialog",
-  () => ({
-    ConfirmDialog: (props: {
-      isOpen: boolean;
-      onConfirm: () => void;
-      onCancel: () => void;
-    }) =>
-      props.isOpen ? (
-        <div data-testid="mock-confirm-dialog">
-          <button data-testid="mock-confirm" onClick={props.onConfirm}>
-            confirm
-          </button>
-          <button data-testid="mock-cancel" onClick={props.onCancel}>
-            cancel
-          </button>
-        </div>
-      ) : null,
-  }),
-);
+vi.mock("@/components/shared/ConfirmDialog/ConfirmDialog", () => ({
+  ConfirmDialog: (props: {
+    isOpen: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
+  }) =>
+    props.isOpen ? (
+      <div data-testid="mock-confirm-dialog">
+        <button data-testid="mock-confirm" onClick={props.onConfirm}>
+          confirm
+        </button>
+        <button data-testid="mock-cancel" onClick={props.onCancel}>
+          cancel
+        </button>
+      </div>
+    ) : null,
+}));
 
 function createExercise(
   id: string,

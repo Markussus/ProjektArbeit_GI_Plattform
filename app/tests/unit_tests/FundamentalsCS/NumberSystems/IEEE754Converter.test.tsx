@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { IEEE754Converter } from "../../../../src/pages/FundamentalsCS/NumberSystems/components/simulator/IEEE754Converter";
+import { IEEE754Converter } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/IEEE754Converter.tsx";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -23,9 +23,14 @@ vi.mock(
     }) => (
       <div data-testid="mock-validation-panel">
         <span data-testid="mock-validation-expected-result">
-          {Array.isArray(expectedResult) ? expectedResult.join(",") : expectedResult}
+          {Array.isArray(expectedResult)
+            ? expectedResult.join(",")
+            : expectedResult}
         </span>
-        <button data-testid="mock-validation-show-solution" onClick={onShowSolution}>
+        <button
+          data-testid="mock-validation-show-solution"
+          onClick={onShowSolution}
+        >
           show solution
         </button>
       </div>
@@ -41,7 +46,9 @@ describe("IEEE754Converter", () => {
   describe("when rendering in decToIeee mode", () => {
     it("defaults to decToIeee mode with value 12.5", () => {
       render(<IEEE754Converter />);
-      expect((screen.getByTestId("ns-ieee-input") as HTMLInputElement).value).toBe("12.5");
+      expect(
+        (screen.getByTestId("ns-ieee-input") as HTMLInputElement).value,
+      ).toBe("12.5");
       expect(screen.getByTestId("ns-ieee-result")).toBeTruthy();
     });
 
@@ -73,8 +80,12 @@ describe("IEEE754Converter", () => {
       render(<IEEE754Converter />);
       fireEvent.click(screen.getByTestId("ns-ieee-ieee-to-dec-button"));
       const input = screen.getByTestId("ns-ieee-input");
-      fireEvent.change(input, { target: { value: "01000001010010000000000000000000" } });
-      expect(screen.getByTestId("ns-ieee-result").textContent).toContain("12.5");
+      fireEvent.change(input, {
+        target: { value: "01000001010010000000000000000000" },
+      });
+      expect(screen.getByTestId("ns-ieee-result").textContent).toContain(
+        "12.5",
+      );
     });
   });
 
@@ -113,9 +124,9 @@ describe("IEEE754Converter", () => {
           initialConverterMode="ieeeToDec"
         />,
       );
-      expect((screen.getByTestId("ns-ieee-input") as HTMLInputElement).value).toBe(
-        "01000001010101000000000000000000",
-      );
+      expect(
+        (screen.getByTestId("ns-ieee-input") as HTMLInputElement).value,
+      ).toBe("01000001010101000000000000000000");
     });
   });
 });

@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NegativeNumbers } from "../../../../src/pages/FundamentalsCS/NumberSystems/components/simulator/NegativeNumbers";
+import { NegativeNumbers } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/NegativeNumbers.tsx";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -23,9 +23,14 @@ vi.mock(
     }) => (
       <div data-testid="mock-validation-panel">
         <span data-testid="mock-validation-expected-result">
-          {Array.isArray(expectedResult) ? expectedResult.join(",") : expectedResult}
+          {Array.isArray(expectedResult)
+            ? expectedResult.join(",")
+            : expectedResult}
         </span>
-        <button data-testid="mock-validation-show-solution" onClick={onShowSolution}>
+        <button
+          data-testid="mock-validation-show-solution"
+          onClick={onShowSolution}
+        >
           show solution
         </button>
       </div>
@@ -57,9 +62,15 @@ describe("NegativeNumbers", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "5" } });
-      expect(screen.getByTestId("ns-negative-sign-magnitude").textContent).toContain("00000101");
-      expect(screen.getByTestId("ns-negative-ones-complement").textContent).toContain("00000101");
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("00000101");
+      expect(
+        screen.getByTestId("ns-negative-sign-magnitude").textContent,
+      ).toContain("00000101");
+      expect(
+        screen.getByTestId("ns-negative-ones-complement").textContent,
+      ).toContain("00000101");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("00000101");
     });
   });
 
@@ -68,28 +79,36 @@ describe("NegativeNumbers", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "-5" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("11111011");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("11111011");
     });
 
     it("computes twos complement for -1", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "-1" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("11111111");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("11111111");
     });
 
     it("computes twos complement for -128 (minimum)", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "-128" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("10000000");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("10000000");
     });
 
     it("computes twos complement for 127 (maximum)", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "127" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("01111111");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("01111111");
     });
   });
 
@@ -98,14 +117,18 @@ describe("NegativeNumbers", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "128" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("--------");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("--------");
     });
 
     it("shows dashes for values below -128", () => {
       render(<NegativeNumbers />);
       const input = screen.getByTestId("ns-negative-decimal-input");
       fireEvent.change(input, { target: { value: "-129" } });
-      expect(screen.getByTestId("ns-negative-twos-complement").textContent).toContain("--------");
+      expect(
+        screen.getByTestId("ns-negative-twos-complement").textContent,
+      ).toContain("--------");
     });
   });
 

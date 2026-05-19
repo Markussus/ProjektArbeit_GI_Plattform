@@ -135,9 +135,9 @@ test.describe("Number Systems page", () => {
 
     await test.step("Switching to binToDec mode changes input and result", async () => {
       await page.getByTestId(appTestIds.nsFractionalBinToDecButton).click();
-      await expect(
-        page.getByTestId(appTestIds.nsFractionalInput),
-      ).toHaveValue(/1010\.1/);
+      await expect(page.getByTestId(appTestIds.nsFractionalInput)).toHaveValue(
+        /1010\.1/,
+      );
       await expect(
         page.getByTestId(appTestIds.nsFractionalResult),
       ).toContainText("10.5");
@@ -162,9 +162,7 @@ test.describe("Number Systems page", () => {
 
     await test.step("Switching to ieeeToDec mode accepts 32-bit binary", async () => {
       await page.getByTestId(appTestIds.nsIeee754IeeeToDecButton).click();
-      await expect(
-        page.getByTestId(appTestIds.nsIeee754Input),
-      ).toBeVisible();
+      await expect(page.getByTestId(appTestIds.nsIeee754Input)).toBeVisible();
     });
   });
 
@@ -202,7 +200,9 @@ test.describe("Number Systems page", () => {
     await page.getByTestId(appTestIds.nsArithmeticTab).click();
 
     await test.step("Arithmetic mode dropdown is visible", async () => {
-      await expect(page.getByText(/Addition|Subtraktion|Multiplikation/)).toBeVisible();
+      await expect(
+        page.getByText(/Addition|Subtraktion|Multiplikation/),
+      ).toBeVisible();
     });
   });
 
@@ -218,9 +218,7 @@ test.describe("Number Systems page", () => {
       await expect(
         page.getByTestId("example-card-number.example_u03_1-open"),
       ).toBeVisible();
-      await page
-        .getByTestId("example-card-number.example_u03_1-open")
-        .click();
+      await page.getByTestId("example-card-number.example_u03_1-open").click();
     });
 
     await test.step("Simulator shows pre-filled decimal value 26", async () => {

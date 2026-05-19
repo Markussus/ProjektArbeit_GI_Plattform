@@ -380,7 +380,10 @@ export function IntegerConverter({
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                 {t("simulator.numbers.resultLabel")}
               </label>
-              <div data-testid="ns-converter-result" className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
+              <div
+                data-testid="ns-converter-result"
+                className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner"
+              >
                 {!locked && decValue !== ""
                   ? targetValue
                   : locked

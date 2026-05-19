@@ -250,9 +250,9 @@ export function FractionalConverter({
                 {t("simulator.numbers.valueLabel")}
               </label>
               <input
-                  type="text"
-                  data-testid="ns-fractional-input"
-                  value={inputValue}
+                type="text"
+                data-testid="ns-fractional-input"
+                value={inputValue}
                 onChange={(e) => handleInputChange(e.target.value)}
                 disabled={isExerciseMode && !showSolution}
                 className="bg-background text-foreground placeholder:text-muted-foreground/50 border-input focus:border-primary focus:ring-primary/20 w-full max-w-xs rounded-md border px-3 py-2 font-mono text-sm focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -277,7 +277,10 @@ export function FractionalConverter({
                       {inputValue}
                     </div>
                     <ArrowRight className="text-muted-foreground h-5 w-5" />
-                    <div data-testid="ns-fractional-result" className="bg-brand text-brand-foreground rounded-lg px-6 py-2 font-mono font-bold tracking-wider shadow-sm">
+                    <div
+                      data-testid="ns-fractional-result"
+                      className="bg-brand text-brand-foreground rounded-lg px-6 py-2 font-mono font-bold tracking-wider shadow-sm"
+                    >
                       {conversionData.finalResult}
                     </div>
                   </div>
