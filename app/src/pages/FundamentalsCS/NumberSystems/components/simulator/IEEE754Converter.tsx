@@ -123,6 +123,7 @@ export function IEEE754Converter({
 
               <div className="bg-muted mb-2 flex shrink-0 rounded-md p-1 sm:mb-0">
                 <button
+                  data-testid="ns-ieee-dec-to-ieee-button"
                   onClick={() => {
                     setConverterMode("decToIeee");
                     setInputValue("12.5");
@@ -132,6 +133,7 @@ export function IEEE754Converter({
                   {t("simulator.numbers.modeDecToIeee")}
                 </button>
                 <button
+                  data-testid="ns-ieee-ieee-to-dec-button"
                   onClick={() => {
                     setConverterMode("ieeeToDec");
                     setInputValue("0 10000010 10010000000000000000000");
@@ -155,6 +157,7 @@ export function IEEE754Converter({
                 >
                   <input
                     type="text"
+                    data-testid="ns-ieee-input"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     readOnly={locked}
@@ -178,7 +181,7 @@ export function IEEE754Converter({
                 {converterMode === "decToIeee" ? (
                   // DEC TO IEEE RESULT BLOCKS
                   !locked && (isValid || isNaNVal) ? (
-                    <div className="bg-background border-border/40 flex shrink-0 overflow-hidden rounded-lg border">
+                    <div data-testid="ns-ieee-result" className="bg-background border-border/40 flex shrink-0 overflow-hidden rounded-lg border">
                       <div className="border-border/40 flex flex-col items-center border-r bg-blue-500/10 px-3 py-3">
                         <span className="mb-1 text-[10px] font-bold text-blue-600 dark:text-blue-400">
                           SIGN
@@ -215,7 +218,7 @@ export function IEEE754Converter({
                   )
                 ) : // IEEE TO DEC RESULT DISPLAY
                 !locked && isValid ? (
-                  <div className="bg-background border-border/40 flex items-center justify-center overflow-hidden rounded-lg border p-6 font-mono text-2xl font-bold tracking-wider">
+                  <div data-testid="ns-ieee-result" className="bg-background border-border/40 flex items-center justify-center overflow-hidden rounded-lg border p-6 font-mono text-2xl font-bold tracking-wider">
                     {isNaNVal
                       ? "NaN"
                       : Object.is(floatVal, -0)
