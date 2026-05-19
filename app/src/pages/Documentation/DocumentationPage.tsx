@@ -27,7 +27,7 @@ export function DocumentationPage() {
   ];
 
   return (
-    <div className="p-8">
+    <div data-testid="documentation-page" className="p-8">
       <PageIntro
         eyebrow={t("documentation.label")}
         title={t("documentation.title")}

@@ -38,41 +38,43 @@ export function TMTransitionTableEditor({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-2 overflow-hidden">
+    <div className="flex min-w-0 flex-col gap-2">
       <div className="mb-2 min-h-[3.5rem]">
         <h3 className="text-md font-semibold">
-          {t("tm.config.transitionTable")}
+          {t("tm.config.transitionTable.transitionTable")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.transitionFormat")}{" "}
+          {t("tm.config.transitionTable.transitionFormat")}{" "}
           <code>(Next State, Write Symbol, Movement)</code>
-          {t("tm.config.transitionExample")}
+          {t("tm.config.transitionTable.transitionExample")}
         </p>
       </div>
 
-      <TableView
-        headers={headers}
-        rows={rows}
-        editMode={disabled ? "cells" : "all"}
-        onCellChange={onCellChange}
-        onCellBlur={onCellBlur}
-        onHeaderChange={onHeaderChange}
-        invalidCell={invalidCell}
-        isCellEditable={isCellEditable}
-        isCellDisabled={isCellDisabled}
-        canAddRow={true}
-        onAddRow={onAddRow}
-        disableAddRow={disabled}
-        canRemoveRow={true}
-        onRemoveRow={onRemoveRow}
-        disableRemoveRow={disabled}
-        canAddColumn={true}
-        onAddColumn={onAddColumn}
-        disableAddColumn={disabled}
-        canRemoveColumn={true}
-        onRemoveColumn={onRemoveColumn}
-        disableRemoveColumn={disabled}
-      />
+      <div className="w-max max-w-full">
+        <TableView
+          headers={headers}
+          rows={rows}
+          editMode={disabled ? "cells" : "all"}
+          onCellChange={onCellChange}
+          onCellBlur={onCellBlur}
+          onHeaderChange={onHeaderChange}
+          invalidCell={invalidCell}
+          isCellEditable={isCellEditable}
+          isCellDisabled={isCellDisabled}
+          canAddRow={true}
+          onAddRow={onAddRow}
+          disableAddRow={disabled}
+          canRemoveRow={true}
+          onRemoveRow={onRemoveRow}
+          disableRemoveRow={disabled}
+          canAddColumn={true}
+          onAddColumn={onAddColumn}
+          disableAddColumn={disabled}
+          canRemoveColumn={true}
+          onRemoveColumn={onRemoveColumn}
+          disableRemoveColumn={disabled}
+        />
+      </div>
     </div>
   );
 }

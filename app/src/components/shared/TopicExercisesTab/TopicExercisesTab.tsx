@@ -23,8 +23,11 @@ export function TopicExercisesTab({
     id: exercise.titleKey,
     title: t(exercise.titleKey),
     description: t(exercise.descriptionKey),
+    titleKey: exercise.titleKey,
+    descriptionKey: exercise.descriptionKey,
     difficulty: exercise.difficulty,
     icon: exercise.icon,
+    kind: "exercise",
   }));
 
   return (
@@ -38,8 +41,9 @@ export function TopicExercisesTab({
         {translatedExercises.map((exercise, index) => (
           <ExerciseCard
             key={exercise.id}
-            exercise={exercise}
+            item={exercise}
             index={index}
+            testIdPrefix={`exercise-card-${exercise.id}`}
             isSelected={selectedExercise?.id === exercise.id}
             onSelect={() => onSelectExercise(exercise)}
             onOpen={() => onOpenExerciseInSimulation(exercise)}

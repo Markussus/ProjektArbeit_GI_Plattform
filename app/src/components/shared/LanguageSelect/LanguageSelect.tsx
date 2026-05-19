@@ -51,6 +51,8 @@ export function LanguageSelect() {
       triggerClassName="h-8 gap-2 px-2.5"
       menuClassName="right-0 min-w-32"
       optionClassName="text-sm"
+      triggerTestId="language-select-trigger"
+      menuTestId="language-select-menu"
     />
   );
 }

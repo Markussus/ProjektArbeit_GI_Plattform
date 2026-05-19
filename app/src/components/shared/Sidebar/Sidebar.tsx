@@ -34,6 +34,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
+      data-testid="sidebar"
+      data-collapsed={collapsed ? "true" : "false"}
       className={cn(
         "border-border bg-background flex h-full flex-col border-r",
         collapsed ? "w-16" : "w-64",
@@ -43,6 +45,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <button
           type="button"
           onClick={onToggle}
+          data-testid="sidebar-toggle"
           className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
           aria-label={t("sidebar.toggle")}
         >
@@ -105,6 +108,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div className="border-border space-y-1 border-t px-2 py-3">
         <Link
           to="/documentation"
+          data-testid="sidebar-documentation-link"
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
             collapsed ? "justify-center" : "gap-3",
@@ -120,6 +124,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
         <Link
           to="/help"
+          data-testid="sidebar-help-link"
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
             collapsed ? "justify-center" : "gap-3",

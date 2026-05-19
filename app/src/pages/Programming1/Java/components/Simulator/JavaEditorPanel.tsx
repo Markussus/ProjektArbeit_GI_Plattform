@@ -1,45 +1,46 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
-import type { Exercise } from "@/types/exercise";
-import { getJavaFileName, getJavaStarterCode } from "../exercises";
+import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 
-interface JavaMonacoEditorProps {
-  selectedExercise: Exercise | null;
+export interface JavaEditorPanelProps {
+  code: string;
+  fileName: string;
   isFocused: boolean;
+  onCodeChange: (nextCode: string) => void;
+  onResetCode: () => void;
+  onImportCode: (nextCode: string) => void;
 }
 
-interface JavaEditorInstanceProps {
-  exerciseId?: string;
-  isFocused: boolean;
-}
-
-function JavaEditorInstance({
-  exerciseId,
+export function JavaEditorPanel({
+  code,
+  fileName,
   isFocused,
-}: JavaEditorInstanceProps) {
+  onCodeChange,
+  onResetCode,
+  onImportCode,
+}: JavaEditorPanelProps) {
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
-  const [code, setCode] = useState(() => getJavaStarterCode(exerciseId));
 
   return (
-    <div className="space-y-4">
+    <div data-testid="java-editor-panel" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
             {t("java.editorLabel")}
           </p>
-          <p className="text-foreground mt-1 text-sm font-medium">
-            {getJavaFileName(exerciseId)}
-          </p>
+          <p className="text-foreground mt-1 text-sm font-medium">{fileName}</p>
         </div>
 
         <button
           type="button"
-          onClick={() => setCode(getJavaStarterCode(exerciseId))}
+          onClick={onResetCode}
+          data-testid="java-reset-button"
           className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
         >
           <RotateCcw className="size-4" />
@@ -47,20 +48,23 @@ function JavaEditorInstance({
         </button>
       </div>
 
-      <div className="ring-foreground/10 overflow-hidden rounded-xl ring-1">
+      <div
+        data-testid="java-editor-container"
+        className="ring-foreground/10 overflow-hidden rounded-xl ring-1"
+      >
         <Suspense
           fallback={
-            <div className="bg-card text-muted-foreground flex h-[30rem] items-center justify-center p-4 text-sm">
+            <div className="bg-card text-muted-foreground flex h-[28rem] items-center justify-center p-4 text-sm">
               {t("java.editorLoading")}
             </div>
           }
         >
           <MonacoEditor
-            height={isFocused ? "calc(100vh - 21rem)" : "30rem"}
+            height={isFocused ? "calc(100vh - 35rem)" : "28rem"}
             language="java"
             theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
             value={code}
-            onChange={(nextValue) => setCode(nextValue ?? "")}
+            onChange={(nextValue) => onCodeChange(nextValue ?? "")}
             options={{
               automaticLayout: true,
               fontSize: 14,
@@ -74,21 +78,13 @@ function JavaEditorInstance({
           />
         </Suspense>
       </div>
+
+      <SimulatorStringTransferBox
+        value={code}
+        codec={javaCodeTransferCodec}
+        onLoad={onImportCode}
+        testIdPrefix="java-transfer"
+      />
     </div>
-  );
-}
-
-export function JavaMonacoEditor({
-  selectedExercise,
-  isFocused,
-}: JavaMonacoEditorProps) {
-  const exerciseId = selectedExercise?.id;
-
-  return (
-    <JavaEditorInstance
-      key={exerciseId ?? "__default-java-editor__"}
-      exerciseId={exerciseId}
-      isFocused={isFocused}
-    />
   );
 }

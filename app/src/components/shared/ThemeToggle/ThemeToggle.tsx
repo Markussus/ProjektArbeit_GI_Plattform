@@ -12,6 +12,8 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
+      data-testid="theme-toggle"
+      data-theme={resolvedTheme}
       className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
       aria-label={isDark ? t("theme.switchToLight") : t("theme.switchToDark")}
       title={isDark ? t("theme.light") : t("theme.dark")}

@@ -1,0 +1,125 @@
+export const HEAD_WINDOW_TRANSITION_RATIO = 0.6;
+export const MIN_TRANSITION_MS = 120;
+export const MAX_TRANSITION_MS = 600;
+export const NO_ANIMATION_THRESHOLD_MS = 140;
+export const MAX_ANIMATED_TAPE_SHIFT_CELLS = 1;
+export const DEFAULT_HEAD_WINDOW_RADIUS = 5;
+
+export interface TMTapeCell {
+  index: number;
+  value: string;
+  isFocused: boolean;
+}
+
+export interface TMTapeViewport {
+  effectiveWindowRadius: number;
+  effectiveHeadWindowRadius: number;
+  startIndex: number;
+  endIndex: number;
+}
+
+export function resolveTapeViewport(
+  headPosition: number,
+  windowRadius: number,
+  headWindowRadius: number,
+  responsiveWindowRadius: number,
+): TMTapeViewport {
+  const maxWindowRadius = Math.max(windowRadius, 0);
+  const effectiveWindowRadius = Math.min(
+    Math.max(responsiveWindowRadius, 0),
+    maxWindowRadius,
+  );
+  const effectiveHeadWindowRadius = Math.min(
+    Math.max(headWindowRadius, 0),
+    effectiveWindowRadius,
+  );
+  const headViewportOffset = Math.max(
+    -effectiveHeadWindowRadius,
+    Math.min(headPosition, effectiveHeadWindowRadius),
+  );
+  const viewportCenter = headPosition - headViewportOffset;
+
+  return {
+    effectiveWindowRadius,
+    effectiveHeadWindowRadius,
+    startIndex: viewportCenter - effectiveWindowRadius,
+    endIndex: viewportCenter + effectiveWindowRadius,
+  };
+}
+
+export function getTapeTransitionDurationMs(stepDurationMs: number): number {
+  if (stepDurationMs <= NO_ANIMATION_THRESHOLD_MS) {
+    return 0;
+  }
+
+  return Math.min(
+    MAX_TRANSITION_MS,
+    Math.max(
+      MIN_TRANSITION_MS,
+      Math.round(stepDurationMs * HEAD_WINDOW_TRANSITION_RATIO),
+    ),
+  );
+}
+
+export function buildTapeCells(
+  tape: Record<number, string>,
+  headPosition: number,
+  blankSymbol: string,
+  startIndex: number,
+  endIndex: number,
+): TMTapeCell[] {
+  const cells: TMTapeCell[] = [];
+
+  for (let index = startIndex; index <= endIndex; index += 1) {
+    const symbol =
+      tape[index] !== undefined && tape[index] !== null
+        ? tape[index]
+        : blankSymbol;
+
+    cells.push({
+      index,
+      value: symbol === "" ? blankSymbol : symbol,
+      isFocused: index === headPosition,
+    });
+  }
+
+  return cells;
+}
+
+export function getResponsiveWindowRadius(params: {
+  viewportWidth: number;
+  baseWidthPx: number;
+  cellWidthPx: number;
+  cellPitchPx: number;
+  maxWindowRadius: number;
+}): number {
+  const {
+    viewportWidth,
+    baseWidthPx,
+    cellWidthPx,
+    cellPitchPx,
+    maxWindowRadius,
+  } = params;
+
+  if (cellWidthPx <= 0 || cellPitchPx <= 0) {
+    return maxWindowRadius;
+  }
+
+  const maxVisibleCells = Math.max(
+    1,
+    Math.floor((viewportWidth - baseWidthPx - cellWidthPx) / cellPitchPx) + 1,
+  );
+
+  return Math.min(maxWindowRadius, Math.floor((maxVisibleCells - 1) / 2));
+}
+
+export function shouldAnimateTapeShift(
+  shiftedCells: number,
+  transitionDurationMs: number,
+): boolean {
+  return (
+    shiftedCells !== 0 &&
+    Math.abs(shiftedCells) <= MAX_ANIMATED_TAPE_SHIFT_CELLS &&
+    transitionDurationMs > 0
+  );
+}

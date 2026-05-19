@@ -1,0 +1,95 @@
+# Build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.fmt
+*.fot
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.xdv
+
+# Latexmk / latexrun / arara
+.latexmkrc
+latex.out/
+
+# Generated PDFs and PS/DVI (optional)
+# *.dvi
+# *.ps
+# *.pdf
+
+# Uncomment this if you WANT to keep final PDFs in git
+!BerichtBeispiel.pdf
+!docs/*.pdf
+
+# Temporary / editor files
+*~
+*.bak
+*.backup
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# TeX editors / IDEs
+.texpadtmp
+.texworks/
+.idea/
+.vscode/
+
+# minted / pygments
+_minted*
+
+# glossaries / nomenclature / acronyms
+*.acn
+*.acr
+*.alg
+*.glsdefs
+*.ist
+
+# TikZ / externalization
+*.md5
+*.dpth
+
+# Split index / makeindex helpers
+*.xdy
+
+# R / Python / SageTeX helpers
+*.pyg
+*.sage
+*.sagetex.sage
+*.sagetex.py
+*.sagetex.scmd
+
+# Package or class distribution outputs
+*.cls
+*.sty.bak
+
+# Keep source files tracked
+!*.tex
+!*.sty
+!*.cls
+!*.bib
+!*.bst
+!*.png
+!*.jpg
+!*.jpeg
+!*.pdf_tex
+!*.eps
+!README.md

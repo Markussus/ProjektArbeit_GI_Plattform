@@ -1,4 +1,4 @@
-import type { TMProgram } from "./tmProgram";
+import { deriveTapeAlphabet, type TMProgram } from "./tmProgram";
 import { isSingleTapeSymbol } from "./tmTypes";
 
 export type TMProgramIssueCode =
@@ -27,10 +27,11 @@ export function validateTMProgram(program: TMProgram): TMProgramIssue[] {
   const issues: TMProgramIssue[] = [];
   const states = new Set(program.states);
   const inputAlphabet = new Set(program.inputAlphabet);
-  const tapeAlphabet = new Set(program.tapeAlphabet);
+  const derivedTapeAlphabet = deriveTapeAlphabet(program);
+  const tapeAlphabet = new Set(derivedTapeAlphabet);
 
   validateStates(program, states, issues);
-  validateAlphabet(program, tapeAlphabet, issues);
+  validateAlphabet(program, derivedTapeAlphabet, tapeAlphabet, issues);
   validateInitialTape(program, inputAlphabet, issues);
   validateTransitions(program, states, tapeAlphabet, issues);
 
@@ -75,6 +76,7 @@ function validateStates(
 
 function validateAlphabet(
   program: TMProgram,
+  derivedTapeAlphabet: string[],
   tapeAlphabet: Set<string>,
   issues: TMProgramIssue[],
 ): void {
@@ -94,7 +96,7 @@ function validateAlphabet(
     });
   }
 
-  for (const symbol of [...new Set(program.tapeAlphabet)]) {
+  for (const symbol of [...new Set(derivedTapeAlphabet)]) {
     if (!isSingleTapeSymbol(symbol)) {
       issues.push({
         code: "tape_symbol_invalid",

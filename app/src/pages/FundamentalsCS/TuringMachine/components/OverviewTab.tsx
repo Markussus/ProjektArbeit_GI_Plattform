@@ -10,16 +10,16 @@ export function OverviewTab() {
     <div className="space-y-6">
       <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
         <h3 className="text-foreground text-lg font-semibold">
-          {t("turing.overviewTitle")}
+          {t("tm.overview.overviewTitle")}
         </h3>
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-          {t("turing.overviewText")}
+          {t("tm.overview.overviewText")}
         </p>
       </div>
 
       <div>
         <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("turing.concepts")}
+          {t("tm.overview.concepts")}
         </h3>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -36,7 +36,7 @@ export function OverviewTab() {
                 </div>
 
                 <span className="text-foreground text-sm font-medium">
-                  {t(`turing.concept${num}`)}
+                  {t(`tm.overview.concept${num}`)}
                 </span>
               </div>
             );
