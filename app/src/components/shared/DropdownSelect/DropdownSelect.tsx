@@ -19,6 +19,8 @@ export interface DropdownSelectProps<T extends string> {
   triggerClassName?: string;
   menuClassName?: string;
   optionClassName?: string;
+  triggerTestId?: string;
+  menuTestId?: string;
 }
 
 export function DropdownSelect<T extends string>({
@@ -31,6 +33,8 @@ export function DropdownSelect<T extends string>({
   triggerClassName,
   menuClassName,
   optionClassName,
+  triggerTestId,
+  menuTestId,
 }: DropdownSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -75,6 +79,7 @@ export function DropdownSelect<T extends string>({
         aria-expanded={isOpen && !disabled}
         aria-label={ariaLabel}
         disabled={disabled}
+        data-testid={triggerTestId}
         className={cn(
           "border-border bg-background text-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex items-center justify-between rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           isOpen && !disabled && "bg-muted/70",
@@ -97,6 +102,7 @@ export function DropdownSelect<T extends string>({
         <div
           role="listbox"
           aria-label={ariaLabel}
+          data-testid={menuTestId}
           className={cn(
             "bg-popover text-popover-foreground border-border absolute top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-xl border p-1 shadow-lg",
             menuClassName,

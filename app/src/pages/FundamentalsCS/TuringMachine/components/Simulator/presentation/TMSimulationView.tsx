@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { TableView } from "@/components/shared/TableVisual/TableView";
@@ -19,6 +19,7 @@ export interface TMSimulationViewProps {
   status: SimulationStatus;
   speed: number;
   error: Error | null;
+  responsiveBoundaryRef?: RefObject<HTMLDivElement | null>;
   onEditConfig: () => void;
   onPlay: () => void;
   onPause: () => void;
@@ -34,6 +35,7 @@ export function TMSimulationView({
   status,
   speed,
   error,
+  responsiveBoundaryRef,
   onEditConfig,
   onPlay,
   onPause,
@@ -54,14 +56,17 @@ export function TMSimulationView({
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">{t("tm.sim.title")}</h2>
+    <div
+      ref={responsiveBoundaryRef}
+      className="mx-auto flex w-full max-w-6xl flex-col gap-8"
+    >
+      <div className="flex w-full items-center justify-between">
+        <h2 className="text-xl font-bold">{t("tm.sim.screen.title")}</h2>
         <button
           onClick={onEditConfig}
           className="hover:bg-accent rounded-md border px-4 py-2"
         >
-          {t("tm.sim.edit")}
+          {t("tm.sim.screen.edit")}
         </button>
       </div>
 
@@ -71,11 +76,12 @@ export function TMSimulationView({
           headPosition={runtime.headPosition}
           stepDurationMs={speed}
           blankSymbol={program.blankSymbol}
+          responsiveBoundaryRef={responsiveBoundaryRef}
         />
       </div>
 
-      <div className="flex flex-col items-start gap-6 lg:flex-row">
-        <div className="flex w-full flex-col gap-4 lg:w-1/3">
+      <div className="flex w-full flex-col items-center gap-6 sm:flex-row sm:flex-wrap sm:items-start sm:justify-center">
+        <div className="flex w-full max-w-md flex-col gap-4 sm:w-96 sm:flex-none">
           <SimulatorControls
             status={status}
             speed={speed}
@@ -94,7 +100,7 @@ export function TMSimulationView({
           />
         </div>
 
-        <div className="w-full lg:w-2/3">
+        <div className="w-full max-w-full sm:min-w-[20rem] sm:flex-1">
           <TableView
             headers={tableHeaders}
             rows={tableRows}

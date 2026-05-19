@@ -29,6 +29,7 @@ export function TabNavigation({
           key={tab}
           type="button"
           onClick={() => onTabChange(tab)}
+          data-testid={`tab-button-${tab}`}
           className={cn(
             "relative px-4 py-2.5 text-sm font-medium",
             activeTab === tab

@@ -1,0 +1,203 @@
+/** @vitest-environment jsdom */
+
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { TerminalSquare } from "lucide-react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { JavaSimulator } from "../../../../src/pages/Programming1/Java/components/Simulator/JavaSimulator";
+import type { Exercise } from "../../../../src/types/exercise";
+
+const runSpy = vi.fn();
+const stopSpy = vi.fn();
+const resetSpy = vi.fn();
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback?: string) =>
+      typeof fallback === "string" ? fallback : key,
+  }),
+}));
+
+vi.mock(
+  "../../../../src/pages/Programming1/Java/components/Simulator/application/useJavaExecution",
+  () => ({
+    useJavaExecution: () => ({
+      snapshot: {
+        phase: "idle",
+        stdout: [],
+        stderr: [],
+        issues: [],
+        artifacts: null,
+        startedAt: null,
+        finishedAt: null,
+      },
+      run: runSpy,
+      stop: stopSpy,
+      reset: resetSpy,
+    }),
+  }),
+);
+
+vi.mock(
+  "../../../../src/pages/Programming1/Java/components/Simulator/JavaEditorPanel",
+  () => ({
+    JavaEditorPanel: ({
+      code,
+      fileName,
+      onCodeChange,
+      onResetCode,
+      onImportCode,
+    }: {
+      code: string;
+      fileName: string;
+      onCodeChange: (nextCode: string) => void;
+      onResetCode: () => void;
+      onImportCode: (nextCode: string) => void;
+    }) => (
+      <div data-testid="mock-java-editor-panel">
+        <div data-testid="mock-java-editor-code">{code}</div>
+        <div data-testid="mock-java-editor-file">{fileName}</div>
+        <button onClick={() => onCodeChange("changed code")}>
+          change code
+        </button>
+        <button onClick={onResetCode}>reset code</button>
+        <button onClick={() => onImportCode("imported code")}>
+          import code
+        </button>
+      </div>
+    ),
+  }),
+);
+
+vi.mock("@/components/shared/ExecutionControls", () => ({
+  ExecutionControls: ({
+    phase,
+    onRun,
+    onStop,
+  }: {
+    phase: string;
+    onRun: () => void;
+    onStop: () => void;
+  }) => (
+    <div data-testid="mock-execution-controls">
+      <div data-testid="mock-execution-phase">{phase}</div>
+      <button onClick={onRun}>run code</button>
+      <button onClick={onStop}>stop code</button>
+    </div>
+  ),
+}));
+
+vi.mock(
+  "../../../../src/pages/Programming1/Java/components/Simulator/JavaConsolePanel",
+  () => ({
+    JavaConsolePanel: () => <div data-testid="mock-java-console-panel" />,
+  }),
+);
+
+function createExercise(
+  id: string,
+  title: string,
+  description: string,
+): Exercise {
+  return {
+    id,
+    title,
+    description,
+    difficulty: "easy",
+    icon: TerminalSquare,
+  };
+}
+
+describe("JavaSimulator", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  beforeEach(() => {
+    runSpy.mockReset();
+    stopSpy.mockReset();
+    resetSpy.mockReset();
+  });
+
+  describe("when no exercise is selected yet", () => {
+    it("starts with the default Java starter code", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        'System.out.println("Start coding in Java!");',
+      );
+      expect(screen.getByTestId("mock-java-editor-file").textContent).toBe(
+        "Main.java",
+      );
+    });
+  });
+
+  describe("when a specific exercise is opened in simulation", () => {
+    it("boots the editor with that exercise starter code", () => {
+      render(
+        <JavaSimulator
+          selectedExercise={createExercise(
+            "java.exercise4",
+            "Array sortieren",
+            "Sort an array",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        "import java.util.Arrays;",
+      );
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        "// TODO: sort the array in ascending order",
+      );
+    });
+  });
+
+  describe("when the user changes or imports code before execution", () => {
+    it("runs the latest changed editor content", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "change code" }));
+      fireEvent.click(screen.getByRole("button", { name: "run code" }));
+
+      expect(runSpy).toHaveBeenCalledWith({
+        source: "changed code",
+        exerciseId: undefined,
+      });
+    });
+
+    it("replaces the editor content on import and resets execution state", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "import code" }));
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
+        "imported code",
+      );
+      expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when the user wants to recover the starter code", () => {
+    it("restores the exercise starter code and resets the execution state", () => {
+      render(
+        <JavaSimulator
+          selectedExercise={createExercise(
+            "java.exercise3",
+            "Zwei Zahlen addieren",
+            "Add two numbers",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "change code" }));
+      fireEvent.click(screen.getByRole("button", { name: "reset code" }));
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        "int firstNumber = 7;",
+      );
+      expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+});

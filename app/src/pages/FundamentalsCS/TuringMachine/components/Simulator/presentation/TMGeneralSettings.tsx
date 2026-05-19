@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
+import { formatTMStateName } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 
 export interface TMGeneralSettingsProps {
@@ -26,7 +27,7 @@ export function TMGeneralSettings({
   const startStateOptions = useMemo(() => {
     return selectableStates.map((state) => {
       const label = (
-        <span className="font-mono text-lg">{formatState(state)}</span>
+        <span className="font-mono text-lg">{formatTMStateName(state)}</span>
       );
 
       return {
@@ -41,7 +42,7 @@ export function TMGeneralSettings({
     <>
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          {t("tm.config.initialTape")}
+          {t("tm.config.general.initialTape")}
         </label>
         <input
           type="text"
@@ -49,19 +50,19 @@ export function TMGeneralSettings({
           value={program.initialTape.join("")}
           onChange={(event) => onInitialTapeChange(event.target.value)}
           disabled={disabled}
-          placeholder={t("tm.config.initialTapePlaceholder")}
+          placeholder={t("tm.config.general.initialTapePlaceholder")}
         />
       </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
-          {t("tm.config.startState")}
+          {t("tm.config.general.startState")}
         </label>
         <DropdownSelect
           value={program.initialState}
           options={startStateOptions}
           onChange={onInitialStateChange}
-          ariaLabel={t("tm.config.startState")}
+          ariaLabel={t("tm.config.general.startState")}
           disabled={disabled}
           triggerClassName="h-12 w-full px-3 py-2"
           menuClassName="right-0 left-0"
@@ -69,13 +70,4 @@ export function TMGeneralSettings({
       </div>
     </>
   );
-}
-
-function formatState(state: string): string {
-  return state.replace(/\d+/g, (match) => {
-    return match
-      .split("")
-      .map((digit) => String.fromCharCode(8320 + Number.parseInt(digit, 10)))
-      .join("");
-  });
 }

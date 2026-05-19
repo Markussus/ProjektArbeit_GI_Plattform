@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { FARuntime } from "../domain/faRuntime";
 
@@ -12,18 +12,8 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentStep = runtime.stepCount;
 
-  // Auto-scroll to keep the active step visible
-  useEffect(() => {
-    if (!scrollRef.current) return;
-    const active = scrollRef.current.querySelector("[data-active='true']");
-    if (active) {
-      active.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
-  }, [currentStep]);
+  // The view is fully manual: do NOT auto-scroll the timeline when the active
+  // step changes. The user pans/scrolls the dot row themselves.
 
   // Build step entries from the state history
   const steps = runtime.stateHistory.map((states, i) => ({
@@ -35,12 +25,15 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   }));
 
   return (
-    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
-      <div className="mb-2 flex items-center justify-between">
+    <div className="min-w-0 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
           {t("fa.sim.stepHistory", "Step History")}
         </span>
-        <span style={{ color: "var(--fa-text-dim)", fontSize: "0.75rem" }}>
+        <span
+          className="shrink-0"
+          style={{ color: "var(--fa-text-dim)", fontSize: "0.75rem" }}
+        >
           {t("fa.sim.stepOf", "Step {{current}} of {{total}}", {
             current: currentStep,
             total: runtime.inputWord.length,

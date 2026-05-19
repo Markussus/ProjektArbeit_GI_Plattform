@@ -82,8 +82,8 @@ export const learningModules: LearningModuleDefinition[] = [
     topics: [
       {
         id: "turing-machine",
-        titleKey: "turing.title",
-        descriptionKey: "turing.description",
+        titleKey: "tm.topic.title",
+        descriptionKey: "tm.topic.description",
         path: "/fundamentals-cs/turing-machine",
         icon: Cpu,
         accent: "orange",

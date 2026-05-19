@@ -3,12 +3,6 @@ export type InputSymbol = string;
 
 export const EPSILON: InputSymbol = "ε";
 
-export interface FATransition {
-  from: StateName;
-  symbol: InputSymbol;
-  to: StateName[];
-}
-
 export type AutomatonType = "DFA" | "NFA";
 
 export interface FATransitionMap {
@@ -32,11 +26,6 @@ export interface RegularGrammar {
   terminals: string[];
   startSymbol: string;
   productions: ProductionRule[];
-  /**
-   * Non-terminals that have an ε production (A → ε).
-   * Tracked separately because ε rules become accepting-state markers,
-   * not transitions, in the converted automaton.
-   */
   epsilonProducingNonTerminals?: string[];
 }
 

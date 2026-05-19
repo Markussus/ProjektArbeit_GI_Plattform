@@ -11,11 +11,17 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import type { Example } from "@/types/exercise";
+import type { TranslationKey } from "@/types/i18n";
 import { faExamples, type FAExample } from "./Simulator/config/faExamples";
 import type { FAProgram } from "./Simulator/domain/faTypes";
 import { useFASimulatorStore } from "../store/faSimulatorStore";
 
-export function ExamplesTab({ onSwitchToSimulation }: ModuleExamplesTabProps) {
+export function ExamplesTab({
+  selectedExample,
+  onSelectExample,
+  onOpenExampleInSimulation,
+}: ModuleExamplesTabProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const loadExample = useFASimulatorStore((s) => s.loadExample);
@@ -24,11 +30,11 @@ export function ExamplesTab({ onSwitchToSimulation }: ModuleExamplesTabProps) {
     setExpandedId((prev) => (prev === id ? null : id));
 
   const handleLoad = useCallback(
-    (program: FAProgram, inputWord: string) => {
+    (example: Example, program: FAProgram, inputWord: string) => {
       loadExample(program, inputWord);
-      onSwitchToSimulation();
+      onOpenExampleInSimulation(example);
     },
-    [loadExample, onSwitchToSimulation],
+    [loadExample, onOpenExampleInSimulation],
   );
 
   return (
@@ -55,32 +61,63 @@ export function ExamplesTab({ onSwitchToSimulation }: ModuleExamplesTabProps) {
 
       {/* Example cards */}
       <div className="space-y-3">
-        {faExamples.map((example) => (
-          <ExampleCard
-            key={example.id}
-            example={example}
-            isExpanded={expandedId === example.id}
-            onToggle={() => toggle(example.id)}
-            onLoad={handleLoad}
-          />
-        ))}
+        {faExamples.map((example) => {
+          const topicExample = toTopicExample(example, t);
+
+          return (
+            <ExampleCard
+              key={example.id}
+              example={example}
+              topicExample={topicExample}
+              isExpanded={expandedId === example.id}
+              isSelected={selectedExample?.id === topicExample.id}
+              onToggle={() => toggle(example.id)}
+              onSelect={() => onSelectExample(topicExample)}
+              onLoad={handleLoad}
+            />
+          );
+        })}
       </div>
     </div>
   );
+}
+
+function toTopicExample(
+  example: FAExample,
+  t: (key: TranslationKey) => string,
+): Example {
+  const titleKey = example.titleKey as TranslationKey;
+  const descriptionKey = example.descriptionKey as TranslationKey;
+
+  return {
+    id: titleKey,
+    title: t(titleKey),
+    description: t(descriptionKey),
+    titleKey,
+    descriptionKey,
+    icon: BookOpen,
+    kind: "example",
+  };
 }
 
 /* ── Individual Example Card ────────────────────────────────────────────── */
 
 function ExampleCard({
   example,
+  topicExample,
   isExpanded,
+  isSelected,
   onToggle,
+  onSelect,
   onLoad,
 }: {
   example: FAExample;
+  topicExample: Example;
   isExpanded: boolean;
+  isSelected: boolean;
   onToggle: () => void;
-  onLoad: (program: FAProgram, inputWord: string) => void;
+  onSelect: () => void;
+  onLoad: (example: Example, program: FAProgram, inputWord: string) => void;
 }) {
   const { t } = useTranslation();
   const hasBoth = !!example.secondVariant;
@@ -101,11 +138,19 @@ function ExampleCard({
       : "bg-module-purple-bg text-module-purple-fg";
 
   return (
-    <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1 transition-shadow hover:shadow-md">
+    <div
+      className={cn(
+        "bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1 transition-shadow hover:shadow-md",
+        isSelected && "ring-primary/40",
+      )}
+    >
       {/* Header row */}
       <button
         type="button"
-        onClick={onToggle}
+        onClick={() => {
+          onSelect();
+          onToggle();
+        }}
         className="hover:bg-muted/30 flex w-full items-center gap-4 px-5 py-4 text-left transition-colors"
       >
         <div className="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
@@ -244,7 +289,9 @@ function ExampleCard({
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => onLoad(activeProgram, activeInputWord)}
+              onClick={() =>
+                onLoad(topicExample, activeProgram, activeInputWord)
+              }
               className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all hover:opacity-90"
             >
               <Play className="h-4 w-4 fill-current" />

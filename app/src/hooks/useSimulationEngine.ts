@@ -114,6 +114,7 @@ export function useSimulationEngine<TConfig, TState>(
   }, [status, speed, handleStep]);
 
   /**
+   * TODO: NEEDS TO BE REMOVED !!!!!!!!!!!!! @Kristian
    * Re-read the simulator's current state and sync it to React state.
    * Used when the simulator was mutated externally (e.g. jumpToStep).
    */

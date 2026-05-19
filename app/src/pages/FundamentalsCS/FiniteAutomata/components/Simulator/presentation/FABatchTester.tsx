@@ -42,8 +42,8 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
 
   return (
     <div
-      className="flex flex-col gap-3 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4"
-      style={{ height: "100%", minHeight: 0, minWidth: "300px" }}
+      className="flex w-full min-w-0 flex-col gap-3 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4"
+      style={{ height: "100%", minHeight: 0 }}
     >
       {/* Header */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
@@ -99,17 +99,17 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                 key={i}
                 type="button"
                 onClick={() => onSelectWord?.(r.inputWord)}
-                className="flex flex-shrink-0 items-center justify-between rounded-md px-3 py-1.5 text-left transition-colors"
+                className="flex w-full min-w-0 flex-shrink-0 items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left transition-colors"
                 style={{
                   background: "var(--fa-surface)",
                   border: "1px solid var(--fa-border-subtle)",
                   fontSize: "0.8125rem",
                   cursor: "pointer",
                 }}
-                title={t("fa.batch.debugHint", "Click to debug step-by-step")}
+                title={r.inputWord || "ε"}
               >
                 <span
-                  className="font-mono"
+                  className="min-w-0 flex-1 truncate font-mono"
                   style={{
                     color: r.accepted ? "var(--fa-green)" : "var(--fa-red)",
                   }}
@@ -117,12 +117,8 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                   {r.inputWord || "ε"}
                 </span>
                 <span
-                  style={{
-                    fontSize: "0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
+                  className="flex shrink-0 items-center gap-1.5"
+                  style={{ fontSize: "0.75rem" }}
                 >
                   <span style={{ color: "var(--fa-text-dim)" }}>
                     {r.steps} {t("fa.batch.steps", "steps")}
