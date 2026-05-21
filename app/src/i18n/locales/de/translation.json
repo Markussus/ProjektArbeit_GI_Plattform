@@ -788,7 +788,9 @@
       "example2": "Beispiel: Unäres Inkrement",
       "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unären Wortes läuft und eine weitere 1 schreibt.",
       "example3": "Beispiel: Binäres Inkrement",
-      "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht."
+      "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht.",
+      "example4": "Beispiel: Binärzahlen addieren",
+      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird."
     },
     "actions": {
       "loadSolution": "Lösung laden",

@@ -792,7 +792,9 @@
       "example2": "Example: Unary Increment",
       "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
       "example3": "Example: Binary Increment",
-      "example3Desc": "A carry-based machine that increments a binary word by one."
+      "example3Desc": "A carry-based machine that increments a binary word by one.",
+      "example4": "Example: Add Binary Numbers",
+      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built."
     },
     "actions": {
       "loadSolution": "Load solution",

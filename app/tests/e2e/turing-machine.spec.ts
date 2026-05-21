@@ -87,7 +87,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Exercises" }).click();
 
     const firstExerciseButton = page.getByRole("button", {
-      name: /Exercise 1: Erase the Tape/i,
+      name: /Exercise 3: Erase the Tape/i,
     });
 
     await firstExerciseButton.click();
@@ -172,7 +172,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Exercises" }).click();
     await page
       .getByRole("button", {
-        name: /Exercise 2: Invert a Binary Word/i,
+        name: /Exercise 4: Invert a Binary Word/i,
       })
       .click();
     await page.getByRole("button", { name: "Open in simulation" }).click();
@@ -205,7 +205,7 @@ test.describe("Turing Machine page", () => {
     await page.getByRole("button", { name: "Exercises" }).click();
     await page
       .getByRole("button", {
-        name: /Exercise 1: Erase the Tape/i,
+        name: /Exercise 3: Erase the Tape/i,
       })
       .click();
     await page.getByRole("button", { name: "Open in simulation" }).click();

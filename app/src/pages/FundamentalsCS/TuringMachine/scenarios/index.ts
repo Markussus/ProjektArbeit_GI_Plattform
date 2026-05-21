@@ -832,6 +832,18 @@ export const turingMachineExamples: TuringMachineExampleScenario[] = [
       icon: Binary,
     },
   },
+  {
+    kind: "example",
+    id: "tm.examples.example4",
+    titleKey: "tm.examples.example4",
+    descriptionKey: "tm.examples.example4Desc",
+    program: addBinary,
+    definition: {
+      titleKey: "tm.examples.example4",
+      descriptionKey: "tm.examples.example4Desc",
+      icon: Binary,
+    },
+  },
 ];
 
 export const turingMachineExerciseDefinitions: ExerciseDefinition[] =
