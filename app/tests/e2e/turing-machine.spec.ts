@@ -3,7 +3,15 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
 const ERASE_TAPE_EXERCISE_ID = "tm.exercises.exerciseEraseTape";
 const INVERT_BINARY_WORD_EXERCISE_ID = "tm.exercises.exerciseInvertBinaryWord";
+const UNARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseUnaryIncrement";
+const BINARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseBinaryIncrement";
+const ADD_BINARY_EXERCISE_ID = "tm.exercises.exerciseAddBinary";
+const CHECK_REGEX_EXERCISE_ID = "tm.exercises.exerciseCheckRegex";
 const BIT_FLIP_EXAMPLE_ID = "tm.examples.example1";
+const UNARY_INCREMENT_EXAMPLE_ID = "tm.examples.example2";
+const BINARY_INCREMENT_EXAMPLE_ID = "tm.examples.example3";
+const ADD_BINARY_EXAMPLE_ID = "tm.examples.example4";
+const BLANK_SYMBOL = "\u25ca";
 const Q1_SUBSCRIPT = "q\u2081";
 
 async function gotoTuringMachinePage(page: Page) {
@@ -17,13 +25,31 @@ async function gotoTuringMachinePage(page: Page) {
 }
 
 async function openSimulationTab(page: Page) {
-  await page.getByTestId("tab-button-simulation").click();
+  await switchTab(page, "simulation");
 
   await expect(page.getByTestId("tm-config-view")).toBeVisible();
 }
 
+async function switchTab(
+  page: Page,
+  tab: "overview" | "exercises" | "examples" | "simulation",
+) {
+  await page.getByTestId(`tab-button-${tab}`).click();
+
+  const tabExitConfirm = page.getByTestId("module-tab-exit-confirm");
+  const requiresConfirm = await tabExitConfirm
+    .waitFor({ state: "visible", timeout: 500 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (requiresConfirm) {
+    await page.getByTestId("module-tab-exit-confirm-confirm").click();
+  }
+}
+
 async function openExerciseInSimulation(page: Page, exerciseId: string) {
-  await page.getByTestId("tab-button-exercises").click();
+  await switchTab(page, "exercises");
+  await expect(page.getByTestId("tm-exercises-tab")).toBeVisible();
   await page.getByTestId(`tm-exercise-card-${exerciseId}-select`).click();
   await page.getByTestId(`tm-exercise-card-${exerciseId}-open`).click();
 
@@ -38,9 +64,58 @@ async function openExerciseInSimulation(page: Page, exerciseId: string) {
   await expect(page.getByTestId("tm-check-solution")).toBeEnabled();
 }
 
+async function openExampleInSimulation(page: Page, exampleId: string) {
+  await switchTab(page, "examples");
+  await expect(page.getByTestId("tm-examples-tab")).toBeVisible();
+  await page.getByTestId(`tm-example-card-${exampleId}-select`).click();
+  await page.getByTestId(`tm-example-card-${exampleId}-open`).click();
+
+  await expect(
+    page.getByTestId("simulation-selected-exercise"),
+  ).toHaveAttribute("data-item-id", exampleId);
+  await expect(page.getByTestId("tm-simulator")).toHaveAttribute(
+    "data-scenario-id",
+    exampleId,
+  );
+  await expect(page.getByTestId("tm-config-view")).toBeVisible();
+}
+
 async function loadSolution(page: Page) {
   await expect(page.getByTestId("tm-load-solution")).toBeEnabled();
   await page.getByTestId("tm-load-solution").click();
+}
+
+async function checkLoadedSolutionPasses(page: Page) {
+  await expect(page.getByTestId("tm-check-solution")).toBeEnabled();
+  await page.getByTestId("tm-check-solution").click();
+  await expect(page.getByTestId("tm-solution-check-dialog")).toBeVisible();
+  await expect(page.getByTestId("tm-solution-check-error")).toHaveCount(0);
+  await expect(solutionRowsByPassed(page, false)).toHaveCount(0);
+  await expect(solutionRows(page).first()).toHaveAttribute(
+    "data-passed",
+    "true",
+  );
+  await page.getByTestId("tm-solution-check-dialog-close").click();
+  await expect(page.getByTestId("tm-solution-check-dialog")).toHaveCount(0);
+}
+
+async function startSimulation(page: Page) {
+  await page.getByTestId("tm-start-simulation").click();
+  await expect(page.getByTestId("tm-simulation-view")).toBeVisible();
+}
+
+async function stepForward(page: Page, count: number) {
+  for (let step = 0; step < count; step += 1) {
+    await page.getByTestId("tm-simulator-controls-step").click();
+  }
+}
+
+async function expectTapeWord(page: Page, expectedWord: string) {
+  for (const [index, expectedSymbol] of Array.from(expectedWord).entries()) {
+    await expect(page.getByTestId(`tm-tape-cell-value-${index}`)).toHaveText(
+      expectedSymbol,
+    );
+  }
 }
 
 function transitionTable(page: Page): Locator {
@@ -371,5 +446,84 @@ test.describe("Turing Machine page", () => {
 
     await page.getByTestId("tm-edit-configuration").click();
     await expect(page.getByTestId("tm-config-view")).toBeVisible();
+  });
+
+  // Tests all bundled example cards can open in the simulator and produce a runnable configuration.
+  test("opens every bundled example in the simulation workspace", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+
+    for (const exampleId of [
+      BIT_FLIP_EXAMPLE_ID,
+      UNARY_INCREMENT_EXAMPLE_ID,
+      BINARY_INCREMENT_EXAMPLE_ID,
+      ADD_BINARY_EXAMPLE_ID,
+    ]) {
+      await openExampleInSimulation(page, exampleId);
+      await startSimulation(page);
+      await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+        "data-step-count",
+        "0",
+      );
+      await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+        "data-halted",
+        "false",
+      );
+      await page.getByTestId("tm-edit-configuration").click();
+      await expect(page.getByTestId("tm-config-view")).toBeVisible();
+    }
+  });
+
+  // Tests representative easy and hard exercise solutions through the full load-and-check workflow.
+  test("loads and checks several exercise solutions successfully", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+
+    for (const exerciseId of [
+      ERASE_TAPE_EXERCISE_ID,
+      INVERT_BINARY_WORD_EXERCISE_ID,
+      UNARY_INCREMENT_EXERCISE_ID,
+      BINARY_INCREMENT_EXERCISE_ID,
+      ADD_BINARY_EXERCISE_ID,
+      CHECK_REGEX_EXERCISE_ID,
+    ]) {
+      await openExerciseInSimulation(page, exerciseId);
+      await loadSolution(page);
+      await checkLoadedSolutionPasses(page);
+    }
+  });
+
+  // Tests building the bit-inverter machine from the blank simulator instead of loading an example or solution.
+  test("builds and runs a bit inverter from scratch", async ({ page }) => {
+    await gotoTuringMachinePage(page);
+    await openSimulationTab(page);
+
+    await page.getByTestId("tm-initial-tape-input").fill("101001");
+
+    await transitionCellInput(page, 1, 2).fill(`(qS, ${BLANK_SYMBOL}, N)`);
+    await transitionCellInput(page, 1, 2).blur();
+    await transitionCellInput(page, 2, 2).fill("(q0, 1, R)");
+    await transitionCellInput(page, 2, 2).blur();
+    await transitionCellInput(page, 3, 2).fill("(q0, 0, R)");
+    await transitionCellInput(page, 3, 2).blur();
+
+    await startSimulation(page);
+    await stepForward(page, 7);
+
+    await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+      "data-current-state",
+      "qS",
+    );
+    await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+      "data-step-count",
+      "7",
+    );
+    await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+      "data-halted",
+      "true",
+    );
+    await expectTapeWord(page, "010110");
   });
 });
