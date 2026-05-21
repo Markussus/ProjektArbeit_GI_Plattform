@@ -759,6 +759,18 @@
       "concept4": "Church-Turing Thesis"
     },
     "exercises": {
+      "exerciseWorksheetAlternatingSymbols": "Check Alternating Symbols",
+      "exerciseWorksheetAlternatingSymbolsDesc": "Given a binary word over {0, 1}, construct a Turing machine that checks whether 0 and 1 always alternate, halting as soon as two equal symbols follow each other or the end of the input is reached.",
+      "exerciseWorksheetSwapFirstTwoSymbols": "Swap the First Two Symbols",
+      "exerciseWorksheetSwapFirstTwoSymbolsDesc": "Construct a Turing machine that swaps the first two input symbols, leaves all remaining symbols unchanged, and finishes on the third symbol.",
+      "exerciseWorksheetSetFirstAndLastToOne": "Set First and Last Symbol to 1",
+      "exerciseWorksheetSetFirstAndLastToOneDesc": "Construct a Turing machine that overwrites the first and last input symbols with 1, leaves all other symbols unchanged, and finishes on the last input symbol.",
+      "exerciseWorksheetAlternatingOverwrite": "Alternating Overwrite",
+      "exerciseWorksheetAlternatingOverwriteDesc": "Construct a Turing machine that overwrites the input from left to right with alternating 0 and 1 symbols and finishes on the last input symbol.",
+      "exerciseWorksheetOverwriteLastTwoWithZero": "Set the Last Two Symbols to 0",
+      "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Construct a Turing machine that overwrites the last two input symbols with 0 and finishes on the last input symbol.",
+      "exerciseWorksheetAsciiParityBit": "Set the ASCII Parity Bit",
+      "exerciseWorksheetAsciiParityBitDesc": "Given an input of exactly seven bits, construct a Turing machine that counts the number of ones, writes the even-parity bit to the blank cell left of the input, and finishes on the first blank cell after the input.",
       "exerciseEraseTape": "Erase the Tape",
       "exerciseEraseTapeDesc": "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
       "exerciseInvertBinaryWord": "Invert a Binary Word",

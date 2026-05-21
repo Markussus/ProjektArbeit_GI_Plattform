@@ -755,6 +755,18 @@
       "concept4": "Church-Turing-These"
     },
     "exercises": {
+      "exerciseWorksheetAlternatingSymbols": "Abwechselnde Symbole prüfen",
+      "exerciseWorksheetAlternatingSymbolsDesc": "Gegeben ist ein Binärwort über {0, 1}. Konstruieren Sie eine Turingmaschine, die prüft, ob sich 0 und 1 immer abwechseln, und anhält, sobald zwei gleiche Symbole aufeinander folgen oder das Ende der Eingabe erreicht ist.",
+      "exerciseWorksheetSwapFirstTwoSymbols": "Erste zwei Symbole vertauschen",
+      "exerciseWorksheetSwapFirstTwoSymbolsDesc": "Konstruieren Sie eine Turingmaschine, die die ersten beiden Symbole der Eingabe vertauscht, alle weiteren Symbole unverändert lässt und am Ende auf dem dritten Symbol steht.",
+      "exerciseWorksheetSetFirstAndLastToOne": "Erstes und letztes Symbol auf 1 setzen",
+      "exerciseWorksheetSetFirstAndLastToOneDesc": "Konstruieren Sie eine Turingmaschine, die das erste und das letzte Zeichen der Eingabe mit 1 überschreibt, alle anderen Symbole unverändert lässt und am Ende auf dem letzten Eingabesymbol steht.",
+      "exerciseWorksheetAlternatingOverwrite": "Eingabe abwechselnd überschreiben",
+      "exerciseWorksheetAlternatingOverwriteDesc": "Konstruieren Sie eine Turingmaschine, die die Eingabe von links nach rechts abwechselnd mit 0 und 1 überschreibt und am Ende auf dem letzten Eingabesymbol stehen bleibt.",
+      "exerciseWorksheetOverwriteLastTwoWithZero": "Letzte zwei Symbole auf 0 setzen",
+      "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Konstruieren Sie eine Turingmaschine, die die letzten beiden Symbole der Eingabe mit 0 überschreibt und am Ende auf dem letzten Eingabesymbol stehen bleibt.",
+      "exerciseWorksheetAsciiParityBit": "ASCII-Paritätsbit setzen",
+      "exerciseWorksheetAsciiParityBitDesc": "Gegeben ist eine Eingabe aus genau sieben Bits. Konstruieren Sie eine Turingmaschine, die die Anzahl der Einsen zählt, links vor der Eingabe das Paritätsbit für gerade Parität setzt und am Ende auf dem ersten Leerzeichen nach der Eingabe steht.",
       "exerciseEraseTape": "Band löschen",
       "exerciseEraseTapeDesc": "Bauen Sie eine Maschine, die das gesamte Eingabewort durch Blanks ersetzt und erst anhält, wenn das Band leer ist.",
       "exerciseInvertBinaryWord": "Binärwort invertieren",

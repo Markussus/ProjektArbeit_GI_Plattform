@@ -5,23 +5,30 @@ import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/
 import { turingMachineExercises } from "@/pages/FundamentalsCS/TuringMachine/scenarios";
 
 describe("tmSolutionChecker", () => {
-  // Tests that the shipped reference solution for an exercise passes all predefined validation inputs and halts via a real halt state.
-  it("accepts the reference solution for exercise 1", () => {
-    const exercise = turingMachineExercises[0];
-    const result = runTMValidation(
-      exercise.solutionProgram,
-      exercise.validationCases,
-    );
+  const invertBinaryWordExercise = turingMachineExercises.find(
+    (exercise) => exercise.id === "tm.exercises.exerciseInvertBinaryWord",
+  );
 
-    expect(result.error).toBeNull();
-    expect(result.rows).toHaveLength(exercise.validationCases.length);
-    expect(result.rows.every((row) => row.passed)).toBe(true);
-    expect(result.rows.every((row) => row.endedInValidHaltState)).toBe(true);
-  });
+  // Tests that all shipped reference solutions pass their predefined validation inputs and halt via a real halt state.
+  it.each(turingMachineExercises)(
+    "accepts the reference solution for $id",
+    (exercise) => {
+      const result = runTMValidation(
+        exercise.solutionProgram,
+        exercise.validationCases,
+      );
+
+      expect(result.error).toBeNull();
+      expect(result.rows).toHaveLength(exercise.validationCases.length);
+      expect(result.rows.every((row) => row.passed)).toBe(true);
+      expect(result.rows.every((row) => row.endedInValidHaltState)).toBe(true);
+    },
+  );
 
   // Tests the stale-input-alphabet regression: validation must re-derive the alphabet for each case instead of trusting whatever tape the editor currently holds.
   it("re-derives the input alphabet for each validation input", () => {
-    const exercise = turingMachineExercises[1];
+    expect(invertBinaryWordExercise).toBeDefined();
+    const exercise = invertBinaryWordExercise!;
     const result = runTMValidation(
       {
         ...exercise.solutionProgram,
@@ -47,7 +54,8 @@ describe("tmSolutionChecker", () => {
 
   // Tests that a starter exercise machine without transitions fails the validation and reports that it did not end in a valid halt state.
   it("reports invalid halt outcomes for an unfinished starter machine", () => {
-    const exercise = turingMachineExercises[1];
+    expect(invertBinaryWordExercise).toBeDefined();
+    const exercise = invertBinaryWordExercise!;
     const result = runTMValidation(exercise.starterProgram, [
       exercise.validationCases[1],
     ]);
