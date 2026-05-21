@@ -325,6 +325,38 @@ test.describe("Turing Machine page", () => {
       .click({ force: true });
   });
 
+  // Tests that the keyboard-friendly blank alias is accepted in visible tape and transition inputs.
+  test("accepts <> as the blank symbol in tape and transition inputs", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openSimulationTab(page);
+
+    const initialTapeInput = page.getByTestId("tm-initial-tape-input");
+    await initialTapeInput.fill("<>");
+    await expect(initialTapeInput).toHaveValue(BLANK_SYMBOL);
+
+    const blankTransitionCell = transitionCellInput(page, 1, 2);
+    await blankTransitionCell.fill("(qS, <>, N)");
+    await blankTransitionCell.blur();
+    await expect(blankTransitionCell).toHaveValue(`(qS, ${BLANK_SYMBOL}, N)`);
+
+    await expect(page.getByTestId("tm-input-alphabet-symbol-◊")).toBeVisible();
+    await expect(page.getByTestId("tm-start-simulation")).toBeEnabled();
+
+    await startSimulation(page);
+    await page.getByTestId("tm-simulator-controls-step").click();
+
+    await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+      "data-current-state",
+      "qS",
+    );
+    await expect(page.getByTestId("tm-status-card")).toHaveAttribute(
+      "data-halted",
+      "true",
+    );
+  });
+
   // Tests cell-level validation errors, the blocking editor state, and program-level validation before the configuration can be applied.
   test("validates invalid symbol, transition, and program configurations before starting the simulation", async ({
     page,

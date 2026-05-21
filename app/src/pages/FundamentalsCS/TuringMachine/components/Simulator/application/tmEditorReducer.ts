@@ -1,7 +1,13 @@
 import { cloneJson } from "@/lib/utils";
 import { deriveTapeAlphabet, withDerivedAlphabets } from "../domain/tmProgram";
 import type { TMProgram } from "../domain/tmProgram";
-import type { StateName, TapeSymbol, TMTransition } from "../domain/tmTypes";
+import {
+  normalizeTapeSymbolInput,
+  parseTapeInput,
+  type StateName,
+  type TapeSymbol,
+  type TMTransition,
+} from "../domain/tmTypes";
 
 export type TMEditorAction =
   | { type: "replace_program"; program: TMProgram }
@@ -36,7 +42,7 @@ export function tmEditorReducer(
     case "set_initial_tape":
       return withDerivedAlphabets({
         ...program,
-        initialTape: action.value.split(""),
+        initialTape: parseTapeInput(action.value),
       });
     case "set_initial_state":
       return updateInitialState(program, action.state);
@@ -148,7 +154,7 @@ function renameTapeSymbol(
   currentSymbol: TapeSymbol,
   nextSymbol: TapeSymbol,
 ): TMProgram {
-  const normalizedNextSymbol = nextSymbol.trim();
+  const normalizedNextSymbol = normalizeTapeSymbolInput(nextSymbol);
 
   if (
     currentSymbol === normalizedNextSymbol ||
