@@ -5,12 +5,34 @@ import { UTF8Encoder } from "./UTF8Encoder";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
+import type { GeneratedExercise } from "../utils/exerciseGenerator";
 
 type EncoderMode = "base64" | "utf8";
 
 interface EncoderSimulatorProps {
   selectedExercise?: TopicItem | null;
   onExitExercise?: () => void;
+}
+
+function getGeneratedExerciseData(item: TopicItem | null | undefined): {
+  isGenerated: boolean;
+  mode?: "base64" | "utf8";
+  converterMode?: "encode" | "decode";
+  initialValue?: string;
+  answer?: string;
+} {
+  if (!item) return { isGenerated: false };
+  if ("exerciseType" in item && "mode" in item && "initialValue" in item) {
+    const gen = item as unknown as GeneratedExercise;
+    return {
+      isGenerated: true,
+      mode: gen.mode,
+      converterMode: gen.converterMode,
+      initialValue: gen.initialValue,
+      answer: gen.answer,
+    };
+  }
+  return { isGenerated: false };
 }
 
 export function EncoderSimulator({
@@ -31,35 +53,48 @@ export function EncoderSimulator({
     "encode" | "decode"
   >("encode");
 
+  const [expectedAnswer, setExpectedAnswer] = useState<string>("");
+
   useEffect(() => {
     if (selectedExercise) {
       const isExample = selectedExercise.id.includes(".example");
+      const genData = getGeneratedExerciseData(selectedExercise);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsExerciseMode(!isExample);
       setShowSolution(isExample);
 
-      if (selectedExercise.id === "encoding.ex_base64_placeholder") {
+      if (genData.isGenerated && genData.mode) {
+        setActiveMode(genData.mode);
+        setInitialConverterMode(genData.converterMode || "encode");
+        setInitialValue(genData.initialValue || "");
+        setExpectedAnswer(genData.answer || "");
+      } else if (selectedExercise.id === "encoding.ex_base64_placeholder") {
         setActiveMode("base64");
         setInitialConverterMode("encode");
         setInitialValue("Hello");
+        setExpectedAnswer("");
       } else if (selectedExercise.id === "encoding.ex_utf8_placeholder") {
         setActiveMode("utf8");
         setInitialConverterMode("encode");
         setInitialValue("A");
+        setExpectedAnswer("");
       } else if (selectedExercise.id === "encoding.example_base64_1") {
         setActiveMode("base64");
         setInitialConverterMode("encode");
         setInitialValue("Hello");
+        setExpectedAnswer("");
       } else if (selectedExercise.id === "encoding.example_utf8_1") {
         setActiveMode("utf8");
         setInitialConverterMode("encode");
         setInitialValue("Hello");
+        setExpectedAnswer("");
       }
     } else {
       setIsExerciseMode(false);
       setShowSolution(true);
       setInitialValue("");
       setInitialConverterMode("encode");
+      setExpectedAnswer("");
     }
   }, [selectedExercise]);
 
@@ -128,6 +163,7 @@ export function EncoderSimulator({
             onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
+            expectedAnswer={expectedAnswer || undefined}
           />
         )}
         {activeMode === "utf8" && (
@@ -143,6 +179,7 @@ export function EncoderSimulator({
             onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
+            expectedAnswer={expectedAnswer || undefined}
           />
         )}
       </div>

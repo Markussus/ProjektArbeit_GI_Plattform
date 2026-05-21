@@ -21,6 +21,7 @@ interface UTF8EncoderProps {
   onExitExercise?: () => void;
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
+  expectedAnswer?: string;
 }
 
 interface CharEncodingStep {
@@ -76,21 +77,6 @@ function getUtf8Bytes(codePoint: number): number[] {
   return [];
 }
 
-function getBytePattern(byteCount: number): string {
-  switch (byteCount) {
-    case 1:
-      return "0xxxxxxx";
-    case 2:
-      return "110xxxxx 10xxxxxx";
-    case 3:
-      return "1110xxxx 10xxxxxx 10xxxxxx";
-    case 4:
-      return "11110xxx 10xxxxxx 10xxxxxx 10xxxxxx";
-    default:
-      return "";
-  }
-}
-
 function displayChar(char: string): string {
   const code = char.codePointAt(0) ?? 0;
   if (code < 0x20 || (code >= 0x7f && code < 0xa0)) {
@@ -101,6 +87,91 @@ function displayChar(char: string): string {
 
 function displayText(text: string): string {
   return Array.from(text).map(displayChar).join("");
+}
+
+interface Utf8BitSegment {
+  type: "control" | "payload";
+  bits: string;
+}
+
+function getUtf8BitSegments(
+  binary: string,
+  byteType: "single" | "lead" | "cont",
+  byteCount: number,
+): Utf8BitSegment[] {
+  const controlLengths: Record<string, number> = {
+    "1": 1,
+    "2-lead": 3,
+    "2-cont": 2,
+    "3-lead": 4,
+    "3-cont": 2,
+    "4-lead": 5,
+    "4-cont": 2,
+  };
+  const key = byteCount === 1 ? "1" : `${byteCount}-${byteType}`;
+  const controlLen = controlLengths[key] ?? 0;
+  const payloadLen = 8 - controlLen;
+  return [
+    { type: "control", bits: binary.slice(0, controlLen) },
+    {
+      type: "payload",
+      bits: binary.slice(controlLen, controlLen + payloadLen),
+    },
+  ];
+}
+
+function Utf8BitDisplay({ segments }: { segments: Utf8BitSegment[] }) {
+  return (
+    <span className="font-mono">
+      {segments.map((seg, i) => (
+        <span
+          key={i}
+          className={
+            seg.type === "control"
+              ? "font-bold text-red-500 dark:text-red-400"
+              : "text-blue-500 dark:text-blue-400"
+          }
+        >
+          {seg.bits}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function getUtf8PatternDisplay(byteCount: number): React.ReactNode {
+  const patterns: Record<number, { control: string; payload: string }[]> = {
+    1: [{ control: "0", payload: "xxxxxxx" }],
+    2: [
+      { control: "110", payload: "xxxxx" },
+      { control: "10", payload: "xxxxxx" },
+    ],
+    3: [
+      { control: "1110", payload: "xxxx" },
+      { control: "10", payload: "xxxxxx" },
+      { control: "10", payload: "xxxxxx" },
+    ],
+    4: [
+      { control: "11110", payload: "xxx" },
+      { control: "10", payload: "xxxxxx" },
+      { control: "10", payload: "xxxxxx" },
+      { control: "10", payload: "xxxxxx" },
+    ],
+  };
+  const bytes = patterns[byteCount] ?? [];
+  return (
+    <span className="font-mono">
+      {bytes.map((b, i) => (
+        <span key={i}>
+          {i > 0 && <span className="text-muted-foreground"> </span>}
+          <span className="font-bold text-red-500 dark:text-red-400">
+            {b.control}
+          </span>
+          <span className="text-blue-500 dark:text-blue-400">{b.payload}</span>
+        </span>
+      ))}
+    </span>
+  );
 }
 
 function decodeUtf8(hexString: string): string {
@@ -165,6 +236,7 @@ export function UTF8Encoder({
   onExitExercise,
   initialValue = "",
   initialConverterMode = "encode",
+  expectedAnswer,
 }: UTF8EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -452,7 +524,7 @@ export function UTF8Encoder({
       resultPanel={
         isExerciseMode && !showSolution ? (
           <ExerciseValidationPanel
-            expectedResult={expectedResults}
+            expectedResult={expectedAnswer || expectedResults}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
             inputMode={inputMode}
@@ -515,9 +587,7 @@ export function UTF8Encoder({
                           </p>
                           <p>
                             {t("simulator.encoding.bytePattern")}:{" "}
-                            <code className="font-mono">
-                              {getBytePattern(step.byteCount)}
-                            </code>
+                            {getUtf8PatternDisplay(step.byteCount)}
                           </p>
                         </div>
                       </CollapsibleStep>
@@ -547,27 +617,51 @@ export function UTF8Encoder({
                         }
                       >
                         <div className="space-y-2 text-sm">
-                          {step.bytes.map((_byte, bi) => (
-                            <div key={bi} className="space-y-1">
-                              <p className="font-medium">
-                                {t("simulator.encoding.byteN", {
-                                  n: bi + 1,
-                                })}
-                              </p>
-                              <p>
-                                {t("simulator.encoding.hexLabel")}:{" "}
-                                <code className="font-mono">
-                                  {step.bytesHex[bi]}
-                                </code>
-                              </p>
-                              <p>
-                                {t("simulator.encoding.binaryLabel")}:{" "}
-                                <code className="font-mono">
-                                  {step.bytesBinary[bi]}
-                                </code>
-                              </p>
-                            </div>
-                          ))}
+                          {step.bytes.map((_byte, bi) => {
+                            const byteType =
+                              bi === 0
+                                ? step.byteCount === 1
+                                  ? "single"
+                                  : "lead"
+                                : "cont";
+                            const segments = getUtf8BitSegments(
+                              step.bytesBinary[bi],
+                              byteType,
+                              step.byteCount,
+                            );
+                            return (
+                              <div key={bi} className="space-y-1">
+                                <p className="font-medium">
+                                  {t("simulator.encoding.byteN", {
+                                    n: bi + 1,
+                                  })}
+                                  {step.byteCount > 1 && (
+                                    <span className="text-muted-foreground ml-2 text-xs">
+                                      (
+                                      {byteType === "lead"
+                                        ? t("simulator.encoding.leadByte", {
+                                            count: step.byteCount,
+                                          })
+                                        : t(
+                                            "simulator.encoding.continuationByte",
+                                          )}
+                                      )
+                                    </span>
+                                  )}
+                                </p>
+                                <p>
+                                  {t("simulator.encoding.hexLabel")}:{" "}
+                                  <code className="font-mono">
+                                    {step.bytesHex[bi]}
+                                  </code>
+                                </p>
+                                <p>
+                                  {t("simulator.encoding.binaryLabel")}:{" "}
+                                  <Utf8BitDisplay segments={segments} />
+                                </p>
+                              </div>
+                            );
+                          })}
                         </div>
                       </CollapsibleStep>
                     ))}
@@ -592,9 +686,33 @@ export function UTF8Encoder({
                       <p className="text-muted-foreground mt-3 mb-1">
                         {t("simulator.encoding.binarySequence")}:
                       </p>
-                      <p className="break-all">
-                        {charSteps.flatMap((s) => s.bytesBinary).join(" ")}
-                      </p>
+                      <div className="flex flex-wrap gap-1 break-all">
+                        {charSteps.map((step) =>
+                          step.bytesBinary.map((binary, bi) => {
+                            const byteType =
+                              bi === 0
+                                ? step.byteCount === 1
+                                  ? "single"
+                                  : "lead"
+                                : "cont";
+                            const segments = getUtf8BitSegments(
+                              binary,
+                              byteType,
+                              step.byteCount,
+                            );
+                            return (
+                              <span key={`${step.index}-${bi}`}>
+                                {bi > 0 && (
+                                  <span className="text-muted-foreground">
+                                    {" "}
+                                  </span>
+                                )}
+                                <Utf8BitDisplay segments={segments} />
+                              </span>
+                            );
+                          }),
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -647,7 +765,13 @@ export function UTF8Encoder({
                           </p>
                           <p>
                             {t("simulator.encoding.binaryLabel")}:{" "}
-                            <code className="font-mono">{step.binary}</code>
+                            <Utf8BitDisplay
+                              segments={getUtf8BitSegments(
+                                step.binary,
+                                step.byteType,
+                                step.byteType === "lead" ? step.byteCount : 1,
+                              )}
+                            />
                           </p>
                           <p>
                             {t("simulator.encoding.byteTypeLabel")}:{" "}

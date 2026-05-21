@@ -24,12 +24,14 @@ interface Base64EncoderProps {
   onExitExercise?: () => void;
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
+  expectedAnswer?: string;
 }
 
 interface EncodingStep {
   index: number;
   char: string;
   ascii: number;
+  hex: string;
   binary: string;
 }
 
@@ -61,6 +63,7 @@ export function Base64Encoder({
   onExitExercise,
   initialValue = "",
   initialConverterMode = "encode",
+  expectedAnswer,
 }: Base64EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -75,6 +78,7 @@ export function Base64Encoder({
       index: i,
       char,
       ascii: char.charCodeAt(0),
+      hex: char.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"),
       binary: char.charCodeAt(0).toString(2).padStart(8, "0"),
     }));
   }, [inputValue, converterMode]);
@@ -287,7 +291,7 @@ export function Base64Encoder({
       resultPanel={
         isExerciseMode && !showSolution ? (
           <ExerciseValidationPanel
-            expectedResult={expectedResults}
+            expectedResult={expectedAnswer || expectedResults}
             onShowSolution={onShowSolution!}
             onExitExercise={onExitExercise}
             inputMode={inputMode}
@@ -325,7 +329,8 @@ export function Base64Encoder({
                         onToggle={() => toggle(`char-${step.index}`)}
                         header={
                           <span className="font-mono text-sm">
-                            '{step.char}' → {step.ascii} → {step.binary}
+                            '{step.char}' → {step.ascii} ({step.hex}) →{" "}
+                            {step.binary}
                           </span>
                         }
                       >
@@ -337,6 +342,10 @@ export function Base64Encoder({
                           <p>
                             {t("simulator.encoding.asciiLabel")}:{" "}
                             <code className="font-mono">{step.ascii}</code>
+                            <span className="text-muted-foreground ml-2">
+                              (Hex:{" "}
+                              <code className="font-mono">{step.hex}</code>)
+                            </span>
                           </p>
                           <p>
                             {t("simulator.encoding.binaryLabel")}:{" "}
@@ -358,8 +367,23 @@ export function Base64Encoder({
                     <h4 className="text-foreground text-sm font-medium">
                       {t("simulator.encoding.step2GroupBits")}
                     </h4>
-                    <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                      {encodingSteps.map((s) => s.binary).join("")}
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-muted-foreground mb-1 text-xs">
+                          ASCII-Hex:
+                        </p>
+                        <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+                          {encodingSteps.map((s) => s.hex).join(" ")}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground mb-1 text-xs">
+                          Binary (concatenated):
+                        </p>
+                        <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+                          {encodingSteps.map((s) => s.binary).join("")}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
