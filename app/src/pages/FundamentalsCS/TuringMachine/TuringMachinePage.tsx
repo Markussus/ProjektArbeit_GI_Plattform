@@ -13,6 +13,7 @@ export function TuringMachinePage() {
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      testId="tm-page"
     />
   );
 }

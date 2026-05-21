@@ -26,37 +26,52 @@ export function TMSimulationStatusCard({
       : null;
 
   return (
-    <div className="bg-card w-full max-w-md rounded-lg border p-4">
+    <div
+      data-testid="tm-status-card"
+      data-current-state={runtime.currentState}
+      data-current-symbol={currentSymbol}
+      data-step-count={runtime.stepCount}
+      data-halted={runtime.halted}
+      className="bg-card w-full max-w-md rounded-lg border p-4"
+    >
       <h3 className="mb-2 font-semibold">{t("tm.sim.status.status")}</h3>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div className="text-muted-foreground">{t("tm.sim.status.state")}:</div>
-        <div className="font-mono">
+        <div data-testid="tm-status-current-state" className="font-mono">
           {formatTMStateName(runtime.currentState)}
         </div>
 
         <div className="text-muted-foreground">
           {t("tm.sim.status.symbol")}:
         </div>
-        <div className="font-mono">{currentSymbol}</div>
+        <div data-testid="tm-status-current-symbol" className="font-mono">
+          {currentSymbol}
+        </div>
 
         <div className="text-muted-foreground">{t("tm.sim.status.step")}:</div>
-        <div>{runtime.stepCount}</div>
+        <div data-testid="tm-status-step-count">{runtime.stepCount}</div>
 
         <div className="text-muted-foreground">{t("tm.sim.status.halt")}:</div>
-        <div>
+        <div data-testid="tm-status-halted">
           {runtime.halted ? t("tm.sim.status.yes") : t("tm.sim.status.no")}
         </div>
       </div>
 
       {haltReasonMessage && (
-        <div className="bg-destructive/10 text-destructive mt-4 rounded p-2 text-sm">
+        <div
+          data-testid="tm-status-halt-reason"
+          className="bg-destructive/10 text-destructive mt-4 rounded p-2 text-sm"
+        >
           {haltReasonMessage}
         </div>
       )}
 
       {error && (
-        <div className="bg-destructive/10 text-destructive mt-4 rounded p-2 text-sm">
+        <div
+          data-testid="tm-status-error"
+          className="bg-destructive/10 text-destructive mt-4 rounded p-2 text-sm"
+        >
           {error.message}
         </div>
       )}

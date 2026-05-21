@@ -40,8 +40,8 @@ export function TMHaltStatesPanel({
   }, [initialState, newState, onAddHaltState, states]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="mb-2 min-h-[3.5rem]">
+    <div data-testid="tm-halt-states-panel" className="flex flex-col gap-2">
+      <div data-testid="tm-halt-states-header" className="mb-2 min-h-[3.5rem]">
         <h3 className="text-md font-semibold">
           {t("tm.config.haltStates.haltStates")}
         </h3>
@@ -50,13 +50,19 @@ export function TMHaltStatesPanel({
         </p>
       </div>
 
-      <div className="bg-card flex flex-col gap-2 rounded border p-3">
+      <div
+        data-testid="tm-halt-states-list"
+        className="bg-card flex flex-col gap-2 rounded border p-3"
+      >
         {selectableStates.map((state) => {
           const isChecked = haltStates.includes(state);
 
           return (
             <label
               key={state}
+              data-testid={`tm-halt-state-${state}`}
+              data-state={state}
+              data-checked={isChecked}
               className="flex cursor-pointer items-center gap-2"
             >
               <input
@@ -64,6 +70,7 @@ export function TMHaltStatesPanel({
                 checked={isChecked}
                 onChange={(event) => onToggle(state, event.target.checked)}
                 disabled={disabled}
+                data-testid={`tm-halt-state-input-${state}`}
                 className="peer sr-only"
               />
               <span className="border-input bg-background peer-focus-visible:ring-brand peer-checked:bg-brand peer-checked:border-brand flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:outline-none peer-disabled:opacity-50">
@@ -100,6 +107,7 @@ export function TMHaltStatesPanel({
               commitNewState();
             }}
             disabled={disabled}
+            data-testid="tm-add-halt-state-input"
             placeholder={t("tm.config.haltStates.addHaltStatePlaceholder")}
             aria-label={t("tm.config.haltStates.addHaltState")}
             className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"

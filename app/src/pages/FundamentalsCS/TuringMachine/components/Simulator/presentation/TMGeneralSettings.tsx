@@ -40,12 +40,13 @@ export function TMGeneralSettings({
 
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div data-testid="tm-initial-tape-field" className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
           {t("tm.config.general.initialTape")}
         </label>
         <input
           type="text"
+          data-testid="tm-initial-tape-input"
           className="h-12 w-full rounded border px-3 py-2 font-mono text-lg"
           value={program.initialTape.join("")}
           onChange={(event) => onInitialTapeChange(event.target.value)}
@@ -54,7 +55,7 @@ export function TMGeneralSettings({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div data-testid="tm-start-state-field" className="flex flex-col gap-2">
         <label className="text-sm font-semibold">
           {t("tm.config.general.startState")}
         </label>
@@ -66,6 +67,9 @@ export function TMGeneralSettings({
           disabled={disabled}
           triggerClassName="h-12 w-full px-3 py-2"
           menuClassName="right-0 left-0"
+          triggerTestId="tm-start-state-select"
+          menuTestId="tm-start-state-menu"
+          optionTestIdPrefix="tm-start-state-option"
         />
       </div>
     </>

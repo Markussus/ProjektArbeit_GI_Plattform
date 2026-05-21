@@ -58,12 +58,16 @@ export function TMSimulationView({
   return (
     <div
       ref={responsiveBoundaryRef}
+      data-testid="tm-simulation-view"
       className="mx-auto flex w-full max-w-6xl flex-col gap-8"
     >
       <div className="flex w-full items-center justify-between">
-        <h2 className="text-xl font-bold">{t("tm.sim.screen.title")}</h2>
+        <h2 data-testid="tm-simulation-title" className="text-xl font-bold">
+          {t("tm.sim.screen.title")}
+        </h2>
         <button
           onClick={onEditConfig}
+          data-testid="tm-edit-configuration"
           className="hover:bg-accent rounded-md border px-4 py-2"
         >
           {t("tm.sim.screen.edit")}
@@ -91,6 +95,7 @@ export function TMSimulationView({
             onStepBack={onStepBack}
             onReset={onReset}
             onSpeedChange={onSpeedChange}
+            testIdPrefix="tm-simulator-controls"
           />
 
           <TMSimulationStatusCard
@@ -102,6 +107,7 @@ export function TMSimulationView({
 
         <div className="w-full max-w-full sm:min-w-[20rem] sm:flex-1">
           <TableView
+            testIdPrefix="tm-runtime-transition-table"
             headers={tableHeaders}
             rows={tableRows}
             activeCell={activeCell}

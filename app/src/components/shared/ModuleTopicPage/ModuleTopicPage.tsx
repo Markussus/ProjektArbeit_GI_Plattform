@@ -38,6 +38,7 @@ interface ModuleTopicPageProps {
   examplesTab: ComponentType<ModuleExamplesTabProps>;
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
+  testId?: string;
 }
 
 export function ModuleTopicPage({
@@ -48,6 +49,7 @@ export function ModuleTopicPage({
   examplesTab: ExamplesTab,
   simulationTab: SimulationTab,
   tabs,
+  testId,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
@@ -163,6 +165,7 @@ export function ModuleTopicPage({
 
   return (
     <div
+      data-testid={testId}
       className={cn(
         "transition-all duration-300 ease-in-out",
         isSimulationFocused ? "p-4 md:p-5" : "p-8",
@@ -191,6 +194,7 @@ export function ModuleTopicPage({
           setPendingTab(null);
         }}
         variant="warning"
+        testId="module-tab-exit-confirm"
       />
     </div>
   );

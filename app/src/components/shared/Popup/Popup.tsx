@@ -7,9 +7,10 @@ interface PopupProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  testId?: string;
 }
 
-export function Popup({ open, title, onClose, children }: PopupProps) {
+export function Popup({ open, title, onClose, children, testId }: PopupProps) {
   useEffect(() => {
     if (!open) {
       return;
@@ -39,6 +40,7 @@ export function Popup({ open, title, onClose, children }: PopupProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="popup-title"
+        data-testid={testId}
         className="bg-card text-card-foreground ring-foreground/10 max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-lg ring-1"
         onClick={(event) => event.stopPropagation()}
       >
@@ -49,6 +51,7 @@ export function Popup({ open, title, onClose, children }: PopupProps) {
           <button
             type="button"
             onClick={onClose}
+            data-testid={testId ? `${testId}-close` : undefined}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-9 items-center justify-center rounded-md border"
             aria-label="Close popup"
           >
