@@ -179,14 +179,11 @@
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
     "examplesTitle": "Lecture examples",
-    "examplesIntro": "Four examples show compactly how rows with result 1 become the DNF.",
+    "examplesIntro": "Examples for both modes: from expression to truth table, and from truth table to DNF.",
     "examples": {
-      "openInSimulation": "Open in simulation",
-      "labels": {
-        "expression": "Expression",
-        "oneRows": "Relevant 1-rows",
-        "terms": "AND terms",
-        "canonicalDnf": "DNF"
+      "modeGroup": {
+        "expression_to_truth_table": "Mode: Expression → truth table",
+        "truth_table_to_dnf": "Mode: Truth table → DNF"
       },
       "walkthroughs": {
         "lectureExpression": {
@@ -204,6 +201,18 @@
         "xor": {
           "title": "Half-adder sum as XOR",
           "explanation": "The sum is 1 when exactly one input is 1."
+        },
+        "carry": {
+          "title": "Half-adder carry",
+          "explanation": "The carry bit is only 1 when both inputs are 1 — a single AND term."
+        },
+        "dnfIntro": {
+          "title": "DNF introduction from the lecture",
+          "explanation": "Only rows 000 and 111 evaluate to 1, producing two AND terms."
+        },
+        "exerciseTwo": {
+          "title": "Exercise 2: polynomial from truth table",
+          "explanation": "Three 1-rows (010, 100, 101) lead to the DNF of lecture exercise 2."
         }
       }
     },

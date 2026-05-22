@@ -1,152 +1,119 @@
-import { ArrowRight, Ban, BookOpen, Table2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowRightLeft, BookOpen, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { cn } from "@/lib/utils";
+import type { Example } from "@/types/exercise";
 import {
   dnfWalkthroughExamples,
   type DnfWalkthroughExample,
-  type DnfWalkthroughExampleId,
+  type DnfWalkthroughExampleMode,
 } from "../examples/walkthroughExamples";
-const iconByExampleId: Record<DnfWalkthroughExampleId, typeof BookOpen> = {
-  "lecture-expression": BookOpen,
-  parentheses: Table2,
-  negation: Ban,
-  xor: ArrowRight,
+
+const modeOrder: DnfWalkthroughExampleMode[] = [
+  "expression_to_truth_table",
+  "truth_table_to_dnf",
+];
+
+const modeIcons: Record<DnfWalkthroughExampleMode, typeof BookOpen> = {
+  expression_to_truth_table: ArrowRightLeft,
+  truth_table_to_dnf: Table2,
 };
 
-export function ExamplesTab(props: ModuleExamplesTabProps) {
-  void props;
+export function ExamplesTab({
+  selectedExample,
+  onSelectExample,
+  onOpenExampleInSimulation,
+}: ModuleExamplesTabProps) {
   const { t } = useTranslation();
+  const [openExampleId, setOpenExampleId] = useState<string | null>(
+    selectedExample?.id ?? null,
+  );
+
+  const handleSelect = (example: Example) => {
+    setOpenExampleId((prev) => (prev === example.id ? null : example.id));
+    onSelectExample(example);
+  };
+
+  const handleOpen = (example: Example) => {
+    onOpenExampleInSimulation(example);
+  };
+
+  const groups = groupExamplesByMode(dnfWalkthroughExamples);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-        <h3 className="text-foreground text-lg font-semibold">
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
+      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-6 shadow-sm ring-1">
+        <h2 className="text-foreground flex items-center gap-2 text-xl font-bold">
+          <BookOpen className="text-primary size-6" />
           {t("dnf.examplesTitle")}
-        </h3>
-        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+        </h2>
+        <p className="text-muted-foreground leading-relaxed">
           {t("dnf.examplesIntro")}
         </p>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        {dnfWalkthroughExamples.map((example) => (
-          <WalkthroughCard key={example.id} example={example} />
-        ))}
-      </div>
-    </div>
-  );
-}
+      {modeOrder.map((mode) => {
+        const examples = groups[mode];
+        if (!examples?.length) {
+          return null;
+        }
 
-function WalkthroughCard({ example }: { example: DnfWalkthroughExample }) {
-  const { t } = useTranslation();
-  const Icon = iconByExampleId[example.id];
+        const ModeIcon = modeIcons[mode];
 
-  return (
-    <article className="bg-card ring-foreground/10 flex flex-col rounded-xl p-5 ring-1">
-      <div className="flex items-start gap-3">
-        <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-          <Icon className="size-4" />
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-foreground text-base font-semibold">
-            {t(example.titleKey)}
-          </h3>
-          <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-            {t(example.explanationKey)}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-4">
-        <LabeledCode
-          label={t(example.expressionLabelKey)}
-          value={example.expression}
-        />
-
-        <ExampleList
-          title={t("dnf.examples.labels.oneRows")}
-          items={example.oneRows}
-        />
-
-        <ExampleList
-          title={t("dnf.examples.labels.terms")}
-          items={example.terms}
-          tone="muted"
-        />
-
-        <LabeledCode
-          label={t("dnf.examples.labels.canonicalDnf")}
-          value={example.canonicalDnf}
-          variant="result"
-        />
-      </div>
-    </article>
-  );
-}
-
-function LabeledCode({
-  label,
-  value,
-  variant = "default",
-}: {
-  label: string;
-  value: string;
-  variant?: "default" | "result";
-}) {
-  return (
-    <div>
-      <p
-        className={cn(
-          "text-xs font-semibold tracking-wide uppercase",
-          variant === "result" ? "text-foreground" : "text-muted-foreground",
-        )}
-      >
-        {label}
-      </p>
-      <code
-        className={cn(
-          "text-foreground mt-2 block overflow-x-auto rounded-md border p-3 font-mono text-sm leading-relaxed [overflow-wrap:anywhere] break-words whitespace-pre-wrap",
-          variant === "result"
-            ? "border-module-rose-fg/20 bg-module-rose-bg/40"
-            : "border-border bg-background/60",
-        )}
-      >
-        {value}
-      </code>
-    </div>
-  );
-}
-
-function ExampleList({
-  title,
-  items,
-  tone = "default",
-}: {
-  title: string;
-  items: string[];
-  tone?: "default" | "muted";
-}) {
-  return (
-    <div>
-      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-        {title}
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {items.map((item) => (
-          <span
-            key={item}
-            className={cn(
-              "border-border rounded-md border px-2.5 py-1 font-mono text-sm",
-              tone === "muted"
-                ? "bg-muted/30 text-muted-foreground"
-                : "bg-background/60 text-foreground",
-            )}
+        return (
+          <div
+            key={mode}
+            className="bg-card ring-foreground/10 flex flex-col gap-4 rounded-xl p-6 shadow-sm ring-1"
           >
-            {item}
-          </span>
-        ))}
-      </div>
+            <h3 className="text-foreground border-border/50 flex items-center gap-2 border-b pb-2 font-semibold">
+              <ModeIcon className="text-primary size-5" />
+              {t(`dnf.examples.modeGroup.${mode}`)}
+            </h3>
+
+            <div>
+              {examples.map((example, index) => {
+                const exampleItem: Example = {
+                  id: example.titleKey,
+                  title: t(example.titleKey),
+                  description: t(example.explanationKey),
+                  titleKey: example.titleKey,
+                  descriptionKey: example.explanationKey,
+                  icon: example.icon,
+                  kind: "example",
+                };
+
+                return (
+                  <ExerciseCard
+                    key={example.id}
+                    item={exampleItem}
+                    index={index}
+                    testIdPrefix={`dnf-example-${example.id}`}
+                    isSelected={openExampleId === exampleItem.id}
+                    onSelect={() => handleSelect(exampleItem)}
+                    onOpen={() => handleOpen(exampleItem)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
+}
+
+function groupExamplesByMode(
+  examples: DnfWalkthroughExample[],
+): Record<DnfWalkthroughExampleMode, DnfWalkthroughExample[]> {
+  const groups: Record<DnfWalkthroughExampleMode, DnfWalkthroughExample[]> = {
+    expression_to_truth_table: [],
+    truth_table_to_dnf: [],
+  };
+
+  for (const example of examples) {
+    groups[example.mode].push(example);
+  }
+
+  return groups;
 }

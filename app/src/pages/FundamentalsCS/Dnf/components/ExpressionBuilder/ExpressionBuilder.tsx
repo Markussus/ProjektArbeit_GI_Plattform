@@ -20,11 +20,19 @@ import {
   VariableLimitPanel,
 } from "../DnfBuilder/presentation/DnfStatusPanels";
 
-export function ExpressionBuilder() {
+interface ExpressionBuilderProps {
+  initialExpression?: string;
+}
+
+export function ExpressionBuilder({
+  initialExpression,
+}: ExpressionBuilderProps = {}) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [inputValue, setInputValue] = useState("");
-  const [committedSource, setCommittedSource] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState(initialExpression ?? "");
+  const [committedSource, setCommittedSource] = useState<string | null>(
+    initialExpression?.trim() ? initialExpression.trim() : null,
+  );
 
   const handleSourceChange = (value: string) => {
     setInputValue(normalizeBooleanOperatorAliases(value));

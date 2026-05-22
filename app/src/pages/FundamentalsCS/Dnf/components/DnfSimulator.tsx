@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Shuffle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Exercise } from "@/types/exercise";
+import type { Example, Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import { buildTruthTableDisplay } from "./DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "./DnfBuilder/application/dnfAnalysis";
@@ -18,6 +18,7 @@ import { DnfResultPanel } from "./DnfBuilder/presentation/DnfResultPanel";
 import { DnfTruthTableView } from "./DnfBuilder/presentation/DnfTruthTableView";
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { getDnfExerciseDefinition } from "../exercises";
+import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
 
 type DnfSimulatorMode = "expression_to_truth_table" | "truth_table_to_dnf";
 
@@ -32,22 +33,31 @@ const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 interface DnfSimulatorProps {
   selectedExercise?: Exercise | null;
+  selectedExample?: Example | null;
   onExitExercise?: () => void;
 }
 
 export function DnfSimulator({
   selectedExercise,
+  selectedExample,
   onExitExercise,
 }: DnfSimulatorProps) {
   const { t } = useTranslation();
   const [activeMode, setActiveMode] = useState<DnfSimulatorMode>(
     "expression_to_truth_table",
   );
+
+  const walkthroughExample = selectedExample
+    ? getDnfWalkthroughExample(selectedExample.id)
+    : null;
+
   const selectedExerciseMode = selectedExercise
     ? (getDnfExerciseDefinition(selectedExercise.id)?.mode ??
       "expression_to_truth_table")
     : null;
-  const visibleMode = selectedExerciseMode ?? activeMode;
+
+  const visibleMode =
+    selectedExerciseMode ?? walkthroughExample?.mode ?? activeMode;
 
   const handleModeClick = (mode: DnfSimulatorMode) => {
     if (mode === visibleMode) return;
@@ -56,6 +66,48 @@ export function DnfSimulator({
     if (selectedExercise) {
       onExitExercise?.();
     }
+  };
+
+  const renderContent = () => {
+    if (selectedExercise) {
+      return (
+        <DnfBuilder
+          key={selectedExercise.id}
+          selectedExercise={selectedExercise}
+        />
+      );
+    }
+
+    if (
+      walkthroughExample?.mode === "expression_to_truth_table" &&
+      visibleMode === "expression_to_truth_table"
+    ) {
+      return (
+        <ExpressionBuilder
+          key={walkthroughExample.id}
+          initialExpression={walkthroughExample.expression}
+        />
+      );
+    }
+
+    if (
+      walkthroughExample?.mode === "truth_table_to_dnf" &&
+      visibleMode === "truth_table_to_dnf"
+    ) {
+      return (
+        <TableToDnfBuilder
+          key={walkthroughExample.id}
+          initialVariables={walkthroughExample.variables}
+          initialResultValues={walkthroughExample.resultValues}
+        />
+      );
+    }
+
+    return visibleMode === "expression_to_truth_table" ? (
+      <ExpressionBuilder />
+    ) : (
+      <TableToDnfBuilder />
+    );
   };
 
   return (
@@ -81,27 +133,29 @@ export function DnfSimulator({
         ))}
       </div>
 
-      <div className="flex-1 overflow-auto">
-        {selectedExercise ? (
-          <DnfBuilder
-            key={selectedExercise.id}
-            selectedExercise={selectedExercise}
-          />
-        ) : activeMode === "expression_to_truth_table" ? (
-          <ExpressionBuilder />
-        ) : (
-          <TableToDnfBuilder />
-        )}
-      </div>
+      <div className="flex-1 overflow-auto">{renderContent()}</div>
     </div>
   );
 }
 
-function TableToDnfBuilder() {
+interface TableToDnfBuilderProps {
+  initialVariables?: string[];
+  initialResultValues?: boolean[];
+}
+
+function TableToDnfBuilder({
+  initialVariables,
+  initialResultValues,
+}: TableToDnfBuilderProps = {}) {
   const { t } = useTranslation();
-  const [variableCount, setVariableCount] = useState(3);
-  const [resultValues, setResultValues] = useState<boolean[]>(
-    Array.from({ length: 2 ** variableCount }, () => false),
+  const initialVariableCount = clampVariableCount(
+    initialVariables?.length ?? 3,
+  );
+  const [variableCount, setVariableCount] = useState(initialVariableCount);
+  const [resultValues, setResultValues] = useState<boolean[]>(() =>
+    initialResultValues && initialResultValues.length === 2 ** initialVariableCount
+      ? [...initialResultValues]
+      : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );
   const [showSolution, setShowSolution] = useState(false);
   const [showFullTable, setShowFullTable] = useState(false);

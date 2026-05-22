@@ -175,14 +175,11 @@
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
     "examplesTitle": "Vorlesungsbeispiele",
-    "examplesIntro": "Vier Beispiele zeigen kompakt, wie aus 1-Zeilen die DNF entsteht.",
+    "examplesIntro": "Beispiele zu beiden Modi: vom Ausdruck zur Wahrheitstabelle und von der Wahrheitstabelle zur DNF.",
     "examples": {
-      "openInSimulation": "In Simulation öffnen",
-      "labels": {
-        "expression": "Ausdruck",
-        "oneRows": "Relevante 1-Zeilen",
-        "terms": "UND-Terme",
-        "canonicalDnf": "DNF"
+      "modeGroup": {
+        "expression_to_truth_table": "Modus: Ausdruck → Wahrheitstabelle",
+        "truth_table_to_dnf": "Modus: Wahrheitstabelle → DNF"
       },
       "walkthroughs": {
         "lectureExpression": {
@@ -200,6 +197,18 @@
         "xor": {
           "title": "Halbaddierer-Summe als XOR",
           "explanation": "Die Summe ist 1, wenn genau ein Eingang 1 ist."
+        },
+        "carry": {
+          "title": "Halbaddierer-Carry",
+          "explanation": "Das Übertragsbit ist nur dann 1, wenn beide Eingänge 1 sind — ein einzelner UND-Term."
+        },
+        "dnfIntro": {
+          "title": "DNF-Einführung aus der Vorlesung",
+          "explanation": "Nur die Zeilen 000 und 111 ergeben 1. Daraus entstehen zwei UND-Terme."
+        },
+        "exerciseTwo": {
+          "title": "Übung 2: Polynom aus Wertetafel",
+          "explanation": "Drei 1-Zeilen (010, 100, 101) führen zur DNF der Vorlesungsübung 2."
         }
       }
     },
