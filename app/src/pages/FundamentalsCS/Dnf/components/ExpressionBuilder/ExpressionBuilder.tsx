@@ -43,7 +43,7 @@ export function ExpressionBuilder() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       {committedSource === null ? (
-        <section className="border-border bg-background/40 rounded-lg border p-4">
+        <section className="border-border bg-card rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-foreground text-lg font-semibold">
@@ -83,7 +83,7 @@ export function ExpressionBuilder() {
             }
             spellCheck="false"
             placeholder="z. B. a ∨ (b ∧ ¬c)"
-            className="border-border bg-card text-foreground focus:ring-ring mt-3 min-h-20 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
+            className="border-border bg-background text-foreground focus:ring-ring mt-3 min-h-20 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
           />
 
           <div className="mt-4">
@@ -128,6 +128,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   );
 
   const [showSolution, setShowSolution] = useState(false);
+  const [showFullTable, setShowFullTable] = useState(false);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
     TruthTableAnswer[]
   >([]);
@@ -207,11 +208,14 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
         resultHeader={committedSource}
         requiresTruthTableAnswers={true}
         canAlwaysShowSolution={true}
+        canToggleFullTable={true}
+        showFullTable={showFullTable}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
         onReset={handleReset}
         onToggleSolution={() => setShowSolution((prev) => !prev)}
+        onToggleFullTable={() => setShowFullTable((prev) => !prev)}
       />
 
       {showSolution && (

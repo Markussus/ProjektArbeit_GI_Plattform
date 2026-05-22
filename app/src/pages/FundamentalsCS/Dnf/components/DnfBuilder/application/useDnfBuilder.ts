@@ -14,7 +14,7 @@ export function useDnfBuilder(selectedExercise: Exercise) {
   const exerciseMode = exerciseDefinition?.mode ?? "expression_to_truth_table";
   const requiresTruthTableAnswers =
     exerciseMode === "expression_to_truth_table";
-  const resultHeader = exerciseMode === "truth_table_to_dnf" ? "???" : source;
+  const resultHeader = exerciseMode === "truth_table_to_dnf" ? "f" : source;
 
   const analysis = useMemo(() => {
     if (exerciseDefinition?.mode === "truth_table_to_dnf") {

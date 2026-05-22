@@ -1,0 +1,342 @@
+import { useMemo, useState } from "react";
+import { Shuffle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import type { Exercise } from "@/types/exercise";
+import { cn } from "@/lib/utils";
+import { buildTruthTableDisplay } from "./DnfBuilder/adapters/truthTableAdapter";
+import { analyzeDnfTruthTable } from "./DnfBuilder/application/dnfAnalysis";
+import { normalizeBooleanOperatorAliases } from "./DnfBuilder/domain/booleanSyntax";
+import {
+  checkDnfExerciseAttempt,
+  type DnfExerciseCheckResult,
+} from "./DnfBuilder/domain/dnfExerciseCheck";
+import { createTruthTableFromResults } from "./DnfBuilder/domain/truthTable";
+import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
+import { DnfDerivationSteps } from "./DnfBuilder/presentation/DnfDerivationSteps";
+import { DnfExerciseWorkspace } from "./DnfBuilder/presentation/DnfExerciseWorkspace";
+import { DnfResultPanel } from "./DnfBuilder/presentation/DnfResultPanel";
+import { DnfTruthTableView } from "./DnfBuilder/presentation/DnfTruthTableView";
+import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
+import { getDnfExerciseDefinition } from "../exercises";
+
+type DnfSimulatorMode = "expression_to_truth_table" | "truth_table_to_dnf";
+
+const simulatorModes: DnfSimulatorMode[] = [
+  "expression_to_truth_table",
+  "truth_table_to_dnf",
+];
+
+const EDITABLE_TABLE_MIN_VARIABLE_COUNT = 1;
+const EDITABLE_TABLE_MAX_VARIABLE_COUNT = 8;
+const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+interface DnfSimulatorProps {
+  selectedExercise?: Exercise | null;
+  onExitExercise?: () => void;
+}
+
+export function DnfSimulator({
+  selectedExercise,
+  onExitExercise,
+}: DnfSimulatorProps) {
+  const { t } = useTranslation();
+  const [activeMode, setActiveMode] = useState<DnfSimulatorMode>(
+    "expression_to_truth_table",
+  );
+  const selectedExerciseMode = selectedExercise
+    ? (getDnfExerciseDefinition(selectedExercise.id)?.mode ??
+      "expression_to_truth_table")
+    : null;
+  const visibleMode = selectedExerciseMode ?? activeMode;
+
+  const handleModeClick = (mode: DnfSimulatorMode) => {
+    if (mode === visibleMode) return;
+
+    setActiveMode(mode);
+    if (selectedExercise) {
+      onExitExercise?.();
+    }
+  };
+
+  return (
+    <div className="flex h-full flex-col space-y-6">
+      <div className="border-border flex gap-1 overflow-x-auto border-b">
+        {simulatorModes.map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            className={cn(
+              "relative shrink-0 px-4 py-2.5 text-sm font-medium",
+              visibleMode === mode
+                ? "text-tab-active"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+            onClick={() => handleModeClick(mode)}
+          >
+            {t(`dnf.simulator.tabs.${mode}`)}
+            {visibleMode === mode && (
+              <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {selectedExercise ? (
+          <DnfBuilder
+            key={selectedExercise.id}
+            selectedExercise={selectedExercise}
+          />
+        ) : activeMode === "expression_to_truth_table" ? (
+          <ExpressionBuilder />
+        ) : (
+          <TableToDnfBuilder />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TableToDnfBuilder() {
+  const { t } = useTranslation();
+  const [variableCount, setVariableCount] = useState(3);
+  const [resultValues, setResultValues] = useState<boolean[]>(
+    Array.from({ length: 2 ** variableCount }, () => false),
+  );
+  const [showSolution, setShowSolution] = useState(false);
+  const [showFullTable, setShowFullTable] = useState(false);
+  const [dnfAnswer, setDnfAnswer] = useState("");
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const truthTable = useMemo(
+    () =>
+      createTruthTableFromResults(
+        editableVariableNames.slice(0, variableCount),
+        resultValues,
+      ),
+    [resultValues, variableCount],
+  );
+  const analysis = useMemo(
+    () => analyzeDnfTruthTable(truthTable),
+    [truthTable],
+  );
+
+  const display = useMemo(() => {
+    if (!showSolution || analysis.status !== "valid") return null;
+
+    return buildTruthTableDisplay(analysis.truthTable, analysis.derivation);
+  }, [analysis, showSolution]);
+
+  const resetAttempt = () => {
+    setShowSolution(false);
+    setDnfAnswer("");
+    setFeedback(null);
+  };
+
+  const updateVariableCount = (nextVariableCount: number) => {
+    const boundedVariableCount = clampVariableCount(nextVariableCount);
+
+    setVariableCount(boundedVariableCount);
+    setResultValues(
+      Array.from({ length: 2 ** boundedVariableCount }, () => false),
+    );
+    resetAttempt();
+  };
+
+  const updateResultValue = (rowIndex: number, value: boolean) => {
+    setResultValues((currentValues) => {
+      const nextValues = [...currentValues];
+      nextValues[rowIndex] = value;
+      return nextValues;
+    });
+    setFeedback(null);
+    setShowSolution(false);
+  };
+
+  const randomizeResultValues = () => {
+    setResultValues(createRandomResultValues(resultValues.length));
+    resetAttempt();
+  };
+
+  const handleCheck = () => {
+    if (analysis.status !== "valid") return;
+
+    setFeedback(
+      checkDnfExerciseAttempt(analysis.truthTable, [], dnfAnswer, {
+        checkTruthTable: false,
+      }),
+    );
+  };
+
+  const updateDnfAnswer = (value: string) => {
+    setDnfAnswer(normalizeBooleanOperatorAliases(value));
+    setFeedback(null);
+    setShowSolution(false);
+  };
+
+  if (analysis.status !== "valid") {
+    return null;
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <section className="border-border bg-card rounded-lg border p-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-foreground text-lg font-semibold">
+              {t("dnf.simulator.tableModeTitle")}
+            </h2>
+            <p className="text-muted-foreground mt-1 max-w-2xl text-sm leading-relaxed">
+              {t("dnf.simulator.tableModeHint")}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+            {t("dnf.simulator.variableCount")}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <label
+              className="text-muted-foreground text-sm"
+              htmlFor="dnf-variable-count"
+            >
+              {t("dnf.simulator.variableCountLabel")}
+            </label>
+            <input
+              id="dnf-variable-count"
+              type="number"
+              min={EDITABLE_TABLE_MIN_VARIABLE_COUNT}
+              max={EDITABLE_TABLE_MAX_VARIABLE_COUNT}
+              step={1}
+              value={variableCount}
+              onChange={(event) =>
+                updateVariableCount(Number(event.target.value))
+              }
+              className="border-border bg-background text-foreground focus:ring-ring h-10 w-24 rounded-md border px-3 text-sm font-semibold focus:ring-2 focus:outline-none"
+            />
+            <span className="text-muted-foreground text-sm">
+              {t("dnf.simulator.variableCountHelp", {
+                min: EDITABLE_TABLE_MIN_VARIABLE_COUNT,
+                max: EDITABLE_TABLE_MAX_VARIABLE_COUNT,
+              })}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setResultValues(
+                Array.from({ length: resultValues.length }, () => false),
+              );
+              resetAttempt();
+            }}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            {t("dnf.simulator.clearTable")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setResultValues(
+                Array.from({ length: resultValues.length }, () => true),
+              );
+              resetAttempt();
+            }}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            {t("dnf.simulator.fillTable")}
+          </button>
+          <button
+            type="button"
+            onClick={randomizeResultValues}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            <Shuffle className="size-4" />
+            {t("dnf.simulator.randomTable")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setResultValues((currentValues) =>
+                currentValues.map((value) => !value),
+              );
+              resetAttempt();
+            }}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            {t("dnf.simulator.invertTable")}
+          </button>
+        </div>
+      </section>
+
+      <DnfExerciseWorkspace
+        source="f"
+        truthTable={analysis.truthTable}
+        truthTableAnswers={resultValues}
+        dnfAnswer={dnfAnswer}
+        feedback={feedback}
+        showSolution={showSolution}
+        resultHeader="f"
+        requiresTruthTableAnswers={false}
+        canAlwaysShowSolution={true}
+        canEditTruthTableResults={true}
+        canToggleFullTable={true}
+        showFullTable={showFullTable}
+        onTruthTableAnswerChange={updateResultValue}
+        onDnfAnswerChange={updateDnfAnswer}
+        onCheck={handleCheck}
+        onReset={resetAttempt}
+        onToggleSolution={() => setShowSolution((current) => !current)}
+        onToggleFullTable={() => setShowFullTable((current) => !current)}
+      />
+
+      {showSolution && (
+        <>
+          <DnfResultPanel
+            formattedDnf={analysis.formattedDnf}
+            variableCount={analysis.truthTable.variables.length}
+            rowCount={analysis.truthTable.rows.length}
+            trueRowCount={analysis.derivation.trueRows.length}
+            derivation={analysis.derivation}
+          />
+          <DnfDerivationSteps
+            derivation={analysis.derivation}
+            truthTable={analysis.truthTable}
+          />
+          {display && <DnfTruthTableView display={display} resultHeader="f" />}
+        </>
+      )}
+    </div>
+  );
+}
+
+function createRandomResultValues(rowCount: number): boolean[] {
+  const values = Array.from({ length: rowCount }, () => Math.random() < 0.5);
+
+  if (rowCount <= 1) {
+    return values;
+  }
+
+  if (values.every((value) => !value)) {
+    values[Math.floor(Math.random() * rowCount)] = true;
+  }
+
+  if (values.every((value) => value)) {
+    values[Math.floor(Math.random() * rowCount)] = false;
+  }
+
+  return values;
+}
+
+function clampVariableCount(value: number): number {
+  if (!Number.isFinite(value)) {
+    return EDITABLE_TABLE_MIN_VARIABLE_COUNT;
+  }
+
+  return Math.min(
+    EDITABLE_TABLE_MAX_VARIABLE_COUNT,
+    Math.max(EDITABLE_TABLE_MIN_VARIABLE_COUNT, Math.trunc(value)),
+  );
+}

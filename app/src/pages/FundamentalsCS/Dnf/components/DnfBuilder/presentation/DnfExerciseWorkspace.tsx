@@ -1,5 +1,5 @@
 import { useRef, type KeyboardEvent } from "react";
-import { Eye, RotateCcw, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, RotateCcw, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBooleanValue } from "../domain/booleanExpression";
@@ -12,6 +12,8 @@ import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
+const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 32;
+
 interface DnfExerciseWorkspaceProps {
   source: string;
   truthTable: TruthTable;
@@ -22,11 +24,15 @@ interface DnfExerciseWorkspaceProps {
   resultHeader: string;
   requiresTruthTableAnswers: boolean;
   canAlwaysShowSolution?: boolean;
+  canEditTruthTableResults?: boolean;
+  canToggleFullTable?: boolean;
+  showFullTable?: boolean;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
   onReset: () => void;
   onToggleSolution: () => void;
+  onToggleFullTable?: () => void;
 }
 
 export function DnfExerciseWorkspace({
@@ -39,11 +45,15 @@ export function DnfExerciseWorkspace({
   resultHeader,
   requiresTruthTableAnswers,
   canAlwaysShowSolution = false,
+  canEditTruthTableResults = false,
+  canToggleFullTable = false,
+  showFullTable = false,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
   onReset,
   onToggleSolution,
+  onToggleFullTable,
 }: DnfExerciseWorkspaceProps) {
   const { t } = useTranslation();
   const dnfInputRef = useRef<HTMLTextAreaElement>(null);
@@ -56,6 +66,13 @@ export function DnfExerciseWorkspace({
   ).length;
   const hasDnfAttempt = dnfAnswer.trim().length > 0;
   const canShowSolution = canAlwaysShowSolution || feedback !== null;
+  const canInteractWithResultColumn =
+    requiresTruthTableAnswers || canEditTruthTableResults;
+  const isLargeWorkspaceTable =
+    truthTable.rows.length >= WORKSPACE_TABLE_TOGGLE_THRESHOLD;
+  const canActuallyToggleTable = canToggleFullTable && isLargeWorkspaceTable;
+  const isCompactEditableTable = canActuallyToggleTable && !showFullTable;
+  const isScrollableTruthTable = isCompactEditableTable;
 
   const focusResultRow = (rowIndex: number) => {
     const nextRow =
@@ -105,7 +122,7 @@ export function DnfExerciseWorkspace({
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="border-border bg-background/40 rounded-lg border p-5">
+      <section className="border-border bg-card rounded-lg border p-5">
         <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {t("dnf.builder.exercise.taskTitle")}
         </p>
@@ -114,19 +131,25 @@ export function DnfExerciseWorkspace({
             <p className="text-muted-foreground text-sm">
               {requiresTruthTableAnswers
                 ? t("dnf.builder.exercise.given")
-                : t("dnf.builder.exercise.givenTruthTable")}
+                : canEditTruthTableResults
+                  ? t("dnf.builder.exercise.buildTruthTable")
+                  : t("dnf.builder.exercise.givenTruthTable")}
             </p>
             {requiresTruthTableAnswers ? (
-              <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-3 font-mono text-sm">
+              <code className="border-border bg-muted/40 text-foreground mt-2 block rounded-md border p-3 font-mono text-sm">
                 {source}
               </code>
+            ) : canEditTruthTableResults ? (
+              <div className="border-border bg-muted/40 text-foreground mt-2 rounded-md border p-3 text-sm leading-relaxed">
+                {t("dnf.builder.exercise.chooseResultColumn")}
+              </div>
             ) : (
-              <div className="border-border bg-card text-foreground mt-2 rounded-md border p-3 text-sm leading-relaxed">
+              <div className="border-border bg-muted/40 text-foreground mt-2 rounded-md border p-3 text-sm leading-relaxed">
                 {t("dnf.builder.exercise.findExpressionFromTable")}
               </div>
             )}
           </div>
-          <div className="border-border bg-card/50 rounded-md border p-3">
+          <div className="border-border bg-muted/40 rounded-md border p-3">
             <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
               {t("dnf.builder.exercise.stepsTitle")}
             </p>
@@ -138,7 +161,9 @@ export function DnfExerciseWorkspace({
                 <span className="text-foreground">
                   {requiresTruthTableAnswers
                     ? t("dnf.builder.exercise.instructionStepTable")
-                    : t("dnf.builder.exercise.instructionStepOneRows")}
+                    : canEditTruthTableResults
+                      ? t("dnf.builder.exercise.instructionStepEditableTable")
+                      : t("dnf.builder.exercise.instructionStepOneRows")}
                 </span>
               </li>
               <li className="flex gap-2">
@@ -157,7 +182,7 @@ export function DnfExerciseWorkspace({
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
-        <section className="border-border bg-background/40 rounded-lg border p-4">
+        <section className="border-border bg-card rounded-lg border p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-foreground text-lg font-semibold">
@@ -166,14 +191,42 @@ export function DnfExerciseWorkspace({
               <p className="text-muted-foreground mt-1 text-sm">
                 {requiresTruthTableAnswers
                   ? t("dnf.builder.exercise.tableHint")
-                  : t("dnf.builder.exercise.tableHintGiven")}
+                  : canEditTruthTableResults
+                    ? t("dnf.builder.exercise.tableHintEditable")
+                    : t("dnf.builder.exercise.tableHintGiven")}
               </p>
             </div>
+            {canActuallyToggleTable && onToggleFullTable && (
+              <button
+                type="button"
+                onClick={onToggleFullTable}
+                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+              >
+                {showFullTable ? (
+                  <ChevronUp className="size-4" />
+                ) : (
+                  <ChevronDown className="size-4" />
+                )}
+                {showFullTable
+                  ? t("dnf.builder.showCompactTable")
+                  : t("dnf.builder.showFullTable")}
+              </button>
+            )}
           </div>
 
-          <div className="border-border mt-4 overflow-x-auto rounded-lg border">
+          <div
+            className={cn(
+              "border-border mt-4 overflow-x-auto rounded-lg border",
+              isScrollableTruthTable && "max-h-[32rem] overflow-y-auto",
+            )}
+          >
             <table className="w-full border-collapse text-sm">
-              <thead className="bg-muted/50">
+              <thead
+                className={cn(
+                  "bg-muted",
+                  isScrollableTruthTable && "sticky top-0 z-10",
+                )}
+              >
                 <tr>
                   <th
                     scope="col"
@@ -207,11 +260,16 @@ export function DnfExerciseWorkspace({
                       key={rowIndex}
                       className={cn(
                         "border-border border-t",
-                        issue?.actual === null && "bg-amber-500/10",
-                        issue?.actual !== null &&
+                        requiresTruthTableAnswers &&
+                          issue?.actual === null &&
+                          "bg-amber-500/10",
+                        requiresTruthTableAnswers &&
+                          issue?.actual !== null &&
                           issue !== undefined &&
                           "bg-destructive/10",
-                        isCorrect && "bg-emerald-500/10",
+                        requiresTruthTableAnswers &&
+                          isCorrect &&
+                          "bg-emerald-500/10",
                       )}
                     >
                       <td className="border-border text-muted-foreground border-r px-3 py-2 font-mono">
@@ -226,7 +284,7 @@ export function DnfExerciseWorkspace({
                         </td>
                       ))}
                       <td className="px-3 py-2">
-                        {requiresTruthTableAnswers ? (
+                        {canInteractWithResultColumn ? (
                           <div
                             ref={(element) => {
                               resultRowRefs.current[rowIndex] = element;
@@ -268,7 +326,7 @@ export function DnfExerciseWorkspace({
                             ))}
                           </div>
                         ) : (
-                          <span className="bg-card border-border inline-flex min-h-9 min-w-12 items-center justify-center rounded-md border px-3 font-mono text-sm font-semibold">
+                          <span className="bg-muted/40 border-border inline-flex min-h-9 min-w-12 items-center justify-center rounded-md border px-3 font-mono text-sm font-semibold">
                             {formatBooleanValue(row.result)}
                           </span>
                         )}
@@ -309,7 +367,7 @@ export function DnfExerciseWorkspace({
               }
               spellCheck="false"
               placeholder={t("dnf.builder.exercise.dnfPlaceholder")}
-              className="border-border bg-card text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
+              className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
             />
           </div>
 
@@ -353,6 +411,7 @@ export function DnfExerciseWorkspace({
           totalRowCount={truthTable.rows.length}
           hasDnfAnswer={hasDnfAttempt}
           isTruthTableProvided={!requiresTruthTableAnswers}
+          isTruthTableEditable={canEditTruthTableResults}
         />
       </div>
     </div>

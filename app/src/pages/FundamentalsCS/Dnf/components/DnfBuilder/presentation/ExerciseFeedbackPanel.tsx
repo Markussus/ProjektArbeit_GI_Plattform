@@ -12,6 +12,7 @@ interface ExerciseFeedbackPanelProps {
   totalRowCount: number;
   hasDnfAnswer: boolean;
   isTruthTableProvided?: boolean;
+  isTruthTableEditable?: boolean;
 }
 
 export function ExerciseFeedbackPanel({
@@ -21,12 +22,13 @@ export function ExerciseFeedbackPanel({
   totalRowCount,
   hasDnfAnswer,
   isTruthTableProvided = false,
+  isTruthTableEditable = false,
 }: ExerciseFeedbackPanelProps) {
   const { t } = useTranslation();
 
   if (!feedback) {
     return (
-      <aside className="border-border bg-background/40 rounded-lg border p-5">
+      <aside className="border-border bg-card rounded-lg border p-5">
         <div className="flex items-center gap-3">
           <div className="bg-muted text-muted-foreground flex size-9 items-center justify-center rounded-md">
             <LockKeyhole className="size-5" />
@@ -37,26 +39,30 @@ export function ExerciseFeedbackPanel({
             </h2>
             <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
               {isTruthTableProvided
-                ? t("dnf.builder.exercise.notCheckedDnfOnly")
+                ? isTruthTableEditable
+                  ? t("dnf.builder.exercise.notCheckedEditable")
+                  : t("dnf.builder.exercise.notCheckedDnfOnly")
                 : t("dnf.builder.exercise.notChecked")}
             </p>
           </div>
         </div>
         <dl className="mt-5 grid gap-2 text-sm">
-          <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">
+          <div className="border-border bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2">
             <dt className="text-muted-foreground">
               {t("dnf.builder.exercise.progressTable")}
             </dt>
             <dd className="text-foreground font-medium">
               {isTruthTableProvided
-                ? t("dnf.builder.exercise.progressTableProvided")
+                ? isTruthTableEditable
+                  ? t("dnf.builder.exercise.progressTableEditable")
+                  : t("dnf.builder.exercise.progressTableProvided")
                 : t("dnf.builder.exercise.progressTableValue", {
                     answered: answeredRowCount,
                     total: totalRowCount,
                   })}
             </dd>
           </div>
-          <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">
+          <div className="border-border bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2">
             <dt className="text-muted-foreground">
               {t("dnf.builder.exercise.progressDnf")}
             </dt>
@@ -93,13 +99,14 @@ export function ExerciseFeedbackPanel({
           truthTable={truthTable}
           hasTruthTableReady={hasTruthTableReady}
           isTruthTableProvided={isTruthTableProvided}
+          isTruthTableEditable={isTruthTableEditable}
         />
       </aside>
     );
   }
 
   return (
-    <aside className="border-border bg-background/40 rounded-lg border p-5">
+    <aside className="border-border bg-card rounded-lg border p-5">
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.exercise.feedbackTitle")}
       </h2>
@@ -109,20 +116,21 @@ export function ExerciseFeedbackPanel({
         truthTable={truthTable}
         hasTruthTableReady={hasTruthTableReady}
         isTruthTableProvided={isTruthTableProvided}
+        isTruthTableEditable={isTruthTableEditable}
       />
       <ul className="mt-4 space-y-3 text-sm leading-relaxed">
         {buildFeedbackItems(feedback, truthTable, hasDnfAnswer, t).map(
           (item) => (
             <li
               key={item}
-              className="border-border bg-card text-muted-foreground rounded-md border px-3 py-2"
+              className="border-border bg-muted/40 text-muted-foreground rounded-md border px-3 py-2"
             >
               {item}
             </li>
           ),
         )}
       </ul>
-      <div className="border-border bg-card mt-4 rounded-md border px-3 py-2">
+      <div className="border-border bg-muted/40 mt-4 rounded-md border px-3 py-2">
         <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {t("dnf.builder.exercise.tipTitle")}
         </p>
@@ -143,12 +151,14 @@ function FeedbackSummary({
   truthTable,
   hasTruthTableReady,
   isTruthTableProvided,
+  isTruthTableEditable,
 }: {
   feedback: DnfExerciseCheckResult;
   totalRowCount: number;
   truthTable: TruthTable;
   hasTruthTableReady: boolean;
   isTruthTableProvided: boolean;
+  isTruthTableEditable: boolean;
 }) {
   const { t } = useTranslation();
   const oneRows = truthTable.rows.flatMap((row, rowIndex) =>
@@ -157,20 +167,22 @@ function FeedbackSummary({
 
   return (
     <dl className="mt-5 grid gap-2 text-sm">
-      <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">
+      <div className="border-border bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2">
         <dt className="text-muted-foreground">
           {t("dnf.builder.exercise.progressTable")}
         </dt>
         <dd className="text-foreground font-medium">
           {isTruthTableProvided
-            ? t("dnf.builder.exercise.progressTableProvided")
+            ? isTruthTableEditable
+              ? t("dnf.builder.exercise.progressTableEditable")
+              : t("dnf.builder.exercise.progressTableProvided")
             : t("dnf.builder.exercise.tableCorrectValue", {
                 correct: feedback.correctRowCount,
                 total: totalRowCount,
               })}
         </dd>
       </div>
-      <div className="border-border bg-card flex items-center justify-between rounded-md border px-3 py-2">
+      <div className="border-border bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2">
         <dt className="text-muted-foreground">
           {t("dnf.builder.exercise.progressDnf")}
         </dt>
@@ -178,7 +190,7 @@ function FeedbackSummary({
           {getDnfStatusLabel(feedback.dnf.status, hasTruthTableReady, t)}
         </dd>
       </div>
-      <div className="border-border bg-card rounded-md border px-3 py-2">
+      <div className="border-border bg-muted/40 rounded-md border px-3 py-2">
         <dt className="text-muted-foreground">
           {t("dnf.builder.exercise.oneRowsLabel")}
         </dt>

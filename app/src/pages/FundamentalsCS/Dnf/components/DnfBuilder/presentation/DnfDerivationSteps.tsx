@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 import { formatDnfTerm, type DnfDerivation } from "../domain/dnfDerivation";
 import type { TruthTable } from "../domain/truthTable";
 
-const DERIVATION_PREVIEW_LIMIT = 8;
+const DERIVATION_COMPACT_STEP_LIMIT = 12;
 
 interface DnfDerivationStepsProps {
   derivation: DnfDerivation;
@@ -16,11 +17,11 @@ export function DnfDerivationSteps({
   truthTable,
 }: DnfDerivationStepsProps) {
   const { t } = useTranslation();
-  const [showAllSteps, setShowAllSteps] = useState(false);
+  const [showFullDerivation, setShowFullDerivation] = useState(false);
 
   if (derivation.dnf.type === "constant") {
     return (
-      <section className="border-border bg-background/40 rounded-lg border p-4">
+      <section className="border-border bg-card rounded-lg border p-4">
         <h2 className="text-foreground text-lg font-semibold">
           {t("dnf.builder.derivationTitle")}
         </h2>
@@ -33,8 +34,12 @@ export function DnfDerivationSteps({
     );
   }
 
+  const isLargeDerivation =
+    derivation.dnf.terms.length > DERIVATION_COMPACT_STEP_LIMIT;
+  const isCompactDerivation = isLargeDerivation && !showFullDerivation;
+
   return (
-    <section className="border-border bg-background/40 rounded-lg border p-4">
+    <section className="border-border bg-card rounded-lg border p-4">
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.derivationTitle")}
       </h2>
@@ -42,29 +47,41 @@ export function DnfDerivationSteps({
         {t("dnf.builder.derivationHint")}
       </p>
 
-      {derivation.dnf.terms.length > DERIVATION_PREVIEW_LIMIT && (
-        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-          {t("dnf.builder.derivationPreview", {
-            shown: showAllSteps
-              ? derivation.dnf.terms.length
-              : DERIVATION_PREVIEW_LIMIT,
-            total: derivation.dnf.terms.length,
-          })}
-        </p>
+      {isLargeDerivation && (
+        <div className="border-border bg-muted/40 mt-4 rounded-md border p-3">
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {showFullDerivation
+              ? t("dnf.builder.derivationFull", {
+                  total: derivation.dnf.terms.length,
+                })
+              : t("dnf.builder.derivationCompact", {
+                  total: derivation.dnf.terms.length,
+                })}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowFullDerivation((current) => !current)}
+            className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+          >
+            {showFullDerivation ? (
+              <ChevronUp className="size-4" />
+            ) : (
+              <ChevronDown className="size-4" />
+            )}
+            {showFullDerivation
+              ? t("dnf.builder.showCompactDerivation")
+              : t("dnf.builder.showFullDerivation")}
+          </button>
+        </div>
       )}
 
       <ol
-        className={`mt-4 space-y-2 ${
-          showAllSteps && derivation.dnf.terms.length > DERIVATION_PREVIEW_LIMIT
-            ? "max-h-96 overflow-y-auto pr-1"
-            : ""
-        }`}
+        className={cn(
+          "mt-4 space-y-2",
+          isCompactDerivation && "max-h-[32rem] overflow-y-auto pr-1",
+        )}
       >
-        {(derivation.dnf.terms.length > DERIVATION_PREVIEW_LIMIT &&
-        !showAllSteps
-          ? derivation.dnf.terms.slice(0, DERIVATION_PREVIEW_LIMIT)
-          : derivation.dnf.terms
-        ).map((term, index) => {
+        {derivation.dnf.terms.map((term, index) => {
           const rowNumber = getDerivationRowNumber(
             derivation,
             truthTable,
@@ -74,7 +91,7 @@ export function DnfDerivationSteps({
           return (
             <li
               key={index}
-              className="border-border bg-card grid gap-2 rounded-md border px-3 py-2 text-sm sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-center"
+              className="border-border bg-muted/40 grid gap-2 rounded-md border px-3 py-2 text-sm sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-center"
             >
               <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                 {t("dnf.builder.derivationRowLabel", { row: rowNumber })}
@@ -86,25 +103,6 @@ export function DnfDerivationSteps({
           );
         })}
       </ol>
-
-      {derivation.dnf.terms.length > DERIVATION_PREVIEW_LIMIT && (
-        <button
-          type="button"
-          onClick={() => setShowAllSteps((current) => !current)}
-          className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
-        >
-          {showAllSteps ? (
-            <ChevronUp className="size-4" />
-          ) : (
-            <ChevronDown className="size-4" />
-          )}
-          {showAllSteps
-            ? t("dnf.builder.showFewerSteps")
-            : t("dnf.builder.showAllSteps", {
-                count: derivation.dnf.terms.length,
-              })}
-        </button>
-      )}
     </section>
   );
 }
