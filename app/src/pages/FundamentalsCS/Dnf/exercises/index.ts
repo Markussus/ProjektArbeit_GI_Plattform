@@ -1,4 +1,4 @@
-import { CircuitBoard, Grid3X3, Sigma, Table, Variable } from "lucide-react";
+import { Grid3X3, Table } from "lucide-react";
 import type { ExerciseDefinition } from "@/types/exercise";
 import { createTruthTableFromResults } from "../components/DnfBuilder/domain/truthTable";
 import type { TruthTable } from "../components/DnfBuilder/domain/truthTable";
@@ -21,46 +21,42 @@ export type DnfExerciseDefinition =
 
 export const dnfExercises: DnfExerciseDefinition[] = [
   {
-    titleKey: "dnf.exercise1",
-    descriptionKey: "dnf.exercise1Desc",
+    titleKey: "dnf.exercises.worksheet02bTruthTable1.title",
+    descriptionKey: "dnf.exercises.worksheet02bTruthTable1.description",
     difficulty: "easy",
     icon: Table,
-    mode: "expression_to_truth_table",
-    expression: DEFAULT_DNF_SOURCE,
-  },
-  {
-    titleKey: "dnf.exercise2",
-    descriptionKey: "dnf.exercise2Desc",
-    difficulty: "medium",
-    icon: Grid3X3,
-    mode: "expression_to_truth_table",
-    expression: "(a ∨ b) ∧ c",
-  },
-  {
-    titleKey: "dnf.exercise3",
-    descriptionKey: "dnf.exercise3Desc",
-    difficulty: "hard",
-    icon: CircuitBoard,
-    mode: "expression_to_truth_table",
-    expression: "(¬x ∧ y) ∨ (x ∧ ¬y)",
-  },
-  {
-    titleKey: "dnf.exercise4",
-    descriptionKey: "dnf.exercise4Desc",
-    difficulty: "hard",
-    icon: Variable,
-    mode: "expression_to_truth_table",
-    expression: "a ∨ (b ∧ c) ∨ ¬d",
-  },
-  {
-    titleKey: "dnf.exercise5",
-    descriptionKey: "dnf.exercise5Desc",
-    difficulty: "medium",
-    icon: Sigma,
     mode: "truth_table_to_dnf",
     truthTable: createTruthTableFromResults(
       ["a", "b", "c"],
-      [false, false, true, false, true, true, false, false],
+      [false, true, false, true, true, false, true, false],
+    ),
+  },
+  {
+    titleKey: "dnf.exercises.worksheet02bTruthTable2.title",
+    descriptionKey: "dnf.exercises.worksheet02bTruthTable2.description",
+    difficulty: "medium",
+    icon: Grid3X3,
+    mode: "truth_table_to_dnf",
+    truthTable: createTruthTableFromResults(
+      ["a", "b", "c", "d"],
+      [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+      ],
     ),
   },
 ];

@@ -226,16 +226,16 @@
     "exampleResultTitle": "DNF",
     "exampleRuleTitle": "Rule of thumb",
     "exampleRuleText": "If the value is 1, keep the variable as-is; if the value is 0, negate it. This makes each AND term describe exactly one matching table row.",
-    "exercise1": "Evaluate expression and derive DNF",
-    "exercise1Desc": "Fill in the truth table and build the DNF from all 1-rows",
-    "exercise2": "Compare parentheses and build DNF",
-    "exercise2Desc": "Evaluate the parenthesized expression and derive the DNF from it",
-    "exercise3": "Half-adder sum as DNF",
-    "exercise3Desc": "Check the XOR polynomial from the lecture through the truth table",
-    "exercise4": "Multi-variable expression as DNF",
-    "exercise4Desc": "Evaluate an expression with four variables and build the DNF",
-    "exercise5": "Boolean polynomial from truth table",
-    "exercise5Desc": "Create the boolean polynomial in DNF from a given truth table",
+    "exercises": {
+      "worksheet02bTruthTable1": {
+        "title": "Worksheet 02b: truth table 1",
+        "description": "Write the Boolean polynomial in disjunctive normal form for the given truth table with a, b, and c."
+      },
+      "worksheet02bTruthTable2": {
+        "title": "Worksheet 02b: truth table 2",
+        "description": "Write the Boolean polynomial in disjunctive normal form for the given truth table with a, b, c, and d."
+      }
+    },
     "exprBuilder": {
       "evaluate": "Evaluate",
       "newExpression": "Enter a different expression"

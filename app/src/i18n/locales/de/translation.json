@@ -222,16 +222,16 @@
     "exampleResultTitle": "DNF",
     "exampleRuleTitle": "Merksatz",
     "exampleRuleText": "Bei Wert 1 wird die Variable normal übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
-    "exercise1": "Ausdruck auswerten und DNF ableiten",
-    "exercise1Desc": "Füllen Sie die Wertetafel und bilden Sie die DNF aus allen 1-Zeilen",
-    "exercise2": "Klammerung vergleichen und DNF bilden",
-    "exercise2Desc": "Werten Sie den geklammerten Ausdruck aus und leiten Sie daraus die DNF ab",
-    "exercise3": "Halbaddierer-Summe als DNF",
-    "exercise3Desc": "Prüfen Sie das XOR-Polynom aus der Vorlesung über die Wertetafel",
-    "exercise4": "Mehrvariablen-Ausdruck als DNF",
-    "exercise4Desc": "Werten Sie einen Ausdruck mit vier Variablen aus und bilden Sie die DNF",
-    "exercise5": "Boolesches Polynom aus Wertetafel",
-    "exercise5Desc": "Erzeugen Sie aus einer vorgegebenen Wertetafel das boolesche Polynom in DNF",
+    "exercises": {
+      "worksheet02bTruthTable1": {
+        "title": "Übungsblatt 02b: Wertetafel 1",
+        "description": "Schreiben Sie das boolesche Polynom in disjunktiver Normalform für die vorgegebene Wertetafel mit a, b und c."
+      },
+      "worksheet02bTruthTable2": {
+        "title": "Übungsblatt 02b: Wertetafel 2",
+        "description": "Schreiben Sie das boolesche Polynom in disjunktiver Normalform für die vorgegebene Wertetafel mit a, b, c und d."
+      }
+    },
     "exprBuilder": {
       "evaluate": "Auswerten",
       "newExpression": "Anderen Ausdruck eingeben"
