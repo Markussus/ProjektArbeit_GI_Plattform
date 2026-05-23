@@ -112,7 +112,7 @@ export function DnfSimulator({
 
   return (
     <div className="flex h-full flex-col space-y-6">
-      <div className="border-border flex gap-1 overflow-x-auto border-b">
+      <div className="border-border flex gap-1 border-b">
         {simulatorModes.map((mode) => (
           <button
             key={mode}
@@ -133,7 +133,7 @@ export function DnfSimulator({
         ))}
       </div>
 
-      <div className="flex-1 overflow-auto">{renderContent()}</div>
+      <div className="flex-1">{renderContent()}</div>
     </div>
   );
 }
@@ -153,7 +153,8 @@ function TableToDnfBuilder({
   );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>
-    initialResultValues && initialResultValues.length === 2 ** initialVariableCount
+    initialResultValues &&
+    initialResultValues.length === 2 ** initialVariableCount
       ? [...initialResultValues]
       : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );

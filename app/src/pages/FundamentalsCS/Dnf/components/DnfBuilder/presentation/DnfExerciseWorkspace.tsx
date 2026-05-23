@@ -12,7 +12,7 @@ import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
-const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 32;
+const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 16;
 
 interface DnfExerciseWorkspaceProps {
   source: string;
@@ -217,7 +217,7 @@ export function DnfExerciseWorkspace({
           <div
             className={cn(
               "border-border mt-4 overflow-x-auto rounded-lg border",
-              isScrollableTruthTable && "max-h-[32rem] overflow-y-auto",
+              isScrollableTruthTable && "max-h-[28rem] overflow-y-auto",
             )}
           >
             <table className="w-full border-collapse text-sm">
