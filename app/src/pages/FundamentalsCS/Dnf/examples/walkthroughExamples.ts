@@ -44,9 +44,7 @@ interface DnfTruthTableExample extends DnfWalkthroughExampleBase {
   resultValues: boolean[];
 }
 
-export type DnfWalkthroughExample =
-  | DnfExpressionExample
-  | DnfTruthTableExample;
+export type DnfWalkthroughExample = DnfExpressionExample | DnfTruthTableExample;
 
 export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
   {
@@ -156,9 +154,6 @@ export function getDnfWalkthroughExample(
   );
 }
 
-function exampleMatchesId(
-  example: DnfWalkthroughExample,
-  id: string,
-): boolean {
+function exampleMatchesId(example: DnfWalkthroughExample, id: string): boolean {
   return example.id === id || example.titleKey === id;
 }

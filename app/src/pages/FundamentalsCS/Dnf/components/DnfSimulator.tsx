@@ -153,7 +153,8 @@ function TableToDnfBuilder({
   );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>
-    initialResultValues && initialResultValues.length === 2 ** initialVariableCount
+    initialResultValues &&
+    initialResultValues.length === 2 ** initialVariableCount
       ? [...initialResultValues]
       : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );

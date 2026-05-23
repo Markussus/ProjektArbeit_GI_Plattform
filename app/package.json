@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "npm@11.12.1",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=11.10.0"
+  },
   "scripts": {
     "dev": "vite",
     "dev:open": "vite --open --port 4173",
@@ -26,6 +31,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "verify:signatures": "npm audit signatures",
     "lhci:ci": "node scripts/run-preview-command.mjs --task=lhci",
     "e2e:ci": "node scripts/run-preview-command.mjs --task=e2e",
     "pipeline:local": "node scripts/pipeline-local.mjs"
