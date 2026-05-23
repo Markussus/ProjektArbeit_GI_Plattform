@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
@@ -17,6 +17,7 @@ interface DnfBuilderProps {
 
 export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
   const builder = useDnfBuilder(selectedExercise);
+  const [showFullTable, setShowFullTable] = useState(false);
   const display = useMemo(() => {
     if (!builder.showSolution || builder.analysis.status !== "valid") {
       return null;
@@ -62,6 +63,8 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         showSolution={builder.showSolution}
         resultHeader={builder.resultHeader}
         requiresTruthTableAnswers={builder.requiresTruthTableAnswers}
+        canToggleFullTable={true}
+        showFullTable={showFullTable}
         simplification={{
           isOpen: simplification.isOpen,
           answer: simplification.answer,
@@ -77,6 +80,7 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         onCheck={builder.checkExercise}
         onReset={builder.reset}
         onToggleSolution={builder.toggleSolution}
+        onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
 
       {builder.showSolution && display && (

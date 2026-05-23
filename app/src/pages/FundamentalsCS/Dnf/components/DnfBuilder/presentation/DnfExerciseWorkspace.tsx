@@ -213,34 +213,34 @@ export function DnfExerciseWorkspace({
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
         <section className="border-border bg-card rounded-lg border p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-foreground text-lg font-semibold">
-                {t("dnf.builder.exercise.tableTitle")}
-              </h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {requiresTruthTableAnswers
-                  ? t("dnf.builder.exercise.tableHint")
-                  : canEditTruthTableResults
-                    ? t("dnf.builder.exercise.tableHintEditable")
-                    : t("dnf.builder.exercise.tableHintGiven")}
-              </p>
-            </div>
+          <div>
+            <h2 className="text-foreground text-lg font-semibold">
+              {t("dnf.builder.exercise.tableTitle")}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {requiresTruthTableAnswers
+                ? t("dnf.builder.exercise.tableHint")
+                : canEditTruthTableResults
+                  ? t("dnf.builder.exercise.tableHintEditable")
+                  : t("dnf.builder.exercise.tableHintGiven")}
+            </p>
             {canActuallyToggleTable && onToggleFullTable && (
-              <button
-                type="button"
-                onClick={onToggleFullTable}
-                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {showFullTable ? (
-                  <ChevronUp className="size-4" />
-                ) : (
-                  <ChevronDown className="size-4" />
-                )}
-                {showFullTable
-                  ? t("dnf.builder.showCompactTable")
-                  : t("dnf.builder.showFullTable")}
-              </button>
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={onToggleFullTable}
+                  className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+                >
+                  {showFullTable ? (
+                    <ChevronUp className="size-4" />
+                  ) : (
+                    <ChevronDown className="size-4" />
+                  )}
+                  {showFullTable
+                    ? t("dnf.builder.showCompactTable")
+                    : t("dnf.builder.showFullTable")}
+                </button>
+              </div>
             )}
           </div>
 
