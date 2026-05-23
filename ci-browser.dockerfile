@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:24-bookworm-slim
 
 RUN apt-get update && apt-get install -y \
     chromium \
@@ -13,4 +13,3 @@ WORKDIR /tmp/pw-install
 COPY app/package.json app/package-lock.json ./
 
 RUN npm ci
-RUN npx playwright install chromium
