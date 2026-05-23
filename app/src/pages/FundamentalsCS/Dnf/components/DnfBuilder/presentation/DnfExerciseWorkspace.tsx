@@ -422,11 +422,12 @@ export function DnfExerciseWorkspace({
                   ? t("dnf.builder.exercise.showSolutionHelp")
                   : t("dnf.builder.exercise.solutionAfterCheck")}
             </button>
-            {canStartSimplification && simplification && (
+            {simplification && (
               <button
                 type="button"
                 onClick={simplification.onToggleOpen}
-                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+                disabled={!canStartSimplification}
+                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Sparkles className="size-4" />
                 {isSimplificationVisible
