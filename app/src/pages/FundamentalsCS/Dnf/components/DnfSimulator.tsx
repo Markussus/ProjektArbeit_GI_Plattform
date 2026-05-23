@@ -36,17 +36,16 @@ interface DnfSimulatorProps {
   selectedExercise?: Exercise | null;
   selectedExample?: Example | null;
   onExitExercise?: () => void;
+  onExitExample?: () => void;
 }
 
 export function DnfSimulator({
   selectedExercise,
   selectedExample,
   onExitExercise,
+  onExitExample,
 }: DnfSimulatorProps) {
   const { t } = useTranslation();
-  const [activeMode, setActiveMode] = useState<DnfSimulatorMode>(
-    "expression_to_truth_table",
-  );
 
   const walkthroughExample = selectedExample
     ? getDnfWalkthroughExample(selectedExample.id)
@@ -57,8 +56,15 @@ export function DnfSimulator({
       "expression_to_truth_table")
     : null;
 
-  const visibleMode =
-    selectedExerciseMode ?? walkthroughExample?.mode ?? activeMode;
+  // Seed the active mode from a walkthrough example (if any) so the example
+  // opens in its native mode, but let the user override by clicking a tab.
+  // The component remounts when the example changes (parent uses a keyed
+  // mount), so this initial value is recomputed for each new example.
+  const [activeMode, setActiveMode] = useState<DnfSimulatorMode>(
+    walkthroughExample?.mode ?? "expression_to_truth_table",
+  );
+
+  const visibleMode = selectedExerciseMode ?? activeMode;
 
   const handleModeClick = (mode: DnfSimulatorMode) => {
     if (mode === visibleMode) return;
@@ -66,6 +72,11 @@ export function DnfSimulator({
     setActiveMode(mode);
     if (selectedExercise) {
       onExitExercise?.();
+    } else if (walkthroughExample) {
+      // Switching tabs while a walkthrough example is active drops the
+      // example: the other mode has no seed data for it and the header would
+      // otherwise still advertise the example as "selected".
+      onExitExample?.();
     }
   };
 

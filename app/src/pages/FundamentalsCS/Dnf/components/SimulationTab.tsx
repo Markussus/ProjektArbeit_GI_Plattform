@@ -17,6 +17,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedExercise={selectedExercise}
         selectedExample={selectedExample}
         onExitExercise={props.onExitExercise}
+        onExitExample={props.onExitExample}
       />
     </TopicSimulationTab>
   );

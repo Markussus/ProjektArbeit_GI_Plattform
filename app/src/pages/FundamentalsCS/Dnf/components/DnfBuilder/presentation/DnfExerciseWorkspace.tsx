@@ -11,6 +11,10 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBooleanValue } from "../domain/booleanExpression";
 import { formatBooleanInput } from "../domain/booleanSyntax";
+import {
+  deriveDnfFromTruthTable,
+  formatDnfExpression,
+} from "../domain/dnfDerivation";
 import type {
   DnfExerciseCheckResult,
   TruthTableAnswer,
@@ -434,7 +438,9 @@ export function DnfExerciseWorkspace({
 
           {isSimplificationVisible && simplification && (
             <DnfSimplificationPanel
-              canonicalDnf={dnfAnswer}
+              canonicalDnf={formatDnfExpression(
+                deriveDnfFromTruthTable(truthTable).dnf,
+              )}
               simplificationAnswer={simplification.answer}
               feedback={simplification.feedback}
               showSolution={simplification.showSolution}

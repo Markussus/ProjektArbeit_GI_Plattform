@@ -39,15 +39,7 @@ export function useDnfSimplification(): UseDnfSimplificationResult {
   };
 
   const toggleOpen = () => {
-    setIsOpen((current) => {
-      const next = !current;
-      if (!next) {
-        setAnswerInternal("");
-        setFeedback(null);
-        setShowSolution(false);
-      }
-      return next;
-    });
+    setIsOpen((current) => !current);
   };
 
   const check = (truthTable: TruthTable) => {

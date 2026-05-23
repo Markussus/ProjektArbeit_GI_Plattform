@@ -3,8 +3,10 @@ import type { TFunction } from "i18next";
 import { CheckCircle2, Eye, Lightbulb, Search, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import type { BooleanExpression } from "../domain/booleanExpression";
-import { formatBooleanInput } from "../domain/booleanSyntax";
+import {
+  formatBooleanExpressionForDisplay,
+  reformatBooleanExpressionInput,
+} from "../domain/booleanExpressionFormat";
 import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 
@@ -75,7 +77,9 @@ export function DnfSimplificationPanel({
           id="dnf-simplified-answer"
           value={simplificationAnswer}
           onChange={(event) => onAnswerChange(event.target.value)}
-          onBlur={(event) => onAnswerChange(formatBooleanInput(event.target.value))}
+          onBlur={(event) =>
+            onAnswerChange(reformatBooleanExpressionInput(event.target.value))
+          }
           spellCheck="false"
           placeholder={t("dnf.builder.exercise.simplifiedDnfPlaceholder")}
           className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-20 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
@@ -116,12 +120,16 @@ export function DnfSimplificationPanel({
             {t("dnf.builder.exercise.minimalDnfLabel")}
           </p>
           <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
-            {formatBooleanExpression(feedback.minimalExpression)}
+            {formatBooleanExpressionForDisplay(feedback.minimalExpression)}
           </code>
           <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
             {t("dnf.builder.exercise.minimalDnfNote", {
-              literals: feedback.minimumLiteralCount,
-              terms: feedback.minimumTermCount,
+              literalsLabel: t("dnf.builder.exercise.literalCount", {
+                count: feedback.minimumLiteralCount,
+              }),
+              termsLabel: t("dnf.builder.exercise.termCount", {
+                count: feedback.minimumTermCount,
+              }),
             })}
           </p>
         </div>
@@ -245,29 +253,3 @@ function getStatusTone(
   }
 }
 
-function formatBooleanExpression(expression: BooleanExpression): string {
-  return renderExpression(expression, 0);
-}
-
-function renderExpression(
-  expression: BooleanExpression,
-  parentPrecedence: number,
-): string {
-  switch (expression.type) {
-    case "constant":
-      return expression.value ? "1" : "0";
-    case "variable":
-      return expression.name;
-    case "not":
-      return `¬${renderExpression(expression.operand, 3)}`;
-    case "binary": {
-      const precedence = expression.operator === "and" ? 2 : 1;
-      const symbol = expression.operator === "and" ? "∧" : "∨";
-      const text = `${renderExpression(
-        expression.left,
-        precedence,
-      )} ${symbol} ${renderExpression(expression.right, precedence)}`;
-      return precedence < parentPrecedence ? `(${text})` : text;
-    }
-  }
-}
