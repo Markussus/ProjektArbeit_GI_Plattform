@@ -11,14 +11,20 @@ test("shows guided DNF examples", async ({ page }) => {
 
   await page.getByRole("button", { name: /^Examples$/ }).click();
   await expect(page.getByText("Lecture examples")).toBeVisible();
-  const lectureExample = page.locator("article").filter({
-    hasText: "Expression with an AND group",
-  });
 
+  const lectureExample = page.getByTestId("dnf-example-lecture-expression");
   await expect(lectureExample).toBeVisible();
-  await expect(lectureExample.getByText("a=0, b=1, c=1")).toBeVisible();
   await expect(
-    lectureExample.getByText("¬a ∧ b ∧ c", { exact: true }),
+    lectureExample.getByText("Expression with an AND group"),
+  ).toBeVisible();
+
+  await lectureExample
+    .getByTestId("dnf-example-lecture-expression-select")
+    .click();
+  await expect(
+    lectureExample.getByText(
+      "The expression is true when a=1 or b and c are both 1.",
+    ),
   ).toBeVisible();
 });
 
@@ -52,12 +58,16 @@ test("covers DNF simulation safeguards for large and invalid inputs", async ({
 
   await page.getByRole("button", { name: "Evaluate" }).click();
   await page.getByRole("button", { name: "Show solution as hint" }).click();
-  await expect(page.getByText("The DNF has 31 terms.")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Show all 31 terms" }),
+    page.getByText(
+      "Large DNF: all 31 terms are scrollable in the compact view.",
+    ),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Show full table" }),
+    page.getByRole("button", { name: "Show full DNF" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Show full table" }).first(),
   ).toBeVisible();
 
   await page
@@ -88,7 +98,7 @@ test("solves a DNF exercise from a given truth table", async ({ page }) => {
   await page.getByRole("button", { name: "Open in simulation" }).click();
 
   await expect(page.getByText("Given the truth table:")).toBeVisible();
-  await expect(page.getByRole("columnheader", { name: "???" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "f" })).toBeVisible();
 
   await page
     .locator("#dnf-exercise-answer")
