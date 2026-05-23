@@ -181,8 +181,7 @@ function countLiterals(expression: BooleanExpression): number {
 function countTopLevelTerms(expression: BooleanExpression): number {
   if (expression.type === "binary" && expression.operator === "or") {
     return (
-      countTopLevelTerms(expression.left) +
-      countTopLevelTerms(expression.right)
+      countTopLevelTerms(expression.left) + countTopLevelTerms(expression.right)
     );
   }
   return 1;
@@ -200,9 +199,10 @@ function getCanonicalLiteralCount(table: TruthTable): number {
 }
 
 /** Internal helper exposed for use by hooks that want a fresh baseline view. */
-export function describeMinimalDnf(
-  table: TruthTable,
-): { minimal: MinimalDnf; expression: BooleanExpression } {
+export function describeMinimalDnf(table: TruthTable): {
+  minimal: MinimalDnf;
+  expression: BooleanExpression;
+} {
   const minimal = computeMinimalDnf(table);
   return {
     minimal,

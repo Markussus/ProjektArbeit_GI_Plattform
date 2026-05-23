@@ -28,10 +28,7 @@ export function reformatBooleanExpressionInput(source: string): string {
 
 type ParentContext = "or" | "and" | "not" | "root";
 
-function renderNode(
-  node: BooleanExpression,
-  parent: ParentContext,
-): string {
+function renderNode(node: BooleanExpression, parent: ParentContext): string {
   switch (node.type) {
     case "constant":
       return node.value ? "1" : "0";

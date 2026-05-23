@@ -53,9 +53,7 @@ export function DnfSimplificationPanel({
   const statusTone = getStatusTone(feedback?.status);
   const walkthrough = useMemo(
     () =>
-      feedback !== null
-        ? buildDnfSimplificationWalkthrough(truthTable)
-        : null,
+      feedback !== null ? buildDnfSimplificationWalkthrough(truthTable) : null,
     [feedback, truthTable],
   );
 
@@ -266,9 +264,7 @@ function SimplificationWalkthrough({
                       ? t("dnf.builder.exercise.walkthroughGroupEliminated", {
                           variables: group.eliminatedVariables.join(", "),
                         })
-                      : t(
-                          "dnf.builder.exercise.walkthroughGroupNoEliminated",
-                        )}
+                      : t("dnf.builder.exercise.walkthroughGroupNoEliminated")}
                   </p>
                 </div>
               ))}
@@ -338,10 +334,7 @@ function SimplificationFeedback({
 
   return (
     <div
-      className={cn(
-        "mt-4 rounded-md border p-3",
-        statusTone.containerClass,
-      )}
+      className={cn("mt-4 rounded-md border p-3", statusTone.containerClass)}
     >
       <div className="flex items-start gap-2">
         <statusTone.Icon
@@ -412,8 +405,7 @@ function getStatusTone(
   switch (status) {
     case "accepted_minimal":
       return {
-        containerClass:
-          "border-emerald-500/30 bg-emerald-500/10",
+        containerClass: "border-emerald-500/30 bg-emerald-500/10",
         titleClass: "text-emerald-700 dark:text-emerald-300",
         iconClass: "text-emerald-600 dark:text-emerald-400",
         Icon: CheckCircle2,

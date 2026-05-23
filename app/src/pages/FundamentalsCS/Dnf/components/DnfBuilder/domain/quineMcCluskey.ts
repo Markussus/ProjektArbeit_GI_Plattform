@@ -87,7 +87,11 @@ function implicantToExpression(
 ): BooleanExpression {
   const literals: BooleanExpression[] = [];
 
-  for (let bitPosition = variableCount - 1; bitPosition >= 0; bitPosition -= 1) {
+  for (
+    let bitPosition = variableCount - 1;
+    bitPosition >= 0;
+    bitPosition -= 1
+  ) {
     const mask = 1 << bitPosition;
 
     if ((implicant.mask & mask) !== 0) {
@@ -259,7 +263,9 @@ function selectCover(
     pickedEssential = false;
 
     for (const minterm of remaining) {
-      const covering = [...available].filter((pi) => pi.covers.includes(minterm));
+      const covering = [...available].filter((pi) =>
+        pi.covers.includes(minterm),
+      );
 
       if (covering.length === 1) {
         const essential = covering[0];

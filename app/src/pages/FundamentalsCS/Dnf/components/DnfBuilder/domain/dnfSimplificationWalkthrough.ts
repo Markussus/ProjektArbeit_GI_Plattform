@@ -77,7 +77,11 @@ function formatImplicantTerm(
   const variableCount = variables.length;
   const literals: string[] = [];
 
-  for (let variableIndex = 0; variableIndex < variableCount; variableIndex += 1) {
+  for (
+    let variableIndex = 0;
+    variableIndex < variableCount;
+    variableIndex += 1
+  ) {
     const bitPosition = variableCount - variableIndex - 1;
     const mask = 1 << bitPosition;
 
@@ -86,7 +90,9 @@ function formatImplicantTerm(
     }
 
     const variable = variables[variableIndex];
-    literals.push((implicant.value & mask) !== 0 ? variable : `${NOT}${variable}`);
+    literals.push(
+      (implicant.value & mask) !== 0 ? variable : `${NOT}${variable}`,
+    );
   }
 
   if (literals.length === 0) {
@@ -105,7 +111,11 @@ function getEliminatedVariables(
   const variableCount = variables.length;
   const eliminated: string[] = [];
 
-  for (let variableIndex = 0; variableIndex < variableCount; variableIndex += 1) {
+  for (
+    let variableIndex = 0;
+    variableIndex < variableCount;
+    variableIndex += 1
+  ) {
     const bitPosition = variableCount - variableIndex - 1;
     if ((implicant.mask & (1 << bitPosition)) !== 0) {
       eliminated.push(variables[variableIndex]);

@@ -47,12 +47,10 @@ describe("dnfSimplificationWalkthrough", () => {
   });
 
   it("explains contradictions as a constant simplification", () => {
-    const table = createTruthTableFromResults(["a", "b"], [
-      false,
-      false,
-      false,
-      false,
-    ]);
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [false, false, false, false],
+    );
 
     const walkthrough = buildDnfSimplificationWalkthrough(table);
 

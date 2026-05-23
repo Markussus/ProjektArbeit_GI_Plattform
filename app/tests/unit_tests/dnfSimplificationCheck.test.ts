@@ -69,10 +69,7 @@ describe("DNF simplification check", () => {
       ),
     );
 
-    const result = checkDnfSimplification(
-      table,
-      "(¬q0 ∧ q1) ∨ (q0 ∧ ¬q1)",
-    );
+    const result = checkDnfSimplification(table, "(¬q0 ∧ q1) ∨ (q0 ∧ ¬q1)");
 
     expect(result.status).toBe("accepted_minimal");
     expect(result.userLiteralCount).toBe(4);

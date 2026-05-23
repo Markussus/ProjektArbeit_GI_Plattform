@@ -23,8 +23,9 @@ export interface UseDnfSimplificationResult {
 export function useDnfSimplification(): UseDnfSimplificationResult {
   const [isOpen, setIsOpen] = useState(false);
   const [answer, setAnswerInternal] = useState("");
-  const [feedback, setFeedback] =
-    useState<DnfSimplificationCheckResult | null>(null);
+  const [feedback, setFeedback] = useState<DnfSimplificationCheckResult | null>(
+    null,
+  );
   const [showSolution, setShowSolution] = useState(false);
   const [showWalkthrough, setShowWalkthrough] = useState(false);
 

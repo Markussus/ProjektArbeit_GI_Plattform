@@ -16,7 +16,10 @@ import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/compo
 
 describe("Quine-McCluskey minimization", () => {
   it("collapses an unsatisfiable function to constant false", () => {
-    const table = createTruthTableFromResults(["a", "b"], [false, false, false, false]);
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [false, false, false, false],
+    );
 
     const minimal = computeMinimalDnf(table);
 
@@ -29,7 +32,10 @@ describe("Quine-McCluskey minimization", () => {
   });
 
   it("collapses a tautology to constant true", () => {
-    const table = createTruthTableFromResults(["a", "b"], [true, true, true, true]);
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [true, true, true, true],
+    );
 
     const minimal = computeMinimalDnf(table);
 

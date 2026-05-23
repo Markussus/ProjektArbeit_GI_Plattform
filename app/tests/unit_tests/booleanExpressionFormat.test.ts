@@ -42,9 +42,7 @@ describe("booleanExpressionFormat", () => {
   });
 
   it("reformats input strings via parse + re-emit", () => {
-    expect(reformatBooleanExpressionInput("a∧b∨c∧d")).toBe(
-      "(a ∧ b) ∨ (c ∧ d)",
-    );
+    expect(reformatBooleanExpressionInput("a∧b∨c∧d")).toBe("(a ∧ b) ∨ (c ∧ d)");
   });
 
   it("falls back to the raw input when parsing fails", () => {
