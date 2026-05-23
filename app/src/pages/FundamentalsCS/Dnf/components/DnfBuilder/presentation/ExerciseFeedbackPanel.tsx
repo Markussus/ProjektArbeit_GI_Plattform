@@ -28,7 +28,7 @@ export function ExerciseFeedbackPanel({
 
   if (!feedback) {
     return (
-      <aside className="border-border bg-card rounded-lg border p-5">
+      <aside className="border-border bg-card h-full rounded-lg border p-5">
         <div className="flex items-center gap-3">
           <div className="bg-muted text-muted-foreground flex size-9 items-center justify-center rounded-md">
             <LockKeyhole className="size-5" />
@@ -81,7 +81,7 @@ export function ExerciseFeedbackPanel({
 
   if (feedback.isCorrect) {
     return (
-      <aside className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-5">
+      <aside className="h-full rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-5">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <div>
@@ -106,7 +106,7 @@ export function ExerciseFeedbackPanel({
   }
 
   return (
-    <aside className="border-border bg-card rounded-lg border p-5">
+    <aside className="border-border bg-card h-full rounded-lg border p-5">
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.exercise.feedbackTitle")}
       </h2>

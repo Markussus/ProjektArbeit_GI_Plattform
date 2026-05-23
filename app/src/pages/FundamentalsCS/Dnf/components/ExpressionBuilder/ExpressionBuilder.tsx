@@ -11,11 +11,9 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
-import { DnfDerivationSteps } from "../DnfBuilder/presentation/DnfDerivationSteps";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
+import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
 import { DnfOperatorToolbar } from "../DnfBuilder/presentation/DnfOperatorToolbar";
-import { DnfResultPanel } from "../DnfBuilder/presentation/DnfResultPanel";
-import { DnfTruthTableView } from "../DnfBuilder/presentation/DnfTruthTableView";
 import {
   ParseErrorPanel,
   VariableLimitPanel,
@@ -209,6 +207,34 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     return <ParseErrorPanel issue={analysis.issue} />;
   }
 
+  const simplificationControls = {
+    answer: simplification.answer,
+    feedback: simplification.feedback,
+    showSolution: simplification.showSolution,
+    showWalkthrough: simplification.showWalkthrough,
+    onAnswerChange: simplification.setAnswer,
+    onCheck: () => simplification.check(analysis.truthTable),
+    onToggleSolution: simplification.toggleSolution,
+    onToggleWalkthrough: simplification.toggleWalkthrough,
+  };
+  const solution =
+    showSolution && display
+      ? {
+          formattedDnf: analysis.formattedDnf,
+          variableCount: analysis.truthTable.variables.length,
+          rowCount: analysis.truthTable.rows.length,
+          trueRowCount: analysis.derivation.trueRows.length,
+          derivation: analysis.derivation,
+          display,
+          resultHeader: committedSource,
+          truthTable: analysis.truthTable,
+        }
+      : undefined;
+  const simplificationFollowUp =
+    feedback?.isCorrect === true
+      ? { truthTable: analysis.truthTable, controls: simplificationControls }
+      : undefined;
+
   return (
     <>
       <DnfExerciseWorkspace
@@ -223,18 +249,6 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
         canAlwaysShowSolution={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
-        simplification={{
-          isOpen: simplification.isOpen,
-          answer: simplification.answer,
-          feedback: simplification.feedback,
-          showSolution: simplification.showSolution,
-          showWalkthrough: simplification.showWalkthrough,
-          onAnswerChange: simplification.setAnswer,
-          onToggleOpen: simplification.toggleOpen,
-          onCheck: () => simplification.check(analysis.truthTable),
-          onToggleSolution: simplification.toggleSolution,
-          onToggleWalkthrough: simplification.toggleWalkthrough,
-        }}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
@@ -243,27 +257,10 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
         onToggleFullTable={() => setShowFullTable((prev) => !prev)}
       />
 
-      {showSolution && (
-        <>
-          <DnfResultPanel
-            formattedDnf={analysis.formattedDnf}
-            variableCount={analysis.truthTable.variables.length}
-            rowCount={analysis.truthTable.rows.length}
-            trueRowCount={analysis.derivation.trueRows.length}
-            derivation={analysis.derivation}
-          />
-          <DnfDerivationSteps
-            derivation={analysis.derivation}
-            truthTable={analysis.truthTable}
-          />
-          {display && (
-            <DnfTruthTableView
-              display={display}
-              resultHeader={committedSource}
-            />
-          )}
-        </>
-      )}
+      <DnfFollowUpSections
+        solution={solution}
+        simplification={simplificationFollowUp}
+      />
     </>
   );
 }

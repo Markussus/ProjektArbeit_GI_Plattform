@@ -2,14 +2,12 @@ import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
-import { DnfDerivationSteps } from "./presentation/DnfDerivationSteps";
 import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
-import { DnfResultPanel } from "./presentation/DnfResultPanel";
+import { DnfFollowUpSections } from "./presentation/DnfFollowUpSections";
 import {
   ParseErrorPanel,
   VariableLimitPanel,
 } from "./presentation/DnfStatusPanels";
-import { DnfTruthTableView } from "./presentation/DnfTruthTableView";
 
 interface DnfBuilderProps {
   selectedExercise: Exercise;
@@ -51,6 +49,33 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
   const analysis = builder.analysis;
   const truthTable = analysis.truthTable;
   const simplification = builder.simplification;
+  const simplificationControls = {
+    answer: simplification.answer,
+    feedback: simplification.feedback,
+    showSolution: simplification.showSolution,
+    showWalkthrough: simplification.showWalkthrough,
+    onAnswerChange: simplification.setAnswer,
+    onCheck: () => simplification.check(truthTable),
+    onToggleSolution: simplification.toggleSolution,
+    onToggleWalkthrough: simplification.toggleWalkthrough,
+  };
+  const solution =
+    builder.showSolution && display
+      ? {
+          formattedDnf: analysis.formattedDnf,
+          variableCount: truthTable.variables.length,
+          rowCount: truthTable.rows.length,
+          trueRowCount: analysis.derivation.trueRows.length,
+          derivation: analysis.derivation,
+          display,
+          resultHeader: builder.resultHeader,
+          truthTable,
+        }
+      : undefined;
+  const simplificationFollowUp =
+    builder.exerciseFeedback?.isCorrect === true
+      ? { truthTable, controls: simplificationControls }
+      : undefined;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -65,18 +90,6 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         requiresTruthTableAnswers={builder.requiresTruthTableAnswers}
         canToggleFullTable={true}
         showFullTable={showFullTable}
-        simplification={{
-          isOpen: simplification.isOpen,
-          answer: simplification.answer,
-          feedback: simplification.feedback,
-          showSolution: simplification.showSolution,
-          showWalkthrough: simplification.showWalkthrough,
-          onAnswerChange: simplification.setAnswer,
-          onToggleOpen: simplification.toggleOpen,
-          onCheck: () => simplification.check(truthTable),
-          onToggleSolution: simplification.toggleSolution,
-          onToggleWalkthrough: simplification.toggleWalkthrough,
-        }}
         onTruthTableAnswerChange={builder.setTruthTableAnswer}
         onDnfAnswerChange={builder.setDnfAnswer}
         onCheck={builder.checkExercise}
@@ -85,25 +98,10 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
 
-      {builder.showSolution && display && (
-        <>
-          <DnfResultPanel
-            formattedDnf={analysis.formattedDnf}
-            variableCount={truthTable.variables.length}
-            rowCount={truthTable.rows.length}
-            trueRowCount={analysis.derivation.trueRows.length}
-            derivation={analysis.derivation}
-          />
-          <DnfDerivationSteps
-            derivation={analysis.derivation}
-            truthTable={truthTable}
-          />
-          <DnfTruthTableView
-            display={display}
-            resultHeader={builder.resultHeader}
-          />
-        </>
-      )}
+      <DnfFollowUpSections
+        solution={solution}
+        simplification={simplificationFollowUp}
+      />
     </div>
   );
 }

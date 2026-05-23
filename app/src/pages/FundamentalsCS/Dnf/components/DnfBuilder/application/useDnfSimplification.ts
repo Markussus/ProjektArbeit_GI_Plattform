@@ -7,13 +7,11 @@ import {
 import type { TruthTable } from "../domain/truthTable";
 
 export interface UseDnfSimplificationResult {
-  isOpen: boolean;
   answer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
   showWalkthrough: boolean;
   setAnswer: (value: string) => void;
-  toggleOpen: () => void;
   check: (truthTable: TruthTable) => void;
   toggleSolution: () => void;
   toggleWalkthrough: () => void;
@@ -21,7 +19,6 @@ export interface UseDnfSimplificationResult {
 }
 
 export function useDnfSimplification(): UseDnfSimplificationResult {
-  const [isOpen, setIsOpen] = useState(false);
   const [answer, setAnswerInternal] = useState("");
   const [feedback, setFeedback] = useState<DnfSimplificationCheckResult | null>(
     null,
@@ -30,7 +27,6 @@ export function useDnfSimplification(): UseDnfSimplificationResult {
   const [showWalkthrough, setShowWalkthrough] = useState(false);
 
   const reset = () => {
-    setIsOpen(false);
     setAnswerInternal("");
     setFeedback(null);
     setShowSolution(false);
@@ -42,10 +38,6 @@ export function useDnfSimplification(): UseDnfSimplificationResult {
     setFeedback(null);
     setShowSolution(false);
     setShowWalkthrough(false);
-  };
-
-  const toggleOpen = () => {
-    setIsOpen((current) => !current);
   };
 
   const check = (truthTable: TruthTable) => {
@@ -61,13 +53,11 @@ export function useDnfSimplification(): UseDnfSimplificationResult {
   };
 
   return {
-    isOpen,
     answer,
     feedback,
     showSolution,
     showWalkthrough,
     setAnswer,
-    toggleOpen,
     check,
     toggleSolution,
     toggleWalkthrough,

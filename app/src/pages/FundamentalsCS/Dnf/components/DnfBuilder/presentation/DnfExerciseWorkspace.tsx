@@ -1,44 +1,18 @@
 import { useRef, type KeyboardEvent } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  RotateCcw,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, RotateCcw, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBooleanValue } from "../domain/booleanExpression";
 import { formatBooleanInput } from "../domain/booleanSyntax";
-import {
-  deriveDnfFromTruthTable,
-  formatDnfExpression,
-} from "../domain/dnfDerivation";
 import type {
   DnfExerciseCheckResult,
   TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
-import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
 import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
-import { DnfSimplificationPanel } from "./DnfSimplificationPanel";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
 const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 16;
-
-export interface DnfSimplificationControls {
-  isOpen: boolean;
-  answer: string;
-  feedback: DnfSimplificationCheckResult | null;
-  showSolution: boolean;
-  showWalkthrough: boolean;
-  onAnswerChange: (value: string) => void;
-  onToggleOpen: () => void;
-  onCheck: () => void;
-  onToggleSolution: () => void;
-  onToggleWalkthrough: () => void;
-}
 
 interface DnfExerciseWorkspaceProps {
   source: string;
@@ -53,7 +27,6 @@ interface DnfExerciseWorkspaceProps {
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
   showFullTable?: boolean;
-  simplification?: DnfSimplificationControls;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
@@ -75,7 +48,6 @@ export function DnfExerciseWorkspace({
   canEditTruthTableResults = false,
   canToggleFullTable = false,
   showFullTable = false,
-  simplification,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
@@ -101,10 +73,6 @@ export function DnfExerciseWorkspace({
   const canActuallyToggleTable = canToggleFullTable && isLargeWorkspaceTable;
   const isCompactEditableTable = canActuallyToggleTable && !showFullTable;
   const isScrollableTruthTable = isCompactEditableTable;
-  const canStartSimplification =
-    simplification !== undefined && feedback?.isCorrect === true;
-  const isSimplificationVisible =
-    canStartSimplification && simplification?.isOpen;
 
   const focusResultRow = (rowIndex: number) => {
     const nextRow =
@@ -213,7 +181,7 @@ export function DnfExerciseWorkspace({
         </div>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
+      <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
         <section className="border-border bg-card rounded-lg border p-4">
           <div>
             <h2 className="text-foreground text-lg font-semibold">
@@ -424,37 +392,7 @@ export function DnfExerciseWorkspace({
                   ? t("dnf.builder.exercise.showSolutionHelp")
                   : t("dnf.builder.exercise.solutionAfterCheck")}
             </button>
-            {simplification && (
-              <button
-                type="button"
-                onClick={simplification.onToggleOpen}
-                disabled={!canStartSimplification}
-                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Sparkles className="size-4" />
-                {isSimplificationVisible
-                  ? t("dnf.builder.exercise.hideSimplification")
-                  : t("dnf.builder.exercise.startSimplification")}
-              </button>
-            )}
           </div>
-
-          {isSimplificationVisible && simplification && (
-            <DnfSimplificationPanel
-              canonicalDnf={formatDnfExpression(
-                deriveDnfFromTruthTable(truthTable).dnf,
-              )}
-              truthTable={truthTable}
-              simplificationAnswer={simplification.answer}
-              feedback={simplification.feedback}
-              showSolution={simplification.showSolution}
-              showWalkthrough={simplification.showWalkthrough}
-              onAnswerChange={simplification.onAnswerChange}
-              onCheck={simplification.onCheck}
-              onToggleSolution={simplification.onToggleSolution}
-              onToggleWalkthrough={simplification.onToggleWalkthrough}
-            />
-          )}
         </section>
 
         <ExerciseFeedbackPanel

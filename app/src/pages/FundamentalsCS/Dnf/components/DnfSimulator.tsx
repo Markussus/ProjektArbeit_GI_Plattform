@@ -13,10 +13,8 @@ import {
 } from "./DnfBuilder/domain/dnfExerciseCheck";
 import { createTruthTableFromResults } from "./DnfBuilder/domain/truthTable";
 import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
-import { DnfDerivationSteps } from "./DnfBuilder/presentation/DnfDerivationSteps";
 import { DnfExerciseWorkspace } from "./DnfBuilder/presentation/DnfExerciseWorkspace";
-import { DnfResultPanel } from "./DnfBuilder/presentation/DnfResultPanel";
-import { DnfTruthTableView } from "./DnfBuilder/presentation/DnfTruthTableView";
+import { DnfFollowUpSections } from "./DnfBuilder/presentation/DnfFollowUpSections";
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
@@ -248,6 +246,34 @@ function TableToDnfBuilder({
     return null;
   }
 
+  const simplificationControls = {
+    answer: simplification.answer,
+    feedback: simplification.feedback,
+    showSolution: simplification.showSolution,
+    showWalkthrough: simplification.showWalkthrough,
+    onAnswerChange: simplification.setAnswer,
+    onCheck: () => simplification.check(analysis.truthTable),
+    onToggleSolution: simplification.toggleSolution,
+    onToggleWalkthrough: simplification.toggleWalkthrough,
+  };
+  const solution =
+    showSolution && display
+      ? {
+          formattedDnf: analysis.formattedDnf,
+          variableCount: analysis.truthTable.variables.length,
+          rowCount: analysis.truthTable.rows.length,
+          trueRowCount: analysis.derivation.trueRows.length,
+          derivation: analysis.derivation,
+          display,
+          resultHeader: "f",
+          truthTable: analysis.truthTable,
+        }
+      : undefined;
+  const simplificationFollowUp =
+    feedback?.isCorrect === true
+      ? { truthTable: analysis.truthTable, controls: simplificationControls }
+      : undefined;
+
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <section className="border-border bg-card rounded-lg border p-4">
@@ -355,18 +381,6 @@ function TableToDnfBuilder({
         canEditTruthTableResults={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
-        simplification={{
-          isOpen: simplification.isOpen,
-          answer: simplification.answer,
-          feedback: simplification.feedback,
-          showSolution: simplification.showSolution,
-          showWalkthrough: simplification.showWalkthrough,
-          onAnswerChange: simplification.setAnswer,
-          onToggleOpen: simplification.toggleOpen,
-          onCheck: () => simplification.check(analysis.truthTable),
-          onToggleSolution: simplification.toggleSolution,
-          onToggleWalkthrough: simplification.toggleWalkthrough,
-        }}
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
@@ -375,22 +389,10 @@ function TableToDnfBuilder({
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
 
-      {showSolution && (
-        <>
-          <DnfResultPanel
-            formattedDnf={analysis.formattedDnf}
-            variableCount={analysis.truthTable.variables.length}
-            rowCount={analysis.truthTable.rows.length}
-            trueRowCount={analysis.derivation.trueRows.length}
-            derivation={analysis.derivation}
-          />
-          <DnfDerivationSteps
-            derivation={analysis.derivation}
-            truthTable={analysis.truthTable}
-          />
-          {display && <DnfTruthTableView display={display} resultHeader="f" />}
-        </>
-      )}
+      <DnfFollowUpSections
+        solution={solution}
+        simplification={simplificationFollowUp}
+      />
     </div>
   );
 }

@@ -29,6 +29,7 @@ interface DnfSimplificationPanelProps {
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
   showWalkthrough: boolean;
+  className?: string;
   onAnswerChange: (value: string) => void;
   onCheck: () => void;
   onToggleSolution: () => void;
@@ -42,6 +43,7 @@ export function DnfSimplificationPanel({
   feedback,
   showSolution,
   showWalkthrough,
+  className,
   onAnswerChange,
   onCheck,
   onToggleSolution,
@@ -58,7 +60,12 @@ export function DnfSimplificationPanel({
   );
 
   return (
-    <section className="border-border bg-muted/30 mt-5 rounded-lg border p-4">
+    <section
+      className={cn(
+        "border-border bg-muted/30 rounded-lg border p-4",
+        className,
+      )}
+    >
       <div className="flex items-start gap-3">
         <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
           <Sparkles className="size-5" />
