@@ -1,6 +1,13 @@
-import { useRef } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import type { TFunction } from "i18next";
-import { CheckCircle2, Eye, Lightbulb, Search, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Eye,
+  Lightbulb,
+  ListChecks,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import {
@@ -8,31 +15,49 @@ import {
   reformatBooleanExpressionInput,
 } from "../domain/booleanExpressionFormat";
 import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
+import {
+  buildDnfSimplificationWalkthrough,
+  type DnfSimplificationWalkthrough,
+} from "../domain/dnfSimplificationWalkthrough";
+import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 
 interface DnfSimplificationPanelProps {
   canonicalDnf: string;
+  truthTable: TruthTable;
   simplificationAnswer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
+  showWalkthrough: boolean;
   onAnswerChange: (value: string) => void;
   onCheck: () => void;
   onToggleSolution: () => void;
+  onToggleWalkthrough: () => void;
 }
 
 export function DnfSimplificationPanel({
   canonicalDnf,
+  truthTable,
   simplificationAnswer,
   feedback,
   showSolution,
+  showWalkthrough,
   onAnswerChange,
   onCheck,
   onToggleSolution,
+  onToggleWalkthrough,
 }: DnfSimplificationPanelProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const statusTone = getStatusTone(feedback?.status);
+  const walkthrough = useMemo(
+    () =>
+      feedback !== null
+        ? buildDnfSimplificationWalkthrough(truthTable)
+        : null,
+    [feedback, truthTable],
+  );
 
   return (
     <section className="border-border bg-muted/30 mt-5 rounded-lg border p-4">
@@ -108,6 +133,19 @@ export function DnfSimplificationPanel({
               ? t("dnf.builder.exercise.showSimplificationSolution")
               : t("dnf.builder.exercise.solutionAfterCheckSimplification")}
         </button>
+        <button
+          type="button"
+          onClick={onToggleWalkthrough}
+          disabled={feedback === null}
+          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ListChecks className="size-4" />
+          {showWalkthrough
+            ? t("dnf.builder.exercise.hideSimplificationWalkthrough")
+            : feedback !== null
+              ? t("dnf.builder.exercise.showSimplificationWalkthrough")
+              : t("dnf.builder.exercise.walkthroughAfterCheckSimplification")}
+        </button>
       </div>
 
       {feedback && (
@@ -134,6 +172,10 @@ export function DnfSimplificationPanel({
           </p>
         </div>
       )}
+
+      {feedback && showWalkthrough && walkthrough && (
+        <SimplificationWalkthrough walkthrough={walkthrough} />
+      )}
     </section>
   );
 }
@@ -141,6 +183,151 @@ export function DnfSimplificationPanel({
 interface SimplificationFeedbackProps {
   feedback: DnfSimplificationCheckResult;
   statusTone: StatusTone;
+}
+
+interface SimplificationWalkthroughProps {
+  walkthrough: DnfSimplificationWalkthrough;
+}
+
+function SimplificationWalkthrough({
+  walkthrough,
+}: SimplificationWalkthroughProps) {
+  const { t } = useTranslation();
+  const hasGroups = walkthrough.groups.length > 0;
+
+  return (
+    <div className="border-border bg-background mt-4 rounded-md border p-3">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="text-brand mt-0.5 size-5 shrink-0" />
+        <div>
+          <p className="text-foreground text-sm font-semibold">
+            {t("dnf.builder.exercise.walkthroughTitle")}
+          </p>
+          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+            {t("dnf.builder.exercise.walkthroughNote")}
+          </p>
+        </div>
+      </div>
+
+      <ol className="mt-4 max-h-80 space-y-3 overflow-y-auto pr-1 text-sm">
+        <WalkthroughStep index={1}>
+          <p className="text-foreground font-semibold">
+            {t("dnf.builder.exercise.walkthroughRowsTitle")}
+          </p>
+          <p className="text-muted-foreground mt-1 leading-relaxed">
+            {walkthrough.constantCase === "always_false"
+              ? t("dnf.builder.exercise.walkthroughNoRows")
+              : t("dnf.builder.exercise.walkthroughRowsText", {
+                  rows: formatRowNumbers(walkthrough.trueRowNumbers, t),
+                })}
+          </p>
+          <code className="border-border bg-card text-foreground mt-2 block max-h-28 overflow-y-auto rounded-md border p-2 font-mono text-xs leading-relaxed break-words">
+            {walkthrough.canonicalDnf}
+          </code>
+        </WalkthroughStep>
+
+        {walkthrough.constantCase !== null && (
+          <WalkthroughStep index={2}>
+            <p className="text-foreground font-semibold">
+              {t("dnf.builder.exercise.walkthroughConstantTitle")}
+            </p>
+            <p className="text-muted-foreground mt-1 leading-relaxed">
+              {walkthrough.constantCase === "always_true"
+                ? t("dnf.builder.exercise.walkthroughAllRows")
+                : t("dnf.builder.exercise.walkthroughAlwaysFalse")}
+            </p>
+          </WalkthroughStep>
+        )}
+
+        {hasGroups && (
+          <WalkthroughStep index={2}>
+            <p className="text-foreground font-semibold">
+              {t("dnf.builder.exercise.walkthroughGroupsTitle")}
+            </p>
+            <p className="text-muted-foreground mt-1 leading-relaxed">
+              {t("dnf.builder.exercise.walkthroughGroupsIntro")}
+            </p>
+            <div className="mt-2 space-y-2">
+              {walkthrough.groups.map((group) => (
+                <div
+                  key={`${group.term}-${group.coveredRowNumbers.join("-")}`}
+                  className="border-border bg-muted/30 rounded-md border p-2"
+                >
+                  <code className="text-foreground font-mono text-xs">
+                    {group.term}
+                  </code>
+                  <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                    {t("dnf.builder.exercise.walkthroughGroupCoverage", {
+                      rows: formatRowNumbers(group.coveredRowNumbers, t),
+                    })}
+                  </p>
+                  <p className="text-muted-foreground text-xs leading-relaxed">
+                    {group.eliminatedVariables.length > 0
+                      ? t("dnf.builder.exercise.walkthroughGroupEliminated", {
+                          variables: group.eliminatedVariables.join(", "),
+                        })
+                      : t(
+                          "dnf.builder.exercise.walkthroughGroupNoEliminated",
+                        )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </WalkthroughStep>
+        )}
+
+        {hasGroups && (
+          <WalkthroughStep index={3}>
+            <p className="text-foreground font-semibold">
+              {t("dnf.builder.exercise.walkthroughCoverTitle")}
+            </p>
+            <p className="text-muted-foreground mt-1 leading-relaxed">
+              {t("dnf.builder.exercise.walkthroughCoverText")}
+            </p>
+          </WalkthroughStep>
+        )}
+
+        <WalkthroughStep index={hasGroups ? 4 : 3}>
+          <p className="text-foreground font-semibold">
+            {t("dnf.builder.exercise.walkthroughResultTitle")}
+          </p>
+          <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-2 font-mono text-xs leading-relaxed break-words">
+            {walkthrough.minimalForm}
+          </code>
+        </WalkthroughStep>
+      </ol>
+    </div>
+  );
+}
+
+interface WalkthroughStepProps {
+  index: number;
+  children: ReactNode;
+}
+
+function WalkthroughStep({ index, children }: WalkthroughStepProps) {
+  return (
+    <li className="flex gap-3">
+      <span className="bg-brand text-brand-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+        {index}
+      </span>
+      <div className="min-w-0 flex-1">{children}</div>
+    </li>
+  );
+}
+
+function formatRowNumbers(rowNumbers: number[], t: TFunction): string {
+  const visibleLimit = 12;
+  const visible = rowNumbers.slice(0, visibleLimit).join(", ");
+
+  if (rowNumbers.length <= visibleLimit) {
+    return visible;
+  }
+
+  return t("dnf.builder.exercise.walkthroughRowListMore", {
+    visible,
+    count: rowNumbers.length - visibleLimit,
+  });
 }
 
 function SimplificationFeedback({
@@ -252,4 +439,3 @@ function getStatusTone(
       };
   }
 }
-

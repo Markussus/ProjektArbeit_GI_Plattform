@@ -228,10 +228,12 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
           answer: simplification.answer,
           feedback: simplification.feedback,
           showSolution: simplification.showSolution,
+          showWalkthrough: simplification.showWalkthrough,
           onAnswerChange: simplification.setAnswer,
           onToggleOpen: simplification.toggleOpen,
           onCheck: () => simplification.check(analysis.truthTable),
           onToggleSolution: simplification.toggleSolution,
+          onToggleWalkthrough: simplification.toggleWalkthrough,
         }}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}

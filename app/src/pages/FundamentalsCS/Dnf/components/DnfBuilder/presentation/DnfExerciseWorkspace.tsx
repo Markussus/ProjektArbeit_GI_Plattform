@@ -32,10 +32,12 @@ export interface DnfSimplificationControls {
   answer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
+  showWalkthrough: boolean;
   onAnswerChange: (value: string) => void;
   onToggleOpen: () => void;
   onCheck: () => void;
   onToggleSolution: () => void;
+  onToggleWalkthrough: () => void;
 }
 
 interface DnfExerciseWorkspaceProps {
@@ -442,12 +444,15 @@ export function DnfExerciseWorkspace({
               canonicalDnf={formatDnfExpression(
                 deriveDnfFromTruthTable(truthTable).dnf,
               )}
+              truthTable={truthTable}
               simplificationAnswer={simplification.answer}
               feedback={simplification.feedback}
               showSolution={simplification.showSolution}
+              showWalkthrough={simplification.showWalkthrough}
               onAnswerChange={simplification.onAnswerChange}
               onCheck={simplification.onCheck}
               onToggleSolution={simplification.onToggleSolution}
+              onToggleWalkthrough={simplification.onToggleWalkthrough}
             />
           )}
         </section>
