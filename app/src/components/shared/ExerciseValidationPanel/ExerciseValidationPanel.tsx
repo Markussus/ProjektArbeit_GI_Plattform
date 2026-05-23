@@ -26,7 +26,9 @@ export type ValidationInputMode =
   | "float"
   | "ieee-binary"
   | "compare"
-  | "text";
+  | "text"
+  | "base64"
+  | "hex-bytes";
 
 /** Filtert eine Zeichenkette basierend auf dem erlaubten `mode`. */
 function filterInput(value: string, mode: ValidationInputMode): string {
@@ -49,6 +51,8 @@ function filterInput(value: string, mode: ValidationInputMode): string {
       // Nur Vergleichssymbole
       return value.replace(/[^<>=]/g, "");
     case "text":
+    case "base64":
+    case "hex-bytes":
     default:
       return value;
   }

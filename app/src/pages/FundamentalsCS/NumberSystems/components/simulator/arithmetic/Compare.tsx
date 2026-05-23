@@ -10,7 +10,7 @@ import {
   CollapsibleStep,
   ResultSectionHeader,
   useToggleSet,
-} from "../shared";
+} from "@/components/shared/SimulatorShared";
 
 interface CompareStep {
   step: number;

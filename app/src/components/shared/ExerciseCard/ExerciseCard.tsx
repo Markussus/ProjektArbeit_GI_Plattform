@@ -37,9 +37,15 @@ export function ExerciseCard({
   const Icon = item.icon;
   const detailsId = useId();
   const itemTitle = item.titleKey ? t(item.titleKey) : item.title;
-  const itemDescription = item.descriptionKey
-    ? t(item.descriptionKey)
+  const rawDescription = item.descriptionKey
+    ? t(item.descriptionKey, item.descriptionParams || {})
     : item.description;
+  const itemDescription = item.descriptionParams
+    ? Object.entries(item.descriptionParams).reduce(
+        (desc, [key, value]) => desc.replace(`{{${key}}}`, String(value)),
+        rawDescription,
+      )
+    : rawDescription;
   const itemLabel =
     item.kind === "example"
       ? t("example.label", { index: index + 1 })

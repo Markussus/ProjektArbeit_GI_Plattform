@@ -321,6 +321,7 @@ export function IntegerConverter({
                   disabled={!!isExerciseMode && !showSolution}
                   triggerClassName="w-full px-3 py-2 text-sm font-normal"
                   menuClassName="w-full"
+                  triggerTestId="ns-integer-source-base"
                 />
               </div>
               <div>
@@ -340,6 +341,7 @@ export function IntegerConverter({
                   disabled={!!isExerciseMode && !showSolution}
                   triggerClassName="w-full px-3 py-2 text-sm font-normal"
                   menuClassName="w-full"
+                  triggerTestId="ns-integer-target-base"
                 />
               </div>
             </div>
@@ -350,6 +352,7 @@ export function IntegerConverter({
               </label>
               <input
                 type="text"
+                data-testid="ns-converter-value-input"
                 value={locked && initialBase !== sourceBase ? "" : inputValue}
                 onChange={(e) => handleInputChange(e.target.value)}
                 readOnly={locked}
@@ -377,7 +380,10 @@ export function IntegerConverter({
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                 {t("simulator.numbers.resultLabel")}
               </label>
-              <div className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner">
+              <div
+                data-testid="ns-converter-result"
+                className="text-primary bg-primary/5 border-primary/20 flex min-h-13.5 items-center rounded-md border px-4 py-3 font-mono text-xl font-bold tracking-wider break-all shadow-inner"
+              >
                 {!locked && decValue !== ""
                   ? targetValue
                   : locked
