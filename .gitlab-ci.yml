@@ -3,11 +3,11 @@ stages:
   - quality
   - unit
   - build
-  - lighthouse
   - e2e
+  - lighthouse
 
 default:
-  image: node:22-bookworm-slim
+  image: projektarbeit/node-24-npm-11:arm64
   tags:
     - pi
   before_script:
@@ -70,6 +70,8 @@ lighthouse_check:
   needs:
     - job: build_app
       artifacts: true
+    - job: e2e_tests
+      artifacts: false
   before_script:
     - cd app
   script:
