@@ -396,6 +396,7 @@
         }
       },
       "followUpTitle": "Continue",
+      "solutionBadge": "Solution",
       "resultTitle": "DNF",
       "resultHint": "Each highlighted row contributes one AND term.",
       "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",

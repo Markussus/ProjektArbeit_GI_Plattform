@@ -182,7 +182,7 @@ export function DnfExerciseWorkspace({
       </section>
 
       <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
-        <section className="border-border bg-card rounded-lg border p-4">
+        <section className="border-border bg-card h-full rounded-lg border p-4">
           <div>
             <h2 className="text-foreground text-lg font-semibold">
               {t("dnf.builder.exercise.tableTitle")}
@@ -328,71 +328,6 @@ export function DnfExerciseWorkspace({
               </tbody>
             </table>
           </div>
-
-          <div className="mt-4">
-            <label
-              className="text-foreground text-sm font-semibold"
-              htmlFor="dnf-exercise-answer"
-            >
-              {t("dnf.builder.exercise.dnfLabel")}
-            </label>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-              {t("dnf.builder.exercise.dnfHint")}
-            </p>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-              {t("dnf.builder.keyboardAliases")}
-            </p>
-            <DnfOperatorToolbar
-              inputRef={dnfInputRef}
-              value={dnfAnswer}
-              onChange={onDnfAnswerChange}
-              className="mt-3"
-            />
-            <textarea
-              ref={dnfInputRef}
-              id="dnf-exercise-answer"
-              value={dnfAnswer}
-              onChange={(event) => onDnfAnswerChange(event.target.value)}
-              onBlur={(event) =>
-                onDnfAnswerChange(formatBooleanInput(event.target.value))
-              }
-              spellCheck="false"
-              placeholder={t("dnf.builder.exercise.dnfPlaceholder")}
-              className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={onCheck}
-              className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
-            >
-              <Search className="size-4" />
-              {t("dnf.builder.exercise.check")}
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
-            >
-              <RotateCcw className="size-4" />
-              {t("dnf.builder.reset")}
-            </button>
-            <button
-              type="button"
-              onClick={onToggleSolution}
-              disabled={!canShowSolution}
-              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Eye className="size-4" />
-              {showSolution
-                ? t("dnf.builder.exercise.hideSolution")
-                : canShowSolution
-                  ? t("dnf.builder.exercise.showSolutionHelp")
-                  : t("dnf.builder.exercise.solutionAfterCheck")}
-            </button>
-          </div>
         </section>
 
         <ExerciseFeedbackPanel
@@ -405,6 +340,73 @@ export function DnfExerciseWorkspace({
           isTruthTableEditable={canEditTruthTableResults}
         />
       </div>
+
+      <section className="border-border bg-card rounded-lg border p-4">
+        <div>
+          <label
+            className="text-foreground text-sm font-semibold"
+            htmlFor="dnf-exercise-answer"
+          >
+            {t("dnf.builder.exercise.dnfLabel")}
+          </label>
+          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            {t("dnf.builder.exercise.dnfHint")}
+          </p>
+          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            {t("dnf.builder.keyboardAliases")}
+          </p>
+          <DnfOperatorToolbar
+            inputRef={dnfInputRef}
+            value={dnfAnswer}
+            onChange={onDnfAnswerChange}
+            className="mt-3"
+          />
+          <textarea
+            ref={dnfInputRef}
+            id="dnf-exercise-answer"
+            value={dnfAnswer}
+            onChange={(event) => onDnfAnswerChange(event.target.value)}
+            onBlur={(event) =>
+              onDnfAnswerChange(formatBooleanInput(event.target.value))
+            }
+            spellCheck="false"
+            placeholder={t("dnf.builder.exercise.dnfPlaceholder")}
+            className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onCheck}
+            className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+          >
+            <Search className="size-4" />
+            {t("dnf.builder.exercise.check")}
+          </button>
+          <button
+            type="button"
+            onClick={onReset}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+          >
+            <RotateCcw className="size-4" />
+            {t("dnf.builder.reset")}
+          </button>
+          <button
+            type="button"
+            onClick={onToggleSolution}
+            disabled={!canShowSolution}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Eye className="size-4" />
+            {showSolution
+              ? t("dnf.builder.exercise.hideSolution")
+              : canShowSolution
+                ? t("dnf.builder.exercise.showSolutionHelp")
+                : t("dnf.builder.exercise.solutionAfterCheck")}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

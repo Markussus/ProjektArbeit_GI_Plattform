@@ -24,6 +24,8 @@ export function DnfTruthTableView({
   ).slice(0, TABLE_PREVIEW_ROW_LIMIT);
   const rowsToRender =
     isLargeTable && !showAllRows ? previewRows : display.rows;
+  const hasHiddenRows = rowsToRender.length < display.rows.length;
+  const canToggleRows = hasHiddenRows || showAllRows;
   const showRowNumbers = isLargeTable;
 
   return (
@@ -32,7 +34,7 @@ export function DnfTruthTableView({
         {t("dnf.builder.truthTableTitle")}
       </h2>
 
-      {isLargeTable && (
+      {canToggleRows && (
         <div className="border-border bg-muted/40 mt-4 rounded-md border p-3">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {showAllRows

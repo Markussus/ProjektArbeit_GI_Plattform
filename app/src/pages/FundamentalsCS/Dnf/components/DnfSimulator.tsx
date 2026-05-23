@@ -269,10 +269,11 @@ function TableToDnfBuilder({
           truthTable: analysis.truthTable,
         }
       : undefined;
-  const simplificationFollowUp =
-    feedback?.isCorrect === true
-      ? { truthTable: analysis.truthTable, controls: simplificationControls }
-      : undefined;
+  const simplificationFollowUp = {
+    truthTable: analysis.truthTable,
+    controls: simplificationControls,
+    isEnabled: feedback?.isCorrect === true,
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -390,6 +391,7 @@ function TableToDnfBuilder({
       />
 
       <DnfFollowUpSections
+        key={solution ? "solution-visible" : "solution-hidden"}
         solution={solution}
         simplification={simplificationFollowUp}
       />

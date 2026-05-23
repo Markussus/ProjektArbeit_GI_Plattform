@@ -43,13 +43,16 @@ interface DnfFollowUpSectionsProps {
   simplification?: {
     truthTable: TruthTable;
     controls: DnfSimplificationControls;
+    isEnabled: boolean;
   };
 }
 
 interface FollowUpSection {
   id: FollowUpSectionId;
   label: string;
-  content: ReactNode;
+  content?: ReactNode;
+  disabled?: boolean;
+  isSolution?: boolean;
 }
 
 export function DnfFollowUpSections({
@@ -67,6 +70,7 @@ export function DnfFollowUpSections({
       nextSections.push({
         id: "result",
         label: t("dnf.builder.resultTitle"),
+        isSolution: true,
         content: (
           <DnfResultPanel
             formattedDnf={solution.formattedDnf}
@@ -81,6 +85,7 @@ export function DnfFollowUpSections({
         nextSections.push({
           id: "truthTable",
           label: t("dnf.builder.truthTableTitle"),
+          isSolution: true,
           content: (
             <DnfTruthTableView
               display={solution.display}
@@ -92,10 +97,13 @@ export function DnfFollowUpSections({
     }
 
     if (simplification) {
+      const isSimplificationEnabled = simplification.isEnabled;
+
       nextSections.push({
         id: "simplification",
         label: t("dnf.builder.exercise.simplificationTitle"),
-        content: (
+        disabled: !isSimplificationEnabled,
+        content: isSimplificationEnabled ? (
           <DnfSimplificationPanel
             canonicalDnf={formatDnfExpression(
               deriveDnfFromTruthTable(simplification.truthTable).dnf,
@@ -110,7 +118,7 @@ export function DnfFollowUpSections({
             onToggleSolution={simplification.controls.onToggleSolution}
             onToggleWalkthrough={simplification.controls.onToggleWalkthrough}
           />
-        ),
+        ) : null,
       });
     }
 
@@ -148,23 +156,34 @@ export function DnfFollowUpSections({
 
       <div className="space-y-3">
         {sections.map((section) => {
-          const isOpen = effectiveOpenSectionIds.includes(section.id);
+          const isOpen =
+            !section.disabled && effectiveOpenSectionIds.includes(section.id);
           const panelId = `dnf-follow-up-${section.id}`;
 
           return (
             <div key={section.id} className="space-y-3">
               <button
                 type="button"
+                disabled={section.disabled}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggleSection(section.id)}
                 className={cn(
                   "border-border bg-card hover:bg-muted/40 flex w-full items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left transition-colors",
-                  isOpen && "border-brand/60",
+                  isOpen && "border-emerald-500/30 bg-emerald-500/5",
+                  section.disabled &&
+                    "hover:bg-card cursor-not-allowed opacity-50",
                 )}
               >
-                <span className="text-foreground text-sm font-semibold">
-                  {section.label}
+                <span className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span className="text-foreground text-sm font-semibold">
+                    {section.label}
+                  </span>
+                  {section.isSolution && (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                      {t("dnf.builder.solutionBadge")}
+                    </span>
+                  )}
                 </span>
                 {isOpen ? (
                   <ChevronUp className="text-muted-foreground size-4 shrink-0" />
@@ -173,7 +192,9 @@ export function DnfFollowUpSections({
                 )}
               </button>
 
-              {isOpen && <div id={panelId}>{section.content}</div>}
+              {isOpen && section.content && (
+                <div id={panelId}>{section.content}</div>
+              )}
             </div>
           );
         })}

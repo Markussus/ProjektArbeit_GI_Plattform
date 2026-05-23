@@ -230,10 +230,11 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
           truthTable: analysis.truthTable,
         }
       : undefined;
-  const simplificationFollowUp =
-    feedback?.isCorrect === true
-      ? { truthTable: analysis.truthTable, controls: simplificationControls }
-      : undefined;
+  const simplificationFollowUp = {
+    truthTable: analysis.truthTable,
+    controls: simplificationControls,
+    isEnabled: feedback?.isCorrect === true,
+  };
 
   return (
     <>
@@ -258,6 +259,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
       />
 
       <DnfFollowUpSections
+        key={solution ? "solution-visible" : "solution-hidden"}
         solution={solution}
         simplification={simplificationFollowUp}
       />

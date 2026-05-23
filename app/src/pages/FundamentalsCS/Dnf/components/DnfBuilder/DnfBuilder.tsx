@@ -72,10 +72,11 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
           truthTable,
         }
       : undefined;
-  const simplificationFollowUp =
-    builder.exerciseFeedback?.isCorrect === true
-      ? { truthTable, controls: simplificationControls }
-      : undefined;
+  const simplificationFollowUp = {
+    truthTable,
+    controls: simplificationControls,
+    isEnabled: builder.exerciseFeedback?.isCorrect === true,
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -99,6 +100,7 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
       />
 
       <DnfFollowUpSections
+        key={solution ? "solution-visible" : "solution-hidden"}
         solution={solution}
         simplification={simplificationFollowUp}
       />
