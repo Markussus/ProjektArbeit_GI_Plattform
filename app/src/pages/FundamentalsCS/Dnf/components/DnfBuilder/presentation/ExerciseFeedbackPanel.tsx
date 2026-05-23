@@ -164,6 +164,7 @@ function FeedbackSummary({
   const oneRows = truthTable.rows.flatMap((row, rowIndex) =>
     row.result ? [rowIndex] : [],
   );
+  const canRevealOneRows = isTruthTableProvided || hasTruthTableReady;
 
   return (
     <dl className="mt-5 grid gap-2 text-sm">
@@ -190,16 +191,18 @@ function FeedbackSummary({
           {getDnfStatusLabel(feedback.dnf.status, hasTruthTableReady, t)}
         </dd>
       </div>
-      <div className="border-border bg-muted/40 rounded-md border px-3 py-2">
-        <dt className="text-muted-foreground">
-          {t("dnf.builder.exercise.oneRowsLabel")}
-        </dt>
-        <dd className="text-foreground mt-1 font-medium">
-          {oneRows.length > 0
-            ? formatRows(oneRows)
-            : t("dnf.builder.exercise.noOneRows")}
-        </dd>
-      </div>
+      {canRevealOneRows && (
+        <div className="border-border bg-muted/40 rounded-md border px-3 py-2">
+          <dt className="text-muted-foreground">
+            {t("dnf.builder.exercise.oneRowsLabel")}
+          </dt>
+          <dd className="text-foreground mt-1 font-medium">
+            {oneRows.length > 0
+              ? formatRows(oneRows)
+              : t("dnf.builder.exercise.noOneRows")}
+          </dd>
+        </div>
+      )}
     </dl>
   );
 }
@@ -224,11 +227,8 @@ function buildFeedbackItems(
   if (feedback.incorrectRowCount > 0) {
     items.push(
       t("dnf.builder.exercise.tableWrongRows", {
-        rows: formatRows(
-          feedback.truthTableIssues
-            .filter((issue) => issue.actual !== null)
-            .map((issue) => issue.rowIndex),
-        ),
+        count: feedback.incorrectRowCount,
+        total: truthTable.rows.length,
       }),
     );
   }

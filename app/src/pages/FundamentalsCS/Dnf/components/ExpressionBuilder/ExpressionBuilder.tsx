@@ -3,6 +3,7 @@ import { ArrowLeft, Eraser, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
+import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
 import {
@@ -142,6 +143,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   >([]);
   const [dnfAnswer, setDnfAnswer] = useState("");
   const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const simplification = useDnfSimplification();
 
   const normalizedAnswers = useMemo(
     () =>
@@ -164,12 +166,14 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     });
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const updateDnfAnswer = (value: string) => {
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const handleCheck = () => {
@@ -189,6 +193,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     setDnfAnswer("");
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   if (analysis.status === "too_many_variables") {
@@ -218,6 +223,16 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
         canAlwaysShowSolution={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
+        simplification={{
+          isOpen: simplification.isOpen,
+          answer: simplification.answer,
+          feedback: simplification.feedback,
+          showSolution: simplification.showSolution,
+          onAnswerChange: simplification.setAnswer,
+          onToggleOpen: simplification.toggleOpen,
+          onCheck: () => simplification.check(analysis.truthTable),
+          onToggleSolution: simplification.toggleSolution,
+        }}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}

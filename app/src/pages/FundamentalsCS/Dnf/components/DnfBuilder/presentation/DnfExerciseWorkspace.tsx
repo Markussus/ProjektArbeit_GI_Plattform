@@ -1,5 +1,12 @@
 import { useRef, type KeyboardEvent } from "react";
-import { ChevronDown, ChevronUp, Eye, RotateCcw, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  RotateCcw,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBooleanValue } from "../domain/booleanExpression";
@@ -8,11 +15,24 @@ import type {
   DnfExerciseCheckResult,
   TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
+import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
 import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
+import { DnfSimplificationPanel } from "./DnfSimplificationPanel";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
 const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 16;
+
+export interface DnfSimplificationControls {
+  isOpen: boolean;
+  answer: string;
+  feedback: DnfSimplificationCheckResult | null;
+  showSolution: boolean;
+  onAnswerChange: (value: string) => void;
+  onToggleOpen: () => void;
+  onCheck: () => void;
+  onToggleSolution: () => void;
+}
 
 interface DnfExerciseWorkspaceProps {
   source: string;
@@ -27,6 +47,7 @@ interface DnfExerciseWorkspaceProps {
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
   showFullTable?: boolean;
+  simplification?: DnfSimplificationControls;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
@@ -48,6 +69,7 @@ export function DnfExerciseWorkspace({
   canEditTruthTableResults = false,
   canToggleFullTable = false,
   showFullTable = false,
+  simplification,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
@@ -73,6 +95,10 @@ export function DnfExerciseWorkspace({
   const canActuallyToggleTable = canToggleFullTable && isLargeWorkspaceTable;
   const isCompactEditableTable = canActuallyToggleTable && !showFullTable;
   const isScrollableTruthTable = isCompactEditableTable;
+  const canStartSimplification =
+    simplification !== undefined && feedback?.isCorrect === true;
+  const isSimplificationVisible =
+    canStartSimplification && simplification?.isOpen;
 
   const focusResultRow = (rowIndex: number) => {
     const nextRow =
@@ -252,8 +278,6 @@ export function DnfExerciseWorkspace({
                 {truthTable.rows.map((row, rowIndex) => {
                   const answer = truthTableAnswers[rowIndex] ?? null;
                   const issue = issueByRow.get(rowIndex);
-                  const isChecked = feedback !== null;
-                  const isCorrect = isChecked && !issue;
 
                   return (
                     <tr
@@ -263,13 +287,6 @@ export function DnfExerciseWorkspace({
                         requiresTruthTableAnswers &&
                           issue?.actual === null &&
                           "bg-amber-500/10",
-                        requiresTruthTableAnswers &&
-                          issue?.actual !== null &&
-                          issue !== undefined &&
-                          "bg-destructive/10",
-                        requiresTruthTableAnswers &&
-                          isCorrect &&
-                          "bg-emerald-500/10",
                       )}
                     >
                       <td className="border-border text-muted-foreground border-r px-3 py-2 font-mono">
@@ -401,7 +418,31 @@ export function DnfExerciseWorkspace({
                   ? t("dnf.builder.exercise.showSolutionHelp")
                   : t("dnf.builder.exercise.solutionAfterCheck")}
             </button>
+            {canStartSimplification && simplification && (
+              <button
+                type="button"
+                onClick={simplification.onToggleOpen}
+                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+              >
+                <Sparkles className="size-4" />
+                {isSimplificationVisible
+                  ? t("dnf.builder.exercise.hideSimplification")
+                  : t("dnf.builder.exercise.startSimplification")}
+              </button>
+            )}
           </div>
+
+          {isSimplificationVisible && simplification && (
+            <DnfSimplificationPanel
+              canonicalDnf={dnfAnswer}
+              simplificationAnswer={simplification.answer}
+              feedback={simplification.feedback}
+              showSolution={simplification.showSolution}
+              onAnswerChange={simplification.onAnswerChange}
+              onCheck={simplification.onCheck}
+              onToggleSolution={simplification.onToggleSolution}
+            />
+          )}
         </section>
 
         <ExerciseFeedbackPanel

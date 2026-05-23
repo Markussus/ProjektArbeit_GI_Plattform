@@ -5,6 +5,7 @@ import type { Example, Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import { buildTruthTableDisplay } from "./DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "./DnfBuilder/application/dnfAnalysis";
+import { useDnfSimplification } from "./DnfBuilder/application/useDnfSimplification";
 import { normalizeBooleanOperatorAliases } from "./DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
@@ -162,6 +163,7 @@ function TableToDnfBuilder({
   const [showFullTable, setShowFullTable] = useState(false);
   const [dnfAnswer, setDnfAnswer] = useState("");
   const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const simplification = useDnfSimplification();
   const truthTable = useMemo(
     () =>
       createTruthTableFromResults(
@@ -185,6 +187,7 @@ function TableToDnfBuilder({
     setShowSolution(false);
     setDnfAnswer("");
     setFeedback(null);
+    simplification.reset();
   };
 
   const updateVariableCount = (nextVariableCount: number) => {
@@ -205,6 +208,7 @@ function TableToDnfBuilder({
     });
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const randomizeResultValues = () => {
@@ -226,6 +230,7 @@ function TableToDnfBuilder({
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   if (analysis.status !== "valid") {
@@ -339,6 +344,16 @@ function TableToDnfBuilder({
         canEditTruthTableResults={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
+        simplification={{
+          isOpen: simplification.isOpen,
+          answer: simplification.answer,
+          feedback: simplification.feedback,
+          showSolution: simplification.showSolution,
+          onAnswerChange: simplification.setAnswer,
+          onToggleOpen: simplification.toggleOpen,
+          onCheck: () => simplification.check(analysis.truthTable),
+          onToggleSolution: simplification.toggleSolution,
+        }}
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
