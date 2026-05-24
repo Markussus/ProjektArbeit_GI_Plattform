@@ -121,12 +121,17 @@ export function DnfSimulator({
   };
 
   return (
-    <div className="flex h-full flex-col space-y-6">
+    <div
+      data-testid="dnf-simulator"
+      data-mode={visibleMode}
+      className="flex h-full flex-col space-y-6"
+    >
       <div className="border-border flex gap-1 border-b">
         {simulatorModes.map((mode) => (
           <button
             key={mode}
             type="button"
+            data-testid={`dnf-mode-tab-${mode}`}
             className={cn(
               "relative shrink-0 px-4 py-2.5 text-sm font-medium",
               visibleMode === mode
@@ -277,7 +282,10 @@ function TableToDnfBuilder({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <section className="border-border bg-card rounded-lg border p-4">
+      <section
+        data-testid="dnf-table-builder-controls"
+        className="border-border bg-card rounded-lg border p-4"
+      >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h2 className="text-foreground text-lg font-semibold">
@@ -302,6 +310,7 @@ function TableToDnfBuilder({
             </label>
             <input
               id="dnf-variable-count"
+              data-testid="dnf-variable-count-input"
               type="number"
               min={EDITABLE_TABLE_MIN_VARIABLE_COUNT}
               max={EDITABLE_TABLE_MAX_VARIABLE_COUNT}
@@ -324,6 +333,7 @@ function TableToDnfBuilder({
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
+            data-testid="dnf-clear-table"
             onClick={() => {
               setResultValues(
                 Array.from({ length: resultValues.length }, () => false),
@@ -336,6 +346,7 @@ function TableToDnfBuilder({
           </button>
           <button
             type="button"
+            data-testid="dnf-fill-table"
             onClick={() => {
               setResultValues(
                 Array.from({ length: resultValues.length }, () => true),
@@ -348,6 +359,7 @@ function TableToDnfBuilder({
           </button>
           <button
             type="button"
+            data-testid="dnf-random-table"
             onClick={randomizeResultValues}
             className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
           >
@@ -356,6 +368,7 @@ function TableToDnfBuilder({
           </button>
           <button
             type="button"
+            data-testid="dnf-invert-table"
             onClick={() => {
               setResultValues((currentValues) =>
                 currentValues.map((value) => !value),

@@ -69,6 +69,7 @@ export function DnfSimplificationPanel({
 
   return (
     <section
+      data-testid="dnf-simplification-panel"
       className={cn(
         "border-border bg-muted/30 rounded-lg border p-4",
         className,
@@ -113,6 +114,7 @@ export function DnfSimplificationPanel({
         <textarea
           ref={inputRef}
           id="dnf-simplified-answer"
+          data-testid="dnf-simplified-answer"
           value={simplificationAnswer}
           onChange={(event) => onAnswerChange(event.target.value)}
           onBlur={(event) =>
@@ -127,6 +129,7 @@ export function DnfSimplificationPanel({
       <div className="mt-4">
         <button
           type="button"
+          data-testid="dnf-check-simplification"
           onClick={onCheck}
           className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
         >
@@ -141,6 +144,7 @@ export function DnfSimplificationPanel({
 
       <div className="mt-4 space-y-2">
         <RevealSection
+          testId="dnf-reveal-minimal-solution"
           icon={Eye}
           title={t("dnf.builder.exercise.revealSolutionTitle")}
           disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
@@ -172,6 +176,7 @@ export function DnfSimplificationPanel({
         </RevealSection>
 
         <RevealSection
+          testId="dnf-reveal-walkthrough"
           icon={ListChecks}
           title={t("dnf.builder.exercise.revealWalkthroughTitle")}
           disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
@@ -186,6 +191,7 @@ export function DnfSimplificationPanel({
         </RevealSection>
 
         <RevealSection
+          testId="dnf-reveal-algebra-reference"
           icon={BookOpen}
           title={t("dnf.builder.exercise.revealAlgebraReferenceTitle")}
           isOpen={isReferenceOpen}
@@ -207,6 +213,7 @@ interface RevealSectionProps {
   disabled: boolean;
   onToggle: () => void;
   isSolution?: boolean;
+  testId?: string;
   children: ReactNode;
 }
 
@@ -218,6 +225,7 @@ function RevealSection({
   disabled,
   onToggle,
   isSolution = false,
+  testId,
   children,
 }: RevealSectionProps) {
   const { t } = useTranslation();
@@ -226,6 +234,7 @@ function RevealSection({
     <div>
       <button
         type="button"
+        data-testid={testId}
         disabled={disabled}
         aria-expanded={isOpen}
         onClick={onToggle}
@@ -516,6 +525,8 @@ function SimplificationFeedback({
 
   return (
     <div
+      data-testid="dnf-simplification-feedback"
+      data-status={feedback.status}
       className={cn("mt-4 rounded-md border p-3", statusTone.containerClass)}
     >
       <div className="flex items-start gap-2">

@@ -3,5 +3,12 @@ import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicEx
 import { dnfExercises } from "../exercises";
 
 export function ExercisesTab(props: ModuleExercisesTabProps) {
-  return <TopicExercisesTab {...props} exercises={dnfExercises} />;
+  return (
+    <TopicExercisesTab
+      {...props}
+      exercises={dnfExercises}
+      testId="dnf-exercises-tab"
+      testIdPrefix="dnf-exercise-card"
+    />
+  );
 }

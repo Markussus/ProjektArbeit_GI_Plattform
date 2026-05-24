@@ -21,7 +21,10 @@ export function DnfDerivationSteps({
 
   if (derivation.dnf.type === "constant") {
     return (
-      <section className="border-border bg-card rounded-lg border p-4">
+      <section
+        data-testid="dnf-derivation-steps"
+        className="border-border bg-card rounded-lg border p-4"
+      >
         <h2 className="text-foreground text-lg font-semibold">
           {t("dnf.builder.derivationTitle")}
         </h2>
@@ -39,7 +42,10 @@ export function DnfDerivationSteps({
   const isCompactDerivation = isLargeDerivation && !showFullDerivation;
 
   return (
-    <section className="border-border bg-card rounded-lg border p-4">
+    <section
+      data-testid="dnf-derivation-steps"
+      className="border-border bg-card rounded-lg border p-4"
+    >
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.derivationTitle")}
       </h2>
@@ -60,6 +66,7 @@ export function DnfDerivationSteps({
           </p>
           <button
             type="button"
+            data-testid="dnf-derivation-toggle"
             onClick={() => setShowFullDerivation((current) => !current)}
             className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
           >

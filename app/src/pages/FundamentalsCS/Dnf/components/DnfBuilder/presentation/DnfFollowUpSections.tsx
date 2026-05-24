@@ -149,7 +149,7 @@ export function DnfFollowUpSections({
   };
 
   return (
-    <section className="space-y-4">
+    <section data-testid="dnf-follow-up-sections" className="space-y-4">
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.followUpTitle")}
       </h2>
@@ -164,6 +164,7 @@ export function DnfFollowUpSections({
             <div key={section.id} className="space-y-3">
               <button
                 type="button"
+                data-testid={`dnf-follow-up-${section.id}-toggle`}
                 disabled={section.disabled}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
@@ -193,7 +194,9 @@ export function DnfFollowUpSections({
               </button>
 
               {isOpen && section.content && (
-                <div id={panelId}>{section.content}</div>
+                <div id={panelId} data-testid={`dnf-follow-up-${section.id}`}>
+                  {section.content}
+                </div>
               )}
             </div>
           );

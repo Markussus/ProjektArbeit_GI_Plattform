@@ -121,8 +121,11 @@ export function DnfExerciseWorkspace({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <section className="border-border bg-card rounded-lg border p-5">
+    <div data-testid="dnf-exercise-workspace" className="flex flex-col gap-5">
+      <section
+        data-testid="dnf-exercise-task"
+        className="border-border bg-card rounded-lg border p-5"
+      >
         <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {t("dnf.builder.exercise.taskTitle")}
         </p>
@@ -182,7 +185,10 @@ export function DnfExerciseWorkspace({
       </section>
 
       <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
-        <section className="border-border bg-card h-full rounded-lg border p-4">
+        <section
+          data-testid="dnf-exercise-truth-table-panel"
+          className="border-border bg-card h-full rounded-lg border p-4"
+        >
           <div>
             <h2 className="text-foreground text-lg font-semibold">
               {t("dnf.builder.exercise.tableTitle")}
@@ -198,6 +204,7 @@ export function DnfExerciseWorkspace({
               <div className="mt-3">
                 <button
                   type="button"
+                  data-testid="dnf-workspace-table-toggle"
                   onClick={onToggleFullTable}
                   className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
                 >
@@ -215,6 +222,7 @@ export function DnfExerciseWorkspace({
           </div>
 
           <div
+            data-testid="dnf-exercise-truth-table"
             className={cn(
               "border-border mt-4 overflow-x-auto rounded-lg border",
               isScrollableTruthTable && "max-h-[28rem] overflow-y-auto",
@@ -256,6 +264,7 @@ export function DnfExerciseWorkspace({
                   return (
                     <tr
                       key={rowIndex}
+                      data-testid={`dnf-exercise-truth-table-row-${rowIndex}`}
                       className={cn(
                         "border-border border-t",
                         requiresTruthTableAnswers &&
@@ -295,6 +304,7 @@ export function DnfExerciseWorkspace({
                               <button
                                 key={String(value)}
                                 type="button"
+                                data-testid={`dnf-result-button-${rowIndex}-${value ? "1" : "0"}`}
                                 aria-pressed={answer === value}
                                 aria-label={t(
                                   "dnf.builder.exercise.resultButtonLabel",
@@ -341,7 +351,10 @@ export function DnfExerciseWorkspace({
         />
       </div>
 
-      <section className="border-border bg-card rounded-lg border p-4">
+      <section
+        data-testid="dnf-exercise-answer-panel"
+        className="border-border bg-card rounded-lg border p-4"
+      >
         <div>
           <label
             className="text-foreground text-sm font-semibold"
@@ -364,6 +377,7 @@ export function DnfExerciseWorkspace({
           <textarea
             ref={dnfInputRef}
             id="dnf-exercise-answer"
+            data-testid="dnf-exercise-answer"
             value={dnfAnswer}
             onChange={(event) => onDnfAnswerChange(event.target.value)}
             onBlur={(event) =>
@@ -378,6 +392,7 @@ export function DnfExerciseWorkspace({
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             type="button"
+            data-testid="dnf-check-answer"
             onClick={onCheck}
             className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
           >
@@ -386,6 +401,7 @@ export function DnfExerciseWorkspace({
           </button>
           <button
             type="button"
+            data-testid="dnf-reset-answer"
             onClick={onReset}
             className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
           >
@@ -394,6 +410,7 @@ export function DnfExerciseWorkspace({
           </button>
           <button
             type="button"
+            data-testid="dnf-toggle-solution"
             onClick={onToggleSolution}
             disabled={!canShowSolution}
             className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"

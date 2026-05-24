@@ -48,7 +48,10 @@ export function ExpressionBuilder({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div
+      data-testid="dnf-expression-builder"
+      className="mx-auto flex w-full max-w-5xl flex-col gap-6"
+    >
       {committedSource === null ? (
         <section className="border-border bg-card rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -65,6 +68,7 @@ export function ExpressionBuilder({
             </div>
             <button
               type="button"
+              data-testid="dnf-clear-expression"
               onClick={handleClear}
               className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
             >
@@ -82,6 +86,7 @@ export function ExpressionBuilder({
           <textarea
             ref={inputRef}
             id="dnf-expression-input"
+            data-testid="dnf-expression-input"
             aria-label={t("dnf.builder.inputTitle")}
             value={inputValue}
             onChange={(event) => handleSourceChange(event.target.value)}
@@ -96,6 +101,7 @@ export function ExpressionBuilder({
           <div className="mt-4">
             <button
               type="button"
+              data-testid="dnf-evaluate-expression"
               onClick={handleEvaluate}
               disabled={inputValue.trim().length === 0}
               className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
@@ -109,6 +115,7 @@ export function ExpressionBuilder({
         <div>
           <button
             type="button"
+            data-testid="dnf-new-expression"
             onClick={handleClear}
             className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
           >

@@ -114,7 +114,7 @@ export function checkDnfSimplification(
     };
   }
 
-  if (userLiteralCount >= canonicalLiteralCount && canonicalLiteralCount > 0) {
+  if (isNotShorterThanCanonical(userLiteralCount, canonicalLiteralCount)) {
     return {
       ...baseResult,
       status: "equivalent_not_shorter",
@@ -185,6 +185,15 @@ function countTopLevelTerms(expression: BooleanExpression): number {
     );
   }
   return 1;
+}
+
+function isNotShorterThanCanonical(
+  userLiteralCount: number,
+  canonicalLiteralCount: number,
+): boolean {
+  return canonicalLiteralCount === 0
+    ? userLiteralCount > 0
+    : userLiteralCount >= canonicalLiteralCount;
 }
 
 function getCanonicalLiteralCount(table: TruthTable): number {
