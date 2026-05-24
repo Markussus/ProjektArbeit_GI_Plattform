@@ -208,7 +208,7 @@
         },
         "associativity": {
           "name": "Associativity",
-          "example": "Grouping of three operands can be reshuffled freely for ∧ and ∨."
+          "example": "With multiple ∧ or ∨ operations, the grouping does not matter — (a ∧ b) ∧ c equals a ∧ (b ∧ c)."
         },
         "distributivity": {
           "name": "Distributivity",
@@ -290,7 +290,7 @@
         "truth_table_to_dnf": "Table → DNF"
       },
       "tableModeTitle": "DNF from truth table",
-      "tableModeHint": "Build your own truth table, set the result column, and write the canonical DNF from it.",
+      "tableModeHint": "Build your own truth table, set the result column, and write the DNF from it.",
       "variableCount": "Variables",
       "variableCountLabel": "Count",
       "variableCountHelp": "{{min}} to {{max}} variables allowed",
@@ -386,8 +386,8 @@
         "startSimplification": "Start simplification",
         "hideSimplification": "Hide simplification",
         "simplificationTitle": "Simplify DNF",
-        "simplificationHint": "Use Boolean algebra rules (absorption, distributivity, …) to transform the correct DNF into a shorter equivalent form.",
-        "canonicalDnfLabel": "Correct DNF",
+        "simplificationHint": "Use the Boolean algebra rules (absorption, distributivity, complement, …) to bring the DNF into a shorter equivalent form.",
+        "canonicalDnfLabel": "Original DNF",
         "simplifiedDnfLabel": "Simplified form",
         "simplifiedDnfPlaceholder": "e.g. a ∨ (b ∧ ¬c)",
         "checkSimplification": "Check simplification",
@@ -418,7 +418,7 @@
         "walkthroughGroupEliminated": "eliminated: {{variables}}",
         "walkthroughGroupNoEliminated": "Already a single term — no reduction needed.",
         "walkthroughCoverTitle": "Cover all 1-rows",
-        "walkthroughCoverText": "The selected groups cover all 1-rows. Canonical terms already contained in these groups are absorbed.",
+        "walkthroughCoverText": "The selected groups cover all 1-rows — no 1-row is left over.",
         "walkthroughResultTitle": "Possible minimal form",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
         "derivationNotes": {
@@ -440,8 +440,8 @@
           "syntax_error": "Check parentheses and the operators ¬, ∧, ∨ (or the aliases !, &, |).",
           "unknown_variable": "The following variable(s) are not part of the truth table: {{variables}}.",
           "not_equivalent": "Your form does not match the original truth table.",
-          "equivalent_not_shorter": "Equivalent, but with {{userLiterals}} literals it is not shorter than the canonical DNF ({{canonicalLiterals}} literals).",
-          "accepted_not_minimal": "Equivalent and shorter than the canonical DNF. You have {{userLiterals}} literals — minimum is {{minimumLiterals}}.",
+          "equivalent_not_shorter": "Equivalent, but with {{userLiterals}} literals it is not shorter than the original DNF ({{canonicalLiterals}} literals).",
+          "accepted_not_minimal": "Equivalent and shorter than the original DNF. You have {{userLiterals}} literals — minimum is {{minimumLiterals}}.",
           "accepted_minimal": "{{userLiterals}} literals — matches the minimum ({{minimumLiterals}})."
         }
       },
@@ -466,8 +466,8 @@
       "showFullDerivation": "Show full derivation",
       "showCompactDerivation": "Show compact derivation",
       "derivationRowLabel": "Row {{row}}",
-      "derivationTautology": "Every row evaluates to 1, so the clean DNF is the constant 1.",
-      "derivationContradiction": "No row evaluates to 1, so the clean DNF is the constant 0.",
+      "derivationTautology": "Every row evaluates to 1 — the DNF is therefore constant 1.",
+      "derivationContradiction": "No row evaluates to 1 — the DNF is therefore constant 0.",
       "truthTableTitle": "Truth table",
       "truthTableRow": "Row",
       "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
