@@ -85,6 +85,55 @@ describe("dnfSimplificationWalkthrough", () => {
     expect(walkthrough.groups[0].derivationSteps.at(-1)?.expression).toBe("a");
   });
 
+  it("explains a group that eliminates three variables in sequence", () => {
+    // f(a, b, c, d) = a — true whenever a=1, regardless of b, c, d.
+    // Covers minterms 8..15, the prime implicant collapses all 8 minterms
+    // into the single literal `a` by eliminating b, c, d in that order
+    // (highest bit position first).
+    const table = createTruthTableFromResults(
+      ["a", "b", "c", "d"],
+      [
+        false, false, false, false,
+        false, false, false, false,
+        true, true, true, true,
+        true, true, true, true,
+      ],
+    );
+
+    const walkthrough = buildDnfSimplificationWalkthrough(table);
+
+    expect(walkthrough.groups).toHaveLength(1);
+    expect(walkthrough.groups[0]).toMatchObject({
+      term: "a",
+      coveredRowNumbers: [9, 10, 11, 12, 13, 14, 15, 16],
+      eliminatedVariables: ["b", "c", "d"],
+      literalCount: 1,
+    });
+
+    const steps = walkthrough.groups[0].derivationSteps;
+    expect(steps).toHaveLength(10);
+    expect(steps.map((step) => step.ruleId)).toEqual([
+      undefined,
+      "distributivity",
+      "complement",
+      "identity",
+      "distributivity",
+      "complement",
+      "identity",
+      "distributivity",
+      "complement",
+      "identity",
+    ]);
+
+    // Reduction is iterative: each round eliminates exactly one variable,
+    // in declared order (b, then c, then d).
+    expect(steps[1].noteVars).toEqual({ variable: "b" });
+    expect(steps[4].noteVars).toEqual({ variable: "c" });
+    expect(steps[7].noteVars).toEqual({ variable: "d" });
+
+    expect(steps.at(-1)?.expression).toBe("a");
+  });
+
   it("keeps a single minterm as-is when no variable can be eliminated", () => {
     const table = createTruthTableFromResults(
       ["a", "b", "c"],
