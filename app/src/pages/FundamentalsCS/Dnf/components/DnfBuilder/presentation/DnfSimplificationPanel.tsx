@@ -1,7 +1,10 @@
-import { useMemo, useRef, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { TFunction } from "i18next";
 import {
+  BookOpen,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Eye,
   Lightbulb,
   ListChecks,
@@ -10,6 +13,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { getBooleanAlgebraRule } from "../domain/booleanAlgebraRules";
 import {
   formatBooleanExpressionForDisplay,
   reformatBooleanExpressionInput,
@@ -17,9 +21,12 @@ import {
 import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
 import {
   buildDnfSimplificationWalkthrough,
+  type DnfDerivationStep,
+  type DnfSimplificationGroup,
   type DnfSimplificationWalkthrough,
 } from "../domain/dnfSimplificationWalkthrough";
 import type { TruthTable } from "../domain/truthTable";
+import { BooleanAlgebraReference } from "./BooleanAlgebraReference";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
 
 interface DnfSimplificationPanelProps {
@@ -51,6 +58,7 @@ export function DnfSimplificationPanel({
 }: DnfSimplificationPanelProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [isReferenceOpen, setIsReferenceOpen] = useState(false);
 
   const statusTone = getStatusTone(feedback?.status);
   const walkthrough = useMemo(
@@ -116,7 +124,7 @@ export function DnfSimplificationPanel({
         />
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4">
         <button
           type="button"
           onClick={onCheck}
@@ -125,63 +133,132 @@ export function DnfSimplificationPanel({
           <Search className="size-4" />
           {t("dnf.builder.exercise.checkSimplification")}
         </button>
-        <button
-          type="button"
-          onClick={onToggleSolution}
-          disabled={feedback === null}
-          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Eye className="size-4" />
-          {showSolution
-            ? t("dnf.builder.exercise.hideSimplificationSolution")
-            : feedback !== null
-              ? t("dnf.builder.exercise.showSimplificationSolution")
-              : t("dnf.builder.exercise.solutionAfterCheckSimplification")}
-        </button>
-        <button
-          type="button"
-          onClick={onToggleWalkthrough}
-          disabled={feedback === null}
-          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <ListChecks className="size-4" />
-          {showWalkthrough
-            ? t("dnf.builder.exercise.hideSimplificationWalkthrough")
-            : feedback !== null
-              ? t("dnf.builder.exercise.showSimplificationWalkthrough")
-              : t("dnf.builder.exercise.walkthroughAfterCheckSimplification")}
-        </button>
       </div>
 
       {feedback && (
         <SimplificationFeedback feedback={feedback} statusTone={statusTone} />
       )}
 
-      {feedback && showSolution && (
-        <div className="border-border bg-background mt-4 rounded-md border p-3">
-          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-            {t("dnf.builder.exercise.minimalDnfLabel")}
-          </p>
-          <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
-            {formatBooleanExpressionForDisplay(feedback.minimalExpression)}
-          </code>
-          <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-            {t("dnf.builder.exercise.minimalDnfNote", {
-              literalsLabel: t("dnf.builder.exercise.literalCount", {
-                count: feedback.minimumLiteralCount,
-              }),
-              termsLabel: t("dnf.builder.exercise.termCount", {
-                count: feedback.minimumTermCount,
-              }),
-            })}
-          </p>
+      <div className="mt-4 space-y-2">
+        <RevealSection
+          icon={Eye}
+          title={t("dnf.builder.exercise.revealSolutionTitle")}
+          disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
+          isOpen={feedback !== null && showSolution}
+          disabled={feedback === null}
+          onToggle={onToggleSolution}
+          isSolution
+        >
+          {feedback && (
+            <div>
+              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                {t("dnf.builder.exercise.minimalDnfLabel")}
+              </p>
+              <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
+                {formatBooleanExpressionForDisplay(feedback.minimalExpression)}
+              </code>
+              <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                {t("dnf.builder.exercise.minimalDnfNote", {
+                  literalsLabel: t("dnf.builder.exercise.literalCount", {
+                    count: feedback.minimumLiteralCount,
+                  }),
+                  termsLabel: t("dnf.builder.exercise.termCount", {
+                    count: feedback.minimumTermCount,
+                  }),
+                })}
+              </p>
+            </div>
+          )}
+        </RevealSection>
+
+        <RevealSection
+          icon={ListChecks}
+          title={t("dnf.builder.exercise.revealWalkthroughTitle")}
+          disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
+          isOpen={feedback !== null && showWalkthrough}
+          disabled={feedback === null}
+          onToggle={onToggleWalkthrough}
+          isSolution
+        >
+          {walkthrough && <SimplificationWalkthrough walkthrough={walkthrough} />}
+        </RevealSection>
+
+        <RevealSection
+          icon={BookOpen}
+          title={t("dnf.builder.exercise.revealAlgebraReferenceTitle")}
+          isOpen={isReferenceOpen}
+          disabled={false}
+          onToggle={() => setIsReferenceOpen((current) => !current)}
+        >
+          <BooleanAlgebraReference variant="panel" />
+        </RevealSection>
+      </div>
+    </section>
+  );
+}
+
+interface RevealSectionProps {
+  icon: typeof Eye;
+  title: string;
+  disabledHint?: string;
+  isOpen: boolean;
+  disabled: boolean;
+  onToggle: () => void;
+  isSolution?: boolean;
+  children: ReactNode;
+}
+
+function RevealSection({
+  icon: Icon,
+  title,
+  disabledHint,
+  isOpen,
+  disabled,
+  onToggle,
+  isSolution = false,
+  children,
+}: RevealSectionProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <button
+        type="button"
+        disabled={disabled}
+        aria-expanded={isOpen}
+        onClick={onToggle}
+        className={cn(
+          "border-border bg-card hover:bg-muted/40 flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left transition-colors",
+          isOpen && "border-brand",
+          disabled && "hover:bg-card cursor-not-allowed opacity-50",
+        )}
+      >
+        <span className="text-foreground flex min-w-0 flex-wrap items-center gap-2 text-sm font-medium">
+          <Icon className="size-4 shrink-0" />
+          <span className="truncate">{title}</span>
+          {isSolution && (
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+              {t("dnf.builder.solutionBadge")}
+            </span>
+          )}
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          {disabled && disabledHint && (
+            <span className="text-muted-foreground text-xs">{disabledHint}</span>
+          )}
+          {isOpen ? (
+            <ChevronUp className="text-muted-foreground size-4" />
+          ) : (
+            <ChevronDown className="text-muted-foreground size-4" />
+          )}
+        </span>
+      </button>
+      {isOpen && !disabled && (
+        <div className="border-border bg-background mt-2 rounded-md border p-3">
+          {children}
         </div>
       )}
-
-      {feedback && showWalkthrough && walkthrough && (
-        <SimplificationWalkthrough walkthrough={walkthrough} />
-      )}
-    </section>
+    </div>
   );
 }
 
@@ -214,7 +291,7 @@ function SimplificationWalkthrough({
         </div>
       </div>
 
-      <ol className="mt-4 max-h-80 space-y-3 overflow-y-auto pr-1 text-sm">
+      <ol className="mt-4 max-h-128 space-y-3 overflow-y-auto pr-1 text-sm">
         <WalkthroughStep index={1}>
           <p className="text-foreground font-semibold">
             {t("dnf.builder.exercise.walkthroughRowsTitle")}
@@ -252,28 +329,13 @@ function SimplificationWalkthrough({
             <p className="text-muted-foreground mt-1 leading-relaxed">
               {t("dnf.builder.exercise.walkthroughGroupsIntro")}
             </p>
-            <div className="mt-2 space-y-2">
-              {walkthrough.groups.map((group) => (
-                <div
+            <div className="mt-2 space-y-3">
+              {walkthrough.groups.map((group, groupIndex) => (
+                <GroupDerivation
                   key={`${group.term}-${group.coveredRowNumbers.join("-")}`}
-                  className="border-border bg-muted/30 rounded-md border p-2"
-                >
-                  <code className="text-foreground font-mono text-xs">
-                    {group.term}
-                  </code>
-                  <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                    {t("dnf.builder.exercise.walkthroughGroupCoverage", {
-                      rows: formatRowNumbers(group.coveredRowNumbers, t),
-                    })}
-                  </p>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    {group.eliminatedVariables.length > 0
-                      ? t("dnf.builder.exercise.walkthroughGroupEliminated", {
-                          variables: group.eliminatedVariables.join(", "),
-                        })
-                      : t("dnf.builder.exercise.walkthroughGroupNoEliminated")}
-                  </p>
-                </div>
+                  group={group}
+                  groupIndex={groupIndex}
+                />
               ))}
             </div>
           </WalkthroughStep>
@@ -300,6 +362,98 @@ function SimplificationWalkthrough({
         </WalkthroughStep>
       </ol>
     </div>
+  );
+}
+
+interface GroupDerivationProps {
+  group: DnfSimplificationGroup;
+  groupIndex: number;
+}
+
+function GroupDerivation({ group, groupIndex }: GroupDerivationProps) {
+  const { t } = useTranslation();
+  const hasMultipleSteps = group.derivationSteps.length > 1;
+
+  return (
+    <div className="border-border bg-muted/30 rounded-md border p-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="text-foreground text-xs font-semibold tracking-wide uppercase">
+          {t("dnf.builder.exercise.walkthroughGroupHeading", {
+            index: groupIndex + 1,
+          })}
+        </span>
+        <code className="text-foreground font-mono text-xs">
+          → {group.term}
+        </code>
+      </div>
+      <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+        {t("dnf.builder.exercise.walkthroughGroupCoverage", {
+          rows: formatRowNumbers(group.coveredRowNumbers, t),
+        })}
+        {group.eliminatedVariables.length > 0 && (
+          <>
+            {" — "}
+            {t("dnf.builder.exercise.walkthroughGroupEliminated", {
+              variables: group.eliminatedVariables.join(", "),
+            })}
+          </>
+        )}
+      </p>
+
+      {hasMultipleSteps ? (
+        <ol className="border-border/60 mt-3 space-y-1.5 border-l-2 pl-3">
+          {group.derivationSteps.map((step, stepIndex) => (
+            <DerivationStepLine
+              key={stepIndex}
+              step={step}
+              isFirst={stepIndex === 0}
+            />
+          ))}
+        </ol>
+      ) : (
+        <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+          {t("dnf.builder.exercise.walkthroughGroupNoEliminated")}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface DerivationStepLineProps {
+  step: DnfDerivationStep;
+  isFirst: boolean;
+}
+
+function DerivationStepLine({ step, isFirst }: DerivationStepLineProps) {
+  const { t } = useTranslation();
+  const ruleName = step.ruleId
+    ? t(getBooleanAlgebraRule(step.ruleId).nameKey)
+    : null;
+  const noteText = step.noteKey ? t(step.noteKey, step.noteVars) : null;
+
+  return (
+    <li className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <span className="text-muted-foreground font-mono text-xs">
+          {isFirst ? "  " : "= "}
+        </span>
+        <code className="text-foreground font-mono text-xs leading-relaxed wrap-break-word">
+          {step.expression}
+        </code>
+      </div>
+      {ruleName && (
+        <div className="ml-6 flex flex-wrap items-center gap-2">
+          <span className="border-border bg-card text-foreground inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
+            {ruleName}
+          </span>
+          {noteText && (
+            <span className="text-muted-foreground text-[11px] leading-snug">
+              {noteText}
+            </span>
+          )}
+        </div>
+      )}
+    </li>
   );
 }
 

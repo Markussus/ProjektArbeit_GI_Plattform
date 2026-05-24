@@ -174,8 +174,52 @@
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
-    "examplesTitle": "Vorlesungsbeispiele",
-    "examplesIntro": "Beispiele zu beiden Modi: vom Ausdruck zur Wahrheitstabelle und von der Wahrheitstabelle zur DNF.",
+    "algebra": {
+      "title": "Regeln der booleschen Algebra",
+      "intro": "Mit diesen Regeln lässt sich eine kanonische DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg im Simulator und für alle Beispiele dort.",
+      "rules": {
+        "identity": {
+          "name": "Neutralelement",
+          "example": "1 ist das neutrale Element von ∧, 0 das von ∨."
+        },
+        "domination": {
+          "name": "Dominanz",
+          "example": "Eine 1 in einer ∨-Verknüpfung erzwingt 1, eine 0 in einer ∧-Verknüpfung erzwingt 0."
+        },
+        "idempotence": {
+          "name": "Idempotenz",
+          "example": "Ein doppelt vorkommender Operand verändert das Ergebnis nicht."
+        },
+        "double_negation": {
+          "name": "Doppelnegation",
+          "example": "Zwei Negationen heben sich gegenseitig auf."
+        },
+        "complement": {
+          "name": "Komplement",
+          "example": "Variable und ihre Negation decken zusammen alle (∨) bzw. keine (∧) Belegung ab."
+        },
+        "commutativity": {
+          "name": "Kommutativgesetz",
+          "example": "Die Reihenfolge der Operanden ist für ∧ und ∨ egal."
+        },
+        "associativity": {
+          "name": "Assoziativgesetz",
+          "example": "Die Klammerung bei drei Operanden darf für ∧ und ∨ frei verschoben werden."
+        },
+        "distributivity": {
+          "name": "Distributivgesetz",
+          "example": "Beide Operatoren distribuieren über den jeweils anderen — zum Ausklammern oder Ausmultiplizieren gemeinsamer Literale."
+        },
+        "absorption": {
+          "name": "Absorptionsgesetz",
+          "example": "Ein Term, der bereits einen kleineren überdeckenden Term enthält, wird von ihm absorbiert."
+        },
+        "de_morgan": {
+          "name": "De Morgan",
+          "example": "Negation kippt den Operator: aus ∧ wird ∨ und jeder Operand wird negiert."
+        }
+      }
+    },
     "examples": {
       "modeGroup": {
         "expression_to_truth_table": "Modus: Ausdruck → Wahrheitstabelle",
@@ -343,12 +387,10 @@
         "simplifiedDnfLabel": "Vereinfachte Form",
         "simplifiedDnfPlaceholder": "z. B. a ∨ (b ∧ ¬c)",
         "checkSimplification": "Vereinfachung prüfen",
-        "showSimplificationSolution": "Mögliche minimale Lösung zeigen",
-        "hideSimplificationSolution": "Mögliche minimale Lösung ausblenden",
-        "solutionAfterCheckSimplification": "Lösung nach Prüfung",
-        "showSimplificationWalkthrough": "Lösungsweg anzeigen",
-        "hideSimplificationWalkthrough": "Lösungsweg ausblenden",
-        "walkthroughAfterCheckSimplification": "Lösungsweg nach Prüfung",
+        "revealSolutionTitle": "Mögliche minimale Lösung",
+        "revealWalkthroughTitle": "Lösungsweg",
+        "revealAlgebraReferenceTitle": "Regel-Spickzettel",
+        "revealRequiresCheck": "erst nach Prüfen",
         "minimalDnfLabel": "Eine mögliche minimale Form",
         "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — mehrere äquivalente Lösungen sind möglich.",
         "literalCount_one": "{{count}} Literal",
@@ -364,14 +406,20 @@
         "walkthroughAllRows": "Alle Zeilen haben Ergebnis 1. Deshalb kann die gesamte DNF zu 1 zusammengefasst werden.",
         "walkthroughAlwaysFalse": "Ohne 1-Zeile bleibt keine UND-Gruppe übrig. Die minimale Form ist daher 0.",
         "walkthroughGroupsTitle": "Passende Zeilen zusammenfassen",
-        "walkthroughGroupsIntro": "Jede Gruppe enthält 1-Zeilen, die sich nur in den gestrichenen Variablen unterscheiden.",
+        "walkthroughGroupsIntro": "Jede Gruppe unten zeigt, wie sich ihre kanonischen 1-Zeilen schrittweise zum Prime-Implikanten zusammenfassen lassen — das Distributivgesetz klammert die gemeinsamen Literale aus, das Komplementgesetz reduziert (x ∨ ¬x) auf 1, und das Neutralelement entfernt das verbleibende ∧ 1.",
+        "walkthroughGroupHeading": "Gruppe {{index}}",
         "walkthroughGroupCoverage": "deckt Zeilen {{rows}} ab",
         "walkthroughGroupEliminated": "gestrichen: {{variables}}",
-        "walkthroughGroupNoEliminated": "kein Literal gestrichen",
+        "walkthroughGroupNoEliminated": "Schon ein einzelner kanonischer Term — keine Umformung nötig.",
         "walkthroughCoverTitle": "Alle 1-Zeilen abdecken",
         "walkthroughCoverText": "Die ausgewählten Gruppen decken alle 1-Zeilen ab. Kanonische Terme, die schon in diesen Gruppen enthalten sind, werden absorbiert.",
         "walkthroughResultTitle": "Mögliche minimale Form",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} weitere)",
+        "derivationNotes": {
+          "factorOut": "Gemeinsame Literale um die Variable {{variable}} ausklammern.",
+          "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
+          "andOneEqualsTerm": "Beliebiger Term ∧ 1 bleibt unverändert — die 1 entfällt."
+        },
         "simplificationStatus": {
           "empty": "Noch keine Eingabe",
           "syntax_error": "Eingabe konnte nicht gelesen werden",

@@ -178,8 +178,52 @@
     "concept2": "Truth Tables",
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
-    "examplesTitle": "Lecture examples",
-    "examplesIntro": "Examples for both modes: from expression to truth table, and from truth table to DNF.",
+    "algebra": {
+      "title": "Boolean algebra rules",
+      "intro": "These rules let you rewrite a canonical DNF into shorter equivalent forms. They power both the worked-out simplification path below and every example shown in the simulator.",
+      "rules": {
+        "identity": {
+          "name": "Identity",
+          "example": "1 acts as the neutral element of ∧ and 0 as the neutral element of ∨."
+        },
+        "domination": {
+          "name": "Domination",
+          "example": "Whatever is OR-ed with 1 is forced to 1; whatever is AND-ed with 0 is forced to 0."
+        },
+        "idempotence": {
+          "name": "Idempotence",
+          "example": "Repeating the same operand neither tightens nor relaxes the term."
+        },
+        "double_negation": {
+          "name": "Double negation",
+          "example": "Two negations cancel each other out."
+        },
+        "complement": {
+          "name": "Complement",
+          "example": "A literal and its negation together cover all assignments (∨) or no assignment (∧)."
+        },
+        "commutativity": {
+          "name": "Commutativity",
+          "example": "Operand order does not affect the result for ∧ and ∨."
+        },
+        "associativity": {
+          "name": "Associativity",
+          "example": "Grouping of three operands can be reshuffled freely for ∧ and ∨."
+        },
+        "distributivity": {
+          "name": "Distributivity",
+          "example": "Either operator distributes over the other — used to factor or expand common literals."
+        },
+        "absorption": {
+          "name": "Absorption",
+          "example": "A term that already contains a smaller covering term is absorbed by it."
+        },
+        "de_morgan": {
+          "name": "De Morgan",
+          "example": "Negation flips the operator: ∧ becomes ∨ and each operand is negated."
+        }
+      }
+    },
     "examples": {
       "modeGroup": {
         "expression_to_truth_table": "Mode: Expression → truth table",
@@ -347,12 +391,10 @@
         "simplifiedDnfLabel": "Simplified form",
         "simplifiedDnfPlaceholder": "e.g. a ∨ (b ∧ ¬c)",
         "checkSimplification": "Check simplification",
-        "showSimplificationSolution": "Show one possible minimal solution",
-        "hideSimplificationSolution": "Hide minimal solution",
-        "solutionAfterCheckSimplification": "Solution after check",
-        "showSimplificationWalkthrough": "Show solution path",
-        "hideSimplificationWalkthrough": "Hide solution path",
-        "walkthroughAfterCheckSimplification": "Solution path after check",
+        "revealSolutionTitle": "One possible minimal solution",
+        "revealWalkthroughTitle": "Solution path",
+        "revealAlgebraReferenceTitle": "Rule cheat-sheet",
+        "revealRequiresCheck": "available after check",
         "minimalDnfLabel": "One possible minimal form",
         "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — multiple equivalent minimal solutions are possible.",
         "literalCount_one": "{{count}} literal",
@@ -368,14 +410,20 @@
         "walkthroughAllRows": "All rows have result 1, so the whole DNF can be collapsed to 1.",
         "walkthroughAlwaysFalse": "Without a 1-row, no AND group remains. The minimal form is therefore 0.",
         "walkthroughGroupsTitle": "Combine matching rows",
-        "walkthroughGroupsIntro": "Each group contains 1-rows that differ only in the eliminated variables.",
+        "walkthroughGroupsIntro": "Each group below shows how its canonical 1-rows reduce step by step to the prime implicant — distributivity factors out the surviving literals, the complement rule collapses (x ∨ ¬x) to 1, and the identity rule drops the trailing ∧ 1.",
+        "walkthroughGroupHeading": "Group {{index}}",
         "walkthroughGroupCoverage": "covers rows {{rows}}",
         "walkthroughGroupEliminated": "eliminated: {{variables}}",
-        "walkthroughGroupNoEliminated": "no literal eliminated",
+        "walkthroughGroupNoEliminated": "Already a single canonical term — no reduction needed.",
         "walkthroughCoverTitle": "Cover all 1-rows",
         "walkthroughCoverText": "The selected groups cover all 1-rows. Canonical terms already contained in these groups are absorbed.",
         "walkthroughResultTitle": "Possible minimal form",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
+        "derivationNotes": {
+          "factorOut": "Factor out the common literals from variable {{variable}}.",
+          "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
+          "andOneEqualsTerm": "Anything ∧ 1 equals itself, so the trailing 1 disappears."
+        },
         "simplificationStatus": {
           "empty": "Nothing entered yet",
           "syntax_error": "Could not parse the input",

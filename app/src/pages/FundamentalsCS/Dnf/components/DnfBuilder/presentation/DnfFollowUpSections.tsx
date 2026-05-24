@@ -170,7 +170,7 @@ export function DnfFollowUpSections({
                 onClick={() => toggleSection(section.id)}
                 className={cn(
                   "border-border bg-card hover:bg-muted/40 flex w-full items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left transition-colors",
-                  isOpen && "border-emerald-500/30 bg-emerald-500/5",
+                  isOpen && "border-brand",
                   section.disabled &&
                     "hover:bg-card cursor-not-allowed opacity-50",
                 )}
