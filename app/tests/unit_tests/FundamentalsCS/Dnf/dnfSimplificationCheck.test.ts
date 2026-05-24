@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { checkDnfSimplification } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfSimplificationCheck";
+import { checkDnfSimplification } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfSimplificationCheck";
 import {
   createTruthTableFromResults,
   generateTruthTable,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
-import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 import {
   evaluateBooleanExpression,
   type BooleanExpression,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
 describe("DNF simplification check", () => {
   it("returns 'empty' for whitespace-only input", () => {
@@ -121,6 +121,18 @@ describe("DNF simplification check", () => {
 
     expect(result.minimumLiteralCount).toBe(0);
     expect(result.status).toBe("accepted_minimal");
+  });
+
+  it("rejects non-minimal tautology and contradiction rewrites", () => {
+    const tautologyTable = generateTruthTable(parse("a | !a"));
+    const contradictionTable = generateTruthTable(parse("a & !a"));
+
+    expect(checkDnfSimplification(tautologyTable, "a | !a").status).toBe(
+      "equivalent_not_shorter",
+    );
+    expect(checkDnfSimplification(contradictionTable, "a & !a").status).toBe(
+      "equivalent_not_shorter",
+    );
   });
 
   it("exposes a minimalExpression that is logically equivalent to the table", () => {

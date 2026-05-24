@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   formatBooleanExpressionForDisplay,
   reformatBooleanExpressionInput,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
 import {
   parseBooleanExpression,
   type DnfParseResult,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 
 describe("booleanExpressionFormat", () => {
   it("renders OR-of-ANDs with parens around each AND group", () => {

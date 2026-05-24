@@ -292,7 +292,11 @@ function SimplificationWalkthrough({
   const hasGroups = walkthrough.groups.length > 0;
 
   return (
-    <div className="border-border bg-background mt-4 rounded-md border p-3">
+    <div
+      data-testid="dnf-simplification-walkthrough"
+      data-view={isFull ? "full" : "compact"}
+      className="border-border bg-background mt-4 rounded-md border p-3"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2">
           <Lightbulb className="text-brand mt-0.5 size-5 shrink-0" />
@@ -307,6 +311,7 @@ function SimplificationWalkthrough({
         </div>
         <button
           type="button"
+          data-testid="dnf-walkthrough-view-toggle"
           onClick={() => setIsFull((current) => !current)}
           className="border-border hover:bg-muted text-foreground inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors"
         >
@@ -405,7 +410,10 @@ function GroupDerivation({ group, groupIndex }: GroupDerivationProps) {
   const hasMultipleSteps = group.derivationSteps.length > 1;
 
   return (
-    <div className="border-border bg-muted/30 rounded-md border p-3">
+    <div
+      data-testid={`dnf-walkthrough-group-${groupIndex}`}
+      className="border-border bg-muted/30 rounded-md border p-3"
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-foreground text-xs font-semibold tracking-wide uppercase">
           {t("dnf.builder.exercise.walkthroughGroupHeading", {
@@ -462,7 +470,12 @@ function DerivationStepLine({ step, isFirst }: DerivationStepLineProps) {
   const noteText = step.noteKey ? t(step.noteKey, step.noteVars) : null;
 
   return (
-    <li className="flex flex-col gap-1">
+    <li
+      data-testid={
+        step.ruleId ? `dnf-derivation-step-${step.ruleId}` : undefined
+      }
+      className="flex flex-col gap-1"
+    >
       <div className="flex flex-wrap items-baseline gap-2">
         <span className="text-muted-foreground font-mono text-xs">
           {isFirst ? "  " : "= "}

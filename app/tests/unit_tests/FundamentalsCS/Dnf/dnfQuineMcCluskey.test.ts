@@ -2,17 +2,17 @@ import { describe, expect, it } from "vitest";
 import {
   evaluateBooleanExpression,
   type BooleanExpression,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
 import {
   createTruthTableFromResults,
   generateTruthTable,
   type TruthTable,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
-import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 
 describe("Quine-McCluskey minimization", () => {
   it("collapses an unsatisfiable function to constant false", () => {

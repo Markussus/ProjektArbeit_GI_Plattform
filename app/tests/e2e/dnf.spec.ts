@@ -150,9 +150,31 @@ test.describe("DNF page", () => {
       "true",
     );
 
+    await expect(
+      page.getByTestId("dnf-simplification-walkthrough"),
+    ).toHaveAttribute("data-view", "compact");
+    await expect(page.getByTestId("dnf-walkthrough-group-0")).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-derivation-step-distributivity").first(),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-derivation-step-complement").first(),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-derivation-step-identity").first(),
+    ).toBeVisible();
+
+    await page.getByTestId("dnf-walkthrough-view-toggle").click();
+    await expect(
+      page.getByTestId("dnf-simplification-walkthrough"),
+    ).toHaveAttribute("data-view", "full");
+
     await page.getByTestId("dnf-reveal-algebra-reference").click();
     await expect(
       page.getByTestId("dnf-algebra-rule-distributivity"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-algebra-rule-de_morgan"),
     ).toBeVisible();
   });
 });

@@ -1,34 +1,34 @@
 import { describe, expect, it } from "vitest";
-import { buildTruthTableDisplay } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/adapters/truthTableAdapter";
+import { buildTruthTableDisplay } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/adapters/truthTableAdapter";
 import {
   analyzeDnfTruthTable,
   analyzeDnfSource,
   MAX_DNF_VARIABLE_COUNT,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/application/dnfAnalysis";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/application/dnfAnalysis";
 import {
   collectExpressionVariables,
   evaluateBooleanExpression,
   type BooleanExpression,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 import {
   formatBooleanInput,
   normalizeBooleanOperatorAliases,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanSyntax";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanSyntax";
 import {
   deriveDnfFromTruthTable,
   formatDnfExpression,
   formatDnfTerm,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfDerivation";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfDerivation";
 import {
   checkDnfExerciseAttempt,
   type TruthTableAnswer,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfExerciseCheck";
-import { parseBooleanExpression } from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfExerciseCheck";
+import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 import {
   createTruthTableFromResults,
   generateTruthTable,
   type TruthTable,
-} from "../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 
 describe("DNF boolean logic", () => {
   it("parses and evaluates operator precedence", () => {
