@@ -279,23 +279,40 @@ function SimplificationWalkthrough({
   walkthrough,
 }: SimplificationWalkthroughProps) {
   const { t } = useTranslation();
+  const [isFull, setIsFull] = useState(false);
   const hasGroups = walkthrough.groups.length > 0;
 
   return (
     <div className="border-border bg-background mt-4 rounded-md border p-3">
-      <div className="flex items-start gap-2">
-        <Lightbulb className="text-brand mt-0.5 size-5 shrink-0" />
-        <div>
-          <p className="text-foreground text-sm font-semibold">
-            {t("dnf.builder.exercise.walkthroughTitle")}
-          </p>
-          <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-            {t("dnf.builder.exercise.walkthroughNote")}
-          </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-2">
+          <Lightbulb className="text-brand mt-0.5 size-5 shrink-0" />
+          <div>
+            <p className="text-foreground text-sm font-semibold">
+              {t("dnf.builder.exercise.walkthroughTitle")}
+            </p>
+            <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+              {t("dnf.builder.exercise.walkthroughNote")}
+            </p>
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={() => setIsFull((current) => !current)}
+          className="border-border hover:bg-muted text-foreground inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors"
+        >
+          {isFull
+            ? t("dnf.builder.exercise.showCompactWalkthrough")
+            : t("dnf.builder.exercise.showFullWalkthrough")}
+        </button>
       </div>
 
-      <ol className="mt-4 max-h-128 space-y-3 overflow-y-auto pr-1 text-sm">
+      <ol
+        className={cn(
+          "mt-4 space-y-3 pr-1 text-sm",
+          !isFull && "max-h-128 overflow-y-auto",
+        )}
+      >
         <WalkthroughStep index={1}>
           <p className="text-foreground font-semibold">
             {t("dnf.builder.exercise.walkthroughRowsTitle")}

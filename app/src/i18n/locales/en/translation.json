@@ -180,7 +180,7 @@
     "concept4": "Logic gates",
     "algebra": {
       "title": "Boolean algebra rules",
-      "intro": "These rules let you rewrite a canonical DNF into shorter equivalent forms. They power both the worked-out simplification path below and every example shown in the simulator.",
+      "intro": "These rules let you rewrite a DNF into shorter equivalent forms. They power the step-by-step solution path and the worked examples in the simulator.",
       "rules": {
         "identity": {
           "name": "Identity",
@@ -200,7 +200,7 @@
         },
         "complement": {
           "name": "Complement",
-          "example": "A literal and its negation together cover all assignments (∨) or no assignment (∧)."
+          "example": "A variable is always either true or false — so a ∨ ¬a is always 1, and a ∧ ¬a is always 0."
         },
         "commutativity": {
           "name": "Commutativity",
@@ -212,11 +212,11 @@
         },
         "distributivity": {
           "name": "Distributivity",
-          "example": "Either operator distributes over the other — used to factor or expand common literals."
+          "example": "A shared operand can be factored out — like factoring in regular maths, but with ∧ and ∨ instead of · and +."
         },
         "absorption": {
           "name": "Absorption",
-          "example": "A term that already contains a smaller covering term is absorbed by it."
+          "example": "If a is already true, then a ∨ (a ∧ b) is also true — the AND part adds nothing."
         },
         "de_morgan": {
           "name": "De Morgan",
@@ -403,6 +403,8 @@
         "termCount_other": "{{count}} terms",
         "walkthroughTitle": "One possible solution path",
         "walkthroughNote": "This path is not unique. It shows one possible grouping of the 1-rows into a minimal form.",
+        "showFullWalkthrough": "Show full solution path",
+        "showCompactWalkthrough": "Show compact solution path",
         "walkthroughRowsTitle": "Start with the 1-rows",
         "walkthroughRowsText": "Rows {{rows}} provide the terms of the correct DNF.",
         "walkthroughNoRows": "There is no 1-row; the function is 0 for every assignment.",
@@ -410,19 +412,19 @@
         "walkthroughAllRows": "All rows have result 1, so the whole DNF can be collapsed to 1.",
         "walkthroughAlwaysFalse": "Without a 1-row, no AND group remains. The minimal form is therefore 0.",
         "walkthroughGroupsTitle": "Combine matching rows",
-        "walkthroughGroupsIntro": "Each group below shows how its canonical 1-rows reduce step by step to the prime implicant — distributivity factors out the surviving literals, the complement rule collapses (x ∨ ¬x) to 1, and the identity rule drops the trailing ∧ 1.",
+        "walkthroughGroupsIntro": "Each group below shows how its 1-rows reduce step by step to a shorter term — distributivity factors out the shared literals, the complement rule collapses (x ∨ ¬x) to 1, and the identity rule drops the trailing ∧ 1.",
         "walkthroughGroupHeading": "Group {{index}}",
         "walkthroughGroupCoverage": "covers rows {{rows}}",
         "walkthroughGroupEliminated": "eliminated: {{variables}}",
-        "walkthroughGroupNoEliminated": "Already a single canonical term — no reduction needed.",
+        "walkthroughGroupNoEliminated": "Already a single term — no reduction needed.",
         "walkthroughCoverTitle": "Cover all 1-rows",
         "walkthroughCoverText": "The selected groups cover all 1-rows. Canonical terms already contained in these groups are absorbed.",
         "walkthroughResultTitle": "Possible minimal form",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
         "derivationNotes": {
-          "factorOut": "Factor out the common literals from variable {{variable}}.",
+          "factorOut": "Factor out {{variable}} — the other literals stay.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
-          "andOneEqualsTerm": "Anything ∧ 1 equals itself, so the trailing 1 disappears."
+          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out."
         },
         "simplificationStatus": {
           "empty": "Nothing entered yet",

@@ -176,7 +176,7 @@
     "concept4": "Logikgatter",
     "algebra": {
       "title": "Regeln der booleschen Algebra",
-      "intro": "Mit diesen Regeln lässt sich eine kanonische DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg im Simulator und für alle Beispiele dort.",
+      "intro": "Mit diesen Regeln lässt sich eine DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg und für die Beispiele im Simulator.",
       "rules": {
         "identity": {
           "name": "Neutralelement",
@@ -196,7 +196,7 @@
         },
         "complement": {
           "name": "Komplement",
-          "example": "Variable und ihre Negation decken zusammen alle (∨) bzw. keine (∧) Belegung ab."
+          "example": "Eine Variable ist immer entweder wahr oder falsch — a ∨ ¬a ist deshalb immer 1, a ∧ ¬a immer 0."
         },
         "commutativity": {
           "name": "Kommutativgesetz",
@@ -208,11 +208,11 @@
         },
         "distributivity": {
           "name": "Distributivgesetz",
-          "example": "Beide Operatoren distribuieren über den jeweils anderen — zum Ausklammern oder Ausmultiplizieren gemeinsamer Literale."
+          "example": "Ein gemeinsamer Operand lässt sich ausklammern — wie beim Ausmultiplizieren in der Mathematik, nur mit ∧ und ∨ statt · und +."
         },
         "absorption": {
           "name": "Absorptionsgesetz",
-          "example": "Ein Term, der bereits einen kleineren überdeckenden Term enthält, wird von ihm absorbiert."
+          "example": "Ist a bereits wahr, dann ist auch a ∨ (a ∧ b) wahr — der UND-Teil fügt nichts hinzu."
         },
         "de_morgan": {
           "name": "De Morgan",
@@ -399,6 +399,8 @@
         "termCount_other": "{{count}} Termen",
         "walkthroughTitle": "Ein möglicher Lösungsweg",
         "walkthroughNote": "Dieser Weg ist nicht eindeutig. Er zeigt eine mögliche Gruppierung der 1-Zeilen zur minimalen Form.",
+        "showFullWalkthrough": "Vollen Lösungsweg anzeigen",
+        "showCompactWalkthrough": "Kompakten Lösungsweg anzeigen",
         "walkthroughRowsTitle": "Start mit den 1-Zeilen",
         "walkthroughRowsText": "Die Zeilen {{rows}} liefern die Terme der korrekten DNF.",
         "walkthroughNoRows": "Es gibt keine 1-Zeile; die Funktion ist für jede Belegung 0.",
@@ -406,19 +408,19 @@
         "walkthroughAllRows": "Alle Zeilen haben Ergebnis 1. Deshalb kann die gesamte DNF zu 1 zusammengefasst werden.",
         "walkthroughAlwaysFalse": "Ohne 1-Zeile bleibt keine UND-Gruppe übrig. Die minimale Form ist daher 0.",
         "walkthroughGroupsTitle": "Passende Zeilen zusammenfassen",
-        "walkthroughGroupsIntro": "Jede Gruppe unten zeigt, wie sich ihre kanonischen 1-Zeilen schrittweise zum Prime-Implikanten zusammenfassen lassen — das Distributivgesetz klammert die gemeinsamen Literale aus, das Komplementgesetz reduziert (x ∨ ¬x) auf 1, und das Neutralelement entfernt das verbleibende ∧ 1.",
+        "walkthroughGroupsIntro": "Jede Gruppe unten zeigt, wie sich ihre 1-Zeilen schrittweise zu einem kürzeren Term zusammenfassen lassen — das Distributivgesetz klammert die gemeinsamen Literale aus, das Komplementgesetz reduziert (x ∨ ¬x) auf 1, und das Neutralelement entfernt das verbleibende ∧ 1.",
         "walkthroughGroupHeading": "Gruppe {{index}}",
         "walkthroughGroupCoverage": "deckt Zeilen {{rows}} ab",
         "walkthroughGroupEliminated": "gestrichen: {{variables}}",
-        "walkthroughGroupNoEliminated": "Schon ein einzelner kanonischer Term — keine Umformung nötig.",
+        "walkthroughGroupNoEliminated": "Schon ein einzelner Term — keine Umformung nötig.",
         "walkthroughCoverTitle": "Alle 1-Zeilen abdecken",
         "walkthroughCoverText": "Die ausgewählten Gruppen decken alle 1-Zeilen ab. Kanonische Terme, die schon in diesen Gruppen enthalten sind, werden absorbiert.",
         "walkthroughResultTitle": "Mögliche minimale Form",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} weitere)",
         "derivationNotes": {
-          "factorOut": "Gemeinsame Literale um die Variable {{variable}} ausklammern.",
+          "factorOut": "{{variable}} ausklammern — die anderen Literale bleiben.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
-          "andOneEqualsTerm": "Beliebiger Term ∧ 1 bleibt unverändert — die 1 entfällt."
+          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg."
         },
         "simplificationStatus": {
           "empty": "Noch keine Eingabe",
