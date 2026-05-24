@@ -37,6 +37,18 @@ export interface DnfSimplificationWalkthrough {
   constantCase: "always_false" | "always_true" | null;
 }
 
+/**
+ * Intermediate AND-term during the algebraic derivation. `mask` marks
+ * variables that have been eliminated; bits in `value` at non-masked positions
+ * indicate whether the surviving variable appears positively (1) or negated
+ * (0). Same shape as `PrimeImplicant` minus the bookkeeping fields, so all
+ * formatters work on both.
+ */
+interface BitTerm {
+  value: number;
+  mask: number;
+}
+
 export function buildDnfSimplificationWalkthrough(
   table: TruthTable,
 ): DnfSimplificationWalkthrough {
@@ -65,7 +77,7 @@ function buildGroups(
   }
 
   return minimal.implicants.map((implicant) => ({
-    term: formatImplicantTerm(implicant, variables),
+    term: formatBitTerm(implicant, variables),
     coveredRowNumbers: implicant.covers.map((rowIndex) => rowIndex + 1),
     eliminatedVariables: getEliminatedVariables(implicant, variables),
     literalCount: implicant.literals,
@@ -82,80 +94,14 @@ function getConstantCase(
   return minimal.value ? "always_true" : "always_false";
 }
 
-function formatImplicantTerm(
-  implicant: PrimeImplicant,
-  variables: string[],
-): string {
-  const literals = getImplicantLiterals(implicant, variables);
-
-  if (literals.length === 0) {
-    return "1";
-  }
-  if (literals.length === 1) {
-    return literals[0];
-  }
-  return `(${literals.join(AND)})`;
-}
-
-function getImplicantLiterals(
-  implicant: PrimeImplicant,
-  variables: string[],
-): string[] {
-  const variableCount = variables.length;
-  const literals: string[] = [];
-
-  for (
-    let variableIndex = 0;
-    variableIndex < variableCount;
-    variableIndex += 1
-  ) {
-    const bitPosition = variableCount - variableIndex - 1;
-    const mask = 1 << bitPosition;
-
-    if ((implicant.mask & mask) !== 0) {
-      continue;
-    }
-
-    const variable = variables[variableIndex];
-    literals.push(
-      (implicant.value & mask) !== 0 ? variable : `${NOT}${variable}`,
-    );
-  }
-
-  return literals;
-}
-
 function getEliminatedVariables(
   implicant: PrimeImplicant,
   variables: string[],
 ): string[] {
-  const variableCount = variables.length;
-  const eliminated: string[] = [];
-
-  for (
-    let variableIndex = 0;
-    variableIndex < variableCount;
-    variableIndex += 1
-  ) {
-    const bitPosition = variableCount - variableIndex - 1;
-    if ((implicant.mask & (1 << bitPosition)) !== 0) {
-      eliminated.push(variables[variableIndex]);
-    }
-  }
-
-  return eliminated;
-}
-
-/**
- * Internal representation of an intermediate term during the algebraic
- * derivation. `mask` marks variables that have already been eliminated; the
- * remaining bits in `value` describe whether each surviving variable appears
- * positively (1) or negated (0). Used to render the step-by-step proof that
- * the canonical 1-rows reduce to the prime implicant.
- */
-interface IntermediateTerm {
-  value: number;
-  mask: number;
+  return variables.filter((_, variableIndex) => {
+    const bitPosition = variables.length - variableIndex - 1;
+    return (implicant.mask & (1 << bitPosition)) !== 0;
+  });
 }
 
 /**
@@ -168,17 +114,14 @@ function buildDerivationSteps(
   implicant: PrimeImplicant,
   variables: string[],
 ): DnfDerivationStep[] {
-  const variableCount = variables.length;
   const steps: DnfDerivationStep[] = [];
 
-  let currentTerms: IntermediateTerm[] = implicant.covers.map((minterm) => ({
+  let currentTerms: BitTerm[] = implicant.covers.map((minterm) => ({
     value: minterm,
     mask: 0,
   }));
 
-  steps.push({
-    expression: formatTermsAsOr(currentTerms, variableCount, variables),
-  });
+  steps.push({ expression: formatBitTermsAsOr(currentTerms, variables) });
 
   if (implicant.mask === 0) {
     return steps;
@@ -187,41 +130,28 @@ function buildDerivationSteps(
   const elimBitsHighFirst = bitsSetIn(implicant.mask).sort((a, b) => b - a);
 
   for (const bitPosition of elimBitsHighFirst) {
-    const variableIndex = variableCount - bitPosition - 1;
-    const variableName = variables[variableIndex];
-    const pairs = groupTermsByPartnerOnBit(currentTerms, bitPosition);
+    const variableName = variables[variables.length - bitPosition - 1];
+    const pairs = collapseTermsByBit(currentTerms, bitPosition);
+    const complementGroup = `(${variableName}${OR}${NOT}${variableName})`;
 
     steps.push({
-      expression: formatPairsFactored(
-        pairs,
-        bitPosition,
-        variableCount,
-        variables,
-      ),
+      expression: formatPairsWithSuffix(pairs, complementGroup, variables),
       ruleId: "distributivity",
       noteKey: "dnf.builder.exercise.derivationNotes.factorOut",
       noteVars: { variable: variableName },
     });
 
     steps.push({
-      expression: formatPairsWithComplementCollapsed(
-        pairs,
-        bitPosition,
-        variableCount,
-        variables,
-      ),
+      expression: formatPairsWithSuffix(pairs, "1", variables),
       ruleId: "complement",
       noteKey: "dnf.builder.exercise.derivationNotes.complementToOne",
       noteVars: { variable: variableName },
     });
 
-    currentTerms = pairs.map((pair) => ({
-      value: pair.commonValue,
-      mask: pair.commonMask,
-    }));
+    currentTerms = pairs;
 
     steps.push({
-      expression: formatTermsAsOr(currentTerms, variableCount, variables),
+      expression: formatBitTermsAsOr(currentTerms, variables),
       ruleId: "identity",
       noteKey: "dnf.builder.exercise.derivationNotes.andOneEqualsTerm",
     });
@@ -230,46 +160,38 @@ function buildDerivationSteps(
   return steps;
 }
 
-interface DerivationPair {
-  commonValue: number;
-  commonMask: number;
-}
-
-function groupTermsByPartnerOnBit(
-  terms: IntermediateTerm[],
-  bitPosition: number,
-): DerivationPair[] {
+/**
+ * Group `terms` into the set of partner-pairs that would result from
+ * eliminating `bitPosition` via Distributivity + Complement + Identity.
+ * Terms that share every other literal collapse into one pair entry.
+ */
+function collapseTermsByBit(terms: BitTerm[], bitPosition: number): BitTerm[] {
   const bit = 1 << bitPosition;
-  const pairs = new Map<string, DerivationPair>();
+  const pairs = new Map<string, BitTerm>();
 
   for (const term of terms) {
-    const commonValue = term.value & ~bit;
-    const commonMask = term.mask | bit;
-    const key = `${commonValue}|${commonMask}`;
+    const value = term.value & ~bit;
+    const mask = term.mask | bit;
+    const key = `${value}|${mask}`;
     if (!pairs.has(key)) {
-      pairs.set(key, { commonValue, commonMask });
+      pairs.set(key, { value, mask });
     }
   }
 
   return [...pairs.values()];
 }
 
-function formatTermsAsOr(
-  terms: IntermediateTerm[],
-  variableCount: number,
-  variables: string[],
-): string {
-  return terms
-    .map((term) => formatTerm(term, variableCount, variables))
-    .join(OR);
+function formatBitTermsAsOr(terms: BitTerm[], variables: string[]): string {
+  return terms.map((term) => formatBitTerm(term, variables)).join(OR);
 }
 
-function formatTerm(
-  term: IntermediateTerm,
-  variableCount: number,
-  variables: string[],
-): string {
-  const literals = collectLiteralsFromTerm(term, variableCount, variables);
+/**
+ * Render a single AND-term (`value` + `mask` bit layout) as a readable
+ * formula. Empty terms render as `1`, single-literal terms drop the
+ * parentheses for readability.
+ */
+function formatBitTerm(term: BitTerm, variables: string[]): string {
+  const literals = collectBitTermLiterals(term, variables);
 
   if (literals.length === 0) {
     return "1";
@@ -280,113 +202,57 @@ function formatTerm(
   return `(${literals.join(AND)})`;
 }
 
-function collectLiteralsFromTerm(
-  term: IntermediateTerm,
-  variableCount: number,
-  variables: string[],
-): string[] {
+function collectBitTermLiterals(term: BitTerm, variables: string[]): string[] {
   const literals: string[] = [];
+
   for (
     let variableIndex = 0;
-    variableIndex < variableCount;
+    variableIndex < variables.length;
     variableIndex += 1
   ) {
-    const bitPosition = variableCount - variableIndex - 1;
+    const bitPosition = variables.length - variableIndex - 1;
     const mask = 1 << bitPosition;
+
     if ((term.mask & mask) !== 0) {
       continue;
     }
-    const variableName = variables[variableIndex];
-    literals.push(
-      (term.value & mask) !== 0 ? variableName : `${NOT}${variableName}`,
-    );
+
+    const variable = variables[variableIndex];
+    literals.push((term.value & mask) !== 0 ? variable : `${NOT}${variable}`);
   }
+
   return literals;
 }
 
-function formatPairsFactored(
-  pairs: DerivationPair[],
-  bitPosition: number,
-  variableCount: number,
+/**
+ * Render `pairs` joined by ∨, with each pair shown as `base ∧ suffix`. When
+ * a pair has no surviving literals the suffix stands alone. When there is
+ * more than one pair, each is wrapped in outer parens so the ∧/∨ precedence
+ * remains visually unambiguous (∧ binds tighter, but new readers benefit
+ * from explicit grouping).
+ */
+function formatPairsWithSuffix(
+  pairs: BitTerm[],
+  suffix: string,
   variables: string[],
 ): string {
-  const variableIndex = variableCount - bitPosition - 1;
-  const variable = variables[variableIndex];
-  const complementGroup = `(${variable}${OR}${NOT}${variable})`;
-  const wrapInOuterParens = pairs.length > 1;
+  const wrapEachPair = pairs.length > 1;
 
   return pairs
-    .map((pair) =>
-      formatFactoredPair(
-        pair,
-        complementGroup,
-        variableCount,
-        variables,
-        wrapInOuterParens,
-      ),
-    )
+    .map((pair) => {
+      const baseLiterals = collectBitTermLiterals(pair, variables);
+      if (baseLiterals.length === 0) {
+        return suffix;
+      }
+
+      const baseRender =
+        baseLiterals.length === 1
+          ? baseLiterals[0]
+          : `(${baseLiterals.join(AND)})`;
+      const inner = `${baseRender}${AND}${suffix}`;
+      return wrapEachPair ? `(${inner})` : inner;
+    })
     .join(OR);
-}
-
-function formatFactoredPair(
-  pair: DerivationPair,
-  complementGroup: string,
-  variableCount: number,
-  variables: string[],
-  wrapInOuterParens: boolean,
-): string {
-  const baseLiterals = collectLiteralsFromTerm(
-    { value: pair.commonValue, mask: pair.commonMask },
-    variableCount,
-    variables,
-  );
-
-  if (baseLiterals.length === 0) {
-    return complementGroup;
-  }
-
-  const baseRender =
-    baseLiterals.length === 1 ? baseLiterals[0] : `(${baseLiterals.join(AND)})`;
-  const inner = `${baseRender}${AND}${complementGroup}`;
-  return wrapInOuterParens ? `(${inner})` : inner;
-}
-
-function formatPairsWithComplementCollapsed(
-  pairs: DerivationPair[],
-  bitPosition: number,
-  variableCount: number,
-  variables: string[],
-): string {
-  const wrapInOuterParens = pairs.length > 1;
-
-  return pairs
-    .map((pair) =>
-      formatPairWithOne(pair, bitPosition, variableCount, variables, wrapInOuterParens),
-    )
-    .join(OR);
-}
-
-function formatPairWithOne(
-  pair: DerivationPair,
-  _bitPosition: number,
-  variableCount: number,
-  variables: string[],
-  wrapInOuterParens: boolean,
-): string {
-  const baseLiterals = collectLiteralsFromTerm(
-    { value: pair.commonValue, mask: pair.commonMask },
-    variableCount,
-    variables,
-  );
-
-  if (baseLiterals.length === 0) {
-    return "1";
-  }
-
-  const baseRender =
-    baseLiterals.length === 1 ? baseLiterals[0] : `(${baseLiterals.join(AND)})`;
-  const inner = `${baseRender}${AND}1`;
-  return wrapInOuterParens ? `(${inner})` : inner;
 }
 
 function bitsSetIn(mask: number): number[] {

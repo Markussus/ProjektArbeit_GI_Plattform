@@ -180,7 +180,9 @@ export function DnfSimplificationPanel({
           onToggle={onToggleWalkthrough}
           isSolution
         >
-          {walkthrough && <SimplificationWalkthrough walkthrough={walkthrough} />}
+          {walkthrough && (
+            <SimplificationWalkthrough walkthrough={walkthrough} />
+          )}
         </RevealSection>
 
         <RevealSection
@@ -244,7 +246,9 @@ function RevealSection({
         </span>
         <span className="flex shrink-0 items-center gap-2">
           {disabled && disabledHint && (
-            <span className="text-muted-foreground text-xs">{disabledHint}</span>
+            <span className="text-muted-foreground text-xs">
+              {disabledHint}
+            </span>
           )}
           {isOpen ? (
             <ChevronUp className="text-muted-foreground size-4" />

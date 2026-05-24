@@ -62,7 +62,10 @@ interface BooleanAlgebraRuleCardProps {
   variant: "page" | "panel";
 }
 
-function BooleanAlgebraRuleCard({ rule, variant }: BooleanAlgebraRuleCardProps) {
+function BooleanAlgebraRuleCard({
+  rule,
+  variant,
+}: BooleanAlgebraRuleCardProps) {
   const { t } = useTranslation();
   const isPanel = variant === "panel";
 
@@ -74,16 +77,14 @@ function BooleanAlgebraRuleCard({ rule, variant }: BooleanAlgebraRuleCardProps) 
         isPanel && "bg-muted/30",
       )}
     >
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="text-foreground text-sm font-semibold">
-          {t(rule.nameKey)}
-        </span>
-      </div>
+      <span className="text-foreground text-sm font-semibold">
+        {t(rule.nameKey)}
+      </span>
       <div className="flex flex-col gap-1">
         {rule.formulas.map((formula) => (
           <code
             key={formula}
-            className="text-foreground font-mono text-xs leading-relaxed break-words"
+            className="text-foreground font-mono text-xs leading-relaxed wrap-break-word"
           >
             {formula}
           </code>
