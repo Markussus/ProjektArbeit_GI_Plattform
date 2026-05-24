@@ -173,8 +173,6 @@ test.describe("DNF page", () => {
     await expect(
       page.getByTestId("dnf-algebra-rule-distributivity"),
     ).toBeVisible();
-    await expect(
-      page.getByTestId("dnf-algebra-rule-de_morgan"),
-    ).toBeVisible();
+    await expect(page.getByTestId("dnf-algebra-rule-de_morgan")).toBeVisible();
   });
 });
