@@ -172,7 +172,7 @@ function TableToDnfBuilder({
   );
   const hasInitialSeed = Boolean(
     initialResultValues &&
-      initialResultValues.length === 2 ** initialVariableCount,
+    initialResultValues.length === 2 ** initialVariableCount,
   );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>

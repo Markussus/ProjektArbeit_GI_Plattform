@@ -198,10 +198,7 @@ function literalsToAnd(
   }));
 }
 
-function termsToOr(
-  terms: Literal[][],
-  variables: string[],
-): BooleanExpression {
+function termsToOr(terms: Literal[][], variables: string[]): BooleanExpression {
   const expressions = terms.map((term) => literalsToAnd(term, variables));
   return expressions.reduce((left, right) => ({
     type: "binary",

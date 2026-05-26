@@ -5,10 +5,7 @@ import {
 } from "./booleanExpression";
 import { deriveDnfFromTruthTable } from "./dnfDerivation";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
-import {
-  countExpressionLiterals,
-  factorMinimalDnf,
-} from "./factorMinimalDnf";
+import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,
@@ -110,7 +107,7 @@ export function checkDnfSimplification(
 
   const expression = parseResult.expression;
   const unknownVariables = findUnknownVariables(expression, table.variables);
-  const userLiteralCount = countLiterals(expression);
+  const userLiteralCount = countExpressionLiterals(expression);
   const userTermCount = countTopLevelTerms(expression);
 
   if (unknownVariables.length > 0) {
@@ -180,20 +177,6 @@ function findUnknownVariables(
   return collectExpressionVariables(expression).filter(
     (variable) => !known.has(variable),
   );
-}
-
-/** Count variable references (each occurrence of a variable, negated or not). */
-function countLiterals(expression: BooleanExpression): number {
-  switch (expression.type) {
-    case "constant":
-      return 0;
-    case "variable":
-      return 1;
-    case "not":
-      return countLiterals(expression.operand);
-    case "binary":
-      return countLiterals(expression.left) + countLiterals(expression.right);
-  }
 }
 
 /** Count top-level OR-separated terms; 1 for non-OR expressions. */
