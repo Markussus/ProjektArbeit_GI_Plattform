@@ -187,6 +187,28 @@ describe("dnfSimplificationWalkthrough", () => {
     expect(walkthrough.groups).toEqual([]);
     expect(walkthrough.minimalForm).toBe("0");
   });
+
+  it("surfaces a factored form when factoring shortens the minimal DNF", () => {
+    const table = generateTruthTable(parse("(a ∧ c) ∨ (b ∧ c)"));
+
+    const walkthrough = buildDnfSimplificationWalkthrough(table);
+
+    expect(walkthrough.minimalLiteralCount).toBe(4);
+    expect(walkthrough.factoredLiteralCount).toBe(3);
+    expect(walkthrough.factoredForm).not.toBeNull();
+    expect(walkthrough.factoredForm).toMatch(
+      /^c ∧ \((a ∨ b|b ∨ a)\)$/,
+    );
+  });
+
+  it("leaves the factored form null when nothing can be factored", () => {
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
+
+    const walkthrough = buildDnfSimplificationWalkthrough(table);
+
+    expect(walkthrough.factoredForm).toBeNull();
+    expect(walkthrough.factoredLiteralCount).toBeNull();
+  });
 });
 
 function parse(source: string): BooleanExpression {

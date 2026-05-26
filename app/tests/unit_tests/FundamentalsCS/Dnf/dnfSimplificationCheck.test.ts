@@ -145,6 +145,29 @@ describe("DNF simplification check", () => {
 
     expectExpressionEquivalentToTable(result.minimalExpression, table);
   });
+
+  it("exposes a strictly shorter factored expression when a literal can be pulled out", () => {
+    // Minimal DNF for (a ∧ c) ∨ (b ∧ c) has 4 literals; factoring out c
+    // produces c ∧ (a ∨ b) with 3 literals.
+    const table = generateTruthTable(parse("(a ∧ c) ∨ (b ∧ c)"));
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.factoredIsShorter).toBe(true);
+    expect(result.factoredLiteralCount).toBeLessThan(result.minimumLiteralCount);
+    expectExpressionEquivalentToTable(result.factoredExpression, table);
+  });
+
+  it("reports factoredIsShorter=false when no literal is shared across groups", () => {
+    // Equivalence-over-3-vars: minterms 000 and 111 share no literal,
+    // so greedy factoring cannot shorten the result.
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.factoredIsShorter).toBe(false);
+    expect(result.factoredLiteralCount).toBe(result.minimumLiteralCount);
+  });
 });
 
 function parse(source: string): BooleanExpression {
