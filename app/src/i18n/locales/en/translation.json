@@ -297,7 +297,11 @@
       "clearTable": "Set table to 0",
       "fillTable": "Set table to 1",
       "randomTable": "Randomize",
-      "invertTable": "Invert results"
+      "invertTable": "Invert results",
+      "setupPreviewTitle": "Set up the truth table",
+      "setupPreviewHint": "Set the f column for each row. Once the table is ready, click \"Commit table\" to start the DNF exercise.",
+      "commitTable": "Commit table",
+      "newTable": "New table"
     },
     "builder": {
       "inputTitle": "Boolean expression",

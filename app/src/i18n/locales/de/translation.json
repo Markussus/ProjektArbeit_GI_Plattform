@@ -293,7 +293,11 @@
       "clearTable": "Tabelle auf 0 setzen",
       "fillTable": "Tabelle auf 1 setzen",
       "randomTable": "Zufällig belegen",
-      "invertTable": "Ergebnisse invertieren"
+      "invertTable": "Ergebnisse invertieren",
+      "setupPreviewTitle": "Wertetafel festlegen",
+      "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
+      "commitTable": "Tabelle übernehmen",
+      "newTable": "Neue Tabelle"
     },
     "builder": {
       "inputTitle": "Boolescher Ausdruck",

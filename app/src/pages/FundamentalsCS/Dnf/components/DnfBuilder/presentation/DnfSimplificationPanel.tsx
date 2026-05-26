@@ -308,12 +308,34 @@ interface SimplificationWalkthroughProps {
   walkthrough: DnfSimplificationWalkthrough;
 }
 
+// A walkthrough is "large" — and therefore worth offering a compact/full
+// toggle with an inner scrollbar — only when it is clearly oversized: lots
+// of minterm groups OR many algebraic reduction steps in total. Below these
+// thresholds the content fits comfortably enough that capping it would feel
+// pointless, so we render it fully without any max-height or scrollbar.
+const LARGE_WALKTHROUGH_GROUP_THRESHOLD = 4;
+const LARGE_WALKTHROUGH_STEP_THRESHOLD = 12;
+
 function SimplificationWalkthrough({
   walkthrough,
 }: SimplificationWalkthroughProps) {
   const { t } = useTranslation();
   const [isFull, setIsFull] = useState(false);
   const hasGroups = walkthrough.groups.length > 0;
+
+  // Decide based on the walkthrough's content size — not on DOM measurement —
+  // whether the compact box (max-h + scroll) and its toggle are worth showing.
+  // Small/medium walkthroughs render fully without a cap, so the user does not
+  // see a scrollbar or a "show full / compact" button that doesn't do anything
+  // useful.
+  const totalDerivationSteps = walkthrough.groups.reduce(
+    (sum, group) => sum + group.derivationSteps.length,
+    0,
+  );
+  const isLargeWalkthrough =
+    walkthrough.groups.length >= LARGE_WALKTHROUGH_GROUP_THRESHOLD ||
+    totalDerivationSteps >= LARGE_WALKTHROUGH_STEP_THRESHOLD;
+  const useCompactBox = isLargeWalkthrough && !isFull;
 
   return (
     <div
@@ -333,22 +355,24 @@ function SimplificationWalkthrough({
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          data-testid="dnf-walkthrough-view-toggle"
-          onClick={() => setIsFull((current) => !current)}
-          className="border-border hover:bg-muted text-foreground inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors"
-        >
-          {isFull
-            ? t("dnf.builder.exercise.showCompactWalkthrough")
-            : t("dnf.builder.exercise.showFullWalkthrough")}
-        </button>
+        {isLargeWalkthrough && (
+          <button
+            type="button"
+            data-testid="dnf-walkthrough-view-toggle"
+            onClick={() => setIsFull((current) => !current)}
+            className="border-border hover:bg-muted text-foreground inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors"
+          >
+            {isFull
+              ? t("dnf.builder.exercise.showCompactWalkthrough")
+              : t("dnf.builder.exercise.showFullWalkthrough")}
+          </button>
+        )}
       </div>
 
       <ol
         className={cn(
           "mt-4 space-y-3 pr-1 text-sm",
-          !isFull && "max-h-128 overflow-y-auto",
+          useCompactBox && "max-h-128 overflow-y-auto",
         )}
       >
         <WalkthroughStep index={1}>
