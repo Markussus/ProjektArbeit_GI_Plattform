@@ -35,9 +35,7 @@ describe("factorMinimalDnf", () => {
   it("keeps the minimal DNF unchanged when no literal is shared", () => {
     // XOR-equivalence over 3 vars: each minterm has different polarities,
     // no literal appears in both groups — greedy factoring is a no-op.
-    const table = generateTruthTable(
-      parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"),
-    );
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
 
     const minimal = computeMinimalDnf(table);
     const factored = factor(table);
@@ -62,7 +60,10 @@ describe("factorMinimalDnf", () => {
   });
 
   it("returns the constant true for an all-ones table", () => {
-    const table = createTruthTableFromResults(["a", "b"], [true, true, true, true]);
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [true, true, true, true],
+    );
 
     const factored = factor(table);
 

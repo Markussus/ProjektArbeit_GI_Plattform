@@ -196,9 +196,7 @@ describe("dnfSimplificationWalkthrough", () => {
     expect(walkthrough.minimalLiteralCount).toBe(4);
     expect(walkthrough.factoredLiteralCount).toBe(3);
     expect(walkthrough.factoredForm).not.toBeNull();
-    expect(walkthrough.factoredForm).toMatch(
-      /^c ∧ \((a ∨ b|b ∨ a)\)$/,
-    );
+    expect(walkthrough.factoredForm).toMatch(/^c ∧ \((a ∨ b|b ∨ a)\)$/);
   });
 
   it("leaves the factored form null when nothing can be factored", () => {

@@ -154,7 +154,9 @@ describe("DNF simplification check", () => {
     const result = checkDnfSimplification(table, "");
 
     expect(result.factoredIsShorter).toBe(true);
-    expect(result.factoredLiteralCount).toBeLessThan(result.minimumLiteralCount);
+    expect(result.factoredLiteralCount).toBeLessThan(
+      result.minimumLiteralCount,
+    );
     expectExpressionEquivalentToTable(result.factoredExpression, table);
   });
 
