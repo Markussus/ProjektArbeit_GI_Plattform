@@ -3,6 +3,10 @@ import type { BooleanAlgebraRuleId } from "./booleanAlgebraRules";
 import { formatBooleanExpressionForDisplay } from "./booleanExpressionFormat";
 import { deriveDnfFromTruthTable, formatDnfExpression } from "./dnfDerivation";
 import {
+  countExpressionLiterals,
+  factorMinimalDnf,
+} from "./factorMinimalDnf";
+import {
   computeMinimalDnf,
   minimalDnfToExpression,
   type MinimalDnf,
@@ -34,6 +38,10 @@ export interface DnfSimplificationWalkthrough {
   canonicalDnf: string;
   groups: DnfSimplificationGroup[];
   minimalForm: string;
+  minimalLiteralCount: number;
+  /** Factored form derived from the minimal DNF; only set when strictly shorter. */
+  factoredForm: string | null;
+  factoredLiteralCount: number | null;
   constantCase: "always_false" | "always_true" | null;
 }
 
@@ -54,6 +62,9 @@ export function buildDnfSimplificationWalkthrough(
 ): DnfSimplificationWalkthrough {
   const derivation = deriveDnfFromTruthTable(table);
   const minimal = computeMinimalDnf(table);
+  const factoredExpression = factorMinimalDnf(minimal, table.variables);
+  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
+  const factoredIsShorter = factoredLiteralCount < minimal.literalCount;
 
   return {
     trueRowNumbers: table.rows.flatMap((row, index) =>
@@ -64,6 +75,11 @@ export function buildDnfSimplificationWalkthrough(
     minimalForm: formatBooleanExpressionForDisplay(
       minimalDnfToExpression(minimal, table.variables),
     ),
+    minimalLiteralCount: minimal.literalCount,
+    factoredForm: factoredIsShorter
+      ? formatBooleanExpressionForDisplay(factoredExpression)
+      : null,
+    factoredLiteralCount: factoredIsShorter ? factoredLiteralCount : null,
     constantCase: getConstantCase(minimal),
   };
 }

@@ -154,23 +154,47 @@ export function DnfSimplificationPanel({
           isSolution
         >
           {feedback && (
-            <div>
-              <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                {t("dnf.builder.exercise.minimalDnfLabel")}
-              </p>
-              <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
-                {formatBooleanExpressionForDisplay(feedback.minimalExpression)}
-              </code>
-              <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                {t("dnf.builder.exercise.minimalDnfNote", {
-                  literalsLabel: t("dnf.builder.exercise.literalCount", {
-                    count: feedback.minimumLiteralCount,
-                  }),
-                  termsLabel: t("dnf.builder.exercise.termCount", {
-                    count: feedback.minimumTermCount,
-                  }),
-                })}
-              </p>
+            <div className="space-y-4">
+              <div>
+                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  {t("dnf.builder.exercise.minimalDnfLabel")}
+                </p>
+                <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
+                  {formatBooleanExpressionForDisplay(
+                    feedback.minimalExpression,
+                  )}
+                </code>
+                <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                  {t("dnf.builder.exercise.minimalDnfNote", {
+                    literalsLabel: t("dnf.builder.exercise.literalCount", {
+                      count: feedback.minimumLiteralCount,
+                    }),
+                    termsLabel: t("dnf.builder.exercise.termCount", {
+                      count: feedback.minimumTermCount,
+                    }),
+                  })}
+                </p>
+              </div>
+
+              {feedback.factoredIsShorter && (
+                <div className="border-border/60 border-t pt-3">
+                  <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                    {t("dnf.builder.exercise.factoredLabel")}
+                  </p>
+                  <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
+                    {formatBooleanExpressionForDisplay(
+                      feedback.factoredExpression,
+                    )}
+                  </code>
+                  <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                    {t("dnf.builder.exercise.factoredNote", {
+                      literalsLabel: t("dnf.builder.exercise.literalCount", {
+                        count: feedback.factoredLiteralCount,
+                      }),
+                    })}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </RevealSection>
@@ -395,6 +419,27 @@ function SimplificationWalkthrough({
             {walkthrough.minimalForm}
           </code>
         </WalkthroughStep>
+
+        {walkthrough.factoredForm !== null &&
+          walkthrough.factoredLiteralCount !== null && (
+            <WalkthroughStep index={hasGroups ? 5 : 4}>
+              <p className="text-foreground font-semibold">
+                {t("dnf.builder.exercise.walkthroughFactoredTitle")}
+              </p>
+              <p className="text-muted-foreground mt-1 leading-relaxed">
+                {t("dnf.builder.exercise.walkthroughFactoredText", {
+                  minimalLiterals: walkthrough.minimalLiteralCount,
+                  factoredLiterals: walkthrough.factoredLiteralCount,
+                })}
+              </p>
+              <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-2 font-mono text-xs leading-relaxed break-words">
+                {walkthrough.factoredForm}
+              </code>
+              <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                {t("dnf.builder.exercise.walkthroughFactoredNote")}
+              </p>
+            </WalkthroughStep>
+          )}
       </ol>
     </div>
   );

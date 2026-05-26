@@ -6,6 +6,10 @@ import {
 import { deriveDnfFromTruthTable } from "./dnfDerivation";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
 import {
+  countExpressionLiterals,
+  factorMinimalDnf,
+} from "./factorMinimalDnf";
+import {
   computeMinimalDnf,
   minimalDnfToExpression,
   type MinimalDnf,
@@ -40,6 +44,16 @@ export interface DnfSimplificationCheck {
 export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
   /** One concrete minimal expression for display when the user asks for help. */
   minimalExpression: BooleanExpression;
+  /**
+   * Greedy-factored expression derived from the minimal DNF. Equals the
+   * minimal DNF when no common factor can be pulled out; otherwise leaves DNF
+   * form and may be strictly shorter.
+   */
+  factoredExpression: BooleanExpression;
+  /** Literal count of the factored expression. */
+  factoredLiteralCount: number;
+  /** True when factoring produced a strictly shorter expression than the minimal DNF. */
+  factoredIsShorter: boolean;
 }
 
 /**
@@ -59,12 +73,17 @@ export function checkDnfSimplification(
 ): DnfSimplificationCheckResult {
   const minimal = computeMinimalDnf(table);
   const minimalExpression = minimalDnfToExpression(minimal, table.variables);
+  const factoredExpression = factorMinimalDnf(minimal, table.variables);
+  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
   const canonicalLiteralCount = getCanonicalLiteralCount(table);
   const baseResult = {
     canonicalLiteralCount,
     minimumLiteralCount: minimal.literalCount,
     minimumTermCount: minimal.termCount,
     minimalExpression,
+    factoredExpression,
+    factoredLiteralCount,
+    factoredIsShorter: factoredLiteralCount < minimal.literalCount,
   };
 
   if (userInput.trim() === "") {
