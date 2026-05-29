@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOCUMENTATION",
+    "legal": "LEGAL",
     "support": "SUPPORT",
     "toggle": "Toggle sidebar"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Third-party notices"
   },
   "theme": {
     "light": "Light Mode",
@@ -444,7 +446,29 @@
     "exercise5Desc": "Iterate over an array and determine the largest contained value.",
     "editorLabel": "Java editor",
     "editorLoading": "Loading Monaco editor...",
-    "resetStarterCode": "Reset starter code"
+    "resetStarterCode": "Reset starter code",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "seconds",
+    "runWhileLoading": "Compiler loading",
+    "compilerStatus": {
+      "not-loaded": "not loaded",
+      "loading": "loading",
+      "ready": "ready",
+      "failed": "failed"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler not loaded yet.",
+      "loading": "Java compiler is loading in the background...",
+      "ready": "Compiler is ready for Java compilation and execution.",
+      "failed": "Compiler could not be loaded. Check the console output below for details."
+    }
+  },
+  "legal": {
+    "label": "Legal",
+    "title": "Third-party notices",
+    "description": "Licensing and source information for bundled compiler components and related dependencies.",
+    "summary": "This application includes a browser-based Java compiler built from teavm-javac. The compiler module includes OpenJDK javac, licensed under GNU GPLv2 with the Classpath Exception, and TeaVM components licensed under Apache License 2.0. No OpenJDK source files were modified. Exact source and build information is available in the project’s third-party notices."
   },
   "exercise": {
     "label": "Exercise {{index}}",

@@ -66,6 +66,11 @@ export function JavaConsolePanel({
                     {issue.stage} / {issue.code}
                   </p>
                   <p className="text-muted-foreground">{issue.message}</p>
+                  {issue.fileName && (
+                    <p className="text-muted-foreground text-xs">
+                      {issue.fileName}
+                    </p>
+                  )}
                   {(issue.line || issue.column) && (
                     <p className="text-muted-foreground text-xs">
                       Line {issue.line ?? "?"}, Column {issue.column ?? "?"}

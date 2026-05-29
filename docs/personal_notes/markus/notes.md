@@ -110,3 +110,15 @@
     - Configured npm to use `npm ci --cache .npm --prefer-offline` so cached packages are reused whenever possible
     - Confirmed that the local GitLab Runner cache works without any external shared cache server
     - Successfully ran the pipeline end to end on the Raspberry Pi
+
+---
+
+## Short Note: Java compiler integration
+
+* The Java simulator no longer uses the old custom Java transpiler.
+* It now uses the TeaVM Java browser compiler pipeline based on `teavm-javac`.
+* The React UI talks only to a Web Worker.
+* Inside the worker, the pinned TeaVM browser compiler artifacts are loaded.
+* Java source is compiled in the worker, converted to WebAssembly, and the generated WebAssembly is also executed in the worker.
+* `stdout`, `stderr`, diagnostics, timeout, and stop events are sent back from the worker to the React UI.
+* The compiler is preloaded when the Java page is opened, so the simulator is ready faster when the user switches to the simulation tab.

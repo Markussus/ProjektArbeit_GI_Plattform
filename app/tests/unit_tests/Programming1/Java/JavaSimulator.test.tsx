@@ -9,6 +9,7 @@ import type { Exercise } from "../../../../src/types/exercise";
 const runSpy = vi.fn();
 const stopSpy = vi.fn();
 const resetSpy = vi.fn();
+const preloadSpy = vi.fn();
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -18,10 +19,11 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock(
-  "../../../../src/pages/Programming1/Java/components/Simulator/application/useJavaExecution",
+  "../../../../src/pages/Programming1/Java/components/Simulator/application/JavaExecutionContext",
   () => ({
-    useJavaExecution: () => ({
+    useJavaExecutionContext: () => ({
       snapshot: {
+        compilerStatus: "ready",
         phase: "idle",
         stdout: [],
         stderr: [],
@@ -29,7 +31,9 @@ vi.mock(
         artifacts: null,
         startedAt: null,
         finishedAt: null,
+        lastErrorCategory: null,
       },
+      preload: preloadSpy,
       run: runSpy,
       stop: stopSpy,
       reset: resetSpy,
@@ -116,6 +120,7 @@ describe("JavaSimulator", () => {
     runSpy.mockReset();
     stopSpy.mockReset();
     resetSpy.mockReset();
+    preloadSpy.mockReset();
   });
 
   describe("when no exercise is selected yet", () => {
@@ -163,6 +168,7 @@ describe("JavaSimulator", () => {
       expect(runSpy).toHaveBeenCalledWith({
         source: "changed code",
         exerciseId: undefined,
+        timeoutMs: 60000,
       });
     });
 
@@ -175,6 +181,15 @@ describe("JavaSimulator", () => {
         "imported code",
       );
       expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when the simulator initializes", () => {
+    it("starts compiler preload in the background and exposes the timeout control", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      expect(preloadSpy).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("java-timeout-input")).toHaveValue(60);
     });
   });
 

@@ -1,19 +1,33 @@
+import { useEffect } from "react";
 import { BookOpen, Code2, ListChecks, PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { JavaCompilerStatusBadge } from "./JavaCompilerStatusBadge";
+import { useJavaExecutionContext } from "./Simulator/application/JavaExecutionContext";
 
 const conceptIcons = [BookOpen, Code2, PlayCircle, ListChecks];
 
 export function OverviewTab() {
   const { t } = useTranslation();
+  const { snapshot, preload } = useJavaExecutionContext();
+
+  useEffect(() => {
+    preload();
+  }, [preload]);
 
   return (
     <div className="space-y-6">
       <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-        <h3 className="text-foreground text-lg font-semibold">
-          {t("java.overviewTitle")}
-        </h3>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h3 className="text-foreground text-lg font-semibold">
+            {t("java.overviewTitle")}
+          </h3>
+          <JavaCompilerStatusBadge status={snapshot.compilerStatus} />
+        </div>
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           {t("java.overviewText")}
+        </p>
+        <p className="text-muted-foreground mt-4 text-sm">
+          {t(`java.compilerStatusText.${snapshot.compilerStatus}`)}
         </p>
       </div>
 

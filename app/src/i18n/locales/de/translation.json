@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOKUMENTATION",
+    "legal": "RECHTLICHES",
     "support": "HILFE",
     "toggle": "Seitenleiste umschalten"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Drittanbieter-Hinweise"
   },
   "theme": {
     "light": "Heller Modus",
@@ -440,7 +442,29 @@
     "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
     "editorLabel": "Java-Editor",
     "editorLoading": "Der Monaco-Editor wird geladen...",
-    "resetStarterCode": "Startercode zuruecksetzen"
+    "resetStarterCode": "Startercode zuruecksetzen",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "Sekunden",
+    "runWhileLoading": "Compiler laedt",
+    "compilerStatus": {
+      "not-loaded": "nicht geladen",
+      "loading": "laedt",
+      "ready": "bereit",
+      "failed": "fehlgeschlagen"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler wurde noch nicht geladen.",
+      "loading": "Java-Compiler wird im Hintergrund geladen...",
+      "ready": "Compiler ist fuer Java-Kompilierung und Ausfuehrung bereit.",
+      "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
+    }
+  },
+  "legal": {
+    "label": "Rechtliches",
+    "title": "Drittanbieter-Hinweise",
+    "description": "Lizenz- und Quelleninformationen fuer eingebundene Compiler-Komponenten und zugehoerige Abhaengigkeiten.",
+    "summary": "Diese Anwendung enthaelt einen browserbasierten Java-Compiler, der aus teavm-javac gebaut wird. Das Compiler-Modul enthaelt OpenJDK javac unter GNU GPLv2 mit Classpath Exception sowie TeaVM-Komponenten unter Apache License 2.0. Es wurden keine OpenJDK-Quelldateien veraendert. Exakte Quellen- und Build-Informationen finden Sie in den Drittanbieter-Hinweisen des Projekts."
   },
   "exercise": {
     "label": "Übung {{index}}",
