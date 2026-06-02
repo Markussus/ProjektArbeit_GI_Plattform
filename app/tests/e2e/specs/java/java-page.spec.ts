@@ -68,7 +68,12 @@ test.describe("Java page", () => {
     await page.getByTestId(appTestIds.tabSimulation).click();
 
     await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTimeoutInput)).toHaveValue("60");
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewButton),
+    ).toBeVisible();
+    await expect(page.getByTestId(appTestIds.javaTimeoutInput)).toHaveValue(
+      "60",
+    );
     await expect(
       page.getByTestId(appTestIds.javaEditorContainer),
     ).toBeVisible();
@@ -83,67 +88,90 @@ test.describe("Java page", () => {
     await expect(page.getByTestId(appTestIds.javaConsoleIssues)).toBeVisible();
   });
 
-  test(
-    "supports transfer import/export and executing both valid and invalid Java code",
-    async ({ page }) => {
-      await page.getByTestId(appTestIds.tabSimulation).click();
-      await expect(
-        page.getByTestId(appTestIds.javaCompilerStatus),
-      ).toContainText(/ready|loading/);
-      await expect(
-        page.getByTestId(appTestIds.javaCompilerStatus),
-      ).toContainText("ready", { timeout: 120000 });
+  test("shows Java browser compiler version and command limitations", async ({
+    page,
+  }) => {
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await page.getByTestId(appTestIds.javaCommandOverviewButton).click();
 
-      await test.step("Export should generate a Java transfer string", async () => {
-        await page.getByTestId(appTestIds.javaTransferExport).click();
-        await expect(
-          page.getByTestId(appTestIds.javaTransferInput),
-        ).toHaveValue(/^j[01]\./);
-      });
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewDialog),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewDialog),
+    ).toContainText(/JDK 25/);
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewDialog),
+    ).toContainText(/ArrayList|Listen/);
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewDialog),
+    ).toContainText(/javac/);
+    await expect(
+      page.getByTestId(appTestIds.javaCommandOverviewDialog),
+    ).toContainText(/Does not work|Geht nicht/);
+  });
 
-      await test.step("Importing runnable code should allow a successful execution with stdout output", async () => {
-        const runnableCode = `public class Main {
+  test("supports transfer import/export and executing both valid and invalid Java code", async ({
+    page,
+  }) => {
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
+      /ready|loading/,
+    );
+    await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
+      "ready",
+      { timeout: 120000 },
+    );
+
+    await test.step("Export should generate a Java transfer string", async () => {
+      await page.getByTestId(appTestIds.javaTransferExport).click();
+      await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+        /^j[01]\./,
+      );
+    });
+
+    await test.step("Importing runnable code should allow a successful execution with stdout output", async () => {
+      const runnableCode = `public class Main {
   public static void main(String[] args) {
     System.out.println("E2E success");
   }
 }
 `;
 
-        await page
-          .getByTestId(appTestIds.javaTransferInput)
-          .fill(encodeJavaTransfer(runnableCode));
-        await page.getByTestId(appTestIds.javaTransferImport).click();
-        await expect(
-          page.getByTestId(appTestIds.javaTransferStatus),
-        ).toBeVisible();
-        await page.getByTestId(appTestIds.javaRunButton).click();
+      await page
+        .getByTestId(appTestIds.javaTransferInput)
+        .fill(encodeJavaTransfer(runnableCode));
+      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await expect(
+        page.getByTestId(appTestIds.javaTransferStatus),
+      ).toBeVisible();
+      await page.getByTestId(appTestIds.javaRunButton).click();
 
-        await expect(
-          page.getByTestId(appTestIds.javaConsoleStdout),
-        ).toContainText("E2E success", { timeout: 120000 });
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleStdout),
+      ).toContainText("E2E success", { timeout: 120000 });
+    });
+
+    await test.step("Importing invalid Java should surface a diagnostic after running", async () => {
+      const invalidCode = "this is not valid java {{{";
+
+      await page
+        .getByTestId(appTestIds.javaTransferInput)
+        .fill(encodeJavaTransfer(invalidCode));
+      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await expect(
+        page.getByTestId(appTestIds.javaTransferStatus),
+      ).toBeVisible();
+      await page.getByTestId(appTestIds.javaRunButton).click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleIssues),
+      ).toContainText(/javac_diagnostic|main_class_missing/, {
+        timeout: 120000,
       });
-
-      await test.step("Importing invalid Java should surface a diagnostic after running", async () => {
-        const invalidCode = "this is not valid java {{{";
-
-        await page
-          .getByTestId(appTestIds.javaTransferInput)
-          .fill(encodeJavaTransfer(invalidCode));
-        await page.getByTestId(appTestIds.javaTransferImport).click();
-        await expect(
-          page.getByTestId(appTestIds.javaTransferStatus),
-        ).toBeVisible();
-        await page.getByTestId(appTestIds.javaRunButton).click();
-
-        await expect(
-          page.getByTestId(appTestIds.javaConsoleIssues),
-        ).toContainText(/javac_diagnostic|main_class_missing/, {
-          timeout: 120000,
-        });
-        await expect(
-          page.getByTestId(appTestIds.javaConsoleStderr),
-        ).toContainText("Java compilation failed", { timeout: 120000 });
-      });
-    },
-  );
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleStderr),
+      ).toContainText("Java compilation failed", { timeout: 120000 });
+    });
+  });
 });

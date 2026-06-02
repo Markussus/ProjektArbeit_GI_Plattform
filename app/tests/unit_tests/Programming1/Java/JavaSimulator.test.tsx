@@ -13,8 +13,17 @@ const preloadSpy = vi.fn();
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
+    t: (key: string, options?: string | { version?: string }) => {
+      if (typeof options === "string") {
+        return options;
+      }
+
+      if (key === "java.commandOverview.summary" && options?.version) {
+        return `Java ${options.version}`;
+      }
+
+      return key;
+    },
   }),
 }));
 
@@ -190,6 +199,22 @@ describe("JavaSimulator", () => {
 
       expect(preloadSpy).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("java-timeout-input")).toHaveValue(60);
+      expect(
+        screen.getByTestId("java-command-overview-button"),
+      ).toBeInTheDocument();
+    });
+
+    it("opens the Java command overview with version and command information", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.click(screen.getByTestId("java-command-overview-button"));
+
+      expect(
+        screen.getByTestId("java-command-overview-dialog"),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/JDK 25/)).toBeInTheDocument();
+      expect(screen.getByText("ArrayList")).toBeInTheDocument();
+      expect(screen.getByText("javac")).toBeInTheDocument();
     });
   });
 

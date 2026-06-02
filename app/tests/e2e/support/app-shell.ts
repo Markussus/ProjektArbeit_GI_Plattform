@@ -5,6 +5,8 @@ export const appTestIds = {
   helpPage: "help-page",
   legalPage: "legal-page",
   javaCompilerStatus: "java-compiler-status",
+  javaCommandOverviewButton: "java-command-overview-button",
+  javaCommandOverviewDialog: "java-command-overview-dialog",
   heroTitle: "home-hero-title",
   javaConsoleIssues: "java-console-issues",
   javaConsolePanel: "java-console-panel",

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
 import type { Exercise } from "@/types/exercise";
 import { getJavaFileName, getJavaStarterCode } from "../../exercises";
 import { JavaCompilerStatusBadge } from "../JavaCompilerStatusBadge";
 import { useJavaExecutionContext } from "./application/JavaExecutionContext";
+import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
 
@@ -38,6 +40,7 @@ function JavaSimulatorSession({
   const { t } = useTranslation();
   const [code, setCode] = useState(() => getJavaStarterCode(exerciseId));
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
+  const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
   const { snapshot, preload, run, stop, reset } = useJavaExecutionContext();
 
   const fileName = useMemo(() => getJavaFileName(exerciseId), [exerciseId]);
@@ -98,32 +101,52 @@ function JavaSimulatorSession({
               {t(`java.compilerStatusText.${snapshot.compilerStatus}`)}
             </p>
           </div>
+          <p className="text-muted-foreground max-w-3xl text-sm">
+            {t("java.compilerEnvironmentSummary")}
+          </p>
         </div>
 
-        <label className="flex items-center gap-3 text-sm font-medium">
-          <span>{t("java.timeoutLabel")}</span>
-          <input
-            type="number"
-            min={1}
-            max={300}
-            step={1}
-            value={timeoutSeconds}
-            onChange={(event) => {
-              const nextValue = Number(event.target.value);
-              if (Number.isNaN(nextValue)) {
-                return;
-              }
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsCommandOverviewOpen(true)}
+            data-testid="java-command-overview-button"
+            className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+          >
+            <ListChecks className="size-4" />
+            {t("java.commandOverview.button")}
+          </button>
 
-              setTimeoutSeconds(Math.min(300, Math.max(1, nextValue)));
-            }}
-            data-testid="java-timeout-input"
-            className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
-          />
-          <span className="text-muted-foreground">
-            {t("java.timeoutUnit")}
-          </span>
-        </label>
+          <label className="flex items-center gap-3 text-sm font-medium">
+            <span>{t("java.timeoutLabel")}</span>
+            <input
+              type="number"
+              min={1}
+              max={300}
+              step={1}
+              value={timeoutSeconds}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value);
+                if (Number.isNaN(nextValue)) {
+                  return;
+                }
+
+                setTimeoutSeconds(Math.min(300, Math.max(1, nextValue)));
+              }}
+              data-testid="java-timeout-input"
+              className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
+            />
+            <span className="text-muted-foreground">
+              {t("java.timeoutUnit")}
+            </span>
+          </label>
+        </div>
       </div>
+
+      <JavaCommandOverview
+        open={isCommandOverviewOpen}
+        onClose={() => setIsCommandOverviewOpen(false)}
+      />
 
       <ExecutionControls
         phase={snapshot.phase}

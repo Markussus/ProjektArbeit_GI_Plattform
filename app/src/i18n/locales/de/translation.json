@@ -447,6 +447,7 @@
     "timeoutLabel": "Timeout",
     "timeoutUnit": "Sekunden",
     "runWhileLoading": "Compiler laedt",
+    "compilerEnvironmentSummary": "Die Java-Unterstuetzung im Browser basiert auf JDK 25 javac ueber teavm-javac. Sie kompiliert und startet kleine konsolenartige Programme als WebAssembly, nicht in einer vollstaendigen lokalen JDK-Umgebung.",
     "compilerStatus": {
       "not-loaded": "nicht geladen",
       "loading": "laedt",
@@ -458,6 +459,106 @@
       "loading": "Java-Compiler wird im Hintergrund geladen...",
       "ready": "Compiler ist fuer Java-Kompilierung und Ausfuehrung bereit.",
       "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
+    },
+    "commandOverview": {
+      "button": "Java-Befehle",
+      "title": "Was geht im Java-Editor?",
+      "summary": "Java {{version}} Syntax fuer kleine Browser-Programme",
+      "versionTitle": "Unterstuetzte Java-Version: {{version}}",
+      "versionText": "Der Browser-Compiler nutzt OpenJDK javac ueber teavm-javac. Sprachdiagnosen kommen damit von javac, das erzeugte Programm laeuft aber als WebAssembly im Browser-Worker.",
+      "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java in den Editor. Es laeuft in einer Browser-Sandbox, daher gibt es keine lokalen Tools und keinen Betriebssystemzugriff.",
+      "commandListTitle": "Kompakte Uebersicht",
+      "status": {
+        "supported": "Geht",
+        "limited": "Eingeschraenkt",
+        "blocked": "Geht nicht",
+        "not-supported": "Nicht unterstuetzt",
+        "explained": "Eingeschraenkt"
+      },
+      "capabilities": {
+        "programShape": {
+          "title": "Programmeinstieg",
+          "description": "Nutze eine Main-Klasse mit main-Methode. Der Run-Button kompiliert und startet genau diese Methode."
+        },
+        "basics": {
+          "title": "Normale Java-Syntax",
+          "description": "Variablen, primitive Typen, Strings, Bedingungen, Operatoren und switch-Anweisungen sind geeignet."
+        },
+        "loops": {
+          "title": "Schleifen und Ablaufsteuerung",
+          "description": "Normale Schleifen funktionieren fuer Uebungen und kleine Algorithmen."
+        },
+        "arraysCollections": {
+          "title": "Arrays, Listen, Maps",
+          "description": "Arrays und typische java.util-Collections funktionieren fuer uebliche Lernaufgaben."
+        },
+        "objects": {
+          "title": "Eigene Typen",
+          "description": "Hilfsklassen, Konstruktoren, Enums, Records und statische Methoden koennen in derselben Editor-Datei stehen."
+        },
+        "output": {
+          "title": "Konsolenausgabe",
+          "description": "Ausgaben werden abgefangen und unten als stdout oder stderr angezeigt."
+        },
+        "standardLibrary": {
+          "title": "Teilmenge der Standardbibliothek",
+          "description": "Haeufige Bibliotheksklassen sind verfuegbar, aber TeaVM/WebAssembly verhaelt sich nicht exakt wie ein vollstaendiges Desktop-JDK."
+        },
+        "singleFile": {
+          "title": "Eine Editor-Datei",
+          "description": "Die UI sendet aktuell eine Quelldatei. Packe Hilfsklassen in dieselbe Datei statt ein Mehrdateien-Projekt zu erwarten."
+        },
+        "input": {
+          "title": "Konsoleneingabe",
+          "description": "Es gibt noch kein interaktives Eingabefeld. Vermeide Scanner/System.in, solange keine explizite Eingabeunterstuetzung eingebaut ist."
+        },
+        "cli": {
+          "title": "Terminalbefehle",
+          "description": "Der Browser stellt Nutzern keine Befehle wie java, javac, JShell, JAR-Tools, Maven oder Gradle bereit."
+        },
+        "environment": {
+          "title": "Betriebssystemzugriff",
+          "description": "Lokale Dateien, Sockets, gestartete Prozesse und native Bibliotheken sind durch das Browser-Laufzeitmodell blockiert."
+        },
+        "runtimeFeatures": {
+          "title": "Dynamische Laufzeitfeatures",
+          "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlaesslich."
+        }
+      },
+      "commands": {
+        "run": {
+          "title": "Aktuellen Editorinhalt kompilieren und starten",
+          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und fuehrt die Main.main-Methode im Worker aus."
+        },
+        "compile": {
+          "title": "Kompilierung ist Teil von Run",
+          "description": "Der interne Compiler-Befehl nutzt javac-Diagnosen und TeaVM-Codegenerierung. Die UI bietet keinen separaten Compile-only-Terminalbefehl."
+        },
+        "javaCli": {
+          "title": "Kein java-Kommandozeilenstarter",
+          "description": "Ein lokaler java-Befehl wird nicht unterstuetzt, weil der Browser keine JVM-Prozesse startet."
+        },
+        "javacCli": {
+          "title": "Kein javac-Terminalbefehl",
+          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer koennen keine beliebigen javac-Flags uebergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
+        },
+        "jshell": {
+          "title": "Keine interaktive JShell",
+          "description": "Der Simulator fuehrt vollstaendige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
+        },
+        "tools": {
+          "title": "Keine Paketierungs- oder Dokumentationswerkzeuge",
+          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme gehoeren nicht zum unterstuetzten Browser-Compiler-Ablauf."
+        },
+        "stdin": {
+          "title": "Konsoleneingabe ist nicht interaktiv",
+          "description": "Konsolenausgabe ueber System.out und System.err wird unterstuetzt. Interaktives Lesen von System.in sollte vermieden werden, solange keine explizite Eingabeunterstuetzung ergaenzt wurde."
+        },
+        "environment": {
+          "title": "Browser-Sandbox gilt",
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhaengige APIs vermeiden, weil WebAssembly in einem Browser-Worker laeuft."
+        }
+      }
     }
   },
   "legal": {
