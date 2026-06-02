@@ -94,6 +94,18 @@ export function JavaCommandOverview({
                     </code>
                   ))}
                 </div>
+                {capability.snippets && (
+                  <div className="mt-3 grid gap-2 md:grid-cols-2">
+                    {capability.snippets.map((snippet) => (
+                      <pre
+                        key={snippet}
+                        className="bg-muted text-muted-foreground overflow-x-auto rounded-md p-2 text-xs"
+                      >
+                        <code>{snippet}</code>
+                      </pre>
+                    ))}
+                  </div>
+                )}
               </article>
             ))}
           </div>

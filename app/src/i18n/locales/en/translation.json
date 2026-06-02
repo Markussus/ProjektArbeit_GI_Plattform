@@ -513,7 +513,7 @@
         },
         "input": {
           "title": "Console input",
-          "description": "Interactive input is not implemented in the UI yet. Avoid Scanner and System.in until an input field exists."
+          "description": "Scanner and System.in work with the input box below the editor. Input is provided before the program starts; interactive prompts during execution are not supported."
         },
         "cli": {
           "title": "Terminal commands",
@@ -559,7 +559,7 @@
         },
         "stdin": {
           "title": "Console input is not interactive",
-          "description": "Console output through System.out and System.err is supported. Interactive reads from System.in should be avoided unless explicit input support is added later."
+          "description": "Console output through System.out and System.err is supported. Scanner/System.in uses the fixed simulator input box."
         },
         "environment": {
           "title": "Browser sandbox restrictions apply",
@@ -586,6 +586,23 @@
         "expectedOutput": "Expected output",
         "phase": "Status"
       }
+    },
+    "exercise6": "Uppercase input text",
+    "exercise6Desc": "Read one line with Scanner and print the text in uppercase.",
+    "exercise7": "Write a method",
+    "exercise7Desc": "Implement a method that squares a number and returns the result.",
+    "exercise8": "Use a simple class",
+    "exercise8Desc": "Store constructor values in a class and return a description.",
+    "exercise9": "Sort an ArrayList",
+    "exercise9Desc": "Sort an ArrayList with Collections.sort and print the list.",
+    "stdin": {
+      "label": "Program input",
+      "placeholder": "Input for Scanner/System.in, e.g. hello java",
+      "help": "This input is provided as System.in before the program starts. Interactive prompts during execution are not supported."
+    },
+    "timeout": {
+      "warningTitle": "Execution stopped by timeout",
+      "warningText": "The program ran too long or is waiting for input. Check loops, Scanner calls, and the timeout."
     }
   },
   "legal": {

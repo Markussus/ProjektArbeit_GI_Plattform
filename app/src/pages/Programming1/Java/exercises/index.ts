@@ -17,6 +17,7 @@ import type { TranslationKey } from "@/types/i18n";
 export interface JavaValidationCase {
   id: string;
   sourceTransform?: (sourceCode: string) => string;
+  stdin?: string;
   expectedStdout: string;
 }
 
@@ -377,6 +378,289 @@ public class Main {
       definition: {
         titleKey: "java.exercise5",
         descriptionKey: "java.exercise5Desc",
+        difficulty: "medium",
+        icon: ListOrdered,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise6",
+      titleKey: "java.exercise6",
+      descriptionKey: "java.exercise6Desc",
+      fileName: "Main.java",
+      starterCode: `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    String text = scanner.nextLine();
+
+    // TODO: print the text in uppercase
+  }
+}
+`,
+      solutionCode: `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    String text = scanner.nextLine();
+
+    System.out.println(text.toUpperCase());
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "uppercase-hello",
+          stdin: "hello java\n",
+          expectedStdout: "HELLO JAVA\n",
+        },
+        {
+          id: "uppercase-browser",
+          stdin: "Browser Compiler\n",
+          expectedStdout: "BROWSER COMPILER\n",
+        },
+      ],
+      code: `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    String text = scanner.nextLine();
+
+    // TODO: print the text in uppercase
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise6",
+        descriptionKey: "java.exercise6Desc",
+        difficulty: "medium",
+        icon: TerminalSquare,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise7",
+      titleKey: "java.exercise7",
+      descriptionKey: "java.exercise7Desc",
+      fileName: "Main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    System.out.println(square(6));
+  }
+
+  static int square(int value) {
+    // TODO: return value multiplied by itself
+    return 0;
+  }
+}
+`,
+      solutionCode: `public class Main {
+  public static void main(String[] args) {
+    System.out.println(square(6));
+  }
+
+  static int square(int value) {
+    return value * value;
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "square-default",
+          expectedStdout: "36\n",
+        },
+        {
+          id: "square-other-value",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /System\.out\.println\(square\(-?\d+\)\);/,
+              "System.out.println(square(12));",
+            ),
+          expectedStdout: "144\n",
+        },
+      ],
+      code: `public class Main {
+  public static void main(String[] args) {
+    System.out.println(square(6));
+  }
+
+  static int square(int value) {
+    // TODO: return value multiplied by itself
+    return 0;
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise7",
+        descriptionKey: "java.exercise7Desc",
+        difficulty: "medium",
+        icon: Calculator,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise8",
+      titleKey: "java.exercise8",
+      descriptionKey: "java.exercise8Desc",
+      fileName: "Main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    Student student = new Student("Ada", 21);
+    System.out.println(student.describe());
+  }
+}
+
+class Student {
+  String name;
+  int age;
+
+  Student(String name, int age) {
+    // TODO: store both constructor arguments
+  }
+
+  String describe() {
+    // TODO: return "Ada is 21"
+    return "";
+  }
+}
+`,
+      solutionCode: `public class Main {
+  public static void main(String[] args) {
+    Student student = new Student("Ada", 21);
+    System.out.println(student.describe());
+  }
+}
+
+class Student {
+  String name;
+  int age;
+
+  Student(String name, int age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  String describe() {
+    return name + " is " + age;
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "student-default",
+          expectedStdout: "Ada is 21\n",
+        },
+        {
+          id: "student-other-values",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /new Student\("[^"]+",\s*\d+\)/,
+              'new Student("Grace", 30)',
+            ),
+          expectedStdout: "Grace is 30\n",
+        },
+      ],
+      code: `public class Main {
+  public static void main(String[] args) {
+    Student student = new Student("Ada", 21);
+    System.out.println(student.describe());
+  }
+}
+
+class Student {
+  String name;
+  int age;
+
+  Student(String name, int age) {
+    // TODO: store both constructor arguments
+  }
+
+  String describe() {
+    // TODO: return "Ada is 21"
+    return "";
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise8",
+        descriptionKey: "java.exercise8Desc",
+        difficulty: "medium",
+        icon: Code2,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise9",
+      titleKey: "java.exercise9",
+      descriptionKey: "java.exercise9Desc",
+      fileName: "Main.java",
+      starterCode: `import java.util.ArrayList;
+import java.util.Collections;
+
+public class Main {
+  public static void main(String[] args) {
+    ArrayList<Integer> numbers = new ArrayList<>();
+    numbers.add(4);
+    numbers.add(1);
+    numbers.add(4);
+    numbers.add(2);
+
+    // TODO: sort the list and print it
+  }
+}
+`,
+      solutionCode: `import java.util.ArrayList;
+import java.util.Collections;
+
+public class Main {
+  public static void main(String[] args) {
+    ArrayList<Integer> numbers = new ArrayList<>();
+    numbers.add(4);
+    numbers.add(1);
+    numbers.add(4);
+    numbers.add(2);
+
+    Collections.sort(numbers);
+    System.out.println(numbers);
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "list-default",
+          expectedStdout: "[1, 2, 4, 4]\n",
+        },
+        {
+          id: "list-other-values",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /numbers\.add\(4\);\s*numbers\.add\(1\);\s*numbers\.add\(4\);\s*numbers\.add\(2\);/,
+              "numbers.add(9);\n    numbers.add(-1);\n    numbers.add(3);\n    numbers.add(3);",
+            ),
+          expectedStdout: "[-1, 3, 3, 9]\n",
+        },
+      ],
+      code: `import java.util.ArrayList;
+import java.util.Collections;
+
+public class Main {
+  public static void main(String[] args) {
+    ArrayList<Integer> numbers = new ArrayList<>();
+    numbers.add(4);
+    numbers.add(1);
+    numbers.add(4);
+    numbers.add(2);
+
+    // TODO: sort the list and print it
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise9",
+        descriptionKey: "java.exercise9Desc",
         difficulty: "medium",
         icon: ListOrdered,
       },

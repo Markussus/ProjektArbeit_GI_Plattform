@@ -101,7 +101,7 @@ async function preloadCompiler(requestId?: string) {
 }
 
 async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
-  const { requestId, sourceCode, mainClass } = message;
+  const { requestId, sourceCode, mainClass, stdin } = message;
 
   try {
     await ensureCompilerReady();
@@ -111,7 +111,10 @@ async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
       requestId,
     });
 
-    const compilation = await compileSource(requestId, sourceCode);
+    const compilation = await compileSource(
+      requestId,
+      createExecutableSource(sourceCode, stdin),
+    );
     const diagnostics = compilation.diagnostics;
 
     if (
@@ -172,6 +175,57 @@ async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
       artifacts: normalized.artifacts ?? null,
     });
   }
+}
+
+function createExecutableSource(sourceCode: string, stdin?: string) {
+  if (!stdin) {
+    return sourceCode;
+  }
+
+  return inlineScannerInput(sourceCode, stdin);
+}
+
+function inlineScannerInput(sourceCode: string, stdin: string) {
+  const lines = stdin.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+  const tokens = stdin.trim().length > 0 ? stdin.trim().split(/\s+/) : [];
+  let nextLineIndex = 0;
+  let nextTokenIndex = 0;
+
+  return sourceCode
+    .replace(/^\s*import\s+java\.util\.Scanner;\s*$/m, "")
+    .replace(
+      /^\s*Scanner\s+([A-Za-z_$][\w$]*)\s*=\s*new\s+Scanner\s*\(\s*System\.in\s*\)\s*;\s*$/gm,
+      "",
+    )
+    .replace(
+      /\bString\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\.nextLine\s*\(\s*\)\s*;/g,
+      (_match, variableName: string) =>
+        `String ${variableName} = ${createJavaStringLiteral(lines[nextLineIndex++] ?? "")};`,
+    )
+    .replace(
+      /\bint\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\.nextInt\s*\(\s*\)\s*;/g,
+      (_match, variableName: string) =>
+        `int ${variableName} = ${Number.parseInt(tokens[nextTokenIndex++] ?? "0", 10) || 0};`,
+    );
+}
+
+function createJavaStringLiteral(value: string) {
+  return `"${Array.from(value, (char) => {
+    switch (char) {
+      case "\\":
+        return "\\\\";
+      case '"':
+        return '\\"';
+      case "\n":
+        return "\\n";
+      case "\r":
+        return "\\r";
+      case "\t":
+        return "\\t";
+      default:
+        return char;
+    }
+  }).join("")}"`;
 }
 
 async function ensureCompilerReady() {

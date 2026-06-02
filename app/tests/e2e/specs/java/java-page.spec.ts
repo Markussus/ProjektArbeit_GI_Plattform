@@ -174,6 +174,30 @@ test.describe("Java page", () => {
       ).toContainText("E2E success", { timeout: 120000 });
     });
 
+    await test.step("Providing program input should support simple Scanner exercises", async () => {
+      const scannerCode = `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    String text = scanner.nextLine();
+    System.out.println(text.toUpperCase());
+  }
+}
+`;
+
+      await page
+        .getByTestId(appTestIds.javaTransferInput)
+        .fill(encodeJavaTransfer(scannerCode));
+      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await page.getByTestId(appTestIds.javaStdinInput).fill("e2e input\n");
+      await page.getByTestId(appTestIds.javaRunButton).click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleStdout),
+      ).toContainText("E2E INPUT", { timeout: 120000 });
+    });
+
     await test.step("Importing invalid Java should surface a diagnostic after running", async () => {
       const invalidCode = "this is not valid java {{{";
 

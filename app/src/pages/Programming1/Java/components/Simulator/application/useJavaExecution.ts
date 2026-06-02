@@ -385,6 +385,7 @@ export function useJavaExecution(): JavaExecutionController {
         sourceCode: request.source,
         mainClass: request.mainClass,
         timeoutMs: request.timeoutMs,
+        stdin: request.stdin,
       });
     },
     [clearPendingTimeout, ensureWorker, stop],

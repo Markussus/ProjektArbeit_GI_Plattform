@@ -6,6 +6,7 @@ export interface JavaCompilerCapability {
   titleKey: string;
   descriptionKey: string;
   examples: string[];
+  snippets?: string[];
 }
 
 export const JAVA_COMPILER_VERSION_INFO = {
@@ -55,6 +56,10 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
       "HashSet",
       "Collections.sort",
     ],
+    snippets: [
+      "int[] numbers = {3, 1, 2};\nArrays.sort(numbers);",
+      'ArrayList<String> names = new ArrayList<>();\nnames.add("Ada");',
+    ],
   },
   {
     id: "strings-math",
@@ -69,6 +74,10 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
       "BigInteger",
       "BigDecimal",
     ],
+    snippets: [
+      'String text = "hello";\nSystem.out.println(text.toUpperCase());',
+      "System.out.println(Math.max(3, 7));",
+    ],
   },
   {
     id: "objects",
@@ -82,6 +91,9 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
       "static methods",
       "enum",
       "record",
+    ],
+    snippets: [
+      "class Student {\n  String name;\n  Student(String name) { this.name = name; }\n}",
     ],
   },
   {
@@ -123,6 +135,9 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     titleKey: "java.commandOverview.capabilities.input.title",
     descriptionKey: "java.commandOverview.capabilities.input.description",
     examples: ["System.in", "Scanner", "BufferedReader(System.in)"],
+    snippets: [
+      "Scanner scanner = new Scanner(System.in);\nString line = scanner.nextLine();",
+    ],
   },
   {
     id: "cli",

@@ -19,6 +19,7 @@ export const appTestIds = {
   javaRunButton: "java-run-button",
   javaSimulator: "java-simulator",
   javaStopButton: "java-stop-button",
+  javaStdinInput: "java-stdin-input",
   javaTimeoutInput: "java-timeout-input",
   javaTransferExport: "java-transfer-export",
   javaTransferImport: "java-transfer-import",

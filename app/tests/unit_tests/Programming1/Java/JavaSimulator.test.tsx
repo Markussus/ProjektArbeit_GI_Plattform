@@ -181,6 +181,23 @@ describe("JavaSimulator", () => {
         source: "changed code",
         exerciseId: undefined,
         timeoutMs: 60000,
+        stdin: "",
+      });
+    });
+
+    it("passes standard input to the Java execution flow", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.change(screen.getByTestId("java-stdin-input"), {
+        target: { value: "hello java\n" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: "run code" }));
+
+      expect(runSpy).toHaveBeenCalledWith({
+        source: expect.any(String),
+        exerciseId: undefined,
+        timeoutMs: 60000,
+        stdin: "hello java\n",
       });
     });
 

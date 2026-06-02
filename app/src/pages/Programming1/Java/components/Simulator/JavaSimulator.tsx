@@ -74,6 +74,7 @@ const JavaSimulatorSession = forwardRef<
   const scenario = useMemo(() => getJavaScenario(itemId), [itemId]);
   const exerciseScenario = scenario?.kind === "exercise" ? scenario : null;
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
+  const [standardInput, setStandardInput] = useState("");
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
   const { snapshot, preload, run, runAsync, stop, reset } =
@@ -96,8 +97,9 @@ const JavaSimulatorSession = forwardRef<
       source: code,
       exerciseId: exerciseScenario?.id,
       timeoutMs: timeoutSeconds * 1000,
+      stdin: standardInput,
     });
-  }, [code, exerciseScenario?.id, run, timeoutSeconds]);
+  }, [code, exerciseScenario?.id, run, standardInput, timeoutSeconds]);
 
   const handleResetCode = useCallback(() => {
     setCode(getJavaStarterCode(itemId));
@@ -139,6 +141,7 @@ const JavaSimulatorSession = forwardRef<
             source,
             exerciseId: exerciseScenario.id,
             timeoutMs: timeoutSeconds * 1000,
+            stdin: validationCase.stdin ?? standardInput,
           });
           const output = result.stdout.join("");
 
@@ -157,7 +160,7 @@ const JavaSimulatorSession = forwardRef<
         return { rows };
       },
     }),
-    [code, exerciseScenario, reset, runAsync, t, timeoutSeconds],
+    [code, exerciseScenario, reset, runAsync, standardInput, t, timeoutSeconds],
   );
 
   return (
@@ -169,7 +172,26 @@ const JavaSimulatorSession = forwardRef<
         onCodeChange={setCode}
         onResetCode={handleResetCode}
         onImportCode={handleImportCode}
+        issues={snapshot.issues}
       />
+
+      <div className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm">
+        <label className="block space-y-2">
+          <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
+            {t("java.stdin.label")}
+          </span>
+          <textarea
+            value={standardInput}
+            onChange={(event) => setStandardInput(event.target.value)}
+            data-testid="java-stdin-input"
+            placeholder={t("java.stdin.placeholder")}
+            className="border-input bg-background min-h-24 w-full rounded-md border px-3 py-2 font-mono text-sm"
+          />
+        </label>
+        <p className="text-muted-foreground mt-2 text-xs">
+          {t("java.stdin.help")}
+        </p>
+      </div>
 
       <div className="bg-card text-card-foreground flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm">
         <div className="space-y-2">

@@ -59,6 +59,7 @@ export interface JavaExecutionRequest {
   exerciseId?: string | null;
   timeoutMs: number;
   mainClass?: string;
+  stdin?: string;
 }
 
 export interface JavaExecutionSnapshot {
@@ -95,6 +96,7 @@ export interface JavaWorkerCompileAndRunRequest {
   sourceCode: string;
   mainClass?: string;
   timeoutMs: number;
+  stdin?: string;
 }
 
 export interface JavaWorkerStopRequest {
