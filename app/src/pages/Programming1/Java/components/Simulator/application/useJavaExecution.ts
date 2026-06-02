@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createJavaExecutionSnapshot,
+  type JavaExecutionController,
   type JavaExecutionErrorCategory,
   type JavaExecutionIssue,
+  type JavaExecutionPhase,
   type JavaExecutionRequest,
   type JavaExecutionSnapshot,
   type JavaWorkerResponse,
 } from "../../Simulator/domain/javaExecution";
+import type { ExecutionPhase } from "@/types/simulator";
 
 function createJavaWorker(): Worker {
   return new Worker(
@@ -55,7 +58,21 @@ function createTerminalIssue(
   };
 }
 
-export function useJavaExecution() {
+function mapJavaPhaseToExecutablePhase(
+  phase: JavaExecutionPhase,
+): ExecutionPhase {
+  if (phase === "idle" || phase === "done" || phase === "error") {
+    return phase;
+  }
+
+  if (phase === "stopped" || phase === "timeout") {
+    return "stopped";
+  }
+
+  return "running";
+}
+
+export function useJavaExecution(): JavaExecutionController {
   const [snapshot, setSnapshot] = useState<JavaExecutionSnapshot>(() =>
     createJavaExecutionSnapshot(),
   );
@@ -63,6 +80,9 @@ export function useJavaExecution() {
   const activeRequestIdRef = useRef<string | null>(null);
   const pendingTimeoutRef = useRef<number | null>(null);
   const shouldPreloadRef = useRef(false);
+  const pendingRunResolveRef = useRef<
+    ((snapshot: JavaExecutionSnapshot) => void) | null
+  >(null);
 
   const clearPendingTimeout = useCallback(() => {
     if (pendingTimeoutRef.current !== null) {
@@ -71,12 +91,34 @@ export function useJavaExecution() {
     }
   }, []);
 
+  const resolvePendingRun = useCallback((snapshot: JavaExecutionSnapshot) => {
+    pendingRunResolveRef.current?.(snapshot);
+    pendingRunResolveRef.current = null;
+  }, []);
+
   const disposeWorker = useCallback(() => {
     if (workerRef.current) {
       workerRef.current.terminate();
       workerRef.current = null;
     }
   }, []);
+
+  const createTerminalSnapshot = useCallback(
+    (
+      currentSnapshot: JavaExecutionSnapshot,
+      nextValues: Partial<JavaExecutionSnapshot>,
+    ) => {
+      const nextSnapshot = {
+        ...currentSnapshot,
+        ...nextValues,
+        finishedAt: new Date().toISOString(),
+      };
+
+      resolvePendingRun(nextSnapshot);
+      return nextSnapshot;
+    },
+    [resolvePendingRun],
+  );
 
   const attachWorkerListeners = useCallback(
     (worker: Worker) => {
@@ -105,23 +147,23 @@ export function useJavaExecution() {
             }));
             return;
           case "compiler-load-error":
-            setSnapshot((currentSnapshot) => ({
-              ...currentSnapshot,
-              compilerStatus: "failed",
-              phase: "error",
-              lastErrorCategory: "compiler-load",
-              issues: [
-                ...currentSnapshot.issues,
-                {
-                  code: "compiler_load_failed",
-                  stage: "compiler-load",
-                  severity: "error",
-                  message: message.error,
-                },
-              ],
-              stderr: [...currentSnapshot.stderr, `${message.error}\n`],
-              finishedAt: new Date().toISOString(),
-            }));
+            setSnapshot((currentSnapshot) =>
+              createTerminalSnapshot(currentSnapshot, {
+                compilerStatus: "failed",
+                phase: "error",
+                lastErrorCategory: "compiler-load",
+                issues: [
+                  ...currentSnapshot.issues,
+                  {
+                    code: "compiler_load_failed",
+                    stage: "compiler-load",
+                    severity: "error",
+                    message: message.error,
+                  },
+                ],
+                stderr: [...currentSnapshot.stderr, `${message.error}\n`],
+              }),
+            );
             return;
           default:
             break;
@@ -166,60 +208,60 @@ export function useJavaExecution() {
           case "success":
             clearPendingTimeout();
             activeRequestIdRef.current = null;
-            setSnapshot((currentSnapshot) => ({
-              ...currentSnapshot,
-              phase: "done",
-              artifacts: message.artifacts,
-              finishedAt: new Date().toISOString(),
-            }));
+            setSnapshot((currentSnapshot) =>
+              createTerminalSnapshot(currentSnapshot, {
+                phase: "done",
+                artifacts: message.artifacts,
+              }),
+            );
             return;
           case "error":
             clearPendingTimeout();
             activeRequestIdRef.current = null;
-            setSnapshot((currentSnapshot) => ({
-              ...currentSnapshot,
-              phase: "error",
-              issues: message.diagnostics ?? currentSnapshot.issues,
-              artifacts:
-                message.artifacts === undefined
-                  ? currentSnapshot.artifacts
-                  : message.artifacts,
-              lastErrorCategory: message.errorCategory,
-              stderr: [...currentSnapshot.stderr, `${message.message}\n`],
-              finishedAt: new Date().toISOString(),
-            }));
+            setSnapshot((currentSnapshot) =>
+              createTerminalSnapshot(currentSnapshot, {
+                phase: "error",
+                issues: message.diagnostics ?? currentSnapshot.issues,
+                artifacts:
+                  message.artifacts === undefined
+                    ? currentSnapshot.artifacts
+                    : message.artifacts,
+                lastErrorCategory: message.errorCategory,
+                stderr: [...currentSnapshot.stderr, `${message.message}\n`],
+              }),
+            );
         }
       };
 
       worker.onerror = (event) => {
         clearPendingTimeout();
         activeRequestIdRef.current = null;
-        setSnapshot((currentSnapshot) => ({
-          ...currentSnapshot,
-          compilerStatus:
-            currentSnapshot.compilerStatus === "loading"
-              ? "failed"
-              : currentSnapshot.compilerStatus,
-          phase: "error",
-          lastErrorCategory: "unknown",
-          stderr: [
-            ...currentSnapshot.stderr,
-            `${event.message || "Unknown worker error"}\n`,
-          ],
-          issues: [
-            ...currentSnapshot.issues,
-            {
-              code: "worker_error",
-              stage: "worker",
-              severity: "error",
-              message: event.message || "Unknown worker error",
-            },
-          ],
-          finishedAt: new Date().toISOString(),
-        }));
+        setSnapshot((currentSnapshot) =>
+          createTerminalSnapshot(currentSnapshot, {
+            compilerStatus:
+              currentSnapshot.compilerStatus === "loading"
+                ? "failed"
+                : currentSnapshot.compilerStatus,
+            phase: "error",
+            lastErrorCategory: "unknown",
+            stderr: [
+              ...currentSnapshot.stderr,
+              `${event.message || "Unknown worker error"}\n`,
+            ],
+            issues: [
+              ...currentSnapshot.issues,
+              {
+                code: "worker_error",
+                stage: "worker",
+                severity: "error",
+                message: event.message || "Unknown worker error",
+              },
+            ],
+          }),
+        );
       };
     },
-    [clearPendingTimeout],
+    [clearPendingTimeout, createTerminalSnapshot],
   );
 
   const ensureWorker = useCallback(() => {
@@ -282,24 +324,24 @@ export function useJavaExecution() {
       const stopMessage = formatStopMessage(reason, timeoutMs);
 
       recreatePreloadedWorker();
-      setSnapshot((currentSnapshot) => ({
-        ...currentSnapshot,
-        phase: reason,
-        finishedAt: new Date().toISOString(),
-        lastErrorCategory: reason as JavaExecutionErrorCategory,
-        issues:
-          currentSnapshot.phase === "idle" &&
-          currentSnapshot.compilerStatus === "ready"
-            ? currentSnapshot.issues
-            : [...currentSnapshot.issues, issue],
-        stderr:
-          currentSnapshot.phase === "idle" &&
-          currentSnapshot.compilerStatus === "ready"
-            ? currentSnapshot.stderr
-            : [...currentSnapshot.stderr, stopMessage],
-      }));
+      setSnapshot((currentSnapshot) =>
+        createTerminalSnapshot(currentSnapshot, {
+          phase: reason,
+          lastErrorCategory: reason as JavaExecutionErrorCategory,
+          issues:
+            currentSnapshot.phase === "idle" &&
+            currentSnapshot.compilerStatus === "ready"
+              ? currentSnapshot.issues
+              : [...currentSnapshot.issues, issue],
+          stderr:
+            currentSnapshot.phase === "idle" &&
+            currentSnapshot.compilerStatus === "ready"
+              ? currentSnapshot.stderr
+              : [...currentSnapshot.stderr, stopMessage],
+        }),
+      );
     },
-    [recreatePreloadedWorker],
+    [createTerminalSnapshot, recreatePreloadedWorker],
   );
 
   const reset = useCallback(() => {
@@ -348,6 +390,22 @@ export function useJavaExecution() {
     [clearPendingTimeout, ensureWorker, stop],
   );
 
+  const runAsync = useCallback(
+    (request: JavaExecutionRequest) =>
+      new Promise<JavaExecutionSnapshot>((resolve) => {
+        pendingRunResolveRef.current = resolve;
+        run(request);
+      }),
+    [run],
+  );
+
+  const getPhase = useCallback(
+    () => mapJavaPhaseToExecutablePhase(snapshot.phase),
+    [snapshot.phase],
+  );
+
+  const getOutput = useCallback(() => snapshot, [snapshot]);
+
   useEffect(() => {
     return () => {
       clearPendingTimeout();
@@ -359,7 +417,10 @@ export function useJavaExecution() {
     snapshot,
     preload,
     run,
+    runAsync,
     stop,
     reset,
+    getPhase,
+    getOutput,
   };
 }

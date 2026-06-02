@@ -1,49 +1,85 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
-import type { Exercise } from "@/types/exercise";
-import { getJavaFileName, getJavaStarterCode } from "../../exercises";
+import type { Exercise, TopicItem } from "@/types/exercise";
+import {
+  getJavaFileName,
+  getJavaScenario,
+  getJavaStarterCode,
+} from "../../exercises";
 import { JavaCompilerStatusBadge } from "../JavaCompilerStatusBadge";
 import { useJavaExecutionContext } from "./application/javaExecutionContextValue";
 import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
 
+export interface JavaValidationRunRow {
+  id: string;
+  passed: boolean;
+  output: string;
+  expectedOutput: string;
+  phase: string;
+}
+
+export interface JavaValidationRunResult {
+  rows: JavaValidationRunRow[];
+  error?: string;
+}
+
+export interface JavaSimulatorHandle {
+  loadSolution: () => void;
+  checkSolution: () => Promise<JavaValidationRunResult>;
+}
+
 export interface JavaSimulatorProps {
   selectedExercise: Exercise | null;
+  selectedItem?: TopicItem | null;
   isFocused: boolean;
 }
 
-export function JavaSimulator({
-  selectedExercise,
-  isFocused,
-}: JavaSimulatorProps) {
+export const JavaSimulator = forwardRef<
+  JavaSimulatorHandle,
+  JavaSimulatorProps
+>(function JavaSimulator({ selectedExercise, selectedItem, isFocused }, ref) {
+  const activeItem = selectedItem ?? selectedExercise;
+
   return (
     <JavaSimulatorSession
-      key={selectedExercise?.id ?? "__default-java-session__"}
-      exerciseId={selectedExercise?.id}
+      key={activeItem?.id ?? "__default-java-session__"}
+      ref={ref}
+      itemId={activeItem?.id}
       isFocused={isFocused}
     />
   );
-}
+});
 
 interface JavaSimulatorSessionProps {
-  exerciseId?: string;
+  itemId?: string;
   isFocused: boolean;
 }
 
-function JavaSimulatorSession({
-  exerciseId,
-  isFocused,
-}: JavaSimulatorSessionProps) {
+const JavaSimulatorSession = forwardRef<
+  JavaSimulatorHandle,
+  JavaSimulatorSessionProps
+>(function JavaSimulatorSession({ itemId, isFocused }, ref) {
   const { t } = useTranslation();
-  const [code, setCode] = useState(() => getJavaStarterCode(exerciseId));
+  const scenario = useMemo(() => getJavaScenario(itemId), [itemId]);
+  const exerciseScenario = scenario?.kind === "exercise" ? scenario : null;
+  const [code, setCode] = useState(() => getJavaStarterCode(itemId));
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
-  const { snapshot, preload, run, stop, reset } = useJavaExecutionContext();
+  const { snapshot, preload, run, runAsync, stop, reset } =
+    useJavaExecutionContext();
 
-  const fileName = useMemo(() => getJavaFileName(exerciseId), [exerciseId]);
+  const fileName = useMemo(() => getJavaFileName(itemId), [itemId]);
   const isBusy =
     snapshot.phase === "loading" ||
     snapshot.phase === "compiling" ||
@@ -58,15 +94,15 @@ function JavaSimulatorSession({
   const handleRun = useCallback(() => {
     run({
       source: code,
-      exerciseId,
+      exerciseId: exerciseScenario?.id,
       timeoutMs: timeoutSeconds * 1000,
     });
-  }, [code, exerciseId, run, timeoutSeconds]);
+  }, [code, exerciseScenario?.id, run, timeoutSeconds]);
 
   const handleResetCode = useCallback(() => {
-    setCode(getJavaStarterCode(exerciseId));
+    setCode(getJavaStarterCode(itemId));
     reset();
-  }, [exerciseId, reset]);
+  }, [itemId, reset]);
 
   const handleImportCode = useCallback(
     (nextCode: string) => {
@@ -74,6 +110,54 @@ function JavaSimulatorSession({
       reset();
     },
     [reset],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      loadSolution: () => {
+        if (!exerciseScenario) {
+          return;
+        }
+
+        setCode(exerciseScenario.solutionCode);
+        reset();
+      },
+      checkSolution: async () => {
+        if (!exerciseScenario) {
+          return {
+            rows: [],
+            error: t("java.validation.exampleCheckUnavailable"),
+          };
+        }
+
+        const rows: JavaValidationRunRow[] = [];
+
+        for (const validationCase of exerciseScenario.validationCases) {
+          const source = validationCase.sourceTransform?.(code) ?? code;
+          const result = await runAsync({
+            source,
+            exerciseId: exerciseScenario.id,
+            timeoutMs: timeoutSeconds * 1000,
+          });
+          const output = result.stdout.join("");
+
+          rows.push({
+            id: validationCase.id,
+            passed:
+              result.phase === "done" &&
+              normalizeOutput(output) ===
+                normalizeOutput(validationCase.expectedStdout),
+            output,
+            expectedOutput: validationCase.expectedStdout,
+            phase: result.phase,
+          });
+        }
+
+        return { rows };
+      },
+    }),
+    [code, exerciseScenario, reset, runAsync, t, timeoutSeconds],
   );
 
   return (
@@ -101,9 +185,6 @@ function JavaSimulatorSession({
               {t(`java.compilerStatusText.${snapshot.compilerStatus}`)}
             </p>
           </div>
-          <p className="text-muted-foreground max-w-3xl text-sm">
-            {t("java.compilerEnvironmentSummary")}
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -168,4 +249,8 @@ function JavaSimulatorSession({
       <JavaConsolePanel snapshot={snapshot} className="flex-1" />
     </div>
   );
+});
+
+function normalizeOutput(output: string) {
+  return output.replace(/\r\n/g, "\n").trimEnd();
 }

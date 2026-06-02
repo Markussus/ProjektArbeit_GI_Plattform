@@ -1,3 +1,5 @@
+import type { IExecutable } from "@/types/simulator";
+
 export type JavaCompilerStatus = "not-loaded" | "loading" | "ready" | "failed";
 
 export type JavaExecutionPhase =
@@ -69,6 +71,17 @@ export interface JavaExecutionSnapshot {
   startedAt: string | null;
   finishedAt: string | null;
   lastErrorCategory: JavaExecutionErrorCategory | null;
+}
+
+export interface JavaExecutionController extends IExecutable<
+  JavaExecutionRequest,
+  JavaExecutionSnapshot
+> {
+  snapshot: JavaExecutionSnapshot;
+  preload(): void;
+  runAsync(request: JavaExecutionRequest): Promise<JavaExecutionSnapshot>;
+  reset(): void;
+  stop(reason?: "stopped" | "timeout", timeoutMs?: number): void;
 }
 
 export interface JavaWorkerPreloadCompilerRequest {

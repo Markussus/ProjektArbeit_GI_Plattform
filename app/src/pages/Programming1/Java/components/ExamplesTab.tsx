@@ -1,77 +1,55 @@
-import { BookOpen, Code2, Repeat } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import type { TranslationKey } from "@/types/i18n";
+import type { Example } from "@/types/exercise";
+import { javaProgrammingExamples } from "../exercises";
 
-interface ExampleCardDefinition {
-  icon: typeof BookOpen;
-  titleKey: TranslationKey;
-  descriptionKey: TranslationKey;
-  code: string;
-}
-
-const exampleCards: ExampleCardDefinition[] = [
-  {
-    icon: BookOpen,
-    titleKey: "java.example1Title",
-    descriptionKey: "java.example1Text",
-    code: `public class Main {
-  public static void main(String[] args) {
-    System.out.println("Hello World");
-  }
-}`,
-  },
-  {
-    icon: Repeat,
-    titleKey: "java.example2Title",
-    descriptionKey: "java.example2Text",
-    code: `for (int i = 0; i < 5; i++) {
-  System.out.println("Hello World");
-}`,
-  },
-  {
-    icon: Code2,
-    titleKey: "java.example3Title",
-    descriptionKey: "java.example3Text",
-    code: `int[] numbers = {5, 2, 9, 1, 4};
-Arrays.sort(numbers);
-System.out.println(Arrays.toString(numbers));`,
-  },
-];
-
-export function ExamplesTab(props: ModuleExamplesTabProps) {
-  void props;
+export function ExamplesTab({
+  selectedExample,
+  onSelectExample,
+  onOpenExampleInSimulation,
+}: ModuleExamplesTabProps) {
   const { t } = useTranslation();
 
+  const translatedExamples: Example[] = javaProgrammingExamples.map(
+    (example) => ({
+      id: example.id,
+      title: t(example.titleKey),
+      description: t(example.descriptionKey),
+      titleKey: example.titleKey,
+      descriptionKey: example.descriptionKey,
+      icon: example.definition.icon,
+      kind: "example",
+    }),
+  );
+
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      {exampleCards.map((card) => {
-        const Icon = card.icon;
+    <div data-testid="java-examples-tab">
+      <div
+        data-testid="java-examples-header"
+        className="text-muted-foreground mb-4 flex items-center gap-2"
+      >
+        <BookOpen className="size-4" />
+        <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
+      </div>
 
-        return (
-          <article
-            key={card.titleKey}
-            className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
-          >
-            <div className="mb-4 flex items-center gap-3">
-              <div className="bg-module-orange-bg text-module-orange-fg flex size-10 items-center justify-center rounded-lg">
-                <Icon className="size-5" />
-              </div>
-              <h3 className="text-foreground text-base font-semibold">
-                {t(card.titleKey)}
-              </h3>
-            </div>
-
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {t(card.descriptionKey)}
-            </p>
-
-            <pre className="bg-muted mt-4 overflow-x-auto rounded-lg p-4 text-xs leading-relaxed">
-              <code>{card.code}</code>
-            </pre>
-          </article>
-        );
-      })}
+      <div
+        data-testid="java-examples-list"
+        className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1"
+      >
+        {translatedExamples.map((example, index) => (
+          <ExerciseCard
+            key={example.id}
+            item={example}
+            index={index}
+            testIdPrefix={`java-example-card-${example.id}`}
+            isSelected={selectedExample?.id === example.id}
+            onSelect={() => onSelectExample(example)}
+            onOpen={() => onOpenExampleInSimulation(example)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

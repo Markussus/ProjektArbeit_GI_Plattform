@@ -134,6 +134,8 @@ describe("useJavaExecution", () => {
         expect(result.current.snapshot.phase).toBe("done");
       });
       expect(result.current.snapshot.artifacts).toEqual(artifacts);
+      expect(result.current.getPhase()).toBe("done");
+      expect(result.current.getOutput()).toBe(result.current.snapshot);
     });
   });
 
@@ -160,6 +162,7 @@ describe("useJavaExecution", () => {
 
       expect(worker.terminated).toBe(true);
       expect(result.current.snapshot.phase).toBe("stopped");
+      expect(result.current.getPhase()).toBe("stopped");
       await waitFor(() => {
         expect(MockWorker.instances).toHaveLength(2);
       });

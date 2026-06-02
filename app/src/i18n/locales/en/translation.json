@@ -451,7 +451,6 @@
     "timeoutLabel": "Timeout",
     "timeoutUnit": "seconds",
     "runWhileLoading": "Compiler loading",
-    "compilerEnvironmentSummary": "Browser Java support is based on JDK 25 javac through teavm-javac. It compiles and runs small console-style programs in WebAssembly, not in a full local JDK environment.",
     "compilerStatus": {
       "not-loaded": "not loaded",
       "loading": "loading",
@@ -467,11 +466,11 @@
     "commandOverview": {
       "button": "Java commands",
       "title": "What works in the Java editor?",
-      "summary": "Java {{version}} syntax for small browser programs",
+      "summary": "Java {{version}} for small browser programs",
       "versionTitle": "Supported Java version: {{version}}",
-      "versionText": "The browser compiler uses OpenJDK javac through teavm-javac. Language diagnostics therefore come from javac, but the generated program is executed as WebAssembly in the browser worker.",
-      "limitationsText": "Write one Main.java-style program in the editor. It runs in a browser sandbox, so local tools and operating-system access are not available.",
-      "commandListTitle": "Compact support overview",
+      "versionText": "The browser compiler uses OpenJDK javac through teavm-javac. Language diagnostics come from javac; the generated program runs as WebAssembly in a browser worker.",
+      "limitationsText": "Write one Main.java-style program. You can run Java source code, but you cannot type terminal commands into the editor.",
+      "commandListTitle": "Compact overview",
       "status": {
         "supported": "Works",
         "limited": "Limited",
@@ -482,23 +481,23 @@
       "capabilities": {
         "programShape": {
           "title": "Program entry point",
-          "description": "Use a Main class with a main method. The Run button compiles and starts that method."
+          "description": "One Main.java program works. public class Main and additional non-public helper classes can be placed in the same editor file."
         },
         "basics": {
           "title": "Basic Java syntax",
-          "description": "Variables, primitive types, strings, conditions, operators, and switch statements are fine."
+          "description": "Basic Java syntax works: variables, operators, if/else, switch, and method calls."
         },
         "loops": {
           "title": "Loops and control flow",
-          "description": "Normal loop constructs work for exercises and small algorithms."
+          "description": "for, while, do/while, and for-each work for exercises and small algorithms."
         },
         "arraysCollections": {
-          "title": "Arrays, lists, maps",
-          "description": "Arrays and common java.util collections work for typical learning tasks."
+          "title": "Arrays, lists, maps, and sets",
+          "description": "Arrays and typical java.util collections work: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
         },
         "objects": {
           "title": "Own types",
-          "description": "Helper classes, constructors, enums, records, and static methods can be written in the same editor file."
+          "description": "Custom classes, constructors, enums, records, interfaces, and static methods can be placed in the same editor file."
         },
         "output": {
           "title": "Console output",
@@ -506,7 +505,7 @@
         },
         "standardLibrary": {
           "title": "Standard library subset",
-          "description": "Common library code is available, but TeaVM/WebAssembly does not behave exactly like a full desktop JDK."
+          "description": "Common library classes from java.lang, java.util, java.math, and simple java.time are available. OS-facing APIs are not reliable."
         },
         "singleFile": {
           "title": "One editor file",
@@ -514,11 +513,11 @@
         },
         "input": {
           "title": "Console input",
-          "description": "There is no interactive input field yet. Avoid Scanner/System.in unless explicit input support is added."
+          "description": "Interactive input is not implemented in the UI yet. Avoid Scanner and System.in until an input field exists."
         },
         "cli": {
           "title": "Terminal commands",
-          "description": "The browser does not expose java, javac, JShell, JAR tools, Maven, or Gradle to users."
+          "description": "The editor expects Java source code, not commands. java, javac, jshell, jar, mvn, and gradle are not executed as terminal commands."
         },
         "environment": {
           "title": "OS access",
@@ -527,6 +526,10 @@
         "runtimeFeatures": {
           "title": "Dynamic runtime features",
           "description": "Reflection-heavy code, dynamic class loading, and real Java threads are not reliable in this WebAssembly target."
+        },
+        "stringsMath": {
+          "title": "Strings, Math, and big numbers",
+          "description": "StringBuilder, String methods, Math functions, BigInteger, and BigDecimal work for typical console tasks."
         }
       },
       "commands": {
@@ -561,7 +564,27 @@
         "environment": {
           "title": "Browser sandbox restrictions apply",
           "description": "Programs should avoid local files, sockets, native libraries, process execution, and environment-dependent APIs because WebAssembly runs inside a browser worker."
-        }
+        },
+        "title": "What can I type into the editor?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
+    "validation": {
+      "popupTitle": "Solution check",
+      "pass": "PASS",
+      "fail": "FAIL",
+      "emptyOutput": "<empty>",
+      "exampleCheckUnavailable": "Examples do not need solution checks.",
+      "table": {
+        "passed": "Passed",
+        "case": "Test case",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "phase": "Status"
       }
     }
   },
@@ -613,7 +636,7 @@
       "moore": "The Moore & Mealy simulator will be available here.",
       "dnf": "The DNF builder / truth table generator will be available here.",
       "encoding": "The Encoding simulator will be available here.",
-      "java": "Select a Java exercise or start directly with your own Java snippet in the Monaco editor."
+      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
     }
   },
   "simulator": {

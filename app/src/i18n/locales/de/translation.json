@@ -416,85 +416,84 @@
   },
   "java": {
     "title": "Java-Programmierung",
-    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafuer direkt einen editierbaren Java-Code-Editor bereit.",
+    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafür direkt einen editierbaren Java-Code-Editor bereit.",
     "overviewTitle": "Einstieg in Java",
-    "overviewText": "Dieses Thema fuehrt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
-    "concepts": "Schluesselkonzepte",
+    "overviewText": "Dieses Thema führt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
+    "concepts": "Schlüsselkonzepte",
     "concept1": "Klasse Main und main-Methode",
-    "concept2": "System.out.println fuer Konsolenausgaben",
-    "concept3": "for-Schleifen fuer wiederholte Ausgaben",
+    "concept2": "System.out.println für Konsolenausgaben",
+    "concept3": "for-Schleifen für wiederholte Ausgaben",
     "concept4": "Arrays lesen, sortieren und auswerten",
     "example1Title": "Einfaches Hello World",
     "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
     "example2Title": "Wiederholte Ausgabe",
-    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausfuehren.",
+    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausführen.",
     "example3Title": "Array sortieren",
     "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
     "exercise1": "Hello World ausgeben",
     "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
-    "exercise2": "Hello World fuenfmal ausgeben",
-    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fuenfmal in die Konsole zu schreiben.",
+    "exercise2": "Hello World fünfmal ausgeben",
+    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fünfmal in die Konsole zu schreiben.",
     "exercise3": "Zwei Zahlen addieren",
     "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
     "exercise4": "Array sortieren",
-    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschliessend aus.",
+    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschließend aus.",
     "exercise5": "Maximum im Array finden",
-    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
+    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den größten enthaltenen Wert.",
     "editorLabel": "Java-Editor",
     "editorLoading": "Der Monaco-Editor wird geladen...",
-    "resetStarterCode": "Startercode zuruecksetzen",
+    "resetStarterCode": "Startercode zurücksetzen",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",
     "timeoutUnit": "Sekunden",
-    "runWhileLoading": "Compiler laedt",
-    "compilerEnvironmentSummary": "Die Java-Unterstuetzung im Browser basiert auf JDK 25 javac ueber teavm-javac. Sie kompiliert und startet kleine konsolenartige Programme als WebAssembly, nicht in einer vollstaendigen lokalen JDK-Umgebung.",
+    "runWhileLoading": "Compiler lädt",
     "compilerStatus": {
       "not-loaded": "nicht geladen",
-      "loading": "laedt",
+      "loading": "lädt",
       "ready": "bereit",
       "failed": "fehlgeschlagen"
     },
     "compilerStatusText": {
       "not-loaded": "Compiler wurde noch nicht geladen.",
       "loading": "Java-Compiler wird im Hintergrund geladen...",
-      "ready": "Compiler ist fuer Java-Kompilierung und Ausfuehrung bereit.",
+      "ready": "Compiler ist für Java-Kompilierung und Ausführung bereit.",
       "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
     },
     "commandOverview": {
       "button": "Java-Befehle",
       "title": "Was geht im Java-Editor?",
-      "summary": "Java {{version}} Syntax fuer kleine Browser-Programme",
-      "versionTitle": "Unterstuetzte Java-Version: {{version}}",
-      "versionText": "Der Browser-Compiler nutzt OpenJDK javac ueber teavm-javac. Sprachdiagnosen kommen damit von javac, das erzeugte Programm laeuft aber als WebAssembly im Browser-Worker.",
-      "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java in den Editor. Es laeuft in einer Browser-Sandbox, daher gibt es keine lokalen Tools und keinen Betriebssystemzugriff.",
-      "commandListTitle": "Kompakte Uebersicht",
+      "summary": "Java {{version}} für kleine Browser-Programme",
+      "versionTitle": "Unterstützte Java-Version: {{version}}",
+      "versionText": "Der Browser-Compiler nutzt OpenJDK javac über teavm-javac. Sprachdiagnosen kommen damit von javac; das erzeugte Programm läuft als WebAssembly im Browser-Worker.",
+      "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java. Du kannst Java-Code ausführen, aber keine Terminalbefehle eingeben.",
+      "commandListTitle": "Kompakte Übersicht",
       "status": {
         "supported": "Geht",
-        "limited": "Eingeschraenkt",
+        "limited": "Eingeschränkt",
         "blocked": "Geht nicht",
-        "not-supported": "Nicht unterstuetzt",
-        "explained": "Eingeschraenkt"
+        "not-supported": "Nicht unterstützt",
+        "explained": "Eingeschränkt"
       },
       "capabilities": {
         "programShape": {
           "title": "Programmeinstieg",
-          "description": "Nutze eine Main-Klasse mit main-Methode. Der Run-Button kompiliert und startet genau diese Methode."
+          "description": "Ein einzelnes Main.java-Programm funktioniert. public class Main und weitere nicht-public Hilfsklassen können in derselben Editor-Datei stehen."
         },
         "basics": {
           "title": "Normale Java-Syntax",
-          "description": "Variablen, primitive Typen, Strings, Bedingungen, Operatoren und switch-Anweisungen sind geeignet."
+          "description": "Grundlegende Java-Syntax funktioniert: Variablen, Operatoren, if/else, switch und Methodenaufrufe."
         },
         "loops": {
           "title": "Schleifen und Ablaufsteuerung",
-          "description": "Normale Schleifen funktionieren fuer Uebungen und kleine Algorithmen."
+          "description": "for, while, do/while und for-each funktionieren für Übungen und kleine Algorithmen."
         },
         "arraysCollections": {
-          "title": "Arrays, Listen, Maps",
-          "description": "Arrays und typische java.util-Collections funktionieren fuer uebliche Lernaufgaben."
+          "title": "Arrays, Listen, Maps und Sets",
+          "description": "Arrays und typische java.util-Collections funktionieren: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
         },
         "objects": {
           "title": "Eigene Typen",
-          "description": "Hilfsklassen, Konstruktoren, Enums, Records und statische Methoden koennen in derselben Editor-Datei stehen."
+          "description": "Eigene Klassen, Konstruktoren, Enums, Records, Interfaces und statische Methoden können in derselben Editor-Datei stehen."
         },
         "output": {
           "title": "Konsolenausgabe",
@@ -502,7 +501,7 @@
         },
         "standardLibrary": {
           "title": "Teilmenge der Standardbibliothek",
-          "description": "Haeufige Bibliotheksklassen sind verfuegbar, aber TeaVM/WebAssembly verhaelt sich nicht exakt wie ein vollstaendiges Desktop-JDK."
+          "description": "Häufige Bibliotheksklassen aus java.lang, java.util, java.math und einfachem java.time sind verfügbar. Betriebssystemnahe APIs sind nicht verlässlich."
         },
         "singleFile": {
           "title": "Eine Editor-Datei",
@@ -510,25 +509,29 @@
         },
         "input": {
           "title": "Konsoleneingabe",
-          "description": "Es gibt noch kein interaktives Eingabefeld. Vermeide Scanner/System.in, solange keine explizite Eingabeunterstuetzung eingebaut ist."
+          "description": "Interaktive Eingabe ist im UI noch nicht umgesetzt. Vermeide Scanner und System.in, solange kein Eingabefeld vorhanden ist."
         },
         "cli": {
           "title": "Terminalbefehle",
-          "description": "Der Browser stellt Nutzern keine Befehle wie java, javac, JShell, JAR-Tools, Maven oder Gradle bereit."
+          "description": "In das Editorfeld gehört Java-Quellcode, keine Befehle. java, javac, jshell, jar, mvn und gradle werden nicht als Terminalkommandos ausgeführt."
         },
         "environment": {
           "title": "Betriebssystemzugriff",
-          "description": "Lokale Dateien, Sockets, gestartete Prozesse und native Bibliotheken sind durch das Browser-Laufzeitmodell blockiert."
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
         },
         "runtimeFeatures": {
           "title": "Dynamische Laufzeitfeatures",
-          "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlaesslich."
+          "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlässlich."
+        },
+        "stringsMath": {
+          "title": "Strings, Math und gro?e Zahlen",
+          "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren f?r typische Konsolenaufgaben."
         }
       },
       "commands": {
         "run": {
           "title": "Aktuellen Editorinhalt kompilieren und starten",
-          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und fuehrt die Main.main-Methode im Worker aus."
+          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und f?hrt die Main.main-Methode im Worker aus."
         },
         "compile": {
           "title": "Kompilierung ist Teil von Run",
@@ -536,28 +539,48 @@
         },
         "javaCli": {
           "title": "Kein java-Kommandozeilenstarter",
-          "description": "Ein lokaler java-Befehl wird nicht unterstuetzt, weil der Browser keine JVM-Prozesse startet."
+          "description": "Ein lokaler java-Befehl wird nicht unterst?tzt, weil der Browser keine JVM-Prozesse startet."
         },
         "javacCli": {
           "title": "Kein javac-Terminalbefehl",
-          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer koennen keine beliebigen javac-Flags uebergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
+          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer k?nnen keine beliebigen javac-Flags ?bergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
         },
         "jshell": {
           "title": "Keine interaktive JShell",
-          "description": "Der Simulator fuehrt vollstaendige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
+          "description": "Der Simulator f?hrt vollst?ndige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
         },
         "tools": {
           "title": "Keine Paketierungs- oder Dokumentationswerkzeuge",
-          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme gehoeren nicht zum unterstuetzten Browser-Compiler-Ablauf."
+          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme geh?ren nicht zum unterst?tzten Browser-Compiler-Ablauf."
         },
         "stdin": {
           "title": "Konsoleneingabe ist nicht interaktiv",
-          "description": "Konsolenausgabe ueber System.out und System.err wird unterstuetzt. Interaktives Lesen von System.in sollte vermieden werden, solange keine explizite Eingabeunterstuetzung ergaenzt wurde."
+          "description": "Konsolenausgabe ?ber System.out und System.err wird unterst?tzt. Interaktives Lesen von System.in sollte vermieden werden, solange keine explizite Eingabeunterst?tzung erg?nzt wurde."
         },
         "environment": {
           "title": "Browser-Sandbox gilt",
-          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhaengige APIs vermeiden, weil WebAssembly in einem Browser-Worker laeuft."
-        }
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabh?ngige APIs vermeiden, weil WebAssembly in einem Browser-Worker l?uft."
+        },
+        "title": "Was darf ich in den Editor schreiben?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft..."
+    },
+    "validation": {
+      "popupTitle": "Lösungsprüfung",
+      "pass": "BESTANDEN",
+      "fail": "FEHLER",
+      "emptyOutput": "<leer>",
+      "exampleCheckUnavailable": "Beispiele benötigen keine Lösungsprüfung.",
+      "table": {
+        "passed": "Bestanden",
+        "case": "Testfall",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "phase": "Status"
       }
     }
   },
@@ -609,7 +632,7 @@
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
       "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
       "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
-      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
+      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
     }
   },
   "simulator": {

@@ -7,6 +7,7 @@ import { JavaSimulator } from "../../../../src/pages/Programming1/Java/component
 import type { Exercise } from "../../../../src/types/exercise";
 
 const runSpy = vi.fn();
+const runAsyncSpy = vi.fn();
 const stopSpy = vi.fn();
 const resetSpy = vi.fn();
 const preloadSpy = vi.fn();
@@ -44,6 +45,7 @@ vi.mock(
       },
       preload: preloadSpy,
       run: runSpy,
+      runAsync: runAsyncSpy,
       stop: stopSpy,
       reset: resetSpy,
     }),
@@ -127,6 +129,7 @@ describe("JavaSimulator", () => {
 
   beforeEach(() => {
     runSpy.mockReset();
+    runAsyncSpy.mockReset();
     stopSpy.mockReset();
     resetSpy.mockReset();
     preloadSpy.mockReset();
