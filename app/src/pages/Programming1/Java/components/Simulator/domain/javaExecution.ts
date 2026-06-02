@@ -1,8 +1,4 @@
-export type JavaCompilerStatus =
-  | "not-loaded"
-  | "loading"
-  | "ready"
-  | "failed";
+export type JavaCompilerStatus = "not-loaded" | "loading" | "ready" | "failed";
 
 export type JavaExecutionPhase =
   | "idle"

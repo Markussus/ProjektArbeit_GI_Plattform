@@ -22,7 +22,9 @@ interface RuntimeLoaderModule {
         enabled?: boolean;
         path?: string;
       };
-      installImports?: (imports: Record<string, Record<string, unknown>>) => void;
+      installImports?: (
+        imports: Record<string, Record<string, unknown>>,
+      ) => void;
     },
   ): Promise<{
     exports: {
@@ -112,7 +114,10 @@ async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
     const compilation = await compileSource(requestId, sourceCode);
     const diagnostics = compilation.diagnostics;
 
-    if (compilation.result.status !== "successful" || !compilation.result.script) {
+    if (
+      compilation.result.status !== "successful" ||
+      !compilation.result.script
+    ) {
       throw createWorkerError(
         inferCompilationCategory(diagnostics),
         inferCompilationMessage(diagnostics),
@@ -210,7 +215,9 @@ async function ensureCompilerReady() {
   return compilerReadyPromise;
 }
 
-function handleCompilerWorkerMessage(event: MessageEvent<UpstreamWorkerMessage>) {
+function handleCompilerWorkerMessage(
+  event: MessageEvent<UpstreamWorkerMessage>,
+) {
   const message = event.data;
 
   switch (message.command) {
@@ -276,10 +283,7 @@ function handleCompilerWorkerError(event: ErrorEvent) {
 
 function compileSource(requestId: string, sourceCode: string) {
   if (!compilerWorker) {
-    throw createWorkerError(
-      "compiler-load",
-      "Compiler could not be loaded.",
-    );
+    throw createWorkerError("compiler-load", "Compiler could not be loaded.");
   }
 
   if (pendingCompilation) {
@@ -289,23 +293,24 @@ function compileSource(requestId: string, sourceCode: string) {
     );
   }
 
-  return new Promise<{ result: UpstreamWorkerMessage; diagnostics: JavaExecutionIssue[] }>(
-    (resolve, reject) => {
-      const diagnostics: JavaExecutionIssue[] = [];
-      pendingCompilation = {
-        requestId,
-        diagnostics,
-        resolve: (result) => resolve({ result, diagnostics }),
-        reject,
-      };
+  return new Promise<{
+    result: UpstreamWorkerMessage;
+    diagnostics: JavaExecutionIssue[];
+  }>((resolve, reject) => {
+    const diagnostics: JavaExecutionIssue[] = [];
+    pendingCompilation = {
+      requestId,
+      diagnostics,
+      resolve: (result) => resolve({ result, diagnostics }),
+      reject,
+    };
 
-      compilerWorker?.postMessage({
-        command: "compile",
-        id: requestId,
-        text: sourceCode,
-      });
-    },
-  );
+    compilerWorker?.postMessage({
+      command: "compile",
+      id: requestId,
+      text: sourceCode,
+    });
+  });
 }
 
 async function runGeneratedProgram(
@@ -318,7 +323,9 @@ async function runGeneratedProgram(
 
   try {
     const runtimeModule = (await import(
-      /* @vite-ignore */ absoluteAssetUrl(JAVA_COMPILER_ASSET_URLS.compilerRuntime)
+      /* @vite-ignore */ absoluteAssetUrl(
+        JAVA_COMPILER_ASSET_URLS.compilerRuntime,
+      )
     )) as RuntimeLoaderModule;
 
     const loaded = await runtimeModule.load(wasmModule, {
@@ -428,11 +435,13 @@ function copyByteArray(bytes: Int8Array) {
 }
 
 function mapDiagnostic(diagnostic: UpstreamWorkerMessage): JavaExecutionIssue {
-  const stage = diagnostic.command === "compiler-diagnostic" ? "javac" : "teavm";
+  const stage =
+    diagnostic.command === "compiler-diagnostic" ? "javac" : "teavm";
   return {
-    code: diagnostic.command === "compiler-diagnostic"
-      ? "javac_diagnostic"
-      : "teavm_diagnostic",
+    code:
+      diagnostic.command === "compiler-diagnostic"
+        ? "javac_diagnostic"
+        : "teavm_diagnostic",
     stage,
     severity:
       diagnostic.severity === "other" || !diagnostic.severity
@@ -470,9 +479,13 @@ function normalizeWorkerError(error: unknown) {
       errorCategory: String(
         (error as { errorCategory?: string }).errorCategory ?? "unknown",
       ) as JavaExecutionErrorCategory,
-      message: String((error as { message?: string }).message ?? "Unknown error"),
-      diagnostics: (error as { diagnostics?: JavaExecutionIssue[] }).diagnostics,
-      artifacts: (error as { artifacts?: JavaExecutionArtifacts | null }).artifacts,
+      message: String(
+        (error as { message?: string }).message ?? "Unknown error",
+      ),
+      diagnostics: (error as { diagnostics?: JavaExecutionIssue[] })
+        .diagnostics,
+      artifacts: (error as { artifacts?: JavaExecutionArtifacts | null })
+        .artifacts,
     };
   }
 

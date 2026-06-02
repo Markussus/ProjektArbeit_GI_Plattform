@@ -89,7 +89,9 @@ export function useJavaExecution() {
               ...currentSnapshot,
               compilerStatus: "loading",
               phase:
-                currentSnapshot.phase === "idle" ? "loading" : currentSnapshot.phase,
+                currentSnapshot.phase === "idle"
+                  ? "loading"
+                  : currentSnapshot.phase,
             }));
             return;
           case "compiler-ready":
@@ -245,7 +247,8 @@ export function useJavaExecution() {
       return {
         ...currentSnapshot,
         compilerStatus: "loading",
-        phase: currentSnapshot.phase === "idle" ? "loading" : currentSnapshot.phase,
+        phase:
+          currentSnapshot.phase === "idle" ? "loading" : currentSnapshot.phase,
       };
     });
 

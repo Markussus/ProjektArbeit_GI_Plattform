@@ -1,13 +1,6 @@
-import {
-  createContext,
-  useContext,
-  type PropsWithChildren,
-} from "react";
+import type { PropsWithChildren } from "react";
+import { JavaExecutionContext } from "./javaExecutionContextValue";
 import { useJavaExecution } from "./useJavaExecution";
-
-const JavaExecutionContext = createContext<ReturnType<
-  typeof useJavaExecution
-> | null>(null);
 
 export function JavaExecutionProvider({ children }: PropsWithChildren) {
   const value = useJavaExecution();
@@ -17,16 +10,4 @@ export function JavaExecutionProvider({ children }: PropsWithChildren) {
       {children}
     </JavaExecutionContext.Provider>
   );
-}
-
-export function useJavaExecutionContext() {
-  const context = useContext(JavaExecutionContext);
-
-  if (!context) {
-    throw new Error(
-      "useJavaExecutionContext must be used within JavaExecutionProvider.",
-    );
-  }
-
-  return context;
 }

@@ -28,7 +28,7 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock(
-  "../../../../src/pages/Programming1/Java/components/Simulator/application/JavaExecutionContext",
+  "../../../../src/pages/Programming1/Java/components/Simulator/application/javaExecutionContextValue",
   () => ({
     useJavaExecutionContext: () => ({
       snapshot: {

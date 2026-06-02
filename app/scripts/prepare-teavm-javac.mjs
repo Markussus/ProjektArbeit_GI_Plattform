@@ -168,12 +168,11 @@ async function canSkipBuild() {
 }
 
 async function buildCompilerDistribution() {
-  const gradleCommand = process.platform === "win32" ? "gradlew.bat" : "./gradlew";
-  await run(
-    gradleCommand,
-    [":compiler:build", ":compiler:createDist"],
-    { cwd: sourceDir },
-  );
+  const gradleCommand =
+    process.platform === "win32" ? "gradlew.bat" : "./gradlew";
+  await run(gradleCommand, [":compiler:build", ":compiler:createDist"], {
+    cwd: sourceDir,
+  });
 
   if (!(await pathExists(distZipPath))) {
     throw new Error(

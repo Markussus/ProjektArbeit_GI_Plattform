@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { BookOpen, Code2, ListChecks, PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { JavaCompilerStatusBadge } from "./JavaCompilerStatusBadge";
-import { useJavaExecutionContext } from "./Simulator/application/JavaExecutionContext";
+import { useJavaExecutionContext } from "./Simulator/application/javaExecutionContextValue";
 
 const conceptIcons = [BookOpen, Code2, PlayCircle, ListChecks];
 

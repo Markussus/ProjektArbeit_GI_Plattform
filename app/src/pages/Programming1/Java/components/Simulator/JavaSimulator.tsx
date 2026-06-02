@@ -5,7 +5,7 @@ import { ExecutionControls } from "@/components/shared/ExecutionControls";
 import type { Exercise } from "@/types/exercise";
 import { getJavaFileName, getJavaStarterCode } from "../../exercises";
 import { JavaCompilerStatusBadge } from "../JavaCompilerStatusBadge";
-import { useJavaExecutionContext } from "./application/JavaExecutionContext";
+import { useJavaExecutionContext } from "./application/javaExecutionContextValue";
 import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
