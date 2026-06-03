@@ -9,7 +9,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       emptyStateTextKey="simulation.emptyStates.number"
     >
       <Simulator
-        selectedExercise={props.selectedExercise}
+        selectedExercise={props.selectedExercise ?? props.selectedItem}
         onExitExercise={props.onExitExercise}
       />
     </TopicSimulationTab>

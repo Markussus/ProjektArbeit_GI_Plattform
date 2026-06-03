@@ -118,6 +118,9 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
 
     return (
       <div
+        data-testid="tm-simulator"
+        data-mode={isEditMode ? "edit" : "simulation"}
+        data-scenario-id={scenario?.id ?? ""}
         className={cn(
           "mx-auto flex w-full flex-col gap-6 p-4",
           isEditMode ? "max-w-none" : "max-w-7xl",
@@ -129,6 +132,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
             <button
               onClick={handleApplyProgram}
               disabled={editor.hasBlockingCellIssue}
+              data-testid="tm-start-simulation"
               className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("tm.config.general.apply")}

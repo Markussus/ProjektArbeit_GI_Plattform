@@ -6,6 +6,7 @@ import {
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
 import type { DnfBuilderAnalysis } from "./dnfAnalysis";
+import { useDnfSimplification } from "./useDnfSimplification";
 
 interface UseDnfExerciseParams {
   analysis: DnfBuilderAnalysis;
@@ -25,12 +26,14 @@ export function useDnfExercise({
   const [dnfAnswer, setDnfAnswer] = useState("");
   const [exerciseFeedback, setExerciseFeedback] =
     useState<DnfExerciseCheckResult | null>(null);
+  const simplification = useDnfSimplification();
 
   const resetExercise = () => {
     setShowSolution(!isExerciseMode);
     setTruthTableAnswers([]);
     setDnfAnswer("");
     setExerciseFeedback(null);
+    simplification.reset();
   };
 
   const setTruthTableAnswer = (rowIndex: number, value: boolean) => {
@@ -41,12 +44,14 @@ export function useDnfExercise({
     });
     setExerciseFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const updateDnfAnswer = (value: string) => {
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setExerciseFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const checkExercise = () => {
@@ -83,5 +88,6 @@ export function useDnfExercise({
     checkExercise,
     toggleSolution: () => setShowSolution((current) => !current),
     resetExercise,
+    simplification,
   };
 }

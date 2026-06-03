@@ -1,14 +1,17 @@
 [mcp_servers.playwright]
 enabled = true
-command = "npx"
+command = "npm"
 args = [
+  "exec",
+  "--prefix",
+  "app",
+  "--",
   "playwright-mcp",
   "--isolated",
   "--browser=chrome",
   "--viewport-size=1440x900",
   "--test-id-attribute=data-testid"
 ]
-cwd = "C:\\Projekte\\fix_projektarbeit_gi_plattform\\app"
 startup_timeout_sec = 30.0
 tool_timeout_sec = 90.0
 
@@ -20,4 +23,3 @@ approval_mode = "approve"
 
 [mcp_servers.playwright.tools.browser_run_code]
 approval_mode = "approve"
-

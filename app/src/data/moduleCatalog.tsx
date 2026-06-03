@@ -49,6 +49,10 @@ const TuringMachineTopicPage = lazy(async () => ({
     await import("@/pages/FundamentalsCS/TuringMachine/TuringMachinePage")
   ).TuringMachinePage,
 }));
+const EncodingTopicPage = lazy(async () => ({
+  default: (await import("@/pages/FundamentalsCS/Encoding/EncodingPage"))
+    .EncodingPage,
+}));
 const JavaProgrammingTopicPage = lazy(async () => ({
   default: (await import("@/pages/Programming1/Java/JavaProgrammingPage"))
     .JavaProgrammingPage,
@@ -139,6 +143,15 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: TableProperties,
         accent: "rose",
         element: <DnfTopicPage />,
+      },
+      {
+        id: "encoding",
+        titleKey: "encoding.title",
+        descriptionKey: "encoding.description",
+        path: "/fundamentals-cs/encoding",
+        icon: Code2,
+        accent: "blue",
+        element: <EncodingTopicPage />,
       },
     ],
   },

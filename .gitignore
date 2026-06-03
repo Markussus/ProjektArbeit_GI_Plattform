@@ -29,3 +29,11 @@ app/.npm/
 
 node_modules/
 app/node_modules/
+
+# teavm-javac source/build artifacts
+third_party/teavm-javac-src/
+third_party/teavm-javac-src/**
+
+# generated browser compiler artifacts
+app/public/java/compiler/
+app/public/java/compiler/**

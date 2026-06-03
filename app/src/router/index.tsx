@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "@/layouts/MainLayout/MainLayout";
 import { learningRoutes } from "@/data/moduleCatalog";
+import { LegalPage } from "@/pages/Legal/LegalPage";
 
 const HomePage = lazy(async () => ({
   default: (await import("@/pages/Home/HomePage")).HomePage,
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
 
       { path: "/documentation", element: <DocumentationPage /> },
       { path: "/help", element: <HelpPage /> },
+      { path: "/legal", element: <LegalPage /> },
 
       { path: "*", element: <NotFoundPage /> },
     ],

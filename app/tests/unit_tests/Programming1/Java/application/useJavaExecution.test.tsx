@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useJavaExecution } from "../../../../../src/pages/Programming1/Java/components/Simulator/application/useJavaExecution";
 import type {
   JavaExecutionArtifacts,
-  JavaExecutionIssue,
   JavaWorkerResponse,
 } from "../../../../../src/pages/Programming1/Java/components/Simulator/domain/javaExecution";
 
@@ -45,35 +44,75 @@ describe("useJavaExecution", () => {
   });
 
   describe("when a Java execution is started", () => {
-    it("tracks stdout and completion state from the worker lifecycle", async () => {
+    it("tracks preload, stdout, and completion state from the worker lifecycle", async () => {
       const { result } = renderHook(() => useJavaExecution());
+
+      act(() => {
+        result.current.preload();
+      });
+
+      const preloadWorker = MockWorker.instances[0];
+
+      act(() => {
+        preloadWorker.emit({
+          type: "compiler-ready",
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.compilerStatus).toBe("ready");
+      });
 
       act(() => {
         result.current.run({
           source: 'System.out.println("Hello");',
           exerciseId: "java.exercise1",
+          timeoutMs: 60_000,
         });
       });
 
       const worker = MockWorker.instances[0];
-      const executeMessage = worker.postedMessages[0] as {
+      const executeMessage = worker.postedMessages[1] as {
         requestId: string;
       };
       const requestId = executeMessage.requestId;
       const artifacts: JavaExecutionArtifacts = {
-        sanitizedSource: 'System.out.println("Hello");',
-        javascript: 'runtime.println("Hello");',
-        wrappedJavascript: '(() => runtime.println("Hello"))();',
+        generatedFiles: [
+          { path: "app.wasm", size: 10 },
+          { path: "app.wasm-runtime.js", size: 20 },
+        ],
+        mainClass: "Main",
       };
-      const issues: JavaExecutionIssue[] = [];
 
-      expect(result.current.snapshot.phase).toBe("running");
+      expect(result.current.snapshot.phase).toBe("loading");
+
+      act(() => {
+        worker.emit({
+          type: "compile-started",
+          requestId,
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.phase).toBe("compiling");
+      });
+
+      act(() => {
+        worker.emit({
+          type: "run-started",
+          requestId,
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.phase).toBe("running");
+      });
 
       act(() => {
         worker.emit({
           type: "stdout",
           requestId,
-          chunk: "Hello\n",
+          data: "Hello\n",
         });
       });
 
@@ -83,10 +122,11 @@ describe("useJavaExecution", () => {
 
       act(() => {
         worker.emit({
-          type: "execution-completed",
+          type: "success",
           requestId,
-          issues,
           artifacts,
+          stdout: "Hello\n",
+          stderr: "",
         });
       });
 
@@ -94,21 +134,27 @@ describe("useJavaExecution", () => {
         expect(result.current.snapshot.phase).toBe("done");
       });
       expect(result.current.snapshot.artifacts).toEqual(artifacts);
-      expect(worker.terminated).toBe(true);
+      expect(result.current.getPhase()).toBe("done");
+      expect(result.current.getOutput()).toBe(result.current.snapshot);
     });
   });
 
   describe("when a running execution is interrupted by the user", () => {
-    it("terminates the worker and marks the execution as stopped", () => {
+    it("terminates the worker, marks the execution as stopped, and starts a fresh preload", async () => {
       const { result } = renderHook(() => useJavaExecution());
+
+      act(() => {
+        result.current.preload();
+      });
+
+      const worker = MockWorker.instances[0];
 
       act(() => {
         result.current.run({
           source: "class Main {}",
+          timeoutMs: 60_000,
         });
       });
-
-      const worker = MockWorker.instances[0];
 
       act(() => {
         result.current.stop();
@@ -116,6 +162,10 @@ describe("useJavaExecution", () => {
 
       expect(worker.terminated).toBe(true);
       expect(result.current.snapshot.phase).toBe("stopped");
+      expect(result.current.getPhase()).toBe("stopped");
+      await waitFor(() => {
+        expect(MockWorker.instances).toHaveLength(2);
+      });
     });
   });
 
@@ -126,6 +176,7 @@ describe("useJavaExecution", () => {
       act(() => {
         result.current.run({
           source: "class Main {}",
+          timeoutMs: 60_000,
         });
       });
 
@@ -138,7 +189,7 @@ describe("useJavaExecution", () => {
         worker.emit({
           type: "stderr",
           requestId: executeMessage.requestId,
-          chunk: "boom\n",
+          data: "boom\n",
         });
       });
 
@@ -151,11 +202,14 @@ describe("useJavaExecution", () => {
       });
 
       expect(worker.terminated).toBe(true);
-      expect(result.current.snapshot.phase).toBe("idle");
+      await waitFor(() => {
+        expect(result.current.snapshot.phase).toBe("loading");
+      });
       expect(result.current.snapshot.stdout).toEqual([]);
       expect(result.current.snapshot.stderr).toEqual([]);
       expect(result.current.snapshot.issues).toEqual([]);
       expect(result.current.snapshot.artifacts).toBeNull();
+      expect(result.current.snapshot.compilerStatus).toBe("loading");
     });
   });
 });

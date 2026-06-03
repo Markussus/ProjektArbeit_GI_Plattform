@@ -20,6 +20,7 @@ export interface SimulatorControlsProps {
   minSpeed?: number;
   maxSpeed?: number;
   className?: string;
+  testIdPrefix?: string;
 }
 
 export function SimulatorControls({
@@ -34,6 +35,7 @@ export function SimulatorControls({
   minSpeed = 100,
   maxSpeed = 2000,
   className,
+  testIdPrefix,
 }: SimulatorControlsProps) {
   const { t } = useTranslation();
 
@@ -59,6 +61,7 @@ export function SimulatorControls({
 
   return (
     <div
+      data-testid={testIdPrefix}
       className={cn(
         "bg-card text-card-foreground flex w-full max-w-md flex-col gap-4 rounded-lg border p-4 shadow-sm",
         className,
@@ -67,6 +70,7 @@ export function SimulatorControls({
       <div className="flex items-center justify-center gap-2">
         <button
           onClick={onReset}
+          data-testid={testIdPrefix ? `${testIdPrefix}-reset` : undefined}
           className={buttonClasses}
           title={t("simulation.controls.reset", "Reset")}
           aria-label={t("simulation.controls.reset", "Reset")}
@@ -77,6 +81,7 @@ export function SimulatorControls({
         <button
           onClick={onStepBack}
           disabled={isPlaying}
+          data-testid={testIdPrefix ? `${testIdPrefix}-step-back` : undefined}
           className={buttonClasses}
           title={t("simulation.controls.stepBack", "Step backward")}
           aria-label={t("simulation.controls.stepBack", "Step backward")}
@@ -87,6 +92,7 @@ export function SimulatorControls({
         {isPlaying ? (
           <button
             onClick={onPause}
+            data-testid={testIdPrefix ? `${testIdPrefix}-pause` : undefined}
             className={cn(
               buttonClasses,
               "bg-brand text-brand-foreground hover:opacity-90",
@@ -100,6 +106,7 @@ export function SimulatorControls({
           <button
             onClick={onPlay}
             disabled={isError}
+            data-testid={testIdPrefix ? `${testIdPrefix}-play` : undefined}
             className={cn(
               buttonClasses,
               "bg-brand text-brand-foreground hover:opacity-90",
@@ -114,6 +121,7 @@ export function SimulatorControls({
         <button
           onClick={onStep}
           disabled={isPlaying || isError}
+          data-testid={testIdPrefix ? `${testIdPrefix}-step` : undefined}
           className={buttonClasses}
           title={t("simulation.controls.step", "Step forward")}
           aria-label={t("simulation.controls.step", "Step forward")}
@@ -140,6 +148,7 @@ export function SimulatorControls({
             "[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-background [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2",
           )}
           aria-label={t("simulation.controls.speed", "Speed")}
+          data-testid={testIdPrefix ? `${testIdPrefix}-speed` : undefined}
         />
       </div>
     </div>

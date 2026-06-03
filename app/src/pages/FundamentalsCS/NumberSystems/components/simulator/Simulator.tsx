@@ -6,7 +6,7 @@ import { IEEE754Converter } from "./IEEE754Converter";
 import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
-import type { Exercise } from "@/types/exercise";
+import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 
 type SimulatorMode =
@@ -17,7 +17,7 @@ type SimulatorMode =
   | "arithmetic";
 
 interface SimulatorProps {
-  selectedExercise?: Exercise | null;
+  selectedExercise?: TopicItem | null;
   /** Callback zum Verlassen des Übungsmodus auf Seite des Elternelementes */
   onExitExercise?: () => void;
 }
@@ -240,7 +240,7 @@ export function Simulator({
   };
 
   return (
-    <div className="flex h-full flex-col space-y-6">
+    <div data-testid="ns-simulator" className="flex h-full flex-col space-y-6">
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
         {(
@@ -254,6 +254,7 @@ export function Simulator({
         ).map((mode) => (
           <button
             key={mode}
+            data-testid={`ns-tab-${mode}`}
             className={cn(
               "relative px-4 py-2.5 text-sm font-medium",
               activeMode === mode

@@ -73,6 +73,16 @@ export interface TableViewProps {
   className?: string;
   tableClassName?: string;
   disableActiveCellAutoScroll?: boolean;
+  testIdPrefix?: string;
+  getRowTestAttributes?: (
+    rowIndex: number,
+    row: string[],
+  ) => Record<string, string | number | boolean | undefined>;
+  getCellTestAttributes?: (
+    rowIndex: number,
+    colIndex: number,
+    value: string,
+  ) => Record<string, string | number | boolean | undefined>;
 }
 
 export interface TableCellState {

@@ -7,21 +7,33 @@ import { JavaSimulator } from "../../../../src/pages/Programming1/Java/component
 import type { Exercise } from "../../../../src/types/exercise";
 
 const runSpy = vi.fn();
+const runAsyncSpy = vi.fn();
 const stopSpy = vi.fn();
 const resetSpy = vi.fn();
+const preloadSpy = vi.fn();
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
+    t: (key: string, options?: string | { version?: string }) => {
+      if (typeof options === "string") {
+        return options;
+      }
+
+      if (key === "java.commandOverview.summary" && options?.version) {
+        return `Java ${options.version}`;
+      }
+
+      return key;
+    },
   }),
 }));
 
 vi.mock(
-  "../../../../src/pages/Programming1/Java/components/Simulator/application/useJavaExecution",
+  "../../../../src/pages/Programming1/Java/components/Simulator/application/javaExecutionContextValue",
   () => ({
-    useJavaExecution: () => ({
+    useJavaExecutionContext: () => ({
       snapshot: {
+        compilerStatus: "ready",
         phase: "idle",
         stdout: [],
         stderr: [],
@@ -29,8 +41,11 @@ vi.mock(
         artifacts: null,
         startedAt: null,
         finishedAt: null,
+        lastErrorCategory: null,
       },
+      preload: preloadSpy,
       run: runSpy,
+      runAsync: runAsyncSpy,
       stop: stopSpy,
       reset: resetSpy,
     }),
@@ -114,8 +129,10 @@ describe("JavaSimulator", () => {
 
   beforeEach(() => {
     runSpy.mockReset();
+    runAsyncSpy.mockReset();
     stopSpy.mockReset();
     resetSpy.mockReset();
+    preloadSpy.mockReset();
   });
 
   describe("when no exercise is selected yet", () => {
@@ -163,6 +180,24 @@ describe("JavaSimulator", () => {
       expect(runSpy).toHaveBeenCalledWith({
         source: "changed code",
         exerciseId: undefined,
+        timeoutMs: 60000,
+        stdin: "",
+      });
+    });
+
+    it("passes standard input to the Java execution flow", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.change(screen.getByTestId("java-stdin-input"), {
+        target: { value: "hello java\n" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: "run code" }));
+
+      expect(runSpy).toHaveBeenCalledWith({
+        source: expect.any(String),
+        exerciseId: undefined,
+        timeoutMs: 60000,
+        stdin: "hello java\n",
       });
     });
 
@@ -175,6 +210,31 @@ describe("JavaSimulator", () => {
         "imported code",
       );
       expect(resetSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("when the simulator initializes", () => {
+    it("starts compiler preload in the background and exposes the timeout control", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      expect(preloadSpy).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("java-timeout-input")).toHaveValue(60);
+      expect(
+        screen.getByTestId("java-command-overview-button"),
+      ).toBeInTheDocument();
+    });
+
+    it("opens the Java command overview with version and command information", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.click(screen.getByTestId("java-command-overview-button"));
+
+      expect(
+        screen.getByTestId("java-command-overview-dialog"),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/JDK 25/)).toBeInTheDocument();
+      expect(screen.getByText("ArrayList")).toBeInTheDocument();
+      expect(screen.getByText("javac")).toBeInTheDocument();
     });
   });
 

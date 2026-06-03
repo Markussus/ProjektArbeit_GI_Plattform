@@ -110,3 +110,52 @@
     - Configured npm to use `npm ci --cache .npm --prefer-offline` so cached packages are reused whenever possible
     - Confirmed that the local GitLab Runner cache works without any external shared cache server
     - Successfully ran the pipeline end to end on the Raspberry Pi
+
+---
+
+## Short Note: Java compiler integration
+
+* The Java simulator no longer uses the old custom Java transpiler.
+* It now uses the TeaVM Java browser compiler pipeline based on `teavm-javac`.
+* The React UI talks only to a Web Worker.
+* Inside the worker, the pinned TeaVM browser compiler artifacts are loaded.
+* Java source is compiled in the worker, converted to WebAssembly, and the generated WebAssembly is also executed in the worker.
+* `stdout`, `stderr`, diagnostics, timeout, and stop events are sent back from the worker to the React UI.
+* The compiler is preloaded when the Java page is opened, so the simulator is ready faster when the user switches to the simulation tab.
+
+---
+
+## Refactoring Ideas: Shared Exercise / Simulation UI
+
+* Some parts of the Java programming page now follow the same interaction pattern as the Turing machine page.
+* It makes sense to abstract the common UI parts, but not the simulator-specific logic.
+
+* Good candidates for shared components:
+    - `TopicExamplesTab`
+        - Similar to the existing `TopicExercisesTab`
+        - Shows selectable example cards
+        - Expands the selected example
+        - Provides an `Open in Simulation` action
+        - Useful because examples should behave consistently across Java, Turing machine, and future topics
+    - Shared simulation actions
+        - Reusable action area for selected simulation items
+        - Supports actions like `Load solution` and `Check solution`
+        - The shared part should only render the buttons and layout
+        - The actual load/check logic should stay inside the concrete simulator
+    - `SolutionCheckDialog`
+        - Shared popup/dialog for displaying validation results
+        - Can show passed/failed rows, actual output, expected output, and status
+        - Useful for Java now and potentially for other simulators later
+        - The dialog should be generic; each simulator provides its own result rows
+
+* Maybe useful later, but not urgent:
+    - Shared scenario data model
+        - Could define common fields like `id`, `kind`, `titleKey`, `descriptionKey`, and `definition`
+        - Should be introduced carefully because Java scenarios contain code and validation cases, while Turing machine scenarios contain machine configurations
+        - Keep simulator-specific payloads separate to avoid an over-generic model
+
+* Preferred direction:
+    - First extract `TopicExamplesTab`
+    - Then extract a small shared simulation action area
+    - Then extract `SolutionCheckDialog`
+    - Only revisit a shared scenario model if a third topic needs the same pattern

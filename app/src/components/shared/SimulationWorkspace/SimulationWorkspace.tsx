@@ -41,6 +41,8 @@ export function SimulationWorkspace({
       {activeItem && (
         <div
           data-testid="simulation-selected-exercise"
+          data-item-id={activeItem.id}
+          data-item-kind={activeItem.kind}
           className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -57,7 +59,10 @@ export function SimulationWorkspace({
             </div>
 
             {selectedItemActions && (
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <div
+                data-testid="simulation-selected-item-actions"
+                className="flex shrink-0 flex-wrap items-center gap-2"
+              >
                 {selectedItemActions}
               </div>
             )}

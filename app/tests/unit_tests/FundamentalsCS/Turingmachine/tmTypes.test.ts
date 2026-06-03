@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_BLANK_SYMBOL,
   isSingleTapeSymbol,
+  normalizeTapeSymbolInput,
+  parseTapeInput,
 } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmTypes";
 
 describe("tmTypes", () => {
@@ -27,6 +29,19 @@ describe("tmTypes", () => {
     it("returns false for strings containing more than one code point", () => {
       expect(isSingleTapeSymbol("ab")).toBe(false);
       expect(isSingleTapeSymbol("é")).toBe(false);
+    });
+  });
+
+  describe("blank symbol input alias", () => {
+    // Tests that the keyboard-friendly blank alias is normalized before single-symbol validation.
+    it("normalizes <> to the default blank symbol", () => {
+      expect(normalizeTapeSymbolInput("<>")).toBe(DEFAULT_BLANK_SYMBOL);
+      expect(normalizeTapeSymbolInput(" <> ")).toBe(DEFAULT_BLANK_SYMBOL);
+    });
+
+    // Tests that the tape input parser treats <> as one blank symbol instead of two characters.
+    it("parses <> as a single blank tape symbol", () => {
+      expect(parseTapeInput("0<>1")).toEqual(["0", DEFAULT_BLANK_SYMBOL, "1"]);
     });
   });
 });
