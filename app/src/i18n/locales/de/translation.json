@@ -66,6 +66,8 @@
     "concept1Desc": "Beide Typen können erstellt werden – der Editor markiert Nichtdeterminismus in Ihrer Übergangstabelle.",
     "concept2": "Grammatik → Automat",
     "concept2Desc": "Fügen Sie eine rechtslineare reguläre Grammatik ein und wandeln Sie sie mit einem Klick in einen NFA um.",
+    "concept3": "Schrittweise Simulation",
+    "concept4": "Stapeltest von Wörtern",
     "comparison": "DFA vs. NFA",
     "dfaSubtitle": "Deterministischer Endlicher Automat",
     "dfaPoint1": "Genau ein Übergang pro (Zustand, Symbol)",
@@ -1337,6 +1339,8 @@
       "startState": "Startzustand",
       "acceptStates": "Akzeptierende Zustände (kommagetrennt)",
       "addEpsilon": "ε-Übergänge hinzufügen",
+      "addState": "Zustand hinzufügen",
+      "removeState": "Zustand {{state}} entfernen",
       "transitionTable": "Übergangstabelle",
       "inputWord": "Eingabewort",
       "inputWordHelp": "Jedes Zeichen wird als ein Eingabesymbol behandelt.",
@@ -1623,6 +1627,7 @@
     "concept2Desc": "Eine reguläre Sprache kann entweder als endliche Wortliste oder per Mengen-Schreibweise wie { a^n c b^m | n, m > 0 } mit Exponenten und unteren Schranken angegeben werden.",
     "concept3": "Wortzugehörigkeit",
     "concept3Desc": "Ob ein Wort in L(G) liegt, entscheidet man durch Simulation des zur Grammatik äquivalenten NFA — akzeptiert genau dann, wenn eine Ableitung das Wort vollständig verarbeitet.",
+    "concept4": "Abschlusseigenschaften",
     "whatYouCanDo": "Was Sie hier tun können",
     "feature1": "Die von einer Grammatik erzeugte Sprache bis zu einer Längenobergrenze aufzählen",
     "feature2": "Eine Grammatik aus einer Wortaufzählung oder einer Mengen-Schreibweise erzeugen",
@@ -1676,6 +1681,20 @@
       "loadExample": "In Simulator laden"
     },
     "examples": {
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammatik → Sprache",
+          "description": "Ausgehend von einer Grammatik ablesen, welche Wörter sie erzeugt."
+        },
+        "languageToGrammar": {
+          "title": "Sprache → Grammatik",
+          "description": "Ausgehend von einer Sprache — einer Wortliste oder einem kompakten Muster — eine passende Grammatik bauen."
+        },
+        "recognizeWord": {
+          "title": "Wörter erkennen",
+          "description": "Entscheiden, ob ein gegebenes Wort zur Sprache einer Grammatik gehört."
+        }
+      },
       "grammarToLanguage": {
         "title": "Grammatik → Sprache",
         "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt.",
@@ -1683,7 +1702,7 @@
         "step1": "Ausgehend vom Startsymbol expandiert die BFS Produktionen und merkt sich jedes akzeptierte Präfix bis zur gewählten Längengrenze. Wörter werden längen-lexikografisch zurückgegeben."
       },
       "languageToGrammar": {
-        "title": "Aufzählung → Grammatik",
+        "title": "Wortliste → Grammatik",
         "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden.",
         "step1Title": "1. Aufzählung erkennen",
         "step1": "Der Mengeninhalt besteht aus komma-getrennten Wörtern (mit oder ohne Anführungszeichen). Jedes Wort wird einzeln verarbeitet.",
@@ -1691,7 +1710,7 @@
         "step2": "Jedes eindeutige Präfix wird zu einem neuen Nichtterminal. Jede Baumkante ergibt eine Produktion A → aB, und jedes Wortende markiert das zugehörige Nichtterminal als ε-produzierend."
       },
       "languageSetBuilder": {
-        "title": "Mengen-Schreibweise L = {a^n c b^m | n, m > 0} → Grammatik",
+        "title": "Muster → Grammatik",
         "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt.",
         "step1Title": "1. Muster und Bedingungen parsen",
         "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
@@ -1703,6 +1722,24 @@
         "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt.",
         "step1Title": "1. Grammatik → NFA → simulieren",
         "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
+      },
+      "lectureGrammar1": {
+        "title": "Vorlesungsbeispiel",
+        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1.",
+        "step1Title": "1. Sprache aufzählen",
+        "step1": "Jede Ableitung verläuft S → 0A → 0…0A → 0…01, jedes Wort ist also eine oder mehrere 0en gefolgt von einer einzelnen 1. Laden Sie sie, um L = {01, 001, 0001, …} aufzuzählen."
+      },
+      "lectureGrammar2": {
+        "title": "Übung 1",
+        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1.",
+        "step1Title": "1. Sprache aufzählen",
+        "step1": "Die ε-Produktionen auf A und B erlauben das Stoppen nach jedem Symbol, während A und B weiter alternieren. Laden Sie sie, um L = {0, 1, 01, 10, 010, 101, 0101, …} aufzuzählen."
+      },
+      "lectureLanguage1": {
+        "title": "Übung 2",
+        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
+        "step1Title": "1. Grammatik ableiten",
+        "step1": "Eine Schleife baut die führenden 0en, eine einzelne Regel konsumiert die 1, und eine abschließende Schleife baut die nachfolgenden 0en. Laden Sie sie, um S → 0S | 0A, A → 1B, B → 0B | 0 abzuleiten."
       }
     },
     "exercises": {
@@ -1803,24 +1840,6 @@
       "confirmYes": "Ja, Lösung anzeigen",
       "confirmNo": "Weiter probieren",
       "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
-    },
-    "lectureBasics": {
-      "sectionTitle": "Grundlagen aus der Vorlesung",
-      "sectionDescription": "Einführende Beispiele aus der Vorlesung. Probieren Sie jede Aufgabe und blenden Sie dann die Lösung ein.",
-      "showSolution": "Lösung anzeigen",
-      "hideSolution": "Lösung ausblenden",
-      "task1": {
-        "title": "Vorlesungsbeispiel",
-        "note": "Wörter, die mit mindestens einer 0 beginnen und mit genau einer 1 enden."
-      },
-      "task2": {
-        "title": "Übung 1",
-        "note": "Strikt alternierende 0en und 1en, beginnend mit 0 oder 1, Mindestlänge 1."
-      },
-      "task3": {
-        "title": "Übung 2",
-        "note": "Mindestens eine 0, genau eine 1, mindestens eine 0."
-      }
     }
   }
 }
