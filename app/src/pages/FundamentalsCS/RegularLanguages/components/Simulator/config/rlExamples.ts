@@ -1,10 +1,23 @@
 import type { SimulationMode } from "../domain/rlTypes";
 
+/**
+ * The example sections shown on the Regular Languages examples page. They mirror
+ * the exercise categories so both tabs read the same way: each category is one
+ * task the learner can practise. Both language → grammar examples (an explicit
+ * word list and a compact pattern) live under `languageToGrammar`.
+ */
+export type RLExampleCategory =
+  | "grammarToLanguage"
+  | "languageToGrammar"
+  | "recognizeWord";
+
 export interface RLExample {
   id: string;
   titleKey: string;
   descriptionKey: string;
   mode: SimulationMode;
+  /** Which on-page section this example belongs to. */
+  category: RLExampleCategory;
   grammarSource?: string;
   languageSource?: string;
   testWord?: string;
@@ -16,6 +29,7 @@ export const exampleGrammarToLanguage: RLExample = {
   titleKey: "rl.examples.grammarToLanguage.title",
   descriptionKey: "rl.examples.grammarToLanguage.description",
   mode: "grammarToLanguage",
+  category: "grammarToLanguage",
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
   steps: [
     {
@@ -30,6 +44,7 @@ export const exampleLanguageToGrammar: RLExample = {
   titleKey: "rl.examples.languageToGrammar.title",
   descriptionKey: "rl.examples.languageToGrammar.description",
   mode: "languageToGrammar",
+  category: "languageToGrammar",
   languageSource: 'L = {"ab", "abb", "abbb"}',
   steps: [
     {
@@ -48,6 +63,7 @@ export const exampleLanguageSetBuilder: RLExample = {
   titleKey: "rl.examples.languageSetBuilder.title",
   descriptionKey: "rl.examples.languageSetBuilder.description",
   mode: "languageToGrammar",
+  category: "languageToGrammar",
   languageSource: "L = {a^n c b^m | n, m > 0}",
   steps: [
     {
@@ -66,6 +82,7 @@ export const exampleRecognizeWord: RLExample = {
   titleKey: "rl.examples.recognizeWord.title",
   descriptionKey: "rl.examples.recognizeWord.description",
   mode: "recognizeWord",
+  category: "recognizeWord",
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
   testWord: "001",
   steps: [
@@ -76,9 +93,85 @@ export const exampleRecognizeWord: RLExample = {
   ],
 };
 
+/**
+ * Introductory worked examples that used to live in the separate "Lecture
+ * Basics" section. They now share the categorised example style: load the given
+ * grammar/language into the simulator to reveal the worked result.
+ */
+export const exampleLectureGrammar1: RLExample = {
+  id: "lecture-g2l-1",
+  titleKey: "rl.examples.lectureGrammar1.title",
+  descriptionKey: "rl.examples.lectureGrammar1.description",
+  mode: "grammarToLanguage",
+  category: "grammarToLanguage",
+  grammarSource: ["S -> 0A", "A -> 0A | 1"].join("\n"),
+  steps: [
+    {
+      titleKey: "rl.examples.lectureGrammar1.step1Title",
+      contentKey: "rl.examples.lectureGrammar1.step1",
+    },
+  ],
+};
+
+export const exampleLectureGrammar2: RLExample = {
+  id: "lecture-g2l-2",
+  titleKey: "rl.examples.lectureGrammar2.title",
+  descriptionKey: "rl.examples.lectureGrammar2.description",
+  mode: "grammarToLanguage",
+  category: "grammarToLanguage",
+  grammarSource: ["S -> 0A | 1B", "A -> 1B | ε", "B -> 0A | ε"].join("\n"),
+  steps: [
+    {
+      titleKey: "rl.examples.lectureGrammar2.step1Title",
+      contentKey: "rl.examples.lectureGrammar2.step1",
+    },
+  ],
+};
+
+export const exampleLectureLanguage1: RLExample = {
+  id: "lecture-l2g-1",
+  titleKey: "rl.examples.lectureLanguage1.title",
+  descriptionKey: "rl.examples.lectureLanguage1.description",
+  mode: "languageToGrammar",
+  category: "languageToGrammar",
+  languageSource: 'L = {"010", "0010", "00100", "00010", "000100"}',
+  steps: [
+    {
+      titleKey: "rl.examples.lectureLanguage1.step1Title",
+      contentKey: "rl.examples.lectureLanguage1.step1",
+    },
+  ],
+};
+
 export const rlExamples: RLExample[] = [
   exampleGrammarToLanguage,
+  exampleLectureGrammar1,
+  exampleLectureGrammar2,
   exampleLanguageToGrammar,
   exampleLanguageSetBuilder,
+  exampleLectureLanguage1,
   exampleRecognizeWord,
+];
+
+/** Section order + heading/description keys used by the examples tab. */
+export const rlExampleCategories: {
+  category: RLExampleCategory;
+  titleKey: string;
+  descriptionKey: string;
+}[] = [
+  {
+    category: "grammarToLanguage",
+    titleKey: "rl.examples.categories.grammarToLanguage.title",
+    descriptionKey: "rl.examples.categories.grammarToLanguage.description",
+  },
+  {
+    category: "languageToGrammar",
+    titleKey: "rl.examples.categories.languageToGrammar.title",
+    descriptionKey: "rl.examples.categories.languageToGrammar.description",
+  },
+  {
+    category: "recognizeWord",
+    titleKey: "rl.examples.categories.recognizeWord.title",
+    descriptionKey: "rl.examples.categories.recognizeWord.description",
+  },
 ];

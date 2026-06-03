@@ -5,9 +5,12 @@ import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { Example } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
-import { rlExamples, type RLExample } from "./Simulator/config/rlExamples";
+import {
+  rlExamples,
+  rlExampleCategories,
+  type RLExample,
+} from "./Simulator/config/rlExamples";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
-import { RLLectureBasics } from "./RLLectureBasics";
 
 export function ExamplesTab({
   selectedExample,
@@ -55,26 +58,42 @@ export function ExamplesTab({
         </div>
       </div>
 
-      <div className="space-y-3">
-        {rlExamples.map((example) => {
-          const topicExample = toTopicExample(example, t);
+      <div className="space-y-8">
+        {rlExampleCategories.map(({ category, titleKey, descriptionKey }) => {
+          const examples = rlExamples.filter((e) => e.category === category);
+          if (examples.length === 0) return null;
 
           return (
-            <ExampleCard
-              key={example.id}
-              example={example}
-              topicExample={topicExample}
-              isExpanded={expandedId === example.id}
-              isSelected={selectedExample?.id === topicExample.id}
-              onToggle={() => toggle(example.id)}
-              onSelect={() => onSelectExample(topicExample)}
-              onLoad={handleLoad}
-            />
+            <section key={category}>
+              <h4 className="text-foreground text-base font-bold">
+                {t(titleKey as TranslationKey)}
+              </h4>
+              <p className="text-muted-foreground mt-1 mb-3 text-sm">
+                {t(descriptionKey as TranslationKey)}
+              </p>
+
+              <div className="space-y-3">
+                {examples.map((example) => {
+                  const topicExample = toTopicExample(example, t);
+
+                  return (
+                    <ExampleCard
+                      key={example.id}
+                      example={example}
+                      topicExample={topicExample}
+                      isExpanded={expandedId === example.id}
+                      isSelected={selectedExample?.id === topicExample.id}
+                      onToggle={() => toggle(example.id)}
+                      onSelect={() => onSelectExample(topicExample)}
+                      onLoad={handleLoad}
+                    />
+                  );
+                })}
+              </div>
+            </section>
           );
         })}
       </div>
-
-      <RLLectureBasics />
     </div>
   );
 }
