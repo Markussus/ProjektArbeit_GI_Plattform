@@ -22,7 +22,9 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
   "A -> 0A | 1",
 ].join("\n");
 
-export function RLGrammarToLanguage({ initialGrammar }: RLGrammarToLanguageProps) {
+export function RLGrammarToLanguage({
+  initialGrammar,
+}: RLGrammarToLanguageProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
   const [maxLen, setMaxLen] = useState(6);
@@ -115,7 +117,9 @@ export function RLGrammarToLanguage({ initialGrammar }: RLGrammarToLanguageProps
               max={12}
               value={maxLen}
               onChange={(e) =>
-                setMaxLen(Math.max(0, Math.min(12, Number(e.target.value) || 0)))
+                setMaxLen(
+                  Math.max(0, Math.min(12, Number(e.target.value) || 0)),
+                )
               }
               className="border-input bg-background w-full rounded-md border px-2 py-1 font-mono text-sm"
             />

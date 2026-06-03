@@ -770,7 +770,8 @@
       "moore": "The Moore & Mealy simulator will be available here.",
       "dnf": "The DNF builder / truth table generator will be available here.",
       "encoding": "The Encoding simulator will be available here.",
-      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
+      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor.",
+      "regularLanguages": "The Regular Languages playground will be available here."
     }
   },
   "simulator": {

@@ -41,10 +41,14 @@ export function RLSimulator() {
       <RLModeSelector mode={mode} onChange={setMode} />
 
       {mode === "grammarToLanguage" && (
-        <RLGrammarToLanguage initialGrammar={pendingGrammarSource ?? undefined} />
+        <RLGrammarToLanguage
+          initialGrammar={pendingGrammarSource ?? undefined}
+        />
       )}
       {mode === "languageToGrammar" && (
-        <RLLanguageToGrammar initialSource={pendingLanguageSource ?? undefined} />
+        <RLLanguageToGrammar
+          initialSource={pendingLanguageSource ?? undefined}
+        />
       )}
       {mode === "recognizeWord" && (
         <RLWordRecognizer

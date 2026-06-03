@@ -1,11 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  BookOpen,
-  ChevronDown,
-  ChevronRight,
-  Play,
-} from "lucide-react";
+import { BookOpen, ChevronDown, ChevronRight, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { Example } from "@/types/exercise";

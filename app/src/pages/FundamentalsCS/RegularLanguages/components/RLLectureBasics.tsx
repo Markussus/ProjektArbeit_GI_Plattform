@@ -96,7 +96,9 @@ function LectureCard({ example }: { example: RLLectureExample }) {
         <NotationBlock
           label={t("rl.exercises.solution", "Solution")}
           text={example.solution}
-          note={example.solutionNoteKey ? t(example.solutionNoteKey) : undefined}
+          note={
+            example.solutionNoteKey ? t(example.solutionNoteKey) : undefined
+          }
         />
       )}
     </div>

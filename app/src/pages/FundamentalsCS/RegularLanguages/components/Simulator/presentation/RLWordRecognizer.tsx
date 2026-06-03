@@ -42,8 +42,7 @@ export function RLWordRecognizer({
   }
 
   const evaluation = useMemo<
-    | { ok: false }
-    | { ok: true; results: PerWordResult[] }
+    { ok: false } | { ok: true; results: PerWordResult[] }
   >(() => {
     const parsed = parseGrammar(source);
     if (!parsed.ok || !parsed.grammar) return { ok: false };

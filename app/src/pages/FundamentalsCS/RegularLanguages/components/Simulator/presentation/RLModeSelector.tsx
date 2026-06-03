@@ -1,10 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  Eye,
-  FileText,
-  ListOrdered,
-  type LucideIcon,
-} from "lucide-react";
+import { Eye, FileText, ListOrdered, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SimulationMode } from "../domain/rlTypes";
 

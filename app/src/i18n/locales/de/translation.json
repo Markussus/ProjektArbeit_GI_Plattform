@@ -766,7 +766,8 @@
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
       "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
       "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
-      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
+      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor.",
+      "regularLanguages": "Der Reguläre-Sprachen-Spielplatz wird hier verfügbar sein."
     }
   },
   "simulator": {

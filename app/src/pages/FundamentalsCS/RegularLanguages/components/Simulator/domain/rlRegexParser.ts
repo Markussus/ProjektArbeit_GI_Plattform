@@ -65,7 +65,14 @@ export function parseRegex(source: string): ParseRegexResult {
       if (next === "e") return { kind: "epsilon" };
       return { kind: "symbol", value: next };
     }
-    if (c === "" || c === ")" || c === "|" || c === "*" || c === "+" || c === "?") {
+    if (
+      c === "" ||
+      c === ")" ||
+      c === "|" ||
+      c === "*" ||
+      c === "+" ||
+      c === "?"
+    ) {
       throw new Error(`Unexpected '${c || "end of input"}' at position ${i}.`);
     }
     consume();
@@ -81,7 +88,11 @@ export function parseRegex(source: string): ParseRegexResult {
         node = { kind: "star", child: node };
       } else if (c === "+") {
         consume();
-        node = { kind: "concat", left: node, right: { kind: "star", child: node } };
+        node = {
+          kind: "concat",
+          left: node,
+          right: { kind: "star", child: node },
+        };
       } else if (c === "?") {
         consume();
         node = { kind: "union", left: node, right: { kind: "epsilon" } };
@@ -116,7 +127,10 @@ export function parseRegex(source: string): ParseRegexResult {
   try {
     const ast = parseUnion();
     if (i < trimmed.length) {
-      return { ok: false, error: `Unexpected character '${peek()}' at position ${i}.` };
+      return {
+        ok: false,
+        error: `Unexpected character '${peek()}' at position ${i}.`,
+      };
     }
     return { ok: true, ast };
   } catch (e) {

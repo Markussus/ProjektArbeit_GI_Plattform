@@ -13,7 +13,10 @@ interface NFA {
   transitions: Map<string, Map<string, Set<string>>>;
 }
 
-function freshNFA(prefix: { value: number }): { start: string; accept: string } {
+function freshNFA(prefix: { value: number }): {
+  start: string;
+  accept: string;
+} {
   const start = `q${prefix.value++}`;
   const accept = `q${prefix.value++}`;
   return { start, accept };

@@ -77,7 +77,10 @@ export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
 
   const barIdx = findTopLevelBar(body);
   if (barIdx >= 0) {
-    return parseSetBuilderBody(body.slice(0, barIdx).trim(), body.slice(barIdx + 1).trim());
+    return parseSetBuilderBody(
+      body.slice(0, barIdx).trim(),
+      body.slice(barIdx + 1).trim(),
+    );
   }
   return parseEnumerationBody(body);
 }
@@ -395,7 +398,8 @@ function parsePattern(
 
 function isSymbolChar(c: string): boolean {
   // A terminal symbol is any printable single char that's not a special token.
-  if (c === "(" || c === ")" || c === "^" || c === "|" || c === ",") return false;
+  if (c === "(" || c === ")" || c === "^" || c === "|" || c === ",")
+    return false;
   return /^[\S]$/.test(c);
 }
 
@@ -503,7 +507,7 @@ function computeLowerBound(text: string): number {
         `Expected ℕ (or N) after '${t}', got '${next ?? "end of input"}'.`,
       );
     }
-    if (t === ">" || t === ">=" || t === "≥" || t === "=" ) {
+    if (t === ">" || t === ">=" || t === "≥" || t === "=") {
       const numStr = tokens[i + 1];
       if (numStr === undefined || !/^\d+$/.test(numStr)) {
         throw new Error(`Expected an integer after '${t}'.`);

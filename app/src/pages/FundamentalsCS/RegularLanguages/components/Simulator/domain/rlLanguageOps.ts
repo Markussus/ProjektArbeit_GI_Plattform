@@ -90,7 +90,8 @@ function simulateFA(
     accepted,
     reason: accepted
       ? `Halted in accepting state(s): ${reachedStates}`
-      : runtime.haltReason?.type === "rejected" && runtime.activeStates.length === 0
+      : runtime.haltReason?.type === "rejected" &&
+          runtime.activeStates.length === 0
         ? "No transition for the next symbol — rejected."
         : `Halted in non-accepting state(s): ${reachedStates}`,
   };

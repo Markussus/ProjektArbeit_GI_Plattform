@@ -6,18 +6,14 @@ import {
   parseLanguageSpec,
   type LanguageSpec,
 } from "../domain/rlLanguageSpecParser";
-import {
-  formatGrammar,
-  setBuilderToGrammar,
-} from "../domain/rlRegexToGrammar";
+import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
 import { languageToGrammar } from "../domain/rlLanguageOps";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
 }
 
-const DEFAULT_SOURCE =
-  'L = {"010", "0010", "00100", "00010", "000100", ..}';
+const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", "00010", "000100", ..}';
 
 // Documents the language definition syntax in the "Supported Formats" panel.
 const LANGUAGE_ENUMERATION_EXAMPLE = 'L = {"010", "0010", "00100", ..}';
@@ -34,7 +30,9 @@ type ConversionResult =
       grammarText: string;
     };
 
-export function RLLanguageToGrammar({ initialSource }: RLLanguageToGrammarProps) {
+export function RLLanguageToGrammar({
+  initialSource,
+}: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
   const [showFormats, setShowFormats] = useState(false);
@@ -181,5 +179,3 @@ export function RLLanguageToGrammar({ initialSource }: RLLanguageToGrammarProps)
     </div>
   );
 }
-
-

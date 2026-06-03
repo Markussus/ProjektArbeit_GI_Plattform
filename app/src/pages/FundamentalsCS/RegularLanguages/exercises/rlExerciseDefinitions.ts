@@ -1,9 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { Code, FileText, ListOrdered } from "lucide-react";
-import type {
-  ExerciseDefinition,
-  ExerciseDifficulty,
-} from "@/types/exercise";
+import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { SimulationMode } from "../components/Simulator/domain/rlTypes";
 
