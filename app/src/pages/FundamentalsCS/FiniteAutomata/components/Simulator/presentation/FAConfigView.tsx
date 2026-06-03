@@ -152,8 +152,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           </select>
         </div>
 
-        {/* Accept States */}
-        <div className="flex flex-col gap-1 sm:col-span-2">
+        {/* Accept States — sits beside Start State so the 2×2 grid has no
+            empty cell. */}
+        <div className="flex flex-col gap-1">
           <label className={labelClass}>
             {t("fa.config.acceptStates", "Accept States (comma-separated)")}
           </label>
