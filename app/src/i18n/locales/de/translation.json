@@ -981,6 +981,28 @@
         "hint1": "Sie benötigen nur drei Zustände — einen pro möglichem Rest (0, 1, 2).",
         "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
         "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
+      },
+      "grammarOnes": {
+        "title": "Automat aus Grammatik: 1 0ⁿ 1",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "Erstellen Sie einen Zustand pro Nichtterminal (START, A, B) plus einen Fehlerzustand für ungültige Eingaben.",
+        "hint2": "ε bei B bedeutet, dass B akzeptierend ist; leiten Sie jeden undefinierten Übergang in den Fehlerzustand."
+      },
+      "grammar0011": {
+        "title": "Automat aus Grammatik: (0011)⁺",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "Verketten Sie einen Zustand pro Nichtterminal: START→A→B→C→D entlang der Symbole 0,0,1,1.",
+        "hint2": "D = \"0\",A springt zurück, um einen weiteren 0011-Block zu lesen, also führt D's 0-Übergang zurück nach A.",
+        "hint3": "ε bei D macht D zum akzeptierenden Zustand; jedes unerwartete Symbol führt in den Fehlerzustand."
+      },
+      "grammarOnesZero": {
+        "title": "Automat aus Grammatik: 1ⁿ 0",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "A = \"1\",A ist eine Schleife auf 1; A = \"0\",B verlässt sie bei einer 0 zum akzeptierenden Zustand B.",
+        "hint2": "B ist akzeptierend (ε); jede Eingabe in B führt in den Fehlerzustand."
       }
     },
     "exerciseWorkspace": {
@@ -1013,7 +1035,13 @@
       "exampleAccept": "Akzeptiert",
       "exampleReject": "Abgelehnt",
       "unbuiltTitle": "Bau zuerst deinen Automaten",
-      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'."
+      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'.",
+      "grammarLabel": "Grammatik",
+      "grammarEpsilonNote": "ε steht für das leere Wort und kennzeichnet einen akzeptierenden (End-)Zustand."
+    },
+    "grammarToAutomaton": {
+      "sectionTitle": "Konstruktion eines endlichen Automaten aus einer regulären Grammatik",
+      "sectionDescription": "Jede rechtslineare Grammatik definiert eine Sprache. Öffnen Sie eine Übung, um den DFA im Simulator zu bauen — nutzen Sie die Hinweise und blenden Sie bei Bedarf den Referenzautomaten zur Kontrolle ein."
     },
     "examples": {
       "endsWith01": {

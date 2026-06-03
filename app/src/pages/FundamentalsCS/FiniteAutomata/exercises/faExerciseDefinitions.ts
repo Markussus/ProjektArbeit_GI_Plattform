@@ -1,5 +1,14 @@
 import type { LucideIcon } from "lucide-react";
-import { Binary, Flag, Hash, Sigma, Target } from "lucide-react";
+import {
+  Binary,
+  Flag,
+  Hash,
+  Sigma,
+  Spline,
+  Target,
+  Waypoints,
+  Workflow,
+} from "lucide-react";
 import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
@@ -13,6 +22,12 @@ export interface FAExerciseDefinition extends ExerciseDefinition {
   difficulty: ExerciseDifficulty;
   icon: LucideIcon;
   alphabet: string[];
+  /**
+   * Optional regular grammar shown as a monospaced prompt in the workspace
+   * panel — used by "construct an automaton from a grammar" exercises. Use "ε"
+   * for the empty word.
+   */
+  grammar?: string;
   /** The reference automaton that defines the target language. */
   solution: FAProgram;
   /** Hints in order of increasing specificity. */
@@ -232,6 +247,139 @@ export const faExercises: FAExerciseDefinition[] = [
   },
 ];
 
+/* ════════════════════════════════════════════════════════════
+   Constructing a finite automaton from a regular grammar
+   ════════════════════════════════════════════════════════════ */
+
+// L = 1 0ⁿ 1 (n ≥ 0): a 1, any number of 0s, a closing 1.
+const grammarOnesSolution: FAProgram = {
+  type: "DFA",
+  states: ["S0", "S1", "S2", "E"],
+  alphabet: ["0", "1"],
+  transitions: {
+    S0: { "0": ["E"], "1": ["S1"] },
+    S1: { "0": ["S1"], "1": ["S2"] },
+    S2: { "0": ["E"], "1": ["E"] },
+    E: { "0": ["E"], "1": ["E"] },
+  },
+  startState: "S0",
+  acceptStates: ["S2"],
+};
+
+// L = (0011)⁺: one or more repetitions of the block 0011.
+const grammar0011Solution: FAProgram = {
+  type: "DFA",
+  states: ["S0", "S1", "S2", "S3", "S4", "E"],
+  alphabet: ["0", "1"],
+  transitions: {
+    S0: { "0": ["S1"], "1": ["E"] },
+    S1: { "0": ["S2"], "1": ["E"] },
+    S2: { "0": ["E"], "1": ["S3"] },
+    S3: { "0": ["E"], "1": ["S4"] },
+    S4: { "0": ["S1"], "1": ["E"] },
+    E: { "0": ["E"], "1": ["E"] },
+  },
+  startState: "S0",
+  acceptStates: ["S4"],
+};
+
+// L = 1ⁿ 0 (n ≥ 1): one or more 1s followed by a single 0.
+const grammarOnesZeroSolution: FAProgram = {
+  type: "DFA",
+  states: ["S0", "S1", "S2", "E"],
+  alphabet: ["0", "1"],
+  transitions: {
+    S0: { "0": ["E"], "1": ["S1"] },
+    S1: { "0": ["S2"], "1": ["S1"] },
+    S2: { "0": ["E"], "1": ["E"] },
+    E: { "0": ["E"], "1": ["E"] },
+  },
+  startState: "S0",
+  acceptStates: ["S2"],
+};
+
+/**
+ * "Construct a DFA from a regular grammar" exercises. They share the FA
+ * exercise machinery (workspace panel, hints, Show solution loads the
+ * reference automaton) but additionally carry a `grammar` prompt.
+ */
+export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
+  {
+    id: "g2a-ones",
+    titleKey: "fa.exercisesTab.grammarOnes.title",
+    goalKey: "fa.exercisesTab.grammarOnes.goal",
+    descriptionKey: "fa.exercisesTab.grammarOnes.description",
+    difficulty: "medium",
+    icon: Workflow,
+    alphabet: ["0", "1"],
+    grammar: ['START = "1", A;', 'A = "0", A | "1", B;', "B = ε;"].join("\n"),
+    solution: grammarOnesSolution,
+    hintKeys: [
+      "fa.exercisesTab.grammarOnes.hint1",
+      "fa.exercisesTab.grammarOnes.hint2",
+    ],
+    starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["11", "101", "1001", "10001"],
+      reject: ["1", "0", "10", "111", "01"],
+    },
+  },
+  {
+    id: "g2a-0011",
+    titleKey: "fa.exercisesTab.grammar0011.title",
+    goalKey: "fa.exercisesTab.grammar0011.goal",
+    descriptionKey: "fa.exercisesTab.grammar0011.description",
+    difficulty: "hard",
+    icon: Waypoints,
+    alphabet: ["0", "1"],
+    grammar: [
+      'START = "0", A;',
+      'A = "0", B;',
+      'B = "1", C;',
+      'C = "1", D;',
+      'D = "0", A | ε;',
+    ].join("\n"),
+    solution: grammar0011Solution,
+    hintKeys: [
+      "fa.exercisesTab.grammar0011.hint1",
+      "fa.exercisesTab.grammar0011.hint2",
+      "fa.exercisesTab.grammar0011.hint3",
+    ],
+    starter: emptyStarter(["0", "1"]),
+    maxTestLen: 8,
+    exampleWords: {
+      accept: ["0011", "00110011"],
+      reject: ["", "0", "001", "00110", "01"],
+    },
+  },
+  {
+    id: "g2a-ones-zero",
+    titleKey: "fa.exercisesTab.grammarOnesZero.title",
+    goalKey: "fa.exercisesTab.grammarOnesZero.goal",
+    descriptionKey: "fa.exercisesTab.grammarOnesZero.description",
+    difficulty: "medium",
+    icon: Spline,
+    alphabet: ["0", "1"],
+    grammar: ['START = "1", A;', 'A = "1", A | "0", B;', "B = ε;"].join("\n"),
+    solution: grammarOnesZeroSolution,
+    hintKeys: [
+      "fa.exercisesTab.grammarOnesZero.hint1",
+      "fa.exercisesTab.grammarOnesZero.hint2",
+    ],
+    starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["10", "110", "1110"],
+      reject: ["1", "0", "01", "100", "11"],
+    },
+  },
+];
+
+/** Every FA exercise, regardless of which section renders it. */
+export const allFAExercises: FAExerciseDefinition[] = [
+  ...faExercises,
+  ...faGrammarToAutomatonExercises,
+];
+
 export function findFAExercise(id: string): FAExerciseDefinition | undefined {
-  return faExercises.find((e) => e.id === id || e.titleKey === id);
+  return allFAExercises.find((e) => e.id === id || e.titleKey === id);
 }
