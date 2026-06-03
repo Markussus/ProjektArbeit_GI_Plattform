@@ -417,7 +417,8 @@
       "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
       "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
-      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
+      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor.",
+      "regularLanguages": "Der Reguläre-Sprachen-Spielplatz wird hier verfügbar sein."
     }
   },
   "simulator": {
@@ -1186,6 +1187,218 @@
       "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
       "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
       "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+    }
+  },
+  "rl": {
+    "title": "Reguläre Sprachen",
+    "description": "Arbeiten Sie mit regulären Sprachen und ihren rechtslinearen Grammatiken — zählen Sie die Wörter einer Grammatik auf, leiten Sie eine Grammatik aus einer Sprachdefinition ab und prüfen Sie Wortzugehörigkeit.",
+    "overviewTitle": "Was sind reguläre Sprachen?",
+    "overviewText": "Eine reguläre Sprache ist eine Menge von Wörtern, die sich durch eine reguläre Grammatik oder einen endlichen Automaten beschreiben lässt. Hier liegt der Fokus auf der rechtslinearen (Typ-3-)Grammatik.",
+    "concepts": "Kernkonzepte",
+    "concept1": "Rechtslineare Grammatiken",
+    "concept1Desc": "Eine rechtslineare (Typ-3-)Grammatik hat Regeln der Form A → aB oder A → a (optional A → ε). Das macht sie äquivalent zu NFAs.",
+    "concept2": "Aufzählung vs. Mengen-Schreibweise",
+    "concept2Desc": "Eine reguläre Sprache kann entweder als endliche Wortliste oder per Mengen-Schreibweise wie { a^n c b^m | n, m > 0 } mit Exponenten und unteren Schranken angegeben werden.",
+    "concept3": "Wortzugehörigkeit",
+    "concept3Desc": "Ob ein Wort in L(G) liegt, entscheidet man durch Simulation des zur Grammatik äquivalenten NFA — akzeptiert genau dann, wenn eine Ableitung das Wort vollständig verarbeitet.",
+    "whatYouCanDo": "Was Sie hier tun können",
+    "feature1": "Die von einer Grammatik erzeugte Sprache bis zu einer Längenobergrenze aufzählen",
+    "feature2": "Eine Grammatik aus einer Wortaufzählung oder einer Mengen-Schreibweise erzeugen",
+    "feature3": "Prüfen, ob ein Wort in der von der Grammatik erzeugten Sprache liegt",
+    "simulator": {
+      "modes": {
+        "grammarToLanguage": "Grammatik → Sprache",
+        "languageToGrammar": "Sprache → Grammatik",
+        "recognizeWord": "Wort erkennen"
+      },
+      "grammarInput": "Grammatik",
+      "grammarOutput": "Ergebnis-Grammatik",
+      "grammarHelp": "Eine Produktion pro Zeile, z. B. 'S -> 0S | 1A'. ε (oder das Wort 'epsilon') steht für das leere Wort.",
+      "grammarInvalid": "Geben Sie eine gültige rechtslineare Grammatik ein.",
+      "languageOutput": "Aufzählung der Sprache",
+      "maxLen": "Maximale Wortlänge",
+      "maxWords": "Maximale Wortanzahl",
+      "noWords": "Innerhalb der Grenzen sind keine Wörter ableitbar.",
+      "truncatedNote": "Ausgabe wurde durch die Wortanzahl-Begrenzung gekürzt. Erhöhen Sie die Grenze, um mehr zu sehen.",
+      "completeNote": "Alle ableitbaren Wörter bis zur gewählten Länge werden angezeigt.",
+      "wordsInput": "Wörter der Sprache",
+      "wordPlaceholder": "Wort eingeben und Enter drücken",
+      "addWord": "Hinzufügen",
+      "removeWord": "Wort entfernen",
+      "noWordsAdded": "Fügen Sie mindestens ein Wort hinzu — leere Eingabe entspricht ε.",
+      "languageToGrammarHelp": "Eine rechtslineare Grammatik wird aus einem Präfixbaum über den Wörtern gebildet. Sie leitet mindestens die genannten Wörter ab, generalisiert aber nicht darüber hinaus.",
+      "languageDefinition": "Sprachdefinition",
+      "languageDefinitionHelp": "Akzeptiert sowohl eine Aufzählung wie L = {\"010\", \"0010\"} als auch eine Mengen-Schreibweise wie L = {a^n c b^m | n, m > 0}. Verwenden Sie ^ für Exponenten, einzelne Buchstaben als Variablen und ∈ ℕ / >= / > für Bedingungen.",
+      "languageInvalid": "Geben Sie eine gültige Sprachdefinition ein, um eine Grammatik abzuleiten.",
+      "detectedEnumeration": "Erkannt: Aufzählung",
+      "detectedSetBuilder": "Erkannt: Mengen-Schreibweise",
+      "pattern": "Muster:",
+      "variables": "Variablen:",
+      "emptyLanguage": "Leere Sprache (keine Wörter).",
+      "preset": {
+        "enumeration": "Aufzählung",
+        "aStarcBStar": "a^n c b^m",
+        "aStar": "a^n",
+        "abGroup": "(ab)^n"
+      },
+      "testWord": "Zu testendes Wort",
+      "testWordPlaceholder": "Leer = ε",
+      "testWordHelp": "Jedes Zeichen wird als Terminalsymbol behandelt. Die Grammatik wird auf das Wort simuliert.",
+      "accepted": "AKZEPTIERT — die Grammatik leitet dieses Wort ab.",
+      "rejected": "ABGELEHNT — die Grammatik leitet dieses Wort nicht ab.",
+      "emptyOutput": "—"
+    },
+    "examplesTab": {
+      "title": "Vorgefertigte Beispiele",
+      "subtitle": "Arbeiten Sie ausgearbeitete Beispiele zwischen Grammatik und Sprache durch.",
+      "loadExample": "In Simulator laden"
+    },
+    "examples": {
+      "grammarToLanguage": {
+        "title": "Grammatik → Sprache",
+        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt.",
+        "step1Title": "1. BFS über Ableitungen",
+        "step1": "Ausgehend vom Startsymbol expandiert die BFS Produktionen und merkt sich jedes akzeptierte Präfix bis zur gewählten Längengrenze. Wörter werden längen-lexikografisch zurückgegeben."
+      },
+      "languageToGrammar": {
+        "title": "Aufzählung → Grammatik",
+        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden.",
+        "step1Title": "1. Aufzählung erkennen",
+        "step1": "Der Mengeninhalt besteht aus komma-getrennten Wörtern (mit oder ohne Anführungszeichen). Jedes Wort wird einzeln verarbeitet.",
+        "step2Title": "2. Präfixbaum bauen",
+        "step2": "Jedes eindeutige Präfix wird zu einem neuen Nichtterminal. Jede Baumkante ergibt eine Produktion A → aB, und jedes Wortende markiert das zugehörige Nichtterminal als ε-produzierend."
+      },
+      "languageSetBuilder": {
+        "title": "Mengen-Schreibweise L = {a^n c b^m | n, m > 0} → Grammatik",
+        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt.",
+        "step1Title": "1. Muster und Bedingungen parsen",
+        "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
+        "step2Title": "2. Grammatik aufbauen",
+        "step2": "Jeder Faktor liefert seinen eigenen Block an Produktionen: a^0 ergibt eine Sternschleife, a^≥1 ein erzwungenes erstes Symbol plus Schleife, a^k k feste Produktionen. Die Blöcke werden so verkettet, dass das Startsymbol das ganze Wort ableitet."
+      },
+      "recognizeWord": {
+        "title": "Wort erkennen",
+        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt.",
+        "step1Title": "1. Grammatik → NFA → simulieren",
+        "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
+      }
+    },
+    "exercises": {
+      "givenGrammar": "Gegebene Grammatik",
+      "targetLanguage": "Zielsprache",
+      "solution": "Lösung",
+      "epsilonHint": "ε steht für das leere Wort.",
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammatik → Sprache",
+          "description": "Lesen Sie die Produktionsregeln und ermitteln Sie, welche Wörter die Grammatik erzeugt."
+        },
+        "languageToGrammar": {
+          "title": "Sprache → Grammatik",
+          "description": "Schreiben Sie eine reguläre Grammatik, deren Regeln genau die gegebenen Wörter erzeugen."
+        },
+        "applied": {
+          "title": "Angewandte Grammatiken",
+          "description": "Modellieren Sie reale Token-Formate wie Ganzzahlen und Bezeichner als reguläre Grammatiken."
+        }
+      },
+      "g2lFiniteBinary": {
+        "title": "Drei-Bit-Wörter",
+        "description": "Zählen Sie jedes Wort auf, das diese Grammatik ableiten kann.",
+        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf.",
+        "hint1": "Jede Ableitung lautet START → 1A → 1xB → 1xy, jedes Wort hat also genau drei Symbole.",
+        "hint2": "A und B bieten je 0 oder 1 — das ergibt 2 × 2 = 4 Wörter, alle mit 1 beginnend."
+      },
+      "g2lTrailingZero": {
+        "title": "Einsen zwischen Nullen",
+        "description": "Bestimmen Sie die von dieser Grammatik erzeugte Sprache.",
+        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter.",
+        "hint1": "A → 1A wiederholt sich und fügt 1en an; beenden lässt sich nur über A → 0B → 00.",
+        "hint2": "Jedes Wort ist also eine führende 0, dann beliebig viele 1en, dann 00."
+      },
+      "g2lEpsilonLoop": {
+        "title": "Rekursion mit ε",
+        "description": "Listen Sie die ableitbaren Wörter auf, wenn B auch das leere Wort erzeugen darf.",
+        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B.",
+        "hint1": "B → ε lässt eine Ableitung direkt nach einer 1 enden; B → 0A führt zurück nach A.",
+        "hint2": "Wörter beginnen mit 0 und wechseln zwischen 0- und 1-Blöcken — verfolgen Sie jeden A/B-Wechsel."
+      },
+      "g2lGrouped": {
+        "title": "Gruppierte Alternativen",
+        "description": "Lösen Sie die gruppierten Regeln auf und zählen Sie die erzeugte Sprache auf.",
+        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf.",
+        "hint1": "Die Klammern dienen nur der Gruppierung: A = \"0\",A | \"1\",B und B = \"1\",B | \"0\".",
+        "hint2": "A fügt führende 0en hinzu; B fügt 1en hinzu und muss mit einer einzelnen 0 enden."
+      },
+      "l2gZeroOnesZero": {
+        "title": "Eine 0, einige 1en, eine 0",
+        "description": "Finden Sie eine reguläre Grammatik, die genau diese Wörter erzeugt.",
+        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen.",
+        "hint1": "Jedes Wort ist eine 0, dann eine oder mehrere 1en, dann eine abschließende 0.",
+        "hint2": "Nutzen Sie einen Zustand, der auf 1 schleift (B → \"1\",B) und bei der letzten 0 endet."
+      },
+      "l2gFourWords": {
+        "title": "Vier feste Wörter",
+        "description": "Schreiben Sie eine Grammatik, die genau diese endliche Sprache ableitet.",
+        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst.",
+        "hint1": "Alle vier Wörter teilen die Endung 11; nur die ersten beiden Bits variieren.",
+        "hint2": "Lassen Sie START und A frei auf 0/1, erzwingen Sie dann B → \"1\",C und C → \"1\"."
+      },
+      "l2gNestedZeros": {
+        "title": "Blöcke von Nullen",
+        "description": "Konstruieren Sie eine Grammatik, die diese Sprache erzeugt.",
+        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1.",
+        "hint1": "Jedes Wort beginnt und endet mit 1 und hat eine 1 in der Mitte.",
+        "hint2": "Zwischen den 1en stehen Blöcke aus einer oder mehreren 0en — das erfordert eine 0-Schleife.",
+        "hint3": "Verketten Sie START→A→B (erster 0-Block) →C→D (zweiter 0-Block), B und D schleifen auf 0."
+      },
+      "appliedIntegers": {
+        "title": "Ganzzahlen",
+        "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen.",
+        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab.",
+        "hint1": "Behandeln Sie \"0\" als eigenen Fall, damit keine führende Null eine längere Zahl beginnt.",
+        "hint2": "Auf eine erste Ziffer ungleich null (1–9) dürfen beliebige Ziffern (0–9) folgen.",
+        "hint3": "Machen Sie den Zustand für Folgeziffern ε-erzeugend, damit die Zahl überall enden kann."
+      },
+      "appliedIdentifiers": {
+        "title": "Bezeichner",
+        "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener erster Buchstabe, gefolgt von Groß- oder Kleinbuchstaben, keine Ziffern.",
+        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab.",
+        "hint1": "Das erste Symbol muss ein Kleinbuchstabe a–z sein.",
+        "hint2": "Danach schleifen Sie über beliebige Buchstaben (a–z oder A–Z) und erlauben ε zum Beenden."
+      }
+    },
+    "exerciseWorkspace": {
+      "selectedExercise": "Ausgewählte Übung",
+      "exit": "Übungsmodus verlassen",
+      "showHint": "Tipp",
+      "noMoreHints": "Alle Tipps angezeigt",
+      "hintsUsed": "{{used}}/{{total}} Tipps verwendet",
+      "hintsHeader": "Tipps",
+      "showSolution": "Lösung anzeigen",
+      "confirmTitle": "Vollständige Lösung anzeigen?",
+      "confirmBody": "Die Lösung wird hier angezeigt und in den Simulator geladen. Sie können stattdessen weiter probieren.",
+      "confirmYes": "Ja, Lösung anzeigen",
+      "confirmNo": "Weiter probieren",
+      "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
+    },
+    "lectureBasics": {
+      "sectionTitle": "Grundlagen aus der Vorlesung",
+      "sectionDescription": "Einführende Beispiele aus der Vorlesung. Probieren Sie jede Aufgabe und blenden Sie dann die Lösung ein.",
+      "showSolution": "Lösung anzeigen",
+      "hideSolution": "Lösung ausblenden",
+      "task1": {
+        "title": "Vorlesungsbeispiel",
+        "note": "Wörter, die mit mindestens einer 0 beginnen und mit genau einer 1 enden."
+      },
+      "task2": {
+        "title": "Übung 1",
+        "note": "Strikt alternierende 0en und 1en, beginnend mit 0 oder 1, Mindestlänge 1."
+      },
+      "task3": {
+        "title": "Übung 2",
+        "note": "Mindestens eine 0, genau eine 1, mindestens eine 0."
+      }
     }
   }
 }
