@@ -3,6 +3,7 @@ import {
   Binary,
   Flag,
   Hash,
+  Route,
   Sigma,
   Spline,
   Target,
@@ -283,6 +284,21 @@ const grammar0011Solution: FAProgram = {
   acceptStates: ["S4"],
 };
 
+// L = 1 1 0ⁿ (n ≥ 0): exactly two 1s followed by any number of 0s.
+const grammarTwoOnesZerosSolution: FAProgram = {
+  type: "DFA",
+  states: ["S0", "S1", "S2", "E"],
+  alphabet: ["0", "1"],
+  transitions: {
+    S0: { "0": ["E"], "1": ["S1"] },
+    S1: { "0": ["E"], "1": ["S2"] },
+    S2: { "0": ["S2"], "1": ["E"] },
+    E: { "0": ["E"], "1": ["E"] },
+  },
+  startState: "S0",
+  acceptStates: ["S2"],
+};
+
 // L = 1ⁿ 0 (n ≥ 1): one or more 1s followed by a single 0.
 const grammarOnesZeroSolution: FAProgram = {
   type: "DFA",
@@ -304,6 +320,26 @@ const grammarOnesZeroSolution: FAProgram = {
  * reference automaton) but additionally carry a `grammar` prompt.
  */
 export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
+  {
+    id: "g2a-two-ones-zeros",
+    titleKey: "fa.exercisesTab.grammarTwoOnesZeros.title",
+    goalKey: "fa.exercisesTab.grammarTwoOnesZeros.goal",
+    descriptionKey: "fa.exercisesTab.grammarTwoOnesZeros.description",
+    difficulty: "medium",
+    icon: Route,
+    alphabet: ["0", "1"],
+    grammar: ['START = "1", A;', 'A = "1", B;', 'B = "0", B | ε;'].join("\n"),
+    solution: grammarTwoOnesZerosSolution,
+    hintKeys: [
+      "fa.exercisesTab.grammarTwoOnesZeros.hint1",
+      "fa.exercisesTab.grammarTwoOnesZeros.hint2",
+    ],
+    starter: emptyStarter(["0", "1"]),
+    exampleWords: {
+      accept: ["11", "110", "1100", "11000"],
+      reject: ["1", "0", "10", "111", "11001"],
+    },
+  },
   {
     id: "g2a-ones",
     titleKey: "fa.exercisesTab.grammarOnes.title",

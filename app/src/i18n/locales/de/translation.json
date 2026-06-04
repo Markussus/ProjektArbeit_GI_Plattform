@@ -1409,6 +1409,13 @@
         "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
         "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
       },
+      "grammarTwoOnesZeros": {
+        "title": "Automat aus Grammatik: 11 0ⁿ",
+        "goal": "Bauen Sie einen DFA für die Sprache L = { 11 0ⁿ | n ≥ 0 }: zwei Einsen, gefolgt von beliebig vielen Nullen.",
+        "description": "Gegeben ist die rechtslineare Grammatik S → \"1\" A, A → \"1\" B, B → \"0\" B | ε. Bauen Sie den passenden endlichen Automaten und prüfen Sie anschließend, ob das Wort \"11001\" zur Sprache gehört.",
+        "hint1": "Nach den beiden Pflicht-Einsen darf nur noch die Null beliebig oft folgen – eine weitere Eins führt in einen Fehlerzustand.",
+        "hint2": "Sie brauchen drei nützliche Zustände (Start, nach der ersten 1, nach der zweiten 1 = Endzustand) plus einen Fangzustand. Das Wort \"11001\" endet im Fangzustand und gehört daher nicht zur Sprache."
+      },
       "grammarOnes": {
         "title": "Automat aus Grammatik: 1 0ⁿ 1",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
@@ -1530,12 +1537,8 @@
         "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
       },
       "lecture": {
-        "title": "Vorlesungsbeispiel",
-        "description": "Ein DFA aus der Vorlesungsübung, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1).",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach nichts mehr. Er lehnt leere Strings, Strings die mit '1' beginnen, oder Strings mit mehr als einer '1' ab.",
-        "step2Title": "2. Zustände entwerfen",
-        "step2": "s0 ist der Startzustand. Das Lesen einer '0' führt zu s1. Von s1 führt eine '1' zu s2 (Akzeptanzzustand). Jede andere Eingabe führt zu s3, einem \"Fangzustand\" (Trap State), da der String ungültig geworden ist."
+        "title": "Worterkennung: 0⁺1",
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
       },
       "grammar": {
         "title": "Grammatik → Automat",
