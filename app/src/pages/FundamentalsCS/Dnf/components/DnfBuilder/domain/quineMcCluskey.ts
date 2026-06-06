@@ -21,6 +21,37 @@ export type MinimalDnf =
       termCount: number;
     };
 
+interface ImplicantLiteral {
+  variableIndex: number;
+  negated: boolean;
+}
+
+export function getImplicantLiterals(
+  implicant: PrimeImplicant,
+  variableCount: number,
+): ImplicantLiteral[] {
+  const literals: ImplicantLiteral[] = [];
+
+  for (
+    let bitPosition = variableCount - 1;
+    bitPosition >= 0;
+    bitPosition -= 1
+  ) {
+    const mask = 1 << bitPosition;
+
+    if ((implicant.mask & mask) !== 0) {
+      continue;
+    }
+
+    literals.push({
+      variableIndex: variableCount - 1 - bitPosition,
+      negated: (implicant.value & mask) === 0,
+    });
+  }
+
+  return literals;
+}
+
 /**
  * Compute a minimal sum-of-products form for the given truth table using
  * Quine-McCluskey. Returns the minimum literal count and a concrete set of
@@ -85,29 +116,14 @@ function implicantToExpression(
   variables: string[],
   variableCount: number,
 ): BooleanExpression {
-  const literals: BooleanExpression[] = [];
+  const literals = getImplicantLiterals(implicant, variableCount).map(
+    ({ variableIndex, negated }): BooleanExpression => {
+      const variable = variables[variableIndex];
+      const literal: BooleanExpression = { type: "variable", name: variable };
 
-  for (
-    let bitPosition = variableCount - 1;
-    bitPosition >= 0;
-    bitPosition -= 1
-  ) {
-    const mask = 1 << bitPosition;
-
-    if ((implicant.mask & mask) !== 0) {
-      continue;
-    }
-
-    const variableIndex = variableCount - 1 - bitPosition;
-    const variable = variables[variableIndex];
-    const literal: BooleanExpression = { type: "variable", name: variable };
-
-    literals.push(
-      (implicant.value & mask) !== 0
-        ? literal
-        : { type: "not", operand: literal },
-    );
-  }
+      return negated ? { type: "not", operand: literal } : literal;
+    },
+  );
 
   if (literals.length === 0) {
     return { type: "constant", value: true };
@@ -155,71 +171,95 @@ function collectPrimeImplicants(
   }));
 
   while (current.length > 0) {
-    const grouped = groupByOneBitCount(current, variableCount);
-    const next: CombinationCandidate[] = [];
-    const nextKeys = new Set<string>();
-
-    for (let groupIndex = 0; groupIndex < grouped.length - 1; groupIndex += 1) {
-      const lowerGroup = grouped[groupIndex];
-      const upperGroup = grouped[groupIndex + 1];
-
-      for (const lower of lowerGroup) {
-        for (const upper of upperGroup) {
-          if (lower.mask !== upper.mask) {
-            continue;
-          }
-
-          const diff = lower.value ^ upper.value;
-
-          if (!isSingleBit(diff)) {
-            continue;
-          }
-
-          lower.combined = true;
-          upper.combined = true;
-
-          const combinedValue = lower.value & ~diff;
-          const combinedMask = lower.mask | diff;
-          const key = `${combinedValue}|${combinedMask}`;
-
-          if (nextKeys.has(key)) {
-            continue;
-          }
-
-          nextKeys.add(key);
-          next.push({
-            value: combinedValue,
-            mask: combinedMask,
-            covers: mergeCovers(lower.covers, upper.covers),
-            combined: false,
-          });
-        }
-      }
-    }
-
-    for (const candidate of current) {
-      if (candidate.combined) {
-        continue;
-      }
-
-      const key = `${candidate.value}|${candidate.mask}`;
-      if (seenKeys.has(key)) {
-        continue;
-      }
-      seenKeys.add(key);
-
-      primes.push({
-        value: candidate.value,
-        mask: candidate.mask,
-        covers: [...candidate.covers].sort((a, b) => a - b),
-        literals: variableCount - countSetBits(candidate.mask),
-      });
-    }
-
+    const next = combineCandidates(current, variableCount);
+    appendNewPrimeImplicants(current, variableCount, seenKeys, primes);
     current = next;
   }
 
   return primes;
+}
+
+function combineCandidates(
+  candidates: CombinationCandidate[],
+  variableCount: number,
+): CombinationCandidate[] {
+  const grouped = groupByOneBitCount(candidates, variableCount);
+  const next: CombinationCandidate[] = [];
+  const nextKeys = new Set<string>();
+
+  for (let groupIndex = 0; groupIndex < grouped.length - 1; groupIndex += 1) {
+    const lowerGroup = grouped[groupIndex];
+    const upperGroup = grouped[groupIndex + 1];
+
+    for (const lower of lowerGroup) {
+      for (const upper of upperGroup) {
+        const combined = combineCandidatePair(lower, upper);
+        if (!combined) {
+          continue;
+        }
+
+        const key = `${combined.value}|${combined.mask}`;
+        if (nextKeys.has(key)) {
+          continue;
+        }
+
+        nextKeys.add(key);
+        next.push(combined);
+      }
+    }
+  }
+
+  return next;
+}
+
+function combineCandidatePair(
+  lower: CombinationCandidate,
+  upper: CombinationCandidate,
+): CombinationCandidate | null {
+  if (lower.mask !== upper.mask) {
+    return null;
+  }
+
+  const diff = lower.value ^ upper.value;
+  if (!isSingleBit(diff)) {
+    return null;
+  }
+
+  lower.combined = true;
+  upper.combined = true;
+
+  return {
+    value: lower.value & ~diff,
+    mask: lower.mask | diff,
+    covers: mergeCovers(lower.covers, upper.covers),
+    combined: false,
+  };
+}
+
+function appendNewPrimeImplicants(
+  candidates: CombinationCandidate[],
+  variableCount: number,
+  seenKeys: Set<string>,
+  primes: PrimeImplicant[],
+): void {
+  for (const candidate of candidates) {
+    if (candidate.combined) {
+      continue;
+    }
+
+    const key = `${candidate.value}|${candidate.mask}`;
+    if (seenKeys.has(key)) {
+      continue;
+    }
+    seenKeys.add(key);
+
+    primes.push({
+      value: candidate.value,
+      mask: candidate.mask,
+      covers: [...candidate.covers].sort((a, b) => a - b),
+      literals: variableCount - countSetBits(candidate.mask),
+    });
+  }
 }
 
 function groupByOneBitCount(

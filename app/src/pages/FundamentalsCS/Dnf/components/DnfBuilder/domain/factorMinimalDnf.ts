@@ -1,5 +1,5 @@
 import type { BooleanExpression } from "./booleanExpression";
-import type { MinimalDnf, PrimeImplicant } from "./quineMcCluskey";
+import { getImplicantLiterals, type MinimalDnf } from "./quineMcCluskey";
 
 interface Literal {
   variableIndex: number;
@@ -25,7 +25,7 @@ export function factorMinimalDnf(
 
   const variableCount = variables.length;
   const terms = minimal.implicants.map((implicant) =>
-    implicantToLiterals(implicant, variableCount),
+    getImplicantLiterals(implicant, variableCount),
   );
 
   return factorTerms(terms, variables);
@@ -136,31 +136,6 @@ function pickMostFrequentLiteral(terms: Literal[][]): Literal | null {
   }
 
   return best?.literal ?? null;
-}
-
-function implicantToLiterals(
-  implicant: PrimeImplicant,
-  variableCount: number,
-): Literal[] {
-  const literals: Literal[] = [];
-
-  for (
-    let bitPosition = variableCount - 1;
-    bitPosition >= 0;
-    bitPosition -= 1
-  ) {
-    const mask = 1 << bitPosition;
-
-    if ((implicant.mask & mask) !== 0) {
-      continue;
-    }
-
-    const variableIndex = variableCount - 1 - bitPosition;
-    const negated = (implicant.value & mask) === 0;
-    literals.push({ variableIndex, negated });
-  }
-
-  return literals;
 }
 
 function literalKey(literal: Literal): string {

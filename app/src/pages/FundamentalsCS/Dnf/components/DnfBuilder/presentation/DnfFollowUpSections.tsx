@@ -2,50 +2,18 @@ import { useMemo, useState, type ReactNode } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import type { TruthTableDisplay } from "../adapters/truthTableAdapter";
+import type { DnfFollowUpConfiguration } from "../application/dnfFollowUp";
 import {
   deriveDnfFromTruthTable,
   formatDnfExpression,
-  type DnfDerivation,
 } from "../domain/dnfDerivation";
-import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
-import type { TruthTable } from "../domain/truthTable";
 import { DnfResultPanel } from "./DnfResultPanel";
 import { DnfSimplificationPanel } from "./DnfSimplificationPanel";
 import { DnfTruthTableView } from "./DnfTruthTableView";
 
 type FollowUpSectionId = "result" | "truthTable" | "simplification";
 
-export interface DnfFollowUpSolution {
-  formattedDnf: string;
-  variableCount: number;
-  rowCount: number;
-  trueRowCount: number;
-  derivation: DnfDerivation;
-  display: TruthTableDisplay | null;
-  resultHeader: string;
-  truthTable: TruthTable;
-}
-
-interface DnfSimplificationControls {
-  answer: string;
-  feedback: DnfSimplificationCheckResult | null;
-  showSolution: boolean;
-  showWalkthrough: boolean;
-  onAnswerChange: (value: string) => void;
-  onCheck: () => void;
-  onToggleSolution: () => void;
-  onToggleWalkthrough: () => void;
-}
-
-interface DnfFollowUpSectionsProps {
-  solution?: DnfFollowUpSolution;
-  simplification?: {
-    truthTable: TruthTable;
-    controls: DnfSimplificationControls;
-    isEnabled: boolean;
-  };
-}
+type DnfFollowUpSectionsProps = DnfFollowUpConfiguration;
 
 interface FollowUpSection {
   id: FollowUpSectionId;

@@ -6,11 +6,7 @@ import {
 import { deriveDnfFromTruthTable } from "./dnfDerivation";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
 import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
-import {
-  computeMinimalDnf,
-  minimalDnfToExpression,
-  type MinimalDnf,
-} from "./quineMcCluskey";
+import { computeMinimalDnf, minimalDnfToExpression } from "./quineMcCluskey";
 import type { TruthTable } from "./truthTable";
 
 export type DnfSimplificationStatus =
@@ -207,16 +203,4 @@ function getCanonicalLiteralCount(table: TruthTable): number {
     (sum, term) => sum + term.literals.length,
     0,
   );
-}
-
-/** Internal helper exposed for use by hooks that want a fresh baseline view. */
-export function describeMinimalDnf(table: TruthTable): {
-  minimal: MinimalDnf;
-  expression: BooleanExpression;
-} {
-  const minimal = computeMinimalDnf(table);
-  return {
-    minimal,
-    expression: minimalDnfToExpression(minimal, table.variables),
-  };
 }

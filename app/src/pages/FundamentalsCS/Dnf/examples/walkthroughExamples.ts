@@ -10,7 +10,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import type { TranslationKey } from "@/types/i18n";
 
-export type DnfWalkthroughExampleId =
+type DnfWalkthroughExampleId =
   | "lecture-expression"
   | "parentheses"
   | "negation"

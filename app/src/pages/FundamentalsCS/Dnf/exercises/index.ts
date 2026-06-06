@@ -3,7 +3,7 @@ import type { ExerciseDefinition } from "@/types/exercise";
 import { createTruthTableFromResults } from "../components/DnfBuilder/domain/truthTable";
 import type { TruthTable } from "../components/DnfBuilder/domain/truthTable";
 
-export const DEFAULT_DNF_SOURCE = "a ∨ (b ∧ c)";
+const DEFAULT_DNF_SOURCE = "a ∨ (b ∧ c)";
 
 interface DnfExpressionExerciseDefinition extends ExerciseDefinition {
   mode: "expression_to_truth_table";

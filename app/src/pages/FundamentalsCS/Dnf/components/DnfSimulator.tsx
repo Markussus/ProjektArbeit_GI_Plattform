@@ -5,6 +5,7 @@ import type { Example, Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import { buildTruthTableDisplay } from "./DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "./DnfBuilder/application/dnfAnalysis";
+import { buildDnfFollowUpConfiguration } from "./DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "./DnfBuilder/application/useDnfSimplification";
 import { formatBooleanValue } from "./DnfBuilder/domain/booleanExpression";
 import { normalizeBooleanOperatorAliases } from "./DnfBuilder/domain/booleanSyntax";
@@ -19,6 +20,7 @@ import {
 import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
 import { DnfExerciseWorkspace } from "./DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "./DnfBuilder/presentation/DnfFollowUpSections";
+import { DnfTruthTable } from "./DnfBuilder/presentation/DnfTruthTable";
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
@@ -270,34 +272,15 @@ function TableToDnfBuilder({
     return null;
   }
 
-  const simplificationControls = {
-    answer: simplification.answer,
-    feedback: simplification.feedback,
-    showSolution: simplification.showSolution,
-    showWalkthrough: simplification.showWalkthrough,
-    onAnswerChange: simplification.setAnswer,
-    onCheck: () => simplification.check(analysis.truthTable),
-    onToggleSolution: simplification.toggleSolution,
-    onToggleWalkthrough: simplification.toggleWalkthrough,
-  };
-  const solution =
-    showSolution && display
-      ? {
-          formattedDnf: analysis.formattedDnf,
-          variableCount: analysis.truthTable.variables.length,
-          rowCount: analysis.truthTable.rows.length,
-          trueRowCount: analysis.derivation.trueRows.length,
-          derivation: analysis.derivation,
-          display,
-          resultHeader: "f",
-          truthTable: analysis.truthTable,
-        }
-      : undefined;
-  const simplificationFollowUp = {
-    truthTable: analysis.truthTable,
-    controls: simplificationControls,
-    isEnabled: feedback?.isCorrect === true,
-  };
+  const { solution, simplification: simplificationFollowUp } =
+    buildDnfFollowUpConfiguration({
+      analysis,
+      display,
+      resultHeader: "f",
+      showSolution,
+      feedback,
+      simplification,
+    });
 
   if (!committed) {
     return (
@@ -488,79 +471,34 @@ function TableSetupPreview({
         {t("dnf.simulator.setupPreviewHint")}
       </p>
 
-      <div
-        className={cn(
-          "border-border mt-4 overflow-x-auto rounded-lg border",
-          isScrollable && "max-h-[28rem] overflow-y-auto",
-        )}
-      >
-        <table className="w-full border-collapse text-sm">
-          <thead
-            className={cn("bg-muted", isScrollable && "sticky top-0 z-10")}
-          >
-            <tr>
-              <th
-                scope="col"
-                className="border-border w-20 border-r px-3 py-2 text-left font-semibold"
-              >
-                {t("dnf.builder.exercise.rowHeader")}
-              </th>
-              {truthTable.variables.map((variable) => (
-                <th
-                  key={variable}
-                  scope="col"
-                  className="border-border border-r px-3 py-2 text-left font-semibold"
-                >
-                  {variable}
-                </th>
-              ))}
-              <th scope="col" className="px-3 py-2 text-left font-semibold">
-                <code className="font-mono text-sm">f</code>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {truthTable.rows.map((row, rowIndex) => {
-              const currentValue = resultValues[rowIndex] ?? false;
+      <DnfTruthTable
+        truthTable={truthTable}
+        resultHeader="f"
+        isScrollable={isScrollable}
+        renderResultCell={(_, rowIndex) => {
+          const currentValue = resultValues[rowIndex] ?? false;
 
-              return (
-                <tr key={rowIndex} className="border-border border-t">
-                  <td className="border-border text-muted-foreground border-r px-3 py-2 font-mono">
-                    {rowIndex + 1}
-                  </td>
-                  {truthTable.variables.map((variable) => (
-                    <td
-                      key={variable}
-                      className="border-border border-r px-3 py-2 font-mono"
-                    >
-                      {formatBooleanValue(row.assignment[variable])}
-                    </td>
-                  ))}
-                  <td className="px-3 py-2">
-                    <div className="grid w-full max-w-36 grid-cols-2 gap-2">
-                      {[false, true].map((value) => (
-                        <button
-                          key={String(value)}
-                          type="button"
-                          aria-pressed={currentValue === value}
-                          onClick={() => onResultChange(rowIndex, value)}
-                          className={cn(
-                            "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
-                            currentValue === value &&
-                              "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
-                          )}
-                        >
-                          {formatBooleanValue(value)}
-                        </button>
-                      ))}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+          return (
+            <div className="grid w-full max-w-36 grid-cols-2 gap-2">
+              {[false, true].map((value) => (
+                <button
+                  key={String(value)}
+                  type="button"
+                  aria-pressed={currentValue === value}
+                  onClick={() => onResultChange(rowIndex, value)}
+                  className={cn(
+                    "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
+                    currentValue === value &&
+                      "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
+                  )}
+                >
+                  {formatBooleanValue(value)}
+                </button>
+              ))}
+            </div>
+          );
+        }}
+      />
     </section>
   );
 }

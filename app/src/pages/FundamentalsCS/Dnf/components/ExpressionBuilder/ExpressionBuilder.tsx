@@ -3,6 +3,7 @@ import { ArrowLeft, Eraser, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
+import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
@@ -214,34 +215,15 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     return <ParseErrorPanel issue={analysis.issue} />;
   }
 
-  const simplificationControls = {
-    answer: simplification.answer,
-    feedback: simplification.feedback,
-    showSolution: simplification.showSolution,
-    showWalkthrough: simplification.showWalkthrough,
-    onAnswerChange: simplification.setAnswer,
-    onCheck: () => simplification.check(analysis.truthTable),
-    onToggleSolution: simplification.toggleSolution,
-    onToggleWalkthrough: simplification.toggleWalkthrough,
-  };
-  const solution =
-    showSolution && display
-      ? {
-          formattedDnf: analysis.formattedDnf,
-          variableCount: analysis.truthTable.variables.length,
-          rowCount: analysis.truthTable.rows.length,
-          trueRowCount: analysis.derivation.trueRows.length,
-          derivation: analysis.derivation,
-          display,
-          resultHeader: committedSource,
-          truthTable: analysis.truthTable,
-        }
-      : undefined;
-  const simplificationFollowUp = {
-    truthTable: analysis.truthTable,
-    controls: simplificationControls,
-    isEnabled: feedback?.isCorrect === true,
-  };
+  const { solution, simplification: simplificationFollowUp } =
+    buildDnfFollowUpConfiguration({
+      analysis,
+      display,
+      resultHeader: committedSource,
+      showSolution,
+      feedback,
+      simplification,
+    });
 
   return (
     <>
