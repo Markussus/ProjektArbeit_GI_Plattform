@@ -76,6 +76,90 @@ const bitFlipProgram = createProgram({
   },
 });
 
+const searchTwoZerosProgram = createProgram({
+  states: ["q0", "q1", "q2", "qS"],
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "E"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "1001".split(""),
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q1: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "L" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "0": {
+      q0: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "0", movement: "R" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "1": {
+      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q1: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+  },
+});
+
+const searchThreeZerosProgram = createProgram({
+  states: ["q0", "q1", "q2", "q3", "qS"],
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "E"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "10000".split(""),
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q1: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q2: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "0": {
+      q0: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "0", movement: "R" },
+      q2: { nextState: "q3", writeSymbol: "0", movement: "R" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "1": {
+      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q1: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+  },
+});
+
+const searchPattern010Program = createProgram({
+  states: ["q0", "q1", "q2", "q3", "qS"],
+  tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1", "E"],
+  blankSymbol: DEFAULT_BLANK_SYMBOL,
+  initialState: "q0",
+  haltStates: ["qS"],
+  initialTape: "10100".split(""),
+  transitions: {
+    [DEFAULT_BLANK_SYMBOL]: {
+      q0: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q1: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q2: { nextState: "qS", writeSymbol: DEFAULT_BLANK_SYMBOL, movement: "N" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "0": {
+      q0: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q1: { nextState: "q1", writeSymbol: "0", movement: "R" },
+      q2: { nextState: "q3", writeSymbol: "0", movement: "R" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+    "1": {
+      q0: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q1: { nextState: "q2", writeSymbol: "1", movement: "R" },
+      q2: { nextState: "q0", writeSymbol: "1", movement: "R" },
+      q3: { nextState: "qS", writeSymbol: "E", movement: "L" },
+    },
+  },
+});
+
 const unaryIncrementProgram = createProgram({
   states: ["q0", "qS"],
   tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "1"],
@@ -841,6 +925,42 @@ export const turingMachineExamples: TuringMachineExampleScenario[] = [
     definition: {
       titleKey: "tm.examples.example4",
       descriptionKey: "tm.examples.example4Desc",
+      icon: Binary,
+    },
+  },
+  {
+    kind: "example",
+    id: "tm.examples.example5",
+    titleKey: "tm.examples.example5",
+    descriptionKey: "tm.examples.example5Desc",
+    program: searchTwoZerosProgram,
+    definition: {
+      titleKey: "tm.examples.example5",
+      descriptionKey: "tm.examples.example5Desc",
+      icon: Binary,
+    },
+  },
+  {
+    kind: "example",
+    id: "tm.examples.example6",
+    titleKey: "tm.examples.example6",
+    descriptionKey: "tm.examples.example6Desc",
+    program: searchThreeZerosProgram,
+    definition: {
+      titleKey: "tm.examples.example6",
+      descriptionKey: "tm.examples.example6Desc",
+      icon: Binary,
+    },
+  },
+  {
+    kind: "example",
+    id: "tm.examples.example7",
+    titleKey: "tm.examples.example7",
+    descriptionKey: "tm.examples.example7Desc",
+    program: searchPattern010Program,
+    definition: {
+      titleKey: "tm.examples.example7",
+      descriptionKey: "tm.examples.example7Desc",
       icon: Binary,
     },
   },

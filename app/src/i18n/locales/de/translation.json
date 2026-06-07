@@ -1201,7 +1201,13 @@
       "example3": "Beispiel: Binäres Inkrement",
       "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht.",
       "example4": "Beispiel: Binärzahlen addieren",
-      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird."
+      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird.",
+      "example5": "Beispiel: Zwei Nullen suchen",
+      "example5Desc": "Suche zwei aufeinanderfolgende Nullen und schreibe danach E. Beispiel: Aus der Eingabe ⋄1001⋄ wird die Ausgabe ⋄100E⋄.",
+      "example6": "Beispiel: Drei Nullen suchen",
+      "example6Desc": "Das Band enthält eine endliche Folge von 0 und 1, die links und rechts durch ⋄ begrenzt ist. Suche drei aufeinanderfolgende Nullen, schreibe danach E und halte an. Der Kopf steht anschließend auf dem Symbol links vom E. Wird das Muster nicht gefunden, bleibt die Maschine beim ⋄ stehen. Beispiel: Aus ⋄10000⋄ wird ⋄1000E⋄.",
+      "example7": "Beispiel: Muster 010 suchen",
+      "example7Desc": "Suche unter denselben Bedingungen das Muster 010, schreibe danach E und halte mit dem Kopf auf dem Symbol links vom E. Beispiel: Aus ⋄10100⋄ wird ⋄1010E⋄. Auch 0010 und 00010 enthalten das gesuchte Muster."
     },
     "actions": {
       "loadSolution": "Lösung laden",

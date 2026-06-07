@@ -1205,7 +1205,13 @@
       "example3": "Example: Binary Increment",
       "example3Desc": "A carry-based machine that increments a binary word by one.",
       "example4": "Example: Add Binary Numbers",
-      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built."
+      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built.",
+      "example5": "Example: Search for Two Zeros",
+      "example5Desc": "Search for two consecutive zeros and then write E. Example: The input ⋄1001⋄ produces the output ⋄100E⋄.",
+      "example6": "Example: Search for Three Zeros",
+      "example6Desc": "The tape contains a finite sequence of 0s and 1s bounded by ⋄ on both sides. Search for three consecutive zeros, write E after them, and halt. The head then rests on the symbol to the left of E. If the pattern is not found, the machine stops on ⋄. Example: ⋄10000⋄ becomes ⋄1000E⋄.",
+      "example7": "Example: Search for Pattern 010",
+      "example7Desc": "Under the same conditions, search for the pattern 010, write E after it, and halt with the head on the symbol to the left of E. Example: ⋄10100⋄ becomes ⋄1010E⋄. The inputs 0010 and 00010 also contain the pattern."
     },
     "actions": {
       "loadSolution": "Load solution",

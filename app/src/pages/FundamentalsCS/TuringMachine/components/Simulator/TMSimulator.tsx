@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { cloneJson, cn } from "@/lib/utils";
 import {
   emptyTuringMachineProgram,
@@ -19,6 +20,7 @@ import {
 } from "./application/tmSolutionChecker";
 import { useTMSimulator } from "./application/useTMSimulator";
 import type { TMProgram } from "./domain/tmProgram";
+import { tmProgramTransferCodec } from "./domain/tmProgramTransfer";
 import { TMConfigView } from "./presentation/TMConfigView";
 import { TMSimulationView } from "./presentation/TMSimulationView";
 
@@ -58,6 +60,13 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
     const handleEditProgram = () => {
       simulation.pause();
       editor.resetToProgram(program);
+      setIsEditMode(true);
+    };
+
+    const handleImportProgram = (nextProgram: TMProgram) => {
+      simulation.pause();
+      setProgram(nextProgram);
+      editor.resetToProgram(nextProgram);
       setIsEditMode(true);
     };
 
@@ -129,6 +138,12 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
         {isEditMode ? (
           <div className="flex flex-col gap-4">
             <TMConfigView editor={editor} />
+            <SimulatorStringTransferBox
+              value={editor.draft}
+              codec={tmProgramTransferCodec}
+              onLoad={handleImportProgram}
+              testIdPrefix="tm-transfer"
+            />
             <button
               onClick={handleApplyProgram}
               disabled={editor.hasBlockingCellIssue}
