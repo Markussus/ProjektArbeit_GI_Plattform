@@ -1,6 +1,6 @@
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { withDerivedAlphabets, type TMProgram } from "./tmProgram";
-import { isTMProgramValid } from "./tmProgramValidation";
+import { validateTMProgram } from "./tmProgramValidation";
 import {
   DEFAULT_BLANK_SYMBOL,
   type HeadMovement,
@@ -108,7 +108,7 @@ export const tmProgramTransferCodec: ISimulatorTransferCodec<TMProgram> = {
 function normalizeProgram(program: TMProgram): NormalizedProgram {
   const programWithDerivedAlphabets = withDerivedAlphabets(program);
   if (
-    !isTMProgramValid(programWithDerivedAlphabets) ||
+    !isTMProgramTransferValid(programWithDerivedAlphabets) ||
     program.blankSymbol !== DEFAULT_BLANK_SYMBOL ||
     program.haltStates.includes(program.initialState) ||
     new Set(program.states).size !== program.states.length ||
@@ -146,9 +146,6 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
   const usedHaltStates = program.haltStates.filter((state) =>
     targetedStates.has(state),
   );
-  if (usedHaltStates.length === 0) {
-    throw new Error("tm_transfer_program_invalid");
-  }
 
   const stateIds = new Map<string, number>();
 
@@ -515,7 +512,7 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
       initialTape,
     });
 
-    if (!isTMProgramValid(program)) {
+    if (!isTMProgramTransferValid(program)) {
       throw new Error("tm_transfer_payload_invalid");
     }
 
@@ -523,6 +520,12 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
   } catch {
     throw new Error("tm_transfer_payload_invalid");
   }
+}
+
+function isTMProgramTransferValid(program: TMProgram): boolean {
+  return validateTMProgram(program).every(
+    (issue) => issue.code === "halt_states_empty",
+  );
 }
 
 function readSymbolDictionary(

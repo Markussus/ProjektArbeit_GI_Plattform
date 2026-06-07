@@ -110,6 +110,66 @@ describe("Turing Machine program transfer codec", () => {
     });
   });
 
+  it("round-trips a partial program without halt states", async () => {
+    const program = createProgram({
+      states: ["start"],
+      haltStates: [],
+      initialTape: ["0"],
+      transitions: {
+        "0": {
+          start: transition("start", "1", "R"),
+        },
+      },
+    });
+
+    const exportedValue = await tmProgramTransferCodec.exportValue(program);
+    const importedProgram =
+      await tmProgramTransferCodec.importValue(exportedValue);
+
+    expect(importedProgram).toEqual(
+      withDerivedAlphabets({
+        states: ["q0"],
+        inputAlphabet: [],
+        tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
+        blankSymbol: DEFAULT_BLANK_SYMBOL,
+        initialState: "q0",
+        haltStates: [],
+        initialTape: ["0"],
+        transitions: {
+          "0": {
+            q0: transition("q0", "1", "R"),
+          },
+        },
+      }),
+    );
+  });
+
+  it("round-trips an incomplete program without transitions", async () => {
+    const program = createProgram({
+      states: ["start"],
+      haltStates: [],
+      initialTape: [],
+      transitions: {},
+    });
+
+    const exportedValue = await tmProgramTransferCodec.exportValue(program);
+
+    await expect(
+      tmProgramTransferCodec.importValue(exportedValue),
+    ).resolves.toEqual(
+      withDerivedAlphabets({
+        states: ["q0"],
+        inputAlphabet: [],
+        tapeAlphabet: [DEFAULT_BLANK_SYMBOL],
+        blankSymbol: DEFAULT_BLANK_SYMBOL,
+        initialState: "q0",
+        haltStates: [],
+        initialTape: [],
+        transitions: {},
+      }),
+    );
+  });
+
   it.each([
     {
       name: "dense raw",
