@@ -211,8 +211,52 @@
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
-    "examplesTitle": "Vorlesungsbeispiele",
-    "examplesIntro": "Beispiele zu beiden Modi: vom Ausdruck zur Wahrheitstabelle und von der Wahrheitstabelle zur DNF.",
+    "algebra": {
+      "title": "Regeln der booleschen Algebra",
+      "intro": "Mit diesen Regeln lässt sich eine DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg und für die Beispiele im Simulator.",
+      "rules": {
+        "identity": {
+          "name": "Neutralelement",
+          "example": "1 ist das neutrale Element von ∧, 0 das von ∨."
+        },
+        "domination": {
+          "name": "Dominanz",
+          "example": "Eine 1 in einer ∨-Verknüpfung erzwingt 1, eine 0 in einer ∧-Verknüpfung erzwingt 0."
+        },
+        "idempotence": {
+          "name": "Idempotenz",
+          "example": "Ein doppelt vorkommender Operand verändert das Ergebnis nicht."
+        },
+        "double_negation": {
+          "name": "Doppelnegation",
+          "example": "Zwei Negationen heben sich gegenseitig auf."
+        },
+        "complement": {
+          "name": "Komplement",
+          "example": "Eine Variable ist immer entweder wahr oder falsch — a ∨ ¬a ist deshalb immer 1, a ∧ ¬a immer 0."
+        },
+        "commutativity": {
+          "name": "Kommutativgesetz",
+          "example": "Die Reihenfolge der Operanden ist für ∧ und ∨ egal."
+        },
+        "associativity": {
+          "name": "Assoziativgesetz",
+          "example": "Bei mehreren ∧- oder ∨-Operationen ist die Klammerung egal — (a ∧ b) ∧ c ergibt dasselbe wie a ∧ (b ∧ c)."
+        },
+        "distributivity": {
+          "name": "Distributivgesetz",
+          "example": "Ein gemeinsamer Operand lässt sich ausklammern — wie beim Ausmultiplizieren in der Mathematik, nur mit ∧ und ∨ statt · und +."
+        },
+        "absorption": {
+          "name": "Absorptionsgesetz",
+          "example": "Ist a bereits wahr, dann ist auch a ∨ (a ∧ b) wahr — der UND-Teil fügt nichts hinzu."
+        },
+        "de_morgan": {
+          "name": "De Morgan",
+          "example": "Negation kippt den Operator: aus ∧ wird ∨ und jeder Operand wird negiert."
+        }
+      }
+    },
     "examples": {
       "modeGroup": {
         "expression_to_truth_table": "Modus: Ausdruck → Wahrheitstabelle",
@@ -258,17 +302,33 @@
     "exampleIgnored": "wird ignoriert",
     "exampleResultTitle": "DNF",
     "exampleRuleTitle": "Merksatz",
-    "exampleRuleText": "Bei Wert 1 wird die Variable normal übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
-    "exercise1": "Ausdruck auswerten und DNF ableiten",
-    "exercise1Desc": "Füllen Sie die Wertetafel und bilden Sie die DNF aus allen 1-Zeilen",
-    "exercise2": "Klammerung vergleichen und DNF bilden",
-    "exercise2Desc": "Werten Sie den geklammerten Ausdruck aus und leiten Sie daraus die DNF ab",
-    "exercise3": "Halbaddierer-Summe als DNF",
-    "exercise3Desc": "Prüfen Sie das XOR-Polynom aus der Vorlesung über die Wertetafel",
-    "exercise4": "Mehrvariablen-Ausdruck als DNF",
-    "exercise4Desc": "Werten Sie einen Ausdruck mit vier Variablen aus und bilden Sie die DNF",
-    "exercise5": "Boolesches Polynom aus Wertetafel",
-    "exercise5Desc": "Erzeugen Sie aus einer vorgegebenen Wertetafel das boolesche Polynom in DNF",
+    "exampleRuleText": "Bei Wert 1 wird die Variable übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
+    "exercises": {
+      "worksheet02bTruthTable1": {
+        "title": "DNF aus Wertetafel bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b und c die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 1."
+      },
+      "simpleExpression": {
+        "title": "Wertetafel aus Ausdruck erstellen",
+        "description": "Erstellen Sie die Wertetafel für den vorgegebenen Ausdruck und leiten Sie daraus die kanonische DNF ab."
+      },
+      "overlappingGroups": {
+        "title": "DNF mit überlappenden Gruppen vereinfachen",
+        "description": "Leiten Sie die kanonische DNF aus der Wertetafel her und bestimmen Sie eine minimale DNF. Beachten Sie, dass eine 1-Zeile mehrere Gruppen abdecken darf."
+      },
+      "negatedExpression": {
+        "title": "Ausdruck mit Negationen auswerten",
+        "description": "Erstellen Sie die Wertetafel für einen Ausdruck mit mehreren Negationen und bestimmen Sie die zugehörige kanonische DNF."
+      },
+      "worksheet02bTruthTable2": {
+        "title": "DNF mit vier Variablen bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b, c und d die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 2."
+      },
+      "complexExpression": {
+        "title": "Komplexen Ausdruck in DNF überführen",
+        "description": "Erstellen Sie die Wertetafel für den Ausdruck mit vier Variablen, bestimmen Sie die kanonische DNF und vereinfachen Sie diese."
+      }
+    },
     "exprBuilder": {
       "evaluate": "Auswerten",
       "newExpression": "Anderen Ausdruck eingeben"
@@ -279,14 +339,18 @@
         "truth_table_to_dnf": "Tabelle → DNF"
       },
       "tableModeTitle": "DNF aus Wertetafel",
-      "tableModeHint": "Bauen Sie eine eigene Wertetafel, setzen Sie die Ergebnis-Spalte und schreiben Sie daraus die kanonische DNF.",
+      "tableModeHint": "Bauen Sie eine eigene Wertetafel, setzen Sie die Ergebnis-Spalte und schreiben Sie daraus die DNF.",
       "variableCount": "Variablen",
       "variableCountLabel": "Anzahl",
       "variableCountHelp": "{{min}} bis {{max}} Variablen möglich",
       "clearTable": "Tabelle auf 0 setzen",
       "fillTable": "Tabelle auf 1 setzen",
       "randomTable": "Zufällig belegen",
-      "invertTable": "Ergebnisse invertieren"
+      "invertTable": "Ergebnisse invertieren",
+      "setupPreviewTitle": "Wertetafel festlegen",
+      "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
+      "commitTable": "Tabelle übernehmen",
+      "newTable": "Neue Tabelle"
     },
     "builder": {
       "inputTitle": "Boolescher Ausdruck",
@@ -349,7 +413,8 @@
         "correctTitle": "Alles richtig",
         "correctDesc": "Wahrheitstabelle und DNF passen zur Aufgabe.",
         "tableIncomplete": "{{count}} Tabellenzeile(n) sind noch nicht ausgefüllt.",
-        "tableWrongRows": "Diese Tabellenzeile(n) sind falsch: {{rows}}.",
+        "tableWrongRows_one": "{{count}} von {{total}} Tabellenzeilen ist noch falsch — finden Sie sie selbst.",
+        "tableWrongRows_other": "{{count}} von {{total}} Tabellenzeilen sind noch falsch — finden Sie sie selbst.",
         "dnfEmpty": "Die DNF-Eingabe fehlt noch.",
         "dnfSyntax": "Die DNF-Eingabe kann syntaktisch nicht gelesen werden.",
         "dnfEquivalentNotCanonical": "Die Eingabe beschreibt zwar dieselbe Funktion, ist aber nicht als DNF aus den 1-Zeilen aufgebaut — für jede 1-Zeile wird genau ein UND-Term benötigt.",
@@ -361,22 +426,90 @@
         "dnfDeferredUntilTable": "Die DNF wird erst detailliert bewertet, wenn die Wertetafel vollständig und korrekt ist.",
         "tipTitle": "Tipp",
         "tipCompleteTable": "Erst wenn jede Tabellenzeile beantwortet ist, lässt sich die DNF sinnvoll prüfen.",
-        "tipTableRows": "Prüfen Sie zuerst die markierten Tabellenzeilen. Die DNF wird aus den korrekten 1-Zeilen abgeleitet.",
+        "tipTableRows": "Gehen Sie die Tabelle Zeile für Zeile durch und prüfen Sie jeden Wert selbst. Erst wenn alle Zeilen stimmen, kann die DNF abgeleitet werden.",
         "tipStartDnf": "Für jede Zeile mit Ergebnis 1 schreiben Sie einen UND-Term mit allen Variablen.",
         "tipSyntax": "Nutzen Sie Klammern und die Operatoren ¬, ∧, ∨ oder die Aliase !, &, |.",
         "tipCanonical": "Jeder UND-Term muss alle Variablen genau einmal enthalten — entweder normal oder negiert.",
         "tipMissingTerms": "Vergleichen Sie die 1-Zeilen der Tabelle mit den UND-Termen in Ihrer DNF.",
         "tipCompareRows": "Testen Sie die DNF gedanklich an den genannten Zeilen und vergleichen Sie das Ergebnis mit der Tabelle.",
         "solutionHint": "Die komplette Lösung kann jetzt als letzte Hilfestellung eingeblendet werden.",
-        "showSolutionHelp": "Lösung als Hilfe anzeigen",
+        "showSolutionHelp": "Lösung anzeigen",
         "solutionAfterCheck": "Lösung nach Prüfung",
-        "hideSolution": "Lösung ausblenden"
+        "hideSolution": "Lösung ausblenden",
+        "startSimplification": "Vereinfachung starten",
+        "hideSimplification": "Vereinfachung ausblenden",
+        "simplificationTitle": "DNF vereinfachen",
+        "simplificationHint": "Nutzen Sie die booleschen Gesetze (Absorption, Distributivität, Komplement, …), um die DNF in eine kürzere äquivalente Form zu bringen.",
+        "canonicalDnfLabel": "Ausgangs-DNF",
+        "simplifiedDnfLabel": "Vereinfachte Form",
+        "simplifiedDnfPlaceholder": "z. B. a ∨ (b ∧ ¬c)",
+        "checkSimplification": "Vereinfachung prüfen",
+        "revealSolutionTitle": "Mögliche minimale Lösung",
+        "revealWalkthroughTitle": "Lösungsweg",
+        "revealAlgebraReferenceTitle": "Regel-Spickzettel",
+        "revealRequiresCheck": "erst nach Prüfen",
+        "minimalDnfLabel": "Eine mögliche minimale DNF",
+        "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF-Form (ODER von UND-Termen), z. B. Ergebnis von Quine-McCluskey.",
+        "factoredLabel": "Mathematisch minimal (mit Faktorisierung)",
+        "factoredNote": "{{literalsLabel}} — durch Ausklammern gemeinsamer Literale noch kürzer als die DNF, aber keine DNF-Form mehr.",
+        "literalCount_one": "{{count}} Literal",
+        "literalCount_other": "{{count}} Literale",
+        "termCount_one": "{{count}} Term",
+        "termCount_other": "{{count}} Termen",
+        "walkthroughTitle": "Ein möglicher Lösungsweg",
+        "walkthroughNote": "Dieser Weg ist nicht eindeutig. Er zeigt eine mögliche Gruppierung der 1-Zeilen zur minimalen Form.",
+        "showFullWalkthrough": "Vollen Lösungsweg anzeigen",
+        "showCompactWalkthrough": "Kompakten Lösungsweg anzeigen",
+        "walkthroughRowsTitle": "Start mit den 1-Zeilen",
+        "walkthroughRowsText": "Die Zeilen {{rows}} liefern die Terme der korrekten DNF.",
+        "walkthroughNoRows": "Es gibt keine 1-Zeile; die Funktion ist für jede Belegung 0.",
+        "walkthroughConstantTitle": "Konstantenfall erkennen",
+        "walkthroughAllRows": "Alle Zeilen haben Ergebnis 1. Deshalb kann die gesamte DNF zu 1 zusammengefasst werden.",
+        "walkthroughAlwaysFalse": "Ohne 1-Zeile bleibt keine UND-Gruppe übrig. Die minimale Form ist daher 0.",
+        "walkthroughGroupsTitle": "Passende Zeilen zusammenfassen",
+        "walkthroughGroupsIntro": "Jede Gruppe unten zeigt, wie sich ihre 1-Zeilen schrittweise zu einem kürzeren Term zusammenfassen lassen — das Distributivgesetz klammert die gemeinsamen Literale aus, das Komplementgesetz reduziert (x ∨ ¬x) auf 1, und das Neutralelement entfernt das verbleibende ∧ 1.",
+        "walkthroughGroupHeading": "Gruppe {{index}}",
+        "walkthroughGroupCoverage": "deckt Zeilen {{rows}} ab",
+        "walkthroughGroupEliminated": "gestrichen: {{variables}}",
+        "walkthroughGroupNoEliminated": "Schon ein einzelner Term — keine Umformung nötig.",
+        "walkthroughCoverTitle": "Alle 1-Zeilen abdecken",
+        "walkthroughCoverText": "Die ausgewählten Gruppen decken alle 1-Zeilen ab — keine 1-Zeile bleibt übrig.",
+        "walkthroughResultTitle": "Mögliche minimale Form",
+        "walkthroughFactoredTitle": "Optional: faktorisieren für noch kürzere Form",
+        "walkthroughFactoredText": "Die minimale DNF hat {{minimalLiterals}} Literale. Durch Ausklammern gemeinsamer Literale (Distributivgesetz rückwärts) lässt sich der Ausdruck auf {{factoredLiterals}} Literale verkürzen — die DNF-Form geht dabei verloren.",
+        "walkthroughFactoredNote": "Diese Form ist mathematisch äquivalent, aber keine DNF mehr (außen steht ∧). Sie ist nur dann gefragt, wenn der kürzeste boolesche Ausdruck gesucht ist, nicht die kürzeste DNF.",
+        "walkthroughRowListMore": "{{visible}}, ... (+{{count}} weitere)",
+        "derivationNotes": {
+          "factorOut": "{{variable}} ausklammern — die anderen Literale bleiben.",
+          "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
+          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg."
+        },
+        "simplificationStatus": {
+          "empty": "Noch keine Eingabe",
+          "syntax_error": "Eingabe konnte nicht gelesen werden",
+          "unknown_variable": "Unbekannte Variable",
+          "not_equivalent": "Nicht äquivalent",
+          "equivalent_not_shorter": "Äquivalent, aber nicht kürzer",
+          "accepted_not_minimal": "Korrekt vereinfacht — geht aber noch kürzer",
+          "accepted_minimal": "Minimale Form — perfekt"
+        },
+        "simplificationDetail": {
+          "empty": "Schreiben Sie eine vereinfachte äquivalente Form der korrekten DNF.",
+          "syntax_error": "Bitte prüfen Sie Klammern und die Operatoren ¬, ∧, ∨ (oder die Aliase !, &, |).",
+          "unknown_variable": "Folgende Variable(n) sind nicht Teil der Wahrheitstabelle: {{variables}}.",
+          "not_equivalent": "Ihre Form stimmt nicht mit der ursprünglichen Wahrheitstabelle überein.",
+          "equivalent_not_shorter": "Äquivalent, aber mit {{userLiterals}} Literalen nicht kürzer als die ursprüngliche DNF mit {{canonicalLiterals}} Literalen.",
+          "accepted_not_minimal": "Äquivalent und kürzer als die ursprüngliche DNF. Sie haben {{userLiterals}} Literale — minimal sind {{minimumLiterals}}.",
+          "accepted_minimal": "{{userLiterals}} Literale — auf Höhe des Minimums ({{minimumLiterals}})."
+        }
       },
+      "followUpTitle": "Weiterarbeiten",
+      "solutionBadge": "Lösung",
       "resultTitle": "DNF",
       "resultHint": "Jede markierte Zeile liefert einen UND-Term.",
       "resultRuleHint": "Merksatz: 0 → Variable negieren, 1 → Variable übernehmen. Nur Zeilen mit Ergebnis 1 werden zu Termen und mit ∨ verknüpft.",
       "variableLimitTitle": "Zu viele Variablen",
-      "variableLimitDesc": "Der Ausdruck enthält {{variables}} Variablen. Bitte nutze höchstens {{max}} Variablen, damit Wahrheitstabelle und DNF im Browser zuverlässig berechnet werden können.",
+      "variableLimitDesc": "Der Ausdruck enthält {{variables}} Variablen. Bitte verwenden Sie höchstens {{max}} Variablen, damit Wahrheitstabelle und DNF im Browser zuverlässig berechnet werden können.",
       "resultCompact": "Große DNF: Alle {{total}} Terme sind in der kompakten Ansicht scrollbar.",
       "resultFull": "Volle DNF mit {{total}} Termen.",
       "showFullResult": "Volle DNF anzeigen",
@@ -391,8 +524,8 @@
       "showFullDerivation": "Volle Herleitung anzeigen",
       "showCompactDerivation": "Kompakte Herleitung anzeigen",
       "derivationRowLabel": "Zeile {{row}}",
-      "derivationTautology": "Jede Zeile ergibt 1, daher ist die saubere DNF die Konstante 1.",
-      "derivationContradiction": "Keine Zeile ergibt 1, daher ist die saubere DNF die Konstante 0.",
+      "derivationTautology": "Jede Zeile ergibt 1 — die DNF ist daher konstant 1.",
+      "derivationContradiction": "Keine Zeile ergibt 1 — die DNF ist daher konstant 0.",
       "truthTableTitle": "Wahrheitstabelle",
       "truthTableRow": "Zeile",
       "truthTablePreview": "Große Tabelle: Es werden zuerst {{shown}} relevante Zeilen angezeigt. Insgesamt: {{total}} Zeilen, davon {{oneRows}} 1-Zeilen.",

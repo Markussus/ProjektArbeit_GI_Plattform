@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,8 @@ export function DnfResultPanel({
 }: DnfResultPanelProps) {
   const { t } = useTranslation();
   const [showFullResult, setShowFullResult] = useState(false);
+  const resultContainerRef = useRef<HTMLDivElement>(null);
+  const [isResultOverflowing, setIsResultOverflowing] = useState(false);
   const terms =
     derivation?.dnf.type === "terms"
       ? derivation.dnf.terms.map(formatDnfTerm)
@@ -31,14 +33,42 @@ export function DnfResultPanel({
     terms && terms.length > RESULT_COMPACT_TERM_LIMIT,
   );
   const isCompactResult = isLargeResult && !showFullResult;
+  const canToggleResult =
+    isLargeResult && (isResultOverflowing || showFullResult);
   const stats = [
     { label: t("dnf.builder.variables"), value: variableCount },
     { label: t("dnf.builder.rows"), value: rowCount },
     { label: t("dnf.builder.oneRows"), value: trueRowCount },
   ];
 
+  useLayoutEffect(() => {
+    if (!isLargeResult || showFullResult) return;
+
+    const element = resultContainerRef.current;
+    if (!element) return;
+
+    const updateOverflow = () => {
+      setIsResultOverflowing(element.scrollHeight > element.clientHeight + 1);
+    };
+
+    const frameId = window.requestAnimationFrame(updateOverflow);
+
+    const resizeObserver = new ResizeObserver(updateOverflow);
+    resizeObserver.observe(element);
+    window.addEventListener("resize", updateOverflow);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateOverflow);
+    };
+  }, [isLargeResult, showFullResult, terms]);
+
   return (
-    <section className="border-border bg-card rounded-lg border p-4">
+    <section
+      data-testid="dnf-result-panel"
+      className="border-border bg-card rounded-lg border p-4"
+    >
       <div className="flex items-center gap-3">
         <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
           <CheckCircle2 className="size-5" />
@@ -53,7 +83,7 @@ export function DnfResultPanel({
         </div>
       </div>
 
-      {isLargeResult && terms && (
+      {canToggleResult && terms && (
         <div className="border-border bg-muted/40 mt-4 rounded-md border p-3">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {showFullResult
@@ -62,6 +92,7 @@ export function DnfResultPanel({
           </p>
           <button
             type="button"
+            data-testid="dnf-result-toggle"
             onClick={() => setShowFullResult((current) => !current)}
             className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
           >
@@ -79,6 +110,7 @@ export function DnfResultPanel({
 
       {terms && terms.length > 1 ? (
         <div
+          ref={resultContainerRef}
           className={cn(
             "border-border bg-muted/40 mt-4 rounded-md border p-3",
             isCompactResult && "max-h-[32rem] overflow-y-auto pr-1",

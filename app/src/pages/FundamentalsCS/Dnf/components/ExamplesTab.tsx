@@ -42,17 +42,10 @@ export function ExamplesTab({
   const groups = groupExamplesByMode(dnfWalkthroughExamples);
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500">
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-6 shadow-sm ring-1">
-        <h2 className="text-foreground flex items-center gap-2 text-xl font-bold">
-          <BookOpen className="text-primary size-6" />
-          {t("dnf.examplesTitle")}
-        </h2>
-        <p className="text-muted-foreground leading-relaxed">
-          {t("dnf.examplesIntro")}
-        </p>
-      </div>
-
+    <div
+      data-testid="dnf-examples-tab"
+      className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500"
+    >
       {modeOrder.map((mode) => {
         const examples = groups[mode];
         if (!examples?.length) {
@@ -64,6 +57,7 @@ export function ExamplesTab({
         return (
           <div
             key={mode}
+            data-testid={`dnf-example-group-${mode}`}
             className="bg-card ring-foreground/10 flex flex-col gap-4 rounded-xl p-6 shadow-sm ring-1"
           >
             <h3 className="text-foreground border-border/50 flex items-center gap-2 border-b pb-2 font-semibold">

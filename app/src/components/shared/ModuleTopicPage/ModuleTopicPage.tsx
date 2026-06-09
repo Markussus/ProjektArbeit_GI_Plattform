@@ -28,6 +28,7 @@ export interface ModuleSimulationTabProps {
   isFocused: boolean;
   onToggleFocus: () => void;
   onExitExercise?: () => void;
+  onExitExample?: () => void;
 }
 
 interface ModuleTopicPageProps {
@@ -70,6 +71,7 @@ export function ModuleTopicPage({
     selectExample,
     openExampleInSimulation,
     clearSimulationExercise,
+    clearSimulationItem,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -156,6 +158,11 @@ export function ModuleTopicPage({
           isFocused={isSimulationFocused}
           onToggleFocus={handleToggleSimulationFocus}
           onExitExercise={simulationExercise ? handleExitExercise : undefined}
+          onExitExample={
+            simulationItem && !simulationExercise
+              ? clearSimulationItem
+              : undefined
+          }
         />
       );
     }

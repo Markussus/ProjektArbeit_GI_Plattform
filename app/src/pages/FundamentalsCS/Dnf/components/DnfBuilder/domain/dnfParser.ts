@@ -15,6 +15,11 @@ interface Token {
   index: number;
 }
 
+interface TokenReadResult {
+  token: Token;
+  nextIndex: number;
+}
+
 export type DnfParseIssueCode =
   | "empty_expression"
   | "unexpected_character"
@@ -217,71 +222,102 @@ function tokenize(source: string): TokenizeResult {
       continue;
     }
 
-    if (char === "0" || char === "1") {
-      tokens.push({ type: "constant", text: char, index });
-      index += 1;
-      continue;
+    const tokenResult = readToken(source, index);
+    if (!tokenResult) {
+      return unexpectedCharacter(index, char);
     }
 
-    if (isIdentifierStart(char)) {
-      const start = index;
-      index += 1;
-
-      while (index < source.length && isIdentifierPart(source[index])) {
-        index += 1;
-      }
-
-      tokens.push({
-        type: "variable",
-        text: source.slice(start, index),
-        index: start,
-      });
-      continue;
-    }
-
-    if (char === "(") {
-      tokens.push({ type: "left_paren", text: char, index });
-      index += 1;
-      continue;
-    }
-
-    if (char === ")") {
-      tokens.push({ type: "right_paren", text: char, index });
-      index += 1;
-      continue;
-    }
-
-    if (char === "¬" || char === "!" || char === "~") {
-      tokens.push({ type: "not", text: char, index });
-      index += 1;
-      continue;
-    }
-
-    if (char === "∧" || char === "&") {
-      const text = source[index + 1] === "&" ? "&&" : char;
-      tokens.push({ type: "and", text, index });
-      index += text.length;
-      continue;
-    }
-
-    if (char === "∨" || char === "|") {
-      const text = source[index + 1] === "|" ? "||" : char;
-      tokens.push({ type: "or", text, index });
-      index += text.length;
-      continue;
-    }
-
-    return {
-      ok: false,
-      issue: {
-        code: "unexpected_character",
-        index,
-        value: char,
-      },
-    };
+    tokens.push(tokenResult.token);
+    index = tokenResult.nextIndex;
   }
 
   return { ok: true, tokens };
+}
+
+function readToken(source: string, index: number): TokenReadResult | null {
+  const char = source[index];
+
+  if (char === "0" || char === "1") {
+    return createToken("constant", char, index);
+  }
+
+  if (isIdentifierStart(char)) {
+    return readIdentifierToken(source, index);
+  }
+
+  const type = getSymbolTokenType(char);
+  if (!type) {
+    return null;
+  }
+
+  const text =
+    type === "and" && source[index + 1] === "&"
+      ? "&&"
+      : type === "or" && source[index + 1] === "|"
+        ? "||"
+        : char;
+
+  return createToken(type, text, index);
+}
+
+function readIdentifierToken(source: string, start: number): TokenReadResult {
+  let nextIndex = start + 1;
+
+  while (nextIndex < source.length && isIdentifierPart(source[nextIndex])) {
+    nextIndex += 1;
+  }
+
+  return {
+    token: {
+      type: "variable",
+      text: source.slice(start, nextIndex),
+      index: start,
+    },
+    nextIndex,
+  };
+}
+
+function createToken(
+  type: TokenType,
+  text: string,
+  index: number,
+): TokenReadResult {
+  return {
+    token: { type, text, index },
+    nextIndex: index + text.length,
+  };
+}
+
+function getSymbolTokenType(char: string): TokenType | null {
+  switch (char) {
+    case "(":
+      return "left_paren";
+    case ")":
+      return "right_paren";
+    case "\u00ac":
+    case "!":
+    case "~":
+      return "not";
+    case "\u2227":
+    case "&":
+      return "and";
+    case "\u2228":
+    case "|":
+      return "or";
+    default:
+      return null;
+  }
+}
+
+function unexpectedCharacter(index: number, value: string): TokenizeResult {
+  return {
+    ok: false,
+    issue: {
+      code: "unexpected_character",
+      index,
+      value,
+    },
+  };
 }
 
 function isWhitespace(value: string): boolean {

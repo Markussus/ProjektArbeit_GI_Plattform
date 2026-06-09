@@ -24,15 +24,20 @@ export function DnfTruthTableView({
   ).slice(0, TABLE_PREVIEW_ROW_LIMIT);
   const rowsToRender =
     isLargeTable && !showAllRows ? previewRows : display.rows;
+  const hasHiddenRows = rowsToRender.length < display.rows.length;
+  const canToggleRows = hasHiddenRows || showAllRows;
   const showRowNumbers = isLargeTable;
 
   return (
-    <section className="border-border bg-card rounded-lg border p-4">
+    <section
+      data-testid="dnf-solution-truth-table-panel"
+      className="border-border bg-card rounded-lg border p-4"
+    >
       <h2 className="text-foreground text-lg font-semibold">
         {t("dnf.builder.truthTableTitle")}
       </h2>
 
-      {isLargeTable && (
+      {canToggleRows && (
         <div className="border-border bg-muted/40 mt-4 rounded-md border p-3">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {showAllRows
@@ -47,6 +52,7 @@ export function DnfTruthTableView({
           </p>
           <button
             type="button"
+            data-testid="dnf-solution-truth-table-toggle"
             onClick={() => setShowAllRows((current) => !current)}
             className="border-border hover:bg-muted mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
           >
@@ -63,6 +69,7 @@ export function DnfTruthTableView({
       )}
 
       <div
+        data-testid="dnf-solution-truth-table"
         className={cn(
           "border-border mt-4 overflow-x-auto rounded-lg border",
           isLargeTable && !showAllRows && "max-h-[32rem] overflow-y-auto",
@@ -120,6 +127,7 @@ export function DnfTruthTableView({
             {rowsToRender.map((row) => (
               <tr
                 key={row.rowNumber}
+                data-testid={`dnf-solution-truth-table-row-${row.rowNumber}`}
                 className={cn(
                   "border-border border-t",
                   row.isContributing && "bg-module-rose-bg/40",

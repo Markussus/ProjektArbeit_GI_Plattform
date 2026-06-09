@@ -10,9 +10,10 @@ import type {
 } from "../domain/dnfExerciseCheck";
 import type { TruthTable } from "../domain/truthTable";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
+import { DnfTruthTable } from "./DnfTruthTable";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
-const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 32;
+const WORKSPACE_TABLE_TOGGLE_THRESHOLD = 16;
 
 interface DnfExerciseWorkspaceProps {
   source: string;
@@ -121,8 +122,11 @@ export function DnfExerciseWorkspace({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <section className="border-border bg-card rounded-lg border p-5">
+    <div data-testid="dnf-exercise-workspace" className="flex flex-col gap-5">
+      <section
+        data-testid="dnf-exercise-task"
+        className="border-border bg-card rounded-lg border p-5"
+      >
         <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {t("dnf.builder.exercise.taskTitle")}
         </p>
@@ -181,227 +185,101 @@ export function DnfExerciseWorkspace({
         </div>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
-        <section className="border-border bg-card rounded-lg border p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-foreground text-lg font-semibold">
-                {t("dnf.builder.exercise.tableTitle")}
-              </h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {requiresTruthTableAnswers
-                  ? t("dnf.builder.exercise.tableHint")
-                  : canEditTruthTableResults
-                    ? t("dnf.builder.exercise.tableHintEditable")
-                    : t("dnf.builder.exercise.tableHintGiven")}
-              </p>
-            </div>
+      <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
+        <section
+          data-testid="dnf-exercise-truth-table-panel"
+          className="border-border bg-card h-full rounded-lg border p-4"
+        >
+          <div>
+            <h2 className="text-foreground text-lg font-semibold">
+              {t("dnf.builder.exercise.tableTitle")}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {requiresTruthTableAnswers
+                ? t("dnf.builder.exercise.tableHint")
+                : canEditTruthTableResults
+                  ? t("dnf.builder.exercise.tableHintEditable")
+                  : t("dnf.builder.exercise.tableHintGiven")}
+            </p>
             {canActuallyToggleTable && onToggleFullTable && (
-              <button
-                type="button"
-                onClick={onToggleFullTable}
-                className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {showFullTable ? (
-                  <ChevronUp className="size-4" />
-                ) : (
-                  <ChevronDown className="size-4" />
-                )}
-                {showFullTable
-                  ? t("dnf.builder.showCompactTable")
-                  : t("dnf.builder.showFullTable")}
-              </button>
+              <div className="mt-3">
+                <button
+                  type="button"
+                  data-testid="dnf-workspace-table-toggle"
+                  onClick={onToggleFullTable}
+                  className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+                >
+                  {showFullTable ? (
+                    <ChevronUp className="size-4" />
+                  ) : (
+                    <ChevronDown className="size-4" />
+                  )}
+                  {showFullTable
+                    ? t("dnf.builder.showCompactTable")
+                    : t("dnf.builder.showFullTable")}
+                </button>
+              </div>
             )}
           </div>
 
-          <div
-            className={cn(
-              "border-border mt-4 overflow-x-auto rounded-lg border",
-              isScrollableTruthTable && "max-h-[32rem] overflow-y-auto",
-            )}
-          >
-            <table className="w-full border-collapse text-sm">
-              <thead
-                className={cn(
-                  "bg-muted",
-                  isScrollableTruthTable && "sticky top-0 z-10",
-                )}
-              >
-                <tr>
-                  <th
-                    scope="col"
-                    className="border-border w-20 border-r px-3 py-2 text-left font-semibold"
-                  >
-                    {t("dnf.builder.exercise.rowHeader")}
-                  </th>
-                  {truthTable.variables.map((variable) => (
-                    <th
-                      key={variable}
-                      scope="col"
-                      className="border-border border-r px-3 py-2 text-left font-semibold"
-                    >
-                      {variable}
-                    </th>
-                  ))}
-                  <th scope="col" className="px-3 py-2 text-left font-semibold">
-                    <code className="font-mono text-sm">{resultHeader}</code>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {truthTable.rows.map((row, rowIndex) => {
-                  const answer = truthTableAnswers[rowIndex] ?? null;
-                  const issue = issueByRow.get(rowIndex);
-                  const isChecked = feedback !== null;
-                  const isCorrect = isChecked && !issue;
+          <DnfTruthTable
+            truthTable={truthTable}
+            resultHeader={resultHeader}
+            isScrollable={isScrollableTruthTable}
+            testId="dnf-exercise-truth-table"
+            getRowTestId={(rowIndex) =>
+              `dnf-exercise-truth-table-row-${rowIndex}`
+            }
+            getRowClassName={(rowIndex) =>
+              requiresTruthTableAnswers &&
+              issueByRow.get(rowIndex)?.actual === null
+                ? "bg-amber-500/10"
+                : undefined
+            }
+            renderResultCell={(row, rowIndex) => {
+              const answer = truthTableAnswers[rowIndex] ?? null;
 
-                  return (
-                    <tr
-                      key={rowIndex}
+              return canInteractWithResultColumn ? (
+                <div
+                  ref={(element) => {
+                    resultRowRefs.current[rowIndex] = element;
+                  }}
+                  tabIndex={0}
+                  role="group"
+                  aria-label={t("dnf.builder.exercise.resultGroupLabel", {
+                    row: rowIndex + 1,
+                  })}
+                  onKeyDown={(event) => handleResultKeyDown(event, rowIndex)}
+                  className="focus:ring-ring grid w-full max-w-36 grid-cols-2 gap-2 rounded-md focus:ring-2 focus:outline-none"
+                >
+                  {[false, true].map((value) => (
+                    <button
+                      key={String(value)}
+                      type="button"
+                      data-testid={`dnf-result-button-${rowIndex}-${value ? "1" : "0"}`}
+                      aria-pressed={answer === value}
+                      aria-label={t("dnf.builder.exercise.resultButtonLabel", {
+                        row: rowIndex + 1,
+                        value: formatBooleanValue(value),
+                      })}
+                      onClick={() => updateTruthTableAnswer(rowIndex, value)}
                       className={cn(
-                        "border-border border-t",
-                        requiresTruthTableAnswers &&
-                          issue?.actual === null &&
-                          "bg-amber-500/10",
-                        requiresTruthTableAnswers &&
-                          issue?.actual !== null &&
-                          issue !== undefined &&
-                          "bg-destructive/10",
-                        requiresTruthTableAnswers &&
-                          isCorrect &&
-                          "bg-emerald-500/10",
+                        "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
+                        answer === value &&
+                          "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
                       )}
                     >
-                      <td className="border-border text-muted-foreground border-r px-3 py-2 font-mono">
-                        {rowIndex + 1}
-                      </td>
-                      {truthTable.variables.map((variable) => (
-                        <td
-                          key={variable}
-                          className="border-border border-r px-3 py-2 font-mono"
-                        >
-                          {formatBooleanValue(row.assignment[variable])}
-                        </td>
-                      ))}
-                      <td className="px-3 py-2">
-                        {canInteractWithResultColumn ? (
-                          <div
-                            ref={(element) => {
-                              resultRowRefs.current[rowIndex] = element;
-                            }}
-                            tabIndex={0}
-                            role="group"
-                            aria-label={t(
-                              "dnf.builder.exercise.resultGroupLabel",
-                              { row: rowIndex + 1 },
-                            )}
-                            onKeyDown={(event) =>
-                              handleResultKeyDown(event, rowIndex)
-                            }
-                            className="focus:ring-ring grid w-full max-w-36 grid-cols-2 gap-2 rounded-md focus:ring-2 focus:outline-none"
-                          >
-                            {[false, true].map((value) => (
-                              <button
-                                key={String(value)}
-                                type="button"
-                                aria-pressed={answer === value}
-                                aria-label={t(
-                                  "dnf.builder.exercise.resultButtonLabel",
-                                  {
-                                    row: rowIndex + 1,
-                                    value: formatBooleanValue(value),
-                                  },
-                                )}
-                                onClick={() =>
-                                  updateTruthTableAnswer(rowIndex, value)
-                                }
-                                className={cn(
-                                  "border-border hover:bg-muted min-h-9 rounded-md border px-3 font-mono text-sm font-semibold transition-colors",
-                                  answer === value &&
-                                    "border-brand bg-brand text-brand-foreground shadow-sm hover:opacity-90",
-                                )}
-                              >
-                                {formatBooleanValue(value)}
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="bg-muted/40 border-border inline-flex min-h-9 min-w-12 items-center justify-center rounded-md border px-3 font-mono text-sm font-semibold">
-                            {formatBooleanValue(row.result)}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4">
-            <label
-              className="text-foreground text-sm font-semibold"
-              htmlFor="dnf-exercise-answer"
-            >
-              {t("dnf.builder.exercise.dnfLabel")}
-            </label>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-              {t("dnf.builder.exercise.dnfHint")}
-            </p>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-              {t("dnf.builder.keyboardAliases")}
-            </p>
-            <DnfOperatorToolbar
-              inputRef={dnfInputRef}
-              value={dnfAnswer}
-              onChange={onDnfAnswerChange}
-              className="mt-3"
-            />
-            <textarea
-              ref={dnfInputRef}
-              id="dnf-exercise-answer"
-              value={dnfAnswer}
-              onChange={(event) => onDnfAnswerChange(event.target.value)}
-              onBlur={(event) =>
-                onDnfAnswerChange(formatBooleanInput(event.target.value))
-              }
-              spellCheck="false"
-              placeholder={t("dnf.builder.exercise.dnfPlaceholder")}
-              className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={onCheck}
-              className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
-            >
-              <Search className="size-4" />
-              {t("dnf.builder.exercise.check")}
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
-            >
-              <RotateCcw className="size-4" />
-              {t("dnf.builder.reset")}
-            </button>
-            <button
-              type="button"
-              onClick={onToggleSolution}
-              disabled={!canShowSolution}
-              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Eye className="size-4" />
-              {showSolution
-                ? t("dnf.builder.exercise.hideSolution")
-                : canShowSolution
-                  ? t("dnf.builder.exercise.showSolutionHelp")
-                  : t("dnf.builder.exercise.solutionAfterCheck")}
-            </button>
-          </div>
+                      {formatBooleanValue(value)}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="bg-muted/40 border-border inline-flex min-h-9 min-w-12 items-center justify-center rounded-md border px-3 font-mono text-sm font-semibold">
+                  {formatBooleanValue(row.result)}
+                </span>
+              );
+            }}
+          />
         </section>
 
         <ExerciseFeedbackPanel
@@ -414,6 +292,80 @@ export function DnfExerciseWorkspace({
           isTruthTableEditable={canEditTruthTableResults}
         />
       </div>
+
+      <section
+        data-testid="dnf-exercise-answer-panel"
+        className="border-border bg-card rounded-lg border p-4"
+      >
+        <div>
+          <label
+            className="text-foreground text-sm font-semibold"
+            htmlFor="dnf-exercise-answer"
+          >
+            {t("dnf.builder.exercise.dnfLabel")}
+          </label>
+          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            {t("dnf.builder.exercise.dnfHint")}
+          </p>
+          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+            {t("dnf.builder.keyboardAliases")}
+          </p>
+          <DnfOperatorToolbar
+            inputRef={dnfInputRef}
+            value={dnfAnswer}
+            onChange={onDnfAnswerChange}
+            className="mt-3"
+          />
+          <textarea
+            ref={dnfInputRef}
+            id="dnf-exercise-answer"
+            data-testid="dnf-exercise-answer"
+            value={dnfAnswer}
+            onChange={(event) => onDnfAnswerChange(event.target.value)}
+            onBlur={(event) =>
+              onDnfAnswerChange(formatBooleanInput(event.target.value))
+            }
+            spellCheck="false"
+            placeholder={t("dnf.builder.exercise.dnfPlaceholder")}
+            className="border-border bg-background text-foreground focus:ring-ring mt-2 min-h-24 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            data-testid="dnf-check-answer"
+            onClick={onCheck}
+            className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+          >
+            <Search className="size-4" />
+            {t("dnf.builder.exercise.check")}
+          </button>
+          <button
+            type="button"
+            data-testid="dnf-reset-answer"
+            onClick={onReset}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+          >
+            <RotateCcw className="size-4" />
+            {t("dnf.builder.reset")}
+          </button>
+          <button
+            type="button"
+            data-testid="dnf-toggle-solution"
+            onClick={onToggleSolution}
+            disabled={!canShowSolution}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Eye className="size-4" />
+            {showSolution
+              ? t("dnf.builder.exercise.hideSolution")
+              : canShowSolution
+                ? t("dnf.builder.exercise.showSolutionHelp")
+                : t("dnf.builder.exercise.solutionAfterCheck")}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

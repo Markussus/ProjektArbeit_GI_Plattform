@@ -21,7 +21,10 @@ export function VariableLimitPanel({
   const { t } = useTranslation();
 
   return (
-    <section className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-amber-800 dark:text-amber-300">
+    <section
+      data-testid="dnf-variable-limit-panel"
+      className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-amber-800 dark:text-amber-300"
+    >
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 size-5 shrink-0" />
         <div>
@@ -44,7 +47,10 @@ export function ParseErrorPanel({ issue }: { issue: DnfParseIssue }) {
   const { t } = useTranslation();
 
   return (
-    <section className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-4">
+    <section
+      data-testid="dnf-parse-error-panel"
+      className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-4"
+    >
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 size-5 shrink-0" />
         <div>
