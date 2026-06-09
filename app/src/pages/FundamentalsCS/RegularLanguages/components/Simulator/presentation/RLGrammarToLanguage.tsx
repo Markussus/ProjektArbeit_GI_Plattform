@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { enumerateLanguage } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
+import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import { RLGrammarInputCard } from "./RLGrammarInputCard";
 
 interface RLGrammarToLanguageProps {
@@ -56,50 +58,57 @@ export function RLGrammarToLanguage({
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"
           titleFallback="Grammar"
-        />
-
-        {/* Supported grammar formats (mirrors the FA grammar panel) */}
-        <details
-          open={showFormats}
-          onToggle={(e) =>
-            setShowFormats((e.target as HTMLDetailsElement).open)
-          }
-          className="bg-card ring-foreground/10 rounded-xl ring-1"
         >
-          <summary className="flex cursor-pointer items-center gap-2 px-5 py-3 text-sm font-medium select-none">
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                !showFormats && "-rotate-90",
-              )}
-            />
-            {t("fa.grammar.supportedFormats", "Supported Formats")}
-          </summary>
-          <div className="flex flex-col gap-3 px-5 pb-4">
-            <div>
-              <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                {t("fa.grammar.format1Label", "Format 1 — simplified")}
+          {/* Supported grammar formats (mirrors the Language → Grammar panel) */}
+          <details
+            open={showFormats}
+            onToggle={(e) =>
+              setShowFormats((e.target as HTMLDetailsElement).open)
+            }
+            className="bg-muted/30 rounded-md border"
+          >
+            <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm font-medium select-none">
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  !showFormats && "-rotate-90",
+                )}
+              />
+              {t("fa.grammar.supportedFormats", "Supported Formats")}
+            </summary>
+            <div className="flex flex-col gap-3 px-3 pb-3">
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+                  {t("fa.grammar.format1Label", "Format 1 — simplified")}
+                </div>
+                <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+                  {GRAMMAR_SIMPLE_EXAMPLE}
+                </pre>
               </div>
-              <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
-                {GRAMMAR_SIMPLE_EXAMPLE}
-              </pre>
-            </div>
-            <div>
-              <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                {t("fa.grammar.format2Label", "Format 2 — structured")}
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+                  {t("fa.grammar.format2Label", "Format 2 — structured")}
+                </div>
+                <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+                  {GRAMMAR_STRUCTURED_EXAMPLE}
+                </pre>
               </div>
-              <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
-                {GRAMMAR_STRUCTURED_EXAMPLE}
-              </pre>
+              <p className="text-muted-foreground text-xs">
+                {t(
+                  "fa.grammar.epsilonHint",
+                  "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
+                )}
+              </p>
             </div>
-            <p className="text-muted-foreground text-xs">
-              {t(
-                "fa.grammar.epsilonHint",
-                "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
-              )}
-            </p>
-          </div>
-        </details>
+          </details>
+        </RLGrammarInputCard>
+
+        <SimulatorStringTransferBox
+          value={source}
+          codec={rlGrammarTransferCodec}
+          onLoad={setSource}
+          testIdPrefix="rl-transfer"
+        />
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">

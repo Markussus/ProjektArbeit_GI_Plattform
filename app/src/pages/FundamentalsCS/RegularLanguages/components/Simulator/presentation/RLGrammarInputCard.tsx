@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import { parseGrammar } from "../domain/rlGrammarValidation";
@@ -7,6 +8,8 @@ interface RLGrammarInputCardProps {
   onChange: (value: string) => void;
   titleKey?: string;
   titleFallback?: string;
+  /** Optional extra content rendered inside the card, e.g. a formats panel. */
+  children?: ReactNode;
 }
 
 const DEFAULT_PLACEHOLDER = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
@@ -16,6 +19,7 @@ export function RLGrammarInputCard({
   onChange,
   titleKey,
   titleFallback,
+  children,
 }: RLGrammarInputCardProps) {
   const { t } = useTranslation();
   const parsed = parseGrammar(value);
@@ -44,6 +48,7 @@ export function RLGrammarInputCard({
           <span>{parsed.error}</span>
         </div>
       )}
+      {children}
     </div>
   );
 }

@@ -2,12 +2,14 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import {
   parseLanguageSpec,
   type LanguageSpec,
 } from "../domain/rlLanguageSpecParser";
 import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
 import { languageToGrammar } from "../domain/rlLanguageOps";
+import { rlLanguageTransferCodec } from "../domain/rlLanguageTransfer";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
@@ -78,68 +80,77 @@ export function RLLanguageToGrammar({
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
-        <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          {t("rl.simulator.languageDefinition", "Language Definition")}
-        </h4>
+      <div className="flex flex-col gap-4">
+        <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+          <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
+            {t("rl.simulator.languageDefinition", "Language Definition")}
+          </h4>
 
-        <textarea
+          <textarea
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+            spellCheck={false}
+            placeholder={DEFAULT_SOURCE}
+            className="border-input bg-background focus:ring-primary min-h-[120px] w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
+          />
+
+          {/* Supported language definition formats (mirrors the FA grammar panel) */}
+          <details
+            open={showFormats}
+            onToggle={(e) =>
+              setShowFormats((e.target as HTMLDetailsElement).open)
+            }
+            className="bg-muted/30 rounded-md border"
+          >
+            <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm font-medium select-none">
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 transition-transform",
+                  !showFormats && "-rotate-90",
+                )}
+              />
+              {t("rl.simulator.supportedFormats", "Supported formats")}
+            </summary>
+            <div className="flex flex-col gap-3 px-3 pb-3">
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+                  {t(
+                    "rl.simulator.supportedFormatsExtensional",
+                    "Extensional / Set Format:",
+                  )}
+                </div>
+                <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+                  {LANGUAGE_ENUMERATION_EXAMPLE}
+                </pre>
+              </div>
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
+                  {t(
+                    "rl.simulator.supportedFormatsIntensional",
+                    "Intensional / Formal Format:",
+                  )}
+                </div>
+                <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
+                  {LANGUAGE_SETBUILDER_EXAMPLE}
+                </pre>
+              </div>
+            </div>
+          </details>
+
+          {!result.ok && result.error && (
+            <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <span>{result.error}</span>
+            </div>
+          )}
+        </div>
+
+        <SimulatorStringTransferBox
           value={source}
-          onChange={(e) => setSource(e.target.value)}
-          spellCheck={false}
-          placeholder={DEFAULT_SOURCE}
-          className="border-input bg-background focus:ring-primary min-h-[120px] w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
+          codec={rlLanguageTransferCodec}
+          onLoad={setSource}
+          testIdPrefix="rl-language-transfer"
         />
-
-        {/* Supported language definition formats (mirrors the FA grammar panel) */}
-        <details
-          open={showFormats}
-          onToggle={(e) =>
-            setShowFormats((e.target as HTMLDetailsElement).open)
-          }
-          className="bg-muted/30 rounded-md border"
-        >
-          <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm font-medium select-none">
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                !showFormats && "-rotate-90",
-              )}
-            />
-            {t("rl.simulator.supportedFormats", "Supported formats")}
-          </summary>
-          <div className="flex flex-col gap-3 px-3 pb-3">
-            <div>
-              <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                {t(
-                  "rl.simulator.supportedFormatsExtensional",
-                  "Extensional / Set Format:",
-                )}
-              </div>
-              <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
-                {LANGUAGE_ENUMERATION_EXAMPLE}
-              </pre>
-            </div>
-            <div>
-              <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                {t(
-                  "rl.simulator.supportedFormatsIntensional",
-                  "Intensional / Formal Format:",
-                )}
-              </div>
-              <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
-                {LANGUAGE_SETBUILDER_EXAMPLE}
-              </pre>
-            </div>
-          </div>
-        </details>
-
-        {!result.ok && result.error && (
-          <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-            <span>{result.error}</span>
-          </div>
-        )}
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">

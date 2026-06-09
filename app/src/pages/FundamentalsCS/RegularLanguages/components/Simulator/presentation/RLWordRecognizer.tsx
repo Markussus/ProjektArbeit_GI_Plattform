@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { recognizeWord } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
+import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import { RLGrammarInputCard } from "./RLGrammarInputCard";
 
 interface RLWordRecognizerProps {
@@ -60,12 +62,21 @@ export function RLWordRecognizer({
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <RLGrammarInputCard
-        value={source}
-        onChange={setSource}
-        titleKey="rl.simulator.grammarInput"
-        titleFallback="Grammar"
-      />
+      <div className="flex flex-col gap-4">
+        <RLGrammarInputCard
+          value={source}
+          onChange={setSource}
+          titleKey="rl.simulator.grammarInput"
+          titleFallback="Grammar"
+        />
+
+        <SimulatorStringTransferBox
+          value={source}
+          codec={rlGrammarTransferCodec}
+          onLoad={setSource}
+          testIdPrefix="rl-transfer"
+        />
+      </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
