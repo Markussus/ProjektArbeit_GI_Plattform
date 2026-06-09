@@ -1,4 +1,4 @@
-import { Grid3X3, Table } from "lucide-react";
+import { Braces, Grid3X3, Table } from "lucide-react";
 import type { ExerciseDefinition } from "@/types/exercise";
 import { createTruthTableFromResults } from "../components/DnfBuilder/domain/truthTable";
 import type { TruthTable } from "../components/DnfBuilder/domain/truthTable";
@@ -32,9 +32,36 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     ),
   },
   {
+    titleKey: "dnf.exercises.simpleExpression.title",
+    descriptionKey: "dnf.exercises.simpleExpression.description",
+    difficulty: "easy",
+    icon: Braces,
+    mode: "expression_to_truth_table",
+    expression: "(a ∨ b) ∧ c",
+  },
+  {
+    titleKey: "dnf.exercises.overlappingGroups.title",
+    descriptionKey: "dnf.exercises.overlappingGroups.description",
+    difficulty: "medium",
+    icon: Table,
+    mode: "truth_table_to_dnf",
+    truthTable: createTruthTableFromResults(
+      ["a", "b", "c"],
+      [true, true, true, false, false, false, false, true],
+    ),
+  },
+  {
+    titleKey: "dnf.exercises.negatedExpression.title",
+    descriptionKey: "dnf.exercises.negatedExpression.description",
+    difficulty: "medium",
+    icon: Braces,
+    mode: "expression_to_truth_table",
+    expression: "¬a ∨ (b ∧ ¬c)",
+  },
+  {
     titleKey: "dnf.exercises.worksheet02bTruthTable2.title",
     descriptionKey: "dnf.exercises.worksheet02bTruthTable2.description",
-    difficulty: "medium",
+    difficulty: "hard",
     icon: Grid3X3,
     mode: "truth_table_to_dnf",
     truthTable: createTruthTableFromResults(
@@ -58,6 +85,14 @@ export const dnfExercises: DnfExerciseDefinition[] = [
         true,
       ],
     ),
+  },
+  {
+    titleKey: "dnf.exercises.complexExpression.title",
+    descriptionKey: "dnf.exercises.complexExpression.description",
+    difficulty: "hard",
+    icon: Braces,
+    mode: "expression_to_truth_table",
+    expression: "(a ∧ ¬b) ∨ (c ∧ d)",
   },
 ];
 

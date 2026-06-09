@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 const DNF_ROUTE = "/fundamentals-cs/dnf";
 const FIRST_DNF_EXERCISE_ID = "dnf.exercises.worksheet02bTruthTable1.title";
+const SIMPLE_EXPRESSION_EXERCISE_ID = "dnf.exercises.simpleExpression.title";
+const COMPLEX_DNF_EXERCISE_ID = "dnf.exercises.complexExpression.title";
 const LECTURE_EXPRESSION_EXAMPLE_ID = "lecture-expression";
 
 async function gotoDnfPage(page: Page) {
@@ -50,6 +52,15 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("tab-button-exercises")).toBeVisible();
     await expect(page.getByTestId("tab-button-examples")).toBeVisible();
     await expect(page.getByTestId("tab-button-simulation")).toBeVisible();
+
+    await switchTab(page, "exercises");
+    await expect(page.getByTestId("dnf-exercises-tab")).toBeVisible();
+    await expect(
+      page.getByTestId(`dnf-exercise-card-${FIRST_DNF_EXERCISE_ID}-select`),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(`dnf-exercise-card-${COMPLEX_DNF_EXERCISE_ID}-select`),
+    ).toBeVisible();
 
     await switchTab(page, "examples");
     await expect(page.getByTestId("dnf-examples-tab")).toBeVisible();
@@ -102,6 +113,30 @@ test.describe("DNF page", () => {
       .fill("a | b | c | d | e | f | g | h | i");
     await page.getByTestId("dnf-evaluate-expression").click();
     await expect(page.getByTestId("dnf-variable-limit-panel")).toBeVisible();
+  });
+
+  test("opens a curated expression exercise in the matching simulator mode", async ({
+    page,
+  }) => {
+    await gotoDnfPage(page);
+    await switchTab(page, "exercises");
+
+    await page
+      .getByTestId(`dnf-exercise-card-${SIMPLE_EXPRESSION_EXERCISE_ID}-select`)
+      .click();
+    await page
+      .getByTestId(`dnf-exercise-card-${SIMPLE_EXPRESSION_EXERCISE_ID}-open`)
+      .click();
+
+    await expect(
+      page.getByTestId("simulation-selected-exercise"),
+    ).toHaveAttribute("data-item-id", SIMPLE_EXPRESSION_EXERCISE_ID);
+    await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
+      "data-mode",
+      "expression_to_truth_table",
+    );
+    await expect(page.getByTestId("dnf-exercise-truth-table")).toBeVisible();
+    await expect(page.getByTestId("dnf-result-button-0-0")).toBeVisible();
   });
 
   test("solves a truth-table exercise and checks simplification walkthrough reveals", async ({

@@ -305,12 +305,28 @@
     "exampleRuleText": "Bei Wert 1 wird die Variable übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
     "exercises": {
       "worksheet02bTruthTable1": {
-        "title": "Übungsblatt 02b: Wertetafel 1",
-        "description": "Schreiben Sie das boolesche Polynom in disjunktiver Normalform für die vorgegebene Wertetafel mit a, b und c."
+        "title": "DNF aus Wertetafel bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b und c die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 1."
+      },
+      "simpleExpression": {
+        "title": "Wertetafel aus Ausdruck erstellen",
+        "description": "Erstellen Sie die Wertetafel für den vorgegebenen Ausdruck und leiten Sie daraus die kanonische DNF ab."
+      },
+      "overlappingGroups": {
+        "title": "DNF mit überlappenden Gruppen vereinfachen",
+        "description": "Leiten Sie die kanonische DNF aus der Wertetafel her und bestimmen Sie eine minimale DNF. Beachten Sie, dass eine 1-Zeile mehrere Gruppen abdecken darf."
+      },
+      "negatedExpression": {
+        "title": "Ausdruck mit Negationen auswerten",
+        "description": "Erstellen Sie die Wertetafel für einen Ausdruck mit mehreren Negationen und bestimmen Sie die zugehörige kanonische DNF."
       },
       "worksheet02bTruthTable2": {
-        "title": "Übungsblatt 02b: Wertetafel 2",
-        "description": "Schreiben Sie das boolesche Polynom in disjunktiver Normalform für die vorgegebene Wertetafel mit a, b, c und d."
+        "title": "DNF mit vier Variablen bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b, c und d die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 2."
+      },
+      "complexExpression": {
+        "title": "Komplexen Ausdruck in DNF überführen",
+        "description": "Erstellen Sie die Wertetafel für den Ausdruck mit vier Variablen, bestimmen Sie die kanonische DNF und vereinfachen Sie diese."
       }
     },
     "exprBuilder": {
@@ -417,7 +433,7 @@
         "tipMissingTerms": "Vergleichen Sie die 1-Zeilen der Tabelle mit den UND-Termen in Ihrer DNF.",
         "tipCompareRows": "Testen Sie die DNF gedanklich an den genannten Zeilen und vergleichen Sie das Ergebnis mit der Tabelle.",
         "solutionHint": "Die komplette Lösung kann jetzt als letzte Hilfestellung eingeblendet werden.",
-        "showSolutionHelp": "Lösung als Hilfe anzeigen",
+        "showSolutionHelp": "Lösung anzeigen",
         "solutionAfterCheck": "Lösung nach Prüfung",
         "hideSolution": "Lösung ausblenden",
         "startSimplification": "Vereinfachung starten",

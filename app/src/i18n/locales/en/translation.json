@@ -309,12 +309,28 @@
     "exampleRuleText": "If the value is 1, keep the variable as-is; if the value is 0, negate it. This makes each AND term describe exactly one matching table row.",
     "exercises": {
       "worksheet02bTruthTable1": {
-        "title": "Worksheet 02b: truth table 1",
-        "description": "Write the Boolean polynomial in disjunctive normal form for the given truth table with a, b, and c."
+        "title": "Derive DNF from a Truth Table",
+        "description": "Derive the canonical DNF from the given truth table with a, b, and c, then simplify it. Based on worksheet 02b, exercise 1."
+      },
+      "simpleExpression": {
+        "title": "Build a Truth Table from an Expression",
+        "description": "Create the truth table for the given expression and derive its canonical DNF."
+      },
+      "overlappingGroups": {
+        "title": "Simplify DNF with Overlapping Groups",
+        "description": "Derive the canonical DNF from the truth table and determine a minimal DNF. Remember that a 1-row may be covered by multiple groups."
+      },
+      "negatedExpression": {
+        "title": "Evaluate an Expression with Negations",
+        "description": "Create the truth table for an expression with multiple negations and determine its canonical DNF."
       },
       "worksheet02bTruthTable2": {
-        "title": "Worksheet 02b: truth table 2",
-        "description": "Write the Boolean polynomial in disjunctive normal form for the given truth table with a, b, c, and d."
+        "title": "Derive DNF with Four Variables",
+        "description": "Derive the canonical DNF from the given truth table with a, b, c, and d, then simplify it. Based on worksheet 02b, exercise 2."
+      },
+      "complexExpression": {
+        "title": "Convert a Complex Expression to DNF",
+        "description": "Create the truth table for the four-variable expression, determine its canonical DNF, and simplify it."
       }
     },
     "exprBuilder": {
@@ -421,7 +437,7 @@
         "tipMissingTerms": "Compare the table's 1-rows with the AND terms in your DNF.",
         "tipCompareRows": "Evaluate your DNF on the listed rows and compare the result with the table.",
         "solutionHint": "The full solution can now be shown as the final hint.",
-        "showSolutionHelp": "Show solution as hint",
+        "showSolutionHelp": "Show solution",
         "solutionAfterCheck": "Solution after check",
         "hideSolution": "Hide solution",
         "startSimplification": "Start simplification",
