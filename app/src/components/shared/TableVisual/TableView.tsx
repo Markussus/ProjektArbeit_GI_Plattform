@@ -73,6 +73,9 @@ export function TableView({
   className,
   tableClassName,
   disableActiveCellAutoScroll = false,
+  testIdPrefix,
+  getRowTestAttributes,
+  getCellTestAttributes,
 }: TableViewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -148,6 +151,9 @@ export function TableView({
       <th
         key={`header-${colIndex}`}
         scope="col"
+        data-testid={
+          testIdPrefix ? `${testIdPrefix}-header-${colIndex + 1}` : undefined
+        }
         className={cn(
           HEADER_CELL_CLASS,
           getColumnWidthClassName(
@@ -164,6 +170,11 @@ export function TableView({
               value={header}
               onChange={(e) => onHeaderChange?.(colIndex, e.target.value)}
               aria-label={getHeaderInputAriaLabel(colIndex)}
+              data-testid={
+                testIdPrefix
+                  ? `${testIdPrefix}-header-input-${colIndex + 1}`
+                  : undefined
+              }
               className={HEADER_INPUT_CLASS}
               autoComplete="off"
               spellCheck="false"
@@ -183,6 +194,11 @@ export function TableView({
               onClick={() => onRemoveColumn?.(colIndex)}
               disabled={disableRemoveColumn}
               aria-label={labels.removeColumn}
+              data-testid={
+                testIdPrefix
+                  ? `${testIdPrefix}-remove-column-${colIndex + 1}`
+                  : undefined
+              }
               className={cn(HOVER_ACTION_BUTTON_CLASS, "-mr-1")}
               title={labels.removeColumn}
             >
@@ -204,6 +220,9 @@ export function TableView({
             onClick={onAddColumn}
             disabled={disableAddColumn}
             aria-label={labels.addColumn}
+            data-testid={
+              testIdPrefix ? `${testIdPrefix}-add-column` : undefined
+            }
             className={ADD_ACTION_BUTTON_CLASS}
             title={labels.addColumn}
           >
@@ -241,6 +260,11 @@ export function TableView({
               "Remove row {{index}}",
               { index: rowIndex + 1 },
             )}
+            data-testid={
+              testIdPrefix
+                ? `${testIdPrefix}-remove-row-${rowIndex + 1}`
+                : undefined
+            }
             className={ROW_ACTION_BUTTON_CLASS}
             title={labels.removeRow}
           >
@@ -274,6 +298,12 @@ export function TableView({
         key={`cell-${rowIndex}-${colIndex}`}
         data-table-row={rowIndex}
         data-table-col={colIndex}
+        data-testid={
+          testIdPrefix
+            ? `${testIdPrefix}-cell-${rowIndex + 1}-${colIndex + 1}`
+            : undefined
+        }
+        {...getCellTestAttributes?.(rowIndex, colIndex, cellState.value)}
         className={cn(
           BODY_CELL_CLASS,
           getColumnWidthClassName(
@@ -294,6 +324,11 @@ export function TableView({
             disabled={cellState.disabled}
             aria-invalid={cellState.isInvalid || undefined}
             aria-label={getCellInputAriaLabel(rowIndex, colIndex)}
+            data-testid={
+              testIdPrefix
+                ? `${testIdPrefix}-cell-input-${rowIndex + 1}-${colIndex + 1}`
+                : undefined
+            }
             className={cn(
               CELL_INPUT_CLASS,
               cellState.isInvalid && CELL_INPUT_INVALID_CLASS,
@@ -302,7 +337,15 @@ export function TableView({
             spellCheck="false"
           />
         ) : (
-          <div aria-label={columnLabel} className={READ_ONLY_CELL_CLASS}>
+          <div
+            aria-label={columnLabel}
+            data-testid={
+              testIdPrefix
+                ? `${testIdPrefix}-cell-value-${rowIndex + 1}-${colIndex + 1}`
+                : undefined
+            }
+            className={READ_ONLY_CELL_CLASS}
+          >
             {cellState.value}
           </div>
         )}
@@ -311,9 +354,14 @@ export function TableView({
   };
 
   return (
-    <div ref={containerRef} className={cn(TABLE_CONTAINER_CLASS, className)}>
+    <div
+      ref={containerRef}
+      data-testid={testIdPrefix ? `${testIdPrefix}-container` : undefined}
+      className={cn(TABLE_CONTAINER_CLASS, className)}
+    >
       <table
         aria-label={labels.table}
+        data-testid={testIdPrefix}
         className={cn(TABLE_CLASS, tableClassName)}
       >
         <thead className={HEADER_ROW_CLASS}>
@@ -340,6 +388,10 @@ export function TableView({
               return (
                 <tr
                   key={`row-${rIdx}`}
+                  data-testid={
+                    testIdPrefix ? `${testIdPrefix}-row-${rIdx + 1}` : undefined
+                  }
+                  {...getRowTestAttributes?.(rIdx, row)}
                   className={cn(
                     BODY_ROW_CLASS,
                     isRowActive && BODY_ROW_ACTIVE_CLASS,
@@ -362,6 +414,9 @@ export function TableView({
                   onClick={onAddRow}
                   disabled={disableAddRow}
                   aria-label={labels.addRow}
+                  data-testid={
+                    testIdPrefix ? `${testIdPrefix}-add-row` : undefined
+                  }
                   className={ADD_ROW_BUTTON_CLASS}
                 >
                   <Plus size={16} />

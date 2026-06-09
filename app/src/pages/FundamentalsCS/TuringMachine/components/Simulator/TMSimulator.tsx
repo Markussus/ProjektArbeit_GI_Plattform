@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { cloneJson, cn } from "@/lib/utils";
 import {
   emptyTuringMachineProgram,
@@ -19,6 +20,7 @@ import {
 } from "./application/tmSolutionChecker";
 import { useTMSimulator } from "./application/useTMSimulator";
 import type { TMProgram } from "./domain/tmProgram";
+import { tmProgramTransferCodec } from "./domain/tmProgramTransfer";
 import { TMConfigView } from "./presentation/TMConfigView";
 import { TMSimulationView } from "./presentation/TMSimulationView";
 
@@ -58,6 +60,13 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
     const handleEditProgram = () => {
       simulation.pause();
       editor.resetToProgram(program);
+      setIsEditMode(true);
+    };
+
+    const handleImportProgram = (nextProgram: TMProgram) => {
+      simulation.pause();
+      setProgram(nextProgram);
+      editor.resetToProgram(nextProgram);
       setIsEditMode(true);
     };
 
@@ -118,6 +127,9 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
 
     return (
       <div
+        data-testid="tm-simulator"
+        data-mode={isEditMode ? "edit" : "simulation"}
+        data-scenario-id={scenario?.id ?? ""}
         className={cn(
           "mx-auto flex w-full flex-col gap-6 p-4",
           isEditMode ? "max-w-none" : "max-w-7xl",
@@ -126,9 +138,16 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
         {isEditMode ? (
           <div className="flex flex-col gap-4">
             <TMConfigView editor={editor} />
+            <SimulatorStringTransferBox
+              value={editor.draft}
+              codec={tmProgramTransferCodec}
+              onLoad={handleImportProgram}
+              testIdPrefix="tm-transfer"
+            />
             <button
               onClick={handleApplyProgram}
               disabled={editor.hasBlockingCellIssue}
+              data-testid="tm-start-simulation"
               className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("tm.config.general.apply")}

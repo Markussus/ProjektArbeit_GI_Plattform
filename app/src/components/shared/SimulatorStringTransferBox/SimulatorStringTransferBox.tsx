@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Clipboard, Download, Upload } from "lucide-react";
+import { Clipboard, Download, LoaderCircle, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
@@ -26,10 +26,15 @@ export function SimulatorStringTransferBox<TValue>({
   );
   const [feedbackKey, setFeedbackKey] = useState<
     | "simulation.transfer.copied"
+    | "simulation.transfer.exportError"
     | "simulation.transfer.importSuccess"
     | "simulation.transfer.importError"
     | null
   >(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [showExportSpinner, setShowExportSpinner] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [showImportSpinner, setShowImportSpinner] = useState(false);
 
   useEffect(() => {
     if (!feedbackKey) {
@@ -52,7 +57,10 @@ export function SimulatorStringTransferBox<TValue>({
     : textValue;
 
   const feedbackToneClassName = useMemo(() => {
-    if (feedbackKey === "simulation.transfer.importError") {
+    if (
+      feedbackKey === "simulation.transfer.exportError" ||
+      feedbackKey === "simulation.transfer.importError"
+    ) {
       return "text-destructive";
     }
 
@@ -60,11 +68,28 @@ export function SimulatorStringTransferBox<TValue>({
   }, [feedbackKey]);
 
   const handleGenerate = () => {
+    if (isExporting) {
+      return;
+    }
+
+    setIsExporting(true);
+    const spinnerTimeoutId = window.setTimeout(() => {
+      setShowExportSpinner(true);
+    }, 10);
+
     void (async () => {
-      const nextValue = await codec.exportValue(value);
-      setTextValue(nextValue);
-      setInputMode("generated");
-      setFeedbackKey(null);
+      try {
+        const nextValue = await codec.exportValue(value);
+        setTextValue(nextValue);
+        setInputMode("generated");
+        setFeedbackKey(null);
+      } catch {
+        setFeedbackKey("simulation.transfer.exportError");
+      } finally {
+        window.clearTimeout(spinnerTimeoutId);
+        setShowExportSpinner(false);
+        setIsExporting(false);
+      }
     })();
   };
 
@@ -78,6 +103,15 @@ export function SimulatorStringTransferBox<TValue>({
   };
 
   const handleLoad = () => {
+    if (isImporting) {
+      return;
+    }
+
+    setIsImporting(true);
+    const spinnerTimeoutId = window.setTimeout(() => {
+      setShowImportSpinner(true);
+    }, 10);
+
     void (async () => {
       try {
         const importedValue = await codec.importValue(trimmedValue);
@@ -88,9 +122,15 @@ export function SimulatorStringTransferBox<TValue>({
         setFeedbackKey("simulation.transfer.importSuccess");
       } catch {
         setFeedbackKey("simulation.transfer.importError");
+      } finally {
+        window.clearTimeout(spinnerTimeoutId);
+        setShowImportSpinner(false);
+        setIsImporting(false);
       }
     })();
   };
+
+  const isBusy = isExporting || isImporting;
 
   return (
     <section
@@ -107,7 +147,7 @@ export function SimulatorStringTransferBox<TValue>({
             data-testid={testIdPrefix ? `${testIdPrefix}-input` : undefined}
             value={inputDisplayValue}
             onChange={(event) => {
-              if (isShowingCopyFeedback) {
+              if (isShowingCopyFeedback || isBusy) {
                 return;
               }
 
@@ -116,7 +156,7 @@ export function SimulatorStringTransferBox<TValue>({
               setInputMode(nextValue.trim().length === 0 ? "empty" : "manual");
             }}
             onPaste={() => {
-              if (isShowingCopyFeedback) {
+              if (isShowingCopyFeedback || isBusy) {
                 return;
               }
 
@@ -128,7 +168,7 @@ export function SimulatorStringTransferBox<TValue>({
             className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none focus-visible:ring-2"
             spellCheck={false}
             autoComplete="off"
-            readOnly={isShowingCopyFeedback}
+            readOnly={isShowingCopyFeedback || isBusy}
           />
 
           <button
@@ -137,7 +177,7 @@ export function SimulatorStringTransferBox<TValue>({
               void handleCopy();
             }}
             data-testid={testIdPrefix ? `${testIdPrefix}-copy` : undefined}
-            disabled={!hasText}
+            disabled={!hasText || isBusy}
             aria-label={t("simulation.transfer.copy")}
             title={t("simulation.transfer.copy")}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-3 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -151,22 +191,50 @@ export function SimulatorStringTransferBox<TValue>({
             type="button"
             onClick={handleGenerate}
             data-testid={testIdPrefix ? `${testIdPrefix}-export` : undefined}
-            disabled={hasManualInput}
-            className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={hasManualInput || isBusy}
+            aria-busy={isExporting}
+            aria-label={t("simulation.transfer.export")}
+            className="bg-brand text-brand-foreground inline-flex min-w-28 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Download className="size-4" />
-            {t("simulation.transfer.export")}
+            {showExportSpinner ? (
+              <LoaderCircle
+                data-testid={
+                  testIdPrefix ? `${testIdPrefix}-export-spinner` : undefined
+                }
+                className="size-4 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <>
+                <Download className="size-4" />
+                {t("simulation.transfer.export")}
+              </>
+            )}
           </button>
 
           <button
             type="button"
             onClick={handleLoad}
             data-testid={testIdPrefix ? `${testIdPrefix}-import` : undefined}
-            disabled={!hasManualInput}
-            className="bg-secondary text-secondary-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!hasManualInput || isBusy}
+            aria-busy={isImporting}
+            aria-label={t("simulation.transfer.import")}
+            className="bg-secondary text-secondary-foreground inline-flex min-w-28 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Upload className="size-4" />
-            {t("simulation.transfer.import")}
+            {showImportSpinner ? (
+              <LoaderCircle
+                data-testid={
+                  testIdPrefix ? `${testIdPrefix}-import-spinner` : undefined
+                }
+                className="size-4 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <>
+                <Upload className="size-4" />
+                {t("simulation.transfer.import")}
+              </>
+            )}
           </button>
         </div>
       </div>

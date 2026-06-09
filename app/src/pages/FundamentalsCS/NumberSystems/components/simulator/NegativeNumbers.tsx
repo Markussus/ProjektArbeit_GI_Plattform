@@ -93,6 +93,7 @@ export function NegativeNumbers({
               >
                 <input
                   type="number"
+                  data-testid="ns-negative-decimal-input"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   readOnly={locked}
@@ -108,6 +109,7 @@ export function NegativeNumbers({
 
             <div className="space-y-4">
               <ResultRow
+                data-testid="ns-negative-sign-magnitude"
                 label={t("simulator.numbers.signMagnitude")}
                 value={locked ? "" : signMagnitude}
                 valid={isValid}
@@ -115,6 +117,7 @@ export function NegativeNumbers({
                 onClick={() => setActiveMode("sign")}
               />
               <ResultRow
+                data-testid="ns-negative-ones-complement"
                 label={t("simulator.numbers.onesComplement")}
                 value={locked ? "" : onesComplement}
                 valid={isValid}
@@ -122,6 +125,7 @@ export function NegativeNumbers({
                 onClick={() => setActiveMode("ones")}
               />
               <ResultRow
+                data-testid="ns-negative-twos-complement"
                 label={t("simulator.numbers.twosComplement")}
                 value={locked ? "" : twosComplement}
                 valid={isValid}
@@ -264,15 +268,17 @@ function ResultRow({
   valid,
   highlight = false,
   onClick,
+  ...rest
 }: {
   label: string;
   value: string;
   valid: boolean;
   highlight?: boolean;
   onClick?: () => void;
-}) {
+} & React.HTMLAttributes<HTMLButtonElement>) {
   return (
     <button
+      {...rest}
       onClick={valid ? onClick : undefined}
       disabled={!valid || !onClick}
       className={`w-full rounded-lg border p-3 text-left ${highlight ? "border-primary bg-primary/5 ring-primary/20 ring-1" : "border-border/40 bg-background hover:border-primary/50 cursor-pointer"} ${(!valid || !onClick) && "hover:border-border/40 cursor-not-allowed opacity-50"}`}

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { FASimulator } from "./Simulator/FASimulator";
@@ -7,15 +8,24 @@ import { findFAExercise } from "../exercises/faExerciseDefinitions";
 import { useFASimulatorStore } from "../store/faSimulatorStore";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
-  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
   const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
   const studentProgram = useFASimulatorStore((s) => s.studentProgram);
   const loadExample = useFASimulatorStore((s) => s.loadExample);
   const setPendingInputWord = useFASimulatorStore((s) => s.setPendingInputWord);
 
-  const activeExercise = activeExerciseId
-    ? findFAExercise(activeExerciseId)
+  // Drive the exercise panel from the page-level selection rather than a
+  // separate store flag. The page clears `selectedExercise` whenever the
+  // exercise is exited, a tab switch is confirmed, or an example is opened in
+  // its place — so the workspace panel never lingers behind those actions.
+  const activeExercise = props.selectedExercise
+    ? findFAExercise(props.selectedExercise.id)
     : undefined;
+
+  // Keep the store flag in sync so other store consumers (e.g. solution
+  // seeding) agree with what is actually displayed.
+  useEffect(() => {
+    setActiveExercise(activeExercise?.id ?? null);
+  }, [activeExercise?.id, setActiveExercise]);
 
   // The FA panel above is the only "selected exercise" display we use here.
   // Suppress the shared workspace card unconditionally so closing an exercise
@@ -30,6 +40,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const handleExitExercise = () => {
     setActiveExercise(null);
+    props.onExitExercise?.();
   };
 
   return (
@@ -49,6 +60,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       <TopicSimulationTab
         {...props}
         selectedExercise={selectedExercise}
+        // While an exercise is active the workspace panel above is its header,
+        // so suppress the shared "Selected exercise" card to avoid showing it
+        // twice. Examples still fall through to the shared card.
+        selectedItem={activeExercise ? null : props.selectedItem}
         emptyStateTextKey="simulation.emptyStates.automata"
       >
         <FASimulator />

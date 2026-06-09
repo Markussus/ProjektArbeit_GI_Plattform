@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOCUMENTATION",
+    "legal": "LEGAL",
     "support": "SUPPORT",
     "toggle": "Toggle sidebar"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Third-party notices"
   },
   "theme": {
     "light": "Light Mode",
@@ -68,6 +70,8 @@
     "concept1Desc": "Build either type — the editor flags non-determinism in your transition table.",
     "concept2": "Grammar → Automaton",
     "concept2Desc": "Paste a right-linear regular grammar and convert it to an NFA in one click.",
+    "concept3": "Step-by-step simulation",
+    "concept4": "Batch testing of words",
     "comparison": "DFA vs. NFA",
     "dfaSubtitle": "Deterministic Finite Automaton",
     "dfaPoint1": "Exactly one transition per (state, symbol)",
@@ -149,6 +153,41 @@
     "example_u06_2": "Binary Multiplication (1011 × 11001)",
     "example_u06_2_desc": "Multiply 1011 and 11001 in binary."
   },
+  "encoding": {
+    "title": "Encoding",
+    "description": "Learn Base64 and UTF-8 encoding. Understand how text is converted to Base64 strings and how characters are represented as UTF-8 byte sequences.",
+    "overviewTitle": "Why Encoding Matters",
+    "overviewText": "Encoding schemes like Base64 and UTF-8 are fundamental to how data is transmitted and stored. Base64 converts binary data to ASCII-safe text, while UTF-8 provides a universal character encoding that supports all writing systems.",
+    "concepts": "Key Concepts",
+    "concept1": "Base64 Encoding",
+    "concept2": "Base64 Decoding",
+    "concept3": "UTF-8 Character Encoding",
+    "concept4": "ASCII vs UTF-8",
+    "ex_base64_placeholder": "Base64 Encoding Exercise",
+    "ex_base64_placeholder_desc": "Encode a text string to Base64.",
+    "ex_utf8_placeholder": "UTF-8 Encoding Exercise",
+    "ex_utf8_placeholder_desc": "Encode characters to their UTF-8 byte sequence.",
+    "ex_ascii_easy": "ASCII Conversion",
+    "ex_ascii_easy_desc": "Convert the character '{{char}}' to its ASCII value (decimal and hex). What is the decimal ASCII value?",
+    "ex_utf8_easy": "UTF-8 Encoding (1 Byte)",
+    "ex_utf8_easy_desc": "Convert the Unicode value U+{{hex}} (range 0x0000-0x007F) to its UTF-8 binary representation.",
+    "ex_time_easy": "Unix Timestamp Calculation",
+    "ex_time_easy_desc": "Given the Unix timestamp {{timestamp}}, what is the counter value exactly {{hours}} hours in the future?",
+    "ex_base64_medium": "Base64 Encoding (3 characters)",
+    "ex_base64_medium_desc": "Convert the string '{{str}}' (exactly 3 characters, no padding needed) to Base64.",
+    "ex_utf8_medium": "UTF-8 Encoding (3 Bytes)",
+    "ex_utf8_medium_desc": "Convert the Unicode value U+{{hex}} (range 0x0800-0xFFFF, requires 3 bytes) to its UTF-8 binary representation.",
+    "ex_time_medium": "Age Verification",
+    "ex_time_medium_desc": "Person A was born at timestamp {{birthTimestamp}}. Today is timestamp {{nowTimestamp}}. Is the person 18 or older? (Answer: Ja/Nein)",
+    "ex_base64_hard": "Base64 Decoding (with Padding)",
+    "ex_base64_hard_desc": "Decode the Base64 string '{{encoded}}' (with padding ==) back to ASCII text.",
+    "ex_utf8_hard": "UTF-8 Decoding (3 Bytes)",
+    "ex_utf8_hard_desc": "Which Unicode value (U+XXXX) corresponds to the 3-byte UTF-8 binary sequence '{{binary}}'?",
+    "example_base64_1": "Base64 Encode 'Hello'",
+    "example_base64_1_desc": "Encode the text 'Hello' to Base64.",
+    "example_utf8_1": "UTF-8 Encode 'Hello'",
+    "example_utf8_1_desc": "Encode the text 'Hello' to UTF-8 bytes."
+  },
   "moore": {
     "title": "Moore & Mealy Machines",
     "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",
@@ -178,15 +217,56 @@
     "concept2": "Truth Tables",
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
-    "examplesTitle": "Lecture examples",
-    "examplesIntro": "Four examples show compactly how rows with result 1 become the DNF.",
+    "algebra": {
+      "title": "Boolean algebra rules",
+      "intro": "These rules let you rewrite a DNF into shorter equivalent forms. They power the step-by-step solution path and the worked examples in the simulator.",
+      "rules": {
+        "identity": {
+          "name": "Identity",
+          "example": "1 acts as the neutral element of ∧ and 0 as the neutral element of ∨."
+        },
+        "domination": {
+          "name": "Domination",
+          "example": "Whatever is OR-ed with 1 is forced to 1; whatever is AND-ed with 0 is forced to 0."
+        },
+        "idempotence": {
+          "name": "Idempotence",
+          "example": "Repeating the same operand neither tightens nor relaxes the term."
+        },
+        "double_negation": {
+          "name": "Double negation",
+          "example": "Two negations cancel each other out."
+        },
+        "complement": {
+          "name": "Complement",
+          "example": "A variable is always either true or false — so a ∨ ¬a is always 1, and a ∧ ¬a is always 0."
+        },
+        "commutativity": {
+          "name": "Commutativity",
+          "example": "Operand order does not affect the result for ∧ and ∨."
+        },
+        "associativity": {
+          "name": "Associativity",
+          "example": "With multiple ∧ or ∨ operations, the grouping does not matter — (a ∧ b) ∧ c equals a ∧ (b ∧ c)."
+        },
+        "distributivity": {
+          "name": "Distributivity",
+          "example": "A shared operand can be factored out — like factoring in regular maths, but with ∧ and ∨ instead of · and +."
+        },
+        "absorption": {
+          "name": "Absorption",
+          "example": "If a is already true, then a ∨ (a ∧ b) is also true — the AND part adds nothing."
+        },
+        "de_morgan": {
+          "name": "De Morgan",
+          "example": "Negation flips the operator: ∧ becomes ∨ and each operand is negated."
+        }
+      }
+    },
     "examples": {
-      "openInSimulation": "Open in simulation",
-      "labels": {
-        "expression": "Expression",
-        "oneRows": "Relevant 1-rows",
-        "terms": "AND terms",
-        "canonicalDnf": "DNF"
+      "modeGroup": {
+        "expression_to_truth_table": "Mode: Expression → truth table",
+        "truth_table_to_dnf": "Mode: Truth table → DNF"
       },
       "walkthroughs": {
         "lectureExpression": {
@@ -204,6 +284,18 @@
         "xor": {
           "title": "Half-adder sum as XOR",
           "explanation": "The sum is 1 when exactly one input is 1."
+        },
+        "carry": {
+          "title": "Half-adder carry",
+          "explanation": "The carry bit is only 1 when both inputs are 1 — a single AND term."
+        },
+        "dnfIntro": {
+          "title": "DNF introduction from the lecture",
+          "explanation": "Only rows 000 and 111 evaluate to 1, producing two AND terms."
+        },
+        "exerciseTwo": {
+          "title": "Exercise 2: polynomial from truth table",
+          "explanation": "Three 1-rows (010, 100, 101) lead to the DNF of lecture exercise 2."
         }
       }
     },
@@ -217,19 +309,54 @@
     "exampleResultTitle": "DNF",
     "exampleRuleTitle": "Rule of thumb",
     "exampleRuleText": "If the value is 1, keep the variable as-is; if the value is 0, negate it. This makes each AND term describe exactly one matching table row.",
-    "exercise1": "Evaluate expression and derive DNF",
-    "exercise1Desc": "Fill in the truth table and build the DNF from all 1-rows",
-    "exercise2": "Compare parentheses and build DNF",
-    "exercise2Desc": "Evaluate the parenthesized expression and derive the DNF from it",
-    "exercise3": "Half-adder sum as DNF",
-    "exercise3Desc": "Check the XOR polynomial from the lecture through the truth table",
-    "exercise4": "Multi-variable expression as DNF",
-    "exercise4Desc": "Evaluate an expression with four variables and build the DNF",
-    "exercise5": "Boolean polynomial from truth table",
-    "exercise5Desc": "Create the boolean polynomial in DNF from a given truth table",
+    "exercises": {
+      "worksheet02bTruthTable1": {
+        "title": "Derive DNF from a Truth Table",
+        "description": "Derive the canonical DNF from the given truth table with a, b, and c, then simplify it. Based on worksheet 02b, exercise 1."
+      },
+      "simpleExpression": {
+        "title": "Build a Truth Table from an Expression",
+        "description": "Create the truth table for the given expression and derive its canonical DNF."
+      },
+      "overlappingGroups": {
+        "title": "Simplify DNF with Overlapping Groups",
+        "description": "Derive the canonical DNF from the truth table and determine a minimal DNF. Remember that a 1-row may be covered by multiple groups."
+      },
+      "negatedExpression": {
+        "title": "Evaluate an Expression with Negations",
+        "description": "Create the truth table for an expression with multiple negations and determine its canonical DNF."
+      },
+      "worksheet02bTruthTable2": {
+        "title": "Derive DNF with Four Variables",
+        "description": "Derive the canonical DNF from the given truth table with a, b, c, and d, then simplify it. Based on worksheet 02b, exercise 2."
+      },
+      "complexExpression": {
+        "title": "Convert a Complex Expression to DNF",
+        "description": "Create the truth table for the four-variable expression, determine its canonical DNF, and simplify it."
+      }
+    },
     "exprBuilder": {
       "evaluate": "Evaluate",
       "newExpression": "Enter a different expression"
+    },
+    "simulator": {
+      "tabs": {
+        "expression_to_truth_table": "Expression → table",
+        "truth_table_to_dnf": "Table → DNF"
+      },
+      "tableModeTitle": "DNF from truth table",
+      "tableModeHint": "Build your own truth table, set the result column, and write the DNF from it.",
+      "variableCount": "Variables",
+      "variableCountLabel": "Count",
+      "variableCountHelp": "{{min}} to {{max}} variables allowed",
+      "clearTable": "Set table to 0",
+      "fillTable": "Set table to 1",
+      "randomTable": "Randomize",
+      "invertTable": "Invert results",
+      "setupPreviewTitle": "Set up the truth table",
+      "setupPreviewHint": "Set the f column for each row. Once the table is ready, click \"Commit table\" to start the DNF exercise.",
+      "commitTable": "Commit table",
+      "newTable": "New table"
     },
     "builder": {
       "inputTitle": "Boolean expression",
@@ -247,14 +374,18 @@
         "taskTitle": "Exercise task",
         "given": "Given the boolean expression:",
         "givenTruthTable": "Given the truth table:",
+        "buildTruthTable": "Build the truth table:",
+        "chooseResultColumn": "Set the result values f yourself. Then build the DNF from all 1-rows.",
         "findExpressionFromTable": "Find the boolean polynomial in disjunctive normal form.",
         "stepsTitle": "Workflow",
         "instructionStepTable": "Fill in the truth table.",
         "instructionStepDnf": "Build one AND term from each 1-row and join the terms with ∨.",
+        "instructionStepEditableTable": "Set the result column f in the truth table.",
         "instructionStepOneRows": "Consider only the rows with result 1.",
         "instructionStepDnfFromTable": "Build one AND term for each 1-row and join them with ∨.",
         "tableTitle": "Workspace",
         "tableHint": "Choose the result value 0 or 1 for each row. With keyboard focus, use 0/1 and the arrow keys.",
+        "tableHintEditable": "Set the result value f for each row. Your DNF must describe exactly this truth table.",
         "tableHintGiven": "The result column is given. Derive the DNF from it.",
         "rowHeader": "Row",
         "resultGroupLabel": "Result for row {{row}}",
@@ -266,9 +397,11 @@
         "feedbackTitle": "Feedback",
         "notChecked": "Not checked yet. Fill in the table, enter the DNF, and click Check.",
         "notCheckedDnfOnly": "Not checked yet. Enter the DNF for the given truth table and click Check.",
+        "notCheckedEditable": "Not checked yet. Set the result values, enter the matching DNF, and click Check.",
         "progressTable": "Truth table",
         "progressTableValue": "{{answered}} / {{total}} rows answered",
         "progressTableProvided": "given",
+        "progressTableEditable": "self-defined",
         "progressDnf": "DNF input",
         "progressDnfReady": "present",
         "progressDnfMissing": "still empty",
@@ -286,7 +419,8 @@
         "correctTitle": "All correct",
         "correctDesc": "Truth table and DNF match the task.",
         "tableIncomplete": "{{count}} table row(s) are still empty.",
-        "tableWrongRows": "These table row(s) are wrong: {{rows}}.",
+        "tableWrongRows_one": "{{count}} of {{total}} table rows is still wrong — find it yourself.",
+        "tableWrongRows_other": "{{count}} of {{total}} table rows are still wrong — find them yourself.",
         "dnfEmpty": "The DNF input is still missing.",
         "dnfSyntax": "The DNF input cannot be parsed.",
         "dnfEquivalentNotCanonical": "The input describes the same function, but is not built as a DNF from the rows with result 1 — each 1-row requires exactly one AND term.",
@@ -298,37 +432,106 @@
         "dnfDeferredUntilTable": "The DNF is checked in detail only after the truth table is complete and correct.",
         "tipTitle": "Tip",
         "tipCompleteTable": "The DNF can only be checked meaningfully after every table row has an answer.",
-        "tipTableRows": "Check the highlighted table rows first. The DNF is derived from the correct 1-rows.",
+        "tipTableRows": "Go through the table row by row and verify each value yourself. The DNF can only be derived once every row is correct.",
         "tipStartDnf": "For each row with result 1, write one AND term containing all variables.",
         "tipSyntax": "Use parentheses and the operators ¬, ∧, ∨ or the aliases !, &, |.",
         "tipCanonical": "Each AND term must contain every variable exactly once — either as-is or negated.",
         "tipMissingTerms": "Compare the table's 1-rows with the AND terms in your DNF.",
         "tipCompareRows": "Evaluate your DNF on the listed rows and compare the result with the table.",
         "solutionHint": "The full solution can now be shown as the final hint.",
-        "showSolutionHelp": "Show solution as hint",
+        "showSolutionHelp": "Show solution",
         "solutionAfterCheck": "Solution after check",
-        "hideSolution": "Hide solution"
+        "hideSolution": "Hide solution",
+        "startSimplification": "Start simplification",
+        "hideSimplification": "Hide simplification",
+        "simplificationTitle": "Simplify DNF",
+        "simplificationHint": "Use the Boolean algebra rules (absorption, distributivity, complement, …) to bring the DNF into a shorter equivalent form.",
+        "canonicalDnfLabel": "Original DNF",
+        "simplifiedDnfLabel": "Simplified form",
+        "simplifiedDnfPlaceholder": "e.g. a ∨ (b ∧ ¬c)",
+        "checkSimplification": "Check simplification",
+        "revealSolutionTitle": "One possible minimal solution",
+        "revealWalkthroughTitle": "Solution path",
+        "revealAlgebraReferenceTitle": "Rule cheat-sheet",
+        "revealRequiresCheck": "available after check",
+        "minimalDnfLabel": "One possible minimal DNF",
+        "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF form (OR of AND-terms), e.g. result of Quine-McCluskey.",
+        "factoredLabel": "Mathematically minimal (factored)",
+        "factoredNote": "{{literalsLabel}} — shorter than the minimal DNF by factoring out common literals, but no longer in DNF form.",
+        "literalCount_one": "{{count}} literal",
+        "literalCount_other": "{{count}} literals",
+        "termCount_one": "{{count}} term",
+        "termCount_other": "{{count}} terms",
+        "walkthroughTitle": "One possible solution path",
+        "walkthroughNote": "This path is not unique. It shows one possible grouping of the 1-rows into a minimal form.",
+        "showFullWalkthrough": "Show full solution path",
+        "showCompactWalkthrough": "Show compact solution path",
+        "walkthroughRowsTitle": "Start with the 1-rows",
+        "walkthroughRowsText": "Rows {{rows}} provide the terms of the correct DNF.",
+        "walkthroughNoRows": "There is no 1-row; the function is 0 for every assignment.",
+        "walkthroughConstantTitle": "Recognize the constant case",
+        "walkthroughAllRows": "All rows have result 1, so the whole DNF can be collapsed to 1.",
+        "walkthroughAlwaysFalse": "Without a 1-row, no AND group remains. The minimal form is therefore 0.",
+        "walkthroughGroupsTitle": "Combine matching rows",
+        "walkthroughGroupsIntro": "Each group below shows how its 1-rows reduce step by step to a shorter term — distributivity factors out the shared literals, the complement rule collapses (x ∨ ¬x) to 1, and the identity rule drops the trailing ∧ 1.",
+        "walkthroughGroupHeading": "Group {{index}}",
+        "walkthroughGroupCoverage": "covers rows {{rows}}",
+        "walkthroughGroupEliminated": "eliminated: {{variables}}",
+        "walkthroughGroupNoEliminated": "Already a single term — no reduction needed.",
+        "walkthroughCoverTitle": "Cover all 1-rows",
+        "walkthroughCoverText": "The selected groups cover all 1-rows — no 1-row is left over.",
+        "walkthroughResultTitle": "Possible minimal form",
+        "walkthroughFactoredTitle": "Optional: factor for an even shorter form",
+        "walkthroughFactoredText": "The minimal DNF has {{minimalLiterals}} literals. By factoring out common literals (reverse distributivity) the expression can be shortened to {{factoredLiterals}} literals — but the DNF form is lost.",
+        "walkthroughFactoredNote": "This form is mathematically equivalent but no longer a DNF (the outer operator is ∧). It is only relevant when the shortest boolean expression is asked for, not the shortest DNF.",
+        "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
+        "derivationNotes": {
+          "factorOut": "Factor out {{variable}} — the other literals stay.",
+          "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
+          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out."
+        },
+        "simplificationStatus": {
+          "empty": "Nothing entered yet",
+          "syntax_error": "Could not parse the input",
+          "unknown_variable": "Unknown variable",
+          "not_equivalent": "Not equivalent",
+          "equivalent_not_shorter": "Equivalent but not shorter",
+          "accepted_not_minimal": "Correctly simplified — but can be even shorter",
+          "accepted_minimal": "Minimal form — perfect"
+        },
+        "simplificationDetail": {
+          "empty": "Write a simplified equivalent form of the correct DNF.",
+          "syntax_error": "Check parentheses and the operators ¬, ∧, ∨ (or the aliases !, &, |).",
+          "unknown_variable": "The following variable(s) are not part of the truth table: {{variables}}.",
+          "not_equivalent": "Your form does not match the original truth table.",
+          "equivalent_not_shorter": "Equivalent, but with {{userLiterals}} literals it is not shorter than the original DNF ({{canonicalLiterals}} literals).",
+          "accepted_not_minimal": "Equivalent and shorter than the original DNF. You have {{userLiterals}} literals — minimum is {{minimumLiterals}}.",
+          "accepted_minimal": "{{userLiterals}} literals — matches the minimum ({{minimumLiterals}})."
+        }
       },
+      "followUpTitle": "Continue",
+      "solutionBadge": "Solution",
       "resultTitle": "DNF",
       "resultHint": "Each highlighted row contributes one AND term.",
       "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",
       "variableLimitTitle": "Too many variables",
       "variableLimitDesc": "The expression contains {{variables}} variables. Use at most {{max}} variables so the truth table and DNF can be calculated reliably in the browser.",
-      "longDnfPreview": "The DNF has {{total}} terms. The first {{shown}} terms are shown initially.",
-      "hiddenTerms": "{{count}} more terms hidden.",
-      "showAllTerms": "Show all {{count}} terms",
-      "showFewerTerms": "Show fewer terms",
+      "resultCompact": "Large DNF: all {{total}} terms are scrollable in the compact view.",
+      "resultFull": "Full DNF with {{total}} terms.",
+      "showFullResult": "Show full DNF",
+      "showCompactResult": "Show compact DNF",
       "variables": "Variables",
       "rows": "Table rows",
       "oneRows": "Rows with result 1",
       "derivationTitle": "Derivation",
       "derivationHint": "Only truth-table rows with result 1 are transformed into terms and then joined with OR.",
-      "derivationPreview": "The derivation has {{total}} steps. The first {{shown}} steps are shown initially.",
-      "showAllSteps": "Show all {{count}} steps",
-      "showFewerSteps": "Show fewer steps",
+      "derivationCompact": "Large derivation: all {{total}} steps are scrollable in the compact view.",
+      "derivationFull": "Full derivation with {{total}} steps.",
+      "showFullDerivation": "Show full derivation",
+      "showCompactDerivation": "Show compact derivation",
       "derivationRowLabel": "Row {{row}}",
-      "derivationTautology": "Every row evaluates to 1, so the clean DNF is the constant 1.",
-      "derivationContradiction": "No row evaluates to 1, so the clean DNF is the constant 0.",
+      "derivationTautology": "Every row evaluates to 1 — the DNF is therefore constant 1.",
+      "derivationContradiction": "No row evaluates to 1 — the DNF is therefore constant 0.",
       "truthTableTitle": "Truth table",
       "truthTableRow": "Row",
       "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
@@ -378,7 +581,182 @@
     "exercise5Desc": "Iterate over an array and determine the largest contained value.",
     "editorLabel": "Java editor",
     "editorLoading": "Loading Monaco editor...",
-    "resetStarterCode": "Reset starter code"
+    "editorLimit": {
+      "lines": "The Java editor is limited to {{maxLines}} lines. The pasted or imported text was not accepted.",
+      "characters": "The Java editor is limited to {{maxCharacters}} characters. The pasted or imported text was not accepted."
+    },
+    "resetStarterCode": "Reset starter code",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "seconds",
+    "runWhileLoading": "Compiler loading",
+    "compilerStatus": {
+      "not-loaded": "not loaded",
+      "loading": "loading",
+      "ready": "ready",
+      "failed": "failed"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler not loaded yet.",
+      "loading": "Java compiler is loading in the background...",
+      "ready": "Compiler is ready for Java compilation and execution.",
+      "failed": "Compiler could not be loaded. Check the console output below for details."
+    },
+    "commandOverview": {
+      "button": "Java commands",
+      "title": "What works in the Java editor?",
+      "summary": "Java {{version}} for small browser programs",
+      "versionTitle": "Supported Java version: {{version}}",
+      "versionText": "The browser compiler uses OpenJDK javac through teavm-javac. Language diagnostics come from javac; the generated program runs as WebAssembly in a browser worker.",
+      "limitationsText": "Write one Main.java-style program. You can run Java source code, but you cannot type terminal commands into the editor.",
+      "commandListTitle": "Compact overview",
+      "status": {
+        "supported": "Works",
+        "limited": "Limited",
+        "blocked": "Does not work",
+        "not-supported": "Not supported",
+        "explained": "Limited"
+      },
+      "capabilities": {
+        "programShape": {
+          "title": "Program entry point",
+          "description": "One Main.java program works. public class Main and additional non-public helper classes can be placed in the same editor file."
+        },
+        "basics": {
+          "title": "Basic Java syntax",
+          "description": "Basic Java syntax works: variables, operators, if/else, switch, and method calls."
+        },
+        "loops": {
+          "title": "Loops and control flow",
+          "description": "for, while, do/while, and for-each work for exercises and small algorithms."
+        },
+        "arraysCollections": {
+          "title": "Arrays, lists, maps, and sets",
+          "description": "Arrays and typical java.util collections work: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+        },
+        "objects": {
+          "title": "Own types",
+          "description": "Custom classes, constructors, enums, records, interfaces, and static methods can be placed in the same editor file."
+        },
+        "output": {
+          "title": "Console output",
+          "description": "Output is captured and shown in stdout or stderr below the editor."
+        },
+        "standardLibrary": {
+          "title": "Standard library subset",
+          "description": "Common library classes from java.lang, java.util, java.math, and simple java.time are available. OS-facing APIs are not reliable."
+        },
+        "singleFile": {
+          "title": "One editor file",
+          "description": "The UI currently sends one source file. Put helper classes into the same file instead of using a multi-file project."
+        },
+        "input": {
+          "title": "Console input",
+          "description": "Scanner and System.in work with the input box below the editor. Input is provided before the program starts; interactive prompts during execution are not supported."
+        },
+        "cli": {
+          "title": "Terminal commands",
+          "description": "The editor expects Java source code, not commands. java, javac, jshell, jar, mvn, and gradle are not executed as terminal commands."
+        },
+        "environment": {
+          "title": "OS access",
+          "description": "Local files, sockets, started processes, and native libraries are blocked by the browser runtime model."
+        },
+        "runtimeFeatures": {
+          "title": "Dynamic runtime features",
+          "description": "Reflection-heavy code, dynamic class loading, and real Java threads are not reliable in this WebAssembly target."
+        },
+        "stringsMath": {
+          "title": "Strings, Math, and big numbers",
+          "description": "StringBuilder, String methods, Math functions, BigInteger, and BigDecimal work for typical console tasks."
+        }
+      },
+      "commands": {
+        "run": {
+          "title": "Compile and run the current editor content",
+          "description": "The Run button sends the Java source to the browser compiler, generates WebAssembly, and executes the Main.main method in the worker."
+        },
+        "compile": {
+          "title": "Compilation is available as part of Run",
+          "description": "The internal compiler command uses javac diagnostics and TeaVM code generation. The UI does not expose a separate standalone compile-only terminal command."
+        },
+        "javaCli": {
+          "title": "No java command-line launcher",
+          "description": "Typing or expecting a local java command is not supported because the browser environment does not start JVM processes."
+        },
+        "javacCli": {
+          "title": "No javac terminal command",
+          "description": "javac is embedded inside the browser compiler pipeline. Users cannot pass arbitrary javac flags or compile multiple project files from a local directory."
+        },
+        "jshell": {
+          "title": "No interactive JShell",
+          "description": "The simulator executes complete programs with a Main class. It does not provide a REPL or interactive command prompt."
+        },
+        "tools": {
+          "title": "No packaging or documentation tools",
+          "description": "Tools such as jar, javadoc, Maven, Gradle, and other local executables are outside the supported browser compiler workflow."
+        },
+        "stdin": {
+          "title": "Console input is not interactive",
+          "description": "Console output through System.out and System.err is supported. Scanner/System.in uses the fixed simulator input box."
+        },
+        "environment": {
+          "title": "Browser sandbox restrictions apply",
+          "description": "Programs should avoid local files, sockets, native libraries, process execution, and environment-dependent APIs because WebAssembly runs inside a browser worker."
+        },
+        "title": "What can I type into the editor?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
+    "validation": {
+      "popupTitle": "Solution check",
+      "pass": "PASS",
+      "fail": "FAIL",
+      "emptyOutput": "<empty>",
+      "exampleCheckUnavailable": "Examples do not need solution checks.",
+      "table": {
+        "passed": "Passed",
+        "case": "Test case",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "phase": "Status"
+      }
+    },
+    "exercise6": "Uppercase input text",
+    "exercise6Desc": "Read one line with Scanner and print the text in uppercase.",
+    "exercise7": "Write a method",
+    "exercise7Desc": "Implement a method that squares a number and returns the result.",
+    "exercise8": "Use a simple class",
+    "exercise8Desc": "Store constructor values in a class and return a description.",
+    "exercise9": "Sort an ArrayList",
+    "exercise9Desc": "Sort an ArrayList with Collections.sort and print the list.",
+    "exercise10": "Implement FizzBuzz",
+    "exercise10Desc": "Combine a loop, modulo, and conditions to produce the classic FizzBuzz output.",
+    "exercise11": "Check a palindrome",
+    "exercise11Desc": "Implement a method that compares text from both ends and detects palindromes.",
+    "exercise12": "Evaluate a matrix",
+    "exercise12Desc": "Use nested loops to calculate every row sum and the main diagonal sum.",
+    "exercise13": "Model a shopping cart",
+    "exercise13Desc": "Store prices in a class with an ArrayList and implement item count, total, and maximum.",
+    "stdin": {
+      "label": "Program input",
+      "placeholder": "Input for Scanner/System.in, e.g. hello java",
+      "help": "This input is provided as System.in before the program starts. Interactive prompts during execution are not supported."
+    },
+    "timeout": {
+      "warningTitle": "Execution stopped by timeout",
+      "warningText": "The program ran too long or is waiting for input. Check loops, Scanner calls, and the timeout."
+    }
+  },
+  "legal": {
+    "label": "Legal",
+    "title": "Third-party notices",
+    "description": "Licensing and source information for bundled compiler components and related dependencies.",
+    "summary": "This application includes a browser-based Java compiler built from teavm-javac. The compiler module includes OpenJDK javac, licensed under GNU GPLv2 with the Classpath Exception, and TeaVM components licensed under Apache License 2.0. No OpenJDK source files were modified. Exact source and build information is available in the project’s third-party notices."
   },
   "exercise": {
     "label": "Exercise {{index}}",
@@ -412,6 +790,7 @@
       "export": "Export",
       "import": "Import",
       "copied": "String copied to clipboard.",
+      "exportError": "String could not be generated.",
       "importSuccess": "String loaded successfully.",
       "importError": "String could not be loaded."
     },
@@ -421,7 +800,9 @@
       "number": "The Number Systems converter will be available here.",
       "moore": "The Moore & Mealy simulator will be available here.",
       "dnf": "The DNF builder / truth table generator will be available here.",
-      "java": "Select a Java exercise or start directly with your own Java snippet in the Monaco editor."
+      "encoding": "The Encoding simulator will be available here.",
+      "regularLanguages": "The Regular Languages simulator will be available here.",
+      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
     }
   },
   "simulator": {
@@ -459,6 +840,7 @@
       },
       "addition": {
         "desc": "Positional addition in binary. Adding two ones creates a carry to the next position.",
+        "bitwiseAddition": "Bitwise Addition",
         "carryOutWarning": "Warning: A carry has exceeded the 8th bit (Carry Out).",
         "overflowWarning": "Overflow error! The addition of logically positive numbers resulted in a negative two's complement result.",
         "overflowTitle": "Overflow Error (2s Complement):",
@@ -481,6 +863,7 @@
       },
       "subtraction": {
         "desc": "Binary subtraction is usually performed as addition with the negative number (in two's complement).",
+        "stepByStepSubtraction": "Step-by-step Subtraction",
         "step1": "1. Form one's complement (flip bits)",
         "step2": "2. Add +1 (two's complement)",
         "step3": "3. Add the two's complement to Number A",
@@ -742,6 +1125,65 @@
       "exitTabTitle": "Switch Tab?",
       "exitTabDesc": "You are currently in exercise mode. Switching tabs will end the current exercise and your progress will be lost.",
       "exitTabConfirm": "Switch Tab"
+    },
+    "encoding": {
+      "tabs": {
+        "base64": "Base64",
+        "utf8": "UTF-8"
+      },
+      "base64Title": "Base64 Encoder",
+      "base64Desc": "Convert text to Base64 encoding or decode Base64 strings back to text.",
+      "utf8Title": "UTF-8 Encoder",
+      "utf8Desc": "Convert characters to their UTF-8 byte sequence representation.",
+      "encode": "Encode",
+      "decode": "Decode",
+      "mode": "Mode",
+      "inputText": "Input Text",
+      "inputBase64": "Base64 String",
+      "inputHexBytes": "Hex Bytes (space-separated)",
+      "base64Result": "Base64 Result",
+      "utf8Result": "UTF-8 Bytes (Hex)",
+      "decodedResult": "Decoded Text",
+      "explanation": "Explanation",
+      "enterValue": "Enter text to see the encoding steps.",
+      "step1CharToAscii": "Step 1: Character to ASCII/Binary",
+      "step2GroupBits": "Step 2: Group into 6-bit chunks",
+      "step3Base64Lookup": "Step 3: Base64 Table Lookup",
+      "step1CodePoint": "Step 1: Unicode Code Point",
+      "step2ByteEncoding": "Step 2: UTF-8 Byte Encoding",
+      "step3FullSequence": "Step 3: Full Byte Sequence",
+      "charLabel": "Character",
+      "asciiLabel": "ASCII Value",
+      "binaryLabel": "Binary",
+      "bitsLabel": "6-bit Group",
+      "decimalLabel": "Decimal",
+      "base64CharLabel": "Base64 Character",
+      "codePointLabel": "Code Point",
+      "bytePattern": "Byte Pattern",
+      "byteN": "Byte {{n}}",
+      "hexLabel": "Hex",
+      "hexSequence": "Hex Sequence",
+      "binarySequence": "Binary Sequence",
+      "finalResult": "Final Result",
+      "decodeStep1Lookup": "Step 1: Base64 Table Lookup",
+      "decodeStep2ConcatBits": "Step 2: Concatenate 6-bit groups",
+      "decodeStep3ToChars": "Step 3: Convert 8-bit bytes to characters",
+      "decodeStep1Bytes": "Step 1: Identify byte types",
+      "decodeStep2CodePoints": "Step 2: Reconstruct Unicode code points",
+      "decodeStep3FullText": "Step 3: Full decoded text",
+      "leadByte": "{{count}}-byte lead byte",
+      "continuationByte": "Continuation byte",
+      "singleByte": "Single-byte ASCII",
+      "byteTypeLabel": "Byte Type",
+      "bytesUsed": "Bytes Used",
+      "invalidUtf8Title": "Invalid UTF-8 Sequence",
+      "invalidUtf8Desc": "The hex bytes do not form a valid UTF-8 sequence. Check your input and try again.",
+      "invalidBase64Title": "Invalid Base64 Input",
+      "invalidBase64Desc": "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
+      "examplesTitle": "Example Exercises",
+      "examplesDesc": "Here you can find additional example exercises for encoding:",
+      "groupbase64": "Base64 Encoding",
+      "grouputf8": "UTF-8 Encoding"
     }
   },
   "tm": {
@@ -759,6 +1201,18 @@
       "concept4": "Church-Turing Thesis"
     },
     "exercises": {
+      "exerciseWorksheetAlternatingSymbols": "Check Alternating Symbols",
+      "exerciseWorksheetAlternatingSymbolsDesc": "Given a binary word over {0, 1}, construct a Turing machine that checks whether 0 and 1 always alternate, halting as soon as two equal symbols follow each other or the end of the input is reached.",
+      "exerciseWorksheetSwapFirstTwoSymbols": "Swap the First Two Symbols",
+      "exerciseWorksheetSwapFirstTwoSymbolsDesc": "Construct a Turing machine that swaps the first two input symbols, leaves all remaining symbols unchanged, and finishes on the third symbol.",
+      "exerciseWorksheetSetFirstAndLastToOne": "Set First and Last Symbol to 1",
+      "exerciseWorksheetSetFirstAndLastToOneDesc": "Construct a Turing machine that overwrites the first and last input symbols with 1, leaves all other symbols unchanged, and finishes on the last input symbol.",
+      "exerciseWorksheetAlternatingOverwrite": "Alternating Overwrite",
+      "exerciseWorksheetAlternatingOverwriteDesc": "Construct a Turing machine that overwrites the input from left to right with alternating 0 and 1 symbols and finishes on the last input symbol.",
+      "exerciseWorksheetOverwriteLastTwoWithZero": "Set the Last Two Symbols to 0",
+      "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Construct a Turing machine that overwrites the last two input symbols with 0 and finishes on the last input symbol.",
+      "exerciseWorksheetAsciiParityBit": "Set the ASCII Parity Bit",
+      "exerciseWorksheetAsciiParityBitDesc": "Given an input of exactly seven bits, construct a Turing machine that counts the number of ones, writes the even-parity bit to the blank cell left of the input, and finishes on the first blank cell after the input.",
       "exerciseEraseTape": "Erase the Tape",
       "exerciseEraseTapeDesc": "Build a machine that replaces the whole input word with blanks and halts once the tape is cleared.",
       "exerciseInvertBinaryWord": "Invert a Binary Word",
@@ -780,7 +1234,15 @@
       "example2": "Example: Unary Increment",
       "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
       "example3": "Example: Binary Increment",
-      "example3Desc": "A carry-based machine that increments a binary word by one."
+      "example3Desc": "A carry-based machine that increments a binary word by one.",
+      "example4": "Example: Add Binary Numbers",
+      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built.",
+      "example5": "Example: Search for Two Zeros",
+      "example5Desc": "Search for two consecutive zeros and then write E. Example: The input ⋄1001⋄ produces the output ⋄100E⋄.",
+      "example6": "Example: Search for Three Zeros",
+      "example6Desc": "The tape contains a finite sequence of 0s and 1s bounded by ⋄ on both sides. Search for three consecutive zeros, write E after them, and halt. The head then rests on the symbol to the left of E. If the pattern is not found, the machine stops on ⋄. Example: ⋄10000⋄ becomes ⋄1000E⋄.",
+      "example7": "Example: Search for Pattern 010",
+      "example7Desc": "Under the same conditions, search for the pattern 010, write E after it, and halt with the head on the symbol to the left of E. Example: ⋄10100⋄ becomes ⋄1010E⋄. The inputs 0010 and 00010 also contain the pattern."
     },
     "actions": {
       "loadSolution": "Load solution",
@@ -933,6 +1395,8 @@
       "startState": "Start State",
       "acceptStates": "Accept States (comma-separated)",
       "addEpsilon": "Add ε-Transitions",
+      "addState": "Add state",
+      "removeState": "Remove state {{state}}",
       "transitionTable": "Transition Table",
       "inputWord": "Input Word",
       "inputWordHelp": "Each character is treated as one input symbol.",
@@ -1000,6 +1464,35 @@
         "hint1": "You only need three states — one for each possible remainder (0, 1, 2).",
         "hint2": "When you are in state with remainder r and read bit b, the new remainder is (2·r + b) mod 3.",
         "hint3": "The start state and the single accept state are both the same: remainder 0."
+      },
+      "grammarTwoOnesZeros": {
+        "title": "Automaton from Grammar: 11 0ⁿ",
+        "goal": "Build a DFA for the language L = { 11 0ⁿ | n ≥ 0 }: two ones followed by any number of zeros.",
+        "description": "Given the right-linear grammar S → \"1\" A, A → \"1\" B, B → \"0\" B | ε, build the corresponding finite automaton and then check whether the word \"11001\" belongs to the language.",
+        "hint1": "After the two required ones, only zeros may follow — another one leads to a trap state.",
+        "hint2": "You need three useful states (start, after the first 1, after the second 1 = accept state) plus a trap state. The word \"11001\" ends in the trap state and therefore is not in the language."
+      },
+      "grammarOnes": {
+        "title": "Automaton from Grammar: 1 0ⁿ 1",
+        "goal": "Build a DFA for the language generated by the grammar below.",
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
+        "hint1": "Create one state per non-terminal (START, A, B) plus a trap state for invalid input.",
+        "hint2": "ε at B means that B is accepting; direct every undefined transition to the trap state."
+      },
+      "grammar0011": {
+        "title": "Automaton from Grammar: (0011)⁺",
+        "goal": "Build a DFA for the language generated by the grammar below.",
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
+        "hint1": "Chain one state per non-terminal: START→A→B→C→D along the symbols 0, 0, 1, 1.",
+        "hint2": "D = \"0\",A jumps back to read another 0011 block, so D's transition on 0 returns to A.",
+        "hint3": "ε at D makes D the accepting state; every unexpected symbol leads to the trap state."
+      },
+      "grammarOnesZero": {
+        "title": "Automaton from Grammar: 1ⁿ 0",
+        "goal": "Build a DFA for the language generated by the grammar below.",
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
+        "hint1": "A = \"1\",A is a loop on 1; A = \"0\",B leaves the loop on a 0 and enters the accepting state B.",
+        "hint2": "B is accepting (ε); every input from B leads to the trap state."
       }
     },
     "exerciseWorkspace": {
@@ -1032,7 +1525,13 @@
       "exampleAccept": "Accepted",
       "exampleReject": "Rejected",
       "unbuiltTitle": "Build your automaton first",
-      "unbuiltBody": "Add states, transitions, and at least one accept state, then run Check Solution again."
+      "unbuiltBody": "Add states, transitions, and at least one accept state, then run Check Solution again.",
+      "grammarLabel": "Grammar",
+      "grammarEpsilonNote": "ε represents the empty word and marks an accepting (final) state."
+    },
+    "grammarToAutomaton": {
+      "sectionTitle": "Constructing a Finite Automaton from a Regular Grammar",
+      "sectionDescription": "Every right-linear grammar defines a language. Open an exercise to build the DFA in the simulator — use the hints and reveal the reference automaton for comparison when needed."
     },
     "examples": {
       "endsWith01": {
@@ -1177,6 +1676,233 @@
       "transitionSymbolInvalid": "A transition symbol is not in the alphabet.",
       "dfaNondeterministic": "DFA has nondeterministic transitions.",
       "dfaEpsilon": "DFA must not have ε-transitions."
+    }
+  },
+  "rl": {
+    "title": "Regular Languages",
+    "description": "Work with regular languages and their right-linear grammars — enumerate the words generated by a grammar, derive a grammar from a language definition, and test word membership.",
+    "overviewTitle": "What are Regular Languages?",
+    "overviewText": "A regular language is a set of words that can be described by a regular grammar or a finite automaton. This module focuses on right-linear (Type 3) grammars.",
+    "concepts": "Core Concepts",
+    "concept1": "Right-linear Grammars",
+    "concept1Desc": "A right-linear (Type 3) grammar has rules of the form A → aB or A → a, optionally A → ε. This makes it equivalent to an NFA.",
+    "concept2": "Enumeration vs. Set-builder Notation",
+    "concept2Desc": "A regular language can be specified either as a finite list of words or with set-builder notation such as { a^n c b^m | n, m > 0 }, using exponents and lower bounds.",
+    "concept3": "Word Membership",
+    "concept3Desc": "Whether a word belongs to L(G) can be decided by simulating the NFA equivalent to the grammar — it is accepted exactly when a derivation consumes the complete word.",
+    "concept4": "Closure Properties",
+    "whatYouCanDo": "What you can do here",
+    "feature1": "Enumerate the language generated by a grammar up to a maximum word length",
+    "feature2": "Generate a grammar from a word enumeration or set-builder notation",
+    "feature3": "Check whether a word belongs to the language generated by a grammar",
+    "simulator": {
+      "modes": {
+        "grammarToLanguage": "Grammar → Language",
+        "languageToGrammar": "Language → Grammar",
+        "recognizeWord": "Recognize Word"
+      },
+      "grammarInput": "Grammar",
+      "grammarOutput": "Resulting Grammar",
+      "grammarHelp": "Enter one production per line, for example 'S -> 0S | 1A'. ε (or the word 'epsilon') represents the empty word.",
+      "grammarInvalid": "Enter a valid right-linear grammar.",
+      "languageOutput": "Language Enumeration",
+      "maxLen": "Maximum Word Length",
+      "maxWords": "Maximum Number of Words",
+      "noWords": "No words can be derived within these limits.",
+      "truncatedNote": "The output was truncated by the word limit. Increase the limit to see more.",
+      "completeNote": "All derivable words up to the selected length are shown.",
+      "wordsInput": "Words in the Language",
+      "wordPlaceholder": "Enter a word and press Enter",
+      "addWord": "Add",
+      "removeWord": "Remove word",
+      "noWordsAdded": "Add at least one word — an empty input represents ε.",
+      "languageToGrammarHelp": "A right-linear grammar is built from a prefix tree over the words. It derives at least the listed words and does not generalize beyond them.",
+      "languageDefinition": "Language Definition",
+      "languageDefinitionHelp": "Accepts both an enumeration such as L = {\"010\", \"0010\"} and set-builder notation such as L = {a^n c b^m | n, m > 0}. Use ^ for exponents, single letters as variables, and ∈ ℕ / >= / > for conditions.",
+      "languageInvalid": "Enter a valid language definition to derive a grammar.",
+      "detectedEnumeration": "Detected: Enumeration",
+      "detectedSetBuilder": "Detected: Set-builder Notation",
+      "pattern": "Pattern:",
+      "variables": "Variables:",
+      "emptyLanguage": "Empty language (no words).",
+      "preset": {
+        "enumeration": "Enumeration",
+        "aStarcBStar": "a^n c b^m",
+        "aStar": "a^n",
+        "abGroup": "(ab)^n"
+      },
+      "testWord": "Word to Test",
+      "testWordPlaceholder": "Empty = ε",
+      "testWordHelp": "Each character is treated as a terminal symbol. The grammar is simulated on the word.",
+      "accepted": "ACCEPTED — the grammar derives this word.",
+      "rejected": "REJECTED — the grammar does not derive this word.",
+      "emptyOutput": "—"
+    },
+    "examplesTab": {
+      "title": "Predefined Examples",
+      "subtitle": "Work through examples that convert between grammars and languages.",
+      "loadExample": "Load in Simulator"
+    },
+    "examples": {
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammar → Language",
+          "description": "Determine which words a grammar generates."
+        },
+        "languageToGrammar": {
+          "title": "Language → Grammar",
+          "description": "Build a suitable grammar from a language given as a word list or compact pattern."
+        },
+        "recognizeWord": {
+          "title": "Recognize Words",
+          "description": "Decide whether a given word belongs to a grammar's language."
+        }
+      },
+      "grammarToLanguage": {
+        "title": "Grammar → Language",
+        "description": "Enumerates the first words generated by a grammar using breadth-first search over its derivations.",
+        "step1Title": "1. Breadth-first Search over Derivations",
+        "step1": "Starting at the start symbol, breadth-first search expands productions and records every accepted prefix up to the selected length limit. Words are returned in length-lexicographic order."
+      },
+      "languageToGrammar": {
+        "title": "Word List → Grammar",
+        "description": "Creates a regular grammar from an explicit set such as L = {\"ab\", \"abb\", \"abbb\"} by combining the words into a prefix tree.",
+        "step1Title": "1. Detect the Enumeration",
+        "step1": "The set contents consist of comma-separated words, with or without quotation marks. Each word is processed separately.",
+        "step2Title": "2. Build a Prefix Tree",
+        "step2": "Each unique prefix becomes a new non-terminal. Every tree edge creates a production A → aB, and each word ending marks its corresponding non-terminal as ε-producing."
+      },
+      "languageSetBuilder": {
+        "title": "Pattern → Grammar",
+        "description": "Reads set-builder notation with exponents and conditions and directly derives a right-linear grammar that generates exactly this language.",
+        "step1Title": "1. Parse the Pattern and Conditions",
+        "step1": "The pattern is read as a sequence of factors, such as a^n, c, b^m. The conditions determine a lower bound for each variable. The same variable may not occur in two factors because that would not be regular, as in a^n b^n.",
+        "step2Title": "2. Build the Grammar",
+        "step2": "Each factor contributes its own production block: a^0 creates a Kleene-star loop, a^≥1 creates a required first symbol followed by a loop, and a^k creates k fixed productions. The blocks are chained so the start symbol derives the complete word."
+      },
+      "recognizeWord": {
+        "title": "Recognize a Word",
+        "description": "Checks whether a concrete word belongs to the language generated by a grammar.",
+        "step1Title": "1. Grammar → NFA → Simulation",
+        "step1": "The grammar is converted to an NFA. The NFA is simulated symbol by symbol over the input word. The word is accepted if any path reaches a final state after consuming the complete input."
+      },
+      "lectureGrammar1": {
+        "title": "Lecture Example",
+        "description": "Read this right-linear grammar: words begin with at least one 0 and end with exactly one 1.",
+        "step1Title": "1. Enumerate the Language",
+        "step1": "Every derivation follows S → 0A → 0…0A → 0…01, so each word consists of one or more zeros followed by a single one. Load it to enumerate L = {01, 001, 0001, …}."
+      },
+      "lectureGrammar2": {
+        "title": "Exercise 1",
+        "description": "Read this grammar: strictly alternating zeros and ones, beginning with either symbol, with a minimum length of 1.",
+        "step1Title": "1. Enumerate the Language",
+        "step1": "The ε-productions on A and B allow the derivation to stop after any symbol, while A and B continue alternating. Load it to enumerate L = {0, 1, 01, 10, 010, 101, 0101, …}."
+      },
+      "lectureLanguage1": {
+        "title": "Exercise 2",
+        "description": "Find a grammar for this language: at least one 0, exactly one 1, followed by at least one 0.",
+        "step1Title": "1. Derive the Grammar",
+        "step1": "A loop builds the leading zeros, one rule consumes the single 1, and a final loop builds the trailing zeros. Load it to derive S → 0S | 0A, A → 1B, B → 0B | 0."
+      }
+    },
+    "exercises": {
+      "givenGrammar": "Given Grammar",
+      "targetLanguage": "Target Language",
+      "solution": "Solution",
+      "epsilonHint": "ε represents the empty word.",
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammar → Language",
+          "description": "Read the production rules and determine which words the grammar generates."
+        },
+        "languageToGrammar": {
+          "title": "Language → Grammar",
+          "description": "Write a regular grammar whose rules generate exactly the given words."
+        },
+        "applied": {
+          "title": "Applied Grammars",
+          "description": "Model real token formats such as integers and identifiers as regular grammars."
+        }
+      },
+      "g2lFiniteBinary": {
+        "title": "Three-bit Words",
+        "description": "Enumerate every word that can be derived by this grammar.",
+        "goal": "List the complete finite language L(G).",
+        "hint1": "Every derivation has the form START → 1A → 1xB → 1xy, so every word has exactly three symbols.",
+        "hint2": "A and B each offer 0 or 1 — producing 2 × 2 = 4 words, all beginning with 1."
+      },
+      "g2lTrailingZero": {
+        "title": "Ones between Zeros",
+        "description": "Determine the language generated by this grammar.",
+        "goal": "Describe the infinite language and list its first words.",
+        "hint1": "A → 1A repeats and appends ones; the derivation can end only through A → 0B → 00.",
+        "hint2": "Every word therefore consists of a leading 0, any number of ones, and then 00."
+      },
+      "g2lEpsilonLoop": {
+        "title": "Recursion with ε",
+        "description": "List the derivable words when B is also allowed to generate the empty word.",
+        "goal": "Enumerate the shortest words and account for B's ε-production.",
+        "hint1": "B → ε lets a derivation end immediately after a 1; B → 0A returns to A.",
+        "hint2": "Words begin with 0 and alternate between blocks of zeros and ones — trace every A/B transition."
+      },
+      "g2lGrouped": {
+        "title": "Grouped Alternatives",
+        "description": "Resolve the grouped rules and enumerate the generated language.",
+        "goal": "Read the parentheses as ordinary alternatives and list the words.",
+        "hint1": "The parentheses only group alternatives: A = \"0\",A | \"1\",B and B = \"1\",B | \"0\".",
+        "hint2": "A adds leading zeros; B adds ones and must end with a single zero."
+      },
+      "l2gZeroOnesZero": {
+        "title": "One 0, Some 1s, One 0",
+        "description": "Find a regular grammar that generates exactly these words.",
+        "goal": "Write right-linear rules that generate 0 1ⁿ 0 for n ≥ 1.",
+        "hint1": "Every word is a 0, followed by one or more ones, followed by a final 0.",
+        "hint2": "Use a state that loops on 1 (B → \"1\",B) and terminates on the final 0."
+      },
+      "l2gFourWords": {
+        "title": "Four Fixed Words",
+        "description": "Write a grammar that derives exactly this finite language.",
+        "goal": "Generate exactly these four 4-bit words and nothing else.",
+        "hint1": "All four words share the suffix 11; only the first two bits vary.",
+        "hint2": "Let START and A freely choose 0 or 1, then enforce B → \"1\",C and C → \"1\"."
+      },
+      "l2gNestedZeros": {
+        "title": "Blocks of Zeros",
+        "description": "Construct a grammar that generates this language.",
+        "goal": "Generate words of the form 1 0ⁿ 1 0ᵐ 1 with n, m ≥ 1.",
+        "hint1": "Every word begins and ends with 1 and has another 1 in the middle.",
+        "hint2": "Between the ones are blocks containing one or more zeros — this requires a loop on 0.",
+        "hint3": "Chain START→A→B for the first zero block and then →C→D for the second; B and D loop on 0."
+      },
+      "appliedIntegers": {
+        "title": "Integers",
+        "description": "Write a grammar for valid integers: an optional minus sign and no leading zeros.",
+        "goal": "Accept 0, 42, -100…, but reject 007 and a minus sign by itself.",
+        "hint1": "Handle \"0\" as a separate case so a leading zero cannot begin a longer number.",
+        "hint2": "A first nonzero digit (1–9) may be followed by any number of digits (0–9).",
+        "hint3": "Make the state for following digits ε-producing so the number can end at any point."
+      },
+      "appliedIdentifiers": {
+        "title": "Identifiers",
+        "description": "Write a grammar for variable names: a lowercase first letter followed by uppercase or lowercase letters, with no digits.",
+        "goal": "Accept x, foo, myVar…, but reject uppercase letters or digits at the beginning.",
+        "hint1": "The first symbol must be a lowercase letter from a–z.",
+        "hint2": "Then loop over any letters (a–z or A–Z) and allow ε to terminate."
+      }
+    },
+    "exerciseWorkspace": {
+      "selectedExercise": "Selected Exercise",
+      "exit": "Exit Exercise Mode",
+      "showHint": "Hint",
+      "noMoreHints": "All hints revealed",
+      "hintsUsed": "{{used}}/{{total}} hints used",
+      "hintsHeader": "Hints",
+      "showSolution": "Show Solution",
+      "confirmTitle": "Reveal the Full Solution?",
+      "confirmBody": "The solution will be displayed here and loaded into the simulator. You can continue trying instead.",
+      "confirmYes": "Yes, Show Solution",
+      "confirmNo": "Keep Trying",
+      "solutionLoadedNote": "The worked solution has been loaded into the simulator below — run it to inspect the derivation."
     }
   }
 }

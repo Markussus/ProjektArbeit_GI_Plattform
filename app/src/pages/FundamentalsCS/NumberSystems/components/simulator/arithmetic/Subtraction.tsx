@@ -11,7 +11,7 @@ import {
   WarningBanner,
   ResultSectionHeader,
   useToggleSet,
-} from "../shared";
+} from "@/components/shared/SimulatorShared";
 
 interface OnesComplementStep {
   position: number;

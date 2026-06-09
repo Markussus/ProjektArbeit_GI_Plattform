@@ -24,7 +24,17 @@ type EditorAction =
   | { type: "SET_START_STATE"; payload: string }
   | { type: "SET_ACCEPT_STATES"; payload: string }
   | { type: "SET_TRANSITION"; from: string; symbol: string; targets: string }
+  | { type: "ADD_STATE" }
+  | { type: "REMOVE_STATE"; payload: string }
   | { type: "RESET"; payload: FAProgram };
+
+function findNextStateName(states: string[]): string {
+  let index = 0;
+  while (states.includes(`S${index}`)) {
+    index += 1;
+  }
+  return `S${index}`;
+}
 
 function parseCSV(value: string): string[] {
   return value
@@ -129,6 +139,27 @@ function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
       newTransitions[action.from] = updatedRow;
       return { ...state, transitions: newTransitions };
     }
+    case "ADD_STATE": {
+      const newState = findNextStateName(state.states);
+      const states = [...state.states, newState];
+      const startState = state.startState || newState;
+      return { ...state, states, startState };
+    }
+    case "REMOVE_STATE": {
+      // Keep at least one state so the program stays well-formed.
+      if (state.states.length <= 1) return state;
+      const target = action.payload;
+      const states = state.states.filter((s) => s !== target);
+      const acceptStates = state.acceptStates.filter((s) => s !== target);
+      const startState =
+        state.startState === target ? states[0] : state.startState;
+      const transitions = pruneTransitions(
+        state.transitions,
+        states,
+        state.alphabet,
+      );
+      return { ...state, states, acceptStates, startState, transitions };
+    }
     case "RESET":
       return action.payload;
     default:
@@ -151,6 +182,8 @@ export interface UseFAConfigEditorResult {
   setStartState: (value: string) => void;
   setAcceptStates: (value: string) => void;
   setTransition: (from: string, symbol: string, targets: string) => void;
+  addState: () => void;
+  removeState: (state: string) => void;
 
   applyProgram: () => { ok: true; program: FAProgram } | { ok: false };
   resetToProgram: (program: FAProgram) => void;
@@ -196,6 +229,11 @@ export function useFAConfigEditor(
       dispatch({ type: "SET_TRANSITION", from, symbol, targets }),
     [],
   );
+  const addState = useCallback(() => dispatch({ type: "ADD_STATE" }), []);
+  const removeState = useCallback(
+    (state: string) => dispatch({ type: "REMOVE_STATE", payload: state }),
+    [],
+  );
 
   const applyProgram = useCallback(():
     | { ok: true; program: FAProgram }
@@ -223,6 +261,8 @@ export function useFAConfigEditor(
     setStartState,
     setAcceptStates,
     setTransition,
+    addState,
+    removeState,
     applyProgram,
     resetToProgram,
   };

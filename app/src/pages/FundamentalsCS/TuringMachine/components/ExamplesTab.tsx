@@ -25,18 +25,25 @@ export function ExamplesTab({
   );
 
   return (
-    <div>
-      <div className="text-muted-foreground mb-4 flex items-center gap-2">
+    <div data-testid="tm-examples-tab">
+      <div
+        data-testid="tm-examples-header"
+        className="text-muted-foreground mb-4 flex items-center gap-2"
+      >
         <BookOpen className="size-4" />
         <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
       </div>
 
-      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
+      <div
+        data-testid="tm-examples-list"
+        className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1"
+      >
         {translatedExamples.map((example, index) => (
           <ExerciseCard
             key={example.id}
             item={example}
             index={index}
+            testIdPrefix={`tm-example-card-${example.id}`}
             isSelected={selectedExample?.id === example.id}
             onSelect={() => onSelectExample(example)}
             onOpen={() => onOpenExampleInSimulation(example)}

@@ -3,6 +3,8 @@ import { ArrowLeft, Eraser, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
+import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
+import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
 import {
@@ -10,20 +12,24 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
-import { DnfDerivationSteps } from "../DnfBuilder/presentation/DnfDerivationSteps";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
+import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
 import { DnfOperatorToolbar } from "../DnfBuilder/presentation/DnfOperatorToolbar";
-import { DnfResultPanel } from "../DnfBuilder/presentation/DnfResultPanel";
-import { DnfTruthTableView } from "../DnfBuilder/presentation/DnfTruthTableView";
 import {
   ParseErrorPanel,
   VariableLimitPanel,
 } from "../DnfBuilder/presentation/DnfStatusPanels";
 
-export function ExpressionBuilder() {
+interface ExpressionBuilderProps {
+  initialExpression?: string;
+}
+
+export function ExpressionBuilder({
+  initialExpression,
+}: ExpressionBuilderProps = {}) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialExpression ?? "");
   const [committedSource, setCommittedSource] = useState<string | null>(null);
 
   const handleSourceChange = (value: string) => {
@@ -41,9 +47,12 @@ export function ExpressionBuilder() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div
+      data-testid="dnf-expression-builder"
+      className="mx-auto flex w-full max-w-5xl flex-col gap-6"
+    >
       {committedSource === null ? (
-        <section className="border-border bg-background/40 rounded-lg border p-4">
+        <section className="border-border bg-card rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-foreground text-lg font-semibold">
@@ -58,6 +67,7 @@ export function ExpressionBuilder() {
             </div>
             <button
               type="button"
+              data-testid="dnf-clear-expression"
               onClick={handleClear}
               className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
             >
@@ -75,6 +85,7 @@ export function ExpressionBuilder() {
           <textarea
             ref={inputRef}
             id="dnf-expression-input"
+            data-testid="dnf-expression-input"
             aria-label={t("dnf.builder.inputTitle")}
             value={inputValue}
             onChange={(event) => handleSourceChange(event.target.value)}
@@ -83,12 +94,13 @@ export function ExpressionBuilder() {
             }
             spellCheck="false"
             placeholder="z. B. a ∨ (b ∧ ¬c)"
-            className="border-border bg-card text-foreground focus:ring-ring mt-3 min-h-20 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
+            className="border-border bg-background text-foreground focus:ring-ring mt-3 min-h-20 w-full resize-y rounded-md border p-3 font-mono text-sm leading-relaxed focus:ring-2 focus:outline-none"
           />
 
           <div className="mt-4">
             <button
               type="button"
+              data-testid="dnf-evaluate-expression"
               onClick={handleEvaluate}
               disabled={inputValue.trim().length === 0}
               className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
@@ -102,6 +114,7 @@ export function ExpressionBuilder() {
         <div>
           <button
             type="button"
+            data-testid="dnf-new-expression"
             onClick={handleClear}
             className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
           >
@@ -128,11 +141,13 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   );
 
   const [showSolution, setShowSolution] = useState(false);
+  const [showFullTable, setShowFullTable] = useState(false);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
     TruthTableAnswer[]
   >([]);
   const [dnfAnswer, setDnfAnswer] = useState("");
   const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const simplification = useDnfSimplification();
 
   const normalizedAnswers = useMemo(
     () =>
@@ -155,12 +170,14 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     });
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const updateDnfAnswer = (value: string) => {
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   const handleCheck = () => {
@@ -180,6 +197,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     setDnfAnswer("");
     setFeedback(null);
     setShowSolution(false);
+    simplification.reset();
   };
 
   if (analysis.status === "too_many_variables") {
@@ -195,6 +213,16 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     return <ParseErrorPanel issue={analysis.issue} />;
   }
 
+  const { solution, simplification: simplificationFollowUp } =
+    buildDnfFollowUpConfiguration({
+      analysis,
+      display,
+      resultHeader: committedSource,
+      showSolution,
+      feedback,
+      simplification,
+    });
+
   return (
     <>
       <DnfExerciseWorkspace
@@ -207,34 +235,21 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
         resultHeader={committedSource}
         requiresTruthTableAnswers={true}
         canAlwaysShowSolution={true}
+        canToggleFullTable={true}
+        showFullTable={showFullTable}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
         onReset={handleReset}
         onToggleSolution={() => setShowSolution((prev) => !prev)}
+        onToggleFullTable={() => setShowFullTable((prev) => !prev)}
       />
 
-      {showSolution && (
-        <>
-          <DnfResultPanel
-            formattedDnf={analysis.formattedDnf}
-            variableCount={analysis.truthTable.variables.length}
-            rowCount={analysis.truthTable.rows.length}
-            trueRowCount={analysis.derivation.trueRows.length}
-            derivation={analysis.derivation}
-          />
-          <DnfDerivationSteps
-            derivation={analysis.derivation}
-            truthTable={analysis.truthTable}
-          />
-          {display && (
-            <DnfTruthTableView
-              display={display}
-              resultHeader={committedSource}
-            />
-          )}
-        </>
-      )}
+      <DnfFollowUpSections
+        key={solution ? "solution-visible" : "solution-hidden"}
+        solution={solution}
+        simplification={simplificationFollowUp}
+      />
     </>
   );
 }

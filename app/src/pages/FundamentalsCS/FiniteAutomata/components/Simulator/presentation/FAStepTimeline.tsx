@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { FARuntime } from "../domain/faRuntime";
 
@@ -15,17 +15,26 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   // The view is fully manual: do NOT auto-scroll the timeline when the active
   // step changes. The user pans/scrolls the dot row themselves.
 
-  // Build step entries from the state history
-  const steps = runtime.stateHistory.map((states, i) => ({
-    index: i,
-    stateCount: states.length,
-    isCurrent: i === currentStep,
-    // Step 0 is the initial state, step N means N symbols consumed
-    label: i === 0 ? "Start" : `${i}`,
-  }));
+  // Render one slot per step the run will take (Start + one per input symbol),
+  // not just the steps reached so far. Reached steps are interactive; the rest
+  // are faded placeholders. Showing the whole track lets the connectors stretch
+  // to fill the panel width instead of leaving it mostly empty.
+  const reachedCount = runtime.stateHistory.length;
+  const totalSteps = runtime.inputWord.length;
+  const slots = Array.from({ length: totalSteps + 1 }, (_, i) => {
+    const isReached = i < reachedCount;
+    return {
+      index: i,
+      isReached,
+      isCurrent: i === currentStep,
+      stateCount: isReached ? runtime.stateHistory[i].length : 0,
+      // Step 0 is the initial state, step N means N symbols consumed
+      label: i === 0 ? "Start" : `${i}`,
+    };
+  });
 
   return (
-    <div className="min-w-0 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+    <div className="flex h-full min-w-0 flex-col rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
           {t("fa.sim.stepHistory", "Step History")}
@@ -43,45 +52,69 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
 
       <div
         ref={scrollRef}
-        className="flex items-center gap-1 overflow-x-auto pb-1"
+        className="flex flex-1 items-center overflow-x-auto pb-1"
         style={{ scrollbarWidth: "thin" }}
       >
-        {steps.map((step) => (
-          <button
-            key={step.index}
-            type="button"
-            data-active={step.isCurrent}
-            onClick={() => onJumpToStep(step.index)}
-            title={`Step ${step.index} · ${step.stateCount} state(s)`}
-            style={{
-              width: step.isCurrent ? 36 : 28,
-              height: step.isCurrent ? 36 : 28,
-              borderRadius: "50%",
-              border: step.isCurrent
-                ? "2px solid var(--fa-cyan)"
-                : "1px solid var(--fa-border)",
-              background: step.isCurrent
-                ? "var(--fa-cyan-dim)"
-                : "var(--fa-surface)",
-              color: step.isCurrent ? "var(--fa-cyan)" : "var(--fa-text-dim)",
-              fontSize: "0.65rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s",
-              boxShadow: step.isCurrent
-                ? "0 0 10px rgba(0, 229, 255, 0.35)"
-                : "none",
-            }}
-          >
-            {step.label}
-          </button>
+        {slots.map((step, i) => (
+          <Fragment key={step.index}>
+            {/* Connector leading into this dot — grows to fill spare width. */}
+            {i > 0 && (
+              <div
+                aria-hidden
+                style={{
+                  flex: "1 1 0",
+                  minWidth: 8,
+                  height: 2,
+                  margin: "0 4px",
+                  borderRadius: 2,
+                  background: step.isReached
+                    ? "var(--fa-cyan)"
+                    : "var(--fa-border)",
+                  opacity: step.isReached ? 0.4 : 1,
+                  transition: "background 0.2s, opacity 0.2s",
+                }}
+              />
+            )}
+            <button
+              type="button"
+              data-active={step.isCurrent}
+              disabled={!step.isReached}
+              onClick={() => step.isReached && onJumpToStep(step.index)}
+              title={
+                step.isReached
+                  ? `Step ${step.index} · ${step.stateCount} state(s)`
+                  : `Step ${step.index} (not reached yet)`
+              }
+              style={{
+                width: step.isCurrent ? 36 : 28,
+                height: step.isCurrent ? 36 : 28,
+                borderRadius: "50%",
+                border: step.isCurrent
+                  ? "2px solid var(--fa-cyan)"
+                  : "1px solid var(--fa-border)",
+                background: step.isCurrent
+                  ? "var(--fa-cyan-dim)"
+                  : "var(--fa-surface)",
+                color: step.isCurrent ? "var(--fa-cyan)" : "var(--fa-text-dim)",
+                fontSize: "0.65rem",
+                fontWeight: 700,
+                cursor: step.isReached ? "pointer" : "default",
+                opacity: step.isReached ? 1 : 0.4,
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                boxShadow: step.isCurrent
+                  ? "0 0 10px rgba(0, 229, 255, 0.35)"
+                  : "none",
+              }}
+            >
+              {step.label}
+            </button>
+          </Fragment>
         ))}
 
-        {/* Connector lines between dots are implicit via the gap */}
         {runtime.halted && (
           <div
             style={{

@@ -121,19 +121,6 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           </select>
         </div>
 
-        {/* States */}
-        <div className="flex flex-col gap-1">
-          <label className={labelClass}>
-            {t("fa.config.states", "States (comma-separated)")}
-          </label>
-          <ArrayInput
-            value={editor.draft.states}
-            onChange={editor.setStates}
-            className={inputClass}
-            placeholder="S0, S1, S2"
-          />
-        </div>
-
         {/* Alphabet */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
@@ -165,8 +152,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           </select>
         </div>
 
-        {/* Accept States */}
-        <div className="flex flex-col gap-1 sm:col-span-2">
+        {/* Accept States — sits beside Start State so the 2×2 grid has no
+            empty cell. */}
+        <div className="flex flex-col gap-1">
           <label className={labelClass}>
             {t("fa.config.acceptStates", "Accept States (comma-separated)")}
           </label>
@@ -183,6 +171,8 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
       <FATransitionTableEditor
         program={editor.draft}
         onTransitionChange={editor.setTransition}
+        onAddState={editor.addState}
+        onRemoveState={editor.removeState}
       />
     </div>
   );

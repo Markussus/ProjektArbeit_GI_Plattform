@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { useTMConfigEditor } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/application/useTMConfigEditor";
 import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
+import { DEFAULT_BLANK_SYMBOL } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmTypes";
 
 function createProgram(overrides: Partial<TMProgram> = {}): TMProgram {
   return {
@@ -70,6 +71,51 @@ describe("useTMConfigEditor", () => {
       "qNew",
     ]);
     expect(result.current.draft.haltStates).toEqual(["qS", "q1", "qNew"]);
+  });
+
+  // Tests the keyboard-friendly blank alias in editor inputs that parse tape symbols.
+  it("normalizes <> to the default blank symbol in tape and transition inputs", () => {
+    const { result } = renderHook(() =>
+      useTMConfigEditor(
+        createProgram({
+          tapeAlphabet: [DEFAULT_BLANK_SYMBOL, "0", "1"],
+          blankSymbol: DEFAULT_BLANK_SYMBOL,
+          transitions: {
+            [DEFAULT_BLANK_SYMBOL]: {},
+            "0": {
+              q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
+            },
+            "1": {
+              q1: { nextState: "qS", writeSymbol: "0", movement: "L" },
+            },
+          },
+        }),
+      ),
+    );
+
+    act(() => {
+      result.current.handleInitialTapeChange("0<>1");
+    });
+    act(() => {
+      result.current.handleCellChange(0, 1, "(qS, <>, N)");
+    });
+    act(() => {
+      result.current.handleCellBlur(0, 1);
+    });
+
+    expect(result.current.draft.initialTape).toEqual([
+      "0",
+      DEFAULT_BLANK_SYMBOL,
+      "1",
+    ]);
+    expect(result.current.draft.transitions[DEFAULT_BLANK_SYMBOL]?.q0).toEqual({
+      nextState: "qS",
+      writeSymbol: DEFAULT_BLANK_SYMBOL,
+      movement: "N",
+    });
+    expect(result.current.displayRows[0][1]).toBe(
+      `(qS, ${DEFAULT_BLANK_SYMBOL}, N)`,
+    );
   });
 
   // Tests invalid symbol editing, which should block unrelated cells, mark only the failing cell editable, and clear once a valid rename is committed.

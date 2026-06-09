@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOKUMENTATION",
+    "legal": "RECHTLICHES",
     "support": "HILFE",
     "toggle": "Seitenleiste umschalten"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Drittanbieter-Hinweise"
   },
   "theme": {
     "light": "Heller Modus",
@@ -40,7 +42,11 @@
     "overview": "Übersicht",
     "exercises": "Übungen",
     "examples": "Beispiele",
-    "simulation": "Simulation"
+    "simulation": "Simulation",
+    "integers": "Ganzzahlen",
+    "negative": "Negative Zahlen",
+    "ieee754": "IEEE 754 (32 Bit)",
+    "arithmetic": "Arithmetik"
   },
   "home": {
     "heroTitle1": "Komplexe Systeme meistern",
@@ -64,6 +70,8 @@
     "concept1Desc": "Beide Typen können erstellt werden – der Editor markiert Nichtdeterminismus in Ihrer Übergangstabelle.",
     "concept2": "Grammatik → Automat",
     "concept2Desc": "Fügen Sie eine rechtslineare reguläre Grammatik ein und wandeln Sie sie mit einem Klick in einen NFA um.",
+    "concept3": "Schrittweise Simulation",
+    "concept4": "Stapeltest von Wörtern",
     "comparison": "DFA vs. NFA",
     "dfaSubtitle": "Deterministischer Endlicher Automat",
     "dfaPoint1": "Genau ein Übergang pro (Zustand, Symbol)",
@@ -145,6 +153,41 @@
     "example_u06_2": "Binäre Multiplikation (1011 × 11001)",
     "example_u06_2_desc": "Multiplizieren Sie 1011 und 11001 im Binärsystem."
   },
+  "encoding": {
+    "title": "Kodierung",
+    "description": "Lernen Sie Base64- und UTF-8-Kodierung. Verstehen Sie, wie Text in Base64-Zeichenfolgen umgewandelt wird und wie Zeichen als UTF-8-Byte-Sequenzen dargestellt werden.",
+    "overviewTitle": "Warum Kodierung wichtig ist",
+    "overviewText": "Kodierungsschemata wie Base64 und UTF-8 sind grundlegend für die Übertragung und Speicherung von Daten. Base64 wandelt Binärdaten in ASCII-sicheren Text um, während UTF-8 eine universelle Zeichenkodierung bietet, die alle Schriftsysteme unterstützt.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Base64-Kodierung",
+    "concept2": "Base64-Dekodierung",
+    "concept3": "UTF-8 Zeichenkodierung",
+    "concept4": "ASCII vs UTF-8",
+    "ex_base64_placeholder": "Base64-Kodierung Übung",
+    "ex_base64_placeholder_desc": "Kodieren Sie einen Text in Base64.",
+    "ex_utf8_placeholder": "UTF-8-Kodierung Übung",
+    "ex_utf8_placeholder_desc": "Kodieren Sie Zeichen in ihre UTF-8-Byte-Sequenz.",
+    "ex_ascii_easy": "ASCII-Umwandlung",
+    "ex_ascii_easy_desc": "Wandeln Sie das Zeichen '{{char}}' in seinen ASCII-Wert (Dezimal und Hex) um. Wie lautet der dezimale ASCII-Wert?",
+    "ex_utf8_easy": "UTF-8-Kodierung (1 Byte)",
+    "ex_utf8_easy_desc": "Wandeln Sie den Unicode-Wert U+{{hex}} (Bereich 0x0000-0x007F) in die UTF-8-Binärdarstellung um.",
+    "ex_time_easy": "Unix-Timestamp-Berechnung",
+    "ex_time_easy_desc": "Gegeben ist der Unix-Timestamp {{timestamp}}. Welcher Zählerstand ergibt sich genau {{hours}} Stunden in der Zukunft?",
+    "ex_base64_medium": "Base64-Kodierung (3 Zeichen)",
+    "ex_base64_medium_desc": "Wandeln Sie die Zeichenkette '{{str}}' (genau 3 Zeichen, kein Padding nötig) in Base64 um.",
+    "ex_utf8_medium": "UTF-8-Kodierung (3 Bytes)",
+    "ex_utf8_medium_desc": "Wandeln Sie den Unicode-Wert U+{{hex}} (Bereich 0x0800-0xFFFF, benötigt 3 Bytes) in die UTF-8-Binärdarstellung um.",
+    "ex_time_medium": "Volljährigkeitsprüfung",
+    "ex_time_medium_desc": "Person A wurde zum Timestamp {{birthTimestamp}} geboren. Heute ist {{nowTimestamp}}. Ist die Person volljährig? (Antwort: Ja/Nein)",
+    "ex_base64_hard": "Base64-Dekodierung (mit Padding)",
+    "ex_base64_hard_desc": "Entschlüsseln Sie die Base64-Zeichenfolge '{{encoded}}' (mit Padding ==) zurück in ASCII-Text.",
+    "ex_utf8_hard": "UTF-8-Dekodierung (3 Bytes)",
+    "ex_utf8_hard_desc": "Welcher Unicode-Wert (U+XXXX) entspricht der 3-Byte-UTF-8-Binärfolge '{{binary}}'?",
+    "example_base64_1": "Base64 kodiere 'Hello'",
+    "example_base64_1_desc": "Kodieren Sie den Text 'Hello' in Base64.",
+    "example_utf8_1": "UTF-8 kodiere 'Hello'",
+    "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes."
+  },
   "moore": {
     "title": "Moore & Mealy Automaten",
     "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",
@@ -174,15 +217,56 @@
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
-    "examplesTitle": "Vorlesungsbeispiele",
-    "examplesIntro": "Vier Beispiele zeigen kompakt, wie aus 1-Zeilen die DNF entsteht.",
+    "algebra": {
+      "title": "Regeln der booleschen Algebra",
+      "intro": "Mit diesen Regeln lässt sich eine DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg und für die Beispiele im Simulator.",
+      "rules": {
+        "identity": {
+          "name": "Neutralelement",
+          "example": "1 ist das neutrale Element von ∧, 0 das von ∨."
+        },
+        "domination": {
+          "name": "Dominanz",
+          "example": "Eine 1 in einer ∨-Verknüpfung erzwingt 1, eine 0 in einer ∧-Verknüpfung erzwingt 0."
+        },
+        "idempotence": {
+          "name": "Idempotenz",
+          "example": "Ein doppelt vorkommender Operand verändert das Ergebnis nicht."
+        },
+        "double_negation": {
+          "name": "Doppelnegation",
+          "example": "Zwei Negationen heben sich gegenseitig auf."
+        },
+        "complement": {
+          "name": "Komplement",
+          "example": "Eine Variable ist immer entweder wahr oder falsch — a ∨ ¬a ist deshalb immer 1, a ∧ ¬a immer 0."
+        },
+        "commutativity": {
+          "name": "Kommutativgesetz",
+          "example": "Die Reihenfolge der Operanden ist für ∧ und ∨ egal."
+        },
+        "associativity": {
+          "name": "Assoziativgesetz",
+          "example": "Bei mehreren ∧- oder ∨-Operationen ist die Klammerung egal — (a ∧ b) ∧ c ergibt dasselbe wie a ∧ (b ∧ c)."
+        },
+        "distributivity": {
+          "name": "Distributivgesetz",
+          "example": "Ein gemeinsamer Operand lässt sich ausklammern — wie beim Ausmultiplizieren in der Mathematik, nur mit ∧ und ∨ statt · und +."
+        },
+        "absorption": {
+          "name": "Absorptionsgesetz",
+          "example": "Ist a bereits wahr, dann ist auch a ∨ (a ∧ b) wahr — der UND-Teil fügt nichts hinzu."
+        },
+        "de_morgan": {
+          "name": "De Morgan",
+          "example": "Negation kippt den Operator: aus ∧ wird ∨ und jeder Operand wird negiert."
+        }
+      }
+    },
     "examples": {
-      "openInSimulation": "In Simulation öffnen",
-      "labels": {
-        "expression": "Ausdruck",
-        "oneRows": "Relevante 1-Zeilen",
-        "terms": "UND-Terme",
-        "canonicalDnf": "DNF"
+      "modeGroup": {
+        "expression_to_truth_table": "Modus: Ausdruck → Wahrheitstabelle",
+        "truth_table_to_dnf": "Modus: Wahrheitstabelle → DNF"
       },
       "walkthroughs": {
         "lectureExpression": {
@@ -200,6 +284,18 @@
         "xor": {
           "title": "Halbaddierer-Summe als XOR",
           "explanation": "Die Summe ist 1, wenn genau ein Eingang 1 ist."
+        },
+        "carry": {
+          "title": "Halbaddierer-Carry",
+          "explanation": "Das Übertragsbit ist nur dann 1, wenn beide Eingänge 1 sind — ein einzelner UND-Term."
+        },
+        "dnfIntro": {
+          "title": "DNF-Einführung aus der Vorlesung",
+          "explanation": "Nur die Zeilen 000 und 111 ergeben 1. Daraus entstehen zwei UND-Terme."
+        },
+        "exerciseTwo": {
+          "title": "Übung 2: Polynom aus Wertetafel",
+          "explanation": "Drei 1-Zeilen (010, 100, 101) führen zur DNF der Vorlesungsübung 2."
         }
       }
     },
@@ -212,20 +308,55 @@
     "exampleIgnored": "wird ignoriert",
     "exampleResultTitle": "DNF",
     "exampleRuleTitle": "Merksatz",
-    "exampleRuleText": "Bei Wert 1 wird die Variable normal übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
-    "exercise1": "Ausdruck auswerten und DNF ableiten",
-    "exercise1Desc": "Füllen Sie die Wertetafel und bilden Sie die DNF aus allen 1-Zeilen",
-    "exercise2": "Klammerung vergleichen und DNF bilden",
-    "exercise2Desc": "Werten Sie den geklammerten Ausdruck aus und leiten Sie daraus die DNF ab",
-    "exercise3": "Halbaddierer-Summe als DNF",
-    "exercise3Desc": "Prüfen Sie das XOR-Polynom aus der Vorlesung über die Wertetafel",
-    "exercise4": "Mehrvariablen-Ausdruck als DNF",
-    "exercise4Desc": "Werten Sie einen Ausdruck mit vier Variablen aus und bilden Sie die DNF",
-    "exercise5": "Boolesches Polynom aus Wertetafel",
-    "exercise5Desc": "Erzeugen Sie aus einer vorgegebenen Wertetafel das boolesche Polynom in DNF",
+    "exampleRuleText": "Bei Wert 1 wird die Variable übernommen, bei Wert 0 wird sie negiert. Dadurch beschreibt jeder UND-Term genau eine passende Tabellenzeile.",
+    "exercises": {
+      "worksheet02bTruthTable1": {
+        "title": "DNF aus Wertetafel bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b und c die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 1."
+      },
+      "simpleExpression": {
+        "title": "Wertetafel aus Ausdruck erstellen",
+        "description": "Erstellen Sie die Wertetafel für den vorgegebenen Ausdruck und leiten Sie daraus die kanonische DNF ab."
+      },
+      "overlappingGroups": {
+        "title": "DNF mit überlappenden Gruppen vereinfachen",
+        "description": "Leiten Sie die kanonische DNF aus der Wertetafel her und bestimmen Sie eine minimale DNF. Beachten Sie, dass eine 1-Zeile mehrere Gruppen abdecken darf."
+      },
+      "negatedExpression": {
+        "title": "Ausdruck mit Negationen auswerten",
+        "description": "Erstellen Sie die Wertetafel für einen Ausdruck mit mehreren Negationen und bestimmen Sie die zugehörige kanonische DNF."
+      },
+      "worksheet02bTruthTable2": {
+        "title": "DNF mit vier Variablen bestimmen",
+        "description": "Leiten Sie aus der vorgegebenen Wertetafel mit a, b, c und d die kanonische DNF her und vereinfachen Sie diese anschließend. Nach Übungsblatt 02b, Aufgabe 2."
+      },
+      "complexExpression": {
+        "title": "Komplexen Ausdruck in DNF überführen",
+        "description": "Erstellen Sie die Wertetafel für den Ausdruck mit vier Variablen, bestimmen Sie die kanonische DNF und vereinfachen Sie diese."
+      }
+    },
     "exprBuilder": {
       "evaluate": "Auswerten",
       "newExpression": "Anderen Ausdruck eingeben"
+    },
+    "simulator": {
+      "tabs": {
+        "expression_to_truth_table": "Ausdruck → Tabelle",
+        "truth_table_to_dnf": "Tabelle → DNF"
+      },
+      "tableModeTitle": "DNF aus Wertetafel",
+      "tableModeHint": "Bauen Sie eine eigene Wertetafel, setzen Sie die Ergebnis-Spalte und schreiben Sie daraus die DNF.",
+      "variableCount": "Variablen",
+      "variableCountLabel": "Anzahl",
+      "variableCountHelp": "{{min}} bis {{max}} Variablen möglich",
+      "clearTable": "Tabelle auf 0 setzen",
+      "fillTable": "Tabelle auf 1 setzen",
+      "randomTable": "Zufällig belegen",
+      "invertTable": "Ergebnisse invertieren",
+      "setupPreviewTitle": "Wertetafel festlegen",
+      "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
+      "commitTable": "Tabelle übernehmen",
+      "newTable": "Neue Tabelle"
     },
     "builder": {
       "inputTitle": "Boolescher Ausdruck",
@@ -243,14 +374,18 @@
         "taskTitle": "Übungsauftrag",
         "given": "Gegeben ist der boolesche Ausdruck:",
         "givenTruthTable": "Gegeben ist die Wertetafel:",
+        "buildTruthTable": "Bauen Sie die Wertetafel:",
+        "chooseResultColumn": "Setzen Sie die Ergebniswerte f selbst. Danach bilden Sie aus allen 1-Zeilen die DNF.",
         "findExpressionFromTable": "Gesucht ist das boolesche Polynom in disjunktiver Normalform.",
         "stepsTitle": "Arbeitsfolge",
         "instructionStepTable": "Wertetafel ausfüllen.",
         "instructionStepDnf": "Aus jeder 1-Zeile einen UND-Term bilden und die Terme mit ∨ verbinden.",
+        "instructionStepEditableTable": "Ergebnis-Spalte f in der Wertetafel setzen.",
         "instructionStepOneRows": "Nur die Zeilen mit Ergebnis 1 betrachten.",
         "instructionStepDnfFromTable": "Für jede 1-Zeile einen UND-Term bilden und mit ∨ verbinden.",
         "tableTitle": "Arbeitsbereich",
         "tableHint": "Wählen Sie pro Zeile den Ergebniswert 0 oder 1. Mit Tastaturfokus können Sie 0/1 und die Pfeiltasten nutzen.",
+        "tableHintEditable": "Setzen Sie pro Zeile den Ergebniswert f. Danach muss Ihre DNF genau diese Wertetafel beschreiben.",
         "tableHintGiven": "Die Ergebnis-Spalte ist vorgegeben. Leiten Sie daraus die DNF ab.",
         "rowHeader": "Zeile",
         "resultGroupLabel": "Ergebnis für Zeile {{row}}",
@@ -262,9 +397,11 @@
         "feedbackTitle": "Feedback",
         "notChecked": "Noch nicht geprüft. Füllen Sie die Tabelle aus, geben Sie die DNF ein und klicken Sie auf Prüfen.",
         "notCheckedDnfOnly": "Noch nicht geprüft. Geben Sie die DNF zur vorgegebenen Wertetafel ein und klicken Sie auf Prüfen.",
+        "notCheckedEditable": "Noch nicht geprüft. Setzen Sie die Ergebniswerte, geben Sie die passende DNF ein und klicken Sie auf Prüfen.",
         "progressTable": "Wahrheitstabelle",
         "progressTableValue": "{{answered}} / {{total}} Zeilen beantwortet",
         "progressTableProvided": "vorgegeben",
+        "progressTableEditable": "selbst gesetzt",
         "progressDnf": "DNF-Eingabe",
         "progressDnfReady": "vorhanden",
         "progressDnfMissing": "noch leer",
@@ -282,7 +419,8 @@
         "correctTitle": "Alles richtig",
         "correctDesc": "Wahrheitstabelle und DNF passen zur Aufgabe.",
         "tableIncomplete": "{{count}} Tabellenzeile(n) sind noch nicht ausgefüllt.",
-        "tableWrongRows": "Diese Tabellenzeile(n) sind falsch: {{rows}}.",
+        "tableWrongRows_one": "{{count}} von {{total}} Tabellenzeilen ist noch falsch — finden Sie sie selbst.",
+        "tableWrongRows_other": "{{count}} von {{total}} Tabellenzeilen sind noch falsch — finden Sie sie selbst.",
         "dnfEmpty": "Die DNF-Eingabe fehlt noch.",
         "dnfSyntax": "Die DNF-Eingabe kann syntaktisch nicht gelesen werden.",
         "dnfEquivalentNotCanonical": "Die Eingabe beschreibt zwar dieselbe Funktion, ist aber nicht als DNF aus den 1-Zeilen aufgebaut — für jede 1-Zeile wird genau ein UND-Term benötigt.",
@@ -294,37 +432,106 @@
         "dnfDeferredUntilTable": "Die DNF wird erst detailliert bewertet, wenn die Wertetafel vollständig und korrekt ist.",
         "tipTitle": "Tipp",
         "tipCompleteTable": "Erst wenn jede Tabellenzeile beantwortet ist, lässt sich die DNF sinnvoll prüfen.",
-        "tipTableRows": "Prüfen Sie zuerst die markierten Tabellenzeilen. Die DNF wird aus den korrekten 1-Zeilen abgeleitet.",
+        "tipTableRows": "Gehen Sie die Tabelle Zeile für Zeile durch und prüfen Sie jeden Wert selbst. Erst wenn alle Zeilen stimmen, kann die DNF abgeleitet werden.",
         "tipStartDnf": "Für jede Zeile mit Ergebnis 1 schreiben Sie einen UND-Term mit allen Variablen.",
         "tipSyntax": "Nutzen Sie Klammern und die Operatoren ¬, ∧, ∨ oder die Aliase !, &, |.",
         "tipCanonical": "Jeder UND-Term muss alle Variablen genau einmal enthalten — entweder normal oder negiert.",
         "tipMissingTerms": "Vergleichen Sie die 1-Zeilen der Tabelle mit den UND-Termen in Ihrer DNF.",
         "tipCompareRows": "Testen Sie die DNF gedanklich an den genannten Zeilen und vergleichen Sie das Ergebnis mit der Tabelle.",
         "solutionHint": "Die komplette Lösung kann jetzt als letzte Hilfestellung eingeblendet werden.",
-        "showSolutionHelp": "Lösung als Hilfe anzeigen",
+        "showSolutionHelp": "Lösung anzeigen",
         "solutionAfterCheck": "Lösung nach Prüfung",
-        "hideSolution": "Lösung ausblenden"
+        "hideSolution": "Lösung ausblenden",
+        "startSimplification": "Vereinfachung starten",
+        "hideSimplification": "Vereinfachung ausblenden",
+        "simplificationTitle": "DNF vereinfachen",
+        "simplificationHint": "Nutzen Sie die booleschen Gesetze (Absorption, Distributivität, Komplement, …), um die DNF in eine kürzere äquivalente Form zu bringen.",
+        "canonicalDnfLabel": "Ausgangs-DNF",
+        "simplifiedDnfLabel": "Vereinfachte Form",
+        "simplifiedDnfPlaceholder": "z. B. a ∨ (b ∧ ¬c)",
+        "checkSimplification": "Vereinfachung prüfen",
+        "revealSolutionTitle": "Mögliche minimale Lösung",
+        "revealWalkthroughTitle": "Lösungsweg",
+        "revealAlgebraReferenceTitle": "Regel-Spickzettel",
+        "revealRequiresCheck": "erst nach Prüfen",
+        "minimalDnfLabel": "Eine mögliche minimale DNF",
+        "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF-Form (ODER von UND-Termen), z. B. Ergebnis von Quine-McCluskey.",
+        "factoredLabel": "Mathematisch minimal (mit Faktorisierung)",
+        "factoredNote": "{{literalsLabel}} — durch Ausklammern gemeinsamer Literale noch kürzer als die DNF, aber keine DNF-Form mehr.",
+        "literalCount_one": "{{count}} Literal",
+        "literalCount_other": "{{count}} Literale",
+        "termCount_one": "{{count}} Term",
+        "termCount_other": "{{count}} Termen",
+        "walkthroughTitle": "Ein möglicher Lösungsweg",
+        "walkthroughNote": "Dieser Weg ist nicht eindeutig. Er zeigt eine mögliche Gruppierung der 1-Zeilen zur minimalen Form.",
+        "showFullWalkthrough": "Vollen Lösungsweg anzeigen",
+        "showCompactWalkthrough": "Kompakten Lösungsweg anzeigen",
+        "walkthroughRowsTitle": "Start mit den 1-Zeilen",
+        "walkthroughRowsText": "Die Zeilen {{rows}} liefern die Terme der korrekten DNF.",
+        "walkthroughNoRows": "Es gibt keine 1-Zeile; die Funktion ist für jede Belegung 0.",
+        "walkthroughConstantTitle": "Konstantenfall erkennen",
+        "walkthroughAllRows": "Alle Zeilen haben Ergebnis 1. Deshalb kann die gesamte DNF zu 1 zusammengefasst werden.",
+        "walkthroughAlwaysFalse": "Ohne 1-Zeile bleibt keine UND-Gruppe übrig. Die minimale Form ist daher 0.",
+        "walkthroughGroupsTitle": "Passende Zeilen zusammenfassen",
+        "walkthroughGroupsIntro": "Jede Gruppe unten zeigt, wie sich ihre 1-Zeilen schrittweise zu einem kürzeren Term zusammenfassen lassen — das Distributivgesetz klammert die gemeinsamen Literale aus, das Komplementgesetz reduziert (x ∨ ¬x) auf 1, und das Neutralelement entfernt das verbleibende ∧ 1.",
+        "walkthroughGroupHeading": "Gruppe {{index}}",
+        "walkthroughGroupCoverage": "deckt Zeilen {{rows}} ab",
+        "walkthroughGroupEliminated": "gestrichen: {{variables}}",
+        "walkthroughGroupNoEliminated": "Schon ein einzelner Term — keine Umformung nötig.",
+        "walkthroughCoverTitle": "Alle 1-Zeilen abdecken",
+        "walkthroughCoverText": "Die ausgewählten Gruppen decken alle 1-Zeilen ab — keine 1-Zeile bleibt übrig.",
+        "walkthroughResultTitle": "Mögliche minimale Form",
+        "walkthroughFactoredTitle": "Optional: faktorisieren für noch kürzere Form",
+        "walkthroughFactoredText": "Die minimale DNF hat {{minimalLiterals}} Literale. Durch Ausklammern gemeinsamer Literale (Distributivgesetz rückwärts) lässt sich der Ausdruck auf {{factoredLiterals}} Literale verkürzen — die DNF-Form geht dabei verloren.",
+        "walkthroughFactoredNote": "Diese Form ist mathematisch äquivalent, aber keine DNF mehr (außen steht ∧). Sie ist nur dann gefragt, wenn der kürzeste boolesche Ausdruck gesucht ist, nicht die kürzeste DNF.",
+        "walkthroughRowListMore": "{{visible}}, ... (+{{count}} weitere)",
+        "derivationNotes": {
+          "factorOut": "{{variable}} ausklammern — die anderen Literale bleiben.",
+          "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
+          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg."
+        },
+        "simplificationStatus": {
+          "empty": "Noch keine Eingabe",
+          "syntax_error": "Eingabe konnte nicht gelesen werden",
+          "unknown_variable": "Unbekannte Variable",
+          "not_equivalent": "Nicht äquivalent",
+          "equivalent_not_shorter": "Äquivalent, aber nicht kürzer",
+          "accepted_not_minimal": "Korrekt vereinfacht — geht aber noch kürzer",
+          "accepted_minimal": "Minimale Form — perfekt"
+        },
+        "simplificationDetail": {
+          "empty": "Schreiben Sie eine vereinfachte äquivalente Form der korrekten DNF.",
+          "syntax_error": "Bitte prüfen Sie Klammern und die Operatoren ¬, ∧, ∨ (oder die Aliase !, &, |).",
+          "unknown_variable": "Folgende Variable(n) sind nicht Teil der Wahrheitstabelle: {{variables}}.",
+          "not_equivalent": "Ihre Form stimmt nicht mit der ursprünglichen Wahrheitstabelle überein.",
+          "equivalent_not_shorter": "Äquivalent, aber mit {{userLiterals}} Literalen nicht kürzer als die ursprüngliche DNF mit {{canonicalLiterals}} Literalen.",
+          "accepted_not_minimal": "Äquivalent und kürzer als die ursprüngliche DNF. Sie haben {{userLiterals}} Literale — minimal sind {{minimumLiterals}}.",
+          "accepted_minimal": "{{userLiterals}} Literale — auf Höhe des Minimums ({{minimumLiterals}})."
+        }
       },
+      "followUpTitle": "Weiterarbeiten",
+      "solutionBadge": "Lösung",
       "resultTitle": "DNF",
       "resultHint": "Jede markierte Zeile liefert einen UND-Term.",
       "resultRuleHint": "Merksatz: 0 → Variable negieren, 1 → Variable übernehmen. Nur Zeilen mit Ergebnis 1 werden zu Termen und mit ∨ verknüpft.",
       "variableLimitTitle": "Zu viele Variablen",
-      "variableLimitDesc": "Der Ausdruck enthält {{variables}} Variablen. Bitte nutze höchstens {{max}} Variablen, damit Wahrheitstabelle und DNF im Browser zuverlässig berechnet werden können.",
-      "longDnfPreview": "Die DNF hat {{total}} Terme. Es werden zunächst {{shown}} Terme angezeigt.",
-      "hiddenTerms": "{{count}} weitere Terme ausgeblendet.",
-      "showAllTerms": "Alle {{count}} Terme anzeigen",
-      "showFewerTerms": "Weniger Terme anzeigen",
+      "variableLimitDesc": "Der Ausdruck enthält {{variables}} Variablen. Bitte verwenden Sie höchstens {{max}} Variablen, damit Wahrheitstabelle und DNF im Browser zuverlässig berechnet werden können.",
+      "resultCompact": "Große DNF: Alle {{total}} Terme sind in der kompakten Ansicht scrollbar.",
+      "resultFull": "Volle DNF mit {{total}} Termen.",
+      "showFullResult": "Volle DNF anzeigen",
+      "showCompactResult": "Kompakte DNF anzeigen",
       "variables": "Variablen",
       "rows": "Tabellenzeilen",
       "oneRows": "1-Zeilen",
       "derivationTitle": "Herleitung",
       "derivationHint": "Nur Wahrheitstabellen-Zeilen mit Ergebnis 1 werden in Terme übersetzt und anschließend mit ODER verknüpft.",
-      "derivationPreview": "Die Herleitung hat {{total}} Schritte. Es werden zunächst {{shown}} Schritte angezeigt.",
-      "showAllSteps": "Alle {{count}} Schritte anzeigen",
-      "showFewerSteps": "Weniger Schritte anzeigen",
+      "derivationCompact": "Große Herleitung: Alle {{total}} Schritte sind in der kompakten Ansicht scrollbar.",
+      "derivationFull": "Volle Herleitung mit {{total}} Schritten.",
+      "showFullDerivation": "Volle Herleitung anzeigen",
+      "showCompactDerivation": "Kompakte Herleitung anzeigen",
       "derivationRowLabel": "Zeile {{row}}",
-      "derivationTautology": "Jede Zeile ergibt 1, daher ist die saubere DNF die Konstante 1.",
-      "derivationContradiction": "Keine Zeile ergibt 1, daher ist die saubere DNF die Konstante 0.",
+      "derivationTautology": "Jede Zeile ergibt 1 — die DNF ist daher konstant 1.",
+      "derivationContradiction": "Keine Zeile ergibt 1 — die DNF ist daher konstant 0.",
       "truthTableTitle": "Wahrheitstabelle",
       "truthTableRow": "Zeile",
       "truthTablePreview": "Große Tabelle: Es werden zuerst {{shown}} relevante Zeilen angezeigt. Insgesamt: {{total}} Zeilen, davon {{oneRows}} 1-Zeilen.",
@@ -348,33 +555,208 @@
   },
   "java": {
     "title": "Java-Programmierung",
-    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafuer direkt einen editierbaren Java-Code-Editor bereit.",
+    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafür direkt einen editierbaren Java-Code-Editor bereit.",
     "overviewTitle": "Einstieg in Java",
-    "overviewText": "Dieses Thema fuehrt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
-    "concepts": "Schluesselkonzepte",
+    "overviewText": "Dieses Thema führt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
+    "concepts": "Schlüsselkonzepte",
     "concept1": "Klasse Main und main-Methode",
-    "concept2": "System.out.println fuer Konsolenausgaben",
-    "concept3": "for-Schleifen fuer wiederholte Ausgaben",
+    "concept2": "System.out.println für Konsolenausgaben",
+    "concept3": "for-Schleifen für wiederholte Ausgaben",
     "concept4": "Arrays lesen, sortieren und auswerten",
     "example1Title": "Einfaches Hello World",
     "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
     "example2Title": "Wiederholte Ausgabe",
-    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausfuehren.",
+    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausführen.",
     "example3Title": "Array sortieren",
     "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
     "exercise1": "Hello World ausgeben",
     "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
-    "exercise2": "Hello World fuenfmal ausgeben",
-    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fuenfmal in die Konsole zu schreiben.",
+    "exercise2": "Hello World fünfmal ausgeben",
+    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fünfmal in die Konsole zu schreiben.",
     "exercise3": "Zwei Zahlen addieren",
     "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
     "exercise4": "Array sortieren",
-    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschliessend aus.",
+    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschließend aus.",
     "exercise5": "Maximum im Array finden",
-    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
+    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den größten enthaltenen Wert.",
     "editorLabel": "Java-Editor",
     "editorLoading": "Der Monaco-Editor wird geladen...",
-    "resetStarterCode": "Startercode zuruecksetzen"
+    "editorLimit": {
+      "lines": "Der Java-Editor ist auf {{maxLines}} Zeilen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen.",
+      "characters": "Der Java-Editor ist auf {{maxCharacters}} Zeichen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen."
+    },
+    "resetStarterCode": "Startercode zurücksetzen",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "Sekunden",
+    "runWhileLoading": "Compiler lädt",
+    "compilerStatus": {
+      "not-loaded": "nicht geladen",
+      "loading": "lädt",
+      "ready": "bereit",
+      "failed": "fehlgeschlagen"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler wurde noch nicht geladen.",
+      "loading": "Java-Compiler wird im Hintergrund geladen...",
+      "ready": "Compiler ist für Java-Kompilierung und Ausführung bereit.",
+      "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
+    },
+    "commandOverview": {
+      "button": "Java-Befehle",
+      "title": "Was geht im Java-Editor?",
+      "summary": "Java {{version}} für kleine Browser-Programme",
+      "versionTitle": "Unterstützte Java-Version: {{version}}",
+      "versionText": "Der Browser-Compiler nutzt OpenJDK javac über teavm-javac. Sprachdiagnosen kommen damit von javac; das erzeugte Programm läuft als WebAssembly im Browser-Worker.",
+      "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java. Du kannst Java-Code ausführen, aber keine Terminalbefehle eingeben.",
+      "commandListTitle": "Kompakte Übersicht",
+      "status": {
+        "supported": "Geht",
+        "limited": "Eingeschränkt",
+        "blocked": "Geht nicht",
+        "not-supported": "Nicht unterstützt",
+        "explained": "Eingeschränkt"
+      },
+      "capabilities": {
+        "programShape": {
+          "title": "Programmeinstieg",
+          "description": "Ein einzelnes Main.java-Programm funktioniert. public class Main und weitere nicht-public Hilfsklassen können in derselben Editor-Datei stehen."
+        },
+        "basics": {
+          "title": "Normale Java-Syntax",
+          "description": "Grundlegende Java-Syntax funktioniert: Variablen, Operatoren, if/else, switch und Methodenaufrufe."
+        },
+        "loops": {
+          "title": "Schleifen und Ablaufsteuerung",
+          "description": "for, while, do/while und for-each funktionieren für Übungen und kleine Algorithmen."
+        },
+        "arraysCollections": {
+          "title": "Arrays, Listen, Maps und Sets",
+          "description": "Arrays und typische java.util-Collections funktionieren: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+        },
+        "objects": {
+          "title": "Eigene Typen",
+          "description": "Eigene Klassen, Konstruktoren, Enums, Records, Interfaces und statische Methoden können in derselben Editor-Datei stehen."
+        },
+        "output": {
+          "title": "Konsolenausgabe",
+          "description": "Ausgaben werden abgefangen und unten als stdout oder stderr angezeigt."
+        },
+        "standardLibrary": {
+          "title": "Teilmenge der Standardbibliothek",
+          "description": "Häufige Bibliotheksklassen aus java.lang, java.util, java.math und einfachem java.time sind verfügbar. Betriebssystemnahe APIs sind nicht verlässlich."
+        },
+        "singleFile": {
+          "title": "Eine Editor-Datei",
+          "description": "Die UI sendet aktuell eine Quelldatei. Packe Hilfsklassen in dieselbe Datei statt ein Mehrdateien-Projekt zu erwarten."
+        },
+        "input": {
+          "title": "Konsoleneingabe",
+          "description": "Scanner und System.in funktionieren mit dem Eingabefeld unter dem Editor. Die Eingabe wird vor dem Start bereitgestellt; interaktive Nachfragen während der Ausführung sind nicht möglich."
+        },
+        "cli": {
+          "title": "Terminalbefehle",
+          "description": "In das Editorfeld gehört Java-Quellcode, keine Befehle. java, javac, jshell, jar, mvn und gradle werden nicht als Terminalkommandos ausgeführt."
+        },
+        "environment": {
+          "title": "Betriebssystemzugriff",
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
+        },
+        "runtimeFeatures": {
+          "title": "Dynamische Laufzeitfeatures",
+          "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlässlich."
+        },
+        "stringsMath": {
+          "title": "Strings, Math und große Zahlen",
+          "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren für typische Konsolenaufgaben."
+        }
+      },
+      "commands": {
+        "run": {
+          "title": "Aktuellen Editorinhalt kompilieren und starten",
+          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und führt die Main.main-Methode im Worker aus."
+        },
+        "compile": {
+          "title": "Kompilierung ist Teil von Run",
+          "description": "Der interne Compiler-Befehl nutzt javac-Diagnosen und TeaVM-Codegenerierung. Die UI bietet keinen separaten Compile-only-Terminalbefehl."
+        },
+        "javaCli": {
+          "title": "Kein java-Kommandozeilenstarter",
+          "description": "Ein lokaler java-Befehl wird nicht unterstützt, weil der Browser keine JVM-Prozesse startet."
+        },
+        "javacCli": {
+          "title": "Kein javac-Terminalbefehl",
+          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer können keine beliebigen javac-Flags übergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
+        },
+        "jshell": {
+          "title": "Keine interaktive JShell",
+          "description": "Der Simulator führt vollständige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
+        },
+        "tools": {
+          "title": "Keine Paketierungs- oder Dokumentationswerkzeuge",
+          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme gehören nicht zum unterstützten Browser-Compiler-Ablauf."
+        },
+        "stdin": {
+          "title": "Konsoleneingabe ist nicht interaktiv",
+          "description": "Konsolenausgabe über System.out und System.err wird unterstützt. Scanner/System.in nutzt das feste Eingabefeld im Simulator."
+        },
+        "environment": {
+          "title": "Browser-Sandbox gilt",
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
+        },
+        "title": "Was darf ich in den Editor schreiben?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft..."
+    },
+    "validation": {
+      "popupTitle": "Lösungsprüfung",
+      "pass": "BESTANDEN",
+      "fail": "FEHLER",
+      "emptyOutput": "<leer>",
+      "exampleCheckUnavailable": "Beispiele benötigen keine Lösungsprüfung.",
+      "table": {
+        "passed": "Bestanden",
+        "case": "Testfall",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "phase": "Status"
+      }
+    },
+    "exercise6": "Text aus Eingabe großschreiben",
+    "exercise6Desc": "Lesen Sie eine Zeile mit Scanner ein und geben Sie den Text in Großbuchstaben aus.",
+    "exercise7": "Methode schreiben",
+    "exercise7Desc": "Implementieren Sie eine Methode, die eine Zahl quadriert und zurückgibt.",
+    "exercise8": "Einfache Klasse verwenden",
+    "exercise8Desc": "Speichern Sie Konstruktorwerte in einer Klasse und geben Sie eine Beschreibung zurück.",
+    "exercise9": "ArrayList sortieren",
+    "exercise9Desc": "Sortieren Sie eine ArrayList mit Collections.sort und geben Sie die Liste aus.",
+    "exercise10": "FizzBuzz umsetzen",
+    "exercise10Desc": "Kombinieren Sie Schleife, Modulo und Bedingungen, um die klassische FizzBuzz-Ausgabe zu erzeugen.",
+    "exercise11": "Palindrom prüfen",
+    "exercise11Desc": "Implementieren Sie eine Methode, die einen Text von beiden Seiten vergleicht und Palindrome erkennt.",
+    "exercise12": "Matrix auswerten",
+    "exercise12Desc": "Berechnen Sie mit verschachtelten Schleifen alle Zeilensummen und die Summe der Hauptdiagonale.",
+    "exercise13": "Warenkorb modellieren",
+    "exercise13Desc": "Verwalten Sie Preise in einer Klasse mit ArrayList und implementieren Sie Anzahl, Gesamtsumme und Maximum.",
+    "stdin": {
+      "label": "Programmeingabe",
+      "placeholder": "Eingabe für Scanner/System.in, z. B. hello java",
+      "help": "Diese Eingabe wird vor dem Programmstart als System.in bereitgestellt. Interaktive Nachfragen während der Ausführung sind nicht möglich."
+    },
+    "timeout": {
+      "warningTitle": "Ausführung wegen Timeout gestoppt",
+      "warningText": "Das Programm lief zu lange oder wartet auf Eingabe. Prüfen Sie Schleifen, Scanner-Aufrufe und das Timeout."
+    }
+  },
+  "legal": {
+    "label": "Rechtliches",
+    "title": "Drittanbieter-Hinweise",
+    "description": "Lizenz- und Quelleninformationen fuer eingebundene Compiler-Komponenten und zugehoerige Abhaengigkeiten.",
+    "summary": "Diese Anwendung enthaelt einen browserbasierten Java-Compiler, der aus teavm-javac gebaut wird. Das Compiler-Modul enthaelt OpenJDK javac unter GNU GPLv2 mit Classpath Exception sowie TeaVM-Komponenten unter Apache License 2.0. Es wurden keine OpenJDK-Quelldateien veraendert. Exakte Quellen- und Build-Informationen finden Sie in den Drittanbieter-Hinweisen des Projekts."
   },
   "exercise": {
     "label": "Übung {{index}}",
@@ -408,6 +790,7 @@
       "export": "Export",
       "import": "Import",
       "copied": "String in die Zwischenablage kopiert.",
+      "exportError": "String konnte nicht erzeugt werden.",
       "importSuccess": "String erfolgreich geladen.",
       "importError": "String konnte nicht geladen werden."
     },
@@ -417,7 +800,9 @@
       "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
       "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
-      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
+      "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
+      "regularLanguages": "Der Simulator für reguläre Sprachen wird hier verfügbar sein.",
+      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
     }
   },
   "simulator": {
@@ -583,6 +968,7 @@
       },
       "addition": {
         "desc": "Stellenweise Addition im Binärsystem. Werden zwei Einsen addiert, gibt es einen Übertrag (Carry) an die nächste Stelle.",
+        "stepByStepTitle": "Stellenweise Addition",
         "carryOutWarning": "Achtung: Ein Übertrag (Carry) hat das 8. Bit überschritten (Carry Out).",
         "overflowWarning": "Overflow-Fehler! Die Addition logisch positiver Zahlen hat zu einem negativen Zweierkomplement-Ergebnis geführt.",
         "overflowTitle": "Overflow Error (2s Complement):",
@@ -693,6 +1079,7 @@
         "mantissaShifted": "Die Mantisse der kleineren Zahl wird um {{diff}} Stellen nach rechts verschoben.",
         "expAligned": "Nun weisen beide Glieder den Exponenten 2^{{exp}} auf und können addiert (bzw. subtrahiert) werden.",
         "normBack": "Das Resultat wird zurück in das Format 1.M × 2^E verschoben.",
+        "normDesc": "Das Ergebnis wird zurück in das Format 1.M × 2^E umgewandelt.",
         "signExpMant": "Sign | Exponent | Mantissa",
         "decimalResult": "Dezimal",
         "expDiffDesc": "Exponentendifferenz: {{larger}} - {{smaller}} = {{diff}}",
@@ -738,6 +1125,65 @@
       "exitTabTitle": "Tab wechseln?",
       "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs wird die aktuelle Übung beendet und dein Fortschritt geht verloren.",
       "exitTabConfirm": "Tab wechseln"
+    },
+    "encoding": {
+      "tabs": {
+        "base64": "Base64",
+        "utf8": "UTF-8"
+      },
+      "base64Title": "Base64-Kodierer",
+      "base64Desc": "Konvertieren Sie Text in Base64-Kodierung oder dekodieren Sie Base64-Zeichenfolgen zurück in Text.",
+      "utf8Title": "UTF-8-Kodierer",
+      "utf8Desc": "Konvertieren Sie Zeichen in ihre UTF-8-Byte-Sequenz-Darstellung.",
+      "encode": "Kodieren",
+      "decode": "Dekodieren",
+      "mode": "Modus",
+      "inputText": "Eingabetext",
+      "inputBase64": "Base64-Zeichenfolge",
+      "inputHexBytes": "Hex-Bytes (durch Leerzeichen getrennt)",
+      "base64Result": "Base64-Ergebnis",
+      "utf8Result": "UTF-8-Bytes (Hex)",
+      "decodedResult": "Dekodierter Text",
+      "explanation": "Erklärung",
+      "enterValue": "Geben Sie Text ein, um die Kodierungsschritte zu sehen.",
+      "step1CharToAscii": "Schritt 1: Zeichen zu ASCII/Binär",
+      "step2GroupBits": "Schritt 2: In 6-Bit-Gruppen einteilen",
+      "step3Base64Lookup": "Schritt 3: Base64-Tabellensuche",
+      "step1CodePoint": "Schritt 1: Unicode-Codepunkt",
+      "step2ByteEncoding": "Schritt 2: UTF-8-Byte-Kodierung",
+      "step3FullSequence": "Schritt 3: Vollständige Byte-Sequenz",
+      "charLabel": "Zeichen",
+      "asciiLabel": "ASCII-Wert",
+      "binaryLabel": "Binär",
+      "bitsLabel": "6-Bit-Gruppe",
+      "decimalLabel": "Dezimal",
+      "base64CharLabel": "Base64-Zeichen",
+      "codePointLabel": "Codepunkt",
+      "bytePattern": "Byte-Muster",
+      "byteN": "Byte {{n}}",
+      "hexLabel": "Hex",
+      "hexSequence": "Hex-Sequenz",
+      "binarySequence": "Binär-Sequenz",
+      "finalResult": "Endergebnis",
+      "decodeStep1Lookup": "Schritt 1: Base64-Tabellensuche",
+      "decodeStep2ConcatBits": "Schritt 2: 6-Bit-Gruppen verketten",
+      "decodeStep3ToChars": "Schritt 3: 8-Bit-Bytes zu Zeichen konvertieren",
+      "decodeStep1Bytes": "Schritt 1: Byte-Typen identifizieren",
+      "decodeStep2CodePoints": "Schritt 2: Unicode-Codepunkte rekonstruieren",
+      "decodeStep3FullText": "Schritt 3: Vollständig dekodierter Text",
+      "leadByte": "{{count}}-Byte Start-Byte",
+      "continuationByte": "Fortsetzungs-Byte",
+      "singleByte": "Einzelnes ASCII-Byte",
+      "byteTypeLabel": "Byte-Typ",
+      "bytesUsed": "Verwendete Bytes",
+      "invalidUtf8Title": "Ungültige UTF-8-Sequenz",
+      "invalidUtf8Desc": "Die Hex-Bytes bilden keine gültige UTF-8-Sequenz. Überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+      "invalidBase64Title": "Ungültige Base64-Eingabe",
+      "invalidBase64Desc": "Die Eingabe enthält ungültige Base64-Zeichen. Verwenden Sie nur A-Z, a-z, 0-9, +, / und = für Padding.",
+      "examplesTitle": "Beispielübungen",
+      "examplesDesc": "Hier finden Sie zusätzliche Beispielübungen zur Kodierung:",
+      "groupbase64": "Base64-Kodierung",
+      "grouputf8": "UTF-8-Kodierung"
     }
   },
   "tm": {
@@ -755,6 +1201,18 @@
       "concept4": "Church-Turing-These"
     },
     "exercises": {
+      "exerciseWorksheetAlternatingSymbols": "Abwechselnde Symbole prüfen",
+      "exerciseWorksheetAlternatingSymbolsDesc": "Gegeben ist ein Binärwort über {0, 1}. Konstruieren Sie eine Turingmaschine, die prüft, ob sich 0 und 1 immer abwechseln, und anhält, sobald zwei gleiche Symbole aufeinander folgen oder das Ende der Eingabe erreicht ist.",
+      "exerciseWorksheetSwapFirstTwoSymbols": "Erste zwei Symbole vertauschen",
+      "exerciseWorksheetSwapFirstTwoSymbolsDesc": "Konstruieren Sie eine Turingmaschine, die die ersten beiden Symbole der Eingabe vertauscht, alle weiteren Symbole unverändert lässt und am Ende auf dem dritten Symbol steht.",
+      "exerciseWorksheetSetFirstAndLastToOne": "Erstes und letztes Symbol auf 1 setzen",
+      "exerciseWorksheetSetFirstAndLastToOneDesc": "Konstruieren Sie eine Turingmaschine, die das erste und das letzte Zeichen der Eingabe mit 1 überschreibt, alle anderen Symbole unverändert lässt und am Ende auf dem letzten Eingabesymbol steht.",
+      "exerciseWorksheetAlternatingOverwrite": "Eingabe abwechselnd überschreiben",
+      "exerciseWorksheetAlternatingOverwriteDesc": "Konstruieren Sie eine Turingmaschine, die die Eingabe von links nach rechts abwechselnd mit 0 und 1 überschreibt und am Ende auf dem letzten Eingabesymbol stehen bleibt.",
+      "exerciseWorksheetOverwriteLastTwoWithZero": "Letzte zwei Symbole auf 0 setzen",
+      "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Konstruieren Sie eine Turingmaschine, die die letzten beiden Symbole der Eingabe mit 0 überschreibt und am Ende auf dem letzten Eingabesymbol stehen bleibt.",
+      "exerciseWorksheetAsciiParityBit": "ASCII-Paritätsbit setzen",
+      "exerciseWorksheetAsciiParityBitDesc": "Gegeben ist eine Eingabe aus genau sieben Bits. Konstruieren Sie eine Turingmaschine, die die Anzahl der Einsen zählt, links vor der Eingabe das Paritätsbit für gerade Parität setzt und am Ende auf dem ersten Leerzeichen nach der Eingabe steht.",
       "exerciseEraseTape": "Band löschen",
       "exerciseEraseTapeDesc": "Bauen Sie eine Maschine, die das gesamte Eingabewort durch Blanks ersetzt und erst anhält, wenn das Band leer ist.",
       "exerciseInvertBinaryWord": "Binärwort invertieren",
@@ -776,7 +1234,15 @@
       "example2": "Beispiel: Unäres Inkrement",
       "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unären Wortes läuft und eine weitere 1 schreibt.",
       "example3": "Beispiel: Binäres Inkrement",
-      "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht."
+      "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht.",
+      "example4": "Beispiel: Binärzahlen addieren",
+      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird.",
+      "example5": "Beispiel: Zwei Nullen suchen",
+      "example5Desc": "Suche zwei aufeinanderfolgende Nullen und schreibe danach E. Beispiel: Aus der Eingabe ⋄1001⋄ wird die Ausgabe ⋄100E⋄.",
+      "example6": "Beispiel: Drei Nullen suchen",
+      "example6Desc": "Das Band enthält eine endliche Folge von 0 und 1, die links und rechts durch ⋄ begrenzt ist. Suche drei aufeinanderfolgende Nullen, schreibe danach E und halte an. Der Kopf steht anschließend auf dem Symbol links vom E. Wird das Muster nicht gefunden, bleibt die Maschine beim ⋄ stehen. Beispiel: Aus ⋄10000⋄ wird ⋄1000E⋄.",
+      "example7": "Beispiel: Muster 010 suchen",
+      "example7Desc": "Suche unter denselben Bedingungen das Muster 010, schreibe danach E und halte mit dem Kopf auf dem Symbol links vom E. Beispiel: Aus ⋄10100⋄ wird ⋄1010E⋄. Auch 0010 und 00010 enthalten das gesuchte Muster."
     },
     "actions": {
       "loadSolution": "Lösung laden",
@@ -784,23 +1250,38 @@
       "checkingSolution": "Prüfung läuft..."
     },
     "config": {
-      "title": "Turingmaschinen-Konfiguration",
-      "apply": "Simulation starten",
-      "initialTape": "Anfangsbandwort",
-      "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
-      "startState": "Startzustand",
-      "haltStates": "Haltezustände",
-      "haltStatesDesc": "Zustände als haltend markieren.",
-      "noStates": "Keine Zustände verfügbar",
-      "transitionTable": "Übergangstabelle",
-      "transitionFormat": "Format:",
-      "transitionExample": " z. B. (q1, 0, R)",
-      "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
-      "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
-      "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
-      "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
-      "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
-      "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+      "general": {
+        "title": "Turingmaschinen-Konfiguration",
+        "apply": "Simulation starten",
+        "initialTape": "Anfangsbandwort",
+        "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
+        "startState": "Startzustand"
+      },
+      "haltStates": {
+        "haltStates": "Haltezustände",
+        "haltStatesDesc": "Zustände als haltend markieren.",
+        "addHaltState": "Haltezustand hinzufügen",
+        "addHaltStatePlaceholder": "Haltezustand hinzufügen",
+        "noStates": "Keine Zustände verfügbar"
+      },
+      "alphabets": {
+        "inputAlphabet": "Eingabealphabet",
+        "tapeAlphabet": "Bandalphabet",
+        "noSymbols": "Keine Symbole verfügbar"
+      },
+      "transitionTable": {
+        "transitionTable": "Übergangstabelle",
+        "transitionFormat": "Format:",
+        "transitionExample": " z. B. (q1, 0, R)"
+      },
+      "editing": {
+        "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
+        "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
+        "cannotRemoveLastState": "Mindestens eine Zustandsspalte muss bestehen bleiben.",
+        "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
+        "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
+        "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+      }
     },
     "validation": {
       "summary": {
@@ -914,6 +1395,8 @@
       "startState": "Startzustand",
       "acceptStates": "Akzeptierende Zustände (kommagetrennt)",
       "addEpsilon": "ε-Übergänge hinzufügen",
+      "addState": "Zustand hinzufügen",
+      "removeState": "Zustand {{state}} entfernen",
       "transitionTable": "Übergangstabelle",
       "inputWord": "Eingabewort",
       "inputWordHelp": "Jedes Zeichen wird als ein Eingabesymbol behandelt.",
@@ -981,6 +1464,35 @@
         "hint1": "Sie benötigen nur drei Zustände — einen pro möglichem Rest (0, 1, 2).",
         "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
         "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
+      },
+      "grammarTwoOnesZeros": {
+        "title": "Automat aus Grammatik: 11 0ⁿ",
+        "goal": "Bauen Sie einen DFA für die Sprache L = { 11 0ⁿ | n ≥ 0 }: zwei Einsen, gefolgt von beliebig vielen Nullen.",
+        "description": "Gegeben ist die rechtslineare Grammatik S → \"1\" A, A → \"1\" B, B → \"0\" B | ε. Bauen Sie den passenden endlichen Automaten und prüfen Sie anschließend, ob das Wort \"11001\" zur Sprache gehört.",
+        "hint1": "Nach den beiden Pflicht-Einsen darf nur noch die Null beliebig oft folgen – eine weitere Eins führt in einen Fehlerzustand.",
+        "hint2": "Sie brauchen drei nützliche Zustände (Start, nach der ersten 1, nach der zweiten 1 = Endzustand) plus einen Fangzustand. Das Wort \"11001\" endet im Fangzustand und gehört daher nicht zur Sprache."
+      },
+      "grammarOnes": {
+        "title": "Automat aus Grammatik: 1 0ⁿ 1",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "Erstellen Sie einen Zustand pro Nichtterminal (START, A, B) plus einen Fehlerzustand für ungültige Eingaben.",
+        "hint2": "ε bei B bedeutet, dass B akzeptierend ist; leiten Sie jeden undefinierten Übergang in den Fehlerzustand."
+      },
+      "grammar0011": {
+        "title": "Automat aus Grammatik: (0011)⁺",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "Verketten Sie einen Zustand pro Nichtterminal: START→A→B→C→D entlang der Symbole 0,0,1,1.",
+        "hint2": "D = \"0\",A springt zurück, um einen weiteren 0011-Block zu lesen, also führt D's 0-Übergang zurück nach A.",
+        "hint3": "ε bei D macht D zum akzeptierenden Zustand; jedes unerwartete Symbol führt in den Fehlerzustand."
+      },
+      "grammarOnesZero": {
+        "title": "Automat aus Grammatik: 1ⁿ 0",
+        "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
+        "hint1": "A = \"1\",A ist eine Schleife auf 1; A = \"0\",B verlässt sie bei einer 0 zum akzeptierenden Zustand B.",
+        "hint2": "B ist akzeptierend (ε); jede Eingabe in B führt in den Fehlerzustand."
       }
     },
     "exerciseWorkspace": {
@@ -1013,7 +1525,13 @@
       "exampleAccept": "Akzeptiert",
       "exampleReject": "Abgelehnt",
       "unbuiltTitle": "Bau zuerst deinen Automaten",
-      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'."
+      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'.",
+      "grammarLabel": "Grammatik",
+      "grammarEpsilonNote": "ε steht für das leere Wort und kennzeichnet einen akzeptierenden (End-)Zustand."
+    },
+    "grammarToAutomaton": {
+      "sectionTitle": "Konstruktion eines endlichen Automaten aus einer regulären Grammatik",
+      "sectionDescription": "Jede rechtslineare Grammatik definiert eine Sprache. Öffnen Sie eine Übung, um den DFA im Simulator zu bauen — nutzen Sie die Hinweise und blenden Sie bei Bedarf den Referenzautomaten zur Kontrolle ein."
     },
     "examples": {
       "endsWith01": {
@@ -1075,12 +1593,12 @@
         "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
       },
       "lecture": {
-        "title": "Vorlesungsbeispiel",
-        "description": "Ein DFA aus der Vorlesungsübung, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1).",
+        "title": "Worterkennung: 0⁺1",
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
         "step1Title": "1. Ziel definieren",
-        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach nichts mehr. Er lehnt leere Strings, Strings die mit '1' beginnen, oder Strings mit mehr als einer '1' ab.",
+        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach darf kein weiteres Zeichen folgen. Er lehnt das leere Wort, Wörter, die mit '1' beginnen, und Wörter mit mehr als einer '1' ab.",
         "step2Title": "2. Zustände entwerfen",
-        "step2": "s0 ist der Startzustand. Das Lesen einer '0' führt zu s1. Von s1 führt eine '1' zu s2 (Akzeptanzzustand). Jede andere Eingabe führt zu s3, einem \"Fangzustand\" (Trap State), da der String ungültig geworden ist."
+        "step2": "s0 ist der Startzustand. Beim Lesen einer '0' wechselt der Automat zu s1, da nun mindestens eine 0 gelesen wurde. Von s1 führt eine '1' zu s2, dem Akzeptanzzustand. Jede andere Eingabe führt zu s3, einem Fangzustand, da das Wort ungültig ist."
       },
       "grammar": {
         "title": "Grammatik → Automat",
@@ -1158,6 +1676,233 @@
       "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
       "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
       "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+    }
+  },
+  "rl": {
+    "title": "Reguläre Sprachen",
+    "description": "Arbeiten Sie mit regulären Sprachen und ihren rechtslinearen Grammatiken — zählen Sie die Wörter einer Grammatik auf, leiten Sie eine Grammatik aus einer Sprachdefinition ab und prüfen Sie Wortzugehörigkeit.",
+    "overviewTitle": "Was sind reguläre Sprachen?",
+    "overviewText": "Eine reguläre Sprache ist eine Menge von Wörtern, die sich durch eine reguläre Grammatik oder einen endlichen Automaten beschreiben lässt. Hier liegt der Fokus auf der rechtslinearen (Typ-3-)Grammatik.",
+    "concepts": "Kernkonzepte",
+    "concept1": "Rechtslineare Grammatiken",
+    "concept1Desc": "Eine rechtslineare (Typ-3-)Grammatik hat Regeln der Form A → aB oder A → a (optional A → ε). Das macht sie äquivalent zu NFAs.",
+    "concept2": "Aufzählung vs. Mengen-Schreibweise",
+    "concept2Desc": "Eine reguläre Sprache kann entweder als endliche Wortliste oder per Mengen-Schreibweise wie { a^n c b^m | n, m > 0 } mit Exponenten und unteren Schranken angegeben werden.",
+    "concept3": "Wortzugehörigkeit",
+    "concept3Desc": "Ob ein Wort in L(G) liegt, entscheidet man durch Simulation des zur Grammatik äquivalenten NFA — akzeptiert genau dann, wenn eine Ableitung das Wort vollständig verarbeitet.",
+    "concept4": "Abschlusseigenschaften",
+    "whatYouCanDo": "Was Sie hier tun können",
+    "feature1": "Die von einer Grammatik erzeugte Sprache bis zu einer Längenobergrenze aufzählen",
+    "feature2": "Eine Grammatik aus einer Wortaufzählung oder einer Mengen-Schreibweise erzeugen",
+    "feature3": "Prüfen, ob ein Wort in der von der Grammatik erzeugten Sprache liegt",
+    "simulator": {
+      "modes": {
+        "grammarToLanguage": "Grammatik → Sprache",
+        "languageToGrammar": "Sprache → Grammatik",
+        "recognizeWord": "Wort erkennen"
+      },
+      "grammarInput": "Grammatik",
+      "grammarOutput": "Ergebnis-Grammatik",
+      "grammarHelp": "Eine Produktion pro Zeile, z. B. 'S -> 0S | 1A'. ε (oder das Wort 'epsilon') steht für das leere Wort.",
+      "grammarInvalid": "Geben Sie eine gültige rechtslineare Grammatik ein.",
+      "languageOutput": "Aufzählung der Sprache",
+      "maxLen": "Maximale Wortlänge",
+      "maxWords": "Maximale Wortanzahl",
+      "noWords": "Innerhalb der Grenzen sind keine Wörter ableitbar.",
+      "truncatedNote": "Ausgabe wurde durch die Wortanzahl-Begrenzung gekürzt. Erhöhen Sie die Grenze, um mehr zu sehen.",
+      "completeNote": "Alle ableitbaren Wörter bis zur gewählten Länge werden angezeigt.",
+      "wordsInput": "Wörter der Sprache",
+      "wordPlaceholder": "Wort eingeben und Enter drücken",
+      "addWord": "Hinzufügen",
+      "removeWord": "Wort entfernen",
+      "noWordsAdded": "Fügen Sie mindestens ein Wort hinzu — leere Eingabe entspricht ε.",
+      "languageToGrammarHelp": "Eine rechtslineare Grammatik wird aus einem Präfixbaum über den Wörtern gebildet. Sie leitet mindestens die genannten Wörter ab, generalisiert aber nicht darüber hinaus.",
+      "languageDefinition": "Sprachdefinition",
+      "languageDefinitionHelp": "Akzeptiert sowohl eine Aufzählung wie L = {\"010\", \"0010\"} als auch eine Mengen-Schreibweise wie L = {a^n c b^m | n, m > 0}. Verwenden Sie ^ für Exponenten, einzelne Buchstaben als Variablen und ∈ ℕ / >= / > für Bedingungen.",
+      "languageInvalid": "Geben Sie eine gültige Sprachdefinition ein, um eine Grammatik abzuleiten.",
+      "detectedEnumeration": "Erkannt: Aufzählung",
+      "detectedSetBuilder": "Erkannt: Mengen-Schreibweise",
+      "pattern": "Muster:",
+      "variables": "Variablen:",
+      "emptyLanguage": "Leere Sprache (keine Wörter).",
+      "preset": {
+        "enumeration": "Aufzählung",
+        "aStarcBStar": "a^n c b^m",
+        "aStar": "a^n",
+        "abGroup": "(ab)^n"
+      },
+      "testWord": "Zu testendes Wort",
+      "testWordPlaceholder": "Leer = ε",
+      "testWordHelp": "Jedes Zeichen wird als Terminalsymbol behandelt. Die Grammatik wird auf das Wort simuliert.",
+      "accepted": "AKZEPTIERT — die Grammatik leitet dieses Wort ab.",
+      "rejected": "ABGELEHNT — die Grammatik leitet dieses Wort nicht ab.",
+      "emptyOutput": "—"
+    },
+    "examplesTab": {
+      "title": "Vorgefertigte Beispiele",
+      "subtitle": "Arbeiten Sie ausgearbeitete Beispiele zwischen Grammatik und Sprache durch.",
+      "loadExample": "In Simulator laden"
+    },
+    "examples": {
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammatik → Sprache",
+          "description": "Ausgehend von einer Grammatik ablesen, welche Wörter sie erzeugt."
+        },
+        "languageToGrammar": {
+          "title": "Sprache → Grammatik",
+          "description": "Ausgehend von einer Sprache — einer Wortliste oder einem kompakten Muster — eine passende Grammatik bauen."
+        },
+        "recognizeWord": {
+          "title": "Wörter erkennen",
+          "description": "Entscheiden, ob ein gegebenes Wort zur Sprache einer Grammatik gehört."
+        }
+      },
+      "grammarToLanguage": {
+        "title": "Grammatik → Sprache",
+        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt.",
+        "step1Title": "1. BFS über Ableitungen",
+        "step1": "Ausgehend vom Startsymbol expandiert die BFS Produktionen und merkt sich jedes akzeptierte Präfix bis zur gewählten Längengrenze. Wörter werden längen-lexikografisch zurückgegeben."
+      },
+      "languageToGrammar": {
+        "title": "Wortliste → Grammatik",
+        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden.",
+        "step1Title": "1. Aufzählung erkennen",
+        "step1": "Der Mengeninhalt besteht aus komma-getrennten Wörtern (mit oder ohne Anführungszeichen). Jedes Wort wird einzeln verarbeitet.",
+        "step2Title": "2. Präfixbaum bauen",
+        "step2": "Jedes eindeutige Präfix wird zu einem neuen Nichtterminal. Jede Baumkante ergibt eine Produktion A → aB, und jedes Wortende markiert das zugehörige Nichtterminal als ε-produzierend."
+      },
+      "languageSetBuilder": {
+        "title": "Muster → Grammatik",
+        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt.",
+        "step1Title": "1. Muster und Bedingungen parsen",
+        "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
+        "step2Title": "2. Grammatik aufbauen",
+        "step2": "Jeder Faktor liefert seinen eigenen Block an Produktionen: a^0 ergibt eine Sternschleife, a^≥1 ein erzwungenes erstes Symbol plus Schleife, a^k k feste Produktionen. Die Blöcke werden so verkettet, dass das Startsymbol das ganze Wort ableitet."
+      },
+      "recognizeWord": {
+        "title": "Wort erkennen",
+        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt.",
+        "step1Title": "1. Grammatik → NFA → simulieren",
+        "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
+      },
+      "lectureGrammar1": {
+        "title": "Vorlesungsbeispiel",
+        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1.",
+        "step1Title": "1. Sprache aufzählen",
+        "step1": "Jede Ableitung verläuft S → 0A → 0…0A → 0…01, jedes Wort ist also eine oder mehrere 0en gefolgt von einer einzelnen 1. Laden Sie sie, um L = {01, 001, 0001, …} aufzuzählen."
+      },
+      "lectureGrammar2": {
+        "title": "Übung 1",
+        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1.",
+        "step1Title": "1. Sprache aufzählen",
+        "step1": "Die ε-Produktionen auf A und B erlauben das Stoppen nach jedem Symbol, während A und B weiter alternieren. Laden Sie sie, um L = {0, 1, 01, 10, 010, 101, 0101, …} aufzuzählen."
+      },
+      "lectureLanguage1": {
+        "title": "Übung 2",
+        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
+        "step1Title": "1. Grammatik ableiten",
+        "step1": "Eine Schleife baut die führenden 0en, eine einzelne Regel konsumiert die 1, und eine abschließende Schleife baut die nachfolgenden 0en. Laden Sie sie, um S → 0S | 0A, A → 1B, B → 0B | 0 abzuleiten."
+      }
+    },
+    "exercises": {
+      "givenGrammar": "Gegebene Grammatik",
+      "targetLanguage": "Zielsprache",
+      "solution": "Lösung",
+      "epsilonHint": "ε steht für das leere Wort.",
+      "categories": {
+        "grammarToLanguage": {
+          "title": "Grammatik → Sprache",
+          "description": "Lesen Sie die Produktionsregeln und ermitteln Sie, welche Wörter die Grammatik erzeugt."
+        },
+        "languageToGrammar": {
+          "title": "Sprache → Grammatik",
+          "description": "Schreiben Sie eine reguläre Grammatik, deren Regeln genau die gegebenen Wörter erzeugen."
+        },
+        "applied": {
+          "title": "Angewandte Grammatiken",
+          "description": "Modellieren Sie reale Token-Formate wie Ganzzahlen und Bezeichner als reguläre Grammatiken."
+        }
+      },
+      "g2lFiniteBinary": {
+        "title": "Drei-Bit-Wörter",
+        "description": "Zählen Sie jedes Wort auf, das diese Grammatik ableiten kann.",
+        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf.",
+        "hint1": "Jede Ableitung lautet START → 1A → 1xB → 1xy, jedes Wort hat also genau drei Symbole.",
+        "hint2": "A und B bieten je 0 oder 1 — das ergibt 2 × 2 = 4 Wörter, alle mit 1 beginnend."
+      },
+      "g2lTrailingZero": {
+        "title": "Einsen zwischen Nullen",
+        "description": "Bestimmen Sie die von dieser Grammatik erzeugte Sprache.",
+        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter.",
+        "hint1": "A → 1A wiederholt sich und fügt 1en an; beenden lässt sich nur über A → 0B → 00.",
+        "hint2": "Jedes Wort ist also eine führende 0, dann beliebig viele 1en, dann 00."
+      },
+      "g2lEpsilonLoop": {
+        "title": "Rekursion mit ε",
+        "description": "Listen Sie die ableitbaren Wörter auf, wenn B auch das leere Wort erzeugen darf.",
+        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B.",
+        "hint1": "B → ε lässt eine Ableitung direkt nach einer 1 enden; B → 0A führt zurück nach A.",
+        "hint2": "Wörter beginnen mit 0 und wechseln zwischen 0- und 1-Blöcken — verfolgen Sie jeden A/B-Wechsel."
+      },
+      "g2lGrouped": {
+        "title": "Gruppierte Alternativen",
+        "description": "Lösen Sie die gruppierten Regeln auf und zählen Sie die erzeugte Sprache auf.",
+        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf.",
+        "hint1": "Die Klammern dienen nur der Gruppierung: A = \"0\",A | \"1\",B und B = \"1\",B | \"0\".",
+        "hint2": "A fügt führende 0en hinzu; B fügt 1en hinzu und muss mit einer einzelnen 0 enden."
+      },
+      "l2gZeroOnesZero": {
+        "title": "Eine 0, einige 1en, eine 0",
+        "description": "Finden Sie eine reguläre Grammatik, die genau diese Wörter erzeugt.",
+        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen.",
+        "hint1": "Jedes Wort ist eine 0, dann eine oder mehrere 1en, dann eine abschließende 0.",
+        "hint2": "Nutzen Sie einen Zustand, der auf 1 schleift (B → \"1\",B) und bei der letzten 0 endet."
+      },
+      "l2gFourWords": {
+        "title": "Vier feste Wörter",
+        "description": "Schreiben Sie eine Grammatik, die genau diese endliche Sprache ableitet.",
+        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst.",
+        "hint1": "Alle vier Wörter teilen die Endung 11; nur die ersten beiden Bits variieren.",
+        "hint2": "Lassen Sie START und A frei auf 0/1, erzwingen Sie dann B → \"1\",C und C → \"1\"."
+      },
+      "l2gNestedZeros": {
+        "title": "Blöcke von Nullen",
+        "description": "Konstruieren Sie eine Grammatik, die diese Sprache erzeugt.",
+        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1.",
+        "hint1": "Jedes Wort beginnt und endet mit 1 und hat eine 1 in der Mitte.",
+        "hint2": "Zwischen den 1en stehen Blöcke aus einer oder mehreren 0en — das erfordert eine 0-Schleife.",
+        "hint3": "Verketten Sie START→A→B (erster 0-Block) →C→D (zweiter 0-Block), B und D schleifen auf 0."
+      },
+      "appliedIntegers": {
+        "title": "Ganzzahlen",
+        "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen.",
+        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab.",
+        "hint1": "Behandeln Sie \"0\" als eigenen Fall, damit keine führende Null eine längere Zahl beginnt.",
+        "hint2": "Auf eine erste Ziffer ungleich null (1–9) dürfen beliebige Ziffern (0–9) folgen.",
+        "hint3": "Machen Sie den Zustand für Folgeziffern ε-erzeugend, damit die Zahl überall enden kann."
+      },
+      "appliedIdentifiers": {
+        "title": "Bezeichner",
+        "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener erster Buchstabe, gefolgt von Groß- oder Kleinbuchstaben, keine Ziffern.",
+        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab.",
+        "hint1": "Das erste Symbol muss ein Kleinbuchstabe a–z sein.",
+        "hint2": "Danach schleifen Sie über beliebige Buchstaben (a–z oder A–Z) und erlauben ε zum Beenden."
+      }
+    },
+    "exerciseWorkspace": {
+      "selectedExercise": "Ausgewählte Übung",
+      "exit": "Übungsmodus verlassen",
+      "showHint": "Tipp",
+      "noMoreHints": "Alle Tipps angezeigt",
+      "hintsUsed": "{{used}}/{{total}} Tipps verwendet",
+      "hintsHeader": "Tipps",
+      "showSolution": "Lösung anzeigen",
+      "confirmTitle": "Vollständige Lösung anzeigen?",
+      "confirmBody": "Die Lösung wird hier angezeigt und in den Simulator geladen. Sie können stattdessen weiter probieren.",
+      "confirmYes": "Ja, Lösung anzeigen",
+      "confirmNo": "Weiter probieren",
+      "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
     }
   }
 }

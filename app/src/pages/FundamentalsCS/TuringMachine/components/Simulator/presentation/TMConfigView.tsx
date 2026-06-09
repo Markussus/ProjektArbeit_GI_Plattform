@@ -64,12 +64,17 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div data-testid="tm-config-view" className="flex w-full flex-col gap-6">
       <div className="space-y-4 lg:mx-auto lg:w-max lg:max-w-full">
-        <h2 className="text-lg font-bold">{t("tm.config.general.title")}</h2>
+        <h2 data-testid="tm-config-title" className="text-lg font-bold">
+          {t("tm.config.general.title")}
+        </h2>
 
         {combinedError && (
-          <div className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line">
+          <div
+            data-testid="tm-config-error"
+            className="bg-destructive/10 text-destructive rounded-md border border-current/20 p-3 text-sm whitespace-pre-line"
+          >
             {combinedError}
           </div>
         )}
@@ -111,11 +116,13 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
             <TMAlphabetPanel
               title={t("tm.config.alphabets.inputAlphabet")}
               symbols={editor.draft.inputAlphabet}
+              testId="tm-input-alphabet"
             />
 
             <TMAlphabetPanel
               title={t("tm.config.alphabets.tapeAlphabet")}
               symbols={displayedTapeAlphabet}
+              testId="tm-tape-alphabet"
             />
           </div>
         </div>

@@ -1,0 +1,138 @@
+import { describe, expect, it } from "vitest";
+import {
+  evaluateBooleanExpression,
+  type BooleanExpression,
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+import { formatBooleanExpressionForDisplay } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
+import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
+import {
+  countExpressionLiterals,
+  factorMinimalDnf,
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/factorMinimalDnf";
+import { computeMinimalDnf } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
+import {
+  createTruthTableFromResults,
+  generateTruthTable,
+  type TruthTable,
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+
+describe("factorMinimalDnf", () => {
+  it("pulls out a literal shared between two minterm groups", () => {
+    // f = (a ∧ c) ∨ (b ∧ c) — c is shared, factoring drops one literal.
+    const table = generateTruthTable(parse("(a ∧ c) ∨ (b ∧ c)"));
+
+    const factored = factor(table);
+
+    expect(countExpressionLiterals(factored)).toBe(3);
+    // Order of operands is implementation-defined; matching either layout is
+    // fine as long as the literal count and equivalence hold.
+    expect(formatBooleanExpressionForDisplay(factored)).toMatch(
+      /^c ∧ \((a ∨ b|b ∨ a)\)$/,
+    );
+    expectEquivalent(factored, table);
+  });
+
+  it("keeps the minimal DNF unchanged when no literal is shared", () => {
+    // XOR-equivalence over 3 vars: each minterm has different polarities,
+    // no literal appears in both groups — greedy factoring is a no-op.
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
+
+    const minimal = computeMinimalDnf(table);
+    const factored = factor(table);
+
+    expect(countExpressionLiterals(factored)).toBe(minimal.literalCount);
+    expectEquivalent(factored, table);
+  });
+
+  it("factors recursively across nested shared literals", () => {
+    // (a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)
+    //   → factor a out of the first two terms
+    //   → then factor b out of the resulting inner OR
+    //   → result has shape (a ∧ b ∧ (c ∨ d)) ∨ (e ∧ f) with 5 literals.
+    const table = generateTruthTable(
+      parse("(a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)"),
+    );
+
+    const factored = factor(table);
+
+    expect(countExpressionLiterals(factored)).toBeLessThan(8);
+    expectEquivalent(factored, table);
+  });
+
+  it("returns the constant true for an all-ones table", () => {
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [true, true, true, true],
+    );
+
+    const factored = factor(table);
+
+    expect(factored).toEqual({ type: "constant", value: true });
+  });
+
+  it("returns the constant false for an all-zeros table", () => {
+    const table = createTruthTableFromResults(
+      ["a", "b"],
+      [false, false, false, false],
+    );
+
+    const factored = factor(table);
+
+    expect(factored).toEqual({ type: "constant", value: false });
+  });
+
+  it("handles a single-minterm minimal DNF without recursing", () => {
+    // f is true only for a=1, b=1, c=1 — minimal DNF is the single term
+    // (a ∧ b ∧ c) and there is nothing to factor.
+    const table = createTruthTableFromResults(
+      ["a", "b", "c"],
+      [false, false, false, false, false, false, false, true],
+    );
+
+    const factored = factor(table);
+
+    expect(countExpressionLiterals(factored)).toBe(3);
+    expectEquivalent(factored, table);
+  });
+});
+
+describe("countExpressionLiterals", () => {
+  it("counts variable references regardless of negation", () => {
+    expect(countLiterals("a")).toBe(1);
+    expect(countLiterals("¬a")).toBe(1);
+    expect(countLiterals("a ∧ ¬b")).toBe(2);
+    expect(countLiterals("(¬a ∧ b) ∨ (a ∧ ¬b)")).toBe(4);
+  });
+
+  it("counts zero literals for constants", () => {
+    expect(countExpressionLiterals({ type: "constant", value: true })).toBe(0);
+    expect(countExpressionLiterals({ type: "constant", value: false })).toBe(0);
+  });
+});
+
+function parse(source: string): BooleanExpression {
+  const result = parseBooleanExpression(source);
+  if (!result.ok) {
+    throw new Error(`Expected expression to parse: ${source}`);
+  }
+  return result.expression;
+}
+
+function factor(table: TruthTable): BooleanExpression {
+  return factorMinimalDnf(computeMinimalDnf(table), table.variables);
+}
+
+function countLiterals(source: string): number {
+  return countExpressionLiterals(parse(source));
+}
+
+function expectEquivalent(
+  expression: BooleanExpression,
+  table: TruthTable,
+): void {
+  for (const row of table.rows) {
+    expect(evaluateBooleanExpression(expression, row.assignment)).toBe(
+      row.result,
+    );
+  }
+}

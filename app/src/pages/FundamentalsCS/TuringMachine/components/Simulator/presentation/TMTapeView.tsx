@@ -235,28 +235,41 @@ export function TMTapeView({
   }, [effectiveWindowRadius, startIndex, transitionDurationMs]);
 
   return (
-    <div ref={tapeViewportRef} className={cn("w-full py-10", className)}>
+    <div
+      ref={tapeViewportRef}
+      data-testid="tm-tape-view"
+      className={cn("w-full py-10", className)}
+    >
       <div className="relative w-full">
         <div
           ref={headIndicatorRef}
+          data-testid="tm-tape-head-indicator"
           className="text-primary pointer-events-none absolute -top-10 left-0 z-20 opacity-0 transition-all ease-out"
           style={headIndicatorStyle}
         >
           <ArrowDown className="h-5 w-5 drop-shadow-sm" />
         </div>
 
-        <div className="bg-muted/30 w-full rounded-xl border px-4 pt-4 pb-8 shadow-inner">
+        <div
+          data-testid="tm-tape-window"
+          className="bg-muted/30 w-full rounded-xl border px-4 pt-4 pb-8 shadow-inner"
+        >
           <div
             ref={tapeTrackRef}
+            data-testid="tm-tape-track"
             className="mx-auto flex w-max gap-1 overflow-visible transition-transform ease-out"
           >
             {cells.map((cell) => (
               <div
                 key={cell.index}
+                data-testid={`tm-tape-cell-${cell.index}`}
+                data-tape-index={cell.index}
+                data-focused={cell.isFocused}
                 className="relative flex flex-col items-center"
                 ref={cell.isFocused ? focusedCellRef : null}
               >
                 <div
+                  data-testid={`tm-tape-cell-value-${cell.index}`}
                   className={cn(
                     "bg-background flex h-14 w-12 items-center justify-center rounded-md border-2 font-mono text-xl transition-all ease-out",
                     cell.isFocused
@@ -270,6 +283,7 @@ export function TMTapeView({
                 </div>
 
                 <span
+                  data-testid={`tm-tape-cell-index-${cell.index}`}
                   className={cn(
                     "absolute -bottom-5 mt-2 origin-top text-[10px] transition-all ease-out",
                     cell.isFocused

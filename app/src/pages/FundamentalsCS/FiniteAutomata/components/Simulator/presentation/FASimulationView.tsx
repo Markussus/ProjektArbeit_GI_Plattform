@@ -79,13 +79,15 @@ export function FASimulationView({
       </div>
 
       {/* Input word + step timeline row.
-          `min-w-0` on each column lets the flex children shrink so a long input
-          word can scroll inside its own panel without blowing out the row. */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row">
-        <div className="min-w-0 flex-1">
+          The input word hugs its tiles (capped so a long word still scrolls
+          inside its own panel), and the step timeline grows to take the
+          remaining width so neither panel leaves a large empty gap.
+          `min-w-0` lets both flex children shrink rather than blow out the row. */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-stretch">
+        <div className="min-w-0 lg:max-w-[45%] lg:flex-[0_1_auto]">
           <FAInputWordView runtime={runtime} />
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 lg:flex-1">
           <FAStepTimeline runtime={runtime} onJumpToStep={onJumpToStep} />
         </div>
       </div>

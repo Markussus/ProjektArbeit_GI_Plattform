@@ -13,6 +13,7 @@ export function DnfPage() {
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      testId="dnf-page"
     />
   );
 }

@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const isCI = !!process.env.CI;
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:4173";
 const useManagedPreview = process.env.PLAYWRIGHT_MANAGED_PREVIEW === "1";
+const chromiumExecutablePath = process.env.CHROME_PATH;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -26,7 +27,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: chromiumExecutablePath
+          ? { executablePath: chromiumExecutablePath }
+          : undefined,
+      },
     },
   ],
 });

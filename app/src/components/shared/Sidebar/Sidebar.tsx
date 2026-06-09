@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { FileText, HelpCircle, Menu } from "lucide-react";
+import { FileText, Gavel, HelpCircle, Menu } from "lucide-react";
 import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalog";
 import { cn } from "@/lib/utils";
 
@@ -135,6 +135,22 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
           {!collapsed && (
             <span className="leading-none">{t("sidebar.support")}</span>
+          )}
+        </Link>
+
+        <Link
+          to="/legal"
+          data-testid="sidebar-legal-link"
+          className={cn(
+            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
+            collapsed ? "justify-center" : "gap-3",
+          )}
+        >
+          <div className="flex size-5 shrink-0 items-center justify-center">
+            <Gavel className="size-4" />
+          </div>
+          {!collapsed && (
+            <span className="leading-none">{t("sidebar.legal")}</span>
           )}
         </Link>
       </div>

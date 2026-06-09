@@ -217,6 +217,7 @@ export function FractionalConverter({
 
               <div className="bg-muted mb-2 flex shrink-0 rounded-md p-1 sm:mb-0">
                 <button
+                  data-testid="ns-frac-dec-to-bin-button"
                   onClick={() => {
                     if (!isExerciseMode) {
                       setConverterMode("decToBin");
@@ -229,6 +230,7 @@ export function FractionalConverter({
                   {t("simulator.numbers.fracModeDecToBin")}
                 </button>
                 <button
+                  data-testid="ns-frac-bin-to-dec-button"
                   onClick={() => {
                     if (!isExerciseMode) {
                       setConverterMode("binToDec");
@@ -249,6 +251,7 @@ export function FractionalConverter({
               </label>
               <input
                 type="text"
+                data-testid="ns-fractional-input"
                 value={inputValue}
                 onChange={(e) => handleInputChange(e.target.value)}
                 disabled={isExerciseMode && !showSolution}
@@ -274,7 +277,10 @@ export function FractionalConverter({
                       {inputValue}
                     </div>
                     <ArrowRight className="text-muted-foreground h-5 w-5" />
-                    <div className="bg-brand text-brand-foreground rounded-lg px-6 py-2 font-mono font-bold tracking-wider shadow-sm">
+                    <div
+                      data-testid="ns-fractional-result"
+                      className="bg-brand text-brand-foreground rounded-lg px-6 py-2 font-mono font-bold tracking-wider shadow-sm"
+                    >
                       {conversionData.finalResult}
                     </div>
                   </div>

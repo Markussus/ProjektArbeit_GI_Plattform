@@ -37,9 +37,15 @@ export function ExerciseCard({
   const Icon = item.icon;
   const detailsId = useId();
   const itemTitle = item.titleKey ? t(item.titleKey) : item.title;
-  const itemDescription = item.descriptionKey
-    ? t(item.descriptionKey)
+  const rawDescription = item.descriptionKey
+    ? t(item.descriptionKey, item.descriptionParams || {})
     : item.description;
+  const itemDescription = item.descriptionParams
+    ? Object.entries(item.descriptionParams).reduce(
+        (desc, [key, value]) => desc.replace(`{{${key}}}`, String(value)),
+        rawDescription,
+      )
+    : rawDescription;
   const itemLabel =
     item.kind === "example"
       ? t("example.label", { index: index + 1 })
@@ -51,6 +57,9 @@ export function ExerciseCard({
 
   return (
     <div
+      data-testid={testIdPrefix}
+      data-item-id={item.id}
+      data-selected={isSelected}
       className={cn(
         "border-border border-b last:border-b-0",
         isSelected && "border-l-[3px]",
@@ -102,10 +111,16 @@ export function ExerciseCard({
       {isSelected && (
         <div
           id={detailsId}
+          data-testid={testIdPrefix ? `${testIdPrefix}-details` : undefined}
           className="border-border bg-muted/20 border-t px-4 py-4"
         >
           <div className="pl-14">
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p
+              data-testid={
+                testIdPrefix ? `${testIdPrefix}-description` : undefined
+              }
+              className="text-muted-foreground text-sm leading-relaxed"
+            >
               {itemDescription}
             </p>
 

@@ -185,17 +185,17 @@ function isCanonicalDnfForTable(
   const expectedKeys = new Set(
     trueRows.map((row) => getAssignmentKey(table.variables, row.assignment)),
   );
-  const termAssignments = flattenByOperator(expression, "or").map((term) =>
-    extractCanonicalTermAssignment(term, table.variables),
+  const termAssignments = extractCanonicalTermAssignments(
+    expression,
+    table.variables,
   );
-
-  if (termAssignments.some((assignment) => assignment === null)) {
+  if (!termAssignments) {
     return false;
   }
 
   const actualKeys = new Set(
     termAssignments.map((assignment) =>
-      getAssignmentKey(table.variables, assignment as VariableAssignment),
+      getAssignmentKey(table.variables, assignment),
     ),
   );
 
@@ -216,19 +216,16 @@ function getCanonicalTermRows(
       rowIndex,
     ]),
   );
-  const termAssignments = flattenByOperator(expression, "or").map((term) =>
-    extractCanonicalTermAssignment(term, table.variables),
+  const termAssignments = extractCanonicalTermAssignments(
+    expression,
+    table.variables,
   );
-
-  if (termAssignments.some((assignment) => assignment === null)) {
+  if (!termAssignments) {
     return null;
   }
 
   return termAssignments.map((assignment) => {
-    const key = getAssignmentKey(
-      table.variables,
-      assignment as VariableAssignment,
-    );
+    const key = getAssignmentKey(table.variables, assignment);
 
     return rowIndexByKey.get(key) ?? -1;
   });
@@ -275,6 +272,21 @@ function extractCanonicalTermAssignment(
 
   return Object.keys(assignment).length === variables.length
     ? assignment
+    : null;
+}
+
+function extractCanonicalTermAssignments(
+  expression: BooleanExpression,
+  variables: string[],
+): VariableAssignment[] | null {
+  const assignments = flattenByOperator(expression, "or").map((term) =>
+    extractCanonicalTermAssignment(term, variables),
+  );
+
+  return assignments.every(
+    (assignment): assignment is VariableAssignment => assignment !== null,
+  )
+    ? assignments
     : null;
 }
 

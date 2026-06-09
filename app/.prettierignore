@@ -1,0 +1,9 @@
+.npm/
+node_modules/
+dist/
+dist-ssr/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+public/java/

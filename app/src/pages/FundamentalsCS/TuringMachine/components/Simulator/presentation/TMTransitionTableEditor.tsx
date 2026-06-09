@@ -38,8 +38,14 @@ export function TMTransitionTableEditor({
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <div className="mb-2 min-h-[3.5rem]">
+    <div
+      data-testid="tm-transition-table-editor"
+      className="flex min-w-0 flex-col gap-2"
+    >
+      <div
+        data-testid="tm-transition-table-header"
+        className="mb-2 min-h-[3.5rem]"
+      >
         <h3 className="text-md font-semibold">
           {t("tm.config.transitionTable.transitionTable")}
         </h3>
@@ -52,6 +58,7 @@ export function TMTransitionTableEditor({
 
       <div className="w-max max-w-full">
         <TableView
+          testIdPrefix="tm-transition-table"
           headers={headers}
           rows={rows}
           editMode={disabled ? "cells" : "all"}

@@ -4,12 +4,17 @@ import type { TranslationKey } from "@/types/i18n";
 export type ExerciseDifficulty = "easy" | "medium" | "hard";
 export type TopicItemKind = "exercise" | "example";
 
+export interface DescriptionParams {
+  [key: string]: string | number | boolean;
+}
+
 interface BaseTopicItem {
   id: TranslationKey;
   title: string;
   description: string;
   titleKey?: TranslationKey;
   descriptionKey?: TranslationKey;
+  descriptionParams?: DescriptionParams;
   icon: LucideIcon;
   kind: TopicItemKind;
 }
@@ -26,6 +31,7 @@ export interface Example extends BaseTopicItem {
 interface BaseTopicItemDefinition {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
+  descriptionParams?: DescriptionParams;
   icon: LucideIcon;
 }
 

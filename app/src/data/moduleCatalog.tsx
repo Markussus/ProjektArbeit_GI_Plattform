@@ -7,6 +7,7 @@ import {
   Cpu,
   GitBranch,
   Hash,
+  Languages,
   Layers3,
   TableProperties,
   ToggleLeft,
@@ -38,10 +39,19 @@ const NumberSystemsTopicPage = lazy(async () => ({
     await import("@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage")
   ).NumberSystemsPage,
 }));
+const RegularLanguagesTopicPage = lazy(async () => ({
+  default: (
+    await import("@/pages/FundamentalsCS/RegularLanguages/RegularLanguagesPage")
+  ).RegularLanguagesPage,
+}));
 const TuringMachineTopicPage = lazy(async () => ({
   default: (
     await import("@/pages/FundamentalsCS/TuringMachine/TuringMachinePage")
   ).TuringMachinePage,
+}));
+const EncodingTopicPage = lazy(async () => ({
+  default: (await import("@/pages/FundamentalsCS/Encoding/EncodingPage"))
+    .EncodingPage,
 }));
 const JavaProgrammingTopicPage = lazy(async () => ({
   default: (await import("@/pages/Programming1/Java/JavaProgrammingPage"))
@@ -99,6 +109,15 @@ export const learningModules: LearningModuleDefinition[] = [
         element: <FiniteAutomataTopicPage />,
       },
       {
+        id: "regular-languages",
+        titleKey: "rl.title",
+        descriptionKey: "rl.description",
+        path: "/fundamentals-cs/regular-languages",
+        icon: Languages,
+        accent: "purple",
+        element: <RegularLanguagesTopicPage />,
+      },
+      {
         id: "number-systems",
         titleKey: "number.title",
         descriptionKey: "number.description",
@@ -124,6 +143,15 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: TableProperties,
         accent: "rose",
         element: <DnfTopicPage />,
+      },
+      {
+        id: "encoding",
+        titleKey: "encoding.title",
+        descriptionKey: "encoding.description",
+        path: "/fundamentals-cs/encoding",
+        icon: Code2,
+        accent: "blue",
+        element: <EncodingTopicPage />,
       },
     ],
   },

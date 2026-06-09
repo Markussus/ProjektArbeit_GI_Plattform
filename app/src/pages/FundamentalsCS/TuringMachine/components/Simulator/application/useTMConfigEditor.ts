@@ -9,8 +9,12 @@ import {
   validateTMProgram,
   type TMProgramIssue,
 } from "../domain/tmProgramValidation";
-import type { HeadMovement, TMTransition } from "../domain/tmTypes";
-import { isSingleTapeSymbol } from "../domain/tmTypes";
+import {
+  isSingleTapeSymbol,
+  normalizeTapeSymbolInput,
+  type HeadMovement,
+  type TMTransition,
+} from "../domain/tmTypes";
 import {
   createProgramDraft,
   tmEditorReducer,
@@ -408,19 +412,23 @@ function validateTransitionTableCell(
 ): TMEditorCellIssue | null {
   if (colIndex === 0) {
     const currentSymbol = orderedTapeAlphabet[rowIndex];
+    const nextSymbol = normalizeTapeSymbolInput(value);
 
     if (!currentSymbol || currentSymbol === draft.blankSymbol) {
       return null;
     }
 
-    if (!isSingleTapeSymbol(value)) {
+    if (!isSingleTapeSymbol(nextSymbol)) {
       return {
         code: "symbol_single_char",
         position: { row: rowIndex, col: colIndex },
       };
     }
 
-    if (draft.tapeAlphabet.includes(value) && value !== currentSymbol) {
+    if (
+      draft.tapeAlphabet.includes(nextSymbol) &&
+      nextSymbol !== currentSymbol
+    ) {
       return {
         code: "symbol_duplicate",
         position: { row: rowIndex, col: colIndex },
@@ -464,7 +472,7 @@ function parseTransition(cellValue: string): TMTransition | null {
     return null;
   }
 
-  const writeSymbol = match[2].trim();
+  const writeSymbol = normalizeTapeSymbolInput(match[2]);
   if (!isSingleTapeSymbol(writeSymbol)) {
     return null;
   }

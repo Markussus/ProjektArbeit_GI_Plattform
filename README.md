@@ -48,11 +48,19 @@ Contains all non-code project artifacts, such as:
 
 ### Prerequisites
 
-* To be defined
+* Node.js 22.12.0 or newer
+* npm 11.10.0 or newer
 
 ### Installation
 
-* To be defined
+```bash
+cd app
+npm ci
+```
+
+The application uses npm's `min-release-age=7` setting. New package versions must be published for at least 7 days before npm may select them during dependency resolution. This reduces exposure to freshly published malicious or compromised package versions.
+
+New direct dependencies are saved with exact versions by default. CI also verifies npm registry signatures after installation.
 
 ### Running the Application
 

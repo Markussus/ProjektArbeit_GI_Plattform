@@ -154,6 +154,26 @@ export function FAExerciseWorkspacePanel({
           </button>
         </div>
 
+        {/* Grammar prompt — for "construct an automaton from a grammar" tasks */}
+        {exercise.grammar && (
+          <div className="mt-4">
+            <p className="text-muted-foreground/80 mb-1 text-xs font-medium tracking-wide uppercase">
+              {t("fa.exerciseWorkspace.grammarLabel", "Grammar")}
+            </p>
+            <pre className="bg-muted/40 text-foreground ring-foreground/10 overflow-x-auto rounded-md p-3 font-mono text-sm leading-relaxed ring-1 ring-inset">
+              {exercise.grammar}
+            </pre>
+            {exercise.grammar.includes("ε") && (
+              <p className="text-muted-foreground/80 mt-1 text-xs">
+                {t(
+                  "fa.exerciseWorkspace.grammarEpsilonNote",
+                  "ε denotes the empty word, which marks an accepting (final) state.",
+                )}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Actions row — integrated directly into the exercise card */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <button

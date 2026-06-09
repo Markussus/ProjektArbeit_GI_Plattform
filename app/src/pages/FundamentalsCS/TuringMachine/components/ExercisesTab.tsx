@@ -3,5 +3,12 @@ import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicEx
 import { turingMachineExercises } from "../exercises";
 
 export function ExercisesTab(props: ModuleExercisesTabProps) {
-  return <TopicExercisesTab {...props} exercises={turingMachineExercises} />;
+  return (
+    <TopicExercisesTab
+      {...props}
+      exercises={turingMachineExercises}
+      testId="tm-exercises-tab"
+      testIdPrefix="tm-exercise-card"
+    />
+  );
 }

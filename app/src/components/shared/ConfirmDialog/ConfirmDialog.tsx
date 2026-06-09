@@ -18,6 +18,7 @@ export interface ConfirmDialogProps {
   onCancel: () => void;
   /** Variante des Dialogs, default "warning" */
   variant?: "warning" | "destructive";
+  testId?: string;
 }
 
 /**
@@ -33,6 +34,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   variant = "warning",
+  testId,
 }: ConfirmDialogProps) {
   const { t } = useTranslation("translation");
 
@@ -42,6 +44,7 @@ export function ConfirmDialog({
 
   return (
     <div
+      data-testid={testId}
       className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 duration-150"
       onClick={onCancel}
     >
@@ -52,6 +55,7 @@ export function ConfirmDialog({
         {/* Close button */}
         <button
           onClick={onCancel}
+          data-testid={testId ? `${testId}-close` : undefined}
           className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-md p-1"
           aria-label={t("common.close")}
         >
@@ -77,12 +81,14 @@ export function ConfirmDialog({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
+            data-testid={testId ? `${testId}-cancel` : undefined}
             className="bg-muted hover:bg-muted/80 text-foreground flex-1 rounded-md px-4 py-2 text-sm font-medium"
           >
             {cancelLabel ?? t("common.cancel")}
           </button>
           <button
             onClick={onConfirm}
+            data-testid={testId ? `${testId}-confirm` : undefined}
             className={`flex-1 rounded-md px-4 py-2 text-sm font-medium text-white ${
               isDestructive
                 ? "bg-destructive hover:bg-destructive/90"
