@@ -446,6 +446,10 @@
     "exercise5Desc": "Iterate over an array and determine the largest contained value.",
     "editorLabel": "Java editor",
     "editorLoading": "Loading Monaco editor...",
+    "editorLimit": {
+      "lines": "The Java editor is limited to {{maxLines}} lines. The pasted or imported text was not accepted.",
+      "characters": "The Java editor is limited to {{maxCharacters}} characters. The pasted or imported text was not accepted."
+    },
     "resetStarterCode": "Reset starter code",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",

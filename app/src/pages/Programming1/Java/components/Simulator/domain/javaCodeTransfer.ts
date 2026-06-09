@@ -202,6 +202,7 @@ export const javaCodeTransferCodec: ISimulatorTransferCodec<string> = {
   },
 
   async importValue(serializedValue) {
+    await yieldToMainThread();
     const normalizedValue = serializedValue.trim();
 
     if (normalizedValue.length < 1) {
@@ -247,7 +248,7 @@ export const javaCodeTransferCodec: ISimulatorTransferCodec<string> = {
       return decodeTokenStream(decompressed);
     }
 
-    return decodeUtf8Source(decompressed);
+    return decodeUtf8SourceForImport(decompressed);
   },
 };
 
@@ -272,24 +273,6 @@ async function validateSourceCodeForExport(sourceCode: string): Promise<void> {
     if (inspectedCharacters >= VALIDATION_YIELD_INTERVAL) {
       inspectedCharacters = 0;
       await yieldToMainThread();
-    }
-  }
-
-  if (unsupportedCharacters.size > 0) {
-    throwUnsupportedCharacters(unsupportedCharacters);
-  }
-}
-
-function validateSourceCode(sourceCode: string): void {
-  const unsupportedCharacters = new Set<string>();
-
-  for (const character of sourceCode) {
-    const codePoint = character.codePointAt(0);
-    if (
-      codePoint === undefined ||
-      (!isAllowedAscii(codePoint) && !specialCharacterTokens.has(character))
-    ) {
-      unsupportedCharacters.add(character);
     }
   }
 
@@ -347,8 +330,9 @@ async function tokenizeSourceCode(sourceCode: string): Promise<Uint8Array> {
   return Uint8Array.from(tokens);
 }
 
-function decodeTokenStream(tokenStream: Uint8Array): string {
+async function decodeTokenStream(tokenStream: Uint8Array): Promise<string> {
   const outputBytes: number[] = [];
+  let processedTokens = 0;
 
   for (const token of tokenStream) {
     if (token < SPECIAL_CHARACTER_TOKEN_START) {
@@ -378,12 +362,18 @@ function decodeTokenStream(tokenStream: Uint8Array): string {
     }
 
     assertSourceSize(outputBytes.length);
+
+    processedTokens++;
+    if (processedTokens >= TOKENIZATION_YIELD_INTERVAL) {
+      processedTokens = 0;
+      await yieldToMainThread();
+    }
   }
 
-  return decodeUtf8Source(Uint8Array.from(outputBytes));
+  return decodeUtf8SourceForImport(Uint8Array.from(outputBytes));
 }
 
-function decodeUtf8Source(bytes: Uint8Array): string {
+async function decodeUtf8SourceForImport(bytes: Uint8Array): Promise<string> {
   assertSourceSize(bytes.length);
 
   let sourceCode: string;
@@ -395,7 +385,7 @@ function decodeUtf8Source(bytes: Uint8Array): string {
     );
   }
 
-  validateSourceCode(sourceCode);
+  await validateSourceCodeForExport(sourceCode);
   return sourceCode;
 }
 

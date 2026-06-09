@@ -1,4 +1,11 @@
-import { lazy, Suspense, useCallback, useEffect, useRef } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import type { OnMount } from "@monaco-editor/react";
 import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -6,6 +13,13 @@ import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringT
 import { useTheme } from "@/hooks/useTheme";
 import type { JavaExecutionIssue } from "./domain/javaExecution";
 import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
+import {
+  getJavaEditorLimitReason,
+  JAVA_EDITOR_MAX_CHARACTERS,
+  JAVA_EDITOR_MAX_LINES,
+  wouldPasteExceedJavaEditorLimit,
+  type JavaEditorLimitReason,
+} from "./domain/javaEditorLimits";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 
@@ -32,6 +46,9 @@ export function JavaEditorPanel({
   const { resolvedTheme } = useTheme();
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null);
   const monacoRef = useRef<Parameters<OnMount>[1] | null>(null);
+  const [limitReason, setLimitReason] = useState<JavaEditorLimitReason | null>(
+    null,
+  );
   const syncMarkers = useCallback(() => {
     const editor = editorRef.current;
     const monaco = monacoRef.current;
@@ -66,11 +83,57 @@ export function JavaEditorPanel({
     monacoRef.current = monaco;
     syncMarkers();
     editor.onDidChangeModel(syncMarkers);
+
+    const editorNode = editor.getDomNode();
+    const pasteListener = (event: ClipboardEvent) => {
+      const model = editor.getModel();
+      const selection = editor.getSelection();
+      const pastedText = event.clipboardData?.getData("text/plain");
+
+      if (!model || !selection || pastedText === undefined) {
+        return;
+      }
+
+      const reason = wouldPasteExceedJavaEditorLimit({
+        currentCharacterCount: model.getValueLength(),
+        currentLineCount: model.getLineCount(),
+        selectedCharacterCount: model.getValueLengthInRange(selection),
+        selectedLineBreakCount:
+          selection.endLineNumber - selection.startLineNumber,
+        pastedText,
+      });
+
+      if (reason) {
+        event.preventDefault();
+        event.stopPropagation();
+        setLimitReason(reason);
+      }
+    };
+
+    editorNode?.addEventListener("paste", pasteListener, true);
+    editor.onDidDispose(() => {
+      editorNode?.removeEventListener("paste", pasteListener, true);
+    });
   };
 
   useEffect(() => {
     syncMarkers();
   }, [syncMarkers]);
+
+  const handleEditorCodeChange = useCallback(
+    (nextCode: string) => {
+      const reason = getJavaEditorLimitReason(nextCode);
+      if (reason) {
+        setLimitReason(reason);
+        editorRef.current?.trigger("java-editor-limit", "undo", null);
+        return;
+      }
+
+      setLimitReason(null);
+      onCodeChange(nextCode);
+    },
+    [onCodeChange],
+  );
 
   return (
     <div data-testid="java-editor-panel" className="space-y-4">
@@ -109,7 +172,7 @@ export function JavaEditorPanel({
             language="java"
             theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
             value={code}
-            onChange={(nextValue) => onCodeChange(nextValue ?? "")}
+            onChange={(nextValue) => handleEditorCodeChange(nextValue ?? "")}
             onMount={handleEditorMount}
             options={{
               automaticLayout: true,
@@ -125,10 +188,36 @@ export function JavaEditorPanel({
         </Suspense>
       </div>
 
+      {limitReason && (
+        <p
+          data-testid="java-editor-limit-warning"
+          className="text-destructive text-sm"
+        >
+          {t(
+            limitReason === "lines"
+              ? "java.editorLimit.lines"
+              : "java.editorLimit.characters",
+            {
+              maxLines: JAVA_EDITOR_MAX_LINES.toLocaleString(),
+              maxCharacters: JAVA_EDITOR_MAX_CHARACTERS.toLocaleString(),
+            },
+          )}
+        </p>
+      )}
+
       <SimulatorStringTransferBox
         value={code}
         codec={javaCodeTransferCodec}
-        onLoad={onImportCode}
+        onLoad={(nextCode) => {
+          const reason = getJavaEditorLimitReason(nextCode);
+          if (reason) {
+            setLimitReason(reason);
+            throw new Error("java_editor_limit_exceeded");
+          }
+
+          setLimitReason(null);
+          onImportCode(nextCode);
+        }}
         testIdPrefix="java-transfer"
       />
     </div>

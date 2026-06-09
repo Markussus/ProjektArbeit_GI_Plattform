@@ -442,6 +442,10 @@
     "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den größten enthaltenen Wert.",
     "editorLabel": "Java-Editor",
     "editorLoading": "Der Monaco-Editor wird geladen...",
+    "editorLimit": {
+      "lines": "Der Java-Editor ist auf {{maxLines}} Zeilen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen.",
+      "characters": "Der Java-Editor ist auf {{maxCharacters}} Zeichen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen."
+    },
     "resetStarterCode": "Startercode zurücksetzen",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",
