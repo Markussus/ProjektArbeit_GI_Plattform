@@ -1,11 +1,13 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { cloneJson } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
 import { useFASimulator } from "./application/useFASimulator";
 import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
 import type { FAProgram } from "./domain/faTypes";
+import { faProgramTransferCodec } from "./domain/faProgramTransfer";
 import { FAConfigView } from "./presentation/FAConfigView";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
@@ -107,6 +109,14 @@ export function FASimulator() {
     setEditorMode("manual");
   };
 
+  const handleImportProgram = (imported: FAProgram) => {
+    simulation.pause();
+    setProgram(imported);
+    editor.resetToProgram(imported);
+    setIsEditMode(true);
+    setEditorMode("manual");
+  };
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
       {isEditMode ? (
@@ -154,6 +164,13 @@ export function FASimulator() {
                   )}
                 </p>
               </div>
+
+              <SimulatorStringTransferBox
+                value={editor.draft}
+                codec={faProgramTransferCodec}
+                onLoad={handleImportProgram}
+                testIdPrefix="fa-transfer"
+              />
 
               <button
                 onClick={handleApplyProgram}

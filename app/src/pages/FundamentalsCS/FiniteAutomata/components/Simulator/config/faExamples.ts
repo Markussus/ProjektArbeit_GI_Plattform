@@ -1,8 +1,8 @@
 import type { FAProgram } from "../domain/faTypes";
 
 /**
- * Each example includes the automaton definition, a sample input word,
- * and a structured breakdown of how and why the automaton was built.
+ * Each example bundles the automaton definition and a sample input word that
+ * is loaded into the simulator when the example is opened.
  */
 export interface FAExampleVariant {
   type: "DFA" | "NFA";
@@ -18,15 +18,8 @@ export interface FAExample {
   type: "DFA" | "NFA";
   program: FAProgram;
   inputWord: string;
-  /** When present, the card shows a second paired variant (e.g. NFA + DFA from the same grammar) */
+  /** When present, a second paired variant (e.g. NFA + DFA from the same grammar) */
   secondVariant?: FAExampleVariant;
-  /** Step-by-step construction guide */
-  steps: FAExampleStep[];
-}
-
-export interface FAExampleStep {
-  titleKey: string;
-  contentKey: string;
 }
 
 // ─── NFA: Contains substring "aba" ──────────────────────────────────────────
@@ -49,24 +42,6 @@ export const exampleContainsAba: FAExample = {
     acceptStates: ["S3"],
   },
   inputWord: "baba",
-  steps: [
-    {
-      titleKey: "fa.examples.containsAba.step1Title",
-      contentKey: "fa.examples.containsAba.step1",
-    },
-    {
-      titleKey: "fa.examples.containsAba.step2Title",
-      contentKey: "fa.examples.containsAba.step2",
-    },
-    {
-      titleKey: "fa.examples.containsAba.step3Title",
-      contentKey: "fa.examples.containsAba.step3",
-    },
-    {
-      titleKey: "fa.examples.containsAba.step4Title",
-      contentKey: "fa.examples.containsAba.step4",
-    },
-  ],
 };
 
 // ─── DFA: Lecture Example (0+1) ─────────────────────────────────────────────
@@ -88,17 +63,7 @@ export const exampleLecture: FAExample = {
     startState: "S0",
     acceptStates: ["S2"],
   },
-  inputWord: "0001",
-  steps: [
-    {
-      titleKey: "fa.examples.lecture.step1Title",
-      contentKey: "fa.examples.lecture.step1",
-    },
-    {
-      titleKey: "fa.examples.lecture.step2Title",
-      contentKey: "fa.examples.lecture.step2",
-    },
-  ],
+  inputWord: "001",
 };
 
 // ─── Grammar → NFA | DFA ────────────────────────────────────────────────────
@@ -137,20 +102,6 @@ export const exampleGrammar: FAExample = {
     },
     inputWord: "0011",
   },
-  steps: [
-    {
-      titleKey: "fa.examples.grammar.step1Title",
-      contentKey: "fa.examples.grammar.step1",
-    },
-    {
-      titleKey: "fa.examples.grammar.step2Title",
-      contentKey: "fa.examples.grammar.step2",
-    },
-    {
-      titleKey: "fa.examples.grammar.step3Title",
-      contentKey: "fa.examples.grammar.step3",
-    },
-  ],
 };
 
 /** All predefined examples */

@@ -7,6 +7,7 @@ import {
   Cpu,
   GitBranch,
   Hash,
+  Languages,
   Layers3,
   TableProperties,
   ToggleLeft,
@@ -37,6 +38,11 @@ const NumberSystemsTopicPage = lazy(async () => ({
   default: (
     await import("@/pages/FundamentalsCS/NumberSystems/NumberSystemsPage")
   ).NumberSystemsPage,
+}));
+const RegularLanguagesTopicPage = lazy(async () => ({
+  default: (
+    await import("@/pages/FundamentalsCS/RegularLanguages/RegularLanguagesPage")
+  ).RegularLanguagesPage,
 }));
 const TuringMachineTopicPage = lazy(async () => ({
   default: (
@@ -101,6 +107,15 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: GitBranch,
         accent: "blue",
         element: <FiniteAutomataTopicPage />,
+      },
+      {
+        id: "regular-languages",
+        titleKey: "rl.title",
+        descriptionKey: "rl.description",
+        path: "/fundamentals-cs/regular-languages",
+        icon: Languages,
+        accent: "purple",
+        element: <RegularLanguagesTopicPage />,
       },
       {
         id: "number-systems",
