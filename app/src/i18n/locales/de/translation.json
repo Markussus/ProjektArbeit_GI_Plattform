@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOKUMENTATION",
+    "legal": "RECHTLICHES",
     "support": "HILFE",
     "toggle": "Seitenleiste umschalten"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Drittanbieter-Hinweise"
   },
   "theme": {
     "light": "Heller Modus",
@@ -144,6 +146,41 @@
     "example_u06_1_sub_desc": "Subtrahieren Sie 00100111 von 01101101 im Binärsystem.",
     "example_u06_2": "Binäre Multiplikation (1011 × 11001)",
     "example_u06_2_desc": "Multiplizieren Sie 1011 und 11001 im Binärsystem."
+  },
+  "encoding": {
+    "title": "Kodierung",
+    "description": "Lernen Sie Base64- und UTF-8-Kodierung. Verstehen Sie, wie Text in Base64-Zeichenfolgen umgewandelt wird und wie Zeichen als UTF-8-Byte-Sequenzen dargestellt werden.",
+    "overviewTitle": "Warum Kodierung wichtig ist",
+    "overviewText": "Kodierungsschemata wie Base64 und UTF-8 sind grundlegend für die Übertragung und Speicherung von Daten. Base64 wandelt Binärdaten in ASCII-sicheren Text um, während UTF-8 eine universelle Zeichenkodierung bietet, die alle Schriftsysteme unterstützt.",
+    "concepts": "Schlüsselkonzepte",
+    "concept1": "Base64-Kodierung",
+    "concept2": "Base64-Dekodierung",
+    "concept3": "UTF-8 Zeichenkodierung",
+    "concept4": "ASCII vs UTF-8",
+    "ex_base64_placeholder": "Base64-Kodierung Übung",
+    "ex_base64_placeholder_desc": "Kodieren Sie einen Text in Base64.",
+    "ex_utf8_placeholder": "UTF-8-Kodierung Übung",
+    "ex_utf8_placeholder_desc": "Kodieren Sie Zeichen in ihre UTF-8-Byte-Sequenz.",
+    "ex_ascii_easy": "ASCII-Umwandlung",
+    "ex_ascii_easy_desc": "Wandeln Sie das Zeichen '{{char}}' in seinen ASCII-Wert (Dezimal und Hex) um. Wie lautet der dezimale ASCII-Wert?",
+    "ex_utf8_easy": "UTF-8-Kodierung (1 Byte)",
+    "ex_utf8_easy_desc": "Wandeln Sie den Unicode-Wert U+{{hex}} (Bereich 0x0000-0x007F) in die UTF-8-Binärdarstellung um.",
+    "ex_time_easy": "Unix-Timestamp-Berechnung",
+    "ex_time_easy_desc": "Gegeben ist der Unix-Timestamp {{timestamp}}. Welcher Zählerstand ergibt sich genau {{hours}} Stunden in der Zukunft?",
+    "ex_base64_medium": "Base64-Kodierung (3 Zeichen)",
+    "ex_base64_medium_desc": "Wandeln Sie die Zeichenkette '{{str}}' (genau 3 Zeichen, kein Padding nötig) in Base64 um.",
+    "ex_utf8_medium": "UTF-8-Kodierung (3 Bytes)",
+    "ex_utf8_medium_desc": "Wandeln Sie den Unicode-Wert U+{{hex}} (Bereich 0x0800-0xFFFF, benötigt 3 Bytes) in die UTF-8-Binärdarstellung um.",
+    "ex_time_medium": "Volljährigkeitsprüfung",
+    "ex_time_medium_desc": "Person A wurde zum Timestamp {{birthTimestamp}} geboren. Heute ist {{nowTimestamp}}. Ist die Person volljährig? (Antwort: Ja/Nein)",
+    "ex_base64_hard": "Base64-Dekodierung (mit Padding)",
+    "ex_base64_hard_desc": "Entschlüsseln Sie die Base64-Zeichenfolge '{{encoded}}' (mit Padding ==) zurück in ASCII-Text.",
+    "ex_utf8_hard": "UTF-8-Dekodierung (3 Bytes)",
+    "ex_utf8_hard_desc": "Welcher Unicode-Wert (U+XXXX) entspricht der 3-Byte-UTF-8-Binärfolge '{{binary}}'?",
+    "example_base64_1": "Base64 kodiere 'Hello'",
+    "example_base64_1_desc": "Kodieren Sie den Text 'Hello' in Base64.",
+    "example_utf8_1": "UTF-8 kodiere 'Hello'",
+    "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes."
   },
   "moore": {
     "title": "Moore & Mealy Automaten",
@@ -496,33 +533,196 @@
   },
   "java": {
     "title": "Java-Programmierung",
-    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafuer direkt einen editierbaren Java-Code-Editor bereit.",
+    "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafür direkt einen editierbaren Java-Code-Editor bereit.",
     "overviewTitle": "Einstieg in Java",
-    "overviewText": "Dieses Thema fuehrt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
-    "concepts": "Schluesselkonzepte",
+    "overviewText": "Dieses Thema führt schrittweise in einfache Java-Programme ein. Im Fokus stehen Aufbau einer Klasse, die main-Methode, Konsolenausgabe, Schleifen und kleine Array-Aufgaben.",
+    "concepts": "Schlüsselkonzepte",
     "concept1": "Klasse Main und main-Methode",
-    "concept2": "System.out.println fuer Konsolenausgaben",
-    "concept3": "for-Schleifen fuer wiederholte Ausgaben",
+    "concept2": "System.out.println für Konsolenausgaben",
+    "concept3": "for-Schleifen für wiederholte Ausgaben",
     "concept4": "Arrays lesen, sortieren und auswerten",
     "example1Title": "Einfaches Hello World",
     "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
     "example2Title": "Wiederholte Ausgabe",
-    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausfuehren.",
+    "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausführen.",
     "example3Title": "Array sortieren",
     "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
     "exercise1": "Hello World ausgeben",
     "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
-    "exercise2": "Hello World fuenfmal ausgeben",
-    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fuenfmal in die Konsole zu schreiben.",
+    "exercise2": "Hello World fünfmal ausgeben",
+    "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fünfmal in die Konsole zu schreiben.",
     "exercise3": "Zwei Zahlen addieren",
     "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
     "exercise4": "Array sortieren",
-    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschliessend aus.",
+    "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschließend aus.",
     "exercise5": "Maximum im Array finden",
-    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den groessten enthaltenen Wert.",
+    "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den größten enthaltenen Wert.",
     "editorLabel": "Java-Editor",
     "editorLoading": "Der Monaco-Editor wird geladen...",
-    "resetStarterCode": "Startercode zuruecksetzen"
+    "resetStarterCode": "Startercode zurücksetzen",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "Sekunden",
+    "runWhileLoading": "Compiler lädt",
+    "compilerStatus": {
+      "not-loaded": "nicht geladen",
+      "loading": "lädt",
+      "ready": "bereit",
+      "failed": "fehlgeschlagen"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler wurde noch nicht geladen.",
+      "loading": "Java-Compiler wird im Hintergrund geladen...",
+      "ready": "Compiler ist für Java-Kompilierung und Ausführung bereit.",
+      "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
+    },
+    "commandOverview": {
+      "button": "Java-Befehle",
+      "title": "Was geht im Java-Editor?",
+      "summary": "Java {{version}} für kleine Browser-Programme",
+      "versionTitle": "Unterstützte Java-Version: {{version}}",
+      "versionText": "Der Browser-Compiler nutzt OpenJDK javac über teavm-javac. Sprachdiagnosen kommen damit von javac; das erzeugte Programm läuft als WebAssembly im Browser-Worker.",
+      "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java. Du kannst Java-Code ausführen, aber keine Terminalbefehle eingeben.",
+      "commandListTitle": "Kompakte Übersicht",
+      "status": {
+        "supported": "Geht",
+        "limited": "Eingeschränkt",
+        "blocked": "Geht nicht",
+        "not-supported": "Nicht unterstützt",
+        "explained": "Eingeschränkt"
+      },
+      "capabilities": {
+        "programShape": {
+          "title": "Programmeinstieg",
+          "description": "Ein einzelnes Main.java-Programm funktioniert. public class Main und weitere nicht-public Hilfsklassen können in derselben Editor-Datei stehen."
+        },
+        "basics": {
+          "title": "Normale Java-Syntax",
+          "description": "Grundlegende Java-Syntax funktioniert: Variablen, Operatoren, if/else, switch und Methodenaufrufe."
+        },
+        "loops": {
+          "title": "Schleifen und Ablaufsteuerung",
+          "description": "for, while, do/while und for-each funktionieren für Übungen und kleine Algorithmen."
+        },
+        "arraysCollections": {
+          "title": "Arrays, Listen, Maps und Sets",
+          "description": "Arrays und typische java.util-Collections funktionieren: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+        },
+        "objects": {
+          "title": "Eigene Typen",
+          "description": "Eigene Klassen, Konstruktoren, Enums, Records, Interfaces und statische Methoden können in derselben Editor-Datei stehen."
+        },
+        "output": {
+          "title": "Konsolenausgabe",
+          "description": "Ausgaben werden abgefangen und unten als stdout oder stderr angezeigt."
+        },
+        "standardLibrary": {
+          "title": "Teilmenge der Standardbibliothek",
+          "description": "Häufige Bibliotheksklassen aus java.lang, java.util, java.math und einfachem java.time sind verfügbar. Betriebssystemnahe APIs sind nicht verlässlich."
+        },
+        "singleFile": {
+          "title": "Eine Editor-Datei",
+          "description": "Die UI sendet aktuell eine Quelldatei. Packe Hilfsklassen in dieselbe Datei statt ein Mehrdateien-Projekt zu erwarten."
+        },
+        "input": {
+          "title": "Konsoleneingabe",
+          "description": "Scanner und System.in funktionieren mit dem Eingabefeld unter dem Editor. Die Eingabe wird vor dem Start bereitgestellt; interaktive Nachfragen w?hrend der Ausf?hrung sind nicht m?glich."
+        },
+        "cli": {
+          "title": "Terminalbefehle",
+          "description": "In das Editorfeld gehört Java-Quellcode, keine Befehle. java, javac, jshell, jar, mvn und gradle werden nicht als Terminalkommandos ausgeführt."
+        },
+        "environment": {
+          "title": "Betriebssystemzugriff",
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
+        },
+        "runtimeFeatures": {
+          "title": "Dynamische Laufzeitfeatures",
+          "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlässlich."
+        },
+        "stringsMath": {
+          "title": "Strings, Math und gro?e Zahlen",
+          "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren f?r typische Konsolenaufgaben."
+        }
+      },
+      "commands": {
+        "run": {
+          "title": "Aktuellen Editorinhalt kompilieren und starten",
+          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und f?hrt die Main.main-Methode im Worker aus."
+        },
+        "compile": {
+          "title": "Kompilierung ist Teil von Run",
+          "description": "Der interne Compiler-Befehl nutzt javac-Diagnosen und TeaVM-Codegenerierung. Die UI bietet keinen separaten Compile-only-Terminalbefehl."
+        },
+        "javaCli": {
+          "title": "Kein java-Kommandozeilenstarter",
+          "description": "Ein lokaler java-Befehl wird nicht unterst?tzt, weil der Browser keine JVM-Prozesse startet."
+        },
+        "javacCli": {
+          "title": "Kein javac-Terminalbefehl",
+          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer k?nnen keine beliebigen javac-Flags ?bergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
+        },
+        "jshell": {
+          "title": "Keine interaktive JShell",
+          "description": "Der Simulator f?hrt vollst?ndige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
+        },
+        "tools": {
+          "title": "Keine Paketierungs- oder Dokumentationswerkzeuge",
+          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme geh?ren nicht zum unterst?tzten Browser-Compiler-Ablauf."
+        },
+        "stdin": {
+          "title": "Konsoleneingabe ist nicht interaktiv",
+          "description": "Konsolenausgabe ?ber System.out und System.err wird unterst?tzt. Scanner/System.in nutzt das feste Eingabefeld im Simulator."
+        },
+        "environment": {
+          "title": "Browser-Sandbox gilt",
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabh?ngige APIs vermeiden, weil WebAssembly in einem Browser-Worker l?uft."
+        },
+        "title": "Was darf ich in den Editor schreiben?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft..."
+    },
+    "validation": {
+      "popupTitle": "Lösungsprüfung",
+      "pass": "BESTANDEN",
+      "fail": "FEHLER",
+      "emptyOutput": "<leer>",
+      "exampleCheckUnavailable": "Beispiele benötigen keine Lösungsprüfung.",
+      "table": {
+        "passed": "Bestanden",
+        "case": "Testfall",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "phase": "Status"
+      }
+    },
+    "exercise6": "Text aus Eingabe gro?schreiben",
+    "exercise6Desc": "Lesen Sie eine Zeile mit Scanner ein und geben Sie den Text in Gro?buchstaben aus.",
+    "exercise7": "Methode schreiben",
+    "exercise7Desc": "Implementieren Sie eine Methode, die eine Zahl quadriert und zur?ckgibt.",
+    "exercise8": "Einfache Klasse verwenden",
+    "exercise8Desc": "Speichern Sie Konstruktorwerte in einer Klasse und geben Sie eine Beschreibung zur?ck.",
+    "exercise9": "ArrayList sortieren",
+    "exercise9Desc": "Sortieren Sie eine ArrayList mit Collections.sort und geben Sie die Liste aus.",
+    "stdin": {
+      "label": "Programmeingabe",
+      "placeholder": "Eingabe f?r Scanner/System.in, z. B. hello java",
+      "help": "Diese Eingabe wird vor dem Programmstart als System.in bereitgestellt. Interaktive Nachfragen w?hrend der Ausf?hrung sind nicht m?glich."
+    },
+    "timeout": {
+      "warningTitle": "Ausf?hrung wegen Timeout gestoppt",
+      "warningText": "Das Programm lief zu lange oder wartet auf Eingabe. Pr?fen Sie Schleifen, Scanner-Aufrufe und das Timeout."
+    }
+  },
+  "legal": {
+    "label": "Rechtliches",
+    "title": "Drittanbieter-Hinweise",
+    "description": "Lizenz- und Quelleninformationen fuer eingebundene Compiler-Komponenten und zugehoerige Abhaengigkeiten.",
+    "summary": "Diese Anwendung enthaelt einen browserbasierten Java-Compiler, der aus teavm-javac gebaut wird. Das Compiler-Modul enthaelt OpenJDK javac unter GNU GPLv2 mit Classpath Exception sowie TeaVM-Komponenten unter Apache License 2.0. Es wurden keine OpenJDK-Quelldateien veraendert. Exakte Quellen- und Build-Informationen finden Sie in den Drittanbieter-Hinweisen des Projekts."
   },
   "exercise": {
     "label": "Übung {{index}}",
@@ -565,7 +765,8 @@
       "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
       "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
       "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
-      "java": "Waehlen Sie eine Java-Uebung aus oder starten Sie direkt mit einem eigenen Java-Snippet im Monaco-Editor."
+      "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
+      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
     }
   },
   "simulator": {
@@ -886,6 +1087,65 @@
       "exitTabTitle": "Tab wechseln?",
       "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs wird die aktuelle Übung beendet und dein Fortschritt geht verloren.",
       "exitTabConfirm": "Tab wechseln"
+    },
+    "encoding": {
+      "tabs": {
+        "base64": "Base64",
+        "utf8": "UTF-8"
+      },
+      "base64Title": "Base64-Kodierer",
+      "base64Desc": "Konvertieren Sie Text in Base64-Kodierung oder dekodieren Sie Base64-Zeichenfolgen zurück in Text.",
+      "utf8Title": "UTF-8-Kodierer",
+      "utf8Desc": "Konvertieren Sie Zeichen in ihre UTF-8-Byte-Sequenz-Darstellung.",
+      "encode": "Kodieren",
+      "decode": "Dekodieren",
+      "mode": "Modus",
+      "inputText": "Eingabetext",
+      "inputBase64": "Base64-Zeichenfolge",
+      "inputHexBytes": "Hex-Bytes (durch Leerzeichen getrennt)",
+      "base64Result": "Base64-Ergebnis",
+      "utf8Result": "UTF-8-Bytes (Hex)",
+      "decodedResult": "Dekodierter Text",
+      "explanation": "Erklärung",
+      "enterValue": "Geben Sie Text ein, um die Kodierungsschritte zu sehen.",
+      "step1CharToAscii": "Schritt 1: Zeichen zu ASCII/Binär",
+      "step2GroupBits": "Schritt 2: In 6-Bit-Gruppen einteilen",
+      "step3Base64Lookup": "Schritt 3: Base64-Tabellensuche",
+      "step1CodePoint": "Schritt 1: Unicode-Codepunkt",
+      "step2ByteEncoding": "Schritt 2: UTF-8-Byte-Kodierung",
+      "step3FullSequence": "Schritt 3: Vollständige Byte-Sequenz",
+      "charLabel": "Zeichen",
+      "asciiLabel": "ASCII-Wert",
+      "binaryLabel": "Binär",
+      "bitsLabel": "6-Bit-Gruppe",
+      "decimalLabel": "Dezimal",
+      "base64CharLabel": "Base64-Zeichen",
+      "codePointLabel": "Codepunkt",
+      "bytePattern": "Byte-Muster",
+      "byteN": "Byte {{n}}",
+      "hexLabel": "Hex",
+      "hexSequence": "Hex-Sequenz",
+      "binarySequence": "Binär-Sequenz",
+      "finalResult": "Endergebnis",
+      "decodeStep1Lookup": "Schritt 1: Base64-Tabellensuche",
+      "decodeStep2ConcatBits": "Schritt 2: 6-Bit-Gruppen verketten",
+      "decodeStep3ToChars": "Schritt 3: 8-Bit-Bytes zu Zeichen konvertieren",
+      "decodeStep1Bytes": "Schritt 1: Byte-Typen identifizieren",
+      "decodeStep2CodePoints": "Schritt 2: Unicode-Codepunkte rekonstruieren",
+      "decodeStep3FullText": "Schritt 3: Vollständig dekodierter Text",
+      "leadByte": "{{count}}-Byte Start-Byte",
+      "continuationByte": "Fortsetzungs-Byte",
+      "singleByte": "Einzelnes ASCII-Byte",
+      "byteTypeLabel": "Byte-Typ",
+      "bytesUsed": "Verwendete Bytes",
+      "invalidUtf8Title": "Ungültige UTF-8-Sequenz",
+      "invalidUtf8Desc": "Die Hex-Bytes bilden keine gültige UTF-8-Sequenz. Überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+      "invalidBase64Title": "Ungültige Base64-Eingabe",
+      "invalidBase64Desc": "Die Eingabe enthält ungültige Base64-Zeichen. Verwenden Sie nur A-Z, a-z, 0-9, +, / und = für Padding.",
+      "examplesTitle": "Beispielübungen",
+      "examplesDesc": "Hier finden Sie zusätzliche Beispielübungen zur Kodierung:",
+      "groupbase64": "Base64-Kodierung",
+      "grouputf8": "UTF-8-Kodierung"
     }
   },
   "tm": {
@@ -938,7 +1198,13 @@
       "example3": "Beispiel: Binäres Inkrement",
       "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht.",
       "example4": "Beispiel: Binärzahlen addieren",
-      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird."
+      "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird.",
+      "example5": "Beispiel: Zwei Nullen suchen",
+      "example5Desc": "Suche zwei aufeinanderfolgende Nullen und schreibe danach E. Beispiel: Aus der Eingabe ⋄1001⋄ wird die Ausgabe ⋄100E⋄.",
+      "example6": "Beispiel: Drei Nullen suchen",
+      "example6Desc": "Das Band enthält eine endliche Folge von 0 und 1, die links und rechts durch ⋄ begrenzt ist. Suche drei aufeinanderfolgende Nullen, schreibe danach E und halte an. Der Kopf steht anschließend auf dem Symbol links vom E. Wird das Muster nicht gefunden, bleibt die Maschine beim ⋄ stehen. Beispiel: Aus ⋄10000⋄ wird ⋄1000E⋄.",
+      "example7": "Beispiel: Muster 010 suchen",
+      "example7Desc": "Suche unter denselben Bedingungen das Muster 010, schreibe danach E und halte mit dem Kopf auf dem Symbol links vom E. Beispiel: Aus ⋄10100⋄ wird ⋄1010E⋄. Auch 0010 und 00010 enthalten das gesuchte Muster."
     },
     "actions": {
       "loadSolution": "Lösung laden",

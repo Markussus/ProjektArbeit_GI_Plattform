@@ -1,13 +1,14 @@
 stages:
   - verify
+  - java-compiler
   - quality
   - unit
   - build
-  - lighthouse
   - e2e
+  - lighthouse
 
 default:
-  image: node:22-bookworm-slim
+  image: projektarbeit/node-24-npm-11:arm64
   tags:
     - pi
   before_script:
@@ -22,6 +23,8 @@ cache:
 
 variables:
   NPM_CONFIG_CACHE: ".npm"
+  NPM_CONFIG_MIN_RELEASE_AGE: "7"
+  NPM_CONFIG_ENGINE_STRICT: "true"
   CI: "true"
 
 verify_pipeline:
@@ -33,13 +36,29 @@ verify_pipeline:
     - node --version
     - npm --version
     - npm ci --cache .npm --prefer-offline
+    - npm run verify:signatures
     - npx vite --version
     - npx vitest --version
     - npx playwright --version
     - npx lhci --version
 
+java_compiler:
+  stage: java-compiler
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run prepare:java-compiler
+    - test -f public/java/compiler/compiler.wasm
+    - test -f public/java/compiler/worker.js
+    - test -f public/java/compiler/.teavm-javac-commit
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - app/public/java/compiler/
+
 quality_checks:
   stage: quality
+  dependencies:
+    - java_compiler
   script:
     - npm ci --cache .npm --prefer-offline
     - npm run format:check
@@ -47,15 +66,23 @@ quality_checks:
 
 unit_tests:
   stage: unit
+  dependencies:
+    - java_compiler
   script:
     - npm ci --cache .npm --prefer-offline
     - npm run test
 
 build_app:
   stage: build
+  dependencies:
+    - java_compiler
   script:
     - npm ci --cache .npm --prefer-offline
-    - npm run build
+    - test -f public/java/compiler/compiler.wasm
+    - test -f public/java/compiler/worker.js
+    - npm run build:app
+    - test -f dist/java/compiler/compiler.wasm
+    - test -f dist/java/compiler/worker.js
   artifacts:
     expire_in: 1 week
     paths:
@@ -67,6 +94,8 @@ lighthouse_check:
   needs:
     - job: build_app
       artifacts: true
+    - job: e2e_tests
+      artifacts: false
   before_script:
     - cd app
   script:

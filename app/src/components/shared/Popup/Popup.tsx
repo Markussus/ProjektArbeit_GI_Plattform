@@ -41,7 +41,7 @@ export function Popup({ open, title, onClose, children, testId }: PopupProps) {
         aria-modal="true"
         aria-labelledby="popup-title"
         data-testid={testId}
-        className="bg-card text-card-foreground ring-foreground/10 max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-lg ring-1"
+        className="bg-card text-card-foreground ring-foreground/10 flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg ring-1"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-border flex items-center justify-between border-b px-5 py-4">
@@ -59,7 +59,9 @@ export function Popup({ open, title, onClose, children, testId }: PopupProps) {
           </button>
         </div>
 
-        <div className="overflow-auto px-5 py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

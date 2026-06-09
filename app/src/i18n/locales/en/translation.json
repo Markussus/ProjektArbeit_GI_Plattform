@@ -19,11 +19,13 @@
     "mooreMealy": "MOORE & MEALY",
     "dnf": "DNF",
     "documentation": "DOCUMENTATION",
+    "legal": "LEGAL",
     "support": "SUPPORT",
     "toggle": "Toggle sidebar"
   },
   "footer": {
-    "copyright": "© 2026 THWS"
+    "copyright": "© 2026 THWS",
+    "legal": "Third-party notices"
   },
   "theme": {
     "light": "Light Mode",
@@ -148,6 +150,41 @@
     "example_u06_1_sub_desc": "Subtract 00100111 from 01101101 in binary.",
     "example_u06_2": "Binary Multiplication (1011 × 11001)",
     "example_u06_2_desc": "Multiply 1011 and 11001 in binary."
+  },
+  "encoding": {
+    "title": "Encoding",
+    "description": "Learn Base64 and UTF-8 encoding. Understand how text is converted to Base64 strings and how characters are represented as UTF-8 byte sequences.",
+    "overviewTitle": "Why Encoding Matters",
+    "overviewText": "Encoding schemes like Base64 and UTF-8 are fundamental to how data is transmitted and stored. Base64 converts binary data to ASCII-safe text, while UTF-8 provides a universal character encoding that supports all writing systems.",
+    "concepts": "Key Concepts",
+    "concept1": "Base64 Encoding",
+    "concept2": "Base64 Decoding",
+    "concept3": "UTF-8 Character Encoding",
+    "concept4": "ASCII vs UTF-8",
+    "ex_base64_placeholder": "Base64 Encoding Exercise",
+    "ex_base64_placeholder_desc": "Encode a text string to Base64.",
+    "ex_utf8_placeholder": "UTF-8 Encoding Exercise",
+    "ex_utf8_placeholder_desc": "Encode characters to their UTF-8 byte sequence.",
+    "ex_ascii_easy": "ASCII Conversion",
+    "ex_ascii_easy_desc": "Convert the character '{{char}}' to its ASCII value (decimal and hex). What is the decimal ASCII value?",
+    "ex_utf8_easy": "UTF-8 Encoding (1 Byte)",
+    "ex_utf8_easy_desc": "Convert the Unicode value U+{{hex}} (range 0x0000-0x007F) to its UTF-8 binary representation.",
+    "ex_time_easy": "Unix Timestamp Calculation",
+    "ex_time_easy_desc": "Given the Unix timestamp {{timestamp}}, what is the counter value exactly {{hours}} hours in the future?",
+    "ex_base64_medium": "Base64 Encoding (3 characters)",
+    "ex_base64_medium_desc": "Convert the string '{{str}}' (exactly 3 characters, no padding needed) to Base64.",
+    "ex_utf8_medium": "UTF-8 Encoding (3 Bytes)",
+    "ex_utf8_medium_desc": "Convert the Unicode value U+{{hex}} (range 0x0800-0xFFFF, requires 3 bytes) to its UTF-8 binary representation.",
+    "ex_time_medium": "Age Verification",
+    "ex_time_medium_desc": "Person A was born at timestamp {{birthTimestamp}}. Today is timestamp {{nowTimestamp}}. Is the person 18 or older? (Answer: Ja/Nein)",
+    "ex_base64_hard": "Base64 Decoding (with Padding)",
+    "ex_base64_hard_desc": "Decode the Base64 string '{{encoded}}' (with padding ==) back to ASCII text.",
+    "ex_utf8_hard": "UTF-8 Decoding (3 Bytes)",
+    "ex_utf8_hard_desc": "Which Unicode value (U+XXXX) corresponds to the 3-byte UTF-8 binary sequence '{{binary}}'?",
+    "example_base64_1": "Base64 Encode 'Hello'",
+    "example_base64_1_desc": "Encode the text 'Hello' to Base64.",
+    "example_utf8_1": "UTF-8 Encode 'Hello'",
+    "example_utf8_1_desc": "Encode the text 'Hello' to UTF-8 bytes."
   },
   "moore": {
     "title": "Moore & Mealy Machines",
@@ -526,7 +563,170 @@
     "exercise5Desc": "Iterate over an array and determine the largest contained value.",
     "editorLabel": "Java editor",
     "editorLoading": "Loading Monaco editor...",
-    "resetStarterCode": "Reset starter code"
+    "resetStarterCode": "Reset starter code",
+    "compilerLabel": "Compiler",
+    "timeoutLabel": "Timeout",
+    "timeoutUnit": "seconds",
+    "runWhileLoading": "Compiler loading",
+    "compilerStatus": {
+      "not-loaded": "not loaded",
+      "loading": "loading",
+      "ready": "ready",
+      "failed": "failed"
+    },
+    "compilerStatusText": {
+      "not-loaded": "Compiler not loaded yet.",
+      "loading": "Java compiler is loading in the background...",
+      "ready": "Compiler is ready for Java compilation and execution.",
+      "failed": "Compiler could not be loaded. Check the console output below for details."
+    },
+    "commandOverview": {
+      "button": "Java commands",
+      "title": "What works in the Java editor?",
+      "summary": "Java {{version}} for small browser programs",
+      "versionTitle": "Supported Java version: {{version}}",
+      "versionText": "The browser compiler uses OpenJDK javac through teavm-javac. Language diagnostics come from javac; the generated program runs as WebAssembly in a browser worker.",
+      "limitationsText": "Write one Main.java-style program. You can run Java source code, but you cannot type terminal commands into the editor.",
+      "commandListTitle": "Compact overview",
+      "status": {
+        "supported": "Works",
+        "limited": "Limited",
+        "blocked": "Does not work",
+        "not-supported": "Not supported",
+        "explained": "Limited"
+      },
+      "capabilities": {
+        "programShape": {
+          "title": "Program entry point",
+          "description": "One Main.java program works. public class Main and additional non-public helper classes can be placed in the same editor file."
+        },
+        "basics": {
+          "title": "Basic Java syntax",
+          "description": "Basic Java syntax works: variables, operators, if/else, switch, and method calls."
+        },
+        "loops": {
+          "title": "Loops and control flow",
+          "description": "for, while, do/while, and for-each work for exercises and small algorithms."
+        },
+        "arraysCollections": {
+          "title": "Arrays, lists, maps, and sets",
+          "description": "Arrays and typical java.util collections work: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+        },
+        "objects": {
+          "title": "Own types",
+          "description": "Custom classes, constructors, enums, records, interfaces, and static methods can be placed in the same editor file."
+        },
+        "output": {
+          "title": "Console output",
+          "description": "Output is captured and shown in stdout or stderr below the editor."
+        },
+        "standardLibrary": {
+          "title": "Standard library subset",
+          "description": "Common library classes from java.lang, java.util, java.math, and simple java.time are available. OS-facing APIs are not reliable."
+        },
+        "singleFile": {
+          "title": "One editor file",
+          "description": "The UI currently sends one source file. Put helper classes into the same file instead of using a multi-file project."
+        },
+        "input": {
+          "title": "Console input",
+          "description": "Scanner and System.in work with the input box below the editor. Input is provided before the program starts; interactive prompts during execution are not supported."
+        },
+        "cli": {
+          "title": "Terminal commands",
+          "description": "The editor expects Java source code, not commands. java, javac, jshell, jar, mvn, and gradle are not executed as terminal commands."
+        },
+        "environment": {
+          "title": "OS access",
+          "description": "Local files, sockets, started processes, and native libraries are blocked by the browser runtime model."
+        },
+        "runtimeFeatures": {
+          "title": "Dynamic runtime features",
+          "description": "Reflection-heavy code, dynamic class loading, and real Java threads are not reliable in this WebAssembly target."
+        },
+        "stringsMath": {
+          "title": "Strings, Math, and big numbers",
+          "description": "StringBuilder, String methods, Math functions, BigInteger, and BigDecimal work for typical console tasks."
+        }
+      },
+      "commands": {
+        "run": {
+          "title": "Compile and run the current editor content",
+          "description": "The Run button sends the Java source to the browser compiler, generates WebAssembly, and executes the Main.main method in the worker."
+        },
+        "compile": {
+          "title": "Compilation is available as part of Run",
+          "description": "The internal compiler command uses javac diagnostics and TeaVM code generation. The UI does not expose a separate standalone compile-only terminal command."
+        },
+        "javaCli": {
+          "title": "No java command-line launcher",
+          "description": "Typing or expecting a local java command is not supported because the browser environment does not start JVM processes."
+        },
+        "javacCli": {
+          "title": "No javac terminal command",
+          "description": "javac is embedded inside the browser compiler pipeline. Users cannot pass arbitrary javac flags or compile multiple project files from a local directory."
+        },
+        "jshell": {
+          "title": "No interactive JShell",
+          "description": "The simulator executes complete programs with a Main class. It does not provide a REPL or interactive command prompt."
+        },
+        "tools": {
+          "title": "No packaging or documentation tools",
+          "description": "Tools such as jar, javadoc, Maven, Gradle, and other local executables are outside the supported browser compiler workflow."
+        },
+        "stdin": {
+          "title": "Console input is not interactive",
+          "description": "Console output through System.out and System.err is supported. Scanner/System.in uses the fixed simulator input box."
+        },
+        "environment": {
+          "title": "Browser sandbox restrictions apply",
+          "description": "Programs should avoid local files, sockets, native libraries, process execution, and environment-dependent APIs because WebAssembly runs inside a browser worker."
+        },
+        "title": "What can I type into the editor?"
+      }
+    },
+    "actions": {
+      "loadSolution": "Load solution",
+      "checkSolution": "Check solution",
+      "checkingSolution": "Checking..."
+    },
+    "validation": {
+      "popupTitle": "Solution check",
+      "pass": "PASS",
+      "fail": "FAIL",
+      "emptyOutput": "<empty>",
+      "exampleCheckUnavailable": "Examples do not need solution checks.",
+      "table": {
+        "passed": "Passed",
+        "case": "Test case",
+        "output": "Output",
+        "expectedOutput": "Expected output",
+        "phase": "Status"
+      }
+    },
+    "exercise6": "Uppercase input text",
+    "exercise6Desc": "Read one line with Scanner and print the text in uppercase.",
+    "exercise7": "Write a method",
+    "exercise7Desc": "Implement a method that squares a number and returns the result.",
+    "exercise8": "Use a simple class",
+    "exercise8Desc": "Store constructor values in a class and return a description.",
+    "exercise9": "Sort an ArrayList",
+    "exercise9Desc": "Sort an ArrayList with Collections.sort and print the list.",
+    "stdin": {
+      "label": "Program input",
+      "placeholder": "Input for Scanner/System.in, e.g. hello java",
+      "help": "This input is provided as System.in before the program starts. Interactive prompts during execution are not supported."
+    },
+    "timeout": {
+      "warningTitle": "Execution stopped by timeout",
+      "warningText": "The program ran too long or is waiting for input. Check loops, Scanner calls, and the timeout."
+    }
+  },
+  "legal": {
+    "label": "Legal",
+    "title": "Third-party notices",
+    "description": "Licensing and source information for bundled compiler components and related dependencies.",
+    "summary": "This application includes a browser-based Java compiler built from teavm-javac. The compiler module includes OpenJDK javac, licensed under GNU GPLv2 with the Classpath Exception, and TeaVM components licensed under Apache License 2.0. No OpenJDK source files were modified. Exact source and build information is available in the project’s third-party notices."
   },
   "exercise": {
     "label": "Exercise {{index}}",
@@ -569,7 +769,8 @@
       "number": "The Number Systems converter will be available here.",
       "moore": "The Moore & Mealy simulator will be available here.",
       "dnf": "The DNF builder / truth table generator will be available here.",
-      "java": "Select a Java exercise or start directly with your own Java snippet in the Monaco editor."
+      "encoding": "The Encoding simulator will be available here.",
+      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
     }
   },
   "simulator": {
@@ -890,6 +1091,65 @@
       "exitTabTitle": "Switch Tab?",
       "exitTabDesc": "You are currently in exercise mode. Switching tabs will end the current exercise and your progress will be lost.",
       "exitTabConfirm": "Switch Tab"
+    },
+    "encoding": {
+      "tabs": {
+        "base64": "Base64",
+        "utf8": "UTF-8"
+      },
+      "base64Title": "Base64 Encoder",
+      "base64Desc": "Convert text to Base64 encoding or decode Base64 strings back to text.",
+      "utf8Title": "UTF-8 Encoder",
+      "utf8Desc": "Convert characters to their UTF-8 byte sequence representation.",
+      "encode": "Encode",
+      "decode": "Decode",
+      "mode": "Mode",
+      "inputText": "Input Text",
+      "inputBase64": "Base64 String",
+      "inputHexBytes": "Hex Bytes (space-separated)",
+      "base64Result": "Base64 Result",
+      "utf8Result": "UTF-8 Bytes (Hex)",
+      "decodedResult": "Decoded Text",
+      "explanation": "Explanation",
+      "enterValue": "Enter text to see the encoding steps.",
+      "step1CharToAscii": "Step 1: Character to ASCII/Binary",
+      "step2GroupBits": "Step 2: Group into 6-bit chunks",
+      "step3Base64Lookup": "Step 3: Base64 Table Lookup",
+      "step1CodePoint": "Step 1: Unicode Code Point",
+      "step2ByteEncoding": "Step 2: UTF-8 Byte Encoding",
+      "step3FullSequence": "Step 3: Full Byte Sequence",
+      "charLabel": "Character",
+      "asciiLabel": "ASCII Value",
+      "binaryLabel": "Binary",
+      "bitsLabel": "6-bit Group",
+      "decimalLabel": "Decimal",
+      "base64CharLabel": "Base64 Character",
+      "codePointLabel": "Code Point",
+      "bytePattern": "Byte Pattern",
+      "byteN": "Byte {{n}}",
+      "hexLabel": "Hex",
+      "hexSequence": "Hex Sequence",
+      "binarySequence": "Binary Sequence",
+      "finalResult": "Final Result",
+      "decodeStep1Lookup": "Step 1: Base64 Table Lookup",
+      "decodeStep2ConcatBits": "Step 2: Concatenate 6-bit groups",
+      "decodeStep3ToChars": "Step 3: Convert 8-bit bytes to characters",
+      "decodeStep1Bytes": "Step 1: Identify byte types",
+      "decodeStep2CodePoints": "Step 2: Reconstruct Unicode code points",
+      "decodeStep3FullText": "Step 3: Full decoded text",
+      "leadByte": "{{count}}-byte lead byte",
+      "continuationByte": "Continuation byte",
+      "singleByte": "Single-byte ASCII",
+      "byteTypeLabel": "Byte Type",
+      "bytesUsed": "Bytes Used",
+      "invalidUtf8Title": "Invalid UTF-8 Sequence",
+      "invalidUtf8Desc": "The hex bytes do not form a valid UTF-8 sequence. Check your input and try again.",
+      "invalidBase64Title": "Invalid Base64 Input",
+      "invalidBase64Desc": "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
+      "examplesTitle": "Example Exercises",
+      "examplesDesc": "Here you can find additional example exercises for encoding:",
+      "groupbase64": "Base64 Encoding",
+      "grouputf8": "UTF-8 Encoding"
     }
   },
   "tm": {
@@ -942,7 +1202,13 @@
       "example3": "Example: Binary Increment",
       "example3Desc": "A carry-based machine that increments a binary word by one.",
       "example4": "Example: Add Binary Numbers",
-      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built."
+      "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built.",
+      "example5": "Example: Search for Two Zeros",
+      "example5Desc": "Search for two consecutive zeros and then write E. Example: The input ⋄1001⋄ produces the output ⋄100E⋄.",
+      "example6": "Example: Search for Three Zeros",
+      "example6Desc": "The tape contains a finite sequence of 0s and 1s bounded by ⋄ on both sides. Search for three consecutive zeros, write E after them, and halt. The head then rests on the symbol to the left of E. If the pattern is not found, the machine stops on ⋄. Example: ⋄10000⋄ becomes ⋄1000E⋄.",
+      "example7": "Example: Search for Pattern 010",
+      "example7Desc": "Under the same conditions, search for the pattern 010, write E after it, and halt with the head on the symbol to the left of E. Example: ⋄10100⋄ becomes ⋄1010E⋄. The inputs 0010 and 00010 also contain the pattern."
     },
     "actions": {
       "loadSolution": "Load solution",

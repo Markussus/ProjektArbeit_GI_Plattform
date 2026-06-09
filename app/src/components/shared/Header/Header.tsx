@@ -13,7 +13,13 @@ export function Header() {
 
   const headerLabel: string = activeModule
     ? t(activeModule.titleKey)
-    : t("nav.home");
+    : location.pathname === "/documentation"
+      ? t("documentation.title")
+      : location.pathname === "/help"
+        ? t("help.title")
+        : location.pathname === "/legal"
+          ? t("legal.title")
+          : t("nav.home");
 
   return (
     <header className="border-border bg-background flex h-16 items-center justify-between border-b px-6">

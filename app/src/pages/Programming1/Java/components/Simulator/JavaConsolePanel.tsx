@@ -1,4 +1,5 @@
 import { TerminalSquare } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { JavaExecutionSnapshot } from "../Simulator/domain/javaExecution";
 
@@ -11,6 +12,7 @@ export function JavaConsolePanel({
   snapshot,
   className,
 }: JavaConsolePanelProps) {
+  const { t } = useTranslation();
   const stdout = snapshot.stdout.join("");
   const stderr = snapshot.stderr.join("");
 
@@ -28,6 +30,16 @@ export function JavaConsolePanel({
       </div>
 
       <div className="space-y-4 p-4">
+        {snapshot.phase === "timeout" && (
+          <div
+            data-testid="java-timeout-warning"
+            className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
+          >
+            <p className="font-semibold">{t("java.timeout.warningTitle")}</p>
+            <p>{t("java.timeout.warningText")}</p>
+          </div>
+        )}
+
         <ConsoleSection
           title="stdout"
           content={stdout}
@@ -66,6 +78,11 @@ export function JavaConsolePanel({
                     {issue.stage} / {issue.code}
                   </p>
                   <p className="text-muted-foreground">{issue.message}</p>
+                  {issue.fileName && (
+                    <p className="text-muted-foreground text-xs">
+                      {issue.fileName}
+                    </p>
+                  )}
                   {(issue.line || issue.column) && (
                     <p className="text-muted-foreground text-xs">
                       Line {issue.line ?? "?"}, Column {issue.column ?? "?"}

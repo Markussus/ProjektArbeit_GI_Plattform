@@ -92,6 +92,7 @@ export function ExamplesTab({
                     isSelected={selectedExample?.id === example.id}
                     onSelect={() => selectExample(example)}
                     onOpen={() => openExample(example)}
+                    testIdPrefix={`example-card-${example.id}`}
                   />
                 );
               })}

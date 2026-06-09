@@ -84,6 +84,9 @@ runNpx(["vitest", "--version"]);
 runNpx(["playwright", "--version"]);
 runNpx(["lhci", "--version"]);
 
+stage("java compiler");
+runNpm(["run", "prepare:java-compiler"]);
+
 stage("quality");
 runNpm(["run", "format:check"]);
 runNpm(["run", "lint"]);
@@ -92,7 +95,7 @@ stage("unit");
 runNpm(["run", "test"]);
 
 stage("build");
-runNpm(["run", "build"]);
+runNpm(["run", "build:app"]);
 
 stage("lighthouse");
 runNpm(["run", "lhci:ci"]);
