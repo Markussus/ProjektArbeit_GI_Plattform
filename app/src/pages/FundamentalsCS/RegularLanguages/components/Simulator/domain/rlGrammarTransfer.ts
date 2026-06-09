@@ -124,7 +124,9 @@ function normalizeGrammar(source: string): NormalizedGrammar {
     symbolMode === SymbolMode.Registry
       ? SYMBOL_REGISTRY.filter((symbol) => grammar.terminals.includes(symbol))
       : [...grammar.terminals];
-  const terminalIds = new Map(terminals.map((symbol, index) => [symbol, index]));
+  const terminalIds = new Map(
+    terminals.map((symbol, index) => [symbol, index]),
+  );
 
   const epsilonSet = new Set(grammar.epsilonProducingNonTerminals ?? []);
   const epsilonMask = orderedNonTerminals.map((name) => epsilonSet.has(name));
@@ -249,9 +251,7 @@ function decodeGrammarUnsafe(serializedGrammar: string): RegularGrammar {
     terminals,
     startSymbol: names[0],
     productions,
-    epsilonProducingNonTerminals: names.filter(
-      (_, ntId) => epsilonMask[ntId],
-    ),
+    epsilonProducingNonTerminals: names.filter((_, ntId) => epsilonMask[ntId]),
   };
 }
 
@@ -328,7 +328,11 @@ function getRequiredMapValue<TKey, TValue>(
 }
 
 function assertCollectionSize(value: number): void {
-  if (!Number.isSafeInteger(value) || value < 0 || value > MAX_COLLECTION_SIZE) {
+  if (
+    !Number.isSafeInteger(value) ||
+    value < 0 ||
+    value > MAX_COLLECTION_SIZE
+  ) {
     throw new Error("rl_transfer_payload_invalid");
   }
 }

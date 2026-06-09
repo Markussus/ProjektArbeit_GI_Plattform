@@ -42,7 +42,11 @@
     "overview": "Übersicht",
     "exercises": "Übungen",
     "examples": "Beispiele",
-    "simulation": "Simulation"
+    "simulation": "Simulation",
+    "integers": "Ganzzahlen",
+    "negative": "Negative Zahlen",
+    "ieee754": "IEEE 754 (32 Bit)",
+    "arithmetic": "Arithmetik"
   },
   "home": {
     "heroTitle1": "Komplexe Systeme meistern",
@@ -963,6 +967,7 @@
       },
       "addition": {
         "desc": "Stellenweise Addition im Binärsystem. Werden zwei Einsen addiert, gibt es einen Übertrag (Carry) an die nächste Stelle.",
+        "stepByStepTitle": "Stellenweise Addition",
         "carryOutWarning": "Achtung: Ein Übertrag (Carry) hat das 8. Bit überschritten (Carry Out).",
         "overflowWarning": "Overflow-Fehler! Die Addition logisch positiver Zahlen hat zu einem negativen Zweierkomplement-Ergebnis geführt.",
         "overflowTitle": "Overflow Error (2s Complement):",
@@ -1073,6 +1078,7 @@
         "mantissaShifted": "Die Mantisse der kleineren Zahl wird um {{diff}} Stellen nach rechts verschoben.",
         "expAligned": "Nun weisen beide Glieder den Exponenten 2^{{exp}} auf und können addiert (bzw. subtrahiert) werden.",
         "normBack": "Das Resultat wird zurück in das Format 1.M × 2^E verschoben.",
+        "normDesc": "Das Ergebnis wird zurück in das Format 1.M × 2^E umgewandelt.",
         "signExpMant": "Sign | Exponent | Mantissa",
         "decimalResult": "Dezimal",
         "expDiffDesc": "Exponentendifferenz: {{larger}} - {{smaller}} = {{diff}}",
@@ -1587,7 +1593,11 @@
       },
       "lecture": {
         "title": "Worterkennung: 0⁺1",
-        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
+        "step1Title": "1. Ziel definieren",
+        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach darf kein weiteres Zeichen folgen. Er lehnt das leere Wort, Wörter, die mit '1' beginnen, und Wörter mit mehr als einer '1' ab.",
+        "step2Title": "2. Zustände entwerfen",
+        "step2": "s0 ist der Startzustand. Beim Lesen einer '0' wechselt der Automat zu s1, da nun mindestens eine 0 gelesen wurde. Von s1 führt eine '1' zu s2, dem Akzeptanzzustand. Jede andere Eingabe führt zu s3, einem Fangzustand, da das Wort ungültig ist."
       },
       "grammar": {
         "title": "Grammatik → Automat",

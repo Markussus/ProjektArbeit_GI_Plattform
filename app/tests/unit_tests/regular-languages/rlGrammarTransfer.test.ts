@@ -28,7 +28,8 @@ describe("Regular grammar transfer codec", () => {
   });
 
   it("round-trips an epsilon-only grammar with no terminals", async () => {
-    const exportedValue = await rlGrammarTransferCodec.exportValue("S -> \u03B5");
+    const exportedValue =
+      await rlGrammarTransferCodec.exportValue("S -> \u03B5");
     const importedSource =
       await rlGrammarTransferCodec.importValue(exportedValue);
 
