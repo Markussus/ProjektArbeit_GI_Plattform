@@ -30,9 +30,7 @@ export function ExpressionBuilder({
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [inputValue, setInputValue] = useState(initialExpression ?? "");
-  const [committedSource, setCommittedSource] = useState<string | null>(
-    initialExpression?.trim() ? initialExpression.trim() : null,
-  );
+  const [committedSource, setCommittedSource] = useState<string | null>(null);
 
   const handleSourceChange = (value: string) => {
     setInputValue(normalizeBooleanOperatorAliases(value));

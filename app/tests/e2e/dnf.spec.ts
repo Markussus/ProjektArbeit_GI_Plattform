@@ -5,6 +5,7 @@ const FIRST_DNF_EXERCISE_ID = "dnf.exercises.worksheet02bTruthTable1.title";
 const SIMPLE_EXPRESSION_EXERCISE_ID = "dnf.exercises.simpleExpression.title";
 const COMPLEX_DNF_EXERCISE_ID = "dnf.exercises.complexExpression.title";
 const LECTURE_EXPRESSION_EXAMPLE_ID = "lecture-expression";
+const DNF_INTRO_TABLE_EXAMPLE_ID = "dnf-intro";
 
 async function gotoDnfPage(page: Page) {
   await page.addInitScript(() => {
@@ -85,6 +86,30 @@ test.describe("DNF page", () => {
       "data-mode",
       "expression_to_truth_table",
     );
+    await expect(page.getByTestId("dnf-expression-input")).not.toHaveValue("");
+    await expect(page.getByTestId("dnf-evaluate-expression")).toBeVisible();
+    await expect(page.getByTestId("dnf-exercise-workspace")).toHaveCount(0);
+
+    await page.getByTestId("dnf-evaluate-expression").click();
+    await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+
+    await switchTab(page, "examples");
+    await page
+      .getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`)
+      .click();
+    await page
+      .getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-open`)
+      .click();
+
+    await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
+      "data-mode",
+      "truth_table_to_dnf",
+    );
+    await expect(page.getByTestId("dnf-table-builder-controls")).toBeVisible();
+    await expect(page.getByTestId("dnf-variable-count-input")).toHaveValue("3");
+    await expect(page.getByTestId("dnf-exercise-workspace")).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Commit table" }).click();
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
   });
 

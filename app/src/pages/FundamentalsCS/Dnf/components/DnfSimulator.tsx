@@ -172,10 +172,6 @@ function TableToDnfBuilder({
   const initialVariableCount = clampVariableCount(
     initialVariables?.length ?? 3,
   );
-  const hasInitialSeed = Boolean(
-    initialResultValues &&
-    initialResultValues.length === 2 ** initialVariableCount,
-  );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>
     initialResultValues &&
@@ -183,7 +179,7 @@ function TableToDnfBuilder({
       ? [...initialResultValues]
       : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );
-  const [committed, setCommitted] = useState(hasInitialSeed);
+  const [committed, setCommitted] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [showFullTable, setShowFullTable] = useState(false);
   const [dnfAnswer, setDnfAnswer] = useState("");
