@@ -1241,23 +1241,38 @@
       "checkingSolution": "Prüfung läuft..."
     },
     "config": {
-      "title": "Turingmaschinen-Konfiguration",
-      "apply": "Simulation starten",
-      "initialTape": "Anfangsbandwort",
-      "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
-      "startState": "Startzustand",
-      "haltStates": "Haltezustände",
-      "haltStatesDesc": "Zustände als haltend markieren.",
-      "noStates": "Keine Zustände verfügbar",
-      "transitionTable": "Übergangstabelle",
-      "transitionFormat": "Format:",
-      "transitionExample": " z. B. (q1, 0, R)",
-      "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
-      "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
-      "cannotRemoveLastState": "Mindestens eine Zustands-Spalte muss bestehen bleiben.",
-      "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
-      "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
-      "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+      "general": {
+        "title": "Turingmaschinen-Konfiguration",
+        "apply": "Simulation starten",
+        "initialTape": "Anfangsbandwort",
+        "initialTapePlaceholder": "Eingabewort eingeben (z. B. 1011)",
+        "startState": "Startzustand"
+      },
+      "haltStates": {
+        "haltStates": "Haltezustände",
+        "haltStatesDesc": "Zustände als haltend markieren.",
+        "addHaltState": "Haltezustand hinzufügen",
+        "addHaltStatePlaceholder": "Haltezustand hinzufügen",
+        "noStates": "Keine Zustände verfügbar"
+      },
+      "alphabets": {
+        "inputAlphabet": "Eingabealphabet",
+        "tapeAlphabet": "Bandalphabet",
+        "noSymbols": "Keine Symbole verfügbar"
+      },
+      "transitionTable": {
+        "transitionTable": "Übergangstabelle",
+        "transitionFormat": "Format:",
+        "transitionExample": " z. B. (q1, 0, R)"
+      },
+      "editing": {
+        "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",
+        "cannotRemoveSymbolColumn": "Die Symbolspalte kann nicht entfernt werden.",
+        "cannotRemoveLastState": "Mindestens eine Zustandsspalte muss bestehen bleiben.",
+        "symbolSingleChar": "Bandsymbole müssen aus genau einem Zeichen bestehen.",
+        "symbolDuplicate": "Dieses Bandsymbol existiert bereits in der Übergangstabelle.",
+        "transitionCellInvalid": "Übergänge müssen das Format (Nächster Zustand, Schreibsymbol, Bewegung) verwenden und das Schreibsymbol muss genau ein Zeichen lang sein."
+      }
     },
     "validation": {
       "summary": {
