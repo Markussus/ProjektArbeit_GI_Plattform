@@ -164,10 +164,9 @@ test.describe("DNF page", () => {
       page.getByTestId("dnf-derivation-step-identity").first(),
     ).toBeVisible();
 
-    await page.getByTestId("dnf-walkthrough-view-toggle").click();
-    await expect(
-      page.getByTestId("dnf-simplification-walkthrough"),
-    ).toHaveAttribute("data-view", "full");
+    await expect(page.getByTestId("dnf-walkthrough-view-toggle")).toHaveCount(
+      0,
+    );
 
     await page.getByTestId("dnf-reveal-algebra-reference").click();
     await expect(
