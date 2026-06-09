@@ -595,6 +595,14 @@
     "exercise8Desc": "Store constructor values in a class and return a description.",
     "exercise9": "Sort an ArrayList",
     "exercise9Desc": "Sort an ArrayList with Collections.sort and print the list.",
+    "exercise10": "Implement FizzBuzz",
+    "exercise10Desc": "Combine a loop, modulo, and conditions to produce the classic FizzBuzz output.",
+    "exercise11": "Check a palindrome",
+    "exercise11Desc": "Implement a method that compares text from both ends and detects palindromes.",
+    "exercise12": "Evaluate a matrix",
+    "exercise12Desc": "Use nested loops to calculate every row sum and the main diagonal sum.",
+    "exercise13": "Model a shopping cart",
+    "exercise13Desc": "Store prices in a class with an ArrayList and implement item count, total, and maximum.",
     "stdin": {
       "label": "Program input",
       "placeholder": "Input for Scanner/System.in, e.g. hello java",
@@ -643,6 +651,7 @@
       "export": "Export",
       "import": "Import",
       "copied": "String copied to clipboard.",
+      "exportError": "String could not be generated.",
       "importSuccess": "String loaded successfully.",
       "importError": "String could not be loaded."
     },

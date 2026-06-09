@@ -509,7 +509,7 @@
         },
         "input": {
           "title": "Konsoleneingabe",
-          "description": "Scanner und System.in funktionieren mit dem Eingabefeld unter dem Editor. Die Eingabe wird vor dem Start bereitgestellt; interaktive Nachfragen w?hrend der Ausf?hrung sind nicht m?glich."
+          "description": "Scanner und System.in funktionieren mit dem Eingabefeld unter dem Editor. Die Eingabe wird vor dem Start bereitgestellt; interaktive Nachfragen während der Ausführung sind nicht möglich."
         },
         "cli": {
           "title": "Terminalbefehle",
@@ -524,14 +524,14 @@
           "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlässlich."
         },
         "stringsMath": {
-          "title": "Strings, Math und gro?e Zahlen",
-          "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren f?r typische Konsolenaufgaben."
+          "title": "Strings, Math und große Zahlen",
+          "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren für typische Konsolenaufgaben."
         }
       },
       "commands": {
         "run": {
           "title": "Aktuellen Editorinhalt kompilieren und starten",
-          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und f?hrt die Main.main-Methode im Worker aus."
+          "description": "Der Run-Button sendet den Java-Quelltext an den Browser-Compiler, erzeugt WebAssembly und führt die Main.main-Methode im Worker aus."
         },
         "compile": {
           "title": "Kompilierung ist Teil von Run",
@@ -539,27 +539,27 @@
         },
         "javaCli": {
           "title": "Kein java-Kommandozeilenstarter",
-          "description": "Ein lokaler java-Befehl wird nicht unterst?tzt, weil der Browser keine JVM-Prozesse startet."
+          "description": "Ein lokaler java-Befehl wird nicht unterstützt, weil der Browser keine JVM-Prozesse startet."
         },
         "javacCli": {
           "title": "Kein javac-Terminalbefehl",
-          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer k?nnen keine beliebigen javac-Flags ?bergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
+          "description": "javac ist in die Browser-Compiler-Pipeline eingebettet. Nutzer können keine beliebigen javac-Flags übergeben oder mehrere Projektdateien aus einem lokalen Ordner kompilieren."
         },
         "jshell": {
           "title": "Keine interaktive JShell",
-          "description": "Der Simulator f?hrt vollst?ndige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
+          "description": "Der Simulator führt vollständige Programme mit einer Main-Klasse aus. Er bietet keine REPL und keine interaktive Eingabeaufforderung."
         },
         "tools": {
           "title": "Keine Paketierungs- oder Dokumentationswerkzeuge",
-          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme geh?ren nicht zum unterst?tzten Browser-Compiler-Ablauf."
+          "description": "Werkzeuge wie jar, javadoc, Maven, Gradle und andere lokale Programme gehören nicht zum unterstützten Browser-Compiler-Ablauf."
         },
         "stdin": {
           "title": "Konsoleneingabe ist nicht interaktiv",
-          "description": "Konsolenausgabe ?ber System.out und System.err wird unterst?tzt. Scanner/System.in nutzt das feste Eingabefeld im Simulator."
+          "description": "Konsolenausgabe über System.out und System.err wird unterstützt. Scanner/System.in nutzt das feste Eingabefeld im Simulator."
         },
         "environment": {
           "title": "Browser-Sandbox gilt",
-          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabh?ngige APIs vermeiden, weil WebAssembly in einem Browser-Worker l?uft."
+          "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
         },
         "title": "Was darf ich in den Editor schreiben?"
       }
@@ -583,22 +583,30 @@
         "phase": "Status"
       }
     },
-    "exercise6": "Text aus Eingabe gro?schreiben",
-    "exercise6Desc": "Lesen Sie eine Zeile mit Scanner ein und geben Sie den Text in Gro?buchstaben aus.",
+    "exercise6": "Text aus Eingabe großschreiben",
+    "exercise6Desc": "Lesen Sie eine Zeile mit Scanner ein und geben Sie den Text in Großbuchstaben aus.",
     "exercise7": "Methode schreiben",
-    "exercise7Desc": "Implementieren Sie eine Methode, die eine Zahl quadriert und zur?ckgibt.",
+    "exercise7Desc": "Implementieren Sie eine Methode, die eine Zahl quadriert und zurückgibt.",
     "exercise8": "Einfache Klasse verwenden",
-    "exercise8Desc": "Speichern Sie Konstruktorwerte in einer Klasse und geben Sie eine Beschreibung zur?ck.",
+    "exercise8Desc": "Speichern Sie Konstruktorwerte in einer Klasse und geben Sie eine Beschreibung zurück.",
     "exercise9": "ArrayList sortieren",
     "exercise9Desc": "Sortieren Sie eine ArrayList mit Collections.sort und geben Sie die Liste aus.",
+    "exercise10": "FizzBuzz umsetzen",
+    "exercise10Desc": "Kombinieren Sie Schleife, Modulo und Bedingungen, um die klassische FizzBuzz-Ausgabe zu erzeugen.",
+    "exercise11": "Palindrom prüfen",
+    "exercise11Desc": "Implementieren Sie eine Methode, die einen Text von beiden Seiten vergleicht und Palindrome erkennt.",
+    "exercise12": "Matrix auswerten",
+    "exercise12Desc": "Berechnen Sie mit verschachtelten Schleifen alle Zeilensummen und die Summe der Hauptdiagonale.",
+    "exercise13": "Warenkorb modellieren",
+    "exercise13Desc": "Verwalten Sie Preise in einer Klasse mit ArrayList und implementieren Sie Anzahl, Gesamtsumme und Maximum.",
     "stdin": {
       "label": "Programmeingabe",
-      "placeholder": "Eingabe f?r Scanner/System.in, z. B. hello java",
-      "help": "Diese Eingabe wird vor dem Programmstart als System.in bereitgestellt. Interaktive Nachfragen w?hrend der Ausf?hrung sind nicht m?glich."
+      "placeholder": "Eingabe für Scanner/System.in, z. B. hello java",
+      "help": "Diese Eingabe wird vor dem Programmstart als System.in bereitgestellt. Interaktive Nachfragen während der Ausführung sind nicht möglich."
     },
     "timeout": {
-      "warningTitle": "Ausf?hrung wegen Timeout gestoppt",
-      "warningText": "Das Programm lief zu lange oder wartet auf Eingabe. Pr?fen Sie Schleifen, Scanner-Aufrufe und das Timeout."
+      "warningTitle": "Ausführung wegen Timeout gestoppt",
+      "warningText": "Das Programm lief zu lange oder wartet auf Eingabe. Prüfen Sie Schleifen, Scanner-Aufrufe und das Timeout."
     }
   },
   "legal": {
@@ -639,6 +647,7 @@
       "export": "Export",
       "import": "Import",
       "copied": "String in die Zwischenablage kopiert.",
+      "exportError": "String konnte nicht erzeugt werden.",
       "importSuccess": "String erfolgreich geladen.",
       "importError": "String konnte nicht geladen werden."
     },

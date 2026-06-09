@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   getJavaFileName,
+  getJavaScenario,
   getJavaStarterCode,
+  javaProgrammingExercises,
 } from "../../../../../src/pages/Programming1/Java/exercises";
 
 describe("Java exercise lookup helpers", () => {
@@ -17,6 +19,32 @@ describe("Java exercise lookup helpers", () => {
 
     it("returns the matching file name for that exercise", () => {
       expect(getJavaFileName("java.exercise4")).toBe("Main.java");
+    });
+  });
+
+  describe("when advanced browser-compatible exercises are registered", () => {
+    it("provides beginner, intermediate, and advanced tasks with multiple checks", () => {
+      expect(javaProgrammingExercises).toHaveLength(13);
+      expect(getJavaScenario("java.exercise10")).toMatchObject({
+        kind: "exercise",
+        definition: { difficulty: "easy" },
+      });
+      expect(getJavaScenario("java.exercise11")).toMatchObject({
+        kind: "exercise",
+        definition: { difficulty: "medium" },
+      });
+
+      for (const id of ["java.exercise12", "java.exercise13"]) {
+        const scenario = getJavaScenario(id);
+        expect(scenario).toMatchObject({
+          kind: "exercise",
+          definition: { difficulty: "hard" },
+        });
+        if (scenario?.kind === "exercise") {
+          expect(scenario.validationCases.length).toBeGreaterThanOrEqual(2);
+          expect(scenario.solutionCode).toContain("public class Main");
+        }
+      }
     });
   });
 

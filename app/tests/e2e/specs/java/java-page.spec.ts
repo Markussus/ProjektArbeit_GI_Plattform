@@ -1,9 +1,9 @@
-import { gzipSync } from "node:zlib";
+import { deflateRawSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
 import { appTestIds } from "../../support/app-shell";
 
 function encodeJavaTransfer(sourceCode: string) {
-  return `j1.${gzipSync(Buffer.from(sourceCode, "utf8")).toString("base64url")}`;
+  return `C${deflateRawSync(Buffer.from(sourceCode, "utf8")).toString("base64url")}`;
 }
 
 test.describe("Java page", () => {
@@ -148,7 +148,7 @@ test.describe("Java page", () => {
     await test.step("Export should generate a Java transfer string", async () => {
       await page.getByTestId(appTestIds.javaTransferExport).click();
       await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-        /^j[01]\./,
+        /^[ABC][A-Za-z0-9_-]*$/,
       );
     });
 

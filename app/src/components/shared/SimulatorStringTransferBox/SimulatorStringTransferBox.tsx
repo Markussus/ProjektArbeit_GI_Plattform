@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Clipboard, Download, Upload } from "lucide-react";
+import { Clipboard, Download, LoaderCircle, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
@@ -26,10 +26,13 @@ export function SimulatorStringTransferBox<TValue>({
   );
   const [feedbackKey, setFeedbackKey] = useState<
     | "simulation.transfer.copied"
+    | "simulation.transfer.exportError"
     | "simulation.transfer.importSuccess"
     | "simulation.transfer.importError"
     | null
   >(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [showExportSpinner, setShowExportSpinner] = useState(false);
 
   useEffect(() => {
     if (!feedbackKey) {
@@ -52,7 +55,10 @@ export function SimulatorStringTransferBox<TValue>({
     : textValue;
 
   const feedbackToneClassName = useMemo(() => {
-    if (feedbackKey === "simulation.transfer.importError") {
+    if (
+      feedbackKey === "simulation.transfer.exportError" ||
+      feedbackKey === "simulation.transfer.importError"
+    ) {
       return "text-destructive";
     }
 
@@ -60,11 +66,28 @@ export function SimulatorStringTransferBox<TValue>({
   }, [feedbackKey]);
 
   const handleGenerate = () => {
+    if (isExporting) {
+      return;
+    }
+
+    setIsExporting(true);
+    const spinnerTimeoutId = window.setTimeout(() => {
+      setShowExportSpinner(true);
+    }, 10);
+
     void (async () => {
-      const nextValue = await codec.exportValue(value);
-      setTextValue(nextValue);
-      setInputMode("generated");
-      setFeedbackKey(null);
+      try {
+        const nextValue = await codec.exportValue(value);
+        setTextValue(nextValue);
+        setInputMode("generated");
+        setFeedbackKey(null);
+      } catch {
+        setFeedbackKey("simulation.transfer.exportError");
+      } finally {
+        window.clearTimeout(spinnerTimeoutId);
+        setShowExportSpinner(false);
+        setIsExporting(false);
+      }
     })();
   };
 
@@ -128,7 +151,7 @@ export function SimulatorStringTransferBox<TValue>({
             className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none focus-visible:ring-2"
             spellCheck={false}
             autoComplete="off"
-            readOnly={isShowingCopyFeedback}
+            readOnly={isShowingCopyFeedback || isExporting}
           />
 
           <button
@@ -137,7 +160,7 @@ export function SimulatorStringTransferBox<TValue>({
               void handleCopy();
             }}
             data-testid={testIdPrefix ? `${testIdPrefix}-copy` : undefined}
-            disabled={!hasText}
+            disabled={!hasText || isExporting}
             aria-label={t("simulation.transfer.copy")}
             title={t("simulation.transfer.copy")}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-3 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -151,18 +174,32 @@ export function SimulatorStringTransferBox<TValue>({
             type="button"
             onClick={handleGenerate}
             data-testid={testIdPrefix ? `${testIdPrefix}-export` : undefined}
-            disabled={hasManualInput}
-            className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={hasManualInput || isExporting}
+            aria-busy={isExporting}
+            aria-label={t("simulation.transfer.export")}
+            className="bg-brand text-brand-foreground inline-flex min-w-28 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Download className="size-4" />
-            {t("simulation.transfer.export")}
+            {showExportSpinner ? (
+              <LoaderCircle
+                data-testid={
+                  testIdPrefix ? `${testIdPrefix}-export-spinner` : undefined
+                }
+                className="size-4 animate-spin"
+                aria-hidden="true"
+              />
+            ) : (
+              <>
+                <Download className="size-4" />
+                {t("simulation.transfer.export")}
+              </>
+            )}
           </button>
 
           <button
             type="button"
             onClick={handleLoad}
             data-testid={testIdPrefix ? `${testIdPrefix}-import` : undefined}
-            disabled={!hasManualInput}
+            disabled={!hasManualInput || isExporting}
             className="bg-secondary text-secondary-foreground inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Upload className="size-4" />

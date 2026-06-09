@@ -665,6 +665,377 @@ public class Main {
         icon: ListOrdered,
       },
     },
+    {
+      kind: "exercise",
+      id: "java.exercise10",
+      titleKey: "java.exercise10",
+      descriptionKey: "java.exercise10Desc",
+      fileName: "Main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    int limit = 15;
+
+    for (int number = 1; number <= limit; number++) {
+      // TODO: print Fizz for multiples of 3, Buzz for multiples
+      // of 5, FizzBuzz for both, otherwise the number
+    }
+  }
+}
+`,
+      solutionCode: `public class Main {
+  public static void main(String[] args) {
+    int limit = 15;
+
+    for (int number = 1; number <= limit; number++) {
+      if (number % 15 == 0) {
+        System.out.println("FizzBuzz");
+      } else if (number % 3 == 0) {
+        System.out.println("Fizz");
+      } else if (number % 5 == 0) {
+        System.out.println("Buzz");
+      } else {
+        System.out.println(number);
+      }
+    }
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "fizzbuzz-fifteen",
+          expectedStdout:
+            "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n",
+        },
+        {
+          id: "fizzbuzz-eight",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(/int limit = \d+;/, "int limit = 8;"),
+          expectedStdout: "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\n",
+        },
+      ],
+      code: `public class Main {
+  public static void main(String[] args) {
+    int limit = 15;
+
+    for (int number = 1; number <= limit; number++) {
+      // TODO: implement FizzBuzz
+    }
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise10",
+        descriptionKey: "java.exercise10Desc",
+        difficulty: "easy",
+        icon: Repeat,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise11",
+      titleKey: "java.exercise11",
+      descriptionKey: "java.exercise11Desc",
+      fileName: "Main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    String text = "lagerregal";
+    System.out.println(isPalindrome(text));
+  }
+
+  static boolean isPalindrome(String text) {
+    // TODO: compare characters from both ends
+    return false;
+  }
+}
+`,
+      solutionCode: `public class Main {
+  public static void main(String[] args) {
+    String text = "lagerregal";
+    System.out.println(isPalindrome(text));
+  }
+
+  static boolean isPalindrome(String text) {
+    int left = 0;
+    int right = text.length() - 1;
+
+    while (left < right) {
+      if (text.charAt(left) != text.charAt(right)) {
+        return false;
+      }
+      left++;
+      right--;
+    }
+
+    return true;
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "palindrome-true",
+          expectedStdout: "true\n",
+        },
+        {
+          id: "palindrome-false",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /String text = "[^"]*";/,
+              'String text = "java";',
+            ),
+          expectedStdout: "false\n",
+        },
+        {
+          id: "palindrome-even",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /String text = "[^"]*";/,
+              'String text = "otto";',
+            ),
+          expectedStdout: "true\n",
+        },
+      ],
+      code: `public class Main {
+  public static void main(String[] args) {
+    String text = "lagerregal";
+    System.out.println(isPalindrome(text));
+  }
+
+  static boolean isPalindrome(String text) {
+    // TODO: implement the palindrome check
+    return false;
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise11",
+        descriptionKey: "java.exercise11Desc",
+        difficulty: "medium",
+        icon: Code2,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise12",
+      titleKey: "java.exercise12",
+      descriptionKey: "java.exercise12Desc",
+      fileName: "Main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    int[][] matrix = {
+      {3, 1, 4},
+      {1, 5, 9},
+      {2, 6, 5}
+    };
+
+    // TODO: print the sum of every row and then the main diagonal sum
+  }
+}
+`,
+      solutionCode: `public class Main {
+  public static void main(String[] args) {
+    int[][] matrix = {
+      {3, 1, 4},
+      {1, 5, 9},
+      {2, 6, 5}
+    };
+
+    for (int row = 0; row < matrix.length; row++) {
+      int rowSum = 0;
+      for (int column = 0; column < matrix[row].length; column++) {
+        rowSum += matrix[row][column];
+      }
+      System.out.println(rowSum);
+    }
+
+    int diagonalSum = 0;
+    for (int index = 0; index < matrix.length; index++) {
+      diagonalSum += matrix[index][index];
+    }
+    System.out.println(diagonalSum);
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "matrix-default",
+          expectedStdout: "8\n15\n13\n13\n",
+        },
+        {
+          id: "matrix-other-values",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /int\[\]\[\]\s+matrix\s*=\s*\{[\s\S]*?\n\s*\};/,
+              `int[][] matrix = {
+      {1, 2, 3},
+      {4, 5, 6},
+      {7, 8, 9}
+    };`,
+            ),
+          expectedStdout: "6\n15\n24\n15\n",
+        },
+      ],
+      code: `public class Main {
+  public static void main(String[] args) {
+    int[][] matrix = {
+      {3, 1, 4},
+      {1, 5, 9},
+      {2, 6, 5}
+    };
+
+    // TODO: calculate row sums and the diagonal sum
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise12",
+        descriptionKey: "java.exercise12Desc",
+        difficulty: "hard",
+        icon: Calculator,
+      },
+    },
+    {
+      kind: "exercise",
+      id: "java.exercise13",
+      titleKey: "java.exercise13",
+      descriptionKey: "java.exercise13Desc",
+      fileName: "Main.java",
+      starterCode: `import java.util.ArrayList;
+
+public class Main {
+  public static void main(String[] args) {
+    ShoppingCart cart = new ShoppingCart();
+    cart.addPrice(499);
+    cart.addPrice(1299);
+    cart.addPrice(401);
+
+    System.out.println(cart.getItemCount());
+    System.out.println(cart.getTotalCents());
+    System.out.println(cart.getMostExpensiveCents());
+  }
+}
+
+class ShoppingCart {
+  private ArrayList<Integer> prices = new ArrayList<>();
+
+  void addPrice(int cents) {
+    // TODO: add the price
+  }
+
+  int getItemCount() {
+    return 0;
+  }
+
+  int getTotalCents() {
+    return 0;
+  }
+
+  int getMostExpensiveCents() {
+    return 0;
+  }
+}
+`,
+      solutionCode: `import java.util.ArrayList;
+
+public class Main {
+  public static void main(String[] args) {
+    ShoppingCart cart = new ShoppingCart();
+    cart.addPrice(499);
+    cart.addPrice(1299);
+    cart.addPrice(401);
+
+    System.out.println(cart.getItemCount());
+    System.out.println(cart.getTotalCents());
+    System.out.println(cart.getMostExpensiveCents());
+  }
+}
+
+class ShoppingCart {
+  private ArrayList<Integer> prices = new ArrayList<>();
+
+  void addPrice(int cents) {
+    prices.add(cents);
+  }
+
+  int getItemCount() {
+    return prices.size();
+  }
+
+  int getTotalCents() {
+    int total = 0;
+    for (int price : prices) {
+      total += price;
+    }
+    return total;
+  }
+
+  int getMostExpensiveCents() {
+    int mostExpensive = 0;
+    for (int price : prices) {
+      if (price > mostExpensive) {
+        mostExpensive = price;
+      }
+    }
+    return mostExpensive;
+  }
+}
+`,
+      validationCases: [
+        {
+          id: "cart-default",
+          expectedStdout: "3\n2199\n1299\n",
+        },
+        {
+          id: "cart-other-prices",
+          sourceTransform: (sourceCode) =>
+            sourceCode.replace(
+              /cart\.addPrice\(499\);\s*cart\.addPrice\(1299\);\s*cart\.addPrice\(401\);/,
+              "cart.addPrice(250);\n    cart.addPrice(750);\n    cart.addPrice(1000);",
+            ),
+          expectedStdout: "3\n2000\n1000\n",
+        },
+      ],
+      code: `import java.util.ArrayList;
+
+public class Main {
+  public static void main(String[] args) {
+    ShoppingCart cart = new ShoppingCart();
+    cart.addPrice(499);
+    cart.addPrice(1299);
+    cart.addPrice(401);
+
+    System.out.println(cart.getItemCount());
+    System.out.println(cart.getTotalCents());
+    System.out.println(cart.getMostExpensiveCents());
+  }
+}
+
+class ShoppingCart {
+  private ArrayList<Integer> prices = new ArrayList<>();
+
+  void addPrice(int cents) {
+    // TODO
+  }
+
+  int getItemCount() {
+    return 0;
+  }
+
+  int getTotalCents() {
+    return 0;
+  }
+
+  int getMostExpensiveCents() {
+    return 0;
+  }
+}
+`,
+      definition: {
+        titleKey: "java.exercise13",
+        descriptionKey: "java.exercise13Desc",
+        difficulty: "hard",
+        icon: ListOrdered,
+      },
+    },
   ] satisfies JavaExerciseScenario[]
 ).sort(compareJavaExercisesByDifficulty);
 
