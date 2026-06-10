@@ -69,7 +69,7 @@ interface TransitionEncoding {
 export const tmProgramTransferCodec: ISimulatorTransferCodec<TMProgram> = {
   async exportValue(program) {
     const normalizedProgram = normalizeProgram(program);
-    const writer = new BitWriter("tm_transfer_program_invalid");
+    const writer = new BitWriter();
     const symbolMode = chooseSymbolMode(normalizedProgram.symbols);
     const transitionEncoding = chooseTransitionEncoding(normalizedProgram);
 
@@ -339,7 +339,7 @@ function encodeRawTransitions(
   symbolBits: number,
   sparse: boolean,
 ): number[] {
-  const writer = new BitWriter("tm_transfer_program_invalid");
+  const writer = new BitWriter();
 
   for (const transition of cells) {
     if (sparse) {
@@ -360,7 +360,7 @@ function encodeDictionaryTransitions(
   symbolBits: number,
   sparse: boolean,
 ): number[] {
-  const writer = new BitWriter("tm_transfer_program_invalid");
+  const writer = new BitWriter();
   writer.writeVarUint(dictionary.length);
 
   for (const transition of dictionary) {
@@ -423,7 +423,6 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
   try {
     const reader = BitReader.fromBase64Url(
       serializedProgram,
-      "tm_transfer_payload_invalid",
     );
     const nonHaltStateCount = reader.readVarUint();
     const haltStateCount = reader.readVarUint();
