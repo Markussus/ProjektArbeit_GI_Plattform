@@ -594,7 +594,6 @@
       "lines": "Der Java-Editor ist auf {{maxLines}} Zeilen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen.",
       "characters": "Der Java-Editor ist auf {{maxCharacters}} Zeichen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen."
     },
-    "resetStarterCode": "Startercode zurücksetzen",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",
     "timeoutUnit": "Sekunden",

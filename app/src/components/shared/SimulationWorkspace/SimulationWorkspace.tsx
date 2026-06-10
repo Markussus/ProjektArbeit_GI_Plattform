@@ -13,6 +13,7 @@ interface SimulationWorkspaceProps {
   onToggleFocus: () => void;
   onReset?: () => void;
   resetDisabled?: boolean;
+  overlayControls?: boolean;
   children?: ReactNode;
 }
 
@@ -25,6 +26,7 @@ export function SimulationWorkspace({
   onToggleFocus,
   onReset,
   resetDisabled = false,
+  overlayControls = false,
   children,
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
@@ -77,11 +79,16 @@ export function SimulationWorkspace({
       <div
         data-testid="simulation-workspace"
         className={cn(
-          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          "bg-card ring-foreground/10 relative rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
-        <div className="mb-3 flex justify-end gap-2">
+        <div
+          className={cn(
+            "flex justify-end gap-2",
+            overlayControls ? "absolute top-6 right-6 z-10" : "mb-3",
+          )}
+        >
           {onReset && (
             <button
               type="button"

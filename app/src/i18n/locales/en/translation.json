@@ -594,7 +594,6 @@
       "lines": "The Java editor is limited to {{maxLines}} lines. The pasted or imported text was not accepted.",
       "characters": "The Java editor is limited to {{maxCharacters}} characters. The pasted or imported text was not accepted."
     },
-    "resetStarterCode": "Reset starter code",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",
     "timeoutUnit": "seconds",

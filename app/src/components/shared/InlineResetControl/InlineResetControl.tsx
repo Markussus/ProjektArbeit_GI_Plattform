@@ -42,7 +42,7 @@ export function InlineResetControl({
     <div
       data-testid={`${testId}-confirmation`}
       className={cn(
-        "border-border bg-background animate-in slide-in-from-right-2 flex min-h-9 items-center gap-2 rounded-md border px-2 py-1 duration-200",
+        "border-border bg-background animate-in slide-in-from-right-2 inline-flex min-h-9 w-fit items-center gap-2 rounded-md border px-2 py-1 duration-200",
         className,
       )}
     >

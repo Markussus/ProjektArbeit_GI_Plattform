@@ -108,6 +108,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         emptyStateTextKey="simulation.emptyStates.java"
         onReset={handleReset}
         resetDisabled={!isSimulatorReady}
+        overlayControls
       >
         <JavaSimulator
           key={props.selectedItem?.id ?? "__java-free-mode__"}

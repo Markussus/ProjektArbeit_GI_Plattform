@@ -177,11 +177,6 @@ const JavaSimulatorSession = forwardRef<
     timeoutSeconds,
   ]);
 
-  const handleResetCode = useCallback(() => {
-    setCode(getJavaStarterCode(itemId));
-    reset();
-  }, [itemId, reset]);
-
   const handleImportCode = useCallback(
     (nextCode: string) => {
       setCode(nextCode);
@@ -267,7 +262,6 @@ const JavaSimulatorSession = forwardRef<
         fileName={fileName}
         isFocused={isFocused}
         onCodeChange={setCode}
-        onResetCode={handleResetCode}
         onImportCode={handleImportCode}
         transferCodec={storageTransferCodec}
         issues={snapshot.issues}

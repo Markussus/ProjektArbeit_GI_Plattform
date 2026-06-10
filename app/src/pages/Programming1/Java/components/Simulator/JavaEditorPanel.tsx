@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import type { OnMount } from "@monaco-editor/react";
-import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
@@ -28,7 +27,6 @@ export interface JavaEditorPanelProps {
   fileName: string;
   isFocused: boolean;
   onCodeChange: (nextCode: string) => void;
-  onResetCode: () => void;
   onImportCode: (nextCode: string) => void;
   transferCodec: ISimulatorTransferCodec<string>;
   issues: JavaExecutionIssue[];
@@ -39,7 +37,6 @@ export function JavaEditorPanel({
   fileName,
   isFocused,
   onCodeChange,
-  onResetCode,
   onImportCode,
   transferCodec,
   issues,
@@ -139,23 +136,13 @@ export function JavaEditorPanel({
 
   return (
     <div data-testid="java-editor-panel" className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="pr-24">
         <div>
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
             {t("java.editorLabel")}
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">{fileName}</p>
         </div>
-
-        <button
-          type="button"
-          onClick={onResetCode}
-          data-testid="java-reset-button"
-          className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
-        >
-          <RotateCcw className="size-4" />
-          {t("java.resetStarterCode")}
-        </button>
       </div>
 
       <div
