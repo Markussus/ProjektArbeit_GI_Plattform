@@ -262,6 +262,9 @@ public class Main {
 
     await page.getByTestId(appTestIds.tabOverview).click();
     await page.getByTestId(appTestIds.tabExamples).click();
+    await page
+      .getByTestId("java-example-card-java.example1Title-select")
+      .click();
     await page.getByTestId("java-example-card-java.example1Title-open").click();
     await page.getByTestId(appTestIds.javaTransferExport).click();
 

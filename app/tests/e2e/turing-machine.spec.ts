@@ -229,6 +229,9 @@ test.describe("Turing Machine page", () => {
     await switchTab(page, "overview");
     await switchTab(page, "examples");
     await page
+      .getByTestId(`tm-example-card-${BIT_FLIP_EXAMPLE_ID}-select`)
+      .click();
+    await page
       .getByTestId(`tm-example-card-${BIT_FLIP_EXAMPLE_ID}-open`)
       .click();
 
