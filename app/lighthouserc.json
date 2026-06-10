@@ -20,9 +20,7 @@
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop",
-        "onlyCategories": [
-          "performance"
-        ],
+        "onlyCategories": ["performance"],
         "chromeFlags": "--no-sandbox --user-data-dir=./.lighthouseci/chrome-profile"
       }
     },

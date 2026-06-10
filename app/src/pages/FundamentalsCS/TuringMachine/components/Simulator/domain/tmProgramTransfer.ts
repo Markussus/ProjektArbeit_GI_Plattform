@@ -421,9 +421,7 @@ function writeTransition(
 
 function restoreImportedProgram(serializedProgram: string): TMProgram {
   try {
-    const reader = BitReader.fromBase64Url(
-      serializedProgram,
-    );
+    const reader = BitReader.fromBase64Url(serializedProgram);
     const nonHaltStateCount = reader.readVarUint();
     const haltStateCount = reader.readVarUint();
     const symbolCount = reader.readVarUint();
