@@ -1,4 +1,5 @@
 import { cloneJson } from "@/lib/utils";
+import { normalizeTMStateName } from "../domain/tmFormatting";
 import { deriveTapeAlphabet, withDerivedAlphabets } from "../domain/tmProgram";
 import type { TMProgram } from "../domain/tmProgram";
 import {
@@ -103,7 +104,7 @@ function toggleHaltState(
 }
 
 function addHaltState(program: TMProgram, state: StateName): TMProgram {
-  const normalizedState = state.trim();
+  const normalizedState = normalizeTMStateName(state).trim();
 
   if (
     normalizedState === "" ||
@@ -258,7 +259,7 @@ function renameState(
   currentState: StateName,
   nextState: StateName,
 ): TMProgram {
-  const normalizedNextState = nextState.trim();
+  const normalizedNextState = normalizeTMStateName(nextState).trim();
 
   if (
     currentState === normalizedNextState ||
@@ -319,7 +320,10 @@ function updateTransition(
   }
 
   if (transition) {
-    nextProgram.transitions[readSymbol][currentState] = transition;
+    nextProgram.transitions[readSymbol][currentState] = {
+      ...transition,
+      nextState: normalizeTMStateName(transition.nextState),
+    };
   } else {
     delete nextProgram.transitions[readSymbol]?.[currentState];
   }

@@ -37,3 +37,4 @@ third_party/teavm-javac-src/**
 # generated browser compiler artifacts
 app/public/java/compiler/
 app/public/java/compiler/**
+/.playwright-mcp

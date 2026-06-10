@@ -4,6 +4,7 @@ import {
   buildTransitionTableRows,
   getOrderedTapeAlphabet,
 } from "../adapters/tmTableAdapter";
+import { normalizeTMStateName } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 import {
   validateTMProgram,
@@ -235,7 +236,7 @@ export function useTMConfigEditor(
       }
 
       const currentState = transitionTableStates[colIndex - 1];
-      const nextState = value.trim();
+      const nextState = normalizeTMStateName(value).trim();
 
       if (
         !currentState ||
@@ -478,7 +479,7 @@ function parseTransition(cellValue: string): TMTransition | null {
   }
 
   return {
-    nextState: match[1].trim(),
+    nextState: normalizeTMStateName(match[1]).trim(),
     writeSymbol,
     movement: match[3].trim() as HeadMovement,
   };
