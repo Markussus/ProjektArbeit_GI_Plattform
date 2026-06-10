@@ -54,7 +54,10 @@ export function useTrainingCenterAutoSave<TValue>({
       void save().catch(() => undefined);
     }, intervalMs);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      window.clearInterval(intervalId);
+      void save().catch(() => undefined);
+    };
   }, [enabled, intervalMs, save]);
 
   return save;

@@ -6,6 +6,7 @@ import {
   TRAINING_CENTER_STORAGE_KEY,
   createTopicIdentifier,
   createTrainingCenterIdentifier,
+  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
   trainingCenterStorage,
@@ -105,6 +106,26 @@ describe("training center storage", () => {
     expect(codec.importValue).not.toHaveBeenCalled();
   });
 
+  it("creates a prefixed transfer codec bound to one storage identifier", async () => {
+    const identifier = createTrainingCenterIdentifier(7, 2);
+    const otherIdentifier = createTrainingCenterIdentifier(7, 3);
+    const codec: ISimulatorTransferCodec<string> = {
+      exportValue: async (value) => `encoded-${value}`,
+      importValue: async (value) => `decoded-${value}`,
+    };
+    const storageCodec = createTrainingCenterTransferCodec(identifier, codec);
+
+    await expect(storageCodec.exportValue("source")).resolves.toBe(
+      `${identifier}encoded-source`,
+    );
+    await expect(
+      storageCodec.importValue(`${identifier}encoded-source`),
+    ).resolves.toBe("decoded-encoded-source");
+    await expect(
+      storageCodec.importValue(`${otherIdentifier}encoded-source`),
+    ).rejects.toThrow("training_center_transfer_identifier_invalid");
+  });
+
   it("provides manual saving and automatically saves every ten seconds", async () => {
     vi.useFakeTimers();
     const identifier = createTrainingCenterIdentifier(4);
@@ -112,7 +133,7 @@ describe("training center storage", () => {
       exportValue: vi.fn(async (value) => `encoded-${value}`),
       importValue: vi.fn(),
     };
-    const { result } = renderHook(() =>
+    const { result, unmount } = renderHook(() =>
       useTrainingCenterAutoSave({
         identifier,
         value: "state",
@@ -134,6 +155,14 @@ describe("training center storage", () => {
     expect(trainingCenterStorage.load(identifier)).toBe(
       `${identifier}encoded-state`,
     );
+
+    act(() => {
+      unmount();
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(codec.exportValue).toHaveBeenCalledTimes(3);
   });
 });
 

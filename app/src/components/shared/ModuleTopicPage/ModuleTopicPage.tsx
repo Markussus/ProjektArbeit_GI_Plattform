@@ -40,6 +40,7 @@ interface ModuleTopicPageProps {
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
   testId?: string;
+  confirmExerciseTabExit?: boolean;
 }
 
 export function ModuleTopicPage({
@@ -51,6 +52,7 @@ export function ModuleTopicPage({
   simulationTab: SimulationTab,
   tabs,
   testId,
+  confirmExerciseTabExit = true,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
@@ -94,13 +96,18 @@ export function ModuleTopicPage({
     const exerciseIsActive =
       !!simulationExercise && !simulationExercise.id.includes(".example");
 
-    if (exerciseIsActive && tab !== activeTab) {
+    if (confirmExerciseTabExit && exerciseIsActive && tab !== activeTab) {
       setPendingTab(tab);
       setShowTabExitConfirm(true);
       return;
     }
 
-    if (exerciseIsActive && tab === activeTab && tab === "simulation") {
+    if (
+      confirmExerciseTabExit &&
+      exerciseIsActive &&
+      tab === activeTab &&
+      tab === "simulation"
+    ) {
       setPendingTab(null);
       setShowTabExitConfirm(true);
       return;

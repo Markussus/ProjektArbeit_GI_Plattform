@@ -9,6 +9,14 @@ import {
 import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import {
+  SIMULATOR_TASK_STORAGE_ID,
+  createTrainingCenterIdentifier,
+  createTrainingCenterTransferCodec,
+  loadTrainingCenterValue,
+} from "@/lib/trainingCenter";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
   getJavaFileName,
@@ -20,6 +28,7 @@ import { useJavaExecutionContext } from "./application/javaExecutionContextValue
 import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
+import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
 
 export interface JavaValidationRunRow {
   id: string;
@@ -73,7 +82,9 @@ const JavaSimulatorSession = forwardRef<
   const { t } = useTranslation();
   const scenario = useMemo(() => getJavaScenario(itemId), [itemId]);
   const exerciseScenario = scenario?.kind === "exercise" ? scenario : null;
+  const isStorageEnabled = scenario?.kind !== "example";
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
+  const [isStorageReady, setIsStorageReady] = useState(false);
   const [standardInput, setStandardInput] = useState("");
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
@@ -87,19 +98,82 @@ const JavaSimulatorSession = forwardRef<
     snapshot.phase === "running";
   const canRun = snapshot.compilerStatus === "ready" && !isBusy;
   const canStop = isBusy || snapshot.compilerStatus === "loading";
+  const storageIdentifier = useMemo(
+    () =>
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.javaProgramming,
+        exerciseScenario?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
+      ),
+    [exerciseScenario?.storageId],
+  );
+  const storageTransferCodec = useMemo(
+    () =>
+      isStorageEnabled
+        ? createTrainingCenterTransferCodec(
+            storageIdentifier,
+            javaCodeTransferCodec,
+          )
+        : javaCodeTransferCodec,
+    [isStorageEnabled, storageIdentifier],
+  );
 
   useEffect(() => {
     preload();
   }, [preload]);
 
+  useEffect(() => {
+    let isCancelled = false;
+    setIsStorageReady(false);
+
+    if (!isStorageEnabled) {
+      return;
+    }
+
+    void loadTrainingCenterValue(storageIdentifier, javaCodeTransferCodec)
+      .then((storedCode) => {
+        if (!isCancelled && storedCode !== null) {
+          setCode(storedCode);
+          reset();
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!isCancelled) {
+          setIsStorageReady(true);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isStorageEnabled, reset, storageIdentifier]);
+
+  const saveCode = useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: code,
+    codec: javaCodeTransferCodec,
+    enabled: isStorageEnabled && isStorageReady,
+  });
+
   const handleRun = useCallback(() => {
+    if (isStorageEnabled) {
+      void saveCode().catch(() => undefined);
+    }
     run({
       source: code,
       exerciseId: exerciseScenario?.id,
       timeoutMs: timeoutSeconds * 1000,
       stdin: standardInput,
     });
-  }, [code, exerciseScenario?.id, run, standardInput, timeoutSeconds]);
+  }, [
+    code,
+    exerciseScenario?.id,
+    isStorageEnabled,
+    run,
+    saveCode,
+    standardInput,
+    timeoutSeconds,
+  ]);
 
   const handleResetCode = useCallback(() => {
     setCode(getJavaStarterCode(itemId));
@@ -172,6 +246,7 @@ const JavaSimulatorSession = forwardRef<
         onCodeChange={setCode}
         onResetCode={handleResetCode}
         onImportCode={handleImportCode}
+        transferCodec={storageTransferCodec}
         issues={snapshot.issues}
       />
 

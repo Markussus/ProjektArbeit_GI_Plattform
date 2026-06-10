@@ -9,6 +9,19 @@ describe("tmSolutionChecker", () => {
     (exercise) => exercise.id === "tm.exercises.exerciseInvertBinaryWord",
   );
 
+  it("assigns a unique six-bit storage id to every exercise", () => {
+    expect(
+      [...turingMachineExercises]
+        .map((exercise) => exercise.storageId)
+        .sort((left, right) => left - right),
+    ).toEqual(
+      Array.from(
+        { length: turingMachineExercises.length },
+        (_, storageId) => storageId,
+      ),
+    );
+  });
+
   // Tests that all shipped reference solutions pass their predefined validation inputs and halt via a real halt state.
   it.each(turingMachineExercises)(
     "accepts the reference solution for $id",

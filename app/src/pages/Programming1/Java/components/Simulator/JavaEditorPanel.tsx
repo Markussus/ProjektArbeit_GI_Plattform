@@ -11,8 +11,8 @@ import { RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import type { JavaExecutionIssue } from "./domain/javaExecution";
-import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
 import {
   getJavaEditorLimitReason,
   JAVA_EDITOR_MAX_CHARACTERS,
@@ -30,6 +30,7 @@ export interface JavaEditorPanelProps {
   onCodeChange: (nextCode: string) => void;
   onResetCode: () => void;
   onImportCode: (nextCode: string) => void;
+  transferCodec: ISimulatorTransferCodec<string>;
   issues: JavaExecutionIssue[];
 }
 
@@ -40,6 +41,7 @@ export function JavaEditorPanel({
   onCodeChange,
   onResetCode,
   onImportCode,
+  transferCodec,
   issues,
 }: JavaEditorPanelProps) {
   const { t } = useTranslation();
@@ -207,7 +209,7 @@ export function JavaEditorPanel({
 
       <SimulatorStringTransferBox
         value={code}
-        codec={javaCodeTransferCodec}
+        codec={transferCodec}
         onLoad={(nextCode) => {
           const reason = getJavaEditorLimitReason(nextCode);
           if (reason) {

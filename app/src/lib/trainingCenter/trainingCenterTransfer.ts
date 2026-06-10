@@ -34,3 +34,23 @@ export async function loadTrainingCenterValue<TValue>(
 
   return codec.importValue(payload);
 }
+
+export function createTrainingCenterTransferCodec<TValue>(
+  identifier: string,
+  codec: ISimulatorTransferCodec<TValue>,
+): ISimulatorTransferCodec<TValue> {
+  readTrainingCenterIdentifier(identifier);
+
+  return {
+    exportValue: (value) =>
+      exportAndStoreTrainingCenterValue(identifier, value, codec),
+    async importValue(serializedValue) {
+      const parsedValue = parseTrainingCenterStorageValue(serializedValue);
+      if (parsedValue.identifier !== identifier || !parsedValue.payload) {
+        throw new Error("training_center_transfer_identifier_invalid");
+      }
+
+      return codec.importValue(parsedValue.payload);
+    },
+  };
+}

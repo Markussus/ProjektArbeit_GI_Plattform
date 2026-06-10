@@ -14,6 +14,7 @@ export function TuringMachinePage() {
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
       testId="tm-page"
+      confirmExerciseTabExit={false}
     />
   );
 }

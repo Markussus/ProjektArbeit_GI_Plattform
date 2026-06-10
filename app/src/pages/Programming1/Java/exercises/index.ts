@@ -31,6 +31,7 @@ interface JavaScenarioBase {
 
 export interface JavaExerciseScenario extends JavaScenarioBase {
   kind: "exercise";
+  storageId: number;
   starterCode: string;
   solutionCode: string;
   validationCases: JavaValidationCase[];
@@ -125,6 +126,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
     {
       kind: "exercise",
       id: "java.exercise1",
+      storageId: 0,
       titleKey: "java.exercise1",
       descriptionKey: "java.exercise1Desc",
       fileName: "Main.java",
@@ -162,6 +164,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
     {
       kind: "exercise",
       id: "java.exercise2",
+      storageId: 1,
       titleKey: "java.exercise2",
       descriptionKey: "java.exercise2Desc",
       fileName: "Main.java",
@@ -202,6 +205,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
     {
       kind: "exercise",
       id: "java.exercise3",
+      storageId: 2,
       titleKey: "java.exercise3",
       descriptionKey: "java.exercise3Desc",
       fileName: "Main.java",
@@ -259,6 +263,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
     {
       kind: "exercise",
       id: "java.exercise4",
+      storageId: 3,
       titleKey: "java.exercise4",
       descriptionKey: "java.exercise4Desc",
       fileName: "Main.java",
@@ -321,6 +326,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise5",
+      storageId: 4,
       titleKey: "java.exercise5",
       descriptionKey: "java.exercise5Desc",
       fileName: "Main.java",
@@ -385,6 +391,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise6",
+      storageId: 5,
       titleKey: "java.exercise6",
       descriptionKey: "java.exercise6Desc",
       fileName: "Main.java",
@@ -443,6 +450,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise7",
+      storageId: 6,
       titleKey: "java.exercise7",
       descriptionKey: "java.exercise7Desc",
       fileName: "Main.java",
@@ -503,6 +511,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise8",
+      storageId: 7,
       titleKey: "java.exercise8",
       descriptionKey: "java.exercise8Desc",
       fileName: "Main.java",
@@ -594,6 +603,7 @@ class Student {
     {
       kind: "exercise",
       id: "java.exercise9",
+      storageId: 8,
       titleKey: "java.exercise9",
       descriptionKey: "java.exercise9Desc",
       fileName: "Main.java",
@@ -668,6 +678,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise10",
+      storageId: 9,
       titleKey: "java.exercise10",
       descriptionKey: "java.exercise10Desc",
       fileName: "Main.java",
@@ -733,6 +744,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise11",
+      storageId: 10,
       titleKey: "java.exercise11",
       descriptionKey: "java.exercise11Desc",
       fileName: "Main.java",
@@ -816,6 +828,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise12",
+      storageId: 11,
       titleKey: "java.exercise12",
       descriptionKey: "java.exercise12Desc",
       fileName: "Main.java",
@@ -896,6 +909,7 @@ public class Main {
     {
       kind: "exercise",
       id: "java.exercise13",
+      storageId: 12,
       titleKey: "java.exercise13",
       descriptionKey: "java.exercise13Desc",
       fileName: "Main.java",

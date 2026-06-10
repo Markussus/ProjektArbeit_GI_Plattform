@@ -21,6 +21,7 @@ export {
   type ITrainingCenterStorage,
 } from "./trainingCenterStorage";
 export {
+  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
 } from "./trainingCenterTransfer";
