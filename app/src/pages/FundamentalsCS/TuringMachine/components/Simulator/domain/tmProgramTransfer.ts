@@ -1,4 +1,5 @@
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
+import { BitReader, BitWriter } from "@/lib/trainingCenter/bitStream";
 import { withDerivedAlphabets, type TMProgram } from "./tmProgram";
 import { validateTMProgram } from "./tmProgramValidation";
 import {
@@ -6,9 +7,6 @@ import {
   type HeadMovement,
   type TMTransition,
 } from "./tmTypes";
-
-const BASE64_URL_ALPHABET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 // Every 6 entries in SYMBOL_REGISTRY add 1 BASE64 char to the output
 const SYMBOL_REGISTRY = [
@@ -71,7 +69,7 @@ interface TransitionEncoding {
 export const tmProgramTransferCodec: ISimulatorTransferCodec<TMProgram> = {
   async exportValue(program) {
     const normalizedProgram = normalizeProgram(program);
-    const writer = new BitWriter();
+    const writer = new BitWriter("tm_transfer_program_invalid");
     const symbolMode = chooseSymbolMode(normalizedProgram.symbols);
     const transitionEncoding = chooseTransitionEncoding(normalizedProgram);
 
@@ -341,7 +339,7 @@ function encodeRawTransitions(
   symbolBits: number,
   sparse: boolean,
 ): number[] {
-  const writer = new BitWriter();
+  const writer = new BitWriter("tm_transfer_program_invalid");
 
   for (const transition of cells) {
     if (sparse) {
@@ -362,7 +360,7 @@ function encodeDictionaryTransitions(
   symbolBits: number,
   sparse: boolean,
 ): number[] {
-  const writer = new BitWriter();
+  const writer = new BitWriter("tm_transfer_program_invalid");
   writer.writeVarUint(dictionary.length);
 
   for (const transition of dictionary) {
@@ -423,7 +421,10 @@ function writeTransition(
 
 function restoreImportedProgram(serializedProgram: string): TMProgram {
   try {
-    const reader = BitReader.fromBase64Url(serializedProgram);
+    const reader = BitReader.fromBase64Url(
+      serializedProgram,
+      "tm_transfer_payload_invalid",
+    );
     const nonHaltStateCount = reader.readVarUint();
     const haltStateCount = reader.readVarUint();
     const symbolCount = reader.readVarUint();
@@ -767,132 +768,5 @@ function assertCollectionSize(value: number): void {
 function assertIdInRange(value: number, count: number): void {
   if (!Number.isSafeInteger(value) || value < 0 || value >= count) {
     throw new Error("tm_transfer_payload_invalid");
-  }
-}
-
-class BitWriter {
-  readonly bits: number[] = [];
-
-  writeBit(bit: number): void {
-    this.bits.push(bit === 0 ? 0 : 1);
-  }
-
-  writeBits(value: number, bitCount: number): void {
-    if (
-      !Number.isSafeInteger(value) ||
-      value < 0 ||
-      (bitCount === 0 ? value !== 0 : value >= 2 ** bitCount)
-    ) {
-      throw new Error("tm_transfer_program_invalid");
-    }
-
-    for (let bitIndex = bitCount - 1; bitIndex >= 0; bitIndex--) {
-      this.writeBit(Math.floor(value / 2 ** bitIndex) % 2);
-    }
-  }
-
-  writeVarUint(value: number): void {
-    if (!Number.isSafeInteger(value) || value < 0) {
-      throw new Error("tm_transfer_program_invalid");
-    }
-
-    let remaining = value;
-    do {
-      const data = remaining % 128;
-      remaining = Math.floor(remaining / 128);
-      this.writeBits(data + (remaining > 0 ? 128 : 0), 8);
-    } while (remaining > 0);
-  }
-
-  writeBitArray(bits: number[]): void {
-    for (const bit of bits) {
-      this.writeBit(bit);
-    }
-  }
-
-  toBase64Url(): string {
-    let result = "";
-
-    for (let offset = 0; offset < this.bits.length; offset += 6) {
-      let value = 0;
-      for (let bitIndex = 0; bitIndex < 6; bitIndex++) {
-        value = value * 2 + (this.bits[offset + bitIndex] ?? 0);
-      }
-      result += BASE64_URL_ALPHABET[value];
-    }
-
-    return result;
-  }
-}
-
-class BitReader {
-  private offset = 0;
-  private readonly bits: number[];
-
-  private constructor(bits: number[]) {
-    this.bits = bits;
-  }
-
-  static fromBase64Url(value: string): BitReader {
-    if (!value || !/^[A-Za-z0-9_-]+$/u.test(value)) {
-      throw new Error("tm_transfer_payload_invalid");
-    }
-
-    const bits: number[] = [];
-    for (const character of value) {
-      const valueIndex = BASE64_URL_ALPHABET.indexOf(character);
-      for (let bitIndex = 5; bitIndex >= 0; bitIndex--) {
-        bits.push(Math.floor(valueIndex / 2 ** bitIndex) % 2);
-      }
-    }
-
-    return new BitReader(bits);
-  }
-
-  readBit(): number {
-    if (this.offset >= this.bits.length) {
-      throw new Error("tm_transfer_payload_invalid");
-    }
-
-    return this.bits[this.offset++];
-  }
-
-  readBits(bitCount: number): number {
-    let value = 0;
-
-    for (let bitIndex = 0; bitIndex < bitCount; bitIndex++) {
-      value = value * 2 + this.readBit();
-    }
-
-    return value;
-  }
-
-  readVarUint(): number {
-    let value = 0;
-    let multiplier = 1;
-
-    for (let byteIndex = 0; byteIndex < 8; byteIndex++) {
-      const byte = this.readBits(8);
-      value += (byte % 128) * multiplier;
-
-      if (!Number.isSafeInteger(value)) {
-        throw new Error("tm_transfer_payload_invalid");
-      }
-
-      if (byte < 128) {
-        return value;
-      }
-
-      multiplier *= 128;
-    }
-
-    throw new Error("tm_transfer_payload_invalid");
-  }
-
-  assertOnlyPaddingRemains(): void {
-    const remainingBits = this.bits.slice(this.offset);
-    if (remainingBits.length > 5 || remainingBits.some((bit) => bit !== 0)) {
-      throw new Error("tm_transfer_payload_invalid");
-    }
   }
 }

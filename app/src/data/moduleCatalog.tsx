@@ -62,6 +62,7 @@ export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
 export interface ModuleTopicDefinition {
   id: string;
+  storageId: number;
   titleKey: TranslationKey;
   descriptionKey?: TranslationKey;
   path: string;
@@ -92,6 +93,7 @@ export const learningModules: LearningModuleDefinition[] = [
     topics: [
       {
         id: "turing-machine",
+        storageId: 0,
         titleKey: "tm.topic.title",
         descriptionKey: "tm.topic.description",
         path: "/fundamentals-cs/turing-machine",
@@ -101,6 +103,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "finite-automata",
+        storageId: 1,
         titleKey: "automata.title",
         descriptionKey: "automata.description",
         path: "/fundamentals-cs/finite-automata",
@@ -110,6 +113,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "regular-languages",
+        storageId: 2,
         titleKey: "rl.title",
         descriptionKey: "rl.description",
         path: "/fundamentals-cs/regular-languages",
@@ -119,6 +123,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "number-systems",
+        storageId: 3,
         titleKey: "number.title",
         descriptionKey: "number.description",
         path: "/fundamentals-cs/number-systems",
@@ -128,6 +133,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "moore-mealy",
+        storageId: 4,
         titleKey: "moore.title",
         descriptionKey: "moore.description",
         path: "/fundamentals-cs/moore-mealy",
@@ -137,6 +143,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "dnf",
+        storageId: 5,
         titleKey: "dnf.title",
         descriptionKey: "dnf.description",
         path: "/fundamentals-cs/dnf",
@@ -146,6 +153,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "encoding",
+        storageId: 6,
         titleKey: "encoding.title",
         descriptionKey: "encoding.description",
         path: "/fundamentals-cs/encoding",
@@ -165,6 +173,7 @@ export const learningModules: LearningModuleDefinition[] = [
     topics: [
       {
         id: "java-programming",
+        storageId: 7,
         titleKey: "java.title",
         descriptionKey: "java.description",
         path: "/programming-1/java-programming",
