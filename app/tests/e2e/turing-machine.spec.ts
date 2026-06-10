@@ -435,6 +435,10 @@ test.describe("Turing Machine page", () => {
     await expect(page.getByTestId("tm-start-simulation")).toBeEnabled();
 
     await startSimulation(page);
+    await page.getByTestId("tm-simulator-controls-play").click();
+    await expect(page.getByTestId("tm-simulation-view")).toBeVisible();
+    await expect(page.getByTestId("tm-config-view")).toHaveCount(0);
+    await page.getByTestId("tm-simulator-controls-pause").click();
     await page.getByTestId("tm-simulator-controls-step").click();
 
     await expect(page.getByTestId("tm-status-card")).toHaveAttribute(

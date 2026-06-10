@@ -69,10 +69,10 @@ export function useSimulationEngine<TConfig, TState>(
   }, [status, simulator]);
 
   const pause = useCallback(() => {
-    if (status === "RUNNING") {
-      setStatus("PAUSED");
-    }
-  }, [status]);
+    setStatus((currentStatus) =>
+      currentStatus === "RUNNING" ? "PAUSED" : currentStatus,
+    );
+  }, []);
 
   const reset = useCallback(
     (newConfig?: TConfig) => {
