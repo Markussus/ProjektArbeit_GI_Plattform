@@ -4,6 +4,15 @@
     "confirm": "Confirm",
     "close": "Close"
   },
+  "trainingCenter": {
+    "resetCurrent": "Reset",
+    "resetAllExercises": "Reset all exercises",
+    "confirmResetAllExercises": "Delete all saved exercise progress?",
+    "resetAllProgressTitle": "Reset saved progress",
+    "resetAllProgressDescription": "Delete all saved simulator and exercise progress from every topic on this device.",
+    "resetAllProgress": "Reset all saved progress",
+    "confirmResetAllProgress": "Delete all saved progress?"
+  },
   "app": {
     "title": "THWS - Traing Center"
   },

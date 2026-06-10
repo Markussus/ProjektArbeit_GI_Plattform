@@ -274,4 +274,32 @@ public class Main {
       ),
     ).toBe(storedFreeSimulation);
   });
+
+  test("resets all Java exercises while preserving simulator and other-topic progress", async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify([
+          "AHAexercise-0",
+          "AHBexercise-1",
+          "AH_free-simulator",
+          "AAAother-topic",
+        ]),
+      );
+    });
+
+    await page.getByTestId(appTestIds.tabExercises).click();
+    await page.getByTestId("java-reset-all-exercises").click();
+    await page.getByTestId("java-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AH_free-simulator", "AAAother-topic"]);
+  });
 });

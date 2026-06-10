@@ -15,6 +15,7 @@ export function TuringMachinePage() {
       simulationTab={SimulationTab}
       testId="tm-page"
       confirmExerciseTabExit={false}
+      clearSimulationSelectionOnTabExit
     />
   );
 }

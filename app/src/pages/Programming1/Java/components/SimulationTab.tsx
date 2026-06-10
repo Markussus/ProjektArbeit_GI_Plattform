@@ -38,6 +38,11 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     simulatorRef.current?.loadSolution();
   };
 
+  const handleReset = () => {
+    setCheckResult(null);
+    simulatorRef.current?.resetStoredState();
+  };
+
   const handleCheckSolution = async () => {
     if (
       !simulatorRef.current ||
@@ -101,6 +106,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.java"
+        onReset={handleReset}
+        resetDisabled={!isSimulatorReady}
       >
         <JavaSimulator
           key={props.selectedItem?.id ?? "__java-free-mode__"}

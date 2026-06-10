@@ -16,6 +16,7 @@ import {
   createTrainingCenterIdentifier,
   createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
@@ -46,6 +47,7 @@ export interface JavaValidationRunResult {
 export interface JavaSimulatorHandle {
   loadSolution: () => void;
   checkSolution: () => Promise<JavaValidationRunResult>;
+  resetStoredState: () => void;
 }
 
 export interface JavaSimulatorProps {
@@ -191,6 +193,16 @@ const JavaSimulatorSession = forwardRef<
   useImperativeHandle(
     ref,
     () => ({
+      resetStoredState: () => {
+        if (isStorageEnabled) {
+          trainingCenterStorage.delete(storageIdentifier);
+        }
+
+        setCode(getJavaStarterCode(itemId));
+        setStandardInput("");
+        setTimeoutSeconds(60);
+        reset();
+      },
       loadSolution: () => {
         if (!exerciseScenario) {
           return;
@@ -234,7 +246,18 @@ const JavaSimulatorSession = forwardRef<
         return { rows };
       },
     }),
-    [code, exerciseScenario, reset, runAsync, standardInput, t, timeoutSeconds],
+    [
+      code,
+      exerciseScenario,
+      isStorageEnabled,
+      itemId,
+      reset,
+      runAsync,
+      standardInput,
+      storageIdentifier,
+      t,
+      timeoutSeconds,
+    ],
   );
 
   return (

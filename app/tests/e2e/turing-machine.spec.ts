@@ -242,6 +242,70 @@ test.describe("Turing Machine page", () => {
     ).toBe(storedFreeSimulation);
   });
 
+  test("returns to the free simulator after leaving an exercise simulation", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
+
+    await switchTab(page, "overview");
+    await switchTab(page, "simulation");
+
+    await expect(page.getByTestId("simulation-selected-exercise")).toHaveCount(
+      0,
+    );
+    await expect(page.getByTestId("tm-simulator")).toHaveAttribute(
+      "data-scenario-id",
+      "",
+    );
+  });
+
+  test("resets the current exercise and deletes only its saved state", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
+
+    await page.getByTestId("tm-initial-tape-input").fill("101");
+    await page.getByTestId("tm-transfer-export").click();
+    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
+      /^AAG[A-Za-z0-9_-]+$/,
+    );
+
+    await page.getByTestId("simulation-reset").click();
+
+    await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue("");
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBeNull();
+  });
+
+  test("resets all TM exercises while preserving the free simulator", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify(["AAAexercise-0", "AABexercise-1", "AA_free-simulator"]),
+      );
+    });
+
+    await switchTab(page, "exercises");
+    await page.getByTestId("tm-reset-all-exercises").click();
+    await page.getByTestId("tm-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AA_free-simulator"]);
+  });
+
   // Tests the validation regression where the currently edited tape must not limit which symbols are accepted during solution checking.
   test("checks a loaded solution successfully even after the editor tape is cleared", async ({
     page,

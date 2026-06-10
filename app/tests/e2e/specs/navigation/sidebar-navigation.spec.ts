@@ -68,4 +68,29 @@ test.describe("Sidebar navigation", () => {
       );
     });
   });
+
+  test("deletes all saved training-center progress from the help page", async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify(["AAAfirst", "AH_second"]),
+      );
+    });
+    await ensureSidebarExpanded(page);
+    await page.getByTestId(appTestIds.sidebarHelpLink).click();
+
+    await page.getByTestId("help-reset-all-progress").click();
+    await expect(
+      page.getByTestId("help-reset-all-progress-confirmation"),
+    ).toBeVisible();
+    await page.getByTestId("help-reset-all-progress-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBeNull();
+  });
 });

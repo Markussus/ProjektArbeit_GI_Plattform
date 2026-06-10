@@ -17,6 +17,7 @@ import {
   createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import {
@@ -38,6 +39,7 @@ import { TMSimulationView } from "./presentation/TMSimulationView";
 export interface TMSimulatorHandle {
   loadSolution: () => void;
   checkSolution: () => Promise<TMValidationRunResult>;
+  resetStoredState: () => void;
 }
 
 interface TMSimulatorProps {
@@ -151,6 +153,17 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
     useImperativeHandle(
       ref,
       () => ({
+        resetStoredState: () => {
+          if (isStorageEnabled) {
+            trainingCenterStorage.delete(storageIdentifier);
+          }
+
+          const resetProgram = cloneJson(getScenarioProgram(scenario));
+          simulation.pause();
+          setProgram(resetProgram);
+          editor.resetToProgram(resetProgram);
+          setIsEditMode(true);
+        },
         loadSolution: () => {
           if (!isExerciseScenario) {
             return;
@@ -196,9 +209,11 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
         editor,
         isEditMode,
         isExerciseScenario,
+        isStorageEnabled,
         program,
         scenario,
         simulation,
+        storageIdentifier,
         t,
       ],
     );

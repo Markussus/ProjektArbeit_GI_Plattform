@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Maximize2, X } from "lucide-react";
+import { Maximize2, RotateCcw, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { Exercise, TopicItem } from "@/types/exercise";
@@ -11,6 +11,8 @@ interface SimulationWorkspaceProps {
   emptyStateText: string;
   isFocused: boolean;
   onToggleFocus: () => void;
+  onReset?: () => void;
+  resetDisabled?: boolean;
   children?: ReactNode;
 }
 
@@ -21,6 +23,8 @@ export function SimulationWorkspace({
   emptyStateText,
   isFocused,
   onToggleFocus,
+  onReset,
+  resetDisabled = false,
   children,
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
@@ -77,7 +81,20 @@ export function SimulationWorkspace({
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex justify-end gap-2">
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              data-testid="simulation-reset"
+              disabled={resetDisabled}
+              aria-label={t("trainingCenter.resetCurrent")}
+              title={t("trainingCenter.resetCurrent")}
+              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RotateCcw className="size-4" />
+            </button>
+          )}
           <button
             type="button"
             onClick={onToggleFocus}

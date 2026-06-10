@@ -16,6 +16,7 @@ export function JavaProgrammingPage() {
         examplesTab={ExamplesTab}
         simulationTab={SimulationTab}
         confirmExerciseTabExit={false}
+        clearSimulationSelectionOnTabExit
       />
     </JavaExecutionProvider>
   );
