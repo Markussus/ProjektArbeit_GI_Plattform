@@ -4,6 +4,15 @@
     "confirm": "Bestätigen",
     "close": "Schließen"
   },
+  "trainingCenter": {
+    "resetCurrent": "Zurücksetzen",
+    "resetAllExercises": "Alle Übungen zurücksetzen",
+    "confirmResetAllExercises": "Alle gespeicherten Übungsstände löschen?",
+    "resetAllProgressTitle": "Gespeicherten Fortschritt zurücksetzen",
+    "resetAllProgressDescription": "Löscht alle gespeicherten Simulator- und Übungsstände aus allen Themen auf diesem Gerät.",
+    "resetAllProgress": "Alle Fortschritte zurücksetzen",
+    "confirmResetAllProgress": "Alle gespeicherten Fortschritte löschen?"
+  },
   "app": {
     "title": "THWS - Traingscenter"
   },
@@ -585,7 +594,6 @@
       "lines": "Der Java-Editor ist auf {{maxLines}} Zeilen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen.",
       "characters": "Der Java-Editor ist auf {{maxCharacters}} Zeichen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen."
     },
-    "resetStarterCode": "Startercode zurücksetzen",
     "compilerLabel": "Compiler",
     "timeoutLabel": "Timeout",
     "timeoutUnit": "Sekunden",

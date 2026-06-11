@@ -58,6 +58,7 @@ describe("useTMConfigEditor", () => {
       result.current.handleAddColumn();
       result.current.handleToggleHaltState("q1", true);
       result.current.handleAddHaltState(" qNew ");
+      result.current.handleAddHaltState("q₃");
     });
 
     expect(result.current.draft.initialTape).toEqual(["1", "0", "1"]);
@@ -69,8 +70,9 @@ describe("useTMConfigEditor", () => {
       "qS",
       "q2",
       "qNew",
+      "q3",
     ]);
-    expect(result.current.draft.haltStates).toEqual(["qS", "q1", "qNew"]);
+    expect(result.current.draft.haltStates).toEqual(["qS", "q1", "qNew", "q3"]);
   });
 
   // Tests the keyboard-friendly blank alias in editor inputs that parse tape symbols.
@@ -186,6 +188,25 @@ describe("useTMConfigEditor", () => {
       movement: "R",
     });
     expect(result.current.displayRows[0][2]).toBe("(q₁, 1, R)");
+  });
+
+  it("normalizes copied transition cells with subscript state names", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    act(() => {
+      result.current.handleCellChange(2, 1, "(q₁, 0, L)");
+    });
+    act(() => {
+      result.current.handleCellBlur(2, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toBeNull();
+    expect(result.current.draft.transitions["1"]?.q0).toEqual({
+      nextState: "q1",
+      writeSymbol: "0",
+      movement: "L",
+    });
+    expect(result.current.displayRows[2][1]).toBe("(q₁, 0, L)");
   });
 
   // Tests header, row, and column removal handlers, including ignored indices that should not mutate the draft.

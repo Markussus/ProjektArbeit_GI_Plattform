@@ -60,8 +60,20 @@ const JavaProgrammingTopicPage = lazy(async () => ({
 
 export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
+export const TOPIC_STORAGE_IDS = {
+  turingMachine: 0,
+  finiteAutomata: 1,
+  regularLanguages: 2,
+  numberSystems: 3,
+  mooreMealy: 4,
+  dnf: 5,
+  encoding: 6,
+  javaProgramming: 7,
+} as const;
+
 export interface ModuleTopicDefinition {
   id: string;
+  storageId: number;
   titleKey: TranslationKey;
   descriptionKey?: TranslationKey;
   path: string;
@@ -92,6 +104,7 @@ export const learningModules: LearningModuleDefinition[] = [
     topics: [
       {
         id: "turing-machine",
+        storageId: TOPIC_STORAGE_IDS.turingMachine,
         titleKey: "tm.topic.title",
         descriptionKey: "tm.topic.description",
         path: "/fundamentals-cs/turing-machine",
@@ -101,6 +114,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "finite-automata",
+        storageId: TOPIC_STORAGE_IDS.finiteAutomata,
         titleKey: "automata.title",
         descriptionKey: "automata.description",
         path: "/fundamentals-cs/finite-automata",
@@ -110,6 +124,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "regular-languages",
+        storageId: TOPIC_STORAGE_IDS.regularLanguages,
         titleKey: "rl.title",
         descriptionKey: "rl.description",
         path: "/fundamentals-cs/regular-languages",
@@ -119,6 +134,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "number-systems",
+        storageId: TOPIC_STORAGE_IDS.numberSystems,
         titleKey: "number.title",
         descriptionKey: "number.description",
         path: "/fundamentals-cs/number-systems",
@@ -128,6 +144,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "moore-mealy",
+        storageId: TOPIC_STORAGE_IDS.mooreMealy,
         titleKey: "moore.title",
         descriptionKey: "moore.description",
         path: "/fundamentals-cs/moore-mealy",
@@ -137,6 +154,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "dnf",
+        storageId: TOPIC_STORAGE_IDS.dnf,
         titleKey: "dnf.title",
         descriptionKey: "dnf.description",
         path: "/fundamentals-cs/dnf",
@@ -146,6 +164,7 @@ export const learningModules: LearningModuleDefinition[] = [
       },
       {
         id: "encoding",
+        storageId: TOPIC_STORAGE_IDS.encoding,
         titleKey: "encoding.title",
         descriptionKey: "encoding.description",
         path: "/fundamentals-cs/encoding",
@@ -165,6 +184,7 @@ export const learningModules: LearningModuleDefinition[] = [
     topics: [
       {
         id: "java-programming",
+        storageId: TOPIC_STORAGE_IDS.javaProgramming,
         titleKey: "java.title",
         descriptionKey: "java.description",
         path: "/programming-1/java-programming",

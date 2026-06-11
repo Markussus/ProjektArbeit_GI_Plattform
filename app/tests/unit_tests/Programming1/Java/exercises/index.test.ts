@@ -25,6 +25,11 @@ describe("Java exercise lookup helpers", () => {
   describe("when advanced browser-compatible exercises are registered", () => {
     it("provides beginner, intermediate, and advanced tasks with multiple checks", () => {
       expect(javaProgrammingExercises).toHaveLength(13);
+      expect(
+        [...javaProgrammingExercises]
+          .map((exercise) => exercise.storageId)
+          .sort((left, right) => left - right),
+      ).toEqual(Array.from({ length: 13 }, (_, storageId) => storageId));
       expect(getJavaScenario("java.exercise10")).toMatchObject({
         kind: "exercise",
         definition: { difficulty: "easy" },

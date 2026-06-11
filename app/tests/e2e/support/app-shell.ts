@@ -15,7 +15,6 @@ export const appTestIds = {
   javaEditorContainer: "java-editor-container",
   javaEditorPanel: "java-editor-panel",
   javaExecutionPhase: "java-execution-phase",
-  javaResetButton: "java-reset-button",
   javaRunButton: "java-run-button",
   javaSimulator: "java-simulator",
   javaStopButton: "java-stop-button",

@@ -59,13 +59,11 @@ vi.mock(
       code,
       fileName,
       onCodeChange,
-      onResetCode,
       onImportCode,
     }: {
       code: string;
       fileName: string;
       onCodeChange: (nextCode: string) => void;
-      onResetCode: () => void;
       onImportCode: (nextCode: string) => void;
     }) => (
       <div data-testid="mock-java-editor-panel">
@@ -74,7 +72,6 @@ vi.mock(
         <button onClick={() => onCodeChange("changed code")}>
           change code
         </button>
-        <button onClick={onResetCode}>reset code</button>
         <button onClick={() => onImportCode("imported code")}>
           import code
         </button>
@@ -235,29 +232,6 @@ describe("JavaSimulator", () => {
       expect(screen.getByText(/JDK 25/)).toBeInTheDocument();
       expect(screen.getByText("ArrayList")).toBeInTheDocument();
       expect(screen.getByText("javac")).toBeInTheDocument();
-    });
-  });
-
-  describe("when the user wants to recover the starter code", () => {
-    it("restores the exercise starter code and resets the execution state", () => {
-      render(
-        <JavaSimulator
-          selectedExercise={createExercise(
-            "java.exercise3",
-            "Zwei Zahlen addieren",
-            "Add two numbers",
-          )}
-          isFocused={false}
-        />,
-      );
-
-      fireEvent.click(screen.getByRole("button", { name: "change code" }));
-      fireEvent.click(screen.getByRole("button", { name: "reset code" }));
-
-      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
-        "int firstNumber = 7;",
-      );
-      expect(resetSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -35,16 +35,6 @@ async function switchTab(
   tab: "overview" | "exercises" | "examples" | "simulation",
 ) {
   await page.getByTestId(`tab-button-${tab}`).click();
-
-  const tabExitConfirm = page.getByTestId("module-tab-exit-confirm");
-  const requiresConfirm = await tabExitConfirm
-    .waitFor({ state: "visible", timeout: 500 })
-    .then(() => true)
-    .catch(() => false);
-
-  if (requiresConfirm) {
-    await page.getByTestId("module-tab-exit-confirm-confirm").click();
-  }
 }
 
 async function openExerciseInSimulation(page: Page, exerciseId: string) {
@@ -209,11 +199,114 @@ test.describe("Turing Machine page", () => {
     await expect(focusToggle).toHaveAttribute("aria-pressed", "true");
 
     await page.getByTestId("tab-button-overview").click();
-    if (!(await page.getByTestId("tm-overview-summary").isVisible())) {
-      await expect(page.getByTestId("module-tab-exit-confirm")).toBeVisible();
-      await page.getByTestId("module-tab-exit-confirm-confirm").click();
-    }
+    await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
     await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+  });
+
+  test("always reloads examples from their built-in program without storing changes", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openSimulationTab(page);
+
+    await page.getByTestId("tm-initial-tape-input").fill("11111");
+    await page.getByTestId("tm-transfer-export").click();
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
+    );
+
+    await openExampleInSimulation(page, BIT_FLIP_EXAMPLE_ID);
+    await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue(
+      "101001",
+    );
+
+    await page.getByTestId("tm-initial-tape-input").fill("000");
+    await page.getByTestId("tm-transfer-export").click();
+    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
+      /^[A-Za-z0-9_-]+$/,
+    );
+
+    await switchTab(page, "overview");
+    await switchTab(page, "examples");
+    await page
+      .getByTestId(`tm-example-card-${BIT_FLIP_EXAMPLE_ID}-select`)
+      .click();
+    await page
+      .getByTestId(`tm-example-card-${BIT_FLIP_EXAMPLE_ID}-open`)
+      .click();
+
+    await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue(
+      "101001",
+    );
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBe(storedFreeSimulation);
+  });
+
+  test("returns to the free simulator after leaving an exercise simulation", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
+
+    await switchTab(page, "overview");
+    await switchTab(page, "simulation");
+
+    await expect(page.getByTestId("simulation-selected-exercise")).toHaveCount(
+      0,
+    );
+    await expect(page.getByTestId("tm-simulator")).toHaveAttribute(
+      "data-scenario-id",
+      "",
+    );
+  });
+
+  test("resets the current exercise and deletes only its saved state", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
+
+    await page.getByTestId("tm-initial-tape-input").fill("101");
+    await page.getByTestId("tm-transfer-export").click();
+    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
+      /^AAG[A-Za-z0-9_-]+$/,
+    );
+
+    await page.getByTestId("simulation-reset").click();
+
+    await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue("");
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBeNull();
+  });
+
+  test("resets all TM exercises while preserving the free simulator", async ({
+    page,
+  }) => {
+    await gotoTuringMachinePage(page);
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify(["AAAexercise-0", "AABexercise-1", "AA_free-simulator"]),
+      );
+    });
+
+    await switchTab(page, "exercises");
+    await page.getByTestId("tm-reset-all-exercises").click();
+    await page.getByTestId("tm-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AA_free-simulator"]);
   });
 
   // Tests the validation regression where the currently edited tape must not limit which symbols are accepted during solution checking.
@@ -345,6 +438,10 @@ test.describe("Turing Machine page", () => {
     await expect(page.getByTestId("tm-start-simulation")).toBeEnabled();
 
     await startSimulation(page);
+    await page.getByTestId("tm-simulator-controls-play").click();
+    await expect(page.getByTestId("tm-simulation-view")).toBeVisible();
+    await expect(page.getByTestId("tm-config-view")).toHaveCount(0);
+    await page.getByTestId("tm-simulator-controls-pause").click();
     await page.getByTestId("tm-simulator-controls-step").click();
 
     await expect(page.getByTestId("tm-status-card")).toHaveAttribute(

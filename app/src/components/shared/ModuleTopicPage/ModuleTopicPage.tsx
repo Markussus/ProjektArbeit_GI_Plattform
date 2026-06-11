@@ -40,6 +40,8 @@ interface ModuleTopicPageProps {
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
   testId?: string;
+  confirmExerciseTabExit?: boolean;
+  clearSimulationSelectionOnTabExit?: boolean;
 }
 
 export function ModuleTopicPage({
@@ -51,6 +53,8 @@ export function ModuleTopicPage({
   simulationTab: SimulationTab,
   tabs,
   testId,
+  confirmExerciseTabExit = true,
+  clearSimulationSelectionOnTabExit = false,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
@@ -72,6 +76,7 @@ export function ModuleTopicPage({
     openExampleInSimulation,
     clearSimulationExercise,
     clearSimulationItem,
+    clearSimulationSelection,
   } = useExerciseTabs();
 
   const handleToggleSimulationFocus = () => {
@@ -94,13 +99,18 @@ export function ModuleTopicPage({
     const exerciseIsActive =
       !!simulationExercise && !simulationExercise.id.includes(".example");
 
-    if (exerciseIsActive && tab !== activeTab) {
+    if (confirmExerciseTabExit && exerciseIsActive && tab !== activeTab) {
       setPendingTab(tab);
       setShowTabExitConfirm(true);
       return;
     }
 
-    if (exerciseIsActive && tab === activeTab && tab === "simulation") {
+    if (
+      confirmExerciseTabExit &&
+      exerciseIsActive &&
+      tab === activeTab &&
+      tab === "simulation"
+    ) {
       setPendingTab(null);
       setShowTabExitConfirm(true);
       return;
@@ -110,6 +120,14 @@ export function ModuleTopicPage({
   };
 
   const applyTabChange = (tab: ModuleTabId) => {
+    if (
+      clearSimulationSelectionOnTabExit &&
+      activeTab === "simulation" &&
+      tab !== "simulation"
+    ) {
+      clearSimulationSelection();
+    }
+
     setActiveTab(tab);
     if (tab !== "simulation") {
       // Leaving the simulation tab should always restore the regular page layout.

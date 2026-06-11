@@ -31,6 +31,11 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     simulatorRef.current?.loadSolution();
   };
 
+  const handleReset = () => {
+    setCheckResult(null);
+    simulatorRef.current?.resetStoredState();
+  };
+
   const handleSimulatorRef = useCallback((handle: TMSimulatorHandle | null) => {
     simulatorRef.current = handle;
     setIsSimulatorReady(handle !== null);
@@ -105,6 +110,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.turing"
+        onReset={handleReset}
+        resetDisabled={!isSimulatorReady}
       >
         <TMSimulator
           key={scenario?.id ?? "__turing-free-mode__"}

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ClipboardList } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
@@ -10,6 +11,7 @@ interface TopicExercisesTabProps {
   onOpenExerciseInSimulation: (exercise: Exercise) => void;
   testId?: string;
   testIdPrefix?: string;
+  headerAction?: ReactNode;
 }
 
 export function TopicExercisesTab({
@@ -19,6 +21,7 @@ export function TopicExercisesTab({
   onOpenExerciseInSimulation,
   testId,
   testIdPrefix = "exercise-card",
+  headerAction,
 }: TopicExercisesTabProps) {
   const { t } = useTranslation();
 
@@ -40,8 +43,14 @@ export function TopicExercisesTab({
         data-testid={testId ? `${testId}-header` : undefined}
         className="text-muted-foreground mb-4 flex items-center gap-2"
       >
-        <ClipboardList className="size-4" />
-        <h3 className="text-sm font-bold">{t("exercise.currentExercises")}</h3>
+        {headerAction ?? (
+          <>
+            <ClipboardList className="size-4" />
+            <h3 className="text-sm font-bold">
+              {t("exercise.currentExercises")}
+            </h3>
+          </>
+        )}
       </div>
 
       <div

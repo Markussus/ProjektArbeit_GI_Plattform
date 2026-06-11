@@ -25,6 +25,7 @@ interface TMScenarioBase {
 
 export interface TuringMachineExerciseScenario extends TMScenarioBase {
   kind: "exercise";
+  storageId: number;
   starterProgram: TMProgram;
   solutionProgram: TMProgram;
   validationCases: TMValidationCase[];
@@ -569,6 +570,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetAlternatingSymbols",
+      storageId: 0,
       titleKey: "tm.exercises.exerciseWorksheetAlternatingSymbols",
       descriptionKey: "tm.exercises.exerciseWorksheetAlternatingSymbolsDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -593,6 +595,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetSwapFirstTwoSymbols",
+      storageId: 1,
       titleKey: "tm.exercises.exerciseWorksheetSwapFirstTwoSymbols",
       descriptionKey: "tm.exercises.exerciseWorksheetSwapFirstTwoSymbolsDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -619,6 +622,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetSetFirstAndLastToOne",
+      storageId: 2,
       titleKey: "tm.exercises.exerciseWorksheetSetFirstAndLastToOne",
       descriptionKey: "tm.exercises.exerciseWorksheetSetFirstAndLastToOneDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -645,6 +649,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetAlternatingOverwrite",
+      storageId: 3,
       titleKey: "tm.exercises.exerciseWorksheetAlternatingOverwrite",
       descriptionKey: "tm.exercises.exerciseWorksheetAlternatingOverwriteDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -670,6 +675,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
+      storageId: 4,
       titleKey: "tm.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
       descriptionKey:
         "tm.exercises.exerciseWorksheetOverwriteLastTwoWithZeroDesc",
@@ -695,6 +701,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseWorksheetAsciiParityBit",
+      storageId: 5,
       titleKey: "tm.exercises.exerciseWorksheetAsciiParityBit",
       descriptionKey: "tm.exercises.exerciseWorksheetAsciiParityBitDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -717,6 +724,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseEraseTape",
+      storageId: 6,
       titleKey: "tm.exercises.exerciseEraseTape",
       descriptionKey: "tm.exercises.exerciseEraseTapeDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -739,6 +747,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseInvertBinaryWord",
+      storageId: 7,
       titleKey: "tm.exercises.exerciseInvertBinaryWord",
       descriptionKey: "tm.exercises.exerciseInvertBinaryWordDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -763,6 +772,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseUnaryIncrement",
+      storageId: 8,
       titleKey: "tm.exercises.exerciseUnaryIncrement",
       descriptionKey: "tm.exercises.exerciseUnaryIncrementDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -785,6 +795,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseDuplicateZeros",
+      storageId: 9,
       titleKey: "tm.exercises.exerciseDuplicateZeros",
       descriptionKey: "tm.exercises.exerciseDuplicateZerosDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -807,6 +818,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseBinaryIncrement",
+      storageId: 10,
       titleKey: "tm.exercises.exerciseBinaryIncrement",
       descriptionKey: "tm.exercises.exerciseBinaryIncrementDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -831,6 +843,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseAddBinary",
+      storageId: 11,
       titleKey: "tm.exercises.exerciseAddBinary",
       descriptionKey: "tm.exercises.exerciseAddBinaryDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -855,6 +868,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
     {
       kind: "exercise",
       id: "tm.exercises.exerciseCheckRegex",
+      storageId: 12,
       titleKey: "tm.exercises.exerciseCheckRegex",
       descriptionKey: "tm.exercises.exerciseCheckRegexDesc",
       starterProgram: emptyTuringMachineProgram,

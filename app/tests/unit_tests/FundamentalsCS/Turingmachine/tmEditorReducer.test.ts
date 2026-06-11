@@ -138,6 +138,17 @@ describe("tmEditorReducer", () => {
       expect(
         tmEditorReducer(program, {
           type: "add_halt_state",
+          state: "q₃",
+        }),
+      ).toEqual({
+        ...program,
+        states: ["q0", "q1", "q2", "halt", "q3"],
+        haltStates: ["halt", "q3"],
+        inputAlphabet: ["1", "0", "_"],
+      });
+      expect(
+        tmEditorReducer(program, {
+          type: "add_halt_state",
           state: "   ",
         }),
       ).toBe(program);
@@ -151,6 +162,12 @@ describe("tmEditorReducer", () => {
         tmEditorReducer(program, {
           type: "add_halt_state",
           state: "q1",
+        }),
+      ).toBe(program);
+      expect(
+        tmEditorReducer(program, {
+          type: "add_halt_state",
+          state: "q₁",
         }),
       ).toBe(program);
     });

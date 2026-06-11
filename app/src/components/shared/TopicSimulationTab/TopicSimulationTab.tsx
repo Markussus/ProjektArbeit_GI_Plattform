@@ -10,6 +10,9 @@ interface TopicSimulationTabProps {
   selectedItem?: TopicItem | null;
   isFocused: boolean;
   onToggleFocus: () => void;
+  onReset?: () => void;
+  resetDisabled?: boolean;
+  overlayControls?: boolean;
   selectedItemActions?: ReactNode;
   children?: ReactNode;
 }
@@ -20,6 +23,9 @@ export function TopicSimulationTab({
   selectedItem,
   isFocused,
   onToggleFocus,
+  onReset,
+  resetDisabled,
+  overlayControls,
   selectedItemActions,
   children,
 }: TopicSimulationTabProps) {
@@ -33,6 +39,9 @@ export function TopicSimulationTab({
       emptyStateText={t(emptyStateTextKey)}
       isFocused={isFocused}
       onToggleFocus={onToggleFocus}
+      onReset={onReset}
+      resetDisabled={resetDisabled}
+      overlayControls={overlayControls}
     >
       {children}
     </SimulationWorkspace>

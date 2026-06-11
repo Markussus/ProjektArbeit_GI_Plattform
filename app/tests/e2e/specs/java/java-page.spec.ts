@@ -2,8 +2,12 @@ import { deflateRawSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
 import { appTestIds } from "../../support/app-shell";
 
-function encodeJavaTransfer(sourceCode: string) {
+function encodeRawJavaTransfer(sourceCode: string) {
   return `C${deflateRawSync(Buffer.from(sourceCode, "utf8")).toString("base64url")}`;
+}
+
+function encodeJavaTransfer(sourceCode: string) {
+  return `AH_${encodeRawJavaTransfer(sourceCode)}`;
 }
 
 test.describe("Java page", () => {
@@ -148,7 +152,7 @@ test.describe("Java page", () => {
     await test.step("Export should generate a Java transfer string", async () => {
       await page.getByTestId(appTestIds.javaTransferExport).click();
       await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-        /^[ABC][A-Za-z0-9_-]*$/,
+        /^AH_[ABC][A-Za-z0-9_-]*$/,
       );
     });
 
@@ -219,5 +223,86 @@ public class Main {
         page.getByTestId(appTestIds.javaConsoleStderr),
       ).toContainText("Java compilation failed", { timeout: 120000 });
     });
+  });
+
+  test("always reloads examples from their built-in code without storing changes", async ({
+    page,
+  }) => {
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await page.getByTestId(appTestIds.javaTransferExport).click();
+    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+      /^AH_[ABC][A-Za-z0-9_-]*$/,
+    );
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
+    );
+
+    await page.getByTestId(appTestIds.tabExamples).click();
+    await page
+      .getByTestId("java-example-card-java.example1Title-select")
+      .click();
+    await page.getByTestId("java-example-card-java.example1Title-open").click();
+
+    await page.getByTestId(appTestIds.javaTransferExport).click();
+    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+      /^[ABC][A-Za-z0-9_-]*$/,
+    );
+    const builtInExampleTransfer = await page
+      .getByTestId(appTestIds.javaTransferInput)
+      .inputValue();
+
+    await page
+      .getByTestId(appTestIds.javaTransferInput)
+      .fill(
+        encodeRawJavaTransfer(
+          "public class Main { public static void main(String[] args) {} }",
+        ),
+      );
+    await page.getByTestId(appTestIds.javaTransferImport).click();
+
+    await page.getByTestId(appTestIds.tabOverview).click();
+    await page.getByTestId(appTestIds.tabExamples).click();
+    await page
+      .getByTestId("java-example-card-java.example1Title-select")
+      .click();
+    await page.getByTestId("java-example-card-java.example1Title-open").click();
+    await page.getByTestId(appTestIds.javaTransferExport).click();
+
+    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+      builtInExampleTransfer,
+    );
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBe(storedFreeSimulation);
+  });
+
+  test("resets all Java exercises while preserving simulator and other-topic progress", async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify([
+          "AHAexercise-0",
+          "AHBexercise-1",
+          "AH_free-simulator",
+          "AAAother-topic",
+        ]),
+      );
+    });
+
+    await page.getByTestId(appTestIds.tabExercises).click();
+    await page.getByTestId("java-reset-all-exercises").click();
+    await page.getByTestId("java-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AH_free-simulator", "AAAother-topic"]);
   });
 });

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Maximize2, X } from "lucide-react";
+import { Maximize2, RotateCcw, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { Exercise, TopicItem } from "@/types/exercise";
@@ -11,6 +11,9 @@ interface SimulationWorkspaceProps {
   emptyStateText: string;
   isFocused: boolean;
   onToggleFocus: () => void;
+  onReset?: () => void;
+  resetDisabled?: boolean;
+  overlayControls?: boolean;
   children?: ReactNode;
 }
 
@@ -21,6 +24,9 @@ export function SimulationWorkspace({
   emptyStateText,
   isFocused,
   onToggleFocus,
+  onReset,
+  resetDisabled = false,
+  overlayControls = false,
   children,
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
@@ -73,11 +79,29 @@ export function SimulationWorkspace({
       <div
         data-testid="simulation-workspace"
         className={cn(
-          "bg-card ring-foreground/10 rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          "bg-card ring-foreground/10 relative rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
-        <div className="mb-3 flex justify-end">
+        <div
+          className={cn(
+            "flex justify-end gap-2",
+            overlayControls ? "absolute top-6 right-6 z-10" : "mb-3",
+          )}
+        >
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              data-testid="simulation-reset"
+              disabled={resetDisabled}
+              aria-label={t("trainingCenter.resetCurrent")}
+              title={t("trainingCenter.resetCurrent")}
+              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RotateCcw className="size-4" />
+            </button>
+          )}
           <button
             type="button"
             onClick={onToggleFocus}

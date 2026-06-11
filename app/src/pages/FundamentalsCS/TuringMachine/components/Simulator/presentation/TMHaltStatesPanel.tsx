@@ -1,7 +1,10 @@
 import { useCallback, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { formatTMStateName } from "../domain/tmFormatting";
+import {
+  formatTMStateName,
+  normalizeTMStateName,
+} from "../domain/tmFormatting";
 import type { StateName } from "../domain/tmTypes";
 
 export interface TMHaltStatesPanelProps {
@@ -25,17 +28,17 @@ export function TMHaltStatesPanel({
   const [newState, setNewState] = useState("");
   const selectableStates = states.filter((state) => state !== initialState);
   const commitNewState = useCallback(() => {
-    const trimmedState = newState.trim();
+    const normalizedState = normalizeTMStateName(newState).trim();
 
     if (
-      trimmedState === "" ||
-      trimmedState === initialState ||
-      states.includes(trimmedState)
+      normalizedState === "" ||
+      normalizedState === initialState ||
+      states.includes(normalizedState)
     ) {
       return;
     }
 
-    onAddHaltState(trimmedState);
+    onAddHaltState(normalizedState);
     setNewState("");
   }, [initialState, newState, onAddHaltState, states]);
 
