@@ -1,0 +1,268 @@
+import { useMemo } from "react";
+import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+
+interface LogicGateDiagramProps {
+  expression: BooleanExpression | null;
+  outputName: string;
+  variables: string[];
+  unavailableText: string;
+}
+
+interface DiagramNode {
+  id: number;
+  label: string;
+  kind: "input" | "not" | "and" | "or" | "constant";
+  depth: number;
+  order: number;
+  children: number[];
+}
+
+export function LogicGateDiagram({
+  expression,
+  outputName,
+  variables,
+  unavailableText,
+}: LogicGateDiagramProps) {
+  const diagram = useMemo(
+    () => (expression ? buildDiagram(expression) : null),
+    [expression],
+  );
+
+  if (!diagram) {
+    return (
+      <div className="border-border bg-muted/20 rounded-xl border border-dashed p-10 text-center text-sm">
+        {unavailableText}
+      </div>
+    );
+  }
+
+  const width = Math.max(680, (diagram.maxDepth + 2) * 180);
+  const height = Math.max(340, diagram.leafCount * 76 + 80);
+  const positions = new Map<number, { x: number; y: number }>();
+  const depthGroups = new Map<number, DiagramNode[]>();
+
+  for (const node of diagram.nodes) {
+    const group = depthGroups.get(node.depth) ?? [];
+    group.push(node);
+    depthGroups.set(node.depth, group);
+  }
+  for (const [depth, nodes] of depthGroups) {
+    nodes.sort((left, right) => left.order - right.order);
+    nodes.forEach((node, index) => {
+      positions.set(node.id, {
+        x: 90 + depth * 170,
+        y: ((index + 1) * height) / (nodes.length + 1),
+      });
+    });
+  }
+
+  const rootPosition = positions.get(diagram.rootId);
+  const outputX = width - 70;
+
+  return (
+    <div className="border-border bg-muted/10 overflow-auto rounded-xl border">
+      <svg
+        data-testid="moore-logic-gate-diagram"
+        role="img"
+        aria-label={`${outputName} logic gate diagram`}
+        viewBox={`0 0 ${width} ${height}`}
+        className="min-h-80 w-full min-w-[680px]"
+      >
+        <defs>
+          <marker
+            id="logic-arrow"
+            markerWidth="8"
+            markerHeight="6"
+            refX="7"
+            refY="3"
+            orient="auto"
+          >
+            <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
+          </marker>
+        </defs>
+
+        {diagram.nodes.flatMap((node) => {
+          const target = positions.get(node.id);
+          if (!target) {
+            return [];
+          }
+          return node.children.map((childId) => {
+            const source = positions.get(childId);
+            if (!source) {
+              return null;
+            }
+            return (
+              <path
+                key={`${childId}-${node.id}`}
+                d={`M ${source.x + 50} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x - 50} ${target.y}`}
+                fill="none"
+                className="stroke-muted-foreground"
+                strokeWidth="2"
+                markerEnd="url(#logic-arrow)"
+              />
+            );
+          });
+        })}
+
+        {rootPosition && (
+          <>
+            <line
+              x1={rootPosition.x + 50}
+              y1={rootPosition.y}
+              x2={outputX}
+              y2={rootPosition.y}
+              className="stroke-brand"
+              strokeWidth="3"
+              markerEnd="url(#logic-arrow)"
+            />
+            <circle
+              cx={outputX + 8}
+              cy={rootPosition.y}
+              r="5"
+              className="fill-brand"
+            />
+            <text
+              x={outputX + 20}
+              y={rootPosition.y + 5}
+              className="fill-brand text-sm font-bold"
+            >
+              {outputName}
+            </text>
+          </>
+        )}
+
+        {diagram.nodes.map((node) => {
+          const position = positions.get(node.id);
+          if (!position) {
+            return null;
+          }
+          return (
+            <GateNode key={node.id} node={node} x={position.x} y={position.y} />
+          );
+        })}
+
+        <text x="20" y="28" className="fill-muted-foreground text-xs">
+          {variables.join(", ")}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function GateNode({ node, x, y }: { node: DiagramNode; x: number; y: number }) {
+  if (node.kind === "input" || node.kind === "constant") {
+    return (
+      <g>
+        <circle cx={x} cy={y} r="6" className="fill-foreground" />
+        <text
+          x={x - 14}
+          y={y + 5}
+          textAnchor="end"
+          className="fill-foreground font-mono text-sm font-semibold"
+        >
+          {node.label}
+        </text>
+      </g>
+    );
+  }
+
+  return (
+    <g>
+      <rect
+        x={x - 42}
+        y={y - 28}
+        width="84"
+        height="56"
+        rx="5"
+        className="fill-card stroke-foreground"
+        strokeWidth="2"
+      />
+      <text
+        x={x}
+        y={y + 6}
+        textAnchor="middle"
+        className="fill-foreground text-lg font-bold"
+      >
+        {node.kind === "and" ? "&" : node.kind === "or" ? "≥1" : "1"}
+      </text>
+      {node.kind === "not" && (
+        <circle
+          cx={x + 48}
+          cy={y}
+          r="6"
+          className="fill-card stroke-foreground"
+          strokeWidth="2"
+        />
+      )}
+    </g>
+  );
+}
+
+function buildDiagram(expression: BooleanExpression) {
+  let nextId = 0;
+  let leafOrder = 0;
+  const nodes: DiagramNode[] = [];
+
+  const visit = (node: BooleanExpression): { id: number; depth: number } => {
+    const id = nextId++;
+    if (node.type === "variable") {
+      nodes.push({
+        id,
+        label: node.name,
+        kind: "input",
+        depth: 0,
+        order: leafOrder++,
+        children: [],
+      });
+      return { id, depth: 0 };
+    }
+    if (node.type === "constant") {
+      nodes.push({
+        id,
+        label: node.value ? "1" : "0",
+        kind: "constant",
+        depth: 0,
+        order: leafOrder++,
+        children: [],
+      });
+      return { id, depth: 0 };
+    }
+    if (node.type === "not") {
+      const child = visit(node.operand);
+      nodes.push({
+        id,
+        label: "NOT",
+        kind: "not",
+        depth: child.depth + 1,
+        order: leafOrder++,
+        children: [child.id],
+      });
+      return { id, depth: child.depth + 1 };
+    }
+
+    const left = visit(node.left);
+    const right = visit(node.right);
+    const depth = Math.max(left.depth, right.depth) + 1;
+    nodes.push({
+      id,
+      label: node.operator.toUpperCase(),
+      kind: node.operator,
+      depth,
+      order: leafOrder++,
+      children: [left.id, right.id],
+    });
+    return { id, depth };
+  };
+
+  const root = visit(expression);
+  return {
+    nodes,
+    rootId: root.id,
+    maxDepth: root.depth,
+    leafCount: Math.max(
+      1,
+      nodes.filter((node) => node.kind === "input" || node.kind === "constant")
+        .length,
+    ),
+  };
+}

@@ -23,3 +23,6 @@ approval_mode = "approve"
 
 [mcp_servers.playwright.tools.browser_run_code]
 approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_resize]
+approval_mode = "approve"

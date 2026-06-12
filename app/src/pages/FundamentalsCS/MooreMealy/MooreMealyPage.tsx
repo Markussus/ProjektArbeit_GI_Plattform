@@ -13,6 +13,7 @@ export function MooreMealyPage() {
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      confirmExerciseTabExit={false}
     />
   );
 }
