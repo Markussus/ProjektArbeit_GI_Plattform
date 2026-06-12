@@ -70,21 +70,21 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
         </button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
-        <SimulatorControls
-          status={props.status}
-          speed={props.speed}
-          onPlay={props.onPlay}
-          onPause={props.onPause}
-          onStep={props.onStep}
-          onStepBack={props.onStepBack}
-          onReset={props.onReset}
-          onSpeedChange={props.onSpeedChange}
-          testIdPrefix="moore-controls"
-          className="max-w-none"
-        />
-        <div className="grid gap-4 xl:grid-cols-[15rem_minmax(0,1fr)]">
-          <div className="border-border bg-card space-y-3 rounded-xl border p-4">
+      <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
+        <div className="space-y-3">
+          <SimulatorControls
+            status={props.status}
+            speed={props.speed}
+            onPlay={props.onPlay}
+            onPause={props.onPause}
+            onStep={props.onStep}
+            onStepBack={props.onStepBack}
+            onReset={props.onReset}
+            onSpeedChange={props.onSpeedChange}
+            testIdPrefix="moore-controls"
+            className="max-w-none"
+          />
+          <div className="border-border bg-card space-y-2 rounded-xl border p-3">
             <StatusRow
               label={t("moore.sim.currentState")}
               value={runtime.currentState}
@@ -104,21 +104,21 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
               }
             />
           </div>
-          <div className="space-y-3">
-            <SymbolSequence
-              title={t("moore.sim.inputWord")}
-              symbols={program.inputWord}
-              activeIndex={runtime.inputPosition}
-              testId="moore-runtime-input"
-            />
-            <SymbolSequence
-              title={t("moore.sim.outputWord")}
-              symbols={runtime.outputSymbols}
-              activeIndex={runtime.outputSymbols.length - 1}
-              testId="moore-runtime-output"
-              showEmptyWord={false}
-            />
-          </div>
+        </div>
+        <div className="grid grid-rows-2 gap-3">
+          <SymbolSequence
+            title={t("moore.sim.inputWord")}
+            symbols={program.inputWord}
+            activeIndex={runtime.inputPosition}
+            testId="moore-runtime-input"
+          />
+          <SymbolSequence
+            title={t("moore.sim.outputWord")}
+            symbols={runtime.outputSymbols}
+            activeIndex={runtime.outputSymbols.length - 1}
+            testId="moore-runtime-output"
+            showEmptyWord={false}
+          />
         </div>
       </div>
 
@@ -128,6 +128,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
         ariaLabel={t("moore.sim.diagram")}
         testId="moore-state-diagram"
         className="w-full"
+        compact
       />
 
       <MooreRuntimeTable
@@ -156,19 +157,19 @@ function MooreRuntimeTable({
   const nextCol = nextState ? program.states.indexOf(nextState) : -1;
 
   return (
-    <div className="border-border overflow-x-auto rounded-xl border">
+    <div className="border-border max-h-64 overflow-auto rounded-xl border">
       <table
         data-testid="moore-runtime-transition-table"
         className="w-full min-w-max border-collapse text-center text-sm"
       >
         <thead>
           <tr className="bg-muted/50 border-b">
-            <th className="border-r p-3">{t("moore.sim.event")}</th>
+            <th className="border-r p-2">{t("moore.sim.event")}</th>
             {program.states.map((state, index) => (
               <th
                 key={state}
                 className={cn(
-                  "min-w-32 border-r p-3 last:border-r-0",
+                  "min-w-28 border-r p-2 last:border-r-0",
                   index === currentCol && "bg-brand/25 text-brand",
                   index === nextCol && index !== currentCol && "bg-brand/10",
                 )}
@@ -185,7 +186,7 @@ function MooreRuntimeTable({
               <tr key={symbol} className="border-b last:border-b-0">
                 <th
                   className={cn(
-                    "border-r p-3 font-mono",
+                    "border-r p-2 font-mono",
                     isCurrentRow && "bg-brand/25 text-brand",
                   )}
                 >
@@ -199,7 +200,7 @@ function MooreRuntimeTable({
                     <td
                       key={state}
                       className={cn(
-                        "border-r p-3 font-mono last:border-r-0",
+                        "border-r p-2 font-mono last:border-r-0",
                         index === nextCol && "bg-brand/5",
                         isSource && "bg-brand/25 text-brand font-bold",
                         isResult &&

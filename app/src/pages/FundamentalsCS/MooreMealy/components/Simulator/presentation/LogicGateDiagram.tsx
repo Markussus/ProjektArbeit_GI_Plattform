@@ -18,6 +18,11 @@ interface DiagramNode {
   children: number[];
 }
 
+interface SelectedConnection {
+  sourceId: number;
+  targetId: number | "output";
+}
+
 export function LogicGateDiagram({
   expression,
   outputName,
@@ -29,6 +34,8 @@ export function LogicGateDiagram({
     [expression],
   );
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
+  const [selectedConnection, setSelectedConnection] =
+    useState<SelectedConnection | null>(null);
 
   if (!diagram) {
     return (
@@ -81,6 +88,16 @@ export function LogicGateDiagram({
           >
             <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
           </marker>
+          <marker
+            id="logic-arrow-selected"
+            markerWidth="8"
+            markerHeight="6"
+            refX="7"
+            refY="3"
+            orient="auto"
+          >
+            <path d="M 0 0 L 8 3 L 0 6 z" className="fill-brand" />
+          </marker>
         </defs>
 
         {diagram.nodes.flatMap((node) => {
@@ -94,21 +111,42 @@ export function LogicGateDiagram({
               return null;
             }
             const selected =
-              selectedNodeId === childId || selectedNodeId === node.id;
+              selectedConnection?.sourceId === childId &&
+              selectedConnection.targetId === node.id;
+            const path = `M ${source.x + 50} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x - 50} ${target.y}`;
             return (
-              <path
-                key={`${childId}-${node.id}`}
-                data-testid={`moore-logic-wire-${childId}-${node.id}`}
-                d={`M ${source.x + 50} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x - 50} ${target.y}`}
-                fill="none"
-                onClick={() => setSelectedNodeId(childId)}
-                className={cn(
-                  "stroke-muted-foreground cursor-pointer",
-                  selected && "stroke-brand",
-                )}
-                strokeWidth={selected ? 4 : 2}
-                markerEnd="url(#logic-arrow)"
-              />
+              <g key={`${childId}-${node.id}`}>
+                <path
+                  d={path}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth="16"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelectedNodeId(null);
+                    setSelectedConnection({
+                      sourceId: childId,
+                      targetId: node.id,
+                    });
+                  }}
+                />
+                <path
+                  data-testid={`moore-logic-wire-${childId}-${node.id}`}
+                  d={path}
+                  fill="none"
+                  pointerEvents="none"
+                  className={cn(
+                    "stroke-muted-foreground",
+                    selected && "stroke-brand",
+                  )}
+                  strokeWidth={selected ? 4 : 2}
+                  markerEnd={
+                    selected
+                      ? "url(#logic-arrow-selected)"
+                      : "url(#logic-arrow)"
+                  }
+                />
+              </g>
             );
           });
         })}
@@ -120,20 +158,59 @@ export function LogicGateDiagram({
               y1={rootPosition.y}
               x2={outputX}
               y2={rootPosition.y}
-              className="stroke-brand"
-              strokeWidth="3"
-              markerEnd="url(#logic-arrow)"
+              stroke="transparent"
+              strokeWidth="16"
+              className="cursor-pointer"
+              onClick={() => {
+                setSelectedNodeId(null);
+                setSelectedConnection({
+                  sourceId: diagram.rootId,
+                  targetId: "output",
+                });
+              }}
+            />
+            <line
+              data-testid={`moore-logic-wire-${diagram.rootId}-output`}
+              x1={rootPosition.x + 50}
+              y1={rootPosition.y}
+              x2={outputX}
+              y2={rootPosition.y}
+              pointerEvents="none"
+              className={cn(
+                "stroke-muted-foreground",
+                selectedConnection?.sourceId === diagram.rootId &&
+                  selectedConnection.targetId === "output" &&
+                  "stroke-brand",
+              )}
+              strokeWidth={
+                selectedConnection?.sourceId === diagram.rootId &&
+                selectedConnection.targetId === "output"
+                  ? 4
+                  : 2
+              }
+              markerEnd={
+                selectedConnection?.sourceId === diagram.rootId &&
+                selectedConnection.targetId === "output"
+                  ? "url(#logic-arrow-selected)"
+                  : "url(#logic-arrow)"
+              }
             />
             <circle
               cx={outputX + 8}
               cy={rootPosition.y}
               r="5"
-              className="fill-brand"
+              className={cn(
+                "fill-muted-foreground",
+                selectedConnection?.targetId === "output" && "fill-brand",
+              )}
             />
             <text
               x={outputX + 20}
               y={rootPosition.y + 5}
-              className="fill-brand text-sm font-bold"
+              className={cn(
+                "fill-foreground text-sm font-bold",
+                selectedConnection?.targetId === "output" && "fill-brand",
+              )}
             >
               {outputName}
             </text>
@@ -153,9 +230,13 @@ export function LogicGateDiagram({
               y={position.y}
               selected={
                 selectedNodeId === node.id ||
-                node.children.includes(selectedNodeId ?? -1)
+                selectedConnection?.sourceId === node.id ||
+                selectedConnection?.targetId === node.id
               }
-              onSelect={() => setSelectedNodeId(node.id)}
+              onSelect={() => {
+                setSelectedConnection(null);
+                setSelectedNodeId(node.id);
+              }}
             />
           );
         })}

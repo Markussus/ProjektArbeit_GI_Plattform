@@ -24,6 +24,7 @@ export interface StateMachineGraphProps {
   ariaLabel: string;
   className?: string;
   testId?: string;
+  compact?: boolean;
 }
 
 const NODE_RADIUS = 42;
@@ -34,6 +35,7 @@ export function StateMachineGraph({
   ariaLabel,
   className,
   testId,
+  compact = false,
 }: StateMachineGraphProps) {
   const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
@@ -53,6 +55,7 @@ export function StateMachineGraph({
       data-testid={testId}
       className={cn(
         "border-border bg-muted/20 relative min-h-80 overflow-hidden rounded-xl border",
+        compact && "min-h-0",
         className,
       )}
     >
@@ -63,7 +66,8 @@ export function StateMachineGraph({
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
         onMouseDown={onMouseDown}
         className={cn(
-          "block min-h-96 w-full select-none",
+          "block w-full select-none",
+          compact ? "h-64 min-h-0" : "min-h-96",
           isPanning ? "cursor-grabbing" : "cursor-grab",
         )}
       >
@@ -193,9 +197,14 @@ export function StateMachineGraph({
           <Plus className="size-4" />
         </GraphButton>
       </div>
-      <span className="bg-background/85 text-muted-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs">
+      <button
+        type="button"
+        onClick={reset}
+        aria-label="Reset zoom to 100%"
+        className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
+      >
         {Math.round(scale * 100)}%
-      </span>
+      </button>
     </div>
   );
 }
