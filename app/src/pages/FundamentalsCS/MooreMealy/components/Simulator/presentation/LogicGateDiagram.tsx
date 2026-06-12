@@ -67,6 +67,20 @@ export function LogicGateDiagram({
 
   const rootPosition = positions.get(diagram.rootId);
   const outputX = width - 70;
+  const selectNode = (node: DiagramNode) => {
+    if (node.kind === "input" || node.kind === "constant") {
+      const parent = diagram.nodes.find((candidate) =>
+        candidate.children.includes(node.id),
+      );
+      if (parent) {
+        setSelectedNodeId(null);
+        setSelectedConnection({ sourceId: node.id, targetId: parent.id });
+        return;
+      }
+    }
+    setSelectedConnection(null);
+    setSelectedNodeId(node.id);
+  };
 
   return (
     <div className="border-border bg-muted/10 overflow-auto rounded-xl border">
@@ -105,7 +119,7 @@ export function LogicGateDiagram({
           if (!target) {
             return [];
           }
-          return node.children.map((childId) => {
+          return node.children.map((childId, childIndex) => {
             const source = positions.get(childId);
             if (!source) {
               return null;
@@ -113,7 +127,13 @@ export function LogicGateDiagram({
             const selected =
               selectedConnection?.sourceId === childId &&
               selectedConnection.targetId === node.id;
-            const path = `M ${source.x + 50} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x - 50} ${target.y}`;
+            const sourceX = source.x + 50;
+            const targetX = target.x - 50;
+            const targetY =
+              target.y + (childIndex - (node.children.length - 1) / 2) * 18;
+            const laneX =
+              sourceX + (targetX - sourceX) * (0.42 + childIndex * 0.12);
+            const path = `M ${sourceX} ${source.y} H ${laneX} V ${targetY} H ${targetX}`;
             return (
               <g key={`${childId}-${node.id}`}>
                 <path
@@ -233,10 +253,7 @@ export function LogicGateDiagram({
                 selectedConnection?.sourceId === node.id ||
                 selectedConnection?.targetId === node.id
               }
-              onSelect={() => {
-                setSelectedConnection(null);
-                setSelectedNodeId(node.id);
-              }}
+              onSelect={() => selectNode(node)}
             />
           );
         })}
@@ -322,8 +339,12 @@ function GateNode({
           cx={x + 48}
           cy={y}
           r="6"
-          className="fill-card stroke-foreground"
-          strokeWidth="2"
+          className={
+            selected
+              ? "fill-brand/15 stroke-brand"
+              : "fill-card stroke-foreground"
+          }
+          strokeWidth={selected ? 4 : 2}
         />
       )}
     </g>

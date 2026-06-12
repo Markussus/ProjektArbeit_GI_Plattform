@@ -24,7 +24,6 @@ interface MooreSimulationViewProps {
 export function MooreSimulationView(props: MooreSimulationViewProps) {
   const { t } = useTranslation();
   const { program, runtime } = props;
-  const lastTransition = runtime.transitionHistory.at(-1);
   const nextInput = program.inputWord[runtime.inputPosition];
   const nextState =
     nextInput !== undefined
@@ -38,8 +37,9 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
         output: program.outputs[state].symbol,
         isStart: state === program.initialState,
         isActive: state === runtime.currentState,
+        isPreview: state === nextState && state !== runtime.currentState,
       })),
-    [program, runtime.currentState],
+    [nextState, program, runtime.currentState],
   );
   const graphEdges = useMemo(
     () =>
@@ -48,12 +48,10 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
           from: state,
           to: program.transitions[inputSymbol][state],
           label: inputSymbol,
-          isActive:
-            lastTransition?.fromState === state &&
-            lastTransition.inputSymbol === inputSymbol,
+          isActive: state === runtime.currentState && inputSymbol === nextInput,
         })),
       ),
-    [lastTransition, program],
+    [nextInput, program, runtime.currentState],
   );
 
   return (

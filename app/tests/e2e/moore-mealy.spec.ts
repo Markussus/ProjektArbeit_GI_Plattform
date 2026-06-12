@@ -95,7 +95,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await expect(page.getByTestId("moore-config-view")).toBeVisible();
   });
 
-  test("renders individual gate networks and the complete sequential circuit", async ({
+  test("renders individual gate networks and navigates between simulator views", async ({
     page,
   }) => {
     await openMooreSimulator(page);
@@ -107,10 +107,16 @@ test.describe("Moore and Mealy simulation tab", () => {
     await page.getByTestId("moore-logic-formula-y2").click();
     await expect(page.getByTestId("moore-logic-gate-diagram")).toBeVisible();
 
-    await page.getByTestId("moore-show-complete-circuit").click();
-    await expect(page.getByTestId("moore-complete-circuit")).toBeVisible();
+    await expect(page.getByTestId("moore-show-complete-circuit")).toHaveCount(
+      0,
+    );
+    await page.getByTestId("moore-logic-show-conversion").click();
+    await expect(page.getByTestId("moore-conversion-view")).toBeVisible();
+    await page.getByTestId("moore-conversion-show-logic").click();
+    await page.getByTestId("moore-logic-show-simulator").click();
+    await expect(page.getByTestId("moore-simulation-view")).toBeVisible();
 
-    await page.getByTestId("moore-subview-back").click();
+    await page.getByTestId("moore-edit-configuration").click();
     await expect(page.getByTestId("moore-config-view")).toBeVisible();
   });
 });

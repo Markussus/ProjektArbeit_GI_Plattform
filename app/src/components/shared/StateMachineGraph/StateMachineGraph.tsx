@@ -9,6 +9,7 @@ export interface StateMachineGraphNode {
   output?: string;
   isStart?: boolean;
   isActive?: boolean;
+  isPreview?: boolean;
 }
 
 export interface StateMachineGraphEdge {
@@ -55,7 +56,7 @@ export function StateMachineGraph({
       data-testid={testId}
       className={cn(
         "border-border bg-muted/20 relative min-h-80 overflow-hidden rounded-xl border",
-        compact && "min-h-0",
+        compact && "h-96 max-h-[70vh] min-h-64 resize-y",
         className,
       )}
     >
@@ -67,7 +68,7 @@ export function StateMachineGraph({
         onMouseDown={onMouseDown}
         className={cn(
           "block w-full select-none",
-          compact ? "h-64 min-h-0" : "min-h-96",
+          compact ? "h-full min-h-0" : "min-h-96",
           isPanning ? "cursor-grabbing" : "cursor-grab",
         )}
       >
@@ -158,8 +159,10 @@ export function StateMachineGraph({
                 className={cn(
                   "fill-card stroke-border transition-colors",
                   node.isActive && "fill-brand/15 stroke-brand",
+                  node.isPreview && "fill-brand/5 stroke-brand",
                 )}
-                strokeWidth={node.isActive ? 4 : 2}
+                strokeWidth={node.isActive || node.isPreview ? 4 : 2}
+                strokeDasharray={node.isPreview ? "8 6" : undefined}
               />
               <text
                 x={position.x}
@@ -168,6 +171,7 @@ export function StateMachineGraph({
                 className={cn(
                   "fill-foreground text-[13px] font-semibold",
                   node.isActive && "fill-brand",
+                  node.isPreview && "fill-brand",
                 )}
               >
                 {node.label}

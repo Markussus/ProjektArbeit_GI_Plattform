@@ -31,7 +31,7 @@ export function MooreConversionView({
       <ViewHeader
         title={t("moore.conversion.title")}
         onBack={onBackToEditor}
-        backLabel={t("moore.conversion.back")}
+        backLabel={t("moore.navigation.editDefinition")}
       />
 
       <div
@@ -71,7 +71,7 @@ export function MooreConversionView({
           data-testid="moore-conversion-show-simulator"
           className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 font-semibold"
         >
-          {t("moore.conversion.showSimulator")}
+          {t("moore.navigation.showSimulator")}
         </button>
         <button
           type="button"
@@ -79,7 +79,7 @@ export function MooreConversionView({
           data-testid="moore-conversion-show-logic"
           className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90"
         >
-          {t("moore.conversion.showLogic")}
+          {t("moore.navigation.showLogic")}
         </button>
       </div>
     </div>

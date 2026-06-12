@@ -276,6 +276,12 @@
         "input_word_invalid": "The input contains a symbol outside the input alphabet."
       }
     },
+    "navigation": {
+      "editDefinition": "Edit definition",
+      "showSimulator": "Show simulator",
+      "showConversion": "Show transfer functions",
+      "showLogic": "Show logic gates"
+    },
     "conversion": {
       "open": "Convert to transition functions",
       "title": "Transition functions",

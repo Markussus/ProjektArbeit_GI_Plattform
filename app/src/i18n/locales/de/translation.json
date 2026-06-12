@@ -276,6 +276,12 @@
         "input_word_invalid": "Die Eingabe enthält ein Symbol außerhalb des Eingabealphabets."
       }
     },
+    "navigation": {
+      "editDefinition": "Definition bearbeiten",
+      "showSimulator": "Simulator anzeigen",
+      "showConversion": "Überführungsfunktionen anzeigen",
+      "showLogic": "Logikgatter anzeigen"
+    },
     "conversion": {
       "open": "In Überführungsfunktionen konvertieren",
       "title": "Überführungsfunktionen",
