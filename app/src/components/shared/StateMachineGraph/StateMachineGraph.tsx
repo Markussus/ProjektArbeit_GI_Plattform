@@ -166,7 +166,7 @@ export function StateMachineGraph({
               />
               <text
                 x={position.x}
-                y={position.y - (node.output ? 7 : 0)}
+                y={position.y - (node.output ? 13 : 0)}
                 textAnchor="middle"
                 className={cn(
                   "fill-foreground text-[13px] font-semibold",
@@ -177,14 +177,27 @@ export function StateMachineGraph({
                 {node.label}
               </text>
               {node.output !== undefined && (
-                <text
-                  x={position.x}
-                  y={position.y + 14}
-                  textAnchor="middle"
-                  className="fill-muted-foreground text-[12px]"
-                >
-                  / {node.output}
-                </text>
+                <>
+                  <line
+                    x1={position.x - NODE_RADIUS + 5}
+                    y1={position.y}
+                    x2={position.x + NODE_RADIUS - 5}
+                    y2={position.y}
+                    className={cn(
+                      "stroke-border",
+                      (node.isActive || node.isPreview) && "stroke-brand",
+                    )}
+                    strokeWidth="1.5"
+                  />
+                  <text
+                    x={position.x}
+                    y={position.y + 21}
+                    textAnchor="middle"
+                    className="fill-muted-foreground text-[12px]"
+                  >
+                    {node.output}
+                  </text>
+                </>
               )}
             </g>
           );

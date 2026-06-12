@@ -66,6 +66,7 @@ export function MooreLogicGateView({
             {formula.name} = {formula.minimal}
           </h3>
           <LogicGateDiagram
+            key={formula.name}
             expression={formula.expression}
             outputName={formula.name}
             variables={formula.variables}

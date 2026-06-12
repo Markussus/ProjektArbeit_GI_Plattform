@@ -253,6 +253,8 @@
       "stateNotFound": "Kein Zustand gefunden",
       "outputForState": "Ausgabe für Zustand {{state}}",
       "outputCodeForState": "Interner Ausgabecode für Zustand {{state}}",
+      "symbolOutput": "Ausgabe (Symbol)",
+      "internalOutputCode": "Interne Zahlendarstellung",
       "removeWordSymbol": "Symbol {{symbol}} an Position {{index}} entfernen",
       "startSimulation": "Simulation starten",
       "simulationTitle": "Moore-Simulation",

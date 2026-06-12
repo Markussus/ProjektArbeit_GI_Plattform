@@ -45,7 +45,8 @@ export function LogicGateDiagram({
     );
   }
 
-  const width = Math.max(680, (diagram.maxDepth + 2) * 180);
+  const depthSpacing = 220;
+  const width = Math.max(760, (diagram.maxDepth + 2) * depthSpacing);
   const height = Math.max(340, diagram.leafCount * 76 + 80);
   const positions = new Map<number, { x: number; y: number }>();
   const depthGroups = new Map<number, DiagramNode[]>();
@@ -59,7 +60,7 @@ export function LogicGateDiagram({
     nodes.sort((left, right) => left.order - right.order);
     nodes.forEach((node, index) => {
       positions.set(node.id, {
-        x: 90 + depth * 170,
+        x: 100 + depth * depthSpacing,
         y: ((index + 1) * height) / (nodes.length + 1),
       });
     });
@@ -131,8 +132,9 @@ export function LogicGateDiagram({
             const targetX = target.x - 50;
             const targetY =
               target.y + (childIndex - (node.children.length - 1) / 2) * 18;
-            const laneX =
-              sourceX + (targetX - sourceX) * (0.42 + childIndex * 0.12);
+            const laneOffset =
+              54 + ((childId * 17 + node.id * 11 + childIndex * 23) % 92);
+            const laneX = Math.min(targetX - 28, sourceX + laneOffset);
             const path = `M ${sourceX} ${source.y} H ${laneX} V ${targetY} H ${targetX}`;
             return (
               <g key={`${childId}-${node.id}`}>

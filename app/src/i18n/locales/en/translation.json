@@ -253,6 +253,8 @@
       "stateNotFound": "No state found",
       "outputForState": "Output for state {{state}}",
       "outputCodeForState": "Internal output code for state {{state}}",
+      "symbolOutput": "Output (symbol)",
+      "internalOutputCode": "Internal number representation",
       "removeWordSymbol": "Remove symbol {{symbol}} at position {{index}}",
       "startSimulation": "Start simulation",
       "simulationTitle": "Moore simulation",

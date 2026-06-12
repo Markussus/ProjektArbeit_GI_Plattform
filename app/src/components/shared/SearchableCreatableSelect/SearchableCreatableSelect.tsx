@@ -39,7 +39,11 @@ export function SearchableCreatableSelect({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [menuPosition, setMenuPosition] = useState({ left: 0, top: 0 });
+  const [menuPosition, setMenuPosition] = useState({
+    left: 0,
+    top: 0,
+    maxHeight: 224,
+  });
   const normalizedQuery = query.trim();
   const matchingOptions = useMemo(
     () =>
@@ -87,11 +91,53 @@ export function SearchableCreatableSelect({
     if (isOpen) {
       const rect = containerRef.current?.getBoundingClientRect();
       if (rect) {
-        setMenuPosition({ left: rect.left, top: rect.bottom + 4 });
+        const menuWidth = 256;
+        const gap = 4;
+        const viewportPadding = 8;
+        const availableBelow = window.innerHeight - rect.bottom - gap;
+        const availableAbove = rect.top - gap;
+        const openAbove =
+          availableBelow < 280 && availableAbove > availableBelow;
+        const maxHeight = Math.max(
+          120,
+          Math.min(280, openAbove ? availableAbove : availableBelow),
+        );
+        setMenuPosition({
+          left: Math.min(
+            Math.max(viewportPadding, rect.left),
+            window.innerWidth - menuWidth - viewportPadding,
+          ),
+          top: openAbove
+            ? Math.max(viewportPadding, rect.top - maxHeight - gap)
+            : rect.bottom + gap,
+          maxHeight,
+        });
       }
       setActiveIndex(0);
       inputRef.current?.focus();
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const closeOnScroll = (event: Event) => {
+      if (
+        event.target instanceof Node &&
+        menuRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+      setIsOpen(false);
+      setQuery("");
+    };
+    window.addEventListener("scroll", closeOnScroll, true);
+    window.addEventListener("resize", closeOnScroll);
+    return () => {
+      window.removeEventListener("scroll", closeOnScroll, true);
+      window.removeEventListener("resize", closeOnScroll);
+    };
   }, [isOpen]);
 
   const selectValue = (nextValue: string) => {
@@ -171,8 +217,12 @@ export function SearchableCreatableSelect({
             ref={menuRef}
             role="listbox"
             aria-label={ariaLabel}
-            style={{ left: menuPosition.left, top: menuPosition.top }}
-            className="bg-popover text-popover-foreground border-border fixed z-[100] w-64 rounded-lg border p-1 shadow-xl"
+            style={{
+              left: menuPosition.left,
+              top: menuPosition.top,
+              maxHeight: menuPosition.maxHeight,
+            }}
+            className="bg-popover text-popover-foreground border-border fixed z-[100] flex w-64 flex-col overflow-hidden rounded-lg border p-1 shadow-xl"
           >
             <div className="border-border relative border-b p-1 pb-2">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
@@ -189,7 +239,7 @@ export function SearchableCreatableSelect({
               />
             </div>
 
-            <div className="max-h-56 overflow-y-auto py-1">
+            <div className="min-h-0 flex-1 overflow-y-auto py-1">
               {matchingOptions.map((option, index) => (
                 <button
                   ref={(element) => {

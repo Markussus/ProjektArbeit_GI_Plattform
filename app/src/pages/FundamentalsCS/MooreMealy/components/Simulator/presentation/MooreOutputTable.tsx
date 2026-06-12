@@ -35,11 +35,14 @@ export function MooreOutputTable({
         >
           <thead>
             <tr className="bg-muted/50 border-b">
-              <th className="w-1/2 border-r p-3 text-left font-semibold">
+              <th className="w-2/5 border-r p-3 text-left font-semibold">
                 {t("moore.sim.state")}
               </th>
-              <th className="w-1/2 p-3 text-left font-semibold">
-                {t("moore.sim.output")}
+              <th className="w-2/5 border-r p-3 text-left font-semibold">
+                {t("moore.sim.symbolOutput")}
+              </th>
+              <th className="w-1/5 p-3 text-left font-semibold">
+                {t("moore.sim.internalOutputCode")}
               </th>
             </tr>
           </thead>
@@ -65,49 +68,49 @@ export function MooreOutputTable({
                       </span>
                     </div>
                   </td>
+                  <td className="border-r p-2">
+                    <input
+                      value={output?.symbol ?? ""}
+                      onChange={(event) =>
+                        onOutputSymbolChange(state, event.target.value)
+                      }
+                      aria-label={t("moore.sim.outputForState", { state })}
+                      data-testid={`moore-output-symbol-${stateIndex}`}
+                      className="border-input bg-background focus:ring-ring h-9 w-full min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
+                    />
+                  </td>
                   <td className="p-2">
-                    <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
-                      <input
-                        value={output?.symbol ?? ""}
-                        onChange={(event) =>
-                          onOutputSymbolChange(state, event.target.value)
-                        }
-                        aria-label={t("moore.sim.outputForState", { state })}
-                        data-testid={`moore-output-symbol-${stateIndex}`}
-                        className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
-                      />
-                      <input
-                        key={`${program.representation}-${output?.code ?? 0}`}
-                        defaultValue={formatInternalNumber(
-                          output?.code ?? 0,
+                    <input
+                      key={`${program.representation}-${output?.code ?? 0}`}
+                      defaultValue={formatInternalNumber(
+                        output?.code ?? 0,
+                        program.representation,
+                      )}
+                      onBlur={(event) => {
+                        const code = parseInternalNumber(
+                          event.currentTarget.value,
                           program.representation,
-                        )}
-                        onBlur={(event) => {
-                          const code = parseInternalNumber(
-                            event.currentTarget.value,
+                        );
+                        if (code === null) {
+                          event.currentTarget.value = formatInternalNumber(
+                            output?.code ?? 0,
                             program.representation,
                           );
-                          if (code === null) {
-                            event.currentTarget.value = formatInternalNumber(
-                              output?.code ?? 0,
-                              program.representation,
-                            );
-                            return;
-                          }
-                          onOutputCodeChange(state, code);
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.currentTarget.blur();
-                          }
-                        }}
-                        aria-label={t("moore.sim.outputCodeForState", {
-                          state,
-                        })}
-                        data-testid={`moore-output-code-${stateIndex}`}
-                        className="border-input bg-background focus:ring-ring h-9 rounded-md border px-2 font-mono outline-none focus:ring-1"
-                      />
-                    </div>
+                          return;
+                        }
+                        onOutputCodeChange(state, code);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.currentTarget.blur();
+                        }
+                      }}
+                      aria-label={t("moore.sim.outputCodeForState", {
+                        state,
+                      })}
+                      data-testid={`moore-output-code-${stateIndex}`}
+                      className="border-input bg-background focus:ring-ring h-9 w-full rounded-md border px-2 font-mono outline-none focus:ring-1"
+                    />
                   </td>
                 </tr>
               );

@@ -158,7 +158,7 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
   }, []);
 
   return (
-    <div className="border-foreground/70 max-w-full overflow-x-auto rounded-xl border-2">
+    <ConversionTableFrame>
       <table
         data-testid="moore-transition-value-table"
         className="w-full min-w-max border-collapse text-center font-mono text-sm"
@@ -258,7 +258,7 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </ConversionTableFrame>
   );
 }
 
@@ -313,29 +313,38 @@ function ValueTable({
   testId: string;
 }) {
   return (
-    <div className="border-border max-w-full overflow-x-auto rounded-xl border">
+    <ConversionTableFrame>
       <table
         data-testid={testId}
         className="w-full min-w-max border-collapse text-center font-mono text-sm"
       >
         <thead>
-          <tr className="border-b">
-            {groups.map((group) => (
+          <tr className="border-foreground/70 border-b-2">
+            {groups.map((group, groupIndex) => (
               <th
                 key={group.title}
                 colSpan={group.variables.length}
-                className={cn("border-r px-4 py-3 last:border-r-0", group.tone)}
+                className={cn(
+                  "border-foreground/70 px-4 py-3",
+                  groupIndex < groups.length - 1 && "border-r-2",
+                  group.tone,
+                )}
               >
                 {group.title}
               </th>
             ))}
           </tr>
-          <tr className="bg-muted/40 border-b">
-            {groups.flatMap((group) =>
-              group.variables.map((variable) => (
+          <tr className="border-foreground/70 bg-muted/40 border-b-2">
+            {groups.flatMap((group, groupIndex) =>
+              group.variables.map((variable, variableIndex) => (
                 <th
                   key={variable}
-                  className="min-w-14 border-r p-2 last:border-r-0"
+                  className={cn(
+                    "min-w-14 border-r p-2 last:border-r-0",
+                    groupIndex < groups.length - 1 &&
+                      variableIndex === group.variables.length - 1 &&
+                      "border-foreground/70 border-r-2",
+                  )}
                 >
                   {variable}
                 </th>
@@ -348,15 +357,22 @@ function ValueTable({
             const bits = getBits(row);
             const titles = getTitles(row);
             return (
-              <tr key={rowIndex} className="border-b last:border-b-0">
+              <tr
+                key={rowIndex}
+                className="group border-foreground/40 border-b-2 last:border-b-0"
+              >
                 {bits.map((bit, bitIndex) => (
                   <td
                     key={bitIndex}
                     title={titles[bitIndex]}
-                    className="group hover:bg-brand/10 relative min-w-14 border-r p-2 transition-colors last:border-r-0"
+                    className={cn(
+                      "group/cell group-hover:bg-brand/10 relative min-w-14 border-r p-2 transition-colors last:border-r-0",
+                      isGroupBoundary(groups, bitIndex) &&
+                        "border-foreground/70 border-r-2",
+                    )}
                   >
                     {bit}
-                    <span className="bg-popover text-popover-foreground border-border pointer-events-none absolute bottom-[calc(100%+0.25rem)] left-1/2 z-30 hidden -translate-x-1/2 rounded-md border px-2 py-1 text-xs whitespace-nowrap shadow-lg group-hover:block">
+                    <span className="bg-popover text-popover-foreground border-border pointer-events-none absolute bottom-[calc(100%+0.25rem)] left-1/2 z-30 hidden -translate-x-1/2 rounded-md border px-2 py-1 text-xs whitespace-nowrap shadow-lg group-hover/cell:block">
                       {titles[bitIndex]}
                     </span>
                   </td>
@@ -366,8 +382,24 @@ function ValueTable({
           })}
         </tbody>
       </table>
+    </ConversionTableFrame>
+  );
+}
+
+function ConversionTableFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-foreground/70 max-w-full overflow-x-auto rounded-xl border-2">
+      {children}
     </div>
   );
+}
+
+function isGroupBoundary(groups: ValueTableGroup[], bitIndex: number) {
+  let endIndex = -1;
+  return groups.slice(0, -1).some((group) => {
+    endIndex += group.variables.length;
+    return bitIndex === endIndex;
+  });
 }
 
 function HoverCell({
