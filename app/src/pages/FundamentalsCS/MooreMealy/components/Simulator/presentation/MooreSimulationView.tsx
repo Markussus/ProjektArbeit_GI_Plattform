@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { StateMachineGraph } from "@/components/shared/StateMachineGraph";
-import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
+import { cn } from "@/lib/utils";
 import type { MooreProgram, MooreRuntime } from "../domain/mooreTypes";
 
 interface MooreSimulationViewProps {
@@ -21,23 +21,15 @@ interface MooreSimulationViewProps {
   onSpeedChange: (speed: number) => void;
 }
 
-export function MooreSimulationView({
-  program,
-  runtime,
-  status,
-  speed,
-  error,
-  onEdit,
-  onPlay,
-  onPause,
-  onStep,
-  onStepBack,
-  onReset,
-  onSpeedChange,
-}: MooreSimulationViewProps) {
+export function MooreSimulationView(props: MooreSimulationViewProps) {
   const { t } = useTranslation();
-  const lastTransition =
-    runtime.transitionHistory[runtime.transitionHistory.length - 1];
+  const { program, runtime } = props;
+  const lastTransition = runtime.transitionHistory.at(-1);
+  const nextInput = program.inputWord[runtime.inputPosition];
+  const nextState =
+    nextInput !== undefined
+      ? program.transitions[nextInput]?.[runtime.currentState]
+      : undefined;
   const graphNodes = useMemo(
     () =>
       program.states.map((state) => ({
@@ -63,33 +55,14 @@ export function MooreSimulationView({
       ),
     [lastTransition, program],
   );
-  const tableRows = program.inputSymbols.map((inputSymbol) => [
-    inputSymbol,
-    ...program.states.map(
-      (state) => program.transitions[inputSymbol]?.[state] ?? "",
-    ),
-  ]);
-  const activeCell = lastTransition
-    ? {
-        row: program.inputSymbols.indexOf(lastTransition.inputSymbol),
-        col: program.states.indexOf(lastTransition.fromState) + 1,
-      }
-    : null;
 
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold">
-            {t("moore.sim.simulationTitle")}
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            {t("moore.sim.mooreOutputHint")}
-          </p>
-        </div>
+        <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
         <button
           type="button"
-          onClick={onEdit}
+          onClick={props.onEdit}
           data-testid="moore-edit-configuration"
           className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium"
         >
@@ -98,19 +71,19 @@ export function MooreSimulationView({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
-        <div className="space-y-4">
-          <SimulatorControls
-            status={status}
-            speed={speed}
-            onPlay={onPlay}
-            onPause={onPause}
-            onStep={onStep}
-            onStepBack={onStepBack}
-            onReset={onReset}
-            onSpeedChange={onSpeedChange}
-            testIdPrefix="moore-controls"
-          />
-
+        <SimulatorControls
+          status={props.status}
+          speed={props.speed}
+          onPlay={props.onPlay}
+          onPause={props.onPause}
+          onStep={props.onStep}
+          onStepBack={props.onStepBack}
+          onReset={props.onReset}
+          onSpeedChange={props.onSpeedChange}
+          testIdPrefix="moore-controls"
+          className="max-w-none"
+        />
+        <div className="grid gap-4 xl:grid-cols-[15rem_minmax(0,1fr)]">
           <div className="border-border bg-card space-y-3 rounded-xl border p-4">
             <StatusRow
               label={t("moore.sim.currentState")}
@@ -123,7 +96,7 @@ export function MooreSimulationView({
             <StatusRow
               label={t("moore.sim.status")}
               value={
-                error
+                props.error
                   ? t("moore.sim.error")
                   : runtime.halted
                     ? t("moore.sim.finished")
@@ -131,40 +104,117 @@ export function MooreSimulationView({
               }
             />
           </div>
+          <div className="space-y-3">
+            <SymbolSequence
+              title={t("moore.sim.inputWord")}
+              symbols={program.inputWord}
+              activeIndex={runtime.inputPosition}
+              testId="moore-runtime-input"
+            />
+            <SymbolSequence
+              title={t("moore.sim.outputWord")}
+              symbols={runtime.outputSymbols}
+              activeIndex={runtime.outputSymbols.length - 1}
+              testId="moore-runtime-output"
+              showEmptyWord={false}
+            />
+          </div>
         </div>
-
-        <StateMachineGraph
-          nodes={graphNodes}
-          edges={graphEdges}
-          ariaLabel={t("moore.sim.diagram")}
-          testId="moore-state-diagram"
-        />
       </div>
 
-      <SymbolSequence
-        title={t("moore.sim.inputWord")}
-        symbols={program.inputWord}
-        activeIndex={runtime.inputPosition}
-        testId="moore-runtime-input"
-      />
-      <SymbolSequence
-        title={t("moore.sim.outputWord")}
-        symbols={runtime.outputSymbols}
-        activeIndex={runtime.outputSymbols.length - 1}
-        testId="moore-runtime-output"
+      <StateMachineGraph
+        nodes={graphNodes}
+        edges={graphEdges}
+        ariaLabel={t("moore.sim.diagram")}
+        testId="moore-state-diagram"
+        className="w-full"
       />
 
-      <TableView
-        headers={[t("moore.sim.event"), ...program.states]}
-        rows={tableRows}
-        activeCell={activeCell}
-        activeCol={program.states.indexOf(runtime.currentState) + 1}
-        className="w-full"
-        tableClassName="w-full table-auto"
-        firstColumnWidthClassName=""
-        dataColumnWidthClassName=""
-        testIdPrefix="moore-runtime-transition-table"
+      <MooreRuntimeTable
+        program={program}
+        currentState={runtime.currentState}
+        nextInput={nextInput}
+        nextState={nextState}
       />
+    </div>
+  );
+}
+
+function MooreRuntimeTable({
+  program,
+  currentState,
+  nextInput,
+  nextState,
+}: {
+  program: MooreProgram;
+  currentState: string;
+  nextInput?: string;
+  nextState?: string;
+}) {
+  const { t } = useTranslation();
+  const currentCol = program.states.indexOf(currentState);
+  const nextCol = nextState ? program.states.indexOf(nextState) : -1;
+
+  return (
+    <div className="border-border overflow-x-auto rounded-xl border">
+      <table
+        data-testid="moore-runtime-transition-table"
+        className="w-full min-w-max border-collapse text-center text-sm"
+      >
+        <thead>
+          <tr className="bg-muted/50 border-b">
+            <th className="border-r p-3">{t("moore.sim.event")}</th>
+            {program.states.map((state, index) => (
+              <th
+                key={state}
+                className={cn(
+                  "min-w-32 border-r p-3 last:border-r-0",
+                  index === currentCol && "bg-brand/25 text-brand",
+                  index === nextCol && index !== currentCol && "bg-brand/10",
+                )}
+              >
+                {state}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {program.inputSymbols.map((symbol) => {
+            const isCurrentRow = symbol === nextInput;
+            return (
+              <tr key={symbol} className="border-b last:border-b-0">
+                <th
+                  className={cn(
+                    "border-r p-3 font-mono",
+                    isCurrentRow && "bg-brand/25 text-brand",
+                  )}
+                >
+                  {symbol}
+                </th>
+                {program.states.map((state, index) => {
+                  const target = program.transitions[symbol][state];
+                  const isSource = isCurrentRow && index === currentCol;
+                  const isResult = isSource && target === nextState;
+                  return (
+                    <td
+                      key={state}
+                      className={cn(
+                        "border-r p-3 font-mono last:border-r-0",
+                        index === nextCol && "bg-brand/5",
+                        isSource && "bg-brand/25 text-brand font-bold",
+                        isResult &&
+                          "outline-brand bg-brand/15 outline-2 -outline-offset-4 outline-dashed",
+                      )}
+                    >
+                      {target}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -183,38 +233,38 @@ function SymbolSequence({
   symbols,
   activeIndex,
   testId,
+  showEmptyWord = true,
 }: {
   title: string;
   symbols: string[];
   activeIndex: number;
   testId: string;
+  showEmptyWord?: boolean;
 }) {
   const { t } = useTranslation();
-
   return (
-    <section data-testid={testId} className="space-y-2">
+    <section data-testid={testId} className="space-y-1">
       <h3 className="text-sm font-semibold">{title}</h3>
-      <div className="border-border bg-card flex min-h-14 items-center gap-2 overflow-x-auto rounded-xl border p-3">
-        {symbols.length > 0 ? (
+      <div className="border-border bg-card flex min-h-12 items-center gap-2 overflow-x-auto rounded-lg border p-2">
+        {symbols.length ? (
           symbols.map((symbol, index) => (
             <span
               key={`${symbol}-${index}`}
-              className={
-                index === activeIndex
-                  ? "border-brand bg-brand/10 text-brand rounded-md border-2 px-3 py-2 font-mono font-semibold"
-                  : index < activeIndex
-                    ? "border-border bg-muted text-muted-foreground rounded-md border px-3 py-2 font-mono"
-                    : "border-border bg-background rounded-md border px-3 py-2 font-mono"
-              }
+              className={cn(
+                "border-border bg-background rounded-md border px-3 py-1.5 font-mono",
+                index < activeIndex && "bg-muted text-muted-foreground",
+                index === activeIndex &&
+                  "border-brand bg-brand/10 text-brand border-2 font-semibold",
+              )}
             >
               {symbol}
             </span>
           ))
-        ) : (
+        ) : showEmptyWord ? (
           <span className="text-muted-foreground text-sm italic">
             {t("moore.sim.emptyWord")}
           </span>
-        )}
+        ) : null}
       </div>
     </section>
   );

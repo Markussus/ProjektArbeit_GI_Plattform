@@ -1,5 +1,7 @@
 import { useMemo } from "react";
+import { Minus, Plus, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
 
 export interface StateMachineGraphNode {
   id: string;
@@ -35,20 +37,35 @@ export function StateMachineGraph({
 }: StateMachineGraphProps) {
   const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
+  const {
+    viewBox,
+    scale,
+    isPanning,
+    setSvgRef,
+    onMouseDown,
+    zoomIn,
+    zoomOut,
+    reset,
+  } = useSvgZoomPan(layout.width, layout.height);
 
   return (
     <div
       data-testid={testId}
       className={cn(
-        "border-border bg-muted/20 min-h-80 overflow-hidden rounded-xl border",
+        "border-border bg-muted/20 relative min-h-80 overflow-hidden rounded-xl border",
         className,
       )}
     >
       <svg
+        ref={setSvgRef}
         role="img"
         aria-label={ariaLabel}
-        viewBox={`0 0 ${layout.width} ${layout.height}`}
-        className="block min-h-80 w-full"
+        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+        onMouseDown={onMouseDown}
+        className={cn(
+          "block min-h-96 w-full select-none",
+          isPanning ? "cursor-grabbing" : "cursor-grab",
+        )}
       >
         <defs>
           <marker
@@ -165,7 +182,43 @@ export function StateMachineGraph({
           );
         })}
       </svg>
+      <div className="absolute top-3 right-3 flex gap-1" data-no-pan>
+        <GraphButton label="Zoom out" onClick={zoomOut}>
+          <Minus className="size-4" />
+        </GraphButton>
+        <GraphButton label="Reset view" onClick={reset}>
+          <RotateCcw className="size-4" />
+        </GraphButton>
+        <GraphButton label="Zoom in" onClick={zoomIn}>
+          <Plus className="size-4" />
+        </GraphButton>
+      </div>
+      <span className="bg-background/85 text-muted-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs">
+        {Math.round(scale * 100)}%
+      </span>
     </div>
+  );
+}
+
+function GraphButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="border-border bg-background hover:bg-muted inline-flex size-8 items-center justify-center rounded-md border shadow-sm"
+    >
+      {children}
+    </button>
   );
 }
 

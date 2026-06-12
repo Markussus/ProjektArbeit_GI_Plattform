@@ -76,7 +76,10 @@ export function MooreLogicGateView({
       {showCompleteCircuit ? (
         <div className="space-y-3">
           <h3 className="font-semibold">{t("moore.logic.completeCircuit")}</h3>
-          <MooreCircuitDiagram conversion={conversion} />
+          <MooreCircuitDiagram
+            conversion={conversion}
+            unavailableText={t("moore.logic.minimizationUnavailable")}
+          />
         </div>
       ) : formula ? (
         <div className="space-y-3">

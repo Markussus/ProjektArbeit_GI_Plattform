@@ -239,6 +239,7 @@
       "inputWord": "Input",
       "outputWord": "Output",
       "inputWordPlaceholder": "Enter a symbol and press Enter",
+      "inputDropPlaceholder": "Drop symbols from the input alphabet here",
       "inputAlphabetHelp": "Input alphabet: click symbols or drag and drop them into the input.",
       "noSymbols": "No symbols",
       "emptyWord": "Empty word (ε)",
@@ -287,7 +288,9 @@
       "state": "State",
       "output": "Output",
       "canonicalDnf": "Canonical DNF",
-      "minimalDnf": "Optimized minimal DNF",
+      "minimalDnf": "Minimized Boolean function",
+      "showSimulator": "Show simulator UI",
+      "showLogic": "Show logic gates",
       "minimizationLimit": "The canonical DNF is shown. Automatic minimization is limited to 8 state and input bits in total."
     },
     "logic": {

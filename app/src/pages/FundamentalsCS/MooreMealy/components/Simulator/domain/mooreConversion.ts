@@ -1,6 +1,10 @@
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 import { formatBooleanExpressionForDisplay } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
 import {
+  countExpressionLiterals,
+  factorMinimalDnf,
+} from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/factorMinimalDnf";
+import {
   computeMinimalDnf,
   minimalDnfToExpression,
 } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
@@ -149,13 +153,19 @@ function buildFormulas(
       createTruthTableFromResults(inputVariables, resultValues),
     );
     const expression = minimalDnfToExpression(minimalDnf, inputVariables);
+    const factoredExpression = factorMinimalDnf(minimalDnf, inputVariables);
+    const preferredExpression =
+      countExpressionLiterals(factoredExpression) <
+      countExpressionLiterals(expression)
+        ? factoredExpression
+        : expression;
 
     return {
       name,
       variables: inputVariables,
       canonical,
-      minimal: formatBooleanExpressionForDisplay(expression),
-      expression,
+      minimal: formatBooleanExpressionForDisplay(preferredExpression),
+      expression: preferredExpression,
       minimizationAvailable: true,
     };
   });

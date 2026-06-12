@@ -3,14 +3,14 @@ import { defaultMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/component
 import { MooreMachineSimulator } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreMachine";
 
 describe("Moore machine simulator", () => {
-  it("emits the start-state output before consuming the first symbol", () => {
+  it("emits no output before consuming the first symbol", () => {
     const simulator = new MooreMachineSimulator();
     simulator.initialize(defaultMooreProgram);
 
     expect(simulator.getCurrentState()).toMatchObject({
       currentState: "HALT",
       inputPosition: 0,
-      outputSymbols: ["4"],
+      outputSymbols: [],
       stepCount: 0,
     });
 
@@ -19,7 +19,7 @@ describe("Moore machine simulator", () => {
     expect(simulator.getCurrentState()).toMatchObject({
       currentState: "READY",
       inputPosition: 1,
-      outputSymbols: ["4", "6"],
+      outputSymbols: ["6"],
       stepCount: 1,
     });
   });
@@ -49,7 +49,7 @@ describe("Moore machine simulator", () => {
     expect(simulator.getCurrentState()).toMatchObject({
       currentState: "CLOSED",
       inputPosition: 2,
-      outputSymbols: ["locked", "unlocked", "locked"],
+      outputSymbols: ["unlocked", "locked"],
       halted: true,
     });
   });
@@ -63,7 +63,7 @@ describe("Moore machine simulator", () => {
     expect(simulator.getCurrentState()).toMatchObject({
       currentState: "HALT",
       inputPosition: 0,
-      outputSymbols: ["4"],
+      outputSymbols: [],
       stepCount: 0,
       halted: false,
     });

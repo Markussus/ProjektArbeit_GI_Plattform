@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SearchableCreatableSelect } from "@/components/shared/SearchableCreatableSelect";
 import { cn } from "@/lib/utils";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import { formatInternalNumber } from "../domain/mooreProgram";
 import type { MooreProgram } from "../domain/mooreTypes";
 
@@ -31,6 +33,16 @@ export function MooreTransitionTable({
   onRemoveInputSymbol,
 }: MooreTransitionTableProps) {
   const { t } = useTranslation();
+  const { setElementRef, onMouseDown, isDragging, scrollToEnd } =
+    useDragScroll<HTMLDivElement>();
+  const previousStateCountRef = useRef(program.states.length);
+
+  useEffect(() => {
+    if (program.states.length > previousStateCountRef.current) {
+      scrollToEnd();
+    }
+    previousStateCountRef.current = program.states.length;
+  }, [program.states.length, scrollToEnd]);
 
   return (
     <section className="min-w-0 space-y-2">
@@ -41,7 +53,15 @@ export function MooreTransitionTable({
         </p>
       </div>
 
-      <div className="border-border max-w-full overflow-x-auto rounded-lg border shadow-sm">
+      <div
+        ref={setElementRef}
+        onMouseDown={onMouseDown}
+        data-testid="moore-transition-table-scroll"
+        className={cn(
+          "border-border max-w-full overflow-x-auto rounded-lg border shadow-sm select-none",
+          isDragging ? "cursor-grabbing" : "cursor-grab",
+        )}
+      >
         <table
           data-testid="moore-transition-table"
           className="w-max min-w-full border-collapse text-sm"

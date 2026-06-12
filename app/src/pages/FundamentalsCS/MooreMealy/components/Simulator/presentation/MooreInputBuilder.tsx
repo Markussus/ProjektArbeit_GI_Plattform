@@ -1,4 +1,4 @@
-import { useState, type DragEvent, type KeyboardEvent } from "react";
+import { useState, type DragEvent } from "react";
 import { GripVertical, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ export function MooreInputBuilder({
   onChange,
 }: MooreInputBuilderProps) {
   const { t } = useTranslation();
-  const [typedSymbol, setTypedSymbol] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
 
   const addSymbol = (symbol: string) => {
@@ -23,17 +22,6 @@ export function MooreInputBuilder({
       return;
     }
     onChange([...inputWord, symbol]);
-    setTypedSymbol("");
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      addSymbol(typedSymbol.trim());
-    }
-    if (event.key === "Backspace" && typedSymbol === "" && inputWord.length) {
-      onChange(inputWord.slice(0, -1));
-    }
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -83,20 +71,11 @@ export function MooreInputBuilder({
             </button>
           </span>
         ))}
-        <input
-          value={typedSymbol}
-          onChange={(event) => setTypedSymbol(event.target.value)}
-          onKeyDown={handleKeyDown}
-          list="moore-input-symbol-options"
-          placeholder={t("moore.sim.inputWordPlaceholder")}
-          className="min-w-44 flex-1 bg-transparent px-1 py-1 font-mono text-sm outline-none"
-          data-testid="moore-input-word-entry"
-        />
-        <datalist id="moore-input-symbol-options">
-          {inputSymbols.map((symbol) => (
-            <option key={symbol} value={symbol} />
-          ))}
-        </datalist>
+        {inputWord.length === 0 && (
+          <span className="text-muted-foreground px-1 text-sm italic">
+            {t("moore.sim.inputDropPlaceholder")}
+          </span>
+        )}
       </div>
 
       <div>

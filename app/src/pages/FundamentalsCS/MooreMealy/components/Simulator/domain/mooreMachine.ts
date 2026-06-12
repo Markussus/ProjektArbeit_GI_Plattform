@@ -23,7 +23,7 @@ export class MooreMachineSimulator implements ISimulator<
       : {
           currentState: program.initialState,
           inputPosition: 0,
-          outputSymbols: [program.outputs[program.initialState].symbol],
+          outputSymbols: [],
           stepCount: 0,
           halted: program.inputWord.length === 0,
           transitionHistory: [],

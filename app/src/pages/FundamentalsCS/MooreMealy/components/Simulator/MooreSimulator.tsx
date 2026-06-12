@@ -347,7 +347,16 @@ export const MooreSimulator = forwardRef<MooreSimulatorHandle>(
         >
           <MooreConversionView
             conversion={conversion}
-            onBack={() => setActiveView("main")}
+            onBackToEditor={() => {
+              setIsEditMode(true);
+              setActiveView("main");
+            }}
+            onShowSimulator={() => {
+              setCommittedProgram(program);
+              setIsEditMode(false);
+              setActiveView("main");
+            }}
+            onShowLogic={() => setActiveView("logic")}
           />
         </div>
       );
@@ -361,7 +370,10 @@ export const MooreSimulator = forwardRef<MooreSimulatorHandle>(
         >
           <MooreLogicGateView
             conversion={conversion}
-            onBack={() => setActiveView("main")}
+            onBack={() => {
+              setIsEditMode(true);
+              setActiveView("main");
+            }}
           />
         </div>
       );

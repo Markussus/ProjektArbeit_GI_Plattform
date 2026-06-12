@@ -239,6 +239,7 @@
       "inputWord": "Eingabe",
       "outputWord": "Ausgabe",
       "inputWordPlaceholder": "Symbol eingeben und Enter drücken",
+      "inputDropPlaceholder": "Symbole aus dem Eingabealphabet hier ablegen",
       "inputAlphabetHelp": "Eingabealphabet: Symbole anklicken oder per Drag-and-drop in die Eingabe ziehen.",
       "noSymbols": "Keine Symbole",
       "emptyWord": "Leeres Wort (ε)",
@@ -287,7 +288,9 @@
       "state": "Zustand",
       "output": "Ausgabe",
       "canonicalDnf": "Kanonische DNF",
-      "minimalDnf": "Optimierte minimale DNF",
+      "minimalDnf": "Minimierte boolesche Funktion",
+      "showSimulator": "Wieder UI anzeigen",
+      "showLogic": "Logikgatter anzeigen",
       "minimizationLimit": "Die kanonische DNF wird angezeigt. Die automatische Minimierung ist auf insgesamt 8 Zustands- und Eingabebits begrenzt."
     },
     "logic": {

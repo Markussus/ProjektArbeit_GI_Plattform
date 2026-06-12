@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
 interface LogicGateDiagramProps {
@@ -27,6 +28,7 @@ export function LogicGateDiagram({
     () => (expression ? buildDiagram(expression) : null),
     [expression],
   );
+  const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
 
   if (!diagram) {
     return (
@@ -91,13 +93,20 @@ export function LogicGateDiagram({
             if (!source) {
               return null;
             }
+            const selected =
+              selectedNodeId === childId || selectedNodeId === node.id;
             return (
               <path
                 key={`${childId}-${node.id}`}
+                data-testid={`moore-logic-wire-${childId}-${node.id}`}
                 d={`M ${source.x + 50} ${source.y} C ${source.x + 90} ${source.y}, ${target.x - 90} ${target.y}, ${target.x - 50} ${target.y}`}
                 fill="none"
-                className="stroke-muted-foreground"
-                strokeWidth="2"
+                onClick={() => setSelectedNodeId(childId)}
+                className={cn(
+                  "stroke-muted-foreground cursor-pointer",
+                  selected && "stroke-brand",
+                )}
+                strokeWidth={selected ? 4 : 2}
                 markerEnd="url(#logic-arrow)"
               />
             );
@@ -137,7 +146,17 @@ export function LogicGateDiagram({
             return null;
           }
           return (
-            <GateNode key={node.id} node={node} x={position.x} y={position.y} />
+            <GateNode
+              key={node.id}
+              node={node}
+              x={position.x}
+              y={position.y}
+              selected={
+                selectedNodeId === node.id ||
+                node.children.includes(selectedNodeId ?? -1)
+              }
+              onSelect={() => setSelectedNodeId(node.id)}
+            />
           );
         })}
 
@@ -149,16 +168,40 @@ export function LogicGateDiagram({
   );
 }
 
-function GateNode({ node, x, y }: { node: DiagramNode; x: number; y: number }) {
+function GateNode({
+  node,
+  x,
+  y,
+  selected,
+  onSelect,
+}: {
+  node: DiagramNode;
+  x: number;
+  y: number;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   if (node.kind === "input" || node.kind === "constant") {
     return (
-      <g>
-        <circle cx={x} cy={y} r="6" className="fill-foreground" />
+      <g
+        data-testid={`moore-logic-node-${node.id}`}
+        onClick={onSelect}
+        className="cursor-pointer"
+      >
+        <circle
+          cx={x}
+          cy={y}
+          r={selected ? 9 : 6}
+          className={selected ? "fill-brand" : "fill-foreground"}
+        />
         <text
           x={x - 14}
           y={y + 5}
           textAnchor="end"
-          className="fill-foreground font-mono text-sm font-semibold"
+          className={cn(
+            "fill-foreground font-mono text-sm font-semibold",
+            selected && "fill-brand",
+          )}
         >
           {node.label}
         </text>
@@ -167,15 +210,23 @@ function GateNode({ node, x, y }: { node: DiagramNode; x: number; y: number }) {
   }
 
   return (
-    <g>
+    <g
+      data-testid={`moore-logic-node-${node.id}`}
+      onClick={onSelect}
+      className="cursor-pointer"
+    >
       <rect
         x={x - 42}
         y={y - 28}
         width="84"
         height="56"
         rx="5"
-        className="fill-card stroke-foreground"
-        strokeWidth="2"
+        className={
+          selected
+            ? "fill-brand/15 stroke-brand"
+            : "fill-card stroke-foreground"
+        }
+        strokeWidth={selected ? 4 : 2}
       />
       <text
         x={x}

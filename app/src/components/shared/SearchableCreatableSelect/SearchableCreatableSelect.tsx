@@ -5,6 +5,7 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +35,11 @@ export function SearchableCreatableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [menuPosition, setMenuPosition] = useState({ left: 0, top: 0 });
   const normalizedQuery = query.trim();
   const matchingOptions = useMemo(
     () =>
@@ -53,7 +58,10 @@ export function SearchableCreatableSelect({
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
+      if (
+        !containerRef.current?.contains(event.target as Node) &&
+        !menuRef.current?.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setQuery("");
       }
@@ -77,6 +85,11 @@ export function SearchableCreatableSelect({
 
   useEffect(() => {
     if (isOpen) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        setMenuPosition({ left: rect.left, top: rect.bottom + 4 });
+      }
+      setActiveIndex(0);
       inputRef.current?.focus();
     }
   }, [isOpen]);
@@ -98,13 +111,31 @@ export function SearchableCreatableSelect({
   };
 
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const itemCount = matchingOptions.length + (canCreate ? 1 : 0);
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (itemCount === 0) {
+        return;
+      }
+      setActiveIndex((current) => {
+        const direction = event.key === "ArrowDown" ? 1 : -1;
+        const next = (current + direction + itemCount) % itemCount;
+        window.setTimeout(() =>
+          optionRefs.current[next]?.scrollIntoView({
+            block: "nearest",
+          }),
+        );
+        return next;
+      });
+      return;
+    }
     if (event.key !== "Enter") {
       return;
     }
 
     event.preventDefault();
-    if (matchingOptions.length === 1 && !canCreate) {
-      selectValue(matchingOptions[0]);
+    if (activeIndex < matchingOptions.length) {
+      selectValue(matchingOptions[activeIndex]);
       return;
     }
 
@@ -133,70 +164,87 @@ export function SearchableCreatableSelect({
         />
       </button>
 
-      {isOpen && !disabled && (
-        <div
-          role="listbox"
-          aria-label={ariaLabel}
-          className="bg-popover text-popover-foreground border-border absolute top-[calc(100%+0.25rem)] left-0 z-40 w-64 rounded-lg border p-1 shadow-xl"
-        >
-          <div className="border-border relative border-b p-1 pb-2">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={handleInputKeyDown}
-              aria-label={`${ariaLabel} search`}
-              data-testid={testId ? `${testId}-search` : undefined}
-              className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </div>
+      {isOpen &&
+        !disabled &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="listbox"
+            aria-label={ariaLabel}
+            style={{ left: menuPosition.left, top: menuPosition.top }}
+            className="bg-popover text-popover-foreground border-border fixed z-[100] w-64 rounded-lg border p-1 shadow-xl"
+          >
+            <div className="border-border relative border-b p-1 pb-2">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={handleInputKeyDown}
+                aria-label={`${ariaLabel} search`}
+                data-testid={testId ? `${testId}-search` : undefined}
+                className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </div>
 
-          <div className="max-h-56 overflow-y-auto py-1">
-            {matchingOptions.map((option) => (
-              <button
-                key={option}
-                type="button"
-                role="option"
-                aria-selected={option === value}
-                onClick={() => selectValue(option)}
-                className={cn(
-                  "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
-                  option === value && "bg-muted",
-                )}
-              >
-                <span className="truncate">{option}</span>
-                {option === value && (
-                  <Check className="text-brand size-4 shrink-0" />
-                )}
-              </button>
-            ))}
+            <div className="max-h-56 overflow-y-auto py-1">
+              {matchingOptions.map((option, index) => (
+                <button
+                  ref={(element) => {
+                    optionRefs.current[index] = element;
+                  }}
+                  key={option}
+                  type="button"
+                  role="option"
+                  data-testid={
+                    testId ? `${testId}-option-${option}` : undefined
+                  }
+                  aria-selected={option === value}
+                  onClick={() => selectValue(option)}
+                  className={cn(
+                    "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
+                    (option === value || index === activeIndex) && "bg-muted",
+                  )}
+                >
+                  <span className="truncate">{option}</span>
+                  {option === value && (
+                    <Check className="text-brand size-4 shrink-0" />
+                  )}
+                </button>
+              ))}
 
-            {matchingOptions.length === 0 && !canCreate && (
-              <p className="text-muted-foreground px-3 py-2 text-sm">
-                {notFoundLabel}
-              </p>
-            )}
+              {matchingOptions.length === 0 && !canCreate && (
+                <p className="text-muted-foreground px-3 py-2 text-sm">
+                  {notFoundLabel}
+                </p>
+              )}
 
-            {canCreate && (
-              <button
-                type="button"
-                onClick={createValue}
-                data-testid={testId ? `${testId}-create` : undefined}
-                className="hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm"
-              >
-                <Plus className="text-brand size-4 shrink-0" />
-                <span className="text-muted-foreground">{createLabel}</span>
-                <span className="truncate font-mono font-semibold">
-                  {normalizedQuery}
-                </span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+              {canCreate && (
+                <button
+                  ref={(element) => {
+                    optionRefs.current[matchingOptions.length] = element;
+                  }}
+                  type="button"
+                  onClick={createValue}
+                  data-testid={testId ? `${testId}-create` : undefined}
+                  className={cn(
+                    "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
+                    activeIndex === matchingOptions.length && "bg-muted",
+                  )}
+                >
+                  <Plus className="text-brand size-4 shrink-0" />
+                  <span className="text-muted-foreground">{createLabel}</span>
+                  <span className="truncate font-mono font-semibold">
+                    {normalizedQuery}
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
