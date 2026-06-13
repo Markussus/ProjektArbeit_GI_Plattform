@@ -18,8 +18,10 @@ export interface UseDnfSimplificationResult {
   reset: () => void;
 }
 
-export function useDnfSimplification(): UseDnfSimplificationResult {
-  const [answer, setAnswerInternal] = useState("");
+export function useDnfSimplification(
+  initialAnswer = "",
+): UseDnfSimplificationResult {
+  const [answer, setAnswerInternal] = useState(initialAnswer);
   const [feedback, setFeedback] = useState<DnfSimplificationCheckResult | null>(
     null,
   );

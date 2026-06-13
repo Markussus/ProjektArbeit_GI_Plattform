@@ -1,6 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Eraser, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
@@ -12,6 +15,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { dnfExpressionTransferCodec } from "../DnfBuilder/domain/dnfTransfer";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
 import { DnfOperatorToolbar } from "../DnfBuilder/presentation/DnfOperatorToolbar";
@@ -22,15 +26,36 @@ import {
 
 interface ExpressionBuilderProps {
   initialExpression?: string;
+  storageIdentifier: string;
+  storageEnabled: boolean;
+  storageReady: boolean;
+  transferCodec: ISimulatorTransferCodec<string>;
+  onTransferValueChange?: (value: string) => void;
 }
 
 export function ExpressionBuilder({
   initialExpression,
-}: ExpressionBuilderProps = {}) {
+  storageIdentifier,
+  storageEnabled,
+  storageReady,
+  transferCodec,
+  onTransferValueChange,
+}: ExpressionBuilderProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [inputValue, setInputValue] = useState(initialExpression ?? "");
   const [committedSource, setCommittedSource] = useState<string | null>(null);
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: inputValue,
+    codec: dnfExpressionTransferCodec,
+    enabled: storageEnabled && storageReady,
+  });
+
+  useEffect(() => {
+    onTransferValueChange?.(inputValue);
+  }, [inputValue, onTransferValueChange]);
 
   const handleSourceChange = (value: string) => {
     setInputValue(normalizeBooleanOperatorAliases(value));
@@ -45,6 +70,15 @@ export function ExpressionBuilder({
     setInputValue("");
     setCommittedSource(null);
   };
+
+  const handleImportExpression = (expression: string) => {
+    const normalizedExpression = normalizeBooleanOperatorAliases(expression);
+
+    setInputValue(normalizedExpression);
+    setCommittedSource(normalizedExpression.trim() || null);
+  };
+
+  const transferExpression = committedSource ?? inputValue.trim();
 
   return (
     <div
@@ -123,6 +157,13 @@ export function ExpressionBuilder({
           </button>
         </div>
       )}
+
+      <SimulatorStringTransferBox
+        value={transferExpression}
+        codec={transferCodec}
+        onLoad={handleImportExpression}
+        testIdPrefix="dnf-expression-transfer"
+      />
 
       {committedSource !== null && (
         <ExpressionWorkspace

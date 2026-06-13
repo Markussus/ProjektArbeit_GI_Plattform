@@ -1,6 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
@@ -10,6 +13,10 @@ import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import {
+  dnfTruthTableTransferCodec,
+  type DnfTruthTableTransferDraft,
+} from "../DnfBuilder/domain/dnfTransfer";
 import { createTruthTableFromResults } from "../DnfBuilder/domain/truthTable";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
@@ -23,12 +30,22 @@ const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 interface TableToDnfBuilderProps {
   initialVariables?: string[];
   initialResultValues?: boolean[];
+  storageIdentifier: string;
+  storageEnabled: boolean;
+  storageReady: boolean;
+  transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
+  onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
 }
 
 export function TableToDnfBuilder({
   initialVariables,
   initialResultValues,
-}: TableToDnfBuilderProps = {}) {
+  storageIdentifier,
+  storageEnabled,
+  storageReady,
+  transferCodec,
+  onTransferValueChange,
+}: TableToDnfBuilderProps) {
   const { t } = useTranslation();
   const initialVariableCount = clampVariableCount(
     initialVariables?.length ?? 3,
@@ -58,6 +75,24 @@ export function TableToDnfBuilder({
     () => analyzeDnfTruthTable(truthTable),
     [truthTable],
   );
+  const transferValue = useMemo(
+    () => ({
+      variableCount,
+      resultValues,
+    }),
+    [resultValues, variableCount],
+  );
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfTruthTableTransferCodec,
+    enabled: storageEnabled && storageReady,
+  });
+
+  useEffect(() => {
+    onTransferValueChange?.(transferValue);
+  }, [onTransferValueChange, transferValue]);
 
   const display = useMemo(() => {
     if (!showSolution || analysis.status !== "valid") return null;
@@ -116,6 +151,14 @@ export function TableToDnfBuilder({
     simplification.reset();
   };
 
+  const handleImportTable = (value: DnfTruthTableTransferDraft) => {
+    setVariableCount(value.variableCount);
+    setResultValues([...value.resultValues]);
+    setCommitted(false);
+    setShowFullTable(false);
+    resetAttempt();
+  };
+
   if (analysis.status !== "valid") {
     return null;
   }
@@ -136,6 +179,14 @@ export function TableToDnfBuilder({
         truthTable={analysis.truthTable}
         variableCount={variableCount}
         resultValues={resultValues}
+        transferControl={
+          <SimulatorStringTransferBox
+            value={transferValue}
+            codec={transferCodec}
+            onLoad={handleImportTable}
+            testIdPrefix="dnf-table-transfer"
+          />
+        }
         onVariableCountChange={updateVariableCount}
         onResultValuesChange={(values) => {
           setResultValues(values);
@@ -159,6 +210,13 @@ export function TableToDnfBuilder({
           {t("dnf.simulator.newTable")}
         </button>
       </div>
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportTable}
+        testIdPrefix="dnf-table-transfer"
+      />
 
       <DnfExerciseWorkspace
         source="f"

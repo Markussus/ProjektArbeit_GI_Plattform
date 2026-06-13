@@ -1,7 +1,14 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { useDnfBuilder } from "./application/useDnfBuilder";
+import {
+  dnfExerciseTransferCodec,
+  type DnfExerciseTransferDraft,
+} from "./domain/dnfTransfer";
 import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "./presentation/DnfFollowUpSections";
 import {
@@ -11,11 +18,43 @@ import {
 
 interface DnfBuilderProps {
   selectedExercise: Exercise;
+  initialAttempt?: DnfExerciseTransferDraft;
+  storageIdentifier: string;
+  storageEnabled: boolean;
+  storageReady: boolean;
+  transferCodec: ISimulatorTransferCodec<DnfExerciseTransferDraft>;
 }
 
-export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
-  const builder = useDnfBuilder(selectedExercise);
+export function DnfBuilder({
+  selectedExercise,
+  initialAttempt,
+  storageIdentifier,
+  storageEnabled,
+  storageReady,
+  transferCodec,
+}: DnfBuilderProps) {
+  const builder = useDnfBuilder(selectedExercise, initialAttempt);
   const [showFullTable, setShowFullTable] = useState(false);
+  const transferValue = useMemo<DnfExerciseTransferDraft>(
+    () => ({
+      truthTableAnswers: builder.truthTableAnswers,
+      dnfAnswer: builder.dnfAnswer,
+      simplificationAnswer: builder.simplification.answer,
+    }),
+    [
+      builder.dnfAnswer,
+      builder.simplification.answer,
+      builder.truthTableAnswers,
+    ],
+  );
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfExerciseTransferCodec,
+    enabled: storageEnabled && storageReady,
+  });
+
   const display = useMemo(() => {
     if (!builder.showSolution || builder.analysis.status !== "valid") {
       return null;
@@ -97,6 +136,13 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         onReset={builder.reset}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+      />
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={builder.loadAttempt}
+        testIdPrefix="dnf-exercise-transfer"
       />
 
       <DnfFollowUpSections
