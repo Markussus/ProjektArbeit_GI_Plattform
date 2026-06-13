@@ -16,6 +16,7 @@ import {
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
 import {
+  createDnfAttemptDraft,
   dnfExpressionTransferCodec,
   type DnfAttemptTransferDraft,
   type DnfExpressionTransferDraft,
@@ -53,11 +54,9 @@ export function ExpressionBuilder({
   const [committedSource, setCommittedSource] = useState<string | null>(
     initialValue?.committed ? initialValue.expression : null,
   );
-  const [attempt, setAttempt] = useState<DnfAttemptTransferDraft>(() => ({
-    truthTableAnswers: initialValue?.truthTableAnswers ?? [],
-    dnfAnswer: initialValue?.dnfAnswer ?? "",
-    simplificationAnswer: initialValue?.simplificationAnswer ?? "",
-  }));
+  const [attempt, setAttempt] = useState<DnfAttemptTransferDraft>(() =>
+    createDnfAttemptDraft(initialValue),
+  );
   const [workspaceVersion, setWorkspaceVersion] = useState(0);
   const transferValue = useMemo<DnfExpressionTransferDraft>(
     () => ({
@@ -96,7 +95,7 @@ export function ExpressionBuilder({
     onUserChange?.();
     setInputValue("");
     setCommittedSource(null);
-    setAttempt(emptyAttempt);
+    setAttempt(createDnfAttemptDraft());
     setWorkspaceVersion((current) => current + 1);
   };
 
@@ -110,11 +109,7 @@ export function ExpressionBuilder({
     setCommittedSource(
       value.committed ? normalizedExpression.trim() || null : null,
     );
-    setAttempt({
-      truthTableAnswers: [...value.truthTableAnswers],
-      dnfAnswer: value.dnfAnswer,
-      simplificationAnswer: value.simplificationAnswer,
-    });
+    setAttempt(createDnfAttemptDraft(value));
     setWorkspaceVersion((current) => current + 1);
   };
 
@@ -300,9 +295,11 @@ function ExpressionWorkspace({
   };
 
   const handleReset = () => {
+    const emptyAttempt = createDnfAttemptDraft();
+
     onUserChange?.();
-    setTruthTableAnswers([]);
-    setDnfAnswer("");
+    setTruthTableAnswers(emptyAttempt.truthTableAnswers);
+    setDnfAnswer(emptyAttempt.dnfAnswer);
     setFeedback(null);
     setShowSolution(false);
     simplification.reset();
@@ -374,9 +371,3 @@ function ExpressionWorkspace({
     </>
   );
 }
-
-const emptyAttempt: DnfAttemptTransferDraft = {
-  truthTableAnswers: [],
-  dnfAnswer: "",
-  simplificationAnswer: "",
-};

@@ -59,6 +59,16 @@ export type DnfExpressionTransferDraft = Omit<
 
 export type DnfExerciseTransferDraft = Omit<DnfExerciseTransferValue, "mode">;
 
+export function createDnfAttemptDraft(
+  attempt?: DnfAttemptTransferDraft,
+): DnfAttemptTransferDraft {
+  return {
+    truthTableAnswers: [...(attempt?.truthTableAnswers ?? [])],
+    dnfAnswer: attempt?.dnfAnswer ?? "",
+    simplificationAnswer: attempt?.simplificationAnswer ?? "",
+  };
+}
+
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
 
@@ -122,7 +132,7 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
           mode: "expression_to_truth_table",
           expression: expression.trim(),
           committed: false,
-          ...emptyAttempt,
+          ...createDnfAttemptDraft(),
         };
       }
 
@@ -153,7 +163,7 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
           variableCount,
           resultValues,
           committed: false,
-          ...emptyAttempt,
+          ...createDnfAttemptDraft(),
         };
       }
 
@@ -204,9 +214,7 @@ export const dnfExpressionTransferCodec: ISimulatorTransferCodec<DnfExpressionTr
       return {
         expression: value.expression,
         committed: value.committed,
-        truthTableAnswers: value.truthTableAnswers,
-        dnfAnswer: value.dnfAnswer,
-        simplificationAnswer: value.simplificationAnswer,
+        ...createDnfAttemptDraft(value),
       };
     },
   };
@@ -230,9 +238,7 @@ export const dnfTruthTableTransferCodec: ISimulatorTransferCodec<DnfTruthTableTr
         variableCount: value.variableCount,
         resultValues: value.resultValues,
         committed: value.committed,
-        truthTableAnswers: value.truthTableAnswers,
-        dnfAnswer: value.dnfAnswer,
-        simplificationAnswer: value.simplificationAnswer,
+        ...createDnfAttemptDraft(value),
       };
     },
   };
@@ -252,11 +258,7 @@ export const dnfExerciseTransferCodec: ISimulatorTransferCodec<DnfExerciseTransf
         throw new Error("dnf_transfer_mode_invalid");
       }
 
-      return {
-        truthTableAnswers: value.truthTableAnswers,
-        dnfAnswer: value.dnfAnswer,
-        simplificationAnswer: value.simplificationAnswer,
-      };
+      return createDnfAttemptDraft(value);
     },
   };
 
@@ -288,12 +290,6 @@ function readUtf8String(reader: BitReader): string {
     throw new Error("dnf_transfer_payload_invalid");
   }
 }
-
-const emptyAttempt: DnfAttemptTransferDraft = {
-  truthTableAnswers: [],
-  dnfAnswer: "",
-  simplificationAnswer: "",
-};
 
 function writeAttempt(writer: BitWriter, value: DnfAttemptTransferDraft): void {
   writer.writeVarUint(value.truthTableAnswers.length);

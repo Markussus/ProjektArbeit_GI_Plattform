@@ -4,6 +4,7 @@ import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
+import { buildDnfFollowUpConfiguration } from "./application/dnfFollowUp";
 import { useDnfBuilder } from "./application/useDnfBuilder";
 import {
   dnfExerciseTransferCodec,
@@ -89,38 +90,19 @@ export function DnfBuilder({
 
   const analysis = builder.analysis;
   const truthTable = analysis.truthTable;
-  const simplification = builder.simplification;
-  const simplificationControls = {
-    answer: simplification.answer,
-    feedback: simplification.feedback,
-    showSolution: simplification.showSolution,
-    showWalkthrough: simplification.showWalkthrough,
-    onAnswerChange: (value: string) => {
-      onUserChange?.();
-      simplification.setAnswer(value);
-    },
-    onCheck: () => simplification.check(truthTable),
-    onToggleSolution: simplification.toggleSolution,
-    onToggleWalkthrough: simplification.toggleWalkthrough,
-  };
-  const solution =
-    builder.showSolution && display
-      ? {
-          formattedDnf: analysis.formattedDnf,
-          variableCount: truthTable.variables.length,
-          rowCount: truthTable.rows.length,
-          trueRowCount: analysis.derivation.trueRows.length,
-          derivation: analysis.derivation,
-          display,
-          resultHeader: builder.resultHeader,
-          truthTable,
-        }
-      : undefined;
-  const simplificationFollowUp = {
-    truthTable,
-    controls: simplificationControls,
-    isEnabled: builder.exerciseFeedback?.isCorrect === true,
-  };
+  const { solution, simplification: simplificationFollowUp } =
+    buildDnfFollowUpConfiguration({
+      analysis,
+      display,
+      resultHeader: builder.resultHeader,
+      showSolution: builder.showSolution,
+      feedback: builder.exerciseFeedback,
+      simplification: builder.simplification,
+      simplificationAnswerChange: (value) => {
+        onUserChange?.();
+        builder.simplification.setAnswer(value);
+      },
+    });
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
