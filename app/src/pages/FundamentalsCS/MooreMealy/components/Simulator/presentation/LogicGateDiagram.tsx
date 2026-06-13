@@ -45,26 +45,10 @@ export function LogicGateDiagram({
     );
   }
 
-  const depthSpacing = 220;
-  const width = Math.max(760, (diagram.maxDepth + 2) * depthSpacing);
+  const depthSpacing = 155;
+  const width = Math.max(680, 240 + diagram.maxDepth * depthSpacing);
   const height = Math.max(340, diagram.leafCount * 76 + 80);
-  const positions = new Map<number, { x: number; y: number }>();
-  const depthGroups = new Map<number, DiagramNode[]>();
-
-  for (const node of diagram.nodes) {
-    const group = depthGroups.get(node.depth) ?? [];
-    group.push(node);
-    depthGroups.set(node.depth, group);
-  }
-  for (const [depth, nodes] of depthGroups) {
-    nodes.sort((left, right) => left.order - right.order);
-    nodes.forEach((node, index) => {
-      positions.set(node.id, {
-        x: 100 + depth * depthSpacing,
-        y: ((index + 1) * height) / (nodes.length + 1),
-      });
-    });
-  }
+  const positions = createCompactPositions(diagram.nodes, height, depthSpacing);
 
   const rootPosition = positions.get(diagram.rootId);
   const outputX = width - 70;
@@ -120,7 +104,7 @@ export function LogicGateDiagram({
           if (!target) {
             return [];
           }
-          return node.children.map((childId, childIndex) => {
+          return node.children.map((childId) => {
             const source = positions.get(childId);
             if (!source) {
               return null;
@@ -130,12 +114,7 @@ export function LogicGateDiagram({
               selectedConnection.targetId === node.id;
             const sourceX = source.x + 50;
             const targetX = target.x - 50;
-            const targetY =
-              target.y + (childIndex - (node.children.length - 1) / 2) * 18;
-            const laneOffset =
-              54 + ((childId * 17 + node.id * 11 + childIndex * 23) % 92);
-            const laneX = Math.min(targetX - 28, sourceX + laneOffset);
-            const path = `M ${sourceX} ${source.y} H ${laneX} V ${targetY} H ${targetX}`;
+            const path = `M ${sourceX} ${source.y} L ${targetX} ${target.y}`;
             return (
               <g key={`${childId}-${node.id}`}>
                 <path
@@ -266,6 +245,51 @@ export function LogicGateDiagram({
       </svg>
     </div>
   );
+}
+
+function createCompactPositions(
+  nodes: DiagramNode[],
+  height: number,
+  depthSpacing: number,
+) {
+  const positions = new Map<number, { x: number; y: number }>();
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const leaves = nodes
+    .filter((node) => node.children.length === 0)
+    .sort((left, right) => left.order - right.order);
+
+  leaves.forEach((node, index) => {
+    positions.set(node.id, {
+      x: 100,
+      y: ((index + 1) * height) / (leaves.length + 1),
+    });
+  });
+
+  const placeNode = (node: DiagramNode): { x: number; y: number } => {
+    const existing = positions.get(node.id);
+    if (existing) {
+      return existing;
+    }
+    const children = node.children
+      .map((childId) => byId.get(childId))
+      .filter((child): child is DiagramNode => Boolean(child))
+      .map(placeNode);
+    const position = {
+      x: 100 + node.depth * depthSpacing,
+      y:
+        children.reduce((sum, child) => sum + child.y, 0) /
+        Math.max(1, children.length),
+    };
+    positions.set(node.id, position);
+    return position;
+  };
+
+  nodes
+    .slice()
+    .sort((left, right) => left.depth - right.depth)
+    .forEach(placeNode);
+
+  return positions;
 }
 
 function GateNode({
