@@ -28,41 +28,43 @@ import {
 const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 interface TableToDnfBuilderProps {
-  initialVariables?: string[];
-  initialResultValues?: boolean[];
+  initialValue?: DnfTruthTableTransferDraft;
   storageIdentifier: string;
   storageEnabled: boolean;
   storageReady: boolean;
   transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
   onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
+  onUserChange?: () => void;
 }
 
 export function TableToDnfBuilder({
-  initialVariables,
-  initialResultValues,
+  initialValue,
   storageIdentifier,
   storageEnabled,
   storageReady,
   transferCodec,
   onTransferValueChange,
+  onUserChange,
 }: TableToDnfBuilderProps) {
   const { t } = useTranslation();
   const initialVariableCount = clampVariableCount(
-    initialVariables?.length ?? 3,
+    initialValue?.variableCount ?? 3,
   );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>
-    initialResultValues &&
-    initialResultValues.length === 2 ** initialVariableCount
-      ? [...initialResultValues]
+    initialValue?.resultValues &&
+    initialValue.resultValues.length === 2 ** initialVariableCount
+      ? [...initialValue.resultValues]
       : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );
-  const [committed, setCommitted] = useState(false);
+  const [committed, setCommitted] = useState(initialValue?.committed ?? false);
   const [showSolution, setShowSolution] = useState(false);
   const [showFullTable, setShowFullTable] = useState(false);
-  const [dnfAnswer, setDnfAnswer] = useState("");
+  const [dnfAnswer, setDnfAnswer] = useState(initialValue?.dnfAnswer ?? "");
   const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
-  const simplification = useDnfSimplification();
+  const simplification = useDnfSimplification(
+    initialValue?.simplificationAnswer,
+  );
   const truthTable = useMemo(
     () =>
       createTruthTableFromResults(
@@ -79,8 +81,12 @@ export function TableToDnfBuilder({
     () => ({
       variableCount,
       resultValues,
+      committed,
+      truthTableAnswers: [],
+      dnfAnswer,
+      simplificationAnswer: simplification.answer,
     }),
-    [resultValues, variableCount],
+    [committed, dnfAnswer, resultValues, simplification.answer, variableCount],
   );
 
   useTrainingCenterAutoSave({
@@ -100,7 +106,7 @@ export function TableToDnfBuilder({
     return buildTruthTableDisplay(analysis.truthTable, analysis.derivation);
   }, [analysis, showSolution]);
 
-  const resetAttempt = () => {
+  const clearAttempt = () => {
     setShowSolution(false);
     setDnfAnswer("");
     setFeedback(null);
@@ -108,22 +114,25 @@ export function TableToDnfBuilder({
   };
 
   const handleNewTable = () => {
+    onUserChange?.();
     setCommitted(false);
     setShowFullTable(false);
-    resetAttempt();
+    clearAttempt();
   };
 
   const updateVariableCount = (nextVariableCount: number) => {
     const boundedVariableCount = clampVariableCount(nextVariableCount);
 
+    onUserChange?.();
     setVariableCount(boundedVariableCount);
     setResultValues(
       Array.from({ length: 2 ** boundedVariableCount }, () => false),
     );
-    resetAttempt();
+    clearAttempt();
   };
 
   const updateResultValue = (rowIndex: number, value: boolean) => {
+    onUserChange?.();
     setResultValues((currentValues) => {
       const nextValues = [...currentValues];
       nextValues[rowIndex] = value;
@@ -145,6 +154,7 @@ export function TableToDnfBuilder({
   };
 
   const updateDnfAnswer = (value: string) => {
+    onUserChange?.();
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
@@ -152,11 +162,15 @@ export function TableToDnfBuilder({
   };
 
   const handleImportTable = (value: DnfTruthTableTransferDraft) => {
+    onUserChange?.();
     setVariableCount(value.variableCount);
     setResultValues([...value.resultValues]);
-    setCommitted(false);
+    setCommitted(value.committed);
+    setDnfAnswer(normalizeBooleanOperatorAliases(value.dnfAnswer));
+    simplification.setAnswer(value.simplificationAnswer);
+    setFeedback(null);
+    setShowSolution(false);
     setShowFullTable(false);
-    resetAttempt();
   };
 
   if (analysis.status !== "valid") {
@@ -171,6 +185,10 @@ export function TableToDnfBuilder({
       showSolution,
       feedback,
       simplification,
+      simplificationAnswerChange: (value) => {
+        onUserChange?.();
+        simplification.setAnswer(value);
+      },
     });
 
   if (!committed) {
@@ -189,11 +207,15 @@ export function TableToDnfBuilder({
         }
         onVariableCountChange={updateVariableCount}
         onResultValuesChange={(values) => {
+          onUserChange?.();
           setResultValues(values);
-          resetAttempt();
+          clearAttempt();
         }}
         onResultChange={updateResultValue}
-        onCommit={() => setCommitted(true)}
+        onCommit={() => {
+          onUserChange?.();
+          setCommitted(true);
+        }}
       />
     );
   }
@@ -234,7 +256,10 @@ export function TableToDnfBuilder({
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={resetAttempt}
+        onReset={() => {
+          onUserChange?.();
+          clearAttempt();
+        }}
         onToggleSolution={() => setShowSolution((current) => !current)}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />

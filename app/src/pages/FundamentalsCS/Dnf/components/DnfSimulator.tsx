@@ -23,6 +23,7 @@ import {
   dnfExpressionTransferCodec,
   dnfTransferCodec,
   dnfTruthTableTransferCodec,
+  type DnfExpressionTransferDraft,
   type DnfTransferValue,
   type DnfTruthTableTransferDraft,
 } from "./DnfBuilder/domain/dnfTransfer";
@@ -79,6 +80,8 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       null,
     );
     const [isStorageReady, setIsStorageReady] = useState(!isStorageEnabled);
+    const [hasStoredState, setHasStoredState] = useState(false);
+    const [hasUserChanges, setHasUserChanges] = useState(false);
     const [resetVersion, setResetVersion] = useState(0);
 
     // Seed the active mode from a walkthrough example (if any) so the example
@@ -125,6 +128,8 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       let isCancelled = false;
       setStoredValue(null);
       setIsStorageReady(false);
+      setHasStoredState(false);
+      setHasUserChanges(false);
 
       if (!isStorageEnabled) {
         setIsStorageReady(true);
@@ -138,6 +143,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           }
 
           setStoredValue(value);
+          setHasStoredState(true);
           if (!selectedExercise && value.mode !== "exercise_attempt") {
             setActiveMode(value.mode);
           }
@@ -175,33 +181,36 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           }
 
           setStoredValue(null);
-          if (!selectedExercise && !walkthroughExample) {
-            setActiveMode("expression_to_truth_table");
-          }
+          setHasStoredState(false);
+          setHasUserChanges(false);
           setResetVersion((current) => current + 1);
         },
       }),
-      [
-        isStorageEnabled,
-        selectedExercise,
-        storageIdentifier,
-        walkthroughExample,
-      ],
+      [isStorageEnabled, storageIdentifier],
     );
 
-    const handleExpressionChange = useCallback((expression: string) => {
-      setStoredValue({ mode: "expression_to_truth_table", expression });
-    }, []);
+    const handleExpressionChange = useCallback(
+      (value: DnfExpressionTransferDraft) => {
+        setStoredValue({ mode: "expression_to_truth_table", ...value });
+      },
+      [],
+    );
     const handleTruthTableChange = useCallback(
       (value: DnfTruthTableTransferDraft) => {
         setStoredValue({ mode: "truth_table_to_dnf", ...value });
       },
       [],
     );
+    const handleUserChange = useCallback(() => {
+      setHasUserChanges(true);
+    }, []);
     const handleModeClick = (mode: DnfSimulatorMode) => {
       if (mode === visibleMode) return;
 
       setActiveMode(mode);
+      if (!selectedExercise && !walkthroughExample) {
+        setHasUserChanges(true);
+      }
       if (selectedExercise) {
         onExitExercise?.();
       } else if (walkthroughExample) {
@@ -216,7 +225,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       const contentKey = `${resetVersion}-${isStorageReady ? "ready" : "loading"}`;
       const commonStorageProps = {
         storageIdentifier,
-        storageEnabled: isStorageEnabled,
+        storageEnabled: isStorageEnabled && (hasStoredState || hasUserChanges),
         storageReady: isStorageReady,
       };
 
@@ -229,6 +238,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
               storedValue?.mode === "exercise_attempt" ? storedValue : undefined
             }
             transferCodec={exerciseTransferCodec}
+            onUserChange={handleUserChange}
             {...commonStorageProps}
           />
         );
@@ -241,11 +251,16 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         return (
           <ExpressionBuilder
             key={`${walkthroughExample.id}-${contentKey}`}
-            initialExpression={walkthroughExample.expression}
+            initialValue={{
+              expression: walkthroughExample.expression,
+              committed: false,
+              ...emptyAttempt,
+            }}
             transferCodec={expressionTransferCodec}
             onTransferValueChange={
               isStorageReady ? handleExpressionChange : undefined
             }
+            onUserChange={handleUserChange}
             {...commonStorageProps}
           />
         );
@@ -258,12 +273,17 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         return (
           <TableToDnfBuilder
             key={`${walkthroughExample.id}-${contentKey}`}
-            initialVariables={walkthroughExample.variables}
-            initialResultValues={walkthroughExample.resultValues}
+            initialValue={{
+              variableCount: walkthroughExample.variables.length,
+              resultValues: walkthroughExample.resultValues,
+              committed: false,
+              ...emptyAttempt,
+            }}
             transferCodec={truthTableTransferCodec}
             onTransferValueChange={
               isStorageReady ? handleTruthTableChange : undefined
             }
+            onUserChange={handleUserChange}
             {...commonStorageProps}
           />
         );
@@ -272,36 +292,29 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       return visibleMode === "expression_to_truth_table" ? (
         <ExpressionBuilder
           key={`free-expression-${contentKey}`}
-          initialExpression={
+          initialValue={
             storedValue?.mode === "expression_to_truth_table"
-              ? storedValue.expression
+              ? storedValue
               : undefined
           }
           transferCodec={expressionTransferCodec}
           onTransferValueChange={
             isStorageReady ? handleExpressionChange : undefined
           }
+          onUserChange={handleUserChange}
           {...commonStorageProps}
         />
       ) : (
         <TableToDnfBuilder
           key={`free-table-${contentKey}`}
-          initialVariables={
-            storedValue?.mode === "truth_table_to_dnf"
-              ? Array.from({ length: storedValue.variableCount }, (_, index) =>
-                  String.fromCharCode(97 + index),
-                )
-              : undefined
-          }
-          initialResultValues={
-            storedValue?.mode === "truth_table_to_dnf"
-              ? storedValue.resultValues
-              : undefined
+          initialValue={
+            storedValue?.mode === "truth_table_to_dnf" ? storedValue : undefined
           }
           transferCodec={truthTableTransferCodec}
           onTransferValueChange={
             isStorageReady ? handleTruthTableChange : undefined
           }
+          onUserChange={handleUserChange}
           {...commonStorageProps}
         />
       );
@@ -340,3 +353,9 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     );
   },
 );
+
+const emptyAttempt = {
+  truthTableAnswers: [],
+  dnfAnswer: "",
+  simplificationAnswer: "",
+};

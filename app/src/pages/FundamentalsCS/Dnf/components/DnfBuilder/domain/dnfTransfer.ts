@@ -3,7 +3,8 @@ import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import type { TruthTableAnswer } from "./dnfExerciseCheck";
 
 const TRANSFER_PREFIX = "D";
-const FORMAT_VERSION = 2;
+const FORMAT_VERSION = 3;
+const LEGACY_FORMAT_VERSION = 2;
 const FORMAT_VERSION_BITS = 3;
 const TRANSFER_MODE_BITS = 2;
 const MAX_TEXT_BYTES = 100_000;
@@ -18,22 +19,27 @@ const TransferMode = {
 } as const;
 type TransferMode = (typeof TransferMode)[keyof typeof TransferMode];
 
-export interface DnfExpressionTransferValue {
-  mode: "expression_to_truth_table";
-  expression: string;
-}
-
-export interface DnfTruthTableTransferValue {
-  mode: "truth_table_to_dnf";
-  variableCount: number;
-  resultValues: boolean[];
-}
-
-export interface DnfExerciseTransferValue {
-  mode: "exercise_attempt";
+export interface DnfAttemptTransferDraft {
   truthTableAnswers: TruthTableAnswer[];
   dnfAnswer: string;
   simplificationAnswer: string;
+}
+
+export interface DnfExpressionTransferValue extends DnfAttemptTransferDraft {
+  mode: "expression_to_truth_table";
+  expression: string;
+  committed: boolean;
+}
+
+export interface DnfTruthTableTransferValue extends DnfAttemptTransferDraft {
+  mode: "truth_table_to_dnf";
+  variableCount: number;
+  resultValues: boolean[];
+  committed: boolean;
+}
+
+export interface DnfExerciseTransferValue extends DnfAttemptTransferDraft {
+  mode: "exercise_attempt";
 }
 
 export type DnfTransferValue =
@@ -43,6 +49,11 @@ export type DnfTransferValue =
 
 export type DnfTruthTableTransferDraft = Omit<
   DnfTruthTableTransferValue,
+  "mode"
+>;
+
+export type DnfExpressionTransferDraft = Omit<
+  DnfExpressionTransferValue,
   "mode"
 >;
 
@@ -58,30 +69,31 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
     writer.writeBits(FORMAT_VERSION, FORMAT_VERSION_BITS);
 
     if (value.mode === "expression_to_truth_table") {
+      validateAttempt(value);
       writer.writeBits(TransferMode.ExpressionToTruthTable, TRANSFER_MODE_BITS);
       writeUtf8String(writer, value.expression.trim());
+      writer.writeBit(value.committed ? 1 : 0);
+      writeAttempt(writer, value);
       return `${TRANSFER_PREFIX}${writer.toBase64Url()}`;
     }
 
     if (value.mode === "truth_table_to_dnf") {
       validateTruthTable(value.variableCount, value.resultValues);
+      validateAttempt(value);
       writer.writeBits(TransferMode.TruthTableToDnf, TRANSFER_MODE_BITS);
       writer.writeVarUint(value.variableCount);
       for (const resultValue of value.resultValues) {
         writer.writeBit(resultValue ? 1 : 0);
       }
+      writer.writeBit(value.committed ? 1 : 0);
+      writeAttempt(writer, value);
 
       return `${TRANSFER_PREFIX}${writer.toBase64Url()}`;
     }
 
-    validateExerciseAttempt(value);
+    validateAttempt(value);
     writer.writeBits(TransferMode.ExerciseAttempt, TRANSFER_MODE_BITS);
-    writer.writeVarUint(value.truthTableAnswers.length);
-    for (const answer of value.truthTableAnswers) {
-      writer.writeBits(answer === null ? 0 : answer ? 2 : 1, 2);
-    }
-    writeUtf8String(writer, value.dnfAnswer);
-    writeUtf8String(writer, value.simplificationAnswer);
+    writeAttempt(writer, value);
 
     return `${TRANSFER_PREFIX}${writer.toBase64Url()}`;
   },
@@ -97,17 +109,31 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
       "dnf_transfer_payload_invalid",
     );
     const version = reader.readBits(FORMAT_VERSION_BITS);
-    if (version !== FORMAT_VERSION) {
+    if (version !== FORMAT_VERSION && version !== LEGACY_FORMAT_VERSION) {
       throw new Error("dnf_transfer_payload_invalid");
     }
 
     const mode = reader.readBits(TRANSFER_MODE_BITS) as TransferMode;
     if (mode === TransferMode.ExpressionToTruthTable) {
       const expression = readUtf8String(reader);
+      if (version === LEGACY_FORMAT_VERSION) {
+        reader.assertOnlyPaddingRemains();
+        return {
+          mode: "expression_to_truth_table",
+          expression: expression.trim(),
+          committed: false,
+          ...emptyAttempt,
+        };
+      }
+
+      const committed = reader.readBit() === 1;
+      const attempt = readAttempt(reader);
       reader.assertOnlyPaddingRemains();
       return {
         mode: "expression_to_truth_table",
         expression: expression.trim(),
+        committed,
+        ...attempt,
       };
     }
 
@@ -119,39 +145,40 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
         () => reader.readBit() === 1,
       );
 
+      if (version === LEGACY_FORMAT_VERSION) {
+        reader.assertOnlyPaddingRemains();
+        validateTruthTable(variableCount, resultValues);
+        return {
+          mode: "truth_table_to_dnf",
+          variableCount,
+          resultValues,
+          committed: false,
+          ...emptyAttempt,
+        };
+      }
+
+      const committed = reader.readBit() === 1;
+      const attempt = readAttempt(reader);
       reader.assertOnlyPaddingRemains();
       validateTruthTable(variableCount, resultValues);
       return {
         mode: "truth_table_to_dnf",
         variableCount,
         resultValues,
+        committed,
+        ...attempt,
       };
     }
 
     if (mode === TransferMode.ExerciseAttempt) {
-      const answerCount = reader.readVarUint();
-      if (answerCount > MAX_TRUTH_TABLE_ANSWERS) {
-        throw new Error("dnf_transfer_payload_invalid");
-      }
-
-      const truthTableAnswers = Array.from({ length: answerCount }, () => {
-        const answer = reader.readBits(2);
-        if (answer === 0) return null;
-        if (answer === 1) return false;
-        if (answer === 2) return true;
-        throw new Error("dnf_transfer_payload_invalid");
-      });
-      const dnfAnswer = readUtf8String(reader);
-      const simplificationAnswer = readUtf8String(reader);
+      const attempt = readAttempt(reader);
 
       reader.assertOnlyPaddingRemains();
       const value: DnfExerciseTransferValue = {
         mode: "exercise_attempt",
-        truthTableAnswers,
-        dnfAnswer,
-        simplificationAnswer,
+        ...attempt,
       };
-      validateExerciseAttempt(value);
+      validateAttempt(value);
       return value;
     }
 
@@ -159,23 +186,30 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
   },
 };
 
-export const dnfExpressionTransferCodec: ISimulatorTransferCodec<string> = {
-  exportValue(expression) {
-    return dnfTransferCodec.exportValue({
-      mode: "expression_to_truth_table",
-      expression,
-    });
-  },
+export const dnfExpressionTransferCodec: ISimulatorTransferCodec<DnfExpressionTransferDraft> =
+  {
+    exportValue(value) {
+      return dnfTransferCodec.exportValue({
+        mode: "expression_to_truth_table",
+        ...value,
+      });
+    },
 
-  async importValue(serializedValue) {
-    const value = await dnfTransferCodec.importValue(serializedValue);
-    if (value.mode !== "expression_to_truth_table") {
-      throw new Error("dnf_transfer_mode_invalid");
-    }
+    async importValue(serializedValue) {
+      const value = await dnfTransferCodec.importValue(serializedValue);
+      if (value.mode !== "expression_to_truth_table") {
+        throw new Error("dnf_transfer_mode_invalid");
+      }
 
-    return value.expression;
-  },
-};
+      return {
+        expression: value.expression,
+        committed: value.committed,
+        truthTableAnswers: value.truthTableAnswers,
+        dnfAnswer: value.dnfAnswer,
+        simplificationAnswer: value.simplificationAnswer,
+      };
+    },
+  };
 
 export const dnfTruthTableTransferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft> =
   {
@@ -195,6 +229,10 @@ export const dnfTruthTableTransferCodec: ISimulatorTransferCodec<DnfTruthTableTr
       return {
         variableCount: value.variableCount,
         resultValues: value.resultValues,
+        committed: value.committed,
+        truthTableAnswers: value.truthTableAnswers,
+        dnfAnswer: value.dnfAnswer,
+        simplificationAnswer: value.simplificationAnswer,
       };
     },
   };
@@ -251,7 +289,43 @@ function readUtf8String(reader: BitReader): string {
   }
 }
 
-function validateExerciseAttempt(value: DnfExerciseTransferValue): void {
+const emptyAttempt: DnfAttemptTransferDraft = {
+  truthTableAnswers: [],
+  dnfAnswer: "",
+  simplificationAnswer: "",
+};
+
+function writeAttempt(writer: BitWriter, value: DnfAttemptTransferDraft): void {
+  writer.writeVarUint(value.truthTableAnswers.length);
+  for (const answer of value.truthTableAnswers) {
+    writer.writeBits(answer === null ? 0 : answer ? 2 : 1, 2);
+  }
+  writeUtf8String(writer, value.dnfAnswer);
+  writeUtf8String(writer, value.simplificationAnswer);
+}
+
+function readAttempt(reader: BitReader): DnfAttemptTransferDraft {
+  const answerCount = reader.readVarUint();
+  if (answerCount > MAX_TRUTH_TABLE_ANSWERS) {
+    throw new Error("dnf_transfer_payload_invalid");
+  }
+
+  const truthTableAnswers = Array.from({ length: answerCount }, () => {
+    const answer = reader.readBits(2);
+    if (answer === 0) return null;
+    if (answer === 1) return false;
+    if (answer === 2) return true;
+    throw new Error("dnf_transfer_payload_invalid");
+  });
+
+  return {
+    truthTableAnswers,
+    dnfAnswer: readUtf8String(reader),
+    simplificationAnswer: readUtf8String(reader),
+  };
+}
+
+function validateAttempt(value: DnfAttemptTransferDraft): void {
   if (
     value.truthTableAnswers.length > MAX_TRUTH_TABLE_ANSWERS ||
     value.truthTableAnswers.some(

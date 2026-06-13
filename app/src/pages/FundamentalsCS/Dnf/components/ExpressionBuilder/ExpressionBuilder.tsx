@@ -15,7 +15,11 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
-import { dnfExpressionTransferCodec } from "../DnfBuilder/domain/dnfTransfer";
+import {
+  dnfExpressionTransferCodec,
+  type DnfAttemptTransferDraft,
+  type DnfExpressionTransferDraft,
+} from "../DnfBuilder/domain/dnfTransfer";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
 import { DnfOperatorToolbar } from "../DnfBuilder/presentation/DnfOperatorToolbar";
@@ -25,60 +29,94 @@ import {
 } from "../DnfBuilder/presentation/DnfStatusPanels";
 
 interface ExpressionBuilderProps {
-  initialExpression?: string;
+  initialValue?: DnfExpressionTransferDraft;
   storageIdentifier: string;
   storageEnabled: boolean;
   storageReady: boolean;
-  transferCodec: ISimulatorTransferCodec<string>;
-  onTransferValueChange?: (value: string) => void;
+  transferCodec: ISimulatorTransferCodec<DnfExpressionTransferDraft>;
+  onTransferValueChange?: (value: DnfExpressionTransferDraft) => void;
+  onUserChange?: () => void;
 }
 
 export function ExpressionBuilder({
-  initialExpression,
+  initialValue,
   storageIdentifier,
   storageEnabled,
   storageReady,
   transferCodec,
   onTransferValueChange,
+  onUserChange,
 }: ExpressionBuilderProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [inputValue, setInputValue] = useState(initialExpression ?? "");
-  const [committedSource, setCommittedSource] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState(initialValue?.expression ?? "");
+  const [committedSource, setCommittedSource] = useState<string | null>(
+    initialValue?.committed ? initialValue.expression : null,
+  );
+  const [attempt, setAttempt] = useState<DnfAttemptTransferDraft>(() => ({
+    truthTableAnswers: initialValue?.truthTableAnswers ?? [],
+    dnfAnswer: initialValue?.dnfAnswer ?? "",
+    simplificationAnswer: initialValue?.simplificationAnswer ?? "",
+  }));
+  const [workspaceVersion, setWorkspaceVersion] = useState(0);
+  const transferValue = useMemo<DnfExpressionTransferDraft>(
+    () => ({
+      expression: inputValue,
+      committed: committedSource !== null,
+      ...attempt,
+    }),
+    [attempt, committedSource, inputValue],
+  );
 
   useTrainingCenterAutoSave({
     identifier: storageIdentifier,
-    value: inputValue,
+    value: transferValue,
     codec: dnfExpressionTransferCodec,
     enabled: storageEnabled && storageReady,
   });
 
   useEffect(() => {
-    onTransferValueChange?.(inputValue);
-  }, [inputValue, onTransferValueChange]);
+    onTransferValueChange?.(transferValue);
+  }, [onTransferValueChange, transferValue]);
 
   const handleSourceChange = (value: string) => {
+    onUserChange?.();
     setInputValue(normalizeBooleanOperatorAliases(value));
   };
 
   const handleEvaluate = () => {
     const trimmed = inputValue.trim();
-    if (trimmed.length > 0) setCommittedSource(trimmed);
+    if (trimmed.length > 0) {
+      onUserChange?.();
+      setCommittedSource(trimmed);
+    }
   };
 
   const handleClear = () => {
+    onUserChange?.();
     setInputValue("");
     setCommittedSource(null);
+    setAttempt(emptyAttempt);
+    setWorkspaceVersion((current) => current + 1);
   };
 
-  const handleImportExpression = (expression: string) => {
-    const normalizedExpression = normalizeBooleanOperatorAliases(expression);
+  const handleImportExpression = (value: DnfExpressionTransferDraft) => {
+    const normalizedExpression = normalizeBooleanOperatorAliases(
+      value.expression,
+    );
 
+    onUserChange?.();
     setInputValue(normalizedExpression);
-    setCommittedSource(normalizedExpression.trim() || null);
+    setCommittedSource(
+      value.committed ? normalizedExpression.trim() || null : null,
+    );
+    setAttempt({
+      truthTableAnswers: [...value.truthTableAnswers],
+      dnfAnswer: value.dnfAnswer,
+      simplificationAnswer: value.simplificationAnswer,
+    });
+    setWorkspaceVersion((current) => current + 1);
   };
-
-  const transferExpression = committedSource ?? inputValue.trim();
 
   return (
     <div
@@ -159,7 +197,7 @@ export function ExpressionBuilder({
       )}
 
       <SimulatorStringTransferBox
-        value={transferExpression}
+        value={transferValue}
         codec={transferCodec}
         onLoad={handleImportExpression}
         testIdPrefix="dnf-expression-transfer"
@@ -167,15 +205,30 @@ export function ExpressionBuilder({
 
       {committedSource !== null && (
         <ExpressionWorkspace
-          key={committedSource}
+          key={`${committedSource}-${workspaceVersion}`}
           committedSource={committedSource}
+          initialAttempt={attempt}
+          onAttemptChange={setAttempt}
+          onUserChange={onUserChange}
         />
       )}
     </div>
   );
 }
 
-function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
+interface ExpressionWorkspaceProps {
+  committedSource: string;
+  initialAttempt: DnfAttemptTransferDraft;
+  onAttemptChange: (attempt: DnfAttemptTransferDraft) => void;
+  onUserChange?: () => void;
+}
+
+function ExpressionWorkspace({
+  committedSource,
+  initialAttempt,
+  onAttemptChange,
+  onUserChange,
+}: ExpressionWorkspaceProps) {
   const analysis = useMemo(
     () => analyzeDnfSource(committedSource),
     [committedSource],
@@ -185,10 +238,12 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   const [showFullTable, setShowFullTable] = useState(false);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
     TruthTableAnswer[]
-  >([]);
-  const [dnfAnswer, setDnfAnswer] = useState("");
+  >(() => initialAttempt.truthTableAnswers);
+  const [dnfAnswer, setDnfAnswer] = useState(initialAttempt.dnfAnswer);
   const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
-  const simplification = useDnfSimplification();
+  const simplification = useDnfSimplification(
+    initialAttempt.simplificationAnswer,
+  );
 
   const normalizedAnswers = useMemo(
     () =>
@@ -204,10 +259,14 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   }, [analysis, showSolution]);
 
   const setTruthTableAnswer = (rowIndex: number, value: boolean) => {
-    setTruthTableAnswers((prev) => {
-      const next = [...prev];
-      next[rowIndex] = value;
-      return next;
+    onUserChange?.();
+    const nextAnswers = [...truthTableAnswers];
+    nextAnswers[rowIndex] = value;
+    setTruthTableAnswers(nextAnswers);
+    onAttemptChange({
+      truthTableAnswers: nextAnswers,
+      dnfAnswer,
+      simplificationAnswer: "",
     });
     setFeedback(null);
     setShowSolution(false);
@@ -215,7 +274,14 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   };
 
   const updateDnfAnswer = (value: string) => {
-    setDnfAnswer(normalizeBooleanOperatorAliases(value));
+    const normalizedValue = normalizeBooleanOperatorAliases(value);
+    onUserChange?.();
+    setDnfAnswer(normalizedValue);
+    onAttemptChange({
+      truthTableAnswers,
+      dnfAnswer: normalizedValue,
+      simplificationAnswer: "",
+    });
     setFeedback(null);
     setShowSolution(false);
     simplification.reset();
@@ -234,11 +300,24 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
   };
 
   const handleReset = () => {
+    onUserChange?.();
     setTruthTableAnswers([]);
     setDnfAnswer("");
     setFeedback(null);
     setShowSolution(false);
     simplification.reset();
+    onAttemptChange(emptyAttempt);
+  };
+
+  const updateSimplificationAnswer = (value: string) => {
+    const normalizedValue = normalizeBooleanOperatorAliases(value);
+    onUserChange?.();
+    simplification.setAnswer(normalizedValue);
+    onAttemptChange({
+      truthTableAnswers,
+      dnfAnswer,
+      simplificationAnswer: normalizedValue,
+    });
   };
 
   if (analysis.status === "too_many_variables") {
@@ -262,6 +341,7 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
       showSolution,
       feedback,
       simplification,
+      simplificationAnswerChange: updateSimplificationAnswer,
     });
 
   return (
@@ -294,3 +374,9 @@ function ExpressionWorkspace({ committedSource }: { committedSource: string }) {
     </>
   );
 }
+
+const emptyAttempt: DnfAttemptTransferDraft = {
+  truthTableAnswers: [],
+  dnfAnswer: "",
+  simplificationAnswer: "",
+};

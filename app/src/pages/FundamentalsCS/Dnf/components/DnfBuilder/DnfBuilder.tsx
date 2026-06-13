@@ -23,6 +23,7 @@ interface DnfBuilderProps {
   storageEnabled: boolean;
   storageReady: boolean;
   transferCodec: ISimulatorTransferCodec<DnfExerciseTransferDraft>;
+  onUserChange?: () => void;
 }
 
 export function DnfBuilder({
@@ -32,6 +33,7 @@ export function DnfBuilder({
   storageEnabled,
   storageReady,
   transferCodec,
+  onUserChange,
 }: DnfBuilderProps) {
   const builder = useDnfBuilder(selectedExercise, initialAttempt);
   const [showFullTable, setShowFullTable] = useState(false);
@@ -93,7 +95,10 @@ export function DnfBuilder({
     feedback: simplification.feedback,
     showSolution: simplification.showSolution,
     showWalkthrough: simplification.showWalkthrough,
-    onAnswerChange: simplification.setAnswer,
+    onAnswerChange: (value: string) => {
+      onUserChange?.();
+      simplification.setAnswer(value);
+    },
     onCheck: () => simplification.check(truthTable),
     onToggleSolution: simplification.toggleSolution,
     onToggleWalkthrough: simplification.toggleWalkthrough,
@@ -130,10 +135,19 @@ export function DnfBuilder({
         requiresTruthTableAnswers={builder.requiresTruthTableAnswers}
         canToggleFullTable={true}
         showFullTable={showFullTable}
-        onTruthTableAnswerChange={builder.setTruthTableAnswer}
-        onDnfAnswerChange={builder.setDnfAnswer}
+        onTruthTableAnswerChange={(rowIndex, value) => {
+          onUserChange?.();
+          builder.setTruthTableAnswer(rowIndex, value);
+        }}
+        onDnfAnswerChange={(value) => {
+          onUserChange?.();
+          builder.setDnfAnswer(value);
+        }}
         onCheck={builder.checkExercise}
-        onReset={builder.reset}
+        onReset={() => {
+          onUserChange?.();
+          builder.reset();
+        }}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
@@ -141,7 +155,10 @@ export function DnfBuilder({
       <SimulatorStringTransferBox
         value={transferValue}
         codec={transferCodec}
-        onLoad={builder.loadAttempt}
+        onLoad={(attempt) => {
+          onUserChange?.();
+          builder.loadAttempt(attempt);
+        }}
         testIdPrefix="dnf-exercise-transfer"
       />
 

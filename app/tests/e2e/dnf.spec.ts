@@ -140,13 +140,16 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("dnf-variable-limit-panel")).toBeVisible();
   });
 
-  test("exports and imports a free expression transfer string", async ({
+  test("exports and imports a complete free expression session", async ({
     page,
   }) => {
     await gotoDnfPage(page);
     await switchTab(page, "simulation");
 
     await page.getByTestId("dnf-expression-input").fill("a & b");
+    await page.getByTestId("dnf-evaluate-expression").click();
+    await page.getByTestId("dnf-result-button-0-1").click();
+    await page.getByTestId("dnf-exercise-answer").fill("a");
     await page.getByTestId("dnf-expression-transfer-export").click();
 
     const transferValue = await page
@@ -157,30 +160,48 @@ test.describe("DNF page", () => {
 
     const transferInput = page.getByTestId("dnf-expression-transfer-input");
 
-    await page.getByTestId("dnf-clear-expression").click();
+    await page.getByTestId("dnf-result-button-0-0").click();
+    await page.getByTestId("dnf-exercise-answer").fill("b");
     await transferInput.fill("");
     await transferInput.fill(transferValue);
     await page.getByTestId("dnf-expression-transfer-import").click();
 
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-result-button-0-1")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
   });
 
-  test("restores and resets the free simulator through local storage", async ({
+  test("restores and resets a complete free table session", async ({
     page,
   }) => {
     await gotoDnfPage(page);
     await switchTab(page, "simulation");
 
-    await page.getByTestId("dnf-expression-input").fill("a & b");
-    await page.getByTestId("dnf-expression-transfer-export").click();
+    await page.getByTestId("dnf-mode-tab-truth_table_to_dnf").click();
+    await page.getByTestId("dnf-fill-table").click();
+    await page.getByRole("button", { name: "Commit table" }).click();
+    await page.getByTestId("dnf-exercise-answer").fill("a");
+    await page.getByTestId("dnf-table-transfer-export").click();
     await page.reload();
     await switchTab(page, "simulation");
 
-    await expect(page.getByTestId("dnf-expression-input")).toHaveValue("a ∧ b");
+    await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
+      "data-mode",
+      "truth_table_to_dnf",
+    );
+    await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
 
     await page.getByTestId("simulation-reset").click();
 
-    await expect(page.getByTestId("dnf-expression-input")).toHaveValue("");
+    await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
+      "data-mode",
+      "truth_table_to_dnf",
+    );
+    await expect(page.getByTestId("dnf-table-builder-controls")).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -188,6 +209,13 @@ test.describe("DNF page", () => {
         ),
       )
       .toBeNull();
+
+    await page.waitForTimeout(10_500);
+    expect(
+      await page.evaluate(() =>
+        window.localStorage.getItem("TrainingCenterStorage"),
+      ),
+    ).toBeNull();
   });
 
   test("rejects an exercise transfer string in a different DNF exercise", async ({
