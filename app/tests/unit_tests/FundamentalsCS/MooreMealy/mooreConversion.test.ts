@@ -49,4 +49,41 @@ describe("Moore circuit conversion", () => {
     expect(conversion.output.outputVariables).toEqual(["y0", "y1", "y2", "y3"]);
     expect(conversion.output.rows.at(-1)?.resultBits).toEqual([1, 1, 1, 1]);
   });
+
+  it("keeps a gate expression when exact minimization exceeds the variable limit", () => {
+    const states = Array.from({ length: 17 }, (_, index) => `S${index}`);
+    const inputSymbols = Array.from({ length: 16 }, (_, index) => `E${index}`);
+    const conversion = buildMooreConversion({
+      states,
+      inputSymbols,
+      transitions: Object.fromEntries(
+        inputSymbols.map((symbol, inputIndex) => [
+          symbol,
+          Object.fromEntries(
+            states.map((state, stateIndex) => [
+              state,
+              states[(stateIndex + inputIndex + 1) % states.length],
+            ]),
+          ),
+        ]),
+      ),
+      outputs: Object.fromEntries(
+        states.map((state, index) => [
+          state,
+          { symbol: `OUT_${index}`, code: index },
+        ]),
+      ),
+      initialState: states[0],
+      inputWord: [],
+      representation: "decimal",
+    });
+
+    expect(conversion.transition.stateVariables).toHaveLength(5);
+    expect(conversion.transition.inputVariables).toHaveLength(4);
+    expect(conversion.transition.formulas[3]).toMatchObject({
+      name: "T3",
+      minimizationAvailable: false,
+    });
+    expect(conversion.transition.formulas[3].expression).not.toBeNull();
+  });
 });

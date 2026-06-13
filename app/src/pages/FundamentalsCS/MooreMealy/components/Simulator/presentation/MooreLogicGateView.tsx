@@ -22,6 +22,7 @@ export function MooreLogicGateView({
   const [selectedFormula, setSelectedFormula] = useState(
     conversion.allFormulas[0]?.name ?? "",
   );
+  const [binaryGates, setBinaryGates] = useState(true);
   const formula =
     conversion.allFormulas.find(
       (candidate) => candidate.name === selectedFormula,
@@ -62,15 +63,28 @@ export function MooreLogicGateView({
 
       {formula ? (
         <div className="space-y-3">
-          <h3 className="font-semibold">
-            {formula.name} = {formula.minimal}
-          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-semibold">
+              {formula.name} = {formula.minimal}
+            </h3>
+            <label className="border-border bg-card flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+              <input
+                type="checkbox"
+                checked={binaryGates}
+                onChange={(event) => setBinaryGates(event.target.checked)}
+                data-testid="moore-binary-gates-toggle"
+                className="accent-brand size-4"
+              />
+              <span>{t("moore.logic.binaryGates")}</span>
+            </label>
+          </div>
           <LogicGateDiagram
-            key={formula.name}
+            key={`${formula.name}-${binaryGates}`}
             expression={formula.expression}
             outputName={formula.name}
             variables={formula.variables}
             unavailableText={t("moore.logic.minimizationUnavailable")}
+            binaryGates={binaryGates}
           />
         </div>
       ) : null}

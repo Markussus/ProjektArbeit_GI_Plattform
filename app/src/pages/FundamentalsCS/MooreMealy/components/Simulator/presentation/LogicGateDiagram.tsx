@@ -7,6 +7,7 @@ interface LogicGateDiagramProps {
   outputName: string;
   variables: string[];
   unavailableText: string;
+  binaryGates?: boolean;
 }
 
 interface DiagramNode {
@@ -28,10 +29,11 @@ export function LogicGateDiagram({
   outputName,
   variables,
   unavailableText,
+  binaryGates = true,
 }: LogicGateDiagramProps) {
   const diagram = useMemo(
-    () => (expression ? buildDiagram(expression) : null),
-    [expression],
+    () => (expression ? buildDiagram(expression, binaryGates) : null),
+    [binaryGates, expression],
   );
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [selectedConnection, setSelectedConnection] =
@@ -47,7 +49,10 @@ export function LogicGateDiagram({
 
   const depthSpacing = 155;
   const width = Math.max(680, 240 + diagram.maxDepth * depthSpacing);
-  const height = Math.max(340, diagram.leafCount * 76 + 80);
+  const height = Math.max(
+    340,
+    Math.max(diagram.leafCount, diagram.maxNodesAtDepth) * 82 + 80,
+  );
   const positions = createCompactPositions(diagram.nodes, height, depthSpacing);
 
   const rootPosition = positions.get(diagram.rootId);
@@ -74,7 +79,8 @@ export function LogicGateDiagram({
         role="img"
         aria-label={`${outputName} logic gate diagram`}
         viewBox={`0 0 ${width} ${height}`}
-        className="min-h-80 w-full min-w-[680px]"
+        style={{ width, height }}
+        className="block max-w-none"
       >
         <defs>
           <marker
@@ -104,7 +110,7 @@ export function LogicGateDiagram({
           if (!target) {
             return [];
           }
-          return node.children.map((childId) => {
+          return node.children.map((childId, childIndex) => {
             const source = positions.get(childId);
             if (!source) {
               return null;
@@ -114,7 +120,14 @@ export function LogicGateDiagram({
               selectedConnection.targetId === node.id;
             const sourceX = source.x + 50;
             const targetX = target.x - 50;
-            const path = `M ${sourceX} ${source.y} L ${targetX} ${target.y}`;
+            const inputSpacing = Math.min(
+              16,
+              48 / Math.max(1, node.children.length - 1),
+            );
+            const targetY =
+              target.y +
+              (childIndex - (node.children.length - 1) / 2) * inputSpacing;
+            const path = `M ${sourceX} ${source.y} L ${targetX} ${targetY}`;
             return (
               <g key={`${childId}-${node.id}`}>
                 <path
@@ -333,6 +346,8 @@ function GateNode({
     );
   }
 
+  const gateHeight = Math.max(56, node.children.length * 16 + 20);
+
   return (
     <g
       data-testid={`moore-logic-node-${node.id}`}
@@ -341,9 +356,9 @@ function GateNode({
     >
       <rect
         x={x - 42}
-        y={y - 28}
+        y={y - gateHeight / 2}
         width="84"
-        height="56"
+        height={gateHeight}
         rx="5"
         className={
           selected
@@ -377,7 +392,7 @@ function GateNode({
   );
 }
 
-function buildDiagram(expression: BooleanExpression) {
+function buildDiagram(expression: BooleanExpression, binaryGates: boolean) {
   let nextId = 0;
   let leafOrder = 0;
   const nodes: DiagramNode[] = [];
@@ -419,16 +434,18 @@ function buildDiagram(expression: BooleanExpression) {
       return { id, depth: child.depth + 1 };
     }
 
-    const left = visit(node.left);
-    const right = visit(node.right);
-    const depth = Math.max(left.depth, right.depth) + 1;
+    const operands = binaryGates
+      ? [node.left, node.right]
+      : flattenOperator(node, node.operator);
+    const children = operands.map(visit);
+    const depth = Math.max(...children.map((child) => child.depth)) + 1;
     nodes.push({
       id,
       label: node.operator.toUpperCase(),
       kind: node.operator,
       depth,
       order: leafOrder++,
-      children: [left.id, right.id],
+      children: children.map((child) => child.id),
     });
     return { id, depth };
   };
@@ -443,5 +460,25 @@ function buildDiagram(expression: BooleanExpression) {
       nodes.filter((node) => node.kind === "input" || node.kind === "constant")
         .length,
     ),
+    maxNodesAtDepth: Math.max(
+      1,
+      ...Array.from(
+        { length: root.depth + 1 },
+        (_, depth) => nodes.filter((node) => node.depth === depth).length,
+      ),
+    ),
   };
+}
+
+function flattenOperator(
+  expression: BooleanExpression,
+  operator: "and" | "or",
+): BooleanExpression[] {
+  if (expression.type !== "binary" || expression.operator !== operator) {
+    return [expression];
+  }
+  return [
+    ...flattenOperator(expression.left, operator),
+    ...flattenOperator(expression.right, operator),
+  ];
 }

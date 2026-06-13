@@ -305,6 +305,7 @@
       "open": "In Logikgatter konvertieren",
       "title": "Logikgatter",
       "minimalFunctions": "Minimierte Funktionen",
+      "binaryGates": "Nur Gatter mit zwei Eingängen",
       "completeCircuit": "Gesamte Schaltung anzeigen",
       "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",
       "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT. Falstad-Export: TODO."

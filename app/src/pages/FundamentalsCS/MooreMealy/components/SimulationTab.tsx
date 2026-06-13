@@ -20,31 +20,33 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       onReset={() => simulatorRef.current?.resetStoredState()}
     >
       <div className="space-y-6">
-        <div
-          role="tablist"
-          aria-label={t("moore.sim.machineType")}
-          className="border-border inline-flex rounded-lg border p-1"
-        >
-          {(["moore", "mealy"] as const).map((type) => (
-            <button
-              key={type}
-              type="button"
-              role="tab"
-              aria-selected={machineType === type}
-              onClick={() => setMachineType(type)}
-              data-testid={`moore-machine-tab-${type}`}
-              className={cn(
-                "rounded-md px-4 py-2 text-sm font-semibold transition-colors",
-                machineType === type
-                  ? "bg-brand text-brand-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {type === "moore"
-                ? t("moore.sim.mooreTab")
-                : t("moore.sim.mealyTab")}
-            </button>
-          ))}
+        <div className="mx-auto w-full max-w-[100rem]">
+          <div
+            role="tablist"
+            aria-label={t("moore.sim.machineType")}
+            className="border-border inline-flex rounded-lg border p-1"
+          >
+            {(["moore", "mealy"] as const).map((type) => (
+              <button
+                key={type}
+                type="button"
+                role="tab"
+                aria-selected={machineType === type}
+                onClick={() => setMachineType(type)}
+                data-testid={`moore-machine-tab-${type}`}
+                className={cn(
+                  "rounded-md px-4 py-2 text-sm font-semibold transition-colors",
+                  machineType === type
+                    ? "bg-brand text-brand-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                {type === "moore"
+                  ? t("moore.sim.mooreTab")
+                  : t("moore.sim.mealyTab")}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div hidden={machineType !== "moore"}>

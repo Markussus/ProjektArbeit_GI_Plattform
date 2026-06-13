@@ -122,21 +122,17 @@ export function SearchableCreatableSelect({
     if (!isOpen) {
       return;
     }
-    const closeOnScroll = (event: Event) => {
-      if (
-        event.target instanceof Node &&
-        menuRef.current?.contains(event.target)
-      ) {
-        return;
-      }
+    const close = () => {
       setIsOpen(false);
       setQuery("");
     };
-    window.addEventListener("scroll", closeOnScroll, true);
-    window.addEventListener("resize", closeOnScroll);
+    window.addEventListener("wheel", close, { capture: true });
+    window.addEventListener("touchmove", close, { capture: true });
+    window.addEventListener("resize", close);
     return () => {
-      window.removeEventListener("scroll", closeOnScroll, true);
-      window.removeEventListener("resize", closeOnScroll);
+      window.removeEventListener("wheel", close, true);
+      window.removeEventListener("touchmove", close, true);
+      window.removeEventListener("resize", close);
     };
   }, [isOpen]);
 
@@ -252,7 +248,11 @@ export function SearchableCreatableSelect({
                     testId ? `${testId}-option-${option}` : undefined
                   }
                   aria-selected={option === value}
-                  onClick={() => selectValue(option)}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    selectValue(option);
+                  }}
                   className={cn(
                     "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
                     (option === value || index === activeIndex) && "bg-muted",
@@ -277,7 +277,11 @@ export function SearchableCreatableSelect({
                     optionRefs.current[matchingOptions.length] = element;
                   }}
                   type="button"
-                  onClick={createValue}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    createValue();
+                  }}
                   data-testid={testId ? `${testId}-create` : undefined}
                   className={cn(
                     "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",

@@ -5,13 +5,19 @@ export interface UseDragScrollResult<TElement extends HTMLElement> {
   isDragging: boolean;
   onMouseDown: (event: React.MouseEvent<TElement>) => void;
   scrollToEnd: () => void;
+  scrollElementIntoView: (element: HTMLElement | null) => void;
 }
 
 export function useDragScroll<
   TElement extends HTMLElement,
 >(): UseDragScrollResult<TElement> {
   const ref = useRef<TElement | null>(null);
-  const dragRef = useRef<{ x: number; scrollLeft: number } | null>(null);
+  const dragRef = useRef<{
+    x: number;
+    y: number;
+    scrollLeft: number;
+    scrollTop: number;
+  } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -26,6 +32,7 @@ export function useDragScroll<
         return;
       }
       element.scrollLeft = drag.scrollLeft - (event.clientX - drag.x);
+      element.scrollTop = drag.scrollTop - (event.clientY - drag.y);
     };
     const handleUp = () => {
       dragRef.current = null;
@@ -51,6 +58,25 @@ export function useDragScroll<
     }
   }, []);
 
+  const scrollElementIntoView = useCallback((target: HTMLElement | null) => {
+    const element = ref.current;
+    if (!element || !target) {
+      return;
+    }
+    const containerRect = element.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    if (targetRect.left < containerRect.left) {
+      element.scrollLeft -= containerRect.left - targetRect.left;
+    } else if (targetRect.right > containerRect.right) {
+      element.scrollLeft += targetRect.right - containerRect.right;
+    }
+    if (targetRect.top < containerRect.top) {
+      element.scrollTop -= containerRect.top - targetRect.top;
+    } else if (targetRect.bottom > containerRect.bottom) {
+      element.scrollTop += targetRect.bottom - containerRect.bottom;
+    }
+  }, []);
+
   return {
     setElementRef,
     isDragging,
@@ -67,9 +93,15 @@ export function useDragScroll<
       if (!element) {
         return;
       }
-      dragRef.current = { x: event.clientX, scrollLeft: element.scrollLeft };
+      dragRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+        scrollLeft: element.scrollLeft,
+        scrollTop: element.scrollTop,
+      };
       setIsDragging(true);
     },
     scrollToEnd,
+    scrollElementIntoView,
   };
 }

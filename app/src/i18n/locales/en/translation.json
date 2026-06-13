@@ -305,6 +305,7 @@
       "open": "Convert to logic gates",
       "title": "Logic gates",
       "minimalFunctions": "Minimized functions",
+      "binaryGates": "Use only two-input gates",
       "completeCircuit": "Show complete circuit",
       "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",
       "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT. Falstad export: TODO."

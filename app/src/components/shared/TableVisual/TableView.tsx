@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import {
   ADD_ACTION_BUTTON_CLASS,
   ADD_ROW_BUTTON_CLASS,
@@ -73,12 +74,18 @@ export function TableView({
   className,
   tableClassName,
   disableActiveCellAutoScroll = false,
+  enableDragScroll = true,
   testIdPrefix,
   getRowTestAttributes,
   getCellTestAttributes,
 }: TableViewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const dragScroll = useDragScroll<HTMLDivElement>();
+  const setContainerRef = (element: HTMLDivElement | null) => {
+    containerRef.current = element;
+    dragScroll.setElementRef(element);
+  };
 
   const maxCols = useMemo(() => {
     return getMaxCols(headers, rows);
@@ -355,9 +362,15 @@ export function TableView({
 
   return (
     <div
-      ref={containerRef}
+      ref={setContainerRef}
+      onMouseDown={enableDragScroll ? dragScroll.onMouseDown : undefined}
       data-testid={testIdPrefix ? `${testIdPrefix}-container` : undefined}
-      className={cn(TABLE_CONTAINER_CLASS, className)}
+      className={cn(
+        TABLE_CONTAINER_CLASS,
+        enableDragScroll &&
+          (dragScroll.isDragging ? "cursor-grabbing" : "cursor-grab"),
+        className,
+      )}
     >
       <table
         aria-label={labels.table}
