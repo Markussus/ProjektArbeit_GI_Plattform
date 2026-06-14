@@ -1,0 +1,156 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{BerichtVorlage-erweitert}[10.06.2026 Erweiterung der schlanken BerichtVorlage]
+
+% -----------------------------------------------------------------------------
+% Paketoptionen
+% -----------------------------------------------------------------------------
+% Standard: Glossar/Akronyme und Literaturverwaltung werden geladen.
+% Bei Bedarf deaktivieren mit:
+%	\usepackage[noglossaries]{BerichtVorlage-erweitert}
+%	\usepackage[nobiblatex]{BerichtVorlage-erweitert}
+%	\usepackage[noglossaries,nobiblatex]{BerichtVorlage-erweitert}
+
+\newif\ifBVE@glossaries
+\newif\ifBVE@biblatex
+\BVE@glossariestrue
+\BVE@biblatextrue
+
+\DeclareOption{glossaries}{\BVE@glossariestrue}
+\DeclareOption{noglossaries}{\BVE@glossariesfalse}
+\DeclareOption{biblatex}{\BVE@biblatextrue}
+\DeclareOption{nobiblatex}{\BVE@biblatexfalse}
+\ProcessOptions\relax
+
+% -----------------------------------------------------------------------------
+% Basisvorlage laden
+% -----------------------------------------------------------------------------
+\RequirePackage{BerichtVorlage}		% Lädt Grundlayout, Sprache, Schrift, Ränder, Header/Footer, Hyperlinks und Dokumentbereiche
+\RequirePackage{etoolbox}			% Hilfsbefehle für Paketlogik, Schalter und spätere Erweiterungen
+
+% -----------------------------------------------------------------------------
+% Mathematik
+% -----------------------------------------------------------------------------
+\RequirePackage{mathtools}			% Erweitert amsmath um zusätzliche Mathematikfunktionen und bessere Formatierung
+\RequirePackage{amssymb}			% Zusätzliche mathematische Symbole
+\RequirePackage{amsfonts}			% Zusätzliche mathematische Schriften wie Mengenzeichen
+
+% -----------------------------------------------------------------------------
+% Grafiken und Zeichnungen
+% -----------------------------------------------------------------------------
+\RequirePackage{graphicx}			% Einbinden und Skalieren von Bildern
+\RequirePackage{tikz}				% Vektorbasierte Zeichnungen, Diagramme und technische Skizzen
+\usetikzlibrary{matrix, positioning, shapes.geometric, arrows.meta, calc}	% TikZ-Erweiterungen für Matrizen, Positionierung, Formen, Pfeile und Koordinatenberechnung.
+
+% -----------------------------------------------------------------------------
+% Tabellen und Beschriftungen
+% -----------------------------------------------------------------------------
+\RequirePackage{caption}			% Erlaubt Anpassung von Bild- und Tabellenbeschriftungen
+\RequirePackage{tabularx}			% Ermöglicht Tabellen mit automatischer Spaltenbreite über den Spaltentyp X
+\RequirePackage{booktabs}			% Stellt Tabellenlinien wie \toprule, \midrule und \bottomrule bereit
+\RequirePackage{longtable}			% Ermöglicht Tabellen, die über mehrere Seiten laufen
+\RequirePackage{array}				% Erweitert Tabellen-Spaltendefinitionen und eigene Spaltentypen
+
+% -----------------------------------------------------------------------------
+% Listen, Code, Boxen und Platzierung
+% -----------------------------------------------------------------------------
+\RequirePackage{enumitem}			% Anpassungen von itemize-, enumerate- und description-Listen
+\RequirePackage{fancyvrb}			% Erweiterte Verbatim- und Code-Darstellung
+\RequirePackage{tcolorbox}			% Gerahmte und farbige Boxen für Hinweise, Beispiele oder Warnungen
+\tcbuselibrary{breakable,skins}		% Aktiviert mehrseitige Boxen und erweiterte Boxgestaltung
+\RequirePackage{float}				% Ermöglicht die genaue Platzierung von Gleitumgebungen mit [H]
+
+% -----------------------------------------------------------------------------
+% Textauszeichnung und Typografie
+% -----------------------------------------------------------------------------
+\RequirePackage[normalem]{ulem}		% Unterstreichen und Durchstreichen, ohne \emph zu verändern
+\RequirePackage[protrusion=true,expansion=true]{microtype}	% Verbessert Randausgleich, Laufweite und Umbruchqualität im Blocksatz
+
+% -----------------------------------------------------------------------------
+% Glossar und Akronyme
+% -----------------------------------------------------------------------------
+\ifBVE@glossaries
+	\RequirePackage[acronym,nonumberlist]{glossaries}	% Glossare und Abkürzungsverzeichnisse ohne Seitenzahlenlisten
+	\makenoidxglossaries
+
+	% Eigener Stil fuer Akronyme: Kürzel | Langform | Beschreibung
+	\newglossarystyle{acrlongdesc}{%
+		\setglossarystyle{list}%
+		\renewcommand*{\glossentry}[2]{%
+			\item[\glstarget{##1}{\glossentryname{##1}}]%
+			\glsentrylong{##1}%
+			\ifglshasdesc{##1}{; \glossentrydesc{##1}}{}%
+		}%
+	}
+
+	% Komfortbefehl für ein deutsches Abkürzungsverzeichnis im eigenen Stil
+	% Mit [heading=none] wird die automatisch erzeugte Glossar-Überschrift unterdrückt
+	\newcommand{\printacronyms}[1][]{%
+		\ifstrequal{#1}{heading=none}{%
+			\begingroup
+				\renewcommand*{\glossarysection}[2][]{}%
+				\printnoidxglossary[type=\acronymtype,style=acrlongdesc,title={}]%
+			\endgroup
+		}{%
+			\printnoidxglossary[type=\acronymtype,style=acrlongdesc,title={Abkürzungsverzeichnis},#1]%
+		}%
+	}
+\fi
+
+% -----------------------------------------------------------------------------
+% Literaturverwaltung mit biblatex/biber
+% -----------------------------------------------------------------------------
+\ifBVE@biblatex
+	\RequirePackage{csquotes}		% Stellt sprachabhängig korrekte Anführungszeichen bereit
+	\RequirePackage[
+		backend=biber,
+		style=ieee,
+		sorting=none,
+		doi=true,
+		isbn=true,
+		url=true
+	]{biblatex}						% Verwaltet Literatur mit biber im IEEE-Stil und numerischen Zitaten
+
+	% Bessere Zeilenumbrüche für lange URLs im Literaturverzeichnis
+	\setcounter{biburlnumpenalty}{7000}
+	\setcounter{biburlucpenalty}{8000}
+	\setcounter{biburllcpenalty}{8000}
+	\AtBeginBibliography{\sloppy}
+\fi
+
+% -----------------------------------------------------------------------------
+% Komfortdefinitionen für Tabellen
+% -----------------------------------------------------------------------------
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% -----------------------------------------------------------------------------
+% Komfortdefinitionen für tcolorbox
+% -----------------------------------------------------------------------------
+\newtcolorbox{HinweisBox}{
+	breakable,
+	title=Hinweis,
+	colback=blue!5,
+	colframe=blue!60!black,
+	coltitle=white,
+	colbacktitle=blue!60!black
+}
+
+\newtcolorbox{BeispielBox}{
+	breakable,
+	title=Beispiel,
+	colback=green!5,
+	colframe=green!50!black,
+	coltitle=white,
+	colbacktitle=green!50!black
+}
+
+\newtcolorbox{WarnungBox}{
+	breakable,
+	title=Warnung,
+	colback=red!5,
+	colframe=red!65!black,
+	coltitle=white,
+	colbacktitle=red!65!black
+}
