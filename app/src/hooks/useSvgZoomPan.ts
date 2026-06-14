@@ -123,9 +123,10 @@ export function useSvgZoomPan(
       if (!svg || !pan) {
         return;
       }
-      const current = new DOMPoint(event.clientX, event.clientY).matrixTransform(
-        pan.screenToSvg,
-      );
+      const current = new DOMPoint(
+        event.clientX,
+        event.clientY,
+      ).matrixTransform(pan.screenToSvg);
       setViewBox({
         ...pan.viewBox,
         x: pan.viewBox.x - (current.x - pan.start.x),

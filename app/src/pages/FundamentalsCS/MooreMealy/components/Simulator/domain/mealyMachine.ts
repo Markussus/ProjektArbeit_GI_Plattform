@@ -3,27 +3,27 @@ import type { ISimulator } from "@/types/simulator";
 import { validateMealyProgram } from "./mealyProgram";
 import type { MealyProgram, MealyRuntime } from "./mealyTypes";
 
-export class MealyMachineSimulator
-  implements ISimulator<MealyProgram, MealyRuntime>
-{
+export class MealyMachineSimulator implements ISimulator<
+  MealyProgram,
+  MealyRuntime
+> {
   private program: MealyProgram | null = null;
   private runtime: MealyRuntime | null = null;
   private history: MealyRuntime[] = [];
 
   initialize(program: MealyProgram, runtime?: MealyRuntime): void {
     const issues = validateMealyProgram(program);
-    if (issues.length) throw new Error(`Invalid Mealy program: ${issues.join(", ")}`);
+    if (issues.length)
+      throw new Error(`Invalid Mealy program: ${issues.join(", ")}`);
     this.program = cloneJson(program);
-    this.runtime =
-      runtime ??
-      {
-        currentState: program.initialState,
-        inputPosition: 0,
-        outputSymbols: [],
-        stepCount: 0,
-        halted: program.inputWord.length === 0,
-        transitionHistory: [],
-      };
+    this.runtime = runtime ?? {
+      currentState: program.initialState,
+      inputPosition: 0,
+      outputSymbols: [],
+      stepCount: 0,
+      halted: program.inputWord.length === 0,
+      transitionHistory: [],
+    };
     this.history = [];
   }
 
@@ -32,7 +32,8 @@ export class MealyMachineSimulator
     if (runtime.halted) return;
     const inputSymbol = program.inputWord[runtime.inputPosition];
     const toState = program.transitions[inputSymbol]?.[runtime.currentState];
-    const outputSymbol = program.outputs[inputSymbol]?.[runtime.currentState]?.symbol;
+    const outputSymbol =
+      program.outputs[inputSymbol]?.[runtime.currentState]?.symbol;
     if (!toState || outputSymbol === undefined)
       throw new Error("mealy_transition_missing");
     this.history.push(cloneJson(runtime));

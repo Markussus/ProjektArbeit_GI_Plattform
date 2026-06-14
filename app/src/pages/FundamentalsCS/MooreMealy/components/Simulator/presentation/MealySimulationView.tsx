@@ -72,8 +72,14 @@ export function MealySimulationView(props: Props) {
           </div>
         </div>
         <div className="space-y-3">
-          <Sequence title={t("moore.sim.inputWord")} values={props.program.inputWord} />
-          <Sequence title={t("moore.sim.outputWord")} values={props.runtime.outputSymbols} />
+          <Sequence
+            title={t("moore.sim.inputWord")}
+            values={props.program.inputWord}
+          />
+          <Sequence
+            title={t("moore.sim.outputWord")}
+            values={props.runtime.outputSymbols}
+          />
         </div>
       </div>
       <StateMachineGraph
@@ -174,7 +180,10 @@ function Sequence({ title, values }: { title: string; values: string[] }) {
       <h3 className="mb-1 text-sm font-semibold">{title}</h3>
       <div className="border-border bg-card flex min-h-12 gap-2 overflow-x-auto rounded-lg border p-2">
         {values.map((value, index) => (
-          <span key={`${value}-${index}`} className="bg-background rounded border px-3 py-1 font-mono">
+          <span
+            key={`${value}-${index}`}
+            className="bg-background rounded border px-3 py-1 font-mono"
+          >
             {value}
           </span>
         ))}

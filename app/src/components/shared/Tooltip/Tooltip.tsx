@@ -17,7 +17,7 @@ export function Tooltip({
       <span
         id={id}
         role="tooltip"
-        className="bg-popover text-popover-foreground border-border pointer-events-none absolute right-0 bottom-[calc(100%+0.4rem)] z-50 hidden rounded-md border px-2 py-1 text-xs whitespace-nowrap shadow-lg group-hover/tooltip:block group-focus-within/tooltip:block"
+        className="bg-popover text-popover-foreground border-border pointer-events-none absolute right-0 bottom-[calc(100%+0.4rem)] z-50 hidden rounded-md border px-2 py-1 text-xs whitespace-nowrap shadow-lg group-focus-within/tooltip:block group-hover/tooltip:block"
       >
         {label}
       </span>

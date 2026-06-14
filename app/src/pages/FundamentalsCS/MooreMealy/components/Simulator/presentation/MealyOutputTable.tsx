@@ -33,11 +33,7 @@ export function MealyOutputTable({
     program.states.map((state) => [state, groupRules(program, state)]),
   );
 
-  const assignInput = (
-    event: DragEvent,
-    state: string,
-    rule: OutputRule,
-  ) => {
+  const assignInput = (event: DragEvent, state: string, rule: OutputRule) => {
     event.preventDefault();
     setDragTarget(null);
     const input = event.dataTransfer.getData("application/x-mealy-input");
@@ -103,10 +99,7 @@ export function MealyOutputTable({
               return rules.map((rule, ruleIndex) => {
                 const targetKey = `${state}-${rule.key}`;
                 return (
-                  <tr
-                    key={targetKey}
-                    className="border-b last:border-b-0"
-                  >
+                  <tr key={targetKey} className="border-b last:border-b-0">
                     {ruleIndex === 0 && (
                       <td
                         rowSpan={rules.length}
@@ -116,7 +109,9 @@ export function MealyOutputTable({
                         )}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-mono font-semibold">{state}</span>
+                          <span className="font-mono font-semibold">
+                            {state}
+                          </span>
                           <span className="text-muted-foreground font-mono text-xs">
                             {formatInternalNumber(
                               stateIndex,
@@ -215,9 +210,7 @@ export function MealyOutputTable({
         onDragLeave={() => setDragTarget(null)}
         onDrop={(event) => {
           event.preventDefault();
-          const input = event.dataTransfer.getData(
-            "application/x-mealy-input",
-          );
+          const input = event.dataTransfer.getData("application/x-mealy-input");
           const state = program.states[0];
           if (!state || !program.inputSymbols.includes(input)) return;
           const output = {

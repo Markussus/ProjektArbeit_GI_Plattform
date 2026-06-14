@@ -47,8 +47,9 @@ export function StateMachineGraph({
     () => new Map(),
   );
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
-  const [labelLayout, setLabelLayout] =
-    useState<"wrapped" | "list">(defaultLabelLayout);
+  const [labelLayout, setLabelLayout] = useState<"wrapped" | "list">(
+    defaultLabelLayout,
+  );
   const svgElementRef = useRef<SVGSVGElement | null>(null);
   const previousActiveNodeIdRef = useRef<string | undefined>(undefined);
   const {
@@ -67,9 +68,7 @@ export function StateMachineGraph({
     [layout.positions, nodePositions],
   );
   const activeNodeId = nodes.find((node) => node.isActive)?.id;
-  const activePosition = activeNodeId
-    ? positions.get(activeNodeId)
-    : undefined;
+  const activePosition = activeNodeId ? positions.get(activeNodeId) : undefined;
 
   useLayoutEffect(() => {
     const activeNodeChanged = previousActiveNodeIdRef.current !== activeNodeId;

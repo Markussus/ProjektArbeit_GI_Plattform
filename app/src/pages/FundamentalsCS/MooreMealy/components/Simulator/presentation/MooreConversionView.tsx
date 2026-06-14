@@ -87,11 +87,7 @@ export function MooreConversionView({
   );
 }
 
-export function ViewHeader({
-  title,
-}: {
-  title: string;
-}) {
+export function ViewHeader({ title }: { title: string }) {
   return <h2 className="text-xl font-bold">{title}</h2>;
 }
 
@@ -218,8 +214,12 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
 
 function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
   const { t } = useTranslation();
-  const { stateVariables, inputVariables = [], outputVariables, rows } =
-    conversion.output;
+  const {
+    stateVariables,
+    inputVariables = [],
+    outputVariables,
+    rows,
+  } = conversion.output;
 
   return (
     <ValueTable

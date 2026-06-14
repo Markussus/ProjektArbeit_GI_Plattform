@@ -1,8 +1,5 @@
 import { cloneJson } from "@/lib/utils";
-import {
-  createNextInputSymbol,
-  createNextStateName,
-} from "./mooreProgram";
+import { createNextInputSymbol, createNextStateName } from "./mooreProgram";
 import type { MealyProgram } from "./mealyTypes";
 
 export { createNextInputSymbol, createNextStateName };
@@ -44,7 +41,9 @@ export function validateMealyProgram(program: MealyProgram): string[] {
 export function normalizeMealyProgram(program: MealyProgram): MealyProgram {
   const normalized = cloneJson(program);
   normalized.states = normalized.states.map((value) => value.trim());
-  normalized.inputSymbols = normalized.inputSymbols.map((value) => value.trim());
+  normalized.inputSymbols = normalized.inputSymbols.map((value) =>
+    value.trim(),
+  );
   normalized.transitions = Object.fromEntries(
     normalized.inputSymbols.map((input) => [
       input,
@@ -79,9 +78,12 @@ export function renameMealyState(
   nextValue: string,
 ): MealyProgram | null {
   const next = nextValue.trim();
-  if (!next || (next !== previous && program.states.includes(next))) return null;
+  if (!next || (next !== previous && program.states.includes(next)))
+    return null;
   const result = cloneJson(program);
-  result.states = result.states.map((state) => (state === previous ? next : state));
+  result.states = result.states.map((state) =>
+    state === previous ? next : state,
+  );
   if (result.initialState === previous) result.initialState = next;
   for (const input of result.inputSymbols) {
     result.transitions[input][next] = result.transitions[input][previous];
@@ -123,5 +125,8 @@ export function renameMealyInput(
 }
 
 function unique(values: string[]) {
-  return values.every((value) => value.trim()) && new Set(values).size === values.length;
+  return (
+    values.every((value) => value.trim()) &&
+    new Set(values).size === values.length
+  );
 }

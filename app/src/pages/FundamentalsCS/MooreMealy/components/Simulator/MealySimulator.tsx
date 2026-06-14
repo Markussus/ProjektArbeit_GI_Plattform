@@ -32,8 +32,12 @@ import { MooreViewActions } from "./presentation/MooreViewActions";
 export function MealySimulator() {
   const { t } = useTranslation();
   const [program, setProgram] = useState(() => cloneJson(defaultMealyProgram));
-  const [committed, setCommitted] = useState(() => cloneJson(defaultMealyProgram));
-  const [mode, setMode] = useState<"edit" | "simulation" | "conversion" | "logic">("edit");
+  const [committed, setCommitted] = useState(() =>
+    cloneJson(defaultMealyProgram),
+  );
+  const [mode, setMode] = useState<
+    "edit" | "simulation" | "conversion" | "logic"
+  >("edit");
   const [storageReady, setStorageReady] = useState(false);
   const simulation = useMealySimulator(committed);
   const issues = useMemo(() => validateMealyProgram(program), [program]);
@@ -46,7 +50,8 @@ export function MealySimulator() {
     [],
   );
   const transferCodec = useMemo(
-    () => createTrainingCenterTransferCodec(identifier, mealyProgramTransferCodec),
+    () =>
+      createTrainingCenterTransferCodec(identifier, mealyProgramTransferCodec),
     [identifier],
   );
   const loadProgram = useCallback((value: MealyProgram) => {
@@ -125,7 +130,10 @@ export function MealySimulator() {
     );
 
   return (
-    <div data-testid="mealy-simulator" className="mx-auto w-full max-w-[100rem] space-y-6">
+    <div
+      data-testid="mealy-simulator"
+      className="mx-auto w-full max-w-[100rem] space-y-6"
+    >
       {mode === "edit" ? (
         <>
           <MealyConfigView
@@ -154,7 +162,8 @@ export function MealySimulator() {
               return true;
             }}
             onAddState={(requested) => {
-              const state = requested?.trim() || createNextStateName(program.states);
+              const state =
+                requested?.trim() || createNextStateName(program.states);
               if (program.states.includes(state)) return state;
               setProgram((current) => ({
                 ...current,
@@ -162,7 +171,10 @@ export function MealySimulator() {
                 transitions: Object.fromEntries(
                   current.inputSymbols.map((input) => [
                     input,
-                    { ...current.transitions[input], [state]: current.initialState },
+                    {
+                      ...current.transitions[input],
+                      [state]: current.initialState,
+                    },
                   ]),
                 ),
                 outputs: Object.fromEntries(
@@ -170,7 +182,10 @@ export function MealySimulator() {
                     input,
                     {
                       ...current.outputs[input],
-                      [state]: { symbol: `OUT_${current.states.length}`, code: current.states.length },
+                      [state]: {
+                        symbol: `OUT_${current.states.length}`,
+                        code: current.states.length,
+                      },
                     },
                   ]),
                 ),
@@ -180,12 +195,17 @@ export function MealySimulator() {
             onRemoveState={(removed) =>
               setProgram((current) => {
                 if (current.states.length <= 1) return current;
-                const states = current.states.filter((state) => state !== removed);
+                const states = current.states.filter(
+                  (state) => state !== removed,
+                );
                 const fallback = states[0];
                 return {
                   ...current,
                   states,
-                  initialState: current.initialState === removed ? fallback : current.initialState,
+                  initialState:
+                    current.initialState === removed
+                      ? fallback
+                      : current.initialState,
                   transitions: Object.fromEntries(
                     current.inputSymbols.map((input) => [
                       input,
@@ -202,7 +222,12 @@ export function MealySimulator() {
                   outputs: Object.fromEntries(
                     current.inputSymbols.map((input) => [
                       input,
-                      Object.fromEntries(states.map((state) => [state, current.outputs[input][state]])),
+                      Object.fromEntries(
+                        states.map((state) => [
+                          state,
+                          current.outputs[input][state],
+                        ]),
+                      ),
                     ]),
                   ),
                 };
@@ -216,7 +241,12 @@ export function MealySimulator() {
                   inputSymbols: [...current.inputSymbols, input],
                   transitions: {
                     ...current.transitions,
-                    [input]: Object.fromEntries(current.states.map((state) => [state, current.initialState])),
+                    [input]: Object.fromEntries(
+                      current.states.map((state) => [
+                        state,
+                        current.initialState,
+                      ]),
+                    ),
                   },
                   outputs: {
                     ...current.outputs,
@@ -244,15 +274,23 @@ export function MealySimulator() {
                 delete outputs[removed];
                 return {
                   ...current,
-                  inputSymbols: current.inputSymbols.filter((input) => input !== removed),
-                  inputWord: current.inputWord.filter((input) => input !== removed),
+                  inputSymbols: current.inputSymbols.filter(
+                    (input) => input !== removed,
+                  ),
+                  inputWord: current.inputWord.filter(
+                    (input) => input !== removed,
+                  ),
                   transitions,
                   outputs,
                 };
               })
             }
-            onOutputSymbolChange={(input, state, symbol) => updateOutput(input, state, { symbol })}
-            onOutputCodeChange={(input, state, code) => updateOutput(input, state, { code })}
+            onOutputSymbolChange={(input, state, symbol) =>
+              updateOutput(input, state, { symbol })
+            }
+            onOutputCodeChange={(input, state, code) =>
+              updateOutput(input, state, { code })
+            }
           />
           <SimulatorStringTransferBox
             value={program}
@@ -262,9 +300,27 @@ export function MealySimulator() {
           />
           <MooreViewActions
             actions={[
-              { label: t("moore.conversion.open"), onClick: () => setMode("conversion"), icon: TableProperties, testId: "mealy-open-conversion", disabled: !conversion },
-              { label: t("moore.sim.startSimulation"), onClick: start, icon: Play, testId: "mealy-start-simulation", disabled: !!issues.length },
-              { label: t("moore.logic.open"), onClick: () => setMode("logic"), icon: CircuitBoard, testId: "mealy-open-logic", disabled: !conversion },
+              {
+                label: t("moore.conversion.open"),
+                onClick: () => setMode("conversion"),
+                icon: TableProperties,
+                testId: "mealy-open-conversion",
+                disabled: !conversion,
+              },
+              {
+                label: t("moore.sim.startSimulation"),
+                onClick: start,
+                icon: Play,
+                testId: "mealy-start-simulation",
+                disabled: !!issues.length,
+              },
+              {
+                label: t("moore.logic.open"),
+                onClick: () => setMode("logic"),
+                icon: CircuitBoard,
+                testId: "mealy-open-logic",
+                disabled: !conversion,
+              },
             ]}
           />
         </>
@@ -285,9 +341,24 @@ export function MealySimulator() {
           />
           <MooreViewActions
             actions={[
-              { label: t("moore.navigation.editDefinition"), onClick: edit, icon: Pencil, testId: "mealy-edit-definition" },
-              { label: t("moore.navigation.showConversion"), onClick: () => setMode("conversion"), icon: TableProperties, testId: "mealy-open-conversion" },
-              { label: t("moore.navigation.showLogic"), onClick: () => setMode("logic"), icon: CircuitBoard, testId: "mealy-open-logic" },
+              {
+                label: t("moore.navigation.editDefinition"),
+                onClick: edit,
+                icon: Pencil,
+                testId: "mealy-edit-definition",
+              },
+              {
+                label: t("moore.navigation.showConversion"),
+                onClick: () => setMode("conversion"),
+                icon: TableProperties,
+                testId: "mealy-open-conversion",
+              },
+              {
+                label: t("moore.navigation.showLogic"),
+                onClick: () => setMode("logic"),
+                icon: CircuitBoard,
+                testId: "mealy-open-logic",
+              },
             ]}
           />
         </>
