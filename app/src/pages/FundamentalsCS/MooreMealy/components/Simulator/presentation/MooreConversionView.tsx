@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { CircuitBoard, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { cn } from "@/lib/utils";
 import type {
   MooreConversion,
   MooreConversionRow,
 } from "../domain/mooreConversion";
 import { MooreFormulaList } from "./MooreFormulaList";
+import { MooreViewActions } from "./MooreViewActions";
 
 interface MooreConversionViewProps {
   conversion: MooreConversion;
@@ -28,30 +30,25 @@ export function MooreConversionView({
 
   return (
     <div data-testid="moore-conversion-view" className="space-y-5">
-      <ViewHeader
-        title={t("moore.conversion.title")}
-        onBack={onBackToEditor}
-        backLabel={t("moore.navigation.editDefinition")}
-      />
+      <ViewHeader title={t("moore.conversion.title")} />
 
-      <div
-        role="tablist"
-        aria-label={t("moore.conversion.title")}
-        className="border-border inline-flex rounded-lg border p-1"
-      >
-        <ConversionTab
-          active={activeTab === "transition"}
-          label={t("moore.conversion.transitionTab")}
-          testId="moore-conversion-tab-transition"
-          onClick={() => setActiveTab("transition")}
-        />
-        <ConversionTab
-          active={activeTab === "output"}
-          label={t("moore.conversion.outputTab")}
-          testId="moore-conversion-tab-output"
-          onClick={() => setActiveTab("output")}
-        />
-      </div>
+      <InlineTabNavigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        ariaLabel={t("moore.conversion.title")}
+        tabs={[
+          {
+            id: "transition",
+            label: t("moore.conversion.transitionTab"),
+            testId: "moore-conversion-tab-transition",
+          },
+          {
+            id: "output",
+            label: t("moore.conversion.outputTab"),
+            testId: "moore-conversion-tab-output",
+          },
+        ]}
+      />
 
       {activeTab === "transition" ? (
         <div className="space-y-6">
@@ -64,81 +61,38 @@ export function MooreConversionView({
           <MooreFormulaList formulas={conversion.output.formulas} />
         </div>
       )}
-      <div className="flex flex-wrap justify-center gap-3">
-        <button
-          type="button"
-          onClick={onShowSimulator}
-          data-testid="moore-conversion-show-simulator"
-          className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 font-semibold"
-        >
-          {t("moore.navigation.showSimulator")}
-        </button>
-        <button
-          type="button"
-          onClick={onShowLogic}
-          data-testid="moore-conversion-show-logic"
-          className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90"
-        >
-          {t("moore.navigation.showLogic")}
-        </button>
-      </div>
+      <MooreViewActions
+        actions={[
+          {
+            label: t("moore.navigation.editDefinition"),
+            onClick: onBackToEditor,
+            icon: Pencil,
+            testId: "moore-conversion-edit-definition",
+          },
+          {
+            label: t("moore.navigation.showSimulator"),
+            onClick: onShowSimulator,
+            icon: Play,
+            testId: "moore-conversion-show-simulator",
+          },
+          {
+            label: t("moore.navigation.showLogic"),
+            onClick: onShowLogic,
+            icon: CircuitBoard,
+            testId: "moore-conversion-show-logic",
+          },
+        ]}
+      />
     </div>
   );
 }
 
 export function ViewHeader({
   title,
-  onBack,
-  backLabel,
 }: {
   title: string;
-  onBack: () => void;
-  backLabel: string;
 }) {
-  return (
-    <div className="space-y-3">
-      <button
-        type="button"
-        onClick={onBack}
-        data-testid="moore-subview-back"
-        className="border-border bg-background hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium"
-      >
-        <ArrowLeft className="size-4" />
-        {backLabel}
-      </button>
-      <h2 className="text-xl font-bold">{title}</h2>
-    </div>
-  );
-}
-
-function ConversionTab({
-  active,
-  label,
-  testId,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  testId: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      data-testid={testId}
-      onClick={onClick}
-      className={cn(
-        "rounded-md px-4 py-2 text-sm font-semibold",
-        active
-          ? "bg-brand text-brand-foreground"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-      )}
-    >
-      {label}
-    </button>
-  );
+  return <h2 className="text-xl font-bold">{title}</h2>;
 }
 
 function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {

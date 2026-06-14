@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { StateMachineGraph } from "@/components/shared/StateMachineGraph";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
 import { cn } from "@/lib/utils";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import type { MooreProgram, MooreRuntime } from "../domain/mooreTypes";
 
 interface MooreSimulationViewProps {
@@ -56,17 +57,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
 
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
-        <button
-          type="button"
-          onClick={props.onEdit}
-          data-testid="moore-edit-configuration"
-          className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium"
-        >
-          {t("moore.sim.editConfiguration")}
-        </button>
-      </div>
+      <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
 
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">
@@ -153,9 +144,30 @@ function MooreRuntimeTable({
   const { t } = useTranslation();
   const currentCol = program.states.indexOf(currentState);
   const nextCol = nextState ? program.states.indexOf(nextState) : -1;
+  const currentRow = nextInput ? program.inputSymbols.indexOf(nextInput) : -1;
+  const { setElementRef, onMouseDown, isDragging, scrollElementIntoView } =
+    useDragScroll<HTMLDivElement>();
+
+  useLayoutEffect(() => {
+    if (currentRow < 0 || currentCol < 0) {
+      return;
+    }
+    const cell = document.querySelector<HTMLElement>(
+      `[data-testid="moore-runtime-cell-${currentRow}-${currentCol}"]`,
+    );
+    scrollElementIntoView(cell);
+  }, [currentCol, currentRow, nextState, scrollElementIntoView]);
 
   return (
-    <div className="border-border max-h-64 overflow-auto rounded-xl border">
+    <div
+      ref={setElementRef}
+      onMouseDown={onMouseDown}
+      data-testid="moore-runtime-table-scroll"
+      className={cn(
+        "border-border max-h-64 overflow-auto rounded-xl border select-none",
+        isDragging ? "cursor-grabbing" : "cursor-grab",
+      )}
+    >
       <table
         data-testid="moore-runtime-transition-table"
         className="w-full min-w-max border-collapse text-center text-sm"
@@ -197,6 +209,7 @@ function MooreRuntimeTable({
                   return (
                     <td
                       key={state}
+                      data-testid={`moore-runtime-cell-${program.inputSymbols.indexOf(symbol)}-${index}`}
                       className={cn(
                         "border-r p-2 font-mono last:border-r-0",
                         index === nextCol && "bg-brand/5",

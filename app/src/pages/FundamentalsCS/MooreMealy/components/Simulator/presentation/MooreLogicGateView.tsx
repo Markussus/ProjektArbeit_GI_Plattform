@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { MooreConversion } from "../domain/mooreConversion";
 import { LogicGateDiagram } from "./LogicGateDiagram";
 import { ViewHeader } from "./MooreConversionView";
+import { MooreViewActions } from "./MooreViewActions";
 
 interface MooreLogicGateViewProps {
   conversion: MooreConversion;
@@ -22,6 +24,7 @@ export function MooreLogicGateView({
   const [selectedFormula, setSelectedFormula] = useState(
     conversion.allFormulas[0]?.name ?? "",
   );
+  const [binaryGates, setBinaryGates] = useState(true);
   const formula =
     conversion.allFormulas.find(
       (candidate) => candidate.name === selectedFormula,
@@ -29,11 +32,7 @@ export function MooreLogicGateView({
 
   return (
     <div data-testid="moore-logic-gate-view" className="space-y-5">
-      <ViewHeader
-        title={t("moore.logic.title")}
-        onBack={onEditDefinition}
-        backLabel={t("moore.navigation.editDefinition")}
-      />
+      <ViewHeader title={t("moore.logic.title")} />
 
       <div className="border-border bg-card space-y-3 rounded-xl border p-4">
         <h3 className="font-semibold">{t("moore.logic.minimalFunctions")}</h3>
@@ -62,37 +61,54 @@ export function MooreLogicGateView({
 
       {formula ? (
         <div className="space-y-3">
-          <h3 className="font-semibold">
-            {formula.name} = {formula.minimal}
-          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-semibold">
+              {formula.name} = {formula.minimal}
+            </h3>
+            <label className="border-border bg-card flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+              <input
+                type="checkbox"
+                checked={binaryGates}
+                onChange={(event) => setBinaryGates(event.target.checked)}
+                data-testid="moore-binary-gates-toggle"
+                className="accent-brand size-4"
+              />
+              <span>{t("moore.logic.binaryGates")}</span>
+            </label>
+          </div>
           <LogicGateDiagram
-            key={formula.name}
+            key={`${formula.name}-${binaryGates}`}
             expression={formula.expression}
             outputName={formula.name}
             variables={formula.variables}
             unavailableText={t("moore.logic.minimizationUnavailable")}
+            binaryGates={binaryGates}
           />
         </div>
       ) : null}
 
-      <div className="flex flex-wrap justify-center gap-3">
-        <button
-          type="button"
-          onClick={onShowSimulator}
-          data-testid="moore-logic-show-simulator"
-          className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 font-semibold"
-        >
-          {t("moore.navigation.showSimulator")}
-        </button>
-        <button
-          type="button"
-          onClick={onShowConversion}
-          data-testid="moore-logic-show-conversion"
-          className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90"
-        >
-          {t("moore.navigation.showConversion")}
-        </button>
-      </div>
+      <MooreViewActions
+        actions={[
+          {
+            label: t("moore.navigation.editDefinition"),
+            onClick: onEditDefinition,
+            icon: Pencil,
+            testId: "moore-logic-edit-definition",
+          },
+          {
+            label: t("moore.navigation.showSimulator"),
+            onClick: onShowSimulator,
+            icon: Play,
+            testId: "moore-logic-show-simulator",
+          },
+          {
+            label: t("moore.navigation.showConversion"),
+            onClick: onShowConversion,
+            icon: TableProperties,
+            testId: "moore-logic-show-conversion",
+          },
+        ]}
+      />
 
       <p className="text-muted-foreground text-xs">
         {t("moore.logic.iecHint")}

@@ -15,6 +15,7 @@ export interface UseSvgZoomPanResult {
   onMouseDown: (event: React.MouseEvent<SVGSVGElement>) => void;
   zoomIn: () => void;
   zoomOut: () => void;
+  ensurePointVisible: (x: number, y: number, padding?: number) => void;
   reset: () => void;
 }
 
@@ -31,8 +32,8 @@ export function useSvgZoomPan(
   const [isPanning, setIsPanning] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const panRef = useRef<{
-    x: number;
-    y: number;
+    start: DOMPoint;
+    screenToSvg: DOMMatrix;
     viewBox: typeof initial;
   } | null>(null);
 
@@ -60,6 +61,35 @@ export function useSvgZoomPan(
       });
     },
     [contentWidth],
+  );
+
+  const ensurePointVisible = useCallback(
+    (x: number, y: number, padding = 0) => {
+      setViewBox((current) => {
+        const horizontalPadding = Math.min(padding, current.width / 2);
+        const verticalPadding = Math.min(padding, current.height / 2);
+        let nextX = current.x;
+        let nextY = current.y;
+
+        if (x < current.x + horizontalPadding) {
+          nextX = x - horizontalPadding;
+        } else if (x > current.x + current.width - horizontalPadding) {
+          nextX = x + horizontalPadding - current.width;
+        }
+
+        if (y < current.y + verticalPadding) {
+          nextY = y - verticalPadding;
+        } else if (y > current.y + current.height - verticalPadding) {
+          nextY = y + verticalPadding - current.height;
+        }
+
+        if (nextX === current.x && nextY === current.y) {
+          return current;
+        }
+        return { ...current, x: nextX, y: nextY };
+      });
+    },
+    [],
   );
 
   useEffect(() => {
@@ -93,15 +123,13 @@ export function useSvgZoomPan(
       if (!svg || !pan) {
         return;
       }
-      const rect = svg.getBoundingClientRect();
+      const current = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+        pan.screenToSvg,
+      );
       setViewBox({
         ...pan.viewBox,
-        x:
-          pan.viewBox.x -
-          (event.clientX - pan.x) * (pan.viewBox.width / rect.width),
-        y:
-          pan.viewBox.y -
-          (event.clientY - pan.y) * (pan.viewBox.height / rect.height),
+        x: pan.viewBox.x - (current.x - pan.start.x),
+        y: pan.viewBox.y - (current.y - pan.start.y),
       });
     };
     const handleUp = () => {
@@ -127,9 +155,16 @@ export function useSvgZoomPan(
       if (event.button !== 0 || (event.target as Element).closest("button")) {
         return;
       }
+      const matrix = svgRef.current?.getScreenCTM();
+      if (!matrix) {
+        return;
+      }
+      const screenToSvg = matrix.inverse();
       panRef.current = {
-        x: event.clientX,
-        y: event.clientY,
+        start: new DOMPoint(event.clientX, event.clientY).matrixTransform(
+          screenToSvg,
+        ),
+        screenToSvg,
         viewBox,
       };
       setIsPanning(true);
@@ -142,6 +177,7 @@ export function useSvgZoomPan(
         viewBox.x + viewBox.width / 2,
         viewBox.y + viewBox.height / 2,
       ),
+    ensurePointVisible,
     reset: () => setViewBox(initial),
   };
 }

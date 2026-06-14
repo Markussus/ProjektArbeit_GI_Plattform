@@ -132,12 +132,16 @@ function buildFormulas(
       inputVariables.length <= MAX_MINIMIZATION_VARIABLES;
 
     if (!minimizationAvailable) {
+      const expression = buildCanonicalDnfExpression(
+        inputVariables,
+        trueAssignments,
+      );
       return {
         name,
         variables: inputVariables,
         canonical,
         minimal: canonical,
-        expression: null,
+        expression,
         minimizationAvailable: false,
       };
     }
@@ -169,6 +173,47 @@ function buildFormulas(
       minimizationAvailable: true,
     };
   });
+}
+
+function buildCanonicalDnfExpression(
+  variables: string[],
+  assignments: number[][],
+): BooleanExpression {
+  if (assignments.length === 0) {
+    return { type: "constant", value: false };
+  }
+  if (assignments.length === 2 ** variables.length) {
+    return { type: "constant", value: true };
+  }
+
+  const terms = assignments.map((assignment) =>
+    combineExpressions(
+      assignment.map<BooleanExpression>((bit, index) => {
+        const variable: BooleanExpression = {
+          type: "variable",
+          name: variables[index],
+        };
+        return bit === 1 ? variable : { type: "not", operand: variable };
+      }),
+      "and",
+    ),
+  );
+  return combineExpressions(terms, "or");
+}
+
+function combineExpressions(
+  expressions: BooleanExpression[],
+  operator: "and" | "or",
+): BooleanExpression {
+  return expressions.slice(1).reduce<BooleanExpression>(
+    (combined, expression) => ({
+      type: "binary",
+      operator,
+      left: combined,
+      right: expression,
+    }),
+    expressions[0] ?? { type: "constant", value: operator === "and" },
+  );
 }
 
 function formatCanonicalDnf(

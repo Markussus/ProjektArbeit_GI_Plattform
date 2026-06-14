@@ -21,7 +21,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     const transition = page.getByTestId("moore-transition-0-0");
     await transition.click();
     await page.getByTestId("moore-transition-0-0-search").fill("CLOSED_NEW");
-    await page.getByTestId("moore-transition-0-0-create").click();
+    await page.keyboard.press("Enter");
 
     await expect(transition).toHaveAttribute("data-value", "CLOSED_NEW");
     await expect(

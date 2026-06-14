@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { List, Minus, Plus, RotateCcw, WrapText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
 
@@ -40,6 +40,12 @@ export function StateMachineGraph({
 }: StateMachineGraphProps) {
   const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
+  const [nodePositions, setNodePositions] = useState<Map<string, Point>>(
+    () => new Map(),
+  );
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
+  const [labelLayout, setLabelLayout] = useState<"wrapped" | "list">("wrapped");
+  const svgElementRef = useRef<SVGSVGElement | null>(null);
   const {
     viewBox,
     scale,
@@ -48,8 +54,63 @@ export function StateMachineGraph({
     onMouseDown,
     zoomIn,
     zoomOut,
+    ensurePointVisible,
     reset,
   } = useSvgZoomPan(layout.width, layout.height);
+  const positions = useMemo(
+    () => new Map([...layout.positions, ...nodePositions]),
+    [layout.positions, nodePositions],
+  );
+  const activeNodeId = nodes.find((node) => node.isActive)?.id;
+  const activePosition = activeNodeId
+    ? positions.get(activeNodeId)
+    : undefined;
+
+  useLayoutEffect(() => {
+    if (activePosition) {
+      ensurePointVisible(activePosition.x, activePosition.y, NODE_RADIUS);
+    }
+  }, [activePosition, ensurePointVisible]);
+
+  useEffect(() => {
+    if (!draggedNodeId) {
+      return;
+    }
+    const handleMove = (event: MouseEvent) => {
+      const svg = svgElementRef.current;
+      if (!svg) {
+        return;
+      }
+      const matrix = svg.getScreenCTM();
+      if (!matrix) {
+        return;
+      }
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const transformed = point.matrixTransform(matrix.inverse());
+      setNodePositions((current) => {
+        const next = new Map(current);
+        next.set(draggedNodeId, {
+          x: transformed.x,
+          y: transformed.y,
+        });
+        return next;
+      });
+    };
+    const handleUp = () => setDraggedNodeId(null);
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [draggedNodeId, layout.height, layout.width]);
+
+  const resetGraph = () => {
+    setNodePositions(new Map());
+    reset();
+  };
 
   return (
     <div
@@ -61,7 +122,10 @@ export function StateMachineGraph({
       )}
     >
       <svg
-        ref={setSvgRef}
+        ref={(element) => {
+          svgElementRef.current = element;
+          setSvgRef(element);
+        }}
         role="img"
         aria-label={ariaLabel}
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
@@ -98,8 +162,8 @@ export function StateMachineGraph({
         </defs>
 
         {groupedEdges.map((edge) => {
-          const from = layout.positions.get(edge.from);
-          const to = layout.positions.get(edge.to);
+          const from = positions.get(edge.from);
+          const to = positions.get(edge.to);
           if (!from || !to) {
             return null;
           }
@@ -111,6 +175,7 @@ export function StateMachineGraph({
               y={from.y}
               label={edge.label}
               active={edge.isActive}
+              labelLayout={labelLayout}
             />
           ) : (
             <DirectedEdge
@@ -119,18 +184,43 @@ export function StateMachineGraph({
               to={to}
               label={edge.label}
               active={edge.isActive}
+              labelLayout={labelLayout}
+              offset={
+                groupedEdges.some(
+                  (candidate) =>
+                    candidate.from === edge.to && candidate.to === edge.from,
+                )
+                  ? edge.from.localeCompare(edge.to) < 0
+                    ? 18
+                    : -18
+                  : 0
+              }
             />
           );
         })}
 
         {nodes.map((node) => {
-          const position = layout.positions.get(node.id);
+          const position = positions.get(node.id);
           if (!position) {
             return null;
           }
 
           return (
-            <g key={node.id}>
+            <g
+              key={node.id}
+              data-testid={`state-machine-node-${node.id}`}
+              onMouseDown={(event) => {
+                if (event.button !== 0) {
+                  return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                setDraggedNodeId(node.id);
+              }}
+              className={
+                draggedNodeId === node.id ? "cursor-grabbing" : "cursor-grab"
+              }
+            >
               {node.isStart && (
                 <>
                   <line
@@ -204,10 +294,28 @@ export function StateMachineGraph({
         })}
       </svg>
       <div className="absolute top-3 right-3 flex gap-1" data-no-pan>
+        <GraphButton
+          label={
+            labelLayout === "wrapped"
+              ? "Show transition symbols as a vertical list"
+              : "Show transition symbols comma-separated"
+          }
+          onClick={() =>
+            setLabelLayout((current) =>
+              current === "wrapped" ? "list" : "wrapped",
+            )
+          }
+        >
+          {labelLayout === "wrapped" ? (
+            <List className="size-4" />
+          ) : (
+            <WrapText className="size-4" />
+          )}
+        </GraphButton>
         <GraphButton label="Zoom out" onClick={zoomOut}>
           <Minus className="size-4" />
         </GraphButton>
-        <GraphButton label="Reset view" onClick={reset}>
+        <GraphButton label="Reset view" onClick={resetGraph}>
           <RotateCcw className="size-4" />
         </GraphButton>
         <GraphButton label="Zoom in" onClick={zoomIn}>
@@ -216,7 +324,7 @@ export function StateMachineGraph({
       </div>
       <button
         type="button"
-        onClick={reset}
+        onClick={resetGraph}
         aria-label="Reset zoom to 100%"
         className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
       >
@@ -300,11 +408,15 @@ function DirectedEdge({
   to,
   label,
   active,
+  offset = 0,
+  labelLayout,
 }: {
   from: Point;
   to: Point;
   label: string;
   active?: boolean;
+  offset?: number;
+  labelLayout: "wrapped" | "list";
 }) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -312,15 +424,15 @@ function DirectedEdge({
   const unitX = dx / distance;
   const unitY = dy / distance;
   const start = {
-    x: from.x + unitX * NODE_RADIUS,
-    y: from.y + unitY * NODE_RADIUS,
+    x: from.x + unitX * NODE_RADIUS - unitY * offset,
+    y: from.y + unitY * NODE_RADIUS + unitX * offset,
   };
   const end = {
-    x: to.x - unitX * (NODE_RADIUS + 8),
-    y: to.y - unitY * (NODE_RADIUS + 8),
+    x: to.x - unitX * (NODE_RADIUS + 8) - unitY * offset,
+    y: to.y - unitY * (NODE_RADIUS + 8) + unitX * offset,
   };
-  const labelX = (start.x + end.x) / 2 - unitY * 12;
-  const labelY = (start.y + end.y) / 2 + unitX * 12;
+  const labelX = (start.x + end.x) / 2 - unitY * 14;
+  const labelY = (start.y + end.y) / 2 + unitX * 14;
 
   return (
     <g>
@@ -337,7 +449,13 @@ function DirectedEdge({
             : "url(#state-machine-arrow)"
         }
       />
-      <EdgeLabel x={labelX} y={labelY} label={label} active={active} />
+      <EdgeLabel
+        x={labelX}
+        y={labelY}
+        label={label}
+        active={active}
+        layout={labelLayout}
+      />
     </g>
   );
 }
@@ -347,11 +465,13 @@ function SelfLoop({
   y,
   label,
   active,
+  labelLayout,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  labelLayout: "wrapped" | "list";
 }) {
   const path = `M ${x - 22} ${y - 36} C ${x - 58} ${y - 92}, ${x + 58} ${y - 92}, ${x + 22} ${y - 36}`;
 
@@ -368,7 +488,13 @@ function SelfLoop({
             : "url(#state-machine-arrow)"
         }
       />
-      <EdgeLabel x={x} y={y - 84} label={label} active={active} />
+      <EdgeLabel
+        x={x}
+        y={y - 84}
+        label={label}
+        active={active}
+        layout={labelLayout}
+      />
     </g>
   );
 }
@@ -378,37 +504,59 @@ function EdgeLabel({
   y,
   label,
   active,
+  layout,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  layout: "wrapped" | "list";
 }) {
-  const width = Math.max(30, label.length * 7 + 14);
+  const labels = label.split(", ");
+  const lines =
+    layout === "list" ? labels : wrapCommaSeparatedLabels(labels, 24);
+  const width = Math.max(30, ...lines.map((line) => line.length * 7 + 14));
+  const height = Math.max(24, lines.length * 18 + 8);
 
   return (
     <g>
       <rect
         x={x - width / 2}
-        y={y - 12}
+        y={y - height / 2}
         width={width}
-        height={24}
+        height={height}
         rx={6}
         className={
           active ? "fill-brand/15 stroke-brand" : "fill-card stroke-border"
         }
       />
-      <text
-        x={x}
-        y={y + 4}
-        textAnchor="middle"
-        className={cn(
-          "fill-foreground text-[12px] font-semibold",
-          active && "fill-brand",
-        )}
-      >
-        {label}
-      </text>
+      {lines.map((line, index) => (
+        <text
+          key={`${line}-${index}`}
+          x={x}
+          y={y - ((lines.length - 1) * 18) / 2 + index * 18 + 4}
+          textAnchor="middle"
+          className={cn(
+            "fill-foreground text-[12px] font-semibold",
+            active && "fill-brand",
+          )}
+        >
+          {line}
+        </text>
+      ))}
     </g>
   );
+}
+
+function wrapCommaSeparatedLabels(labels: string[], maxCharacters: number) {
+  return labels.reduce<string[]>((lines, label) => {
+    const lastIndex = lines.length - 1;
+    const candidate = lastIndex >= 0 ? `${lines[lastIndex]}, ${label}` : label;
+    if (lastIndex >= 0 && candidate.length <= maxCharacters) {
+      lines[lastIndex] = candidate;
+    } else {
+      lines.push(label);
+    }
+    return lines;
+  }, []);
 }
