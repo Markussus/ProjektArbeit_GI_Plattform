@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { CircuitBoard, Play, TableProperties } from "lucide-react";
+import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
@@ -39,6 +39,7 @@ import { MooreConfigView } from "./presentation/MooreConfigView";
 import { MooreConversionView } from "./presentation/MooreConversionView";
 import { MooreLogicGateView } from "./presentation/MooreLogicGateView";
 import { MooreSimulationView } from "./presentation/MooreSimulationView";
+import { MooreViewActions } from "./presentation/MooreViewActions";
 
 export interface MooreSimulatorHandle {
   resetStoredState: () => void;
@@ -414,21 +415,30 @@ export const MooreSimulator = forwardRef<MooreSimulatorHandle>(
               testIdPrefix="moore-transfer"
             />
 
-            <button
-              type="button"
-              onClick={startSimulation}
-              disabled={issues.length > 0}
-              data-testid="moore-start-simulation"
-              className="bg-brand text-brand-foreground mx-auto flex items-center gap-2 rounded-lg px-5 py-3 font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Play className="size-4 fill-current" />
-              {t("moore.sim.startSimulation")}
-            </button>
-
-            <ConversionActions
-              disabled={!conversion}
-              onOpenConversion={() => setActiveView("conversion")}
-              onOpenLogic={() => setActiveView("logic")}
+            <MooreViewActions
+              actions={[
+                {
+                  label: t("moore.conversion.open"),
+                  onClick: () => setActiveView("conversion"),
+                  icon: TableProperties,
+                  testId: "moore-open-conversion",
+                  disabled: !conversion,
+                },
+                {
+                  label: t("moore.sim.startSimulation"),
+                  onClick: startSimulation,
+                  icon: Play,
+                  testId: "moore-start-simulation",
+                  disabled: issues.length > 0,
+                },
+                {
+                  label: t("moore.logic.open"),
+                  onClick: () => setActiveView("logic"),
+                  icon: CircuitBoard,
+                  testId: "moore-open-logic",
+                  disabled: !conversion,
+                },
+              ]}
             />
           </div>
         ) : (
@@ -451,16 +461,39 @@ export const MooreSimulator = forwardRef<MooreSimulatorHandle>(
               onReset={() => simulation.reset()}
               onSpeedChange={simulation.setSpeed}
             />
-            <ConversionActions
-              disabled={!conversion}
-              onOpenConversion={() => {
-                simulation.pause();
-                setActiveView("conversion");
-              }}
-              onOpenLogic={() => {
-                simulation.pause();
-                setActiveView("logic");
-              }}
+            <MooreViewActions
+              actions={[
+                {
+                  label: t("moore.navigation.editDefinition"),
+                  onClick: () => {
+                    simulation.pause();
+                    setProgram(cloneJson(committedProgram));
+                    setIsEditMode(true);
+                  },
+                  icon: Pencil,
+                  testId: "moore-bottom-edit-configuration",
+                },
+                {
+                  label: t("moore.navigation.showConversion"),
+                  onClick: () => {
+                    simulation.pause();
+                    setActiveView("conversion");
+                  },
+                  icon: TableProperties,
+                  testId: "moore-open-conversion",
+                  disabled: !conversion,
+                },
+                {
+                  label: t("moore.navigation.showLogic"),
+                  onClick: () => {
+                    simulation.pause();
+                    setActiveView("logic");
+                  },
+                  icon: CircuitBoard,
+                  testId: "moore-open-logic",
+                  disabled: !conversion,
+                },
+              ]}
             />
           </div>
         )}
@@ -468,40 +501,3 @@ export const MooreSimulator = forwardRef<MooreSimulatorHandle>(
     );
   },
 );
-
-function ConversionActions({
-  disabled,
-  onOpenConversion,
-  onOpenLogic,
-}: {
-  disabled: boolean;
-  onOpenConversion: () => void;
-  onOpenLogic: () => void;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <div className="flex flex-wrap justify-center gap-3">
-      <button
-        type="button"
-        onClick={onOpenConversion}
-        disabled={disabled}
-        data-testid="moore-open-conversion"
-        className="border-brand text-brand hover:bg-brand/10 inline-flex items-center gap-2 rounded-lg border px-4 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <TableProperties className="size-4" />
-        {t("moore.conversion.open")}
-      </button>
-      <button
-        type="button"
-        onClick={onOpenLogic}
-        disabled={disabled}
-        data-testid="moore-open-logic"
-        className="border-border bg-secondary text-secondary-foreground hover:bg-muted inline-flex items-center gap-2 rounded-lg border px-4 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <CircuitBoard className="size-4" />
-        {t("moore.logic.open")}
-      </button>
-    </div>
-  );
-}

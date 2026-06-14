@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { MooreConversion } from "../domain/mooreConversion";
 import { LogicGateDiagram } from "./LogicGateDiagram";
 import { ViewHeader } from "./MooreConversionView";
+import { MooreViewActions } from "./MooreViewActions";
 
 interface MooreLogicGateViewProps {
   conversion: MooreConversion;
@@ -89,24 +91,28 @@ export function MooreLogicGateView({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap justify-center gap-3">
-        <button
-          type="button"
-          onClick={onShowSimulator}
-          data-testid="moore-logic-show-simulator"
-          className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 font-semibold"
-        >
-          {t("moore.navigation.showSimulator")}
-        </button>
-        <button
-          type="button"
-          onClick={onShowConversion}
-          data-testid="moore-logic-show-conversion"
-          className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90"
-        >
-          {t("moore.navigation.showConversion")}
-        </button>
-      </div>
+      <MooreViewActions
+        actions={[
+          {
+            label: t("moore.navigation.editDefinition"),
+            onClick: onEditDefinition,
+            icon: Pencil,
+            testId: "moore-logic-edit-definition",
+          },
+          {
+            label: t("moore.navigation.showSimulator"),
+            onClick: onShowSimulator,
+            icon: Play,
+            testId: "moore-logic-show-simulator",
+          },
+          {
+            label: t("moore.navigation.showConversion"),
+            onClick: onShowConversion,
+            icon: TableProperties,
+            testId: "moore-logic-show-conversion",
+          },
+        ]}
+      />
 
       <p className="text-muted-foreground text-xs">
         {t("moore.logic.iecHint")}
