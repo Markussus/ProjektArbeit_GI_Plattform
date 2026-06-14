@@ -218,7 +218,8 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
 
 function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
   const { t } = useTranslation();
-  const { stateVariables, outputVariables, rows } = conversion.output;
+  const { stateVariables, inputVariables = [], outputVariables, rows } =
+    conversion.output;
 
   return (
     <ValueTable
@@ -229,6 +230,15 @@ function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
           variables: stateVariables,
           tone: "bg-blue-500/10",
         },
+        ...(inputVariables.length
+          ? [
+              {
+                title: t("moore.conversion.event"),
+                variables: inputVariables,
+                tone: "bg-amber-500/10",
+              },
+            ]
+          : []),
         {
           title: t("moore.conversion.output"),
           variables: outputVariables,
@@ -236,9 +246,14 @@ function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
         },
       ]}
       rows={rows}
-      getBits={(row) => [...row.currentBits, ...row.resultBits]}
+      getBits={(row) => [
+        ...row.currentBits,
+        ...row.inputBits,
+        ...row.resultBits,
+      ]}
       getTitles={(row) => [
         ...row.currentBits.map(() => row.currentState),
+        ...row.inputBits.map(() => row.inputSymbol ?? ""),
         ...row.resultBits.map(
           () => `${row.outputSymbol ?? ""} (${row.resultBits.join("")})`,
         ),

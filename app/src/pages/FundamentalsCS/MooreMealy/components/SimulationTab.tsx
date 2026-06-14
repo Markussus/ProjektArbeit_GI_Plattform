@@ -7,6 +7,7 @@ import {
   MooreSimulator,
   type MooreSimulatorHandle,
 } from "./Simulator/MooreSimulator";
+import { MealySimulator } from "./Simulator/MealySimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
@@ -44,17 +45,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         <div hidden={machineType !== "moore"}>
           <MooreSimulator ref={simulatorRef} />
         </div>
-        {machineType === "mealy" && (
-          <div
-            data-testid="mealy-simulator-placeholder"
-            className="border-border bg-muted/20 rounded-xl border border-dashed p-10 text-center"
-          >
-            <h2 className="font-semibold">{t("moore.sim.mealyTab")}</h2>
-            <p className="text-muted-foreground mt-2 text-sm">
-              {t("moore.sim.mealyLater")}
-            </p>
-          </div>
-        )}
+        <div hidden={machineType !== "mealy"}>
+          <MealySimulator />
+        </div>
       </div>
     </TopicSimulationTab>
   );

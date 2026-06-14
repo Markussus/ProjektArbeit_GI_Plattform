@@ -278,6 +278,17 @@
         "input_word_invalid": "Die Eingabe enthält ein Symbol außerhalb des Eingabealphabets."
       }
     },
+    "mealy": {
+      "configureTitle": "Mealy-Automat definieren",
+      "outputFunction": "Ausgabefunktion λ",
+      "outputFunctionHelp": "Für jede Kombination aus Zustand und Eingabe wird genau ein Ausgabezeichen festgelegt.",
+      "outputDragHelp": "Eingabealphabet Σ: Symbole auf eine Regel ziehen, um sie dieser Ausgabe zuzuordnen.",
+      "addRule": "Regel",
+      "addOutputRule": "Neue Ausgaberegel für Zustand {{state}} anlegen",
+      "dropForNewRule": "Eingabesymbol hier ablegen, um eine neue Regel anzulegen",
+      "simulationTitle": "Mealy-Simulation",
+      "diagram": "Zustandsübergangsgraph des Mealy-Automaten"
+    },
     "navigation": {
       "editDefinition": "Definition bearbeiten",
       "showSimulator": "Simulator anzeigen",
@@ -305,6 +316,7 @@
       "open": "In Logikgatter konvertieren",
       "title": "Logikgatter",
       "minimalFunctions": "Minimierte Funktionen",
+      "formulaMode": "Formeldarstellung",
       "binaryGates": "Nur Gatter mit zwei Eingängen",
       "completeCircuit": "Gesamte Schaltung anzeigen",
       "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",

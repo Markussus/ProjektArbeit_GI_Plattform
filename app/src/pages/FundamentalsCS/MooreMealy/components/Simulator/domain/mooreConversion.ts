@@ -29,6 +29,7 @@ export interface MooreFormula {
   canonical: string;
   minimal: string;
   expression: BooleanExpression | null;
+  canonicalExpression: BooleanExpression;
   minimizationAvailable: boolean;
 }
 
@@ -42,6 +43,7 @@ export interface MooreTransitionConversion {
 
 export interface MooreOutputConversion {
   stateVariables: string[];
+  inputVariables?: string[];
   outputVariables: string[];
   rows: MooreConversionRow[];
   formulas: MooreFormula[];
@@ -118,7 +120,7 @@ export function buildMooreConversion(program: MooreProgram): MooreConversion {
   };
 }
 
-function buildFormulas(
+export function buildFormulas(
   resultVariables: string[],
   inputVariables: string[],
   rows: MooreConversionRow[],
@@ -142,6 +144,7 @@ function buildFormulas(
         canonical,
         minimal: canonical,
         expression,
+        canonicalExpression: expression,
         minimizationAvailable: false,
       };
     }
@@ -170,6 +173,10 @@ function buildFormulas(
       canonical,
       minimal: formatBooleanExpressionForDisplay(preferredExpression),
       expression: preferredExpression,
+      canonicalExpression: buildCanonicalDnfExpression(
+        inputVariables,
+        trueAssignments,
+      ),
       minimizationAvailable: true,
     };
   });
@@ -239,15 +246,15 @@ function formatCanonicalDnf(
     .join(" ∨ ");
 }
 
-function bitsNeeded(count: number): number {
+export function bitsNeeded(count: number): number {
   return count <= 1 ? 1 : Math.ceil(Math.log2(count));
 }
 
-function createVariableNames(prefix: string, count: number): string[] {
+export function createVariableNames(prefix: string, count: number): string[] {
   return Array.from({ length: count }, (_, index) => `${prefix}${index}`);
 }
 
-function toBits(value: number, width: number): number[] {
+export function toBits(value: number, width: number): number[] {
   return Array.from({ length: width }, (_, index) => {
     const bitPosition = width - index - 1;
     return Math.floor(value / 2 ** bitPosition) % 2;

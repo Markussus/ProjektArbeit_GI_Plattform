@@ -278,6 +278,17 @@
         "input_word_invalid": "The input contains a symbol outside the input alphabet."
       }
     },
+    "mealy": {
+      "configureTitle": "Define Mealy machine",
+      "outputFunction": "Output function λ",
+      "outputFunctionHelp": "Exactly one output symbol is assigned to every state and input combination.",
+      "outputDragHelp": "Input alphabet Σ: drag symbols onto a rule to assign them to that output.",
+      "addRule": "Rule",
+      "addOutputRule": "Add an output rule for state {{state}}",
+      "dropForNewRule": "Drop an input symbol here to create a new rule",
+      "simulationTitle": "Mealy simulation",
+      "diagram": "State transition graph of the Mealy machine"
+    },
     "navigation": {
       "editDefinition": "Edit definition",
       "showSimulator": "Show simulator",
@@ -305,6 +316,7 @@
       "open": "Convert to logic gates",
       "title": "Logic gates",
       "minimalFunctions": "Minimized functions",
+      "formulaMode": "Formula representation",
       "binaryGates": "Use only two-input gates",
       "completeCircuit": "Show complete circuit",
       "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",

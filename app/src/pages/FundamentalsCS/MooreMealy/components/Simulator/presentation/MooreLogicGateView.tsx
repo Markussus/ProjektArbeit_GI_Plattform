@@ -6,6 +6,7 @@ import type { MooreConversion } from "../domain/mooreConversion";
 import { LogicGateDiagram } from "./LogicGateDiagram";
 import { ViewHeader } from "./MooreConversionView";
 import { MooreViewActions } from "./MooreViewActions";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 
 interface MooreLogicGateViewProps {
   conversion: MooreConversion;
@@ -25,17 +26,53 @@ export function MooreLogicGateView({
     conversion.allFormulas[0]?.name ?? "",
   );
   const [binaryGates, setBinaryGates] = useState(true);
+  const [formulaMode, setFormulaMode] = useState<"minimal" | "canonical">(
+    "minimal",
+  );
   const formula =
     conversion.allFormulas.find(
       (candidate) => candidate.name === selectedFormula,
     ) ?? conversion.allFormulas[0];
+  const displayedFormula =
+    formulaMode === "canonical" ? formula?.canonical : formula?.minimal;
+  const displayedExpression =
+    formulaMode === "canonical"
+      ? formula?.canonicalExpression
+      : formula?.expression;
 
   return (
     <div data-testid="moore-logic-gate-view" className="space-y-5">
       <ViewHeader title={t("moore.logic.title")} />
 
       <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-        <h3 className="font-semibold">{t("moore.logic.minimalFunctions")}</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="font-semibold">
+            {formulaMode === "canonical"
+              ? t("moore.conversion.canonicalDnf")
+              : t("moore.logic.minimalFunctions")}
+          </h3>
+          <DropdownSelect
+            value={formulaMode}
+            options={[
+              {
+                value: "minimal",
+                label: t("moore.logic.minimalFunctions"),
+              },
+              {
+                value: "canonical",
+                label: t("moore.conversion.canonicalDnf"),
+              },
+            ]}
+            onChange={(mode) => {
+              setFormulaMode(mode);
+              setSelectedFormula(conversion.allFormulas[0]?.name ?? "");
+            }}
+            ariaLabel={t("moore.logic.formulaMode")}
+            triggerClassName="h-10 min-w-56 px-3"
+            menuClassName="right-0 min-w-56"
+            triggerTestId="moore-logic-formula-mode"
+          />
+        </div>
         <div className="grid gap-2 md:grid-cols-2">
           {conversion.allFormulas.map((candidate) => (
             <button
@@ -53,7 +90,9 @@ export function MooreLogicGateView({
               )}
             >
               <strong>{candidate.name} = </strong>
-              {candidate.minimal}
+              {formulaMode === "canonical"
+                ? candidate.canonical
+                : candidate.minimal}
             </button>
           ))}
         </div>
@@ -63,7 +102,7 @@ export function MooreLogicGateView({
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-semibold">
-              {formula.name} = {formula.minimal}
+              {formula.name} = {displayedFormula}
             </h3>
             <label className="border-border bg-card flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm">
               <input
@@ -77,8 +116,8 @@ export function MooreLogicGateView({
             </label>
           </div>
           <LogicGateDiagram
-            key={`${formula.name}-${binaryGates}`}
-            expression={formula.expression}
+            key={`${formula.name}-${formulaMode}-${binaryGates}`}
+            expression={displayedExpression ?? null}
             outputName={formula.name}
             variables={formula.variables}
             unavailableText={t("moore.logic.minimizationUnavailable")}
