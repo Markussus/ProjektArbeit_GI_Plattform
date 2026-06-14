@@ -1,0 +1,87 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{BerichtVorlage-erweitert}		% Stil einbinden
+
+\title{Interaktive Lernplattform für Grundlagen Informatik}
+\author{M. Nöth, R. Schröder, E. Ebert, D. T. Pham, K. Popov}
+\date{\today}
+
+% Optional: Header / Footer anpassen
+% Standardmäßig steht der Autor mittig im Header
+% und die Seitenzahl mittig im Footer.
+% \setheaderleft{abc}
+% \setheadercenter{Autor}
+\setheaderright{Projektarbeit}
+% \setfooterleft{Entwurf}
+% \setfootercenter{Seite}
+% \setfooterright{Vertraulich}
+
+\setheaderleft{\hspace*{-0.68cm}\includegraphics[width=2cm]{THWS.pdf}}
+
+\addbibresource{Literatur.bib}
+
+\include{glossary}
+
+\begin{document}
+
+\begin{Cover}
+	\begin{center}
+		\includegraphics[width=10cm]{THWS.pdf}
+
+		\vspace*{5em}
+
+		{\Large \textbf{\thetitle}}
+
+		\vspace*{3em}
+
+		Projektarbeit -- SS 26
+
+		\vspace*{2em}
+
+		\thedate
+
+		\vspace*{25em}
+
+		\noindent\begin{tabular}{@{}lllr}
+			\textbf{Studenten}:	& Markus Nöth		&\href{mailto:markus.noeth@study.thws.de}{markus.noeth@study.thws.de}			& 5123027\\[2ex]
+								& Richard Schröder	&\href{mailto:richard.schroeder@study.thws.de}{richard.schroeder@study.thws.de}	& 5123042\\[2ex]
+								& Enrico Ebert		&\href{mailto:enrico.ebert@study.thws.de}{enrico.ebert@study.thws.de}			& 5123098\\[2ex]
+								& Duy Tan Pham		&\href{mailto:duytan.pham@study.thws.de}{duytan.pham@study.thws.de}				& 5123063\\[2ex]
+								& Kristian Popov	&\href{mailto:kristian.popov@study.thws.de}{kristian.popov@study.thws.de}		& 5123029\\[4ex]
+			\textbf{Dozent}:	& Prof. Dr. Peter Braun
+		\end{tabular}
+	\end{center}
+\end{Cover}
+
+\begin{PreContent}
+	\tableofcontents
+	\listoffigures
+	\listoftables
+\end{PreContent}
+
+\begin{Content}
+	\input{includes/01_Einleitung}
+
+	\input{includes/02_Architektur}
+
+	\input{includes/03_Designentscheidungen}
+
+	\input{includes/04_KI}
+
+	\input{includes/05_Evaluation}
+
+	\input{includes/06_Fazit}
+\end{Content}
+
+\begin{PostContent}
+	\subNsection*[toc]{0}{Anhang}
+
+	\subNsection*[toc]{1}{Abkürzungsverzeichnis}
+
+	\printacronyms[heading=none]
+
+	\subNsection*[toc]{1}{Literatur}
+
+	\printbibliography[heading=none]
+\end{PostContent}
+
+\end{document}
