@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { List, Minus, Plus, RotateCcw, WrapText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
@@ -54,12 +54,23 @@ export function StateMachineGraph({
     onMouseDown,
     zoomIn,
     zoomOut,
+    ensurePointVisible,
     reset,
   } = useSvgZoomPan(layout.width, layout.height);
   const positions = useMemo(
     () => new Map([...layout.positions, ...nodePositions]),
     [layout.positions, nodePositions],
   );
+  const activeNodeId = nodes.find((node) => node.isActive)?.id;
+  const activePosition = activeNodeId
+    ? positions.get(activeNodeId)
+    : undefined;
+
+  useLayoutEffect(() => {
+    if (activePosition) {
+      ensurePointVisible(activePosition.x, activePosition.y, NODE_RADIUS);
+    }
+  }, [activePosition, ensurePointVisible]);
 
   useEffect(() => {
     if (!draggedNodeId) {
