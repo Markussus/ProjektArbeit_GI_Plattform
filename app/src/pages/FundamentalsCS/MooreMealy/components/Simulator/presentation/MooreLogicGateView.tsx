@@ -32,11 +32,7 @@ export function MooreLogicGateView({
 
   return (
     <div data-testid="moore-logic-gate-view" className="space-y-5">
-      <ViewHeader
-        title={t("moore.logic.title")}
-        onBack={onEditDefinition}
-        backLabel={t("moore.navigation.editDefinition")}
-      />
+      <ViewHeader title={t("moore.logic.title")} />
 
       <div className="border-border bg-card space-y-3 rounded-xl border p-4">
         <h3 className="font-semibold">{t("moore.logic.minimalFunctions")}</h3>

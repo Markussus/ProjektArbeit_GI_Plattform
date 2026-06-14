@@ -57,17 +57,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
 
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
-        <button
-          type="button"
-          onClick={props.onEdit}
-          data-testid="moore-edit-configuration"
-          className="border-border bg-background hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium"
-        >
-          {t("moore.sim.editConfiguration")}
-        </button>
-      </div>
+      <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
 
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">

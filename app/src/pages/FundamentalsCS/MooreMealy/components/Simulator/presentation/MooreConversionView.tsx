@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, CircuitBoard, Pencil, Play } from "lucide-react";
+import { CircuitBoard, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { cn } from "@/lib/utils";
@@ -30,11 +30,7 @@ export function MooreConversionView({
 
   return (
     <div data-testid="moore-conversion-view" className="space-y-5">
-      <ViewHeader
-        title={t("moore.conversion.title")}
-        onBack={onBackToEditor}
-        backLabel={t("moore.navigation.editDefinition")}
-      />
+      <ViewHeader title={t("moore.conversion.title")} />
 
       <InlineTabNavigation
         activeTab={activeTab}
@@ -93,27 +89,10 @@ export function MooreConversionView({
 
 export function ViewHeader({
   title,
-  onBack,
-  backLabel,
 }: {
   title: string;
-  onBack: () => void;
-  backLabel: string;
 }) {
-  return (
-    <div className="space-y-3">
-      <button
-        type="button"
-        onClick={onBack}
-        data-testid="moore-subview-back"
-        className="border-border bg-background hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium"
-      >
-        <ArrowLeft className="size-4" />
-        {backLabel}
-      </button>
-      <h2 className="text-xl font-bold">{title}</h2>
-    </div>
-  );
+  return <h2 className="text-xl font-bold">{title}</h2>;
 }
 
 function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
