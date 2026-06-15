@@ -198,6 +198,14 @@
     "example_utf8_1_desc": "Encode the text 'Hello' to UTF-8 bytes."
   },
   "moore": {
+    "examples": {
+      "mooreDefault": "moore.examples.mooreDefault",
+      "mealyDefault": "moore.examples.mealyDefault",
+      "mooreTitle": "Moore example machine",
+      "mooreDescription": "A Moore machine with four states and two input symbols.",
+      "mealyTitle": "Mealy example machine",
+      "mealyDescription": "A Mealy machine with two states and transition-dependent outputs."
+    },
     "title": "Moore & Mealy Machines",
     "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",
     "overviewTitle": "Moore vs. Mealy",

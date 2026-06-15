@@ -1,12 +1,49 @@
+import { Cpu, GitBranch } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import type { Example } from "@/types/exercise";
+import { MEALY_EXAMPLE_ID, MOORE_EXAMPLE_ID } from "./SimulationTab";
 
-export function ExamplesTab(props: ModuleExamplesTabProps) {
-  void props;
+export function ExamplesTab({
+  selectedExample,
+  onSelectExample,
+  onOpenExampleInSimulation,
+}: ModuleExamplesTabProps) {
+  const { t } = useTranslation();
+  const examples: Example[] = [
+    {
+      id: MOORE_EXAMPLE_ID,
+      title: t("moore.examples.mooreTitle"),
+      description: t("moore.examples.mooreDescription"),
+      icon: Cpu,
+      kind: "example",
+    },
+    {
+      id: MEALY_EXAMPLE_ID,
+      title: t("moore.examples.mealyTitle"),
+      description: t("moore.examples.mealyDescription"),
+      icon: GitBranch,
+      kind: "example",
+    },
+  ];
+
   return (
-    <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-      <p className="text-muted-foreground text-sm">
-        Interactive examples for Moore & Mealy machines will be available here.
-      </p>
+    <div
+      data-testid="moore-mealy-examples"
+      className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1"
+    >
+      {examples.map((example, index) => (
+        <ExerciseCard
+          key={example.id}
+          item={example}
+          index={index}
+          testIdPrefix={`moore-mealy-example-${example.id}`}
+          isSelected={selectedExample?.id === example.id}
+          onSelect={() => onSelectExample(example)}
+          onOpen={() => onOpenExampleInSimulation(example)}
+        />
+      ))}
     </div>
   );
 }

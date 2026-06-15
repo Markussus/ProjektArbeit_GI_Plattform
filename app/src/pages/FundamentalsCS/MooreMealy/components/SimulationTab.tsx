@@ -7,18 +7,35 @@ import {
   MooreSimulator,
   type MooreSimulatorHandle,
 } from "./Simulator/MooreSimulator";
-import { MealySimulator } from "./Simulator/MealySimulator";
+import {
+  MealySimulator,
+  type MealySimulatorHandle,
+} from "./Simulator/MealySimulator";
+import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
+import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
+
+export const MOORE_EXAMPLE_ID = "moore.examples.mooreDefault";
+export const MEALY_EXAMPLE_ID = "moore.examples.mealyDefault";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
-  const [machineType, setMachineType] = useState<"moore" | "mealy">("moore");
-  const simulatorRef = useRef<MooreSimulatorHandle | null>(null);
+  const [machineType, setMachineType] = useState<"moore" | "mealy">(() =>
+    props.selectedItem?.id === MEALY_EXAMPLE_ID ? "mealy" : "moore",
+  );
+  const mooreSimulatorRef = useRef<MooreSimulatorHandle | null>(null);
+  const mealySimulatorRef = useRef<MealySimulatorHandle | null>(null);
+  const isMooreExample = props.selectedItem?.id === MOORE_EXAMPLE_ID;
+  const isMealyExample = props.selectedItem?.id === MEALY_EXAMPLE_ID;
 
   return (
     <TopicSimulationTab
       {...props}
       emptyStateTextKey="simulation.emptyStates.moore"
-      onReset={() => simulatorRef.current?.resetStoredState()}
+      onReset={() =>
+        machineType === "moore"
+          ? mooreSimulatorRef.current?.resetStoredState()
+          : mealySimulatorRef.current?.resetStoredState()
+      }
     >
       <div className="space-y-6">
         <div className="mx-auto w-full max-w-[100rem]">
@@ -43,10 +60,18 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         </div>
 
         <div hidden={machineType !== "moore"}>
-          <MooreSimulator ref={simulatorRef} />
+          <MooreSimulator
+            ref={mooreSimulatorRef}
+            initialProgram={isMooreExample ? defaultMooreProgram : undefined}
+            storageEnabled={!isMooreExample}
+          />
         </div>
         <div hidden={machineType !== "mealy"}>
-          <MealySimulator />
+          <MealySimulator
+            ref={mealySimulatorRef}
+            initialProgram={isMealyExample ? defaultMealyProgram : undefined}
+            storageEnabled={!isMealyExample}
+          />
         </div>
       </div>
     </TopicSimulationTab>

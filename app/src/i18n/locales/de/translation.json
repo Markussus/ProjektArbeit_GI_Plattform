@@ -198,6 +198,14 @@
     "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes."
   },
   "moore": {
+    "examples": {
+      "mooreDefault": "moore.examples.mooreDefault",
+      "mealyDefault": "moore.examples.mealyDefault",
+      "mooreTitle": "Moore-Beispielautomat",
+      "mooreDescription": "Ein Moore-Automat mit vier Zuständen und zwei Eingabesymbolen.",
+      "mealyTitle": "Mealy-Beispielautomat",
+      "mealyDescription": "Ein Mealy-Automat mit zwei Zuständen und ausgabeabhängigen Übergängen."
+    },
     "title": "Moore & Mealy Automaten",
     "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",
     "overviewTitle": "Moore vs. Mealy",

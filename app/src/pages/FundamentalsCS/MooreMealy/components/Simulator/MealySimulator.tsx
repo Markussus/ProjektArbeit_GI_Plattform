@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
@@ -8,10 +15,11 @@ import {
   createTrainingCenterIdentifier,
   createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import { useMealySimulator } from "./application/useMealySimulator";
-import { defaultMealyProgram } from "./config/defaultMealyProgram";
+import { emptyMealyProgram } from "./config/emptyMealyProgram";
 import { buildMealyConversion } from "./domain/mealyConversion";
 import {
   createNextInputSymbol,
@@ -29,12 +37,26 @@ import { MooreConversionView } from "./presentation/MooreConversionView";
 import { MooreLogicGateView } from "./presentation/MooreLogicGateView";
 import { MooreViewActions } from "./presentation/MooreViewActions";
 
-export function MealySimulator() {
+export interface MealySimulatorHandle {
+  resetStoredState: () => void;
+  loadProgram: (program: MealyProgram) => void;
+}
+
+interface MealySimulatorProps {
+  initialProgram?: MealyProgram;
+  storageEnabled?: boolean;
+}
+
+export const MealySimulator = forwardRef<
+  MealySimulatorHandle,
+  MealySimulatorProps
+>(function MealySimulator(
+  { initialProgram = emptyMealyProgram, storageEnabled = true },
+  ref,
+) {
   const { t } = useTranslation();
-  const [program, setProgram] = useState(() => cloneJson(defaultMealyProgram));
-  const [committed, setCommitted] = useState(() =>
-    cloneJson(defaultMealyProgram),
-  );
+  const [program, setProgram] = useState(() => cloneJson(initialProgram));
+  const [committed, setCommitted] = useState(() => cloneJson(initialProgram));
   const [mode, setMode] = useState<
     "edit" | "simulation" | "conversion" | "logic"
   >("edit");
@@ -59,6 +81,10 @@ export function MealySimulator() {
     setMode("edit");
   }, []);
   useEffect(() => {
+    if (!storageEnabled) {
+      setStorageReady(true);
+      return;
+    }
     let cancelled = false;
     void loadTrainingCenterValue(identifier, mealyProgramTransferCodec)
       .then((value) => {
@@ -70,13 +96,30 @@ export function MealySimulator() {
     return () => {
       cancelled = true;
     };
-  }, [identifier, loadProgram]);
+  }, [identifier, loadProgram, storageEnabled]);
   useTrainingCenterAutoSave({
     identifier,
     value: program,
     codec: mealyProgramTransferCodec,
-    enabled: storageReady,
+    enabled: storageEnabled && storageReady,
   });
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetStoredState() {
+        if (storageEnabled) {
+          trainingCenterStorage.delete(identifier);
+        }
+        simulation.pause();
+        const resetProgram = cloneJson(initialProgram);
+        setProgram(resetProgram);
+        setCommitted(resetProgram);
+        setMode("edit");
+      },
+      loadProgram,
+    }),
+    [identifier, initialProgram, loadProgram, simulation, storageEnabled],
+  );
 
   const updateOutput = (
     input: string,
@@ -365,4 +408,4 @@ export function MealySimulator() {
       )}
     </div>
   );
-}
+});
