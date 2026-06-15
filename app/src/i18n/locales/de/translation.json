@@ -201,10 +201,12 @@
     "exercises": {
       "loadSolution": "Lösung laden",
       "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft...",
       "checkResultTitle": "Prüfergebnis",
       "checkCorrect": "Alle Testläufe liefern die erwarteten Ausgabefolgen.",
       "checkIncorrect": "{{passed}} von {{total}} Testläufen liefern die erwartete Ausgabefolge.",
       "validation": {
+        "exampleCheckUnavailable": "Für dieses Szenario ist keine Lösungsprüfung verfügbar.",
         "passed": "Bestanden",
         "input": "Eingabe",
         "output": "Ausgabe",

@@ -24,7 +24,12 @@ import {
 } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import { useMooreSimulator } from "./application/useMooreSimulator";
+import {
+  runMooreValidation,
+  type MooreValidationResult,
+} from "./application/mooreSolutionChecker";
 import { emptyMooreProgram } from "./config/emptyMooreProgram";
+import type { MooreExerciseScenario } from "../../exercises";
 import {
   createNextInputSymbol,
   createNextStateName,
@@ -43,28 +48,33 @@ import { MooreViewActions } from "./presentation/MooreViewActions";
 
 export interface MooreSimulatorHandle {
   resetStoredState: () => void;
-  loadProgram: (program: MooreProgram) => void;
-  getProgram: () => MooreProgram;
+  loadSolution: () => void;
+  checkSolution: () => Promise<MooreValidationResult>;
 }
 
 interface MooreSimulatorProps {
+  scenario: MooreExerciseScenario | null;
   initialProgram?: MooreProgram;
-  storageEnabled?: boolean;
+  isExample?: boolean;
 }
 
 export const MooreSimulator = forwardRef<
   MooreSimulatorHandle,
   MooreSimulatorProps
 >(function MooreSimulator(
-  { initialProgram = emptyMooreProgram, storageEnabled = true },
+  { scenario, initialProgram = emptyMooreProgram, isExample = false },
   ref,
 ) {
   const { t } = useTranslation();
+  const scenarioProgram = useMemo(
+    () => cloneJson(scenario?.starterProgram ?? initialProgram),
+    [initialProgram, scenario],
+  );
   const [program, setProgram] = useState<MooreProgram>(() =>
-    cloneJson(initialProgram),
+    cloneJson(scenarioProgram),
   );
   const [committedProgram, setCommittedProgram] = useState<MooreProgram>(() =>
-    cloneJson(initialProgram),
+    cloneJson(scenarioProgram),
   );
   const [isEditMode, setIsEditMode] = useState(true);
   const [activeView, setActiveView] = useState<"main" | "conversion" | "logic">(
@@ -72,6 +82,7 @@ export const MooreSimulator = forwardRef<
   );
   const [isStorageReady, setIsStorageReady] = useState(false);
   const simulation = useMooreSimulator(committedProgram);
+  const isStorageEnabled = !isExample;
   const pauseSimulation = simulation.pause;
   const issues = useMemo(() => validateMooreProgram(program), [program]);
   const conversion = useMemo<MooreConversion | null>(
@@ -82,17 +93,19 @@ export const MooreSimulator = forwardRef<
     () =>
       createTrainingCenterIdentifier(
         TOPIC_STORAGE_IDS.mooreMealy,
-        SIMULATOR_TASK_STORAGE_ID,
+        scenario?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
       ),
-    [],
+    [scenario?.storageId],
   );
   const transferCodec = useMemo(
     () =>
-      createTrainingCenterTransferCodec(
-        storageIdentifier,
-        mooreProgramTransferCodec,
-      ),
-    [storageIdentifier],
+      isStorageEnabled
+        ? createTrainingCenterTransferCodec(
+            storageIdentifier,
+            mooreProgramTransferCodec,
+          )
+        : mooreProgramTransferCodec,
+    [isStorageEnabled, storageIdentifier],
   );
 
   const loadProgram = useCallback(
@@ -106,7 +119,8 @@ export const MooreSimulator = forwardRef<
   );
 
   useEffect(() => {
-    if (!storageEnabled) {
+    setIsStorageReady(false);
+    if (!isStorageEnabled) {
       setIsStorageReady(true);
       return;
     }
@@ -127,39 +141,55 @@ export const MooreSimulator = forwardRef<
     return () => {
       cancelled = true;
     };
-  }, [loadProgram, storageEnabled, storageIdentifier]);
+  }, [isStorageEnabled, loadProgram, storageIdentifier]);
 
   useTrainingCenterAutoSave({
     identifier: storageIdentifier,
     value: program,
     codec: mooreProgramTransferCodec,
-    enabled: storageEnabled && isStorageReady,
+    enabled: isStorageEnabled && isStorageReady,
   });
 
   useImperativeHandle(
     ref,
     () => ({
       resetStoredState() {
-        if (storageEnabled) {
+        if (isStorageEnabled) {
           trainingCenterStorage.delete(storageIdentifier);
         }
         pauseSimulation();
-        const resetProgram = cloneJson(initialProgram);
+        const resetProgram = cloneJson(scenarioProgram);
         setProgram(resetProgram);
         setCommittedProgram(resetProgram);
         setIsEditMode(true);
         setActiveView("main");
       },
-      loadProgram,
-      getProgram: () => cloneJson(program),
+      loadSolution() {
+        if (!scenario) {
+          return;
+        }
+        loadProgram(cloneJson(scenario.solutionProgram));
+      },
+      checkSolution: async () => {
+        if (!scenario) {
+          return {
+            rows: [],
+            passed: false,
+            error: t("moore.exercises.validation.exampleCheckUnavailable"),
+          };
+        }
+        return runMooreValidation(program, scenario.validationCases);
+      },
     }),
     [
-      initialProgram,
+      isStorageEnabled,
       loadProgram,
       pauseSimulation,
       program,
-      storageEnabled,
+      scenario,
+      scenarioProgram,
       storageIdentifier,
+      t,
     ],
   );
 

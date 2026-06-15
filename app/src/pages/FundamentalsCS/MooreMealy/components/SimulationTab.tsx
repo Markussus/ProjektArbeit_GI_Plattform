@@ -1,10 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
-import { Popup } from "@/components/shared/Popup/Popup";
-import { TableView } from "@/components/shared/TableVisual/TableView";
+import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import {
   MooreSimulator,
   type MooreSimulatorHandle,
@@ -16,10 +15,7 @@ import {
 import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
 import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
 import { getMooreExerciseScenario } from "../exercises";
-import {
-  runMooreValidation,
-  type MooreValidationResult,
-} from "./Simulator/application/mooreSolutionChecker";
+import type { MooreValidationResult } from "./Simulator/application/mooreSolutionChecker";
 
 export const MOORE_EXAMPLE_ID = "moore.examples.mooreDefault";
 export const MEALY_EXAMPLE_ID = "moore.examples.mealyDefault";
@@ -32,6 +28,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const [checkResult, setCheckResult] = useState<MooreValidationResult | null>(
     null,
   );
+  const [isChecking, setIsChecking] = useState(false);
+  const [isMooreSimulatorReady, setIsMooreSimulatorReady] = useState(false);
   const mooreSimulatorRef = useRef<MooreSimulatorHandle | null>(null);
   const mealySimulatorRef = useRef<MealySimulatorHandle | null>(null);
   const isMooreExample = props.selectedItem?.id === MOORE_EXAMPLE_ID;
@@ -48,16 +46,27 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     (isMooreExample ? defaultMooreProgram : undefined);
   const storageEnabled =
     !isMooreExample && !isMealyExample && !exerciseScenario;
-  const handleCheckSolution = () => {
-    if (!exerciseScenario || !mooreSimulatorRef.current) {
+  const handleMooreSimulatorRef = useCallback(
+    (handle: MooreSimulatorHandle | null) => {
+      mooreSimulatorRef.current = handle;
+      setIsMooreSimulatorReady(handle !== null);
+    },
+    [],
+  );
+  const handleCheckSolution = async () => {
+    if (
+      !exerciseScenario ||
+      !mooreSimulatorRef.current ||
+      !isMooreSimulatorReady
+    ) {
       return;
     }
-    setCheckResult(
-      runMooreValidation(
-        mooreSimulatorRef.current.getProgram(),
-        exerciseScenario.validationCases,
-      ),
-    );
+    setIsChecking(true);
+    try {
+      setCheckResult(await mooreSimulatorRef.current.checkSolution());
+    } finally {
+      setIsChecking(false);
+    }
   };
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
@@ -86,23 +95,23 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
             <>
               <button
                 type="button"
-                onClick={() =>
-                  mooreSimulatorRef.current?.loadProgram(
-                    exerciseScenario.solutionProgram,
-                  )
-                }
+                onClick={() => mooreSimulatorRef.current?.loadSolution()}
+                disabled={!isMooreSimulatorReady}
                 data-testid="moore-load-solution"
-                className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
+                className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("moore.exercises.loadSolution")}
               </button>
               <button
                 type="button"
                 onClick={handleCheckSolution}
+                disabled={isChecking || !isMooreSimulatorReady}
                 data-testid="moore-check-solution"
-                className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90"
+                className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {t("moore.exercises.checkSolution")}
+                {isChecking
+                  ? t("moore.exercises.checkingSolution")
+                  : t("moore.exercises.checkSolution")}
               </button>
             </>
           ) : undefined
@@ -145,9 +154,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
                 exerciseScenario?.id ??
                 (isMooreExample ? MOORE_EXAMPLE_ID : "free")
               }
-              ref={mooreSimulatorRef}
+              ref={handleMooreSimulatorRef}
+              scenario={exerciseScenario}
               initialProgram={mooreInitialProgram}
-              storageEnabled={storageEnabled}
+              isExample={isMooreExample}
             />
           </div>
           <div hidden={machineType !== "mealy"}>
@@ -159,13 +169,12 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           </div>
         </div>
       </TopicSimulationTab>
-      <Popup
+      <SolutionCheckDialog
         open={checkResult !== null}
         title={t("moore.exercises.checkResultTitle")}
         onClose={() => setCheckResult(null)}
         testId="moore-solution-check-dialog"
-      >
-        <div className="space-y-4">
+        summary={
           <p
             data-testid="moore-solution-check-result"
             data-passed={String(checkResult?.passed)}
@@ -183,30 +192,21 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
                   total: checkResult?.rows.length ?? 0,
                 })}
           </p>
-          {checkResult?.error && (
-            <p className="text-sm text-red-600">{checkResult.error}</p>
-          )}
-          {checkResult && checkResult.rows.length > 0 && (
-            <TableView
-              testIdPrefix="moore-solution-check-table"
-              headers={[
-                t("moore.exercises.validation.passed"),
-                t("moore.exercises.validation.input"),
-                t("moore.exercises.validation.output"),
-                t("moore.exercises.validation.expectedOutput"),
-              ]}
-              rows={resultRows}
-              getRowTestAttributes={(rowIndex) => ({
-                "data-passed": String(
-                  checkResult.rows[rowIndex]?.passed ?? false,
-                ),
-              })}
-              firstColumnWidthClassName="w-[6rem] max-w-[8rem]"
-              dataColumnWidthClassName="w-[12rem] max-w-[18rem]"
-            />
-          )}
-        </div>
-      </Popup>
+        }
+        error={checkResult?.error}
+        tableTestIdPrefix="moore-solution-check-table"
+        headers={[
+          t("moore.exercises.validation.passed"),
+          t("moore.exercises.validation.input"),
+          t("moore.exercises.validation.output"),
+          t("moore.exercises.validation.expectedOutput"),
+        ]}
+        rows={resultRows}
+        getRowTestAttributes={(rowIndex) => ({
+          "data-passed": String(checkResult?.rows[rowIndex]?.passed ?? false),
+        })}
+        dataColumnWidthClassName="w-[12rem] max-w-[18rem]"
+      />
     </>
   );
 }

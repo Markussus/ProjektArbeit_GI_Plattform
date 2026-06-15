@@ -311,7 +311,7 @@ const cruiseSolution: MooreProgram = {
 export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   {
     id: "moore.exercises.turnstile.title",
-    storageId: 0x40,
+    storageId: 0x30,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: turnstileSolution,
     validationCases: [
@@ -334,7 +334,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.elevator.title",
-    storageId: 0x41,
+    storageId: 0x31,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: elevatorSolution,
     validationCases: createValidationCases(elevatorSolution, [
@@ -354,7 +354,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.barrier.title",
-    storageId: 0x42,
+    storageId: 0x32,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: barrierSolution,
     validationCases: createValidationCases(barrierSolution, [
@@ -374,7 +374,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.vending.title",
-    storageId: 0x43,
+    storageId: 0x33,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: vendingSolution,
     validationCases: createValidationCases(vendingSolution, [
@@ -395,7 +395,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.wiper.title",
-    storageId: 0x44,
+    storageId: 0x34,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: wiperSolution,
     validationCases: createValidationCases(wiperSolution, [
@@ -414,7 +414,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.alarm.title",
-    storageId: 0x45,
+    storageId: 0x35,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: alarmSolution,
     validationCases: createValidationCases(alarmSolution, [
@@ -433,7 +433,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     id: "moore.exercises.cruise.title",
-    storageId: 0x46,
+    storageId: 0x36,
     starterProgram: createEmptyExerciseProgram(),
     solutionProgram: cruiseSolution,
     validationCases: createValidationCases(cruiseSolution, [

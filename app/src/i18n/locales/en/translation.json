@@ -201,10 +201,12 @@
     "exercises": {
       "loadSolution": "Load solution",
       "checkSolution": "Check solution",
+      "checkingSolution": "Checking...",
       "checkResultTitle": "Check result",
       "checkCorrect": "All test runs produce the expected output sequences.",
       "checkIncorrect": "{{passed}} of {{total}} test runs produce the expected output sequence.",
       "validation": {
+        "exampleCheckUnavailable": "Solution checking is unavailable for this scenario.",
         "passed": "Passed",
         "input": "Input",
         "output": "Output",

@@ -204,8 +204,10 @@ test.describe("Moore and Mealy simulation tab", () => {
 
     for (const exerciseId of exerciseIds) {
       await page.getByTestId("tab-button-exercises").click();
-      await page.getByTestId(`exercise-card-${exerciseId}-select`).click();
-      await page.getByTestId(`exercise-card-${exerciseId}-open`).click();
+      await page
+        .getByTestId(`moore-exercise-card-${exerciseId}-select`)
+        .click();
+      await page.getByTestId(`moore-exercise-card-${exerciseId}-open`).click();
       await expect(page.getByTestId("moore-config-view")).toBeVisible();
       await page.getByTestId("moore-load-solution").click();
       await expect(page.getByTestId("moore-config-error")).toHaveCount(0);
@@ -216,10 +218,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await preparePage(page);
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
       .click();
     await expect(
       page
@@ -274,10 +276,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await preparePage(page);
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
       .click();
     await page.getByTestId("moore-load-solution").click();
     await expect(
@@ -302,6 +304,50 @@ test.describe("Moore and Mealy simulation tab", () => {
         .getByTestId("moore-config-view")
         .locator('[data-testid^="moore-input-symbol-"]'),
     ).toHaveCount(0);
+  });
+
+  test("persists each exercise and resets all exercise progress", async ({
+    page,
+  }) => {
+    await preparePage(page);
+    await page.getByTestId("tab-button-exercises").click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .click();
+
+    const stateName = page
+      .getByTestId("moore-config-view")
+      .getByTestId("moore-state-name-0");
+    await stateName.fill("SAVED_STATE");
+    await stateName.press("Enter");
+    await page.getByTestId("tab-button-overview").click();
+
+    await page.getByTestId("tab-button-exercises").click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .click();
+    await expect(
+      page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
+    ).toHaveValue("SAVED_STATE");
+
+    await page.getByTestId("tab-button-exercises").click();
+    await page.getByTestId("moore-reset-all-exercises").click();
+    await page.getByTestId("moore-reset-all-exercises-confirm").click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .click();
+    await page
+      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .click();
+    await expect(
+      page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
+    ).toHaveValue("STATE_0");
   });
 
   test("opens transition/output functions and returns to the editor", async ({
