@@ -44,6 +44,7 @@ import { MooreViewActions } from "./presentation/MooreViewActions";
 export interface MooreSimulatorHandle {
   resetStoredState: () => void;
   loadProgram: (program: MooreProgram) => void;
+  getProgram: () => MooreProgram;
 }
 
 interface MooreSimulatorProps {
@@ -150,11 +151,13 @@ export const MooreSimulator = forwardRef<
         setActiveView("main");
       },
       loadProgram,
+      getProgram: () => cloneJson(program),
     }),
     [
       initialProgram,
       loadProgram,
       pauseSimulation,
+      program,
       storageEnabled,
       storageIdentifier,
     ],

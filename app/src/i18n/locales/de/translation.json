@@ -198,6 +198,53 @@
     "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes."
   },
   "moore": {
+    "exercises": {
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkResultTitle": "Prüfergebnis",
+      "checkCorrect": "Alle Testläufe liefern die erwarteten Ausgabefolgen.",
+      "checkIncorrect": "{{passed}} von {{total}} Testläufen liefern die erwartete Ausgabefolge.",
+      "validation": {
+        "passed": "Bestanden",
+        "input": "Eingabe",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "pass": "Bestanden",
+        "fail": "Fehlgeschlagen",
+        "emptyInput": "Leere Eingabe (ε)",
+        "errors": {
+          "input_symbol_missing": "Eingabesymbol fehlt"
+        }
+      },
+      "turnstile": {
+        "title": "Drehkreuzsteuerung",
+        "description": "Vervollständige den Moore-Automaten für ein Drehkreuz. COIN gibt das gesperrte Drehkreuz frei, PASS sperrt es nach dem Durchgang wieder. Bestimme die vollständige Übergangstabelle; Zustände, Ereignisse und Ausgaben sind vorgegeben."
+      },
+      "elevator": {
+        "title": "Fahrstuhlsteuerung",
+        "description": "Vervollständige den Moore-Automaten für einen Fahrstuhl mit Erdgeschoss, Obergeschoss und offener oder geschlossener Tür. Fahrbefehle dürfen bei offener Tür den Zustand nicht ändern."
+      },
+      "barrier": {
+        "title": "Schranke zur Tiefgarage",
+        "description": "Modelliere die Schranke mit dauerhaft geöffnetem Gästemodus und Kartenmodus. Eine gültige Karte öffnet die Schranke; nach der Durchfahrt schließt sie wieder."
+      },
+      "vending": {
+        "title": "Getränkeautomat",
+        "description": "Vervollständige den Automaten für 50-Cent- und 1-Euro-Münzen, Guthaben bis 1,50 Euro, Start und Abbrechen. Berücksichtige alle Ereignisse in jedem Zustand."
+      },
+      "wiper": {
+        "title": "Scheibenwischersteuerung",
+        "description": "Modelliere Aus, einmaliges Wischen, Dauerbetrieb und Regensensorbetrieb. Die Ausgabe beschreibt die jeweilige Motoraktion."
+      },
+      "alarm": {
+        "title": "Alarmanlage",
+        "description": "Vervollständige die Zustände Aus, Scharf und Alarm. Der Sensor löst nur im scharfen Zustand Alarm aus; Off beendet auch einen laufenden Alarm."
+      },
+      "cruise": {
+        "title": "Tempomat",
+        "description": "Modelliere einen ausgeschalteten, bereiten und aktiven Tempomat mit On/Off, Set, Bremse, Beschleunigen, Reset, Cancel, Plus und Minus."
+      }
+    },
     "examples": {
       "mooreDefault": "moore.examples.mooreDefault",
       "mealyDefault": "moore.examples.mealyDefault",
