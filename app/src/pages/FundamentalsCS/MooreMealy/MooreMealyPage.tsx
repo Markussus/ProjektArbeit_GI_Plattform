@@ -14,6 +14,7 @@ export function MooreMealyPage() {
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
       confirmExerciseTabExit={false}
+      clearSimulationSelectionOnTabExit
     />
   );
 }

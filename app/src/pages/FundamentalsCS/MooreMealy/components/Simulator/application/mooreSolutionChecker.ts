@@ -62,8 +62,7 @@ export function runMooreValidation(
         input: validationCase.input,
         outputCodes: [],
         expectedOutputCodes: validationCase.expectedOutputCodes,
-        error:
-          error instanceof Error ? error.message : "validation_failed",
+        error: error instanceof Error ? error.message : "validation_failed",
       };
     }
   });

@@ -236,9 +236,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await expect(
       page.getByTestId("moore-solution-check-result"),
     ).toHaveAttribute("data-passed", "false");
-    await expect(
-      page.getByTestId("moore-solution-check-table"),
-    ).toBeVisible();
+    await expect(page.getByTestId("moore-solution-check-table")).toBeVisible();
     await expect(
       page.locator(
         '[data-testid^="moore-solution-check-table-row-"][data-passed="false"]',
@@ -258,6 +256,42 @@ test.describe("Moore and Mealy simulation tab", () => {
     ).toHaveCount(0);
     await page.getByTestId("moore-solution-check-dialog-close").click();
     await page.getByTestId("simulation-reset").click();
+    await expect(
+      page
+        .getByTestId("moore-config-view")
+        .locator('[data-testid^="moore-state-name-"]'),
+    ).toHaveCount(1);
+    await expect(
+      page
+        .getByTestId("moore-config-view")
+        .locator('[data-testid^="moore-input-symbol-"]'),
+    ).toHaveCount(0);
+  });
+
+  test("returns to the free simulator after leaving an exercise", async ({
+    page,
+  }) => {
+    await preparePage(page);
+    await page.getByTestId("tab-button-exercises").click();
+    await page
+      .getByTestId("exercise-card-moore.exercises.turnstile.title-select")
+      .click();
+    await page
+      .getByTestId("exercise-card-moore.exercises.turnstile.title-open")
+      .click();
+    await page.getByTestId("moore-load-solution").click();
+    await expect(
+      page
+        .getByTestId("moore-config-view")
+        .locator('[data-testid^="moore-state-name-"]'),
+    ).toHaveCount(2);
+
+    await page.getByTestId("tab-button-overview").click();
+    await page.getByTestId("tab-button-simulation").click();
+
+    await expect(page.getByTestId("simulation-selected-exercise")).toHaveCount(
+      0,
+    );
     await expect(
       page
         .getByTestId("moore-config-view")

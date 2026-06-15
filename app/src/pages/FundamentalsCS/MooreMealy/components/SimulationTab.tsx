@@ -29,8 +29,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const [machineType, setMachineType] = useState<"moore" | "mealy">(() =>
     props.selectedItem?.id === MEALY_EXAMPLE_ID ? "mealy" : "moore",
   );
-  const [checkResult, setCheckResult] =
-    useState<MooreValidationResult | null>(null);
+  const [checkResult, setCheckResult] = useState<MooreValidationResult | null>(
+    null,
+  );
   const mooreSimulatorRef = useRef<MooreSimulatorHandle | null>(null);
   const mealySimulatorRef = useRef<MealySimulatorHandle | null>(null);
   const isMooreExample = props.selectedItem?.id === MOORE_EXAMPLE_ID;
