@@ -125,6 +125,10 @@ test.describe("DNF page", () => {
 
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await page.getByTestId("dnf-toggle-solution").click();
+    await expect(page.getByTestId("dnf-follow-up-solution")).toBeVisible();
+    await expect(page.getByTestId("dnf-follow-up-solution-toggle")).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId("dnf-result-panel")).toBeVisible();
     await expect(
       page.getByTestId("dnf-solution-truth-table-panel"),
@@ -366,9 +370,8 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-follow-up-simplification-toggle").click();
     await expect(page.getByTestId("dnf-simplification-panel")).toBeVisible();
     await expect(
-      page.getByTestId("dnf-reveal-minimal-solution"),
+      page.getByTestId("dnf-toggle-simplification-solution"),
     ).toBeDisabled();
-    await expect(page.getByTestId("dnf-reveal-walkthrough")).toBeDisabled();
 
     await page.getByTestId("dnf-simplified-answer").fill("(!a & c) | (a & !c)");
     await page.getByTestId("dnf-check-simplification").click();
@@ -377,16 +380,11 @@ test.describe("DNF page", () => {
       page.getByTestId("dnf-simplification-feedback"),
     ).toHaveAttribute("data-status", "accepted_minimal");
 
-    await page.getByTestId("dnf-reveal-minimal-solution").click();
+    await page.getByTestId("dnf-toggle-simplification-solution").click();
     await expect(
-      page.getByTestId("dnf-reveal-minimal-solution"),
+      page.getByTestId("dnf-toggle-simplification-solution"),
     ).toHaveAttribute("aria-expanded", "true");
-
-    await page.getByTestId("dnf-reveal-walkthrough").click();
-    await expect(page.getByTestId("dnf-reveal-walkthrough")).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    );
+    await expect(page.getByTestId("dnf-simplification-solution")).toBeVisible();
 
     await expect(
       page.getByTestId("dnf-simplification-walkthrough"),
