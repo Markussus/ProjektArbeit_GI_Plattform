@@ -5,7 +5,7 @@ import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelec
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { ValidationInputMode } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 
-type BaseType = "dec" | "bin" | "oct" | "hex";
+import type { BaseType, IntegerConverterState } from "./nsTransferCodec";
 
 interface IntegerConverterProps {
   isExerciseMode?: boolean;
@@ -15,6 +15,8 @@ interface IntegerConverterProps {
   initialValue?: string;
   initialBase?: BaseType;
   initialTargetBase?: BaseType;
+  initialState?: IntegerConverterState;
+  onChangeState?: (state: IntegerConverterState) => void;
 }
 
 export function IntegerConverter({
@@ -25,20 +27,27 @@ export function IntegerConverter({
   initialValue = "",
   initialBase = "dec",
   initialTargetBase = "bin",
+  initialState,
+  onChangeState,
 }: IntegerConverterProps) {
   const { t } = useTranslation("translation");
-  const [sourceBase, setSourceBase] = useState<BaseType>("dec");
-  const [targetBase, setTargetBase] = useState<BaseType>("bin");
-  const [inputValue, setInputValue] = useState<string>("255");
+  const locked = !!isExerciseMode && !showSolution;
+  const [sourceBase, setSourceBase] = useState<BaseType>(
+    locked ? initialBase : (initialState?.sourceBase ?? initialBase),
+  );
+  const [targetBase, setTargetBase] = useState<BaseType>(
+    locked
+      ? initialTargetBase
+      : (initialState?.targetBase ?? initialTargetBase),
+  );
+  const [inputValue, setInputValue] = useState<string>(
+    locked ? initialValue : (initialState?.inputValue ?? initialValue),
+  );
 
   useEffect(() => {
-    if (initialValue) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSourceBase(initialBase);
-      setTargetBase(initialTargetBase);
-      setInputValue(initialValue);
-    }
-  }, [initialValue, initialBase, initialTargetBase]);
+    onChangeState?.({ inputValue, sourceBase, targetBase });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, sourceBase, targetBase]);
 
   const handleSourceBaseChange = (newBase: BaseType) => {
     setSourceBase(newBase);
@@ -171,7 +180,6 @@ export function IntegerConverter({
     return steps;
   };
 
-  const locked = !!isExerciseMode && !showSolution;
   const showToDecSteps = sourceBase !== "dec" && decValue !== "";
   const showFromDecSteps = targetBase !== "dec" && decValue !== "";
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { IntegerConverter } from "./IntegerConverter";
 import { NegativeNumbers } from "./NegativeNumbers";
@@ -8,6 +8,18 @@ import { ArithmeticMode } from "./arithmetic";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import {
+  SIMULATOR_TASK_STORAGE_ID,
+  createTrainingCenterIdentifier,
+  createTrainingCenterTransferCodec,
+  loadTrainingCenterValue,
+} from "@/lib/trainingCenter";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { numberSystemsExercises } from "../../exercises";
+import { nsTransferCodec } from "./nsTransferCodec";
+import type { NumberSystemState } from "./nsTransferCodec";
 
 type SimulatorMode =
   | "integers"
@@ -27,11 +39,54 @@ export function Simulator({
   onExitExercise,
 }: SimulatorProps) {
   const { t } = useTranslation("translation");
-  const [activeMode, setActiveMode] = useState<SimulatorMode>("integers");
+  const getInitialActiveMode = (id: string): SimulatorMode => {
+    if (
+      id.includes("floatToBin") ||
+      id.includes("example_u05_1") ||
+      id.includes("example_u05_2")
+    )
+      return "fractional";
+    if (
+      id.includes("ieee") ||
+      id.includes("example_u05_3") ||
+      id.includes("example_u05_4")
+    )
+      return "ieee754";
+    if (
+      id.includes("Add") ||
+      id.includes("Sub") ||
+      id.includes("mult") ||
+      id.includes("example_u06") ||
+      id.includes("example_u03_2")
+    )
+      return "arithmetic";
+    return "integers";
+  };
+
+  const [simulatorState, setSimulatorState] = useState<NumberSystemState>(
+    () => {
+      return {
+        activeMode: selectedExercise
+          ? getInitialActiveMode(selectedExercise.id)
+          : "integers",
+      };
+    },
+  );
+  const [isStorageReady, setIsStorageReady] = useState(false);
+  const [loadVersion, setLoadVersion] = useState(0);
+  const activeMode = simulatorState.activeMode;
+
+  const setActiveMode = (mode: SimulatorMode) => {
+    setSimulatorState((prev) => ({ ...prev, activeMode: mode }));
+  };
 
   // Exercise mode states
-  const [isExerciseMode, setIsExerciseMode] = useState(false);
-  const [showSolution, setShowSolution] = useState(true);
+  const [isExerciseMode, setIsExerciseMode] = useState(() => {
+    return selectedExercise ? !selectedExercise.id.includes(".example") : false;
+  });
+  const [showSolution, setShowSolution] = useState(() => {
+    return selectedExercise ? selectedExercise.id.includes(".example") : true;
+  });
 
   // Tab-change confirm dialog state
   const [pendingMode, setPendingMode] = useState<SimulatorMode | null>(null);
@@ -215,6 +270,71 @@ export function Simulator({
     onExitExercise?.();
   };
 
+  const isExample = selectedExercise?.id.includes(".example");
+  const isStorageEnabled = !isExample;
+  const exerciseIndex = selectedExercise
+    ? numberSystemsExercises.findIndex(
+        (ex) => ex.titleKey === selectedExercise.id,
+      )
+    : -1;
+  const taskStorageId =
+    exerciseIndex >= 0 ? exerciseIndex : SIMULATOR_TASK_STORAGE_ID;
+
+  const storageIdentifier = createTrainingCenterIdentifier(
+    TOPIC_STORAGE_IDS.numberSystems,
+    taskStorageId,
+  );
+
+  const storageTransferCodec = useMemo(
+    () =>
+      isStorageEnabled
+        ? createTrainingCenterTransferCodec(storageIdentifier, nsTransferCodec)
+        : nsTransferCodec,
+    [isStorageEnabled, storageIdentifier],
+  );
+
+  useEffect(() => {
+    let isCancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsStorageReady(false);
+
+    if (!isStorageEnabled) {
+      return;
+    }
+
+    void loadTrainingCenterValue(storageIdentifier, nsTransferCodec)
+      .then((storedState) => {
+        if (!isCancelled && storedState) {
+          setSimulatorState(() => {
+            const nextState = { ...storedState };
+            if (selectedExercise) {
+              nextState.activeMode = getInitialActiveMode(selectedExercise.id);
+            }
+            return nextState;
+          });
+          setLoadVersion((v) => v + 1);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!isCancelled) {
+          setIsStorageReady(true);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStorageEnabled, storageIdentifier]);
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: simulatorState,
+    codec: nsTransferCodec,
+    enabled: isStorageEnabled && isStorageReady,
+  });
+
   /**
    * Tab-Click Handler: Wenn im Übungsmodus, Dialog anzeigen.
    * Andernfalls direkt wechseln.
@@ -241,6 +361,18 @@ export function Simulator({
 
   return (
     <div data-testid="ns-simulator" className="flex h-full flex-col space-y-6">
+      {isStorageEnabled && isStorageReady && (
+        <SimulatorStringTransferBox
+          value={simulatorState}
+          codec={storageTransferCodec}
+          onLoad={(val: NumberSystemState) => {
+            setSimulatorState(val);
+            setLoadVersion((v) => v + 1);
+          }}
+          className="shrink-0"
+          testIdPrefix="ns-transfer"
+        />
+      )}
       {/* Dashboard Navigation */}
       <div className="border-border flex gap-1 border-b">
         {(
@@ -277,8 +409,8 @@ export function Simulator({
           <IntegerConverter
             key={
               selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-int"
+                ? `${selectedExercise.id}-${initialValue}-${loadVersion}`
+                : `free-int-${loadVersion}`
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
@@ -287,42 +419,60 @@ export function Simulator({
             initialValue={initialValue}
             initialBase={initialBase}
             initialTargetBase={initialTargetBase}
+            initialState={
+              selectedExercise ? undefined : simulatorState.integers
+            }
+            onChangeState={(state) =>
+              setSimulatorState((p) => ({ ...p, integers: state }))
+            }
           />
         )}
         {activeMode === "negative" && (
           <NegativeNumbers
             key={
               selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-neg"
+                ? `${selectedExercise.id}-${initialValue}-${loadVersion}`
+                : `free-neg-${loadVersion}`
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
             onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
+            initialState={
+              selectedExercise ? undefined : simulatorState.negative
+            }
+            onChangeState={(state) =>
+              setSimulatorState((p) => ({ ...p, negative: state }))
+            }
           />
         )}
         {activeMode === "fractional" && (
           <FractionalConverter
             key={
               selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-frac"
+                ? `${selectedExercise.id}-${initialValue}-${loadVersion}`
+                : `free-frac-${loadVersion}`
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
             onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
+            initialState={
+              selectedExercise ? undefined : simulatorState.fractional
+            }
+            onChangeState={(state) =>
+              setSimulatorState((p) => ({ ...p, fractional: state }))
+            }
           />
         )}
         {activeMode === "ieee754" && (
           <IEEE754Converter
             key={
               selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-ieee"
+                ? `${selectedExercise.id}-${initialValue}-${loadVersion}`
+                : `free-ieee-${loadVersion}`
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
@@ -330,14 +480,18 @@ export function Simulator({
             onExitExercise={isExerciseMode ? handleExitExercise : undefined}
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
+            initialState={selectedExercise ? undefined : simulatorState.ieee754}
+            onChangeState={(state) =>
+              setSimulatorState((p) => ({ ...p, ieee754: state }))
+            }
           />
         )}
         {activeMode === "arithmetic" && (
           <ArithmeticMode
             key={
               selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValueA}-${initialValueB}`
-                : "free-arith"
+                ? `${selectedExercise.id}-${initialValueA}-${initialValueB}-${loadVersion}`
+                : `free-arith-${loadVersion}`
             }
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
@@ -355,6 +509,12 @@ export function Simulator({
             }
             initialValueA={initialValueA}
             initialValueB={initialValueB}
+            initialState={
+              selectedExercise ? undefined : simulatorState.arithmetic
+            }
+            onChangeState={(state) =>
+              setSimulatorState((p) => ({ ...p, arithmetic: state }))
+            }
           />
         )}
       </div>
