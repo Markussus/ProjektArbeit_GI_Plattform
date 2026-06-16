@@ -198,6 +198,63 @@
     "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes."
   },
   "moore": {
+    "exercises": {
+      "loadSolution": "Lösung laden",
+      "checkSolution": "Lösung prüfen",
+      "checkingSolution": "Prüfung läuft...",
+      "checkResultTitle": "Prüfergebnis",
+      "checkCorrect": "Alle Testläufe liefern die erwarteten Ausgabefolgen.",
+      "checkIncorrect": "{{passed}} von {{total}} Testläufen liefern die erwartete Ausgabefolge.",
+      "validation": {
+        "exampleCheckUnavailable": "Für dieses Szenario ist keine Lösungsprüfung verfügbar.",
+        "passed": "Bestanden",
+        "input": "Eingabe",
+        "output": "Ausgabe",
+        "expectedOutput": "Erwartete Ausgabe",
+        "pass": "Bestanden",
+        "fail": "Fehlgeschlagen",
+        "emptyInput": "Leere Eingabe (ε)",
+        "errors": {
+          "input_symbol_missing": "Eingabesymbol fehlt"
+        }
+      },
+      "turnstile": {
+        "title": "Drehkreuzsteuerung",
+        "description": "Vervollständige den Moore-Automaten für ein Drehkreuz. COIN gibt das gesperrte Drehkreuz frei, PASS sperrt es nach dem Durchgang wieder. Bestimme die vollständige Übergangstabelle; Zustände, Ereignisse und Ausgaben sind vorgegeben."
+      },
+      "elevator": {
+        "title": "Fahrstuhlsteuerung",
+        "description": "Vervollständige den Moore-Automaten für einen Fahrstuhl mit Erdgeschoss, Obergeschoss und offener oder geschlossener Tür. Fahrbefehle dürfen bei offener Tür den Zustand nicht ändern."
+      },
+      "barrier": {
+        "title": "Schranke zur Tiefgarage",
+        "description": "Modelliere die Schranke mit dauerhaft geöffnetem Gästemodus und Kartenmodus. Eine gültige Karte öffnet die Schranke; nach der Durchfahrt schließt sie wieder."
+      },
+      "vending": {
+        "title": "Getränkeautomat",
+        "description": "Vervollständige den Automaten für 50-Cent- und 1-Euro-Münzen, Guthaben bis 1,50 Euro, Start und Abbrechen. Berücksichtige alle Ereignisse in jedem Zustand."
+      },
+      "wiper": {
+        "title": "Scheibenwischersteuerung",
+        "description": "Modelliere Aus, einmaliges Wischen, Dauerbetrieb und Regensensorbetrieb. Die Ausgabe beschreibt die jeweilige Motoraktion."
+      },
+      "alarm": {
+        "title": "Alarmanlage",
+        "description": "Vervollständige die Zustände Aus, Scharf und Alarm. Der Sensor löst nur im scharfen Zustand Alarm aus; Off beendet auch einen laufenden Alarm."
+      },
+      "cruise": {
+        "title": "Tempomat",
+        "description": "Modelliere einen ausgeschalteten, bereiten und aktiven Tempomat mit On/Off, Set, Bremse, Beschleunigen, Reset, Cancel, Plus und Minus."
+      }
+    },
+    "examples": {
+      "mooreDefault": "moore.examples.mooreDefault",
+      "mealyDefault": "moore.examples.mealyDefault",
+      "mooreTitle": "Moore-Beispielautomat",
+      "mooreDescription": "Ein Moore-Automat mit vier Zuständen und zwei Eingabesymbolen.",
+      "mealyTitle": "Mealy-Beispielautomat",
+      "mealyDescription": "Ein Mealy-Automat mit zwei Zuständen und ausgabeabhängigen Übergängen."
+    },
     "title": "Moore & Mealy Automaten",
     "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",
     "overviewTitle": "Moore vs. Mealy",
@@ -278,6 +335,17 @@
         "input_word_invalid": "Die Eingabe enthält ein Symbol außerhalb des Eingabealphabets."
       }
     },
+    "mealy": {
+      "configureTitle": "Mealy-Automat definieren",
+      "outputFunction": "Ausgabefunktion λ",
+      "outputFunctionHelp": "Für jede Kombination aus Zustand und Eingabe wird genau ein Ausgabezeichen festgelegt.",
+      "outputDragHelp": "Eingabealphabet Σ: Symbole auf eine Regel ziehen, um sie dieser Ausgabe zuzuordnen.",
+      "addRule": "Regel",
+      "addOutputRule": "Neue Ausgaberegel für Zustand {{state}} anlegen",
+      "dropForNewRule": "Eingabesymbol hier ablegen, um eine neue Regel anzulegen",
+      "simulationTitle": "Mealy-Simulation",
+      "diagram": "Zustandsübergangsgraph des Mealy-Automaten"
+    },
     "navigation": {
       "editDefinition": "Definition bearbeiten",
       "showSimulator": "Simulator anzeigen",
@@ -305,6 +373,7 @@
       "open": "In Logikgatter konvertieren",
       "title": "Logikgatter",
       "minimalFunctions": "Minimierte Funktionen",
+      "formulaMode": "Formeldarstellung",
       "binaryGates": "Nur Gatter mit zwei Eingängen",
       "completeCircuit": "Gesamte Schaltung anzeigen",
       "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",

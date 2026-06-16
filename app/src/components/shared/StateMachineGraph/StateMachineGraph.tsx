@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { List, Minus, Plus, RotateCcw, WrapText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
+import { Tooltip } from "@/components/shared/Tooltip";
 
 export interface StateMachineGraphNode {
   id: string;
@@ -26,6 +27,7 @@ export interface StateMachineGraphProps {
   className?: string;
   testId?: string;
   compact?: boolean;
+  defaultLabelLayout?: "wrapped" | "list";
 }
 
 const NODE_RADIUS = 42;
@@ -37,6 +39,7 @@ export function StateMachineGraph({
   className,
   testId,
   compact = false,
+  defaultLabelLayout = "wrapped",
 }: StateMachineGraphProps) {
   const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
@@ -44,8 +47,11 @@ export function StateMachineGraph({
     () => new Map(),
   );
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
-  const [labelLayout, setLabelLayout] = useState<"wrapped" | "list">("wrapped");
+  const [labelLayout, setLabelLayout] = useState<"wrapped" | "list">(
+    defaultLabelLayout,
+  );
   const svgElementRef = useRef<SVGSVGElement | null>(null);
+  const previousActiveNodeIdRef = useRef<string | undefined>(undefined);
   const {
     viewBox,
     scale,
@@ -62,15 +68,15 @@ export function StateMachineGraph({
     [layout.positions, nodePositions],
   );
   const activeNodeId = nodes.find((node) => node.isActive)?.id;
-  const activePosition = activeNodeId
-    ? positions.get(activeNodeId)
-    : undefined;
+  const activePosition = activeNodeId ? positions.get(activeNodeId) : undefined;
 
   useLayoutEffect(() => {
-    if (activePosition) {
+    const activeNodeChanged = previousActiveNodeIdRef.current !== activeNodeId;
+    previousActiveNodeIdRef.current = activeNodeId;
+    if (activePosition && activeNodeChanged) {
       ensurePointVisible(activePosition.x, activePosition.y, NODE_RADIUS);
     }
-  }, [activePosition, ensurePointVisible]);
+  }, [activeNodeId, activePosition, ensurePointVisible]);
 
   useEffect(() => {
     if (!draggedNodeId) {
@@ -344,15 +350,16 @@ function GraphButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className="border-border bg-background hover:bg-muted inline-flex size-8 items-center justify-center rounded-md border shadow-sm"
-    >
-      {children}
-    </button>
+    <Tooltip label={label}>
+      <button
+        type="button"
+        aria-label={label}
+        onClick={onClick}
+        className="border-border bg-background hover:bg-muted inline-flex size-8 items-center justify-center rounded-md border shadow-sm"
+      >
+        {children}
+      </button>
+    </Tooltip>
   );
 }
 

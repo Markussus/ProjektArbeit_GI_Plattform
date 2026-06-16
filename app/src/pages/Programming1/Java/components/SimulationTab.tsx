@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { Popup } from "@/components/shared/Popup/Popup";
-import { TableView } from "@/components/shared/TableVisual/TableView";
+import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { getJavaScenario } from "../exercises";
 import {
@@ -119,42 +118,26 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         />
       </TopicSimulationTab>
 
-      <Popup
+      <SolutionCheckDialog
         open={checkResult !== null}
         title={t("java.validation.popupTitle")}
         onClose={() => setCheckResult(null)}
         testId="java-solution-check-dialog"
-      >
-        <div className="space-y-4">
-          {checkResult?.error && (
-            <p
-              data-testid="java-solution-check-error"
-              className="text-sm text-red-600"
-            >
-              {checkResult.error}
-            </p>
-          )}
-
-          {checkResult && checkResult.rows.length > 0 && (
-            <TableView
-              testIdPrefix="java-solution-check-table"
-              headers={[
-                t("java.validation.table.passed"),
-                t("java.validation.table.case"),
-                t("java.validation.table.output"),
-                t("java.validation.table.expectedOutput"),
-                t("java.validation.table.phase"),
-              ]}
-              rows={resultRows}
-              getRowTestAttributes={(rowIndex) => ({
-                "data-passed": String(checkResult.rows[rowIndex]?.passed),
-              })}
-              firstColumnWidthClassName="w-[6rem] max-w-[8rem]"
-              dataColumnWidthClassName="w-[12rem] max-w-[16rem]"
-            />
-          )}
-        </div>
-      </Popup>
+        error={checkResult?.error}
+        errorTestId="java-solution-check-error"
+        tableTestIdPrefix="java-solution-check-table"
+        headers={[
+          t("java.validation.table.passed"),
+          t("java.validation.table.case"),
+          t("java.validation.table.output"),
+          t("java.validation.table.expectedOutput"),
+          t("java.validation.table.phase"),
+        ]}
+        rows={resultRows}
+        getRowTestAttributes={(rowIndex) => ({
+          "data-passed": String(checkResult?.rows[rowIndex]?.passed),
+        })}
+      />
     </>
   );
 }

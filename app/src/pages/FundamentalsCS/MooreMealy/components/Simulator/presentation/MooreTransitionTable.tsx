@@ -7,8 +7,13 @@ import { useDragScroll } from "@/hooks/useDragScroll";
 import { formatInternalNumber } from "../domain/mooreProgram";
 import type { MooreProgram } from "../domain/mooreTypes";
 
+type TransitionProgram = Pick<
+  MooreProgram,
+  "states" | "inputSymbols" | "transitions" | "initialState" | "representation"
+>;
+
 interface MooreTransitionTableProps {
-  program: MooreProgram;
+  program: TransitionProgram;
   onTransitionChange: (
     inputSymbol: string,
     state: string,
