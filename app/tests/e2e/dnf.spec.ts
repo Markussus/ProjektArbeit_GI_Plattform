@@ -309,6 +309,34 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
   });
 
+  test("loads the full solution from the exercise header", async ({ page }) => {
+    await gotoDnfPage(page);
+    await openFirstDnfExercise(page);
+
+    // Nothing solved yet: the simplification step is still locked.
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification-toggle"),
+    ).toBeDisabled();
+
+    await page.getByTestId("dnf-load-solution").click();
+
+    // The exercise is now filled and checked as correct.
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).not.toHaveValue("");
+
+    // The simplification is auto-opened, filled, and accepted as minimal.
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification"),
+    ).toBeVisible();
+    await expect(page.getByTestId("dnf-simplified-answer")).not.toHaveValue("");
+    await expect(
+      page.getByTestId("dnf-simplification-feedback"),
+    ).toHaveAttribute("data-status", "accepted_minimal");
+  });
+
   test("keeps the simplification reachable after restoring a solved exercise", async ({
     page,
   }) => {

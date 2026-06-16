@@ -563,6 +563,7 @@
       "setupPreviewTitle": "Wertetafel festlegen",
       "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
       "commitTable": "Tabelle übernehmen",
+      "loadSolution": "Lösung laden",
       "editConfig": "Konfiguration bearbeiten"
     },
     "builder": {

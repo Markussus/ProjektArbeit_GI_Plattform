@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
+import { formatBooleanExpressionForDisplay } from "../domain/booleanExpressionFormat";
 import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
+import {
+  computeMinimalDnf,
+  minimalDnfToExpression,
+} from "../domain/quineMcCluskey";
 import type { DnfBuilderAnalysis } from "./dnfAnalysis";
 import type { DnfExerciseTransferDraft } from "../domain/dnfTransfer";
 import { useDnfSimplification } from "./useDnfSimplification";
@@ -38,6 +43,7 @@ export function useDnfExercise({
   const simplification = useDnfSimplification(
     initialAttempt?.simplificationAnswer,
   );
+  const [solutionVersion, setSolutionVersion] = useState(0);
 
   const resetExercise = () => {
     setShowSolution(!isExerciseMode);
@@ -90,6 +96,37 @@ export function useDnfExercise({
     simplification.setAnswer(attempt.simplificationAnswer);
   };
 
+  // Fill the exercise with its reference solution: correct truth table, the
+  // canonical DNF and the minimal simplification — each shown as already
+  // checked, so the whole flow opens in a solved state (the "give up / show me"
+  // action used by the header button).
+  const loadSolution = () => {
+    if (analysis.status !== "valid") {
+      return;
+    }
+
+    const { truthTable } = analysis;
+    const solvedAnswers = truthTable.rows.map((row) => row.result);
+    const canonicalDnf = analysis.formattedDnf;
+    const minimalDnf = formatBooleanExpressionForDisplay(
+      minimalDnfToExpression(
+        computeMinimalDnf(truthTable),
+        truthTable.variables,
+      ),
+    );
+
+    setShowSolution(false);
+    setTruthTableAnswers(solvedAnswers);
+    setDnfAnswer(canonicalDnf);
+    setExerciseFeedback(
+      checkDnfExerciseAttempt(truthTable, solvedAnswers, canonicalDnf, {
+        checkTruthTable: requiresTruthTableAnswers,
+      }),
+    );
+    simplification.loadSolution(minimalDnf, truthTable);
+    setSolutionVersion((current) => current + 1);
+  };
+
   const normalizedTruthTableAnswers = useMemo(
     () =>
       analysis.status === "valid"
@@ -111,6 +148,8 @@ export function useDnfExercise({
     setDnfAnswer: updateDnfAnswer,
     checkExercise,
     loadAttempt,
+    loadSolution,
+    solutionVersion,
     toggleSolution: () => setShowSolution((current) => !current),
     resetExercise,
     simplification,

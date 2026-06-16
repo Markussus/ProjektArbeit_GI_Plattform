@@ -4,6 +4,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,7 @@ import {
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
-import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
+import { DnfBuilder, type DnfBuilderHandle } from "./DnfBuilder/DnfBuilder";
 import {
   dnfExerciseTransferCodec,
   dnfExpressionTransferCodec,
@@ -51,6 +52,7 @@ interface DnfSimulatorProps {
 
 export interface DnfSimulatorHandle {
   resetStoredState: () => void;
+  loadSolution: () => void;
 }
 
 export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
@@ -86,6 +88,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     const [hasStoredState, setHasStoredState] = useState(false);
     const [hasUserChanges, setHasUserChanges] = useState(false);
     const [resetVersion, setResetVersion] = useState(0);
+    const dnfBuilderRef = useRef<DnfBuilderHandle | null>(null);
 
     // Seed the active mode from a walkthrough example (if any) so the example
     // opens in its native mode, but let the user override by clicking a tab.
@@ -198,6 +201,9 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           setHasUserChanges(false);
           setResetVersion((current) => current + 1);
         },
+        loadSolution: () => {
+          dnfBuilderRef.current?.loadSolution();
+        },
       }),
       [buildResetValue, isStorageEnabled, storageIdentifier],
     );
@@ -248,6 +254,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         return (
           <DnfBuilder
             key={`${selectedExercise.id}-${contentKey}`}
+            ref={dnfBuilderRef}
             selectedExercise={selectedExercise}
             initialAttempt={
               storedValue?.mode === "exercise_attempt" ? storedValue : undefined

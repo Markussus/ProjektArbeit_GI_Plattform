@@ -563,6 +563,7 @@
       "setupPreviewTitle": "Set up the truth table",
       "setupPreviewHint": "Set the f column for each row. Once the table is ready, click \"Commit table\" to start the DNF exercise.",
       "commitTable": "Commit table",
+      "loadSolution": "Load solution",
       "editConfig": "Edit config"
     },
     "builder": {
