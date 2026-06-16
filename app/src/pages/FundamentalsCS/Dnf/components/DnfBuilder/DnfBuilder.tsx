@@ -134,6 +134,12 @@ export function DnfBuilder({
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
 
+      <DnfFollowUpSections
+        key={solution ? "solution-visible" : "solution-hidden"}
+        solution={solution}
+        simplification={simplificationFollowUp}
+      />
+
       <SimulatorStringTransferBox
         value={transferValue}
         codec={transferCodec}
@@ -142,12 +148,6 @@ export function DnfBuilder({
           builder.loadAttempt(attempt);
         }}
         testIdPrefix="dnf-exercise-transfer"
-      />
-
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
       />
     </div>
   );

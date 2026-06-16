@@ -11,7 +11,7 @@ import { DnfResultPanel } from "./DnfResultPanel";
 import { DnfSimplificationPanel } from "./DnfSimplificationPanel";
 import { DnfTruthTableView } from "./DnfTruthTableView";
 
-type FollowUpSectionId = "result" | "truthTable" | "simplification";
+type FollowUpSectionId = "solution" | "simplification";
 
 type DnfFollowUpSectionsProps = DnfFollowUpConfiguration;
 
@@ -36,32 +36,26 @@ export function DnfFollowUpSections({
 
     if (solution) {
       nextSections.push({
-        id: "result",
-        label: t("dnf.builder.resultTitle"),
-        isSolution: true,
+        id: "solution",
+        label: t("dnf.builder.solutionTitle"),
         content: (
-          <DnfResultPanel
-            formattedDnf={solution.formattedDnf}
-            variableCount={solution.variableCount}
-            rowCount={solution.rowCount}
-            trueRowCount={solution.trueRowCount}
-            derivation={solution.derivation}
-          />
+          <div className="space-y-4">
+            <DnfResultPanel
+              formattedDnf={solution.formattedDnf}
+              variableCount={solution.variableCount}
+              rowCount={solution.rowCount}
+              trueRowCount={solution.trueRowCount}
+              derivation={solution.derivation}
+            />
+            {solution.display && (
+              <DnfTruthTableView
+                display={solution.display}
+                resultHeader={solution.resultHeader}
+              />
+            )}
+          </div>
         ),
       });
-      if (solution.display) {
-        nextSections.push({
-          id: "truthTable",
-          label: t("dnf.builder.truthTableTitle"),
-          isSolution: true,
-          content: (
-            <DnfTruthTableView
-              display={solution.display}
-              resultHeader={solution.resultHeader}
-            />
-          ),
-        });
-      }
     }
 
     if (simplification) {
@@ -97,7 +91,7 @@ export function DnfFollowUpSections({
     return null;
   }
 
-  const defaultOpenId: FollowUpSectionId | null = solution ? "result" : null;
+  const defaultOpenId: FollowUpSectionId | null = solution ? "solution" : null;
   const effectiveOpenSectionIds: FollowUpSectionId[] =
     hasUserChangedSections || defaultOpenId === null
       ? openSectionIds

@@ -233,13 +233,6 @@ export function TableToDnfBuilder({
         </button>
       </div>
 
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportTable}
-        testIdPrefix="dnf-table-transfer"
-      />
-
       <DnfExerciseWorkspace
         source="f"
         truthTable={analysis.truthTable}
@@ -268,6 +261,13 @@ export function TableToDnfBuilder({
         key={solution ? "solution-visible" : "solution-hidden"}
         solution={solution}
         simplification={simplificationFollowUp}
+      />
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportTable}
+        testIdPrefix="dnf-table-transfer"
       />
     </div>
   );

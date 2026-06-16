@@ -126,8 +126,6 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await page.getByTestId("dnf-toggle-solution").click();
     await expect(page.getByTestId("dnf-result-panel")).toBeVisible();
-
-    await page.getByTestId("dnf-follow-up-truthTable-toggle").click();
     await expect(
       page.getByTestId("dnf-solution-truth-table-panel"),
     ).toBeVisible();
@@ -259,6 +257,36 @@ test.describe("DNF page", () => {
     await openFirstDnfExercise(page);
 
     await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
+  });
+
+  test("keeps the simplification reachable after restoring a solved exercise", async ({
+    page,
+  }) => {
+    await gotoDnfPage(page);
+    await openFirstDnfExercise(page);
+
+    await page
+      .getByTestId("dnf-exercise-answer")
+      .fill("(!a & !b & c) | (!a & b & c) | (a & !b & !c) | (a & b & !c)");
+    await page.getByTestId("dnf-check-answer").click();
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+
+    await page.getByTestId("dnf-follow-up-simplification-toggle").click();
+    await page.getByTestId("dnf-simplified-answer").fill("a");
+    await page.getByTestId("dnf-exercise-transfer-export").click();
+    await page.reload();
+    await openFirstDnfExercise(page);
+
+    // The restored attempt is correct, so the simplification stays unlocked
+    // and its answer is restored instead of being lost on reload.
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification-toggle"),
+    ).toBeEnabled();
+    await page.getByTestId("dnf-follow-up-simplification-toggle").click();
+    await expect(page.getByTestId("dnf-simplified-answer")).toHaveValue("a");
   });
 
   test("resets all DNF exercises while preserving the free simulator", async ({

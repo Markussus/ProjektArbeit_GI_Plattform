@@ -191,13 +191,6 @@ export function ExpressionBuilder({
         </div>
       )}
 
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportExpression}
-        testIdPrefix="dnf-expression-transfer"
-      />
-
       {committedSource !== null && (
         <ExpressionWorkspace
           key={`${committedSource}-${workspaceVersion}`}
@@ -207,6 +200,13 @@ export function ExpressionBuilder({
           onUserChange={onUserChange}
         />
       )}
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportExpression}
+        testIdPrefix="dnf-expression-transfer"
+      />
     </div>
   );
 }

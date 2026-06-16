@@ -614,6 +614,7 @@
       },
       "followUpTitle": "Weiterarbeiten",
       "solutionBadge": "Lösung",
+      "solutionTitle": "Lösung",
       "resultTitle": "DNF",
       "resultHint": "Jede markierte Zeile liefert einen UND-Term.",
       "resultRuleHint": "Merksatz: 0 → Variable negieren, 1 → Variable übernehmen. Nur Zeilen mit Ergebnis 1 werden zu Termen und mit ∨ verknüpft.",
