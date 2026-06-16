@@ -49,7 +49,8 @@ export function Simulator({
     if (
       id.includes("ieee") ||
       id.includes("example_u05_3") ||
-      id.includes("example_u05_4")
+      id.includes("example_u05_4") ||
+      id.includes("example_u07_5")
     )
       return "ieee754";
     if (
@@ -57,9 +58,12 @@ export function Simulator({
       id.includes("Sub") ||
       id.includes("mult") ||
       id.includes("example_u06") ||
-      id.includes("example_u03_2")
+      id.includes("example_u03_2") ||
+      id.includes("example_u07_2") ||
+      id.includes("example_u07_4")
     )
       return "arithmetic";
+    if (id.includes("example_u07_3")) return "negative";
     return "integers";
   };
 
@@ -248,6 +252,101 @@ export function Simulator({
         setInitialSubMode("multiplication");
         setInitialValueA("1011");
         setInitialValueB("11001");
+      } else if (selectedExercise.id === "number.example_u07_1_1") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("127");
+      } else if (selectedExercise.id === "number.example_u07_1_2") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("45");
+      } else if (selectedExercise.id === "number.example_u07_1_3") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("456");
+      } else if (selectedExercise.id === "number.example_u07_1_4") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("255");
+      } else if (selectedExercise.id === "number.example_u07_1_5") {
+        setActiveMode("integers");
+        setInitialBase("dec");
+        setInitialTargetBase("bin");
+        setInitialValue("110");
+      } else if (selectedExercise.id === "number.example_u07_2_1") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("110101");
+        setInitialValueB("100110");
+      } else if (selectedExercise.id === "number.example_u07_2_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("10000000");
+        setInitialValueB("111111");
+      } else if (selectedExercise.id === "number.example_u07_2_3") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("addition");
+        setInitialValueA("11111111");
+        setInitialValueB("11001000");
+      } else if (selectedExercise.id === "number.example_u07_3_1") {
+        setActiveMode("negative");
+        setInitialValue("-5");
+      } else if (selectedExercise.id === "number.example_u07_3_2") {
+        setActiveMode("negative");
+        setInitialValue("-125");
+      } else if (selectedExercise.id === "number.example_u07_3_3") {
+        setActiveMode("negative");
+        setInitialValue("0");
+      } else if (selectedExercise.id === "number.example_u07_3_4") {
+        setActiveMode("negative");
+        setInitialValue("-63");
+      } else if (selectedExercise.id === "number.example_u07_3_5") {
+        setActiveMode("negative");
+        setInitialValue("-128");
+      } else if (selectedExercise.id === "number.example_u07_4_1") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("110010");
+        setInitialValueB("100110");
+      } else if (selectedExercise.id === "number.example_u07_4_2") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("1000011");
+        setInitialValueB("1000100");
+      } else if (selectedExercise.id === "number.example_u07_4_3") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("101");
+        setInitialValueB("1000");
+      } else if (selectedExercise.id === "number.example_u07_4_4") {
+        setActiveMode("arithmetic");
+        setInitialSubMode("subtraction");
+        setInitialValueA("1111");
+        setInitialValueB("1111");
+      } else if (selectedExercise.id === "number.example_u07_5_1") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("5.75");
+      } else if (selectedExercise.id === "number.example_u07_5_2") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("24.25");
+      } else if (selectedExercise.id === "number.example_u07_5_3") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("18.375");
+      } else if (selectedExercise.id === "number.example_u07_5_4") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("-2.8125");
+      } else if (selectedExercise.id === "number.example_u07_5_5") {
+        setActiveMode("ieee754");
+        setInitialConverterMode("decToIeee");
+        setInitialValue("-10.9375");
       }
     } else {
       setIsExerciseMode(false);
