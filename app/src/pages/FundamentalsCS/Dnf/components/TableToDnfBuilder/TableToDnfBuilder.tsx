@@ -249,10 +249,6 @@ export function TableToDnfBuilder({
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={() => {
-          onUserChange?.();
-          clearAttempt();
-        }}
         onToggleSolution={() => setShowSolution((current) => !current)}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />

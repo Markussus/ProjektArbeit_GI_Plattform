@@ -294,18 +294,6 @@ function ExpressionWorkspace({
     );
   };
 
-  const handleReset = () => {
-    const emptyAttempt = createDnfAttemptDraft();
-
-    onUserChange?.();
-    setTruthTableAnswers(emptyAttempt.truthTableAnswers);
-    setDnfAnswer(emptyAttempt.dnfAnswer);
-    setFeedback(null);
-    setShowSolution(false);
-    simplification.reset();
-    onAttemptChange(emptyAttempt);
-  };
-
   const updateSimplificationAnswer = (value: string) => {
     const normalizedValue = normalizeBooleanOperatorAliases(value);
     onUserChange?.();
@@ -358,7 +346,6 @@ function ExpressionWorkspace({
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={handleReset}
         onToggleSolution={() => setShowSolution((prev) => !prev)}
         onToggleFullTable={() => setShowFullTable((prev) => !prev)}
       />

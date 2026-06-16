@@ -126,10 +126,6 @@ export function DnfBuilder({
           builder.setDnfAnswer(value);
         }}
         onCheck={builder.checkExercise}
-        onReset={() => {
-          onUserChange?.();
-          builder.reset();
-        }}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
       />
