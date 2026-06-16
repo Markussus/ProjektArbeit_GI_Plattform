@@ -584,7 +584,10 @@ export function UTF8Encoder({
                           <span className="font-mono text-sm">
                             '{step.char}' → {step.codePointHex} (
                             {step.byteCount}{" "}
-                            {step.byteCount === 1 ? "byte" : "bytes"})
+                            {t("simulator.encoding.byteLabel", {
+                              count: step.byteCount,
+                            })}
+                            )
                           </span>
                         }
                       >

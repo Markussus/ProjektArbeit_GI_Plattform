@@ -1195,7 +1195,13 @@
       "examplesTitle": "Example Exercises",
       "examplesDesc": "Here you can find additional example exercises for encoding:",
       "groupbase64": "Base64 Encoding",
-      "grouputf8": "UTF-8 Encoding"
+      "grouputf8": "UTF-8 Encoding",
+      "asciiHexLabel": "ASCII-Hex",
+      "binaryConcatLabel": "Binary (concatenated)",
+      "leadByte_one": "Lead Byte",
+      "leadByte_other": "Lead Byte ({{count}} bytes total)",
+      "byteLabel_one": "byte",
+      "byteLabel_other": "bytes"
     }
   },
   "tm": {

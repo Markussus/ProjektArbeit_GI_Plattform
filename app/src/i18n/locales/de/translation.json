@@ -1195,7 +1195,13 @@
       "examplesTitle": "Beispielübungen",
       "examplesDesc": "Hier finden Sie zusätzliche Beispielübungen zur Kodierung:",
       "groupbase64": "Base64-Kodierung",
-      "grouputf8": "UTF-8-Kodierung"
+      "grouputf8": "UTF-8-Kodierung",
+      "asciiHexLabel": "ASCII-Hex",
+      "binaryConcatLabel": "Binär (verkettet)",
+      "leadByte_one": "Startbyte",
+      "leadByte_other": "Startbyte (insgesamt {{count}} Bytes)",
+      "byteLabel_one": "Byte",
+      "byteLabel_other": "Bytes"
     }
   },
   "tm": {

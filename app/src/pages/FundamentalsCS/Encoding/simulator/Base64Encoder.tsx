@@ -384,7 +384,7 @@ export function Base64Encoder({
                     <div className="space-y-2">
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          ASCII-Hex:
+                          {t("simulator.encoding.asciiHexLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.hex).join(" ")}
@@ -392,7 +392,7 @@ export function Base64Encoder({
                       </div>
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          Binary (concatenated):
+                          {t("simulator.encoding.binaryConcatLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.binary).join("")}

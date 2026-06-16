@@ -35,7 +35,7 @@ export function SimulationWorkspace({
     ? t(activeItem.titleKey)
     : activeItem?.title;
   const activeItemDescription = activeItem?.descriptionKey
-    ? t(activeItem.descriptionKey)
+    ? t(activeItem.descriptionKey, activeItem.descriptionParams)
     : activeItem?.description;
   const itemLabel =
     activeItem?.kind === "example"
