@@ -30,10 +30,9 @@ import {
 } from "./DnfBuilder/domain/dnfTransfer";
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { TableToDnfBuilder } from "./TableToDnfBuilder/TableToDnfBuilder";
+import { buildDnfResetValue, type DnfSimulatorMode } from "./dnfSimulatorReset";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
-
-type DnfSimulatorMode = "expression_to_truth_table" | "truth_table_to_dnf";
 
 const simulatorModes: DnfSimulatorMode[] = [
   "expression_to_truth_table",
@@ -95,74 +94,12 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
 
     const visibleMode = selectedExerciseMode ?? activeMode;
     const buildResetValue = useCallback((): DnfTransferValue | null => {
-      const emptyAttempt = createDnfAttemptDraft();
-
-      if (selectedExercise) {
-        return {
-          mode: "exercise_attempt",
-          ...emptyAttempt,
-        };
-      }
-
-      if (visibleMode === "expression_to_truth_table") {
-        const currentValue =
-          storedValue?.mode === "expression_to_truth_table"
-            ? storedValue
-            : null;
-        const exampleValue =
-          walkthroughExample?.mode === "expression_to_truth_table"
-            ? walkthroughExample
-            : null;
-
-        if (exampleValue) {
-          return {
-            mode: "expression_to_truth_table",
-            expression: exampleValue.expression,
-            committed: currentValue?.committed ?? false,
-            ...emptyAttempt,
-          };
-        }
-
-        if (currentValue?.committed) {
-          return {
-            mode: "expression_to_truth_table",
-            expression: currentValue.expression,
-            committed: true,
-            ...emptyAttempt,
-          };
-        }
-
-        return null;
-      }
-
-      const currentValue =
-        storedValue?.mode === "truth_table_to_dnf" ? storedValue : null;
-      const exampleValue =
-        walkthroughExample?.mode === "truth_table_to_dnf"
-          ? walkthroughExample
-          : null;
-
-      if (exampleValue) {
-        return {
-          mode: "truth_table_to_dnf",
-          variableCount: exampleValue.variables.length,
-          resultValues: exampleValue.resultValues,
-          committed: currentValue?.committed ?? false,
-          ...emptyAttempt,
-        };
-      }
-
-      const variableCount = currentValue?.variableCount ?? 3;
-
-      return {
-        mode: "truth_table_to_dnf",
-        variableCount,
-        resultValues: currentValue?.committed
-          ? currentValue.resultValues
-          : Array.from({ length: 2 ** variableCount }, () => false),
-        committed: currentValue?.committed ?? false,
-        ...emptyAttempt,
-      };
+      return buildDnfResetValue({
+        hasSelectedExercise: Boolean(selectedExercise),
+        storedValue,
+        visibleMode,
+        walkthroughExample,
+      });
     }, [selectedExercise, storedValue, visibleMode, walkthroughExample]);
     const expressionTransferCodec = useMemo(
       () =>
