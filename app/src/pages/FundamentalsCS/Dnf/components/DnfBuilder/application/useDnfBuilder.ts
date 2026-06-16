@@ -4,10 +4,14 @@ import {
   getDnfExerciseDefinition,
   getDnfExerciseSource,
 } from "../../../exercises";
+import type { DnfExerciseTransferDraft } from "../domain/dnfTransfer";
 import { analyzeDnfSource, analyzeDnfTruthTable } from "./dnfAnalysis";
 import { useDnfExercise } from "./useDnfExercise";
 
-export function useDnfBuilder(selectedExercise: Exercise) {
+export function useDnfBuilder(
+  selectedExercise: Exercise,
+  initialAttempt?: DnfExerciseTransferDraft,
+) {
   const selectedExerciseId = selectedExercise.id;
   const exerciseDefinition = getDnfExerciseDefinition(selectedExerciseId);
   const source = getDnfExerciseSource(selectedExerciseId);
@@ -28,6 +32,7 @@ export function useDnfBuilder(selectedExercise: Exercise) {
     analysis,
     isExerciseMode: true,
     requiresTruthTableAnswers,
+    initialAttempt,
   });
 
   const reset = () => {

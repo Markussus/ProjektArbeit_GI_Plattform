@@ -45,6 +45,7 @@ interface BuildDnfFollowUpConfigurationOptions {
   showSolution: boolean;
   feedback: DnfExerciseCheckResult | null;
   simplification: UseDnfSimplificationResult;
+  simplificationAnswerChange?: (value: string) => void;
 }
 
 export function buildDnfFollowUpConfiguration({
@@ -54,6 +55,7 @@ export function buildDnfFollowUpConfiguration({
   showSolution,
   feedback,
   simplification,
+  simplificationAnswerChange,
 }: BuildDnfFollowUpConfigurationOptions): DnfFollowUpConfiguration {
   const solution =
     showSolution && display
@@ -77,7 +79,7 @@ export function buildDnfFollowUpConfiguration({
         feedback: simplification.feedback,
         showSolution: simplification.showSolution,
         showWalkthrough: simplification.showWalkthrough,
-        onAnswerChange: simplification.setAnswer,
+        onAnswerChange: simplificationAnswerChange ?? simplification.setAnswer,
         onCheck: () => simplification.check(analysis.truthTable),
         onToggleSolution: simplification.toggleSolution,
         onToggleWalkthrough: simplification.toggleWalkthrough,
