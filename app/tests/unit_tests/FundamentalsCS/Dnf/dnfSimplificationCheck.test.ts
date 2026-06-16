@@ -76,6 +76,24 @@ describe("DNF simplification check", () => {
     expect(result.minimumLiteralCount).toBe(4);
   });
 
+  it("accepts an already-minimal DNF that cannot be simplified further", () => {
+    // f = 1 only for 000 and 111 (the "all equal" function). The two minterms
+    // share no literal, so the canonical DNF is already minimal — there is no
+    // shorter equivalent form. Submitting it must be accepted as minimal, not
+    // flagged as "equivalent but not shorter".
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
+
+    const result = checkDnfSimplification(
+      table,
+      "(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)",
+    );
+
+    expect(result.status).toBe("accepted_minimal");
+    expect(result.userLiteralCount).toBe(6);
+    expect(result.minimumLiteralCount).toBe(6);
+    expect(result.canonicalLiteralCount).toBe(6);
+  });
+
   it("accepts a shorter-but-not-minimal simplification", () => {
     // Function f(a,b,c) with minterms {0,1,2,3,5,7}. Canonical DNF = 18
     // literals; QMC minimum is ¬a ∨ (a∧c) = 3 literals. The submission below

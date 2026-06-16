@@ -53,12 +53,14 @@ export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
  * Check whether the user's simplified expression is an acceptable simplification
  * of the canonical DNF for the given truth table.
  *
- * Pass criteria, in order of severity:
+ * Pass criteria, in order:
  *   1. parse + variables must be valid
  *   2. expression must be logically equivalent to the truth table
- *   3. literal count must be strictly less than the canonical DNF
- *   4. literal count is compared to the QMC minimum to distinguish
- *      "good but not optimal" from "minimal"
+ *   3. reaching the QMC minimum literal count counts as "minimal" — this also
+ *      covers already-minimal DNFs whose canonical form cannot be shortened
+ *   4. otherwise an answer not shorter than the canonical DNF simplified
+ *      nothing ("equivalent_not_shorter"); shorter-but-not-minimal is
+ *      "accepted_not_minimal"
  */
 export function checkDnfSimplification(
   table: TruthTable,
@@ -126,20 +128,23 @@ export function checkDnfSimplification(
     };
   }
 
-  if (isNotShorterThanCanonical(userLiteralCount, canonicalLiteralCount)) {
+  // Reaching the QMC minimum is accepted as minimal even when it is not shorter
+  // than the canonical DNF — that is exactly the already-minimal case, where no
+  // shorter equivalent form exists.
+  if (userLiteralCount <= minimal.literalCount) {
     return {
       ...baseResult,
-      status: "equivalent_not_shorter",
+      status: "accepted_minimal",
       unknownVariables: [],
       userLiteralCount,
       userTermCount,
     };
   }
 
-  if (userLiteralCount <= minimal.literalCount) {
+  if (isNotShorterThanCanonical(userLiteralCount, canonicalLiteralCount)) {
     return {
       ...baseResult,
-      status: "accepted_minimal",
+      status: "equivalent_not_shorter",
       unknownVariables: [],
       userLiteralCount,
       userTermCount,
