@@ -45,9 +45,32 @@ export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
     ref,
   ) {
     const builder = useDnfBuilder(selectedExercise, initialAttempt);
-    useImperativeHandle(ref, () => ({ loadSolution: builder.loadSolution }), [
-      builder.loadSolution,
-    ]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        loadSolution: () => {
+          const solvedAttempt = builder.buildSolutionAttempt();
+          if (!solvedAttempt) {
+            return;
+          }
+
+          void (async () => {
+            if (storageReady) {
+              await Promise.resolve(transferCodec.exportValue(solvedAttempt));
+            }
+            builder.loadSolution(solvedAttempt);
+          })().catch(() => {
+            builder.loadSolution(solvedAttempt);
+          });
+        },
+      }),
+      [
+        builder.buildSolutionAttempt,
+        builder.loadSolution,
+        storageReady,
+        transferCodec,
+      ],
+    );
     const [showFullTable, setShowFullTable] = useState(false);
     const transferValue = useMemo<DnfExerciseTransferDraft>(
       () => ({

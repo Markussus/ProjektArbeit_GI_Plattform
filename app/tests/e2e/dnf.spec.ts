@@ -317,6 +317,7 @@ test.describe("DNF page", () => {
     await expect(
       page.getByTestId("dnf-follow-up-simplification-toggle"),
     ).toBeDisabled();
+    await expect(page.getByTestId("dnf-load-solution")).toBeEnabled();
 
     await page.getByTestId("dnf-load-solution").click();
 
@@ -335,6 +336,18 @@ test.describe("DNF page", () => {
     await expect(
       page.getByTestId("dnf-simplification-feedback"),
     ).toHaveAttribute("data-status", "accepted_minimal");
+
+    await page.reload();
+    await openFirstDnfExercise(page);
+
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).not.toHaveValue("");
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification-toggle"),
+    ).toBeEnabled();
   });
 
   test("keeps the simplification reachable after restoring a solved exercise", async ({

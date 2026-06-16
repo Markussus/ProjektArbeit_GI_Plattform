@@ -48,6 +48,7 @@ interface DnfSimulatorProps {
   selectedExample?: Example | null;
   onExitExercise?: () => void;
   onExitExample?: () => void;
+  onStorageReadyChange?: (ready: boolean) => void;
 }
 
 export interface DnfSimulatorHandle {
@@ -57,7 +58,13 @@ export interface DnfSimulatorHandle {
 
 export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
   function DnfSimulator(
-    { selectedExercise, selectedExample, onExitExercise, onExitExample },
+    {
+      selectedExercise,
+      selectedExample,
+      onExitExercise,
+      onExitExample,
+      onStorageReadyChange,
+    },
     ref,
   ) {
     const { t } = useTranslation();
@@ -139,6 +146,10 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     );
 
     useEffect(() => {
+      onStorageReadyChange?.(isStorageReady);
+    }, [isStorageReady, onStorageReadyChange]);
+
+    useEffect(() => {
       let isCancelled = false;
       setStoredValue(null);
       setIsStorageReady(false);
@@ -202,10 +213,13 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           setResetVersion((current) => current + 1);
         },
         loadSolution: () => {
+          if (!isStorageReady) {
+            return;
+          }
           dnfBuilderRef.current?.loadSolution();
         },
       }),
-      [buildResetValue, isStorageEnabled, storageIdentifier],
+      [buildResetValue, isStorageEnabled, isStorageReady, storageIdentifier],
     );
 
     const handleExpressionChange = useCallback(

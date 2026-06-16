@@ -100,9 +100,9 @@ export function useDnfExercise({
   // canonical DNF and the minimal simplification — each shown as already
   // checked, so the whole flow opens in a solved state (the "give up / show me"
   // action used by the header button).
-  const loadSolution = () => {
+  const buildSolutionAttempt = (): DnfExerciseTransferDraft | null => {
     if (analysis.status !== "valid") {
-      return;
+      return null;
     }
 
     const { truthTable } = analysis;
@@ -115,16 +115,39 @@ export function useDnfExercise({
       ),
     );
 
+    return {
+      truthTableAnswers: solvedAnswers,
+      dnfAnswer: canonicalDnf,
+      simplificationAnswer: minimalDnf,
+    };
+  };
+
+  const loadSolution = (
+    solvedAttempt = buildSolutionAttempt(),
+  ): DnfExerciseTransferDraft | null => {
+    if (!solvedAttempt || analysis.status !== "valid") {
+      return null;
+    }
+
     setShowSolution(false);
-    setTruthTableAnswers(solvedAnswers);
-    setDnfAnswer(canonicalDnf);
+    setTruthTableAnswers([...solvedAttempt.truthTableAnswers]);
+    setDnfAnswer(solvedAttempt.dnfAnswer);
     setExerciseFeedback(
-      checkDnfExerciseAttempt(truthTable, solvedAnswers, canonicalDnf, {
-        checkTruthTable: requiresTruthTableAnswers,
-      }),
+      checkDnfExerciseAttempt(
+        analysis.truthTable,
+        solvedAttempt.truthTableAnswers,
+        solvedAttempt.dnfAnswer,
+        {
+          checkTruthTable: requiresTruthTableAnswers,
+        },
+      ),
     );
-    simplification.loadSolution(minimalDnf, truthTable);
+    simplification.loadSolution(
+      solvedAttempt.simplificationAnswer,
+      analysis.truthTable,
+    );
     setSolutionVersion((current) => current + 1);
+    return solvedAttempt;
   };
 
   const normalizedTruthTableAnswers = useMemo(
@@ -148,6 +171,7 @@ export function useDnfExercise({
     setDnfAnswer: updateDnfAnswer,
     checkExercise,
     loadAttempt,
+    buildSolutionAttempt,
     loadSolution,
     solutionVersion,
     toggleSolution: () => setShowSolution((current) => !current),
