@@ -127,8 +127,6 @@ export function TableSetup({
         onResultChange={onResultChange}
       />
 
-      {transferControl}
-
       <div>
         <button
           type="button"
@@ -139,6 +137,8 @@ export function TableSetup({
           {t("dnf.simulator.commitTable")}
         </button>
       </div>
+
+      {transferControl}
     </div>
   );
 }

@@ -233,13 +233,6 @@ export function TableToDnfBuilder({
         </button>
       </div>
 
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportTable}
-        testIdPrefix="dnf-table-transfer"
-      />
-
       <DnfExerciseWorkspace
         source="f"
         truthTable={analysis.truthTable}
@@ -249,25 +242,24 @@ export function TableToDnfBuilder({
         showSolution={showSolution}
         resultHeader="f"
         requiresTruthTableAnswers={false}
-        canAlwaysShowSolution={true}
         canEditTruthTableResults={false}
         canToggleFullTable={true}
         showFullTable={showFullTable}
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={() => {
-          onUserChange?.();
-          clearAttempt();
-        }}
         onToggleSolution={() => setShowSolution((current) => !current)}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportTable}
+        testIdPrefix="dnf-table-transfer"
       />
     </div>
   );

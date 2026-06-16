@@ -28,7 +28,13 @@ export function useDnfExercise({
   >(() => initialAttempt?.truthTableAnswers ?? []);
   const [dnfAnswer, setDnfAnswer] = useState(initialAttempt?.dnfAnswer ?? "");
   const [exerciseFeedback, setExerciseFeedback] =
-    useState<DnfExerciseCheckResult | null>(null);
+    useState<DnfExerciseCheckResult | null>(() =>
+      deriveRestoredFeedback(
+        analysis,
+        initialAttempt,
+        requiresTruthTableAnswers,
+      ),
+    );
   const simplification = useDnfSimplification(
     initialAttempt?.simplificationAnswer,
   );
@@ -78,7 +84,9 @@ export function useDnfExercise({
     setShowSolution(false);
     setTruthTableAnswers([...attempt.truthTableAnswers]);
     setDnfAnswer(normalizeBooleanOperatorAliases(attempt.dnfAnswer));
-    setExerciseFeedback(null);
+    setExerciseFeedback(
+      deriveRestoredFeedback(analysis, attempt, requiresTruthTableAnswers),
+    );
     simplification.setAnswer(attempt.simplificationAnswer);
   };
 
@@ -107,4 +115,26 @@ export function useDnfExercise({
     resetExercise,
     simplification,
   };
+}
+
+function deriveRestoredFeedback(
+  analysis: DnfBuilderAnalysis,
+  attempt: DnfExerciseTransferDraft | undefined,
+  requiresTruthTableAnswers: boolean,
+): DnfExerciseCheckResult | null {
+  if (!attempt || analysis.status !== "valid") {
+    return null;
+  }
+
+  // Only restore the "solved" state for a genuinely correct attempt, so an
+  // imported or auto-loaded session keeps the simplification step unlocked
+  // without ever revealing the solution for an unsolved attempt.
+  const result = checkDnfExerciseAttempt(
+    analysis.truthTable,
+    attempt.truthTableAnswers,
+    normalizeBooleanOperatorAliases(attempt.dnfAnswer),
+    { checkTruthTable: requiresTruthTableAnswers },
+  );
+
+  return result.isCorrect ? result : null;
 }

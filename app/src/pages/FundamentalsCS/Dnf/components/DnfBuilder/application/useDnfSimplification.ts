@@ -10,11 +10,9 @@ export interface UseDnfSimplificationResult {
   answer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
-  showWalkthrough: boolean;
   setAnswer: (value: string) => void;
   check: (truthTable: TruthTable) => void;
   toggleSolution: () => void;
-  toggleWalkthrough: () => void;
   reset: () => void;
 }
 
@@ -26,20 +24,17 @@ export function useDnfSimplification(
     null,
   );
   const [showSolution, setShowSolution] = useState(false);
-  const [showWalkthrough, setShowWalkthrough] = useState(false);
 
   const reset = () => {
     setAnswerInternal("");
     setFeedback(null);
     setShowSolution(false);
-    setShowWalkthrough(false);
   };
 
   const setAnswer = (value: string) => {
     setAnswerInternal(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
-    setShowWalkthrough(false);
   };
 
   const check = (truthTable: TruthTable) => {
@@ -50,19 +45,13 @@ export function useDnfSimplification(
     setShowSolution((current) => !current);
   };
 
-  const toggleWalkthrough = () => {
-    setShowWalkthrough((current) => !current);
-  };
-
   return {
     answer,
     feedback,
     showSolution,
-    showWalkthrough,
     setAnswer,
     check,
     toggleSolution,
-    toggleWalkthrough,
     reset,
   };
 }

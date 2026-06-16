@@ -191,13 +191,6 @@ export function ExpressionBuilder({
         </div>
       )}
 
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportExpression}
-        testIdPrefix="dnf-expression-transfer"
-      />
-
       {committedSource !== null && (
         <ExpressionWorkspace
           key={`${committedSource}-${workspaceVersion}`}
@@ -207,6 +200,13 @@ export function ExpressionBuilder({
           onUserChange={onUserChange}
         />
       )}
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportExpression}
+        testIdPrefix="dnf-expression-transfer"
+      />
     </div>
   );
 }
@@ -294,18 +294,6 @@ function ExpressionWorkspace({
     );
   };
 
-  const handleReset = () => {
-    const emptyAttempt = createDnfAttemptDraft();
-
-    onUserChange?.();
-    setTruthTableAnswers(emptyAttempt.truthTableAnswers);
-    setDnfAnswer(emptyAttempt.dnfAnswer);
-    setFeedback(null);
-    setShowSolution(false);
-    simplification.reset();
-    onAttemptChange(emptyAttempt);
-  };
-
   const updateSimplificationAnswer = (value: string) => {
     const normalizedValue = normalizeBooleanOperatorAliases(value);
     onUserChange?.();
@@ -352,22 +340,17 @@ function ExpressionWorkspace({
         showSolution={showSolution}
         resultHeader={committedSource}
         requiresTruthTableAnswers={true}
-        canAlwaysShowSolution={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
         onTruthTableAnswerChange={setTruthTableAnswer}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={handleReset}
         onToggleSolution={() => setShowSolution((prev) => !prev)}
         onToggleFullTable={() => setShowFullTable((prev) => !prev)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
-      />
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
     </>
   );
 }

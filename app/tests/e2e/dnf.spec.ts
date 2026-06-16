@@ -66,10 +66,10 @@ test.describe("DNF page", () => {
     await switchTab(page, "examples");
     await expect(page.getByTestId("dnf-examples-tab")).toBeVisible();
     await expect(
-      page.getByTestId("dnf-example-group-expression_to_truth_table"),
+      page.getByTestId(`dnf-example-${LECTURE_EXPRESSION_EXAMPLE_ID}-select`),
     ).toBeVisible();
     await expect(
-      page.getByTestId("dnf-example-group-truth_table_to_dnf"),
+      page.getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`),
     ).toBeVisible();
 
     await page
@@ -111,6 +111,15 @@ test.describe("DNF page", () => {
 
     await page.getByRole("button", { name: "Commit table" }).click();
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await page.getByTestId("dnf-exercise-answer").fill("a");
+    await page.getByTestId("simulation-reset").click();
+    await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
+      "data-mode",
+      "truth_table_to_dnf",
+    );
+    await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-table-builder-controls")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("");
   });
 
   test("covers expression simulation results, compact toggles, and variable limits", async ({
@@ -124,10 +133,16 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-evaluate-expression").click();
 
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-reset-answer")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-toggle-solution")).toBeDisabled();
+    await page.getByTestId("dnf-check-answer").click();
+    await expect(page.getByTestId("dnf-toggle-solution")).toBeEnabled();
     await page.getByTestId("dnf-toggle-solution").click();
+    await expect(page.getByTestId("dnf-follow-up-solution")).toBeVisible();
+    await expect(page.getByTestId("dnf-follow-up-solution-toggle")).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId("dnf-result-panel")).toBeVisible();
-
-    await page.getByTestId("dnf-follow-up-truthTable-toggle").click();
     await expect(
       page.getByTestId("dnf-solution-truth-table-panel"),
     ).toBeVisible();
@@ -201,7 +216,9 @@ test.describe("DNF page", () => {
       "data-mode",
       "truth_table_to_dnf",
     );
-    await expect(page.getByTestId("dnf-table-builder-controls")).toBeVisible();
+    await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-table-builder-controls")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("");
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -231,7 +248,7 @@ test.describe("DNF page", () => {
       .inputValue();
 
     await switchTab(page, "exercises");
-    await page.getByRole("button", { name: "Switch Tab" }).click();
+    await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
     await page
       .getByTestId(`dnf-exercise-card-${SIMPLE_EXPRESSION_EXERCISE_ID}-select`)
       .click();
@@ -259,6 +276,36 @@ test.describe("DNF page", () => {
     await openFirstDnfExercise(page);
 
     await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
+  });
+
+  test("keeps the simplification reachable after restoring a solved exercise", async ({
+    page,
+  }) => {
+    await gotoDnfPage(page);
+    await openFirstDnfExercise(page);
+
+    await page
+      .getByTestId("dnf-exercise-answer")
+      .fill("(!a & !b & c) | (!a & b & c) | (a & !b & !c) | (a & b & !c)");
+    await page.getByTestId("dnf-check-answer").click();
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+
+    await page.getByTestId("dnf-follow-up-simplification-toggle").click();
+    await page.getByTestId("dnf-simplified-answer").fill("a");
+    await page.getByTestId("dnf-exercise-transfer-export").click();
+    await page.reload();
+    await openFirstDnfExercise(page);
+
+    // The restored attempt is correct, so the simplification stays unlocked
+    // and its answer is restored instead of being lost on reload.
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification-toggle"),
+    ).toBeEnabled();
+    await page.getByTestId("dnf-follow-up-simplification-toggle").click();
+    await expect(page.getByTestId("dnf-simplified-answer")).toHaveValue("a");
   });
 
   test("resets all DNF exercises while preserving the free simulator", async ({
@@ -338,9 +385,8 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-follow-up-simplification-toggle").click();
     await expect(page.getByTestId("dnf-simplification-panel")).toBeVisible();
     await expect(
-      page.getByTestId("dnf-reveal-minimal-solution"),
+      page.getByTestId("dnf-toggle-simplification-solution"),
     ).toBeDisabled();
-    await expect(page.getByTestId("dnf-reveal-walkthrough")).toBeDisabled();
 
     await page.getByTestId("dnf-simplified-answer").fill("(!a & c) | (a & !c)");
     await page.getByTestId("dnf-check-simplification").click();
@@ -349,16 +395,11 @@ test.describe("DNF page", () => {
       page.getByTestId("dnf-simplification-feedback"),
     ).toHaveAttribute("data-status", "accepted_minimal");
 
-    await page.getByTestId("dnf-reveal-minimal-solution").click();
+    await page.getByTestId("dnf-toggle-simplification-solution").click();
     await expect(
-      page.getByTestId("dnf-reveal-minimal-solution"),
+      page.getByTestId("dnf-toggle-simplification-solution"),
     ).toHaveAttribute("aria-expanded", "true");
-
-    await page.getByTestId("dnf-reveal-walkthrough").click();
-    await expect(page.getByTestId("dnf-reveal-walkthrough")).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    );
+    await expect(page.getByTestId("dnf-simplification-solution")).toBeVisible();
 
     await expect(
       page.getByTestId("dnf-simplification-walkthrough"),

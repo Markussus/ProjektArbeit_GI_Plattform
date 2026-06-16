@@ -1,5 +1,5 @@
 import { useRef, type KeyboardEvent } from "react";
-import { ChevronDown, ChevronUp, Eye, RotateCcw, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatBooleanValue } from "../domain/booleanExpression";
@@ -9,7 +9,9 @@ import type {
   TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
 import type { TruthTable } from "../domain/truthTable";
+import type { DnfFollowUpSolution } from "../application/dnfFollowUp";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
+import { DnfSolutionBlock } from "./DnfSolutionBlock";
 import { DnfTruthTable } from "./DnfTruthTable";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
@@ -24,14 +26,13 @@ interface DnfExerciseWorkspaceProps {
   showSolution: boolean;
   resultHeader: string;
   requiresTruthTableAnswers: boolean;
-  canAlwaysShowSolution?: boolean;
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
   showFullTable?: boolean;
+  solution?: DnfFollowUpSolution;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
-  onReset: () => void;
   onToggleSolution: () => void;
   onToggleFullTable?: () => void;
 }
@@ -45,14 +46,13 @@ export function DnfExerciseWorkspace({
   showSolution,
   resultHeader,
   requiresTruthTableAnswers,
-  canAlwaysShowSolution = false,
   canEditTruthTableResults = false,
   canToggleFullTable = false,
   showFullTable = false,
+  solution,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
-  onReset,
   onToggleSolution,
   onToggleFullTable,
 }: DnfExerciseWorkspaceProps) {
@@ -66,7 +66,7 @@ export function DnfExerciseWorkspace({
     (answer) => answer !== null,
   ).length;
   const hasDnfAttempt = dnfAnswer.trim().length > 0;
-  const canShowSolution = canAlwaysShowSolution || feedback !== null;
+  const canShowSolution = feedback !== null;
   const canInteractWithResultColumn =
     requiresTruthTableAnswers || canEditTruthTableResults;
   const isLargeWorkspaceTable =
@@ -343,15 +343,6 @@ export function DnfExerciseWorkspace({
           </button>
           <button
             type="button"
-            data-testid="dnf-reset-answer"
-            onClick={onReset}
-            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors"
-          >
-            <RotateCcw className="size-4" />
-            {t("dnf.builder.reset")}
-          </button>
-          <button
-            type="button"
             data-testid="dnf-toggle-solution"
             onClick={onToggleSolution}
             disabled={!canShowSolution}
@@ -365,6 +356,8 @@ export function DnfExerciseWorkspace({
                 : t("dnf.builder.exercise.solutionAfterCheck")}
           </button>
         </div>
+
+        {solution && <DnfSolutionBlock solution={solution} />}
       </section>
     </div>
   );

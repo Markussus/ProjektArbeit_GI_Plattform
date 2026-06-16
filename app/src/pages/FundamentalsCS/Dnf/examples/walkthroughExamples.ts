@@ -19,10 +19,6 @@ type DnfWalkthroughExampleId =
   | "dnf-intro"
   | "exercise-two";
 
-export type DnfWalkthroughExampleMode =
-  | "expression_to_truth_table"
-  | "truth_table_to_dnf";
-
 interface DnfWalkthroughExampleBase {
   id: DnfWalkthroughExampleId;
   titleKey: TranslationKey;

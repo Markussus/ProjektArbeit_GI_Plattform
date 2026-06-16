@@ -22,11 +22,9 @@ interface DnfSimplificationControls {
   answer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
-  showWalkthrough: boolean;
   onAnswerChange: (value: string) => void;
   onCheck: () => void;
   onToggleSolution: () => void;
-  onToggleWalkthrough: () => void;
 }
 
 export interface DnfFollowUpConfiguration {
@@ -78,11 +76,9 @@ export function buildDnfFollowUpConfiguration({
         answer: simplification.answer,
         feedback: simplification.feedback,
         showSolution: simplification.showSolution,
-        showWalkthrough: simplification.showWalkthrough,
         onAnswerChange: simplificationAnswerChange ?? simplification.setAnswer,
         onCheck: () => simplification.check(analysis.truthTable),
         onToggleSolution: simplification.toggleSolution,
-        onToggleWalkthrough: simplification.toggleWalkthrough,
       },
       isEnabled: feedback?.isCorrect === true,
     },

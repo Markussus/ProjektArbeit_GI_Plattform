@@ -488,10 +488,6 @@
       }
     },
     "examples": {
-      "modeGroup": {
-        "expression_to_truth_table": "Mode: Expression → truth table",
-        "truth_table_to_dnf": "Mode: Truth table → DNF"
-      },
       "walkthroughs": {
         "lectureExpression": {
           "title": "Expression with an AND group",
@@ -735,6 +731,7 @@
       },
       "followUpTitle": "Continue",
       "solutionBadge": "Solution",
+      "solutionTitle": "Solution",
       "resultTitle": "DNF",
       "resultHint": "Each highlighted row contributes one AND term.",
       "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",

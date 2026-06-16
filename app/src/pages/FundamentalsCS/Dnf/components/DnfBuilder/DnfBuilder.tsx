@@ -126,13 +126,12 @@ export function DnfBuilder({
           builder.setDnfAnswer(value);
         }}
         onCheck={builder.checkExercise}
-        onReset={() => {
-          onUserChange?.();
-          builder.reset();
-        }}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
+
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
 
       <SimulatorStringTransferBox
         value={transferValue}
@@ -142,12 +141,6 @@ export function DnfBuilder({
           builder.loadAttempt(attempt);
         }}
         testIdPrefix="dnf-exercise-transfer"
-      />
-
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
       />
     </div>
   );

@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Eye,
   Lightbulb,
-  ListChecks,
   Search,
   Sparkles,
 } from "lucide-react";
@@ -30,12 +29,10 @@ interface DnfSimplificationPanelProps {
   simplificationAnswer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
-  showWalkthrough: boolean;
   className?: string;
   onAnswerChange: (value: string) => void;
   onCheck: () => void;
   onToggleSolution: () => void;
-  onToggleWalkthrough: () => void;
 }
 
 export function DnfSimplificationPanel({
@@ -44,12 +41,10 @@ export function DnfSimplificationPanel({
   simplificationAnswer,
   feedback,
   showSolution,
-  showWalkthrough,
   className,
   onAnswerChange,
   onCheck,
   onToggleSolution,
-  onToggleWalkthrough,
 }: DnfSimplificationPanelProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -121,7 +116,7 @@ export function DnfSimplificationPanel({
         />
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-wrap gap-3">
         <button
           type="button"
           data-testid="dnf-check-simplification"
@@ -131,84 +126,32 @@ export function DnfSimplificationPanel({
           <Search className="size-4" />
           {t("dnf.builder.exercise.checkSimplification")}
         </button>
+        <button
+          type="button"
+          data-testid="dnf-toggle-simplification-solution"
+          disabled={feedback === null}
+          aria-expanded={feedback !== null && showSolution}
+          onClick={onToggleSolution}
+          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Eye className="size-4" />
+          {showSolution
+            ? t("dnf.builder.exercise.hideSolution")
+            : feedback
+              ? t("dnf.builder.exercise.showSolutionHelp")
+              : t("dnf.builder.exercise.solutionAfterCheck")}
+        </button>
       </div>
 
       {feedback && (
         <SimplificationFeedback feedback={feedback} statusTone={statusTone} />
       )}
 
+      {feedback && showSolution && walkthrough && (
+        <SimplificationSolution feedback={feedback} walkthrough={walkthrough} />
+      )}
+
       <div className="mt-4 space-y-2">
-        <RevealSection
-          testId="dnf-reveal-minimal-solution"
-          icon={Eye}
-          title={t("dnf.builder.exercise.revealSolutionTitle")}
-          disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
-          isOpen={feedback !== null && showSolution}
-          disabled={feedback === null}
-          onToggle={onToggleSolution}
-          isSolution
-        >
-          {feedback && (
-            <div className="space-y-4">
-              <div>
-                <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  {t("dnf.builder.exercise.minimalDnfLabel")}
-                </p>
-                <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
-                  {formatBooleanExpressionForDisplay(
-                    feedback.minimalExpression,
-                  )}
-                </code>
-                <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                  {t("dnf.builder.exercise.minimalDnfNote", {
-                    literalsLabel: t("dnf.builder.exercise.literalCount", {
-                      count: feedback.minimumLiteralCount,
-                    }),
-                    termsLabel: t("dnf.builder.exercise.termCount", {
-                      count: feedback.minimumTermCount,
-                    }),
-                  })}
-                </p>
-              </div>
-
-              {feedback.factoredIsShorter && (
-                <div className="border-border/60 border-t pt-3">
-                  <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                    {t("dnf.builder.exercise.factoredLabel")}
-                  </p>
-                  <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
-                    {formatBooleanExpressionForDisplay(
-                      feedback.factoredExpression,
-                    )}
-                  </code>
-                  <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                    {t("dnf.builder.exercise.factoredNote", {
-                      literalsLabel: t("dnf.builder.exercise.literalCount", {
-                        count: feedback.factoredLiteralCount,
-                      }),
-                    })}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </RevealSection>
-
-        <RevealSection
-          testId="dnf-reveal-walkthrough"
-          icon={ListChecks}
-          title={t("dnf.builder.exercise.revealWalkthroughTitle")}
-          disabledHint={t("dnf.builder.exercise.revealRequiresCheck")}
-          isOpen={feedback !== null && showWalkthrough}
-          disabled={feedback === null}
-          onToggle={onToggleWalkthrough}
-          isSolution
-        >
-          {walkthrough && (
-            <SimplificationWalkthrough walkthrough={walkthrough} />
-          )}
-        </RevealSection>
-
         <RevealSection
           testId="dnf-reveal-algebra-reference"
           icon={BookOpen}
@@ -224,14 +167,78 @@ export function DnfSimplificationPanel({
   );
 }
 
+interface SimplificationSolutionProps {
+  feedback: DnfSimplificationCheckResult;
+  walkthrough: ReturnType<typeof buildDnfSimplificationWalkthrough>;
+}
+
+function SimplificationSolution({
+  feedback,
+  walkthrough,
+}: SimplificationSolutionProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div
+      data-testid="dnf-simplification-solution"
+      className="border-border bg-background mt-4 rounded-md border p-3"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-foreground text-sm font-semibold">
+          {t("dnf.builder.solutionTitle")}
+        </p>
+      </div>
+
+      <div className="mt-3 space-y-4">
+        <div>
+          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+            {t("dnf.builder.exercise.minimalDnfLabel")}
+          </p>
+          <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
+            {formatBooleanExpressionForDisplay(feedback.minimalExpression)}
+          </code>
+          <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+            {t("dnf.builder.exercise.minimalDnfNote", {
+              literalsLabel: t("dnf.builder.exercise.literalCount", {
+                count: feedback.minimumLiteralCount,
+              }),
+              termsLabel: t("dnf.builder.exercise.termCount", {
+                count: feedback.minimumTermCount,
+              }),
+            })}
+          </p>
+        </div>
+
+        {feedback.factoredIsShorter && (
+          <div className="border-border/60 border-t pt-3">
+            <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              {t("dnf.builder.exercise.factoredLabel")}
+            </p>
+            <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
+              {formatBooleanExpressionForDisplay(feedback.factoredExpression)}
+            </code>
+            <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+              {t("dnf.builder.exercise.factoredNote", {
+                literalsLabel: t("dnf.builder.exercise.literalCount", {
+                  count: feedback.factoredLiteralCount,
+                }),
+              })}
+            </p>
+          </div>
+        )}
+
+        <SimplificationWalkthrough walkthrough={walkthrough} />
+      </div>
+    </div>
+  );
+}
+
 interface RevealSectionProps {
   icon: typeof Eye;
   title: string;
-  disabledHint?: string;
   isOpen: boolean;
   disabled: boolean;
   onToggle: () => void;
-  isSolution?: boolean;
   testId?: string;
   children: ReactNode;
 }
@@ -239,16 +246,12 @@ interface RevealSectionProps {
 function RevealSection({
   icon: Icon,
   title,
-  disabledHint,
   isOpen,
   disabled,
   onToggle,
-  isSolution = false,
   testId,
   children,
 }: RevealSectionProps) {
-  const { t } = useTranslation();
-
   return (
     <div>
       <button
@@ -266,18 +269,8 @@ function RevealSection({
         <span className="text-foreground flex min-w-0 flex-wrap items-center gap-2 text-sm font-medium">
           <Icon className="size-4 shrink-0" />
           <span className="truncate">{title}</span>
-          {isSolution && (
-            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-              {t("dnf.builder.solutionBadge")}
-            </span>
-          )}
         </span>
         <span className="flex shrink-0 items-center gap-2">
-          {disabled && disabledHint && (
-            <span className="text-muted-foreground text-xs">
-              {disabledHint}
-            </span>
-          )}
           {isOpen ? (
             <ChevronUp className="text-muted-foreground size-4" />
           ) : (

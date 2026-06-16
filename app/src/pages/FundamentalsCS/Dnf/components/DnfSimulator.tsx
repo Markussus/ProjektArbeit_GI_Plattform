@@ -30,10 +30,9 @@ import {
 } from "./DnfBuilder/domain/dnfTransfer";
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { TableToDnfBuilder } from "./TableToDnfBuilder/TableToDnfBuilder";
+import { buildDnfResetValue, type DnfSimulatorMode } from "./dnfSimulatorReset";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
-
-type DnfSimulatorMode = "expression_to_truth_table" | "truth_table_to_dnf";
 
 const simulatorModes: DnfSimulatorMode[] = [
   "expression_to_truth_table",
@@ -94,6 +93,14 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     );
 
     const visibleMode = selectedExerciseMode ?? activeMode;
+    const buildResetValue = useCallback((): DnfTransferValue | null => {
+      return buildDnfResetValue({
+        hasSelectedExercise: Boolean(selectedExercise),
+        storedValue,
+        visibleMode,
+        walkthroughExample,
+      });
+    }, [selectedExercise, storedValue, visibleMode, walkthroughExample]);
     const expressionTransferCodec = useMemo(
       () =>
         isStorageEnabled
@@ -177,17 +184,19 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       ref,
       () => ({
         resetStoredState: () => {
+          const resetValue = buildResetValue();
+
           if (isStorageEnabled) {
             trainingCenterStorage.delete(storageIdentifier);
           }
 
-          setStoredValue(null);
+          setStoredValue(resetValue);
           setHasStoredState(false);
           setHasUserChanges(false);
           setResetVersion((current) => current + 1);
         },
       }),
-      [isStorageEnabled, storageIdentifier],
+      [buildResetValue, isStorageEnabled, storageIdentifier],
     );
 
     const handleExpressionChange = useCallback(
@@ -249,14 +258,14 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
 
       if (visibleMode === "expression_to_truth_table") {
         const initialValue =
-          activeWalkthroughExample?.mode === "expression_to_truth_table"
-            ? {
-                expression: activeWalkthroughExample.expression,
-                committed: false,
-                ...createDnfAttemptDraft(),
-              }
-            : storedValue?.mode === "expression_to_truth_table"
-              ? storedValue
+          storedValue?.mode === "expression_to_truth_table"
+            ? storedValue
+            : activeWalkthroughExample?.mode === "expression_to_truth_table"
+              ? {
+                  expression: activeWalkthroughExample.expression,
+                  committed: false,
+                  ...createDnfAttemptDraft(),
+                }
               : undefined;
 
         return (
@@ -274,15 +283,15 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       }
 
       const initialValue =
-        activeWalkthroughExample?.mode === "truth_table_to_dnf"
-          ? {
-              variableCount: activeWalkthroughExample.variables.length,
-              resultValues: activeWalkthroughExample.resultValues,
-              committed: false,
-              ...createDnfAttemptDraft(),
-            }
-          : storedValue?.mode === "truth_table_to_dnf"
-            ? storedValue
+        storedValue?.mode === "truth_table_to_dnf"
+          ? storedValue
+          : activeWalkthroughExample?.mode === "truth_table_to_dnf"
+            ? {
+                variableCount: activeWalkthroughExample.variables.length,
+                resultValues: activeWalkthroughExample.resultValues,
+                committed: false,
+                ...createDnfAttemptDraft(),
+              }
             : undefined;
 
       return (
