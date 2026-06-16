@@ -219,11 +219,13 @@ export function EncoderSimulator({
     >
       {isStorageReady && !isExerciseMode && (
         <SimulatorStringTransferBox
+          testIdPrefix="encoding-transfer"
           value={simulatorState}
           codec={tcCodec}
           onLoad={(newState) => {
             setSimulatorState(newState);
             setLoadVersion((v) => v + 1);
+            setActiveMode(newState.activeMode);
 
             if (newState.activeMode === "base64" && newState.base64) {
               setInitialValue(newState.base64.inputValue);
@@ -234,7 +236,6 @@ export function EncoderSimulator({
             }
           }}
           className="shrink-0"
-          testIdPrefix="enc-transfer"
         />
       )}
       <div className="border-border flex gap-1 border-b">

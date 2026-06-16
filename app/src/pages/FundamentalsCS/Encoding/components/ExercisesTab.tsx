@@ -66,7 +66,7 @@ export function ExercisesTab({
               key={exercise.id}
               item={exerciseAsTopic}
               index={index}
-              testIdPrefix={`exercise-card-${exercise.exerciseType}`}
+              testIdPrefix={`exercise-card-${index}`}
               isSelected={selectedExercise?.id === exercise.id}
               onSelect={() => onSelectExercise(exerciseAsTopic)}
               onOpen={() => {

@@ -513,6 +513,7 @@ export function UTF8Encoder({
           </div>
 
           <BinaryInput
+            data-testid="utf8-input"
             label={inputLabel}
             value={inputValue}
             onChange={handleInputChange}
@@ -524,7 +525,14 @@ export function UTF8Encoder({
               <span className="text-muted-foreground text-xs font-medium">
                 {resultLabel}
               </span>
-              <div className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all">
+              <div
+                data-testid={
+                  converterMode === "encode"
+                    ? "utf8-result-hex"
+                    : "utf8-result-ascii"
+                }
+                className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all"
+              >
                 {result}
               </div>
             </div>
