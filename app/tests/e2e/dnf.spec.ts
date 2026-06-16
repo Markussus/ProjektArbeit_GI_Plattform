@@ -71,6 +71,11 @@ test.describe("DNF page", () => {
     await expect(
       page.getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`),
     ).toBeVisible();
+    await expect(page.getByTestId("dnf-example-negation-select")).toHaveCount(
+      0,
+    );
+    await expect(page.getByTestId("dnf-example-xor-select")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-example-carry-select")).toHaveCount(0);
 
     await page
       .getByTestId(`dnf-example-${LECTURE_EXPRESSION_EXAMPLE_ID}-select`)

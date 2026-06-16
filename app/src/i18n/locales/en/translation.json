@@ -490,24 +490,12 @@
     "examples": {
       "walkthroughs": {
         "lectureExpression": {
-          "title": "Expression with an AND group",
-          "explanation": "The expression is true when a=1 or b and c are both 1."
+          "title": "Lecture example: a ∨ (b ∧ c)",
+          "explanation": "The lecture truth table shows where a is 1 or b and c are both 1."
         },
         "parentheses": {
-          "title": "Parentheses change the result",
-          "explanation": "Here c=1, and a=1 or b=1 must also hold."
-        },
-        "negation": {
-          "title": "Negation restricts the true rows",
-          "explanation": "Because ¬a is set, only rows with a=0 can be true. Additionally, b or c must equal 1."
-        },
-        "xor": {
-          "title": "Half-adder sum as XOR",
-          "explanation": "The sum is 1 when exactly one input is 1."
-        },
-        "carry": {
-          "title": "Half-adder carry",
-          "explanation": "The carry bit is only 1 when both inputs are 1 — a single AND term."
+          "title": "Exercise 1: (a ∨ b) ∧ c",
+          "explanation": "The lecture exercise changes only the parentheses and compares the result with the previous table."
         },
         "dnfIntro": {
           "title": "DNF introduction from the lecture",

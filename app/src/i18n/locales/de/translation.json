@@ -490,24 +490,12 @@
     "examples": {
       "walkthroughs": {
         "lectureExpression": {
-          "title": "Ausdruck mit UND-Klammer",
-          "explanation": "Wahr ist der Ausdruck bei a=1 oder wenn b und c beide 1 sind."
+          "title": "Vorlesungsbeispiel: a ∨ (b ∧ c)",
+          "explanation": "Die Wertetafel aus der Vorlesung zeigt, wo a gleich 1 ist oder b und c beide 1 sind."
         },
         "parentheses": {
-          "title": "Klammerung verändert das Ergebnis",
-          "explanation": "Hier gilt c=1 und zusätzlich a=1 oder b=1."
-        },
-        "negation": {
-          "title": "Negation schränkt die wahren Zeilen ein",
-          "explanation": "Da ¬a gesetzt ist, können nur Zeilen mit a=0 wahr werden. Zusätzlich muss b oder c gleich 1 sein."
-        },
-        "xor": {
-          "title": "Halbaddierer-Summe als XOR",
-          "explanation": "Die Summe ist 1, wenn genau ein Eingang 1 ist."
-        },
-        "carry": {
-          "title": "Halbaddierer-Carry",
-          "explanation": "Das Übertragsbit ist nur dann 1, wenn beide Eingänge 1 sind — ein einzelner UND-Term."
+          "title": "Übung 1: (a ∨ b) ∧ c",
+          "explanation": "Die Vorlesungsübung verändert nur die Klammerung und vergleicht das Ergebnis mit der vorherigen Wertetafel."
         },
         "dnfIntro": {
           "title": "DNF-Einführung aus der Vorlesung",
