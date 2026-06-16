@@ -19,7 +19,6 @@ import {
 } from "@/lib/trainingCenter";
 import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
 import {
-  createDnfAttemptDraft,
   dnfExerciseTransferCodec,
   dnfExpressionTransferCodec,
   dnfTransferCodec,
@@ -31,6 +30,10 @@ import {
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { TableToDnfBuilder } from "./TableToDnfBuilder/TableToDnfBuilder";
 import { buildDnfResetValue, type DnfSimulatorMode } from "./dnfSimulatorReset";
+import {
+  buildDnfExpressionWalkthroughValue,
+  buildDnfTruthTableWalkthroughValue,
+} from "./dnfWalkthroughSeed";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
 
@@ -261,11 +264,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           storedValue?.mode === "expression_to_truth_table"
             ? storedValue
             : activeWalkthroughExample?.mode === "expression_to_truth_table"
-              ? {
-                  expression: activeWalkthroughExample.expression,
-                  committed: false,
-                  ...createDnfAttemptDraft(),
-                }
+              ? buildDnfExpressionWalkthroughValue(activeWalkthroughExample)
               : undefined;
 
         return (
@@ -277,6 +276,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
               isStorageReady ? handleExpressionChange : undefined
             }
             onUserChange={handleUserChange}
+            seedInitialFeedback={activeWalkthroughExample !== null}
             {...commonStorageProps}
           />
         );
@@ -286,12 +286,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         storedValue?.mode === "truth_table_to_dnf"
           ? storedValue
           : activeWalkthroughExample?.mode === "truth_table_to_dnf"
-            ? {
-                variableCount: activeWalkthroughExample.variables.length,
-                resultValues: activeWalkthroughExample.resultValues,
-                committed: false,
-                ...createDnfAttemptDraft(),
-              }
+            ? buildDnfTruthTableWalkthroughValue(activeWalkthroughExample)
             : undefined;
 
       return (
@@ -303,6 +298,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
             isStorageReady ? handleTruthTableChange : undefined
           }
           onUserChange={handleUserChange}
+          seedInitialFeedback={activeWalkthroughExample !== null}
           {...commonStorageProps}
         />
       );

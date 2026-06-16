@@ -16,12 +16,17 @@ export interface UseDnfSimplificationResult {
   reset: () => void;
 }
 
+interface UseDnfSimplificationOptions {
+  initialFeedback?: DnfSimplificationCheckResult | null;
+}
+
 export function useDnfSimplification(
   initialAnswer = "",
+  options: UseDnfSimplificationOptions = {},
 ): UseDnfSimplificationResult {
   const [answer, setAnswerInternal] = useState(initialAnswer);
   const [feedback, setFeedback] = useState<DnfSimplificationCheckResult | null>(
-    null,
+    options.initialFeedback ?? null,
   );
   const [showSolution, setShowSolution] = useState(false);
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -13,6 +13,7 @@ import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
 import {
   dnfTruthTableTransferCodec,
   type DnfTruthTableTransferDraft,
@@ -35,6 +36,7 @@ interface TableToDnfBuilderProps {
   transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
   onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 export function TableToDnfBuilder({
@@ -45,6 +47,7 @@ export function TableToDnfBuilder({
   transferCodec,
   onTransferValueChange,
   onUserChange,
+  seedInitialFeedback = false,
 }: TableToDnfBuilderProps) {
   const { t } = useTranslation();
   const initialVariableCount = clampVariableCount(
@@ -61,10 +64,6 @@ export function TableToDnfBuilder({
   const [showSolution, setShowSolution] = useState(false);
   const [showFullTable, setShowFullTable] = useState(false);
   const [dnfAnswer, setDnfAnswer] = useState(initialValue?.dnfAnswer ?? "");
-  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
-  const simplification = useDnfSimplification(
-    initialValue?.simplificationAnswer,
-  );
   const truthTable = useMemo(
     () =>
       createTruthTableFromResults(
@@ -76,6 +75,34 @@ export function TableToDnfBuilder({
   const analysis = useMemo(
     () => analyzeDnfTruthTable(truthTable),
     [truthTable],
+  );
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(() =>
+    seedInitialFeedback &&
+    analysis.status === "valid" &&
+    (initialValue?.dnfAnswer ?? "").trim().length > 0
+      ? checkDnfExerciseAttempt(
+          analysis.truthTable,
+          [],
+          initialValue?.dnfAnswer ?? "",
+          { checkTruthTable: false },
+        )
+      : null,
+  );
+  const initialSimplificationFeedback = useMemo(
+    () =>
+      seedInitialFeedback &&
+      analysis.status === "valid" &&
+      (initialValue?.simplificationAnswer ?? "").trim().length > 0
+        ? checkDnfSimplification(
+            analysis.truthTable,
+            initialValue?.simplificationAnswer ?? "",
+          )
+        : null,
+    [analysis, initialValue?.simplificationAnswer, seedInitialFeedback],
+  );
+  const simplification = useDnfSimplification(
+    initialValue?.simplificationAnswer,
+    { initialFeedback: initialSimplificationFeedback },
   );
   const transferValue = useMemo(
     () => ({
@@ -225,11 +252,12 @@ export function TableToDnfBuilder({
       <div>
         <button
           type="button"
+          data-testid="dnf-edit-table-config"
           onClick={handleNewTable}
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
+          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
         >
-          <ArrowLeft className="size-4" />
-          {t("dnf.simulator.newTable")}
+          <Pencil className="size-4" />
+          {t("dnf.simulator.editConfig")}
         </button>
       </div>
 
@@ -253,7 +281,10 @@ export function TableToDnfBuilder({
         solution={solution}
       />
 
-      <DnfFollowUpSections simplification={simplificationFollowUp} />
+      <DnfFollowUpSections
+        simplification={simplificationFollowUp}
+        initiallyOpenSimplification={seedInitialFeedback}
+      />
 
       <SimulatorStringTransferBox
         value={transferValue}

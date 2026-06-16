@@ -86,12 +86,20 @@ test.describe("DNF page", () => {
       "data-mode",
       "expression_to_truth_table",
     );
-    await expect(page.getByTestId("dnf-expression-input")).not.toHaveValue("");
-    await expect(page.getByTestId("dnf-evaluate-expression")).toBeVisible();
-    await expect(page.getByTestId("dnf-exercise-workspace")).toHaveCount(0);
-
-    await page.getByTestId("dnf-evaluate-expression").click();
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-expression-input")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-edit-expression-config")).toBeVisible();
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).not.toHaveValue("");
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-simplification-feedback"),
+    ).toHaveAttribute("data-status", "accepted_minimal");
 
     await switchTab(page, "examples");
     await page
@@ -105,10 +113,24 @@ test.describe("DNF page", () => {
       "data-mode",
       "truth_table_to_dnf",
     );
+    await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
+    await expect(page.getByTestId("dnf-table-builder-controls")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-edit-table-config")).toBeVisible();
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).not.toHaveValue("");
+    await expect(
+      page.getByTestId("dnf-follow-up-simplification"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-simplification-feedback"),
+    ).toHaveAttribute("data-status", "accepted_minimal");
+
+    await page.getByTestId("dnf-edit-table-config").click();
     await expect(page.getByTestId("dnf-table-builder-controls")).toBeVisible();
     await expect(page.getByTestId("dnf-variable-count-input")).toHaveValue("3");
-    await expect(page.getByTestId("dnf-exercise-workspace")).toHaveCount(0);
-
     await page.getByRole("button", { name: "Commit table" }).click();
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await page.getByTestId("dnf-exercise-answer").fill("a");
@@ -119,7 +141,11 @@ test.describe("DNF page", () => {
     );
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await expect(page.getByTestId("dnf-table-builder-controls")).toHaveCount(0);
-    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("");
+    await expect(page.getByTestId("dnf-exercise-feedback")).toHaveAttribute(
+      "data-status",
+      "correct",
+    );
+    await expect(page.getByTestId("dnf-exercise-answer")).not.toHaveValue("");
   });
 
   test("covers expression simulation results, compact toggles, and variable limits", async ({
@@ -147,7 +173,7 @@ test.describe("DNF page", () => {
       page.getByTestId("dnf-solution-truth-table-panel"),
     ).toBeVisible();
 
-    await page.getByTestId("dnf-new-expression").click();
+    await page.getByTestId("dnf-edit-expression-config").click();
     await page
       .getByTestId("dnf-expression-input")
       .fill("a | b | c | d | e | f | g | h | i");

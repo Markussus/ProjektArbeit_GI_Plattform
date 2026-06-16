@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Eraser, Play } from "lucide-react";
+import { Eraser, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -15,6 +15,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
 import {
   createDnfAttemptDraft,
   dnfExpressionTransferCodec,
@@ -37,6 +38,7 @@ interface ExpressionBuilderProps {
   transferCodec: ISimulatorTransferCodec<DnfExpressionTransferDraft>;
   onTransferValueChange?: (value: DnfExpressionTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 export function ExpressionBuilder({
@@ -47,6 +49,7 @@ export function ExpressionBuilder({
   transferCodec,
   onTransferValueChange,
   onUserChange,
+  seedInitialFeedback = false,
 }: ExpressionBuilderProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -94,6 +97,13 @@ export function ExpressionBuilder({
   const handleClear = () => {
     onUserChange?.();
     setInputValue("");
+    setCommittedSource(null);
+    setAttempt(createDnfAttemptDraft());
+    setWorkspaceVersion((current) => current + 1);
+  };
+
+  const handleEditConfig = () => {
+    onUserChange?.();
     setCommittedSource(null);
     setAttempt(createDnfAttemptDraft());
     setWorkspaceVersion((current) => current + 1);
@@ -181,12 +191,12 @@ export function ExpressionBuilder({
         <div>
           <button
             type="button"
-            data-testid="dnf-new-expression"
-            onClick={handleClear}
-            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
+            data-testid="dnf-edit-expression-config"
+            onClick={handleEditConfig}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
           >
-            <ArrowLeft className="size-4" />
-            {t("dnf.exprBuilder.newExpression")}
+            <Pencil className="size-4" />
+            {t("dnf.simulator.editConfig")}
           </button>
         </div>
       )}
@@ -198,6 +208,7 @@ export function ExpressionBuilder({
           initialAttempt={attempt}
           onAttemptChange={setAttempt}
           onUserChange={onUserChange}
+          seedInitialFeedback={seedInitialFeedback}
         />
       )}
 
@@ -216,6 +227,7 @@ interface ExpressionWorkspaceProps {
   initialAttempt: DnfAttemptTransferDraft;
   onAttemptChange: (attempt: DnfAttemptTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 function ExpressionWorkspace({
@@ -223,6 +235,7 @@ function ExpressionWorkspace({
   initialAttempt,
   onAttemptChange,
   onUserChange,
+  seedInitialFeedback = false,
 }: ExpressionWorkspaceProps) {
   const analysis = useMemo(
     () => analyzeDnfSource(committedSource),
@@ -235,9 +248,33 @@ function ExpressionWorkspace({
     TruthTableAnswer[]
   >(() => initialAttempt.truthTableAnswers);
   const [dnfAnswer, setDnfAnswer] = useState(initialAttempt.dnfAnswer);
-  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(() =>
+    seedInitialFeedback &&
+    analysis.status === "valid" &&
+    initialAttempt.dnfAnswer.trim().length > 0
+      ? checkDnfExerciseAttempt(
+          analysis.truthTable,
+          initialAttempt.truthTableAnswers,
+          initialAttempt.dnfAnswer,
+          { checkTruthTable: true },
+        )
+      : null,
+  );
+  const initialSimplificationFeedback = useMemo(
+    () =>
+      seedInitialFeedback &&
+      analysis.status === "valid" &&
+      initialAttempt.simplificationAnswer.trim().length > 0
+        ? checkDnfSimplification(
+            analysis.truthTable,
+            initialAttempt.simplificationAnswer,
+          )
+        : null,
+    [analysis, initialAttempt.simplificationAnswer, seedInitialFeedback],
+  );
   const simplification = useDnfSimplification(
     initialAttempt.simplificationAnswer,
+    { initialFeedback: initialSimplificationFeedback },
   );
 
   const normalizedAnswers = useMemo(
@@ -350,7 +387,10 @@ function ExpressionWorkspace({
         solution={solution}
       />
 
-      <DnfFollowUpSections simplification={simplificationFollowUp} />
+      <DnfFollowUpSections
+        simplification={simplificationFollowUp}
+        initiallyOpenSimplification={seedInitialFeedback}
+      />
     </>
   );
 }

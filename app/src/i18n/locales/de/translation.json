@@ -556,8 +556,7 @@
       }
     },
     "exprBuilder": {
-      "evaluate": "Auswerten",
-      "newExpression": "Anderen Ausdruck eingeben"
+      "evaluate": "Auswerten"
     },
     "simulator": {
       "tabs": {
@@ -576,7 +575,7 @@
       "setupPreviewTitle": "Wertetafel festlegen",
       "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
       "commitTable": "Tabelle übernehmen",
-      "newTable": "Neue Tabelle"
+      "editConfig": "Konfiguration bearbeiten"
     },
     "builder": {
       "inputTitle": "Boolescher Ausdruck",
