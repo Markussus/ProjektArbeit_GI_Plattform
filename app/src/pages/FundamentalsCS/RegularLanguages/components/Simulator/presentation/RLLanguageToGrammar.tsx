@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import {
   RL_STORAGE_TASK_IDS,
   useRLPersistedSource,
 } from "../useRLPersistedSource";
+import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
@@ -58,6 +59,16 @@ export function RLLanguageToGrammar({
     setSource,
     hasSeed: initialSource !== undefined,
   });
+
+  // Publish the current language so the lifted exercise "Check solution" action
+  // can validate it; clear it when this mode unmounts.
+  const setStudentLanguageSource = useRLSimulatorStore(
+    (s) => s.setStudentLanguageSource,
+  );
+  useEffect(() => {
+    setStudentLanguageSource(source);
+    return () => setStudentLanguageSource(null);
+  }, [source, setStudentLanguageSource]);
 
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
