@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe, Info } from "lucide-react";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -22,6 +22,10 @@ interface UTF8EncoderProps {
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
   expectedAnswer?: string;
+  onChangeState?: (state: {
+    converterMode: "encode" | "decode";
+    inputValue: string;
+  }) => void;
 }
 
 interface CharEncodingStep {
@@ -237,6 +241,7 @@ export function UTF8Encoder({
   initialValue = "",
   initialConverterMode = "encode",
   expectedAnswer,
+  onChangeState,
 }: UTF8EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -244,6 +249,11 @@ export function UTF8Encoder({
     initialConverterMode,
   );
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    onChangeState?.({ converterMode, inputValue });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [converterMode, inputValue]);
 
   const charSteps = useMemo((): CharEncodingStep[] => {
     if (converterMode !== "encode" || !inputValue) return [];

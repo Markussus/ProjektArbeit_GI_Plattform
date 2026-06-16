@@ -10,10 +10,6 @@ interface BinaryInputProps {
   max?: number;
 }
 
-/**
- * Einzel-Eingabefeld für binäre (oder numerische) Werte
- * mit einheitlichem locked/unlocked-Styling.
- */
 export function BinaryInput({
   label,
   value,

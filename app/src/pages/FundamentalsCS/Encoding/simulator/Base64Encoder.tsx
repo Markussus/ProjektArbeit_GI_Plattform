@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FileText, Info } from "lucide-react";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -25,6 +25,10 @@ interface Base64EncoderProps {
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
   expectedAnswer?: string;
+  onChangeState?: (state: {
+    converterMode: "encode" | "decode";
+    inputValue: string;
+  }) => void;
 }
 
 interface EncodingStep {
@@ -64,6 +68,7 @@ export function Base64Encoder({
   initialValue = "",
   initialConverterMode = "encode",
   expectedAnswer,
+  onChangeState,
 }: Base64EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -71,6 +76,11 @@ export function Base64Encoder({
     initialConverterMode,
   );
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    onChangeState?.({ converterMode, inputValue });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [converterMode, inputValue]);
 
   const encodingSteps = useMemo((): EncodingStep[] => {
     if (converterMode !== "encode" || !inputValue) return [];
