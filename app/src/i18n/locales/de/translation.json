@@ -367,10 +367,6 @@
       }
     },
     "examples": {
-      "modeGroup": {
-        "expression_to_truth_table": "Modus: Ausdruck → Wahrheitstabelle",
-        "truth_table_to_dnf": "Modus: Wahrheitstabelle → DNF"
-      },
       "walkthroughs": {
         "lectureExpression": {
           "title": "Ausdruck mit UND-Klammer",

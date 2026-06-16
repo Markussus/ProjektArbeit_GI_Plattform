@@ -367,10 +367,6 @@
       }
     },
     "examples": {
-      "modeGroup": {
-        "expression_to_truth_table": "Mode: Expression → truth table",
-        "truth_table_to_dnf": "Mode: Truth table → DNF"
-      },
       "walkthroughs": {
         "lectureExpression": {
           "title": "Expression with an AND group",

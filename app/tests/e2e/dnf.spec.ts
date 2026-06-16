@@ -66,10 +66,10 @@ test.describe("DNF page", () => {
     await switchTab(page, "examples");
     await expect(page.getByTestId("dnf-examples-tab")).toBeVisible();
     await expect(
-      page.getByTestId("dnf-example-group-expression_to_truth_table"),
+      page.getByTestId(`dnf-example-${LECTURE_EXPRESSION_EXAMPLE_ID}-select`),
     ).toBeVisible();
     await expect(
-      page.getByTestId("dnf-example-group-truth_table_to_dnf"),
+      page.getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`),
     ).toBeVisible();
 
     await page
