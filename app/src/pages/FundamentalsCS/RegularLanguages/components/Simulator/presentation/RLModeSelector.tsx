@@ -52,7 +52,7 @@ export function RLModeSelector({ mode, onChange }: RLModeSelectorProps) {
               className={cn(
                 "flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-brand text-brand-foreground shadow-sm"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >

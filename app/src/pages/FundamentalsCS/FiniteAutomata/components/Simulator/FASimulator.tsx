@@ -1,8 +1,24 @@
-import { useState, useEffect, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
-import { cloneJson } from "@/lib/utils";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import {
+  SIMULATOR_TASK_STORAGE_ID,
+  createTrainingCenterIdentifier,
+  createTrainingCenterTransferCodec,
+  exportAndStoreTrainingCenterValue,
+  loadTrainingCenterValue,
+} from "@/lib/trainingCenter";
+import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
 import { useFASimulator } from "./application/useFASimulator";
 import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
@@ -24,8 +40,34 @@ export function FASimulator() {
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
+  // A pending program (queued by an example/exercise) takes priority over the
+  // saved draft, so storage is considered ready immediately in that case.
+  const [isStorageReady, setIsStorageReady] = useState(
+    () => useFASimulatorStore.getState().pendingProgram !== null,
+  );
+
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
+
+  // Persist the edited automaton to local storage using the same Training
+  // Center mechanism as the Turing Machine module: the simulator slot for this
+  // topic (no per-exercise scenario, so the shared simulator task id is used).
+  const storageIdentifier = useMemo(
+    () =>
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.finiteAutomata,
+        SIMULATOR_TASK_STORAGE_ID,
+      ),
+    [],
+  );
+  const storageTransferCodec = useMemo(
+    () =>
+      createTrainingCenterTransferCodec(
+        storageIdentifier,
+        faProgramTransferCodec,
+      ),
+    [storageIdentifier],
+  );
 
   // Consume pending example from the store (loaded via ExamplesTab or by the
   // exercise panel revealing a solution).
@@ -90,11 +132,70 @@ export function FASimulator() {
     }
   }, [pendingInputWordOverride, consumePendingInputWord]);
 
+  const pauseSimulation = simulation.pause;
+  const resetEditorToProgram = editor.resetToProgram;
+
+  const handleImportProgram = useCallback(
+    (imported: FAProgram) => {
+      pauseSimulation();
+      setProgram(imported);
+      resetEditorToProgram(imported);
+      setIsEditMode(true);
+      setEditorMode("manual");
+    },
+    [pauseSimulation, resetEditorToProgram],
+  );
+
+  // Restore the most recently saved automaton on mount. A pending program
+  // queued by an example/exercise takes priority, so skip the restore then.
+  const hasInitializedStorage = useRef(false);
+  useEffect(() => {
+    if (hasInitializedStorage.current) {
+      return;
+    }
+    hasInitializedStorage.current = true;
+
+    // A pending program will be applied this render; don't restore over it.
+    if (useFASimulatorStore.getState().pendingProgram !== null) {
+      return;
+    }
+
+    let isCancelled = false;
+    void loadTrainingCenterValue(storageIdentifier, faProgramTransferCodec)
+      .then((storedProgram) => {
+        if (!isCancelled && storedProgram) {
+          handleImportProgram(storedProgram);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!isCancelled) {
+          setIsStorageReady(true);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [handleImportProgram, storageIdentifier]);
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: editor.draft,
+    codec: faProgramTransferCodec,
+    enabled: isStorageReady,
+  });
+
   const handleApplyProgram = () => {
     const result = editor.applyProgram();
     if (!result.ok) return;
     setProgram(result.program);
     setIsEditMode(false);
+    void exportAndStoreTrainingCenterValue(
+      storageIdentifier,
+      result.program,
+      faProgramTransferCodec,
+    );
   };
 
   const handleEditProgram = () => {
@@ -109,16 +210,13 @@ export function FASimulator() {
     setEditorMode("manual");
   };
 
-  const handleImportProgram = (imported: FAProgram) => {
-    simulation.pause();
-    setProgram(imported);
-    editor.resetToProgram(imported);
-    setIsEditMode(true);
-    setEditorMode("manual");
-  };
-
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
+    <div
+      className={cn(
+        "mx-auto flex w-full flex-col gap-6 p-2 sm:p-4",
+        isEditMode ? "max-w-none" : "max-w-7xl",
+      )}
+    >
       {isEditMode ? (
         <div className="flex flex-col gap-6">
           {/* Mode Toggle */}
@@ -167,7 +265,7 @@ export function FASimulator() {
 
               <SimulatorStringTransferBox
                 value={editor.draft}
-                codec={faProgramTransferCodec}
+                codec={storageTransferCodec}
                 onLoad={handleImportProgram}
                 testIdPrefix="fa-transfer"
               />
@@ -175,7 +273,7 @@ export function FASimulator() {
               <button
                 onClick={handleApplyProgram}
                 disabled={!editor.isValid}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-brand text-brand-foreground inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Play className="h-4 w-4 fill-current" />
                 {t("fa.config.apply", "Start Simulation")}

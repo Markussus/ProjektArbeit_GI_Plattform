@@ -5,11 +5,7 @@ import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { Example } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
-import {
-  rlExamples,
-  rlExampleCategories,
-  type RLExample,
-} from "./Simulator/config/rlExamples";
+import { rlExamples, type RLExample } from "./Simulator/config/rlExamples";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
 
 export function ExamplesTab({
@@ -34,44 +30,28 @@ export function ExamplesTab({
   );
 
   return (
-    <div data-testid="rl-examples-tab" className="space-y-8">
-      <div className="text-muted-foreground flex items-center gap-2">
+    <div data-testid="rl-examples-tab">
+      <div className="text-muted-foreground mb-4 flex items-center gap-2">
         <BookOpen className="size-4" />
         <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
       </div>
 
-      {rlExampleCategories.map(({ category, titleKey, descriptionKey }) => {
-        const examples = rlExamples.filter((e) => e.category === category);
-        if (examples.length === 0) return null;
-
-        return (
-          <section key={category}>
-            <h4 className="text-foreground text-base font-bold">
-              {t(titleKey as TranslationKey)}
-            </h4>
-            <p className="text-muted-foreground mt-1 mb-3 text-sm">
-              {t(descriptionKey as TranslationKey)}
-            </p>
-
-            <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-              {examples.map((example, index) => {
-                const item = toTopicExample(example, t);
-                return (
-                  <ExerciseCard
-                    key={example.id}
-                    item={item}
-                    index={index}
-                    testIdPrefix={`rl-example-card-${example.id}`}
-                    isSelected={selectedExample?.id === item.id}
-                    onSelect={() => onSelectExample(item)}
-                    onOpen={() => handleOpen(example)}
-                  />
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
+      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
+        {rlExamples.map((example, index) => {
+          const item = toTopicExample(example, t);
+          return (
+            <ExerciseCard
+              key={example.id}
+              item={item}
+              index={index}
+              testIdPrefix={`rl-example-card-${example.id}`}
+              isSelected={selectedExample?.id === item.id}
+              onSelect={() => onSelectExample(item)}
+              onOpen={() => handleOpen(example)}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -89,7 +69,7 @@ function toTopicExample(
     description: t(descriptionKey),
     titleKey,
     descriptionKey,
-    icon: BookOpen,
+    icon: example.icon,
     kind: "example",
   };
 }

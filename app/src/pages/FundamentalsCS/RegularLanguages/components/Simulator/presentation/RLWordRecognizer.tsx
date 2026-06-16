@@ -6,6 +6,10 @@ import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringT
 import { recognizeWord } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
+import {
+  RL_STORAGE_TASK_IDS,
+  useRLPersistedSource,
+} from "../useRLPersistedSource";
 import { RLGrammarInputCard } from "./RLGrammarInputCard";
 
 interface RLWordRecognizerProps {
@@ -43,6 +47,14 @@ export function RLWordRecognizer({
     setWord(initialWord);
   }
 
+  const storageTransferCodec = useRLPersistedSource({
+    taskStorageId: RL_STORAGE_TASK_IDS.recognizeWord,
+    codec: rlGrammarTransferCodec,
+    source,
+    setSource,
+    hasSeed: initialGrammar !== undefined,
+  });
+
   const evaluation = useMemo<
     { ok: false } | { ok: true; results: PerWordResult[] }
   >(() => {
@@ -68,13 +80,6 @@ export function RLWordRecognizer({
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"
           titleFallback="Grammar"
-        />
-
-        <SimulatorStringTransferBox
-          value={source}
-          codec={rlGrammarTransferCodec}
-          onLoad={setSource}
-          testIdPrefix="rl-transfer"
         />
       </div>
 
@@ -134,6 +139,14 @@ export function RLWordRecognizer({
           </p>
         )}
       </div>
+
+      <SimulatorStringTransferBox
+        value={source}
+        codec={storageTransferCodec}
+        onLoad={setSource}
+        testIdPrefix="rl-transfer"
+        className="lg:col-span-2"
+      />
     </div>
   );
 }

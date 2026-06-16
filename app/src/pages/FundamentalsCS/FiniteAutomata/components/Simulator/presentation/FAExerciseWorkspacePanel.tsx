@@ -179,7 +179,7 @@ export function FAExerciseWorkspacePanel({
           <button
             type="button"
             onClick={handleCheck}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold"
+            className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold hover:opacity-90"
           >
             <CheckCircle2 className="h-4 w-4" />
             {t("fa.exerciseWorkspace.check", "Check Solution")}

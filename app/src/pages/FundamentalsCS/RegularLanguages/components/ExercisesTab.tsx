@@ -1,13 +1,18 @@
-import { ClipboardList } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
+import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import {
+  createTrainingCenterIdentifier,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
 import type { Exercise } from "@/types/exercise";
 import {
   rlExercises,
-  rlExerciseCategories,
   type RLExerciseDefinition,
 } from "../exercises/rlExerciseDefinitions";
+import { RL_STORAGE_TASK_IDS } from "./Simulator/useRLPersistedSource";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
 
 export function ExercisesTab({
@@ -44,45 +49,46 @@ export function ExercisesTab({
     onOpenExerciseInSimulation(toExercise(def));
   };
 
+  // RL exercise progress lives in the per-mode simulator sources, which autosave
+  // to their topic slots — clearing them resets the saved exercise work.
+  const handleResetAllExercises = () => {
+    for (const taskStorageId of Object.values(RL_STORAGE_TASK_IDS)) {
+      trainingCenterStorage.delete(
+        createTrainingCenterIdentifier(
+          TOPIC_STORAGE_IDS.regularLanguages,
+          taskStorageId,
+        ),
+      );
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="text-muted-foreground flex items-center gap-2">
-        <ClipboardList className="size-4" />
-        <h3 className="text-sm font-bold">{t("exercise.currentExercises")}</h3>
+    <div data-testid="rl-exercises-tab">
+      <div className="mb-4 flex items-center gap-2">
+        <InlineResetControl
+          label={t("trainingCenter.resetAllExercises")}
+          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          onConfirm={handleResetAllExercises}
+          testId="rl-reset-all-exercises"
+        />
       </div>
 
-      {rlExerciseCategories.map(({ category, titleKey, descriptionKey }) => {
-        const defs = rlExercises.filter((e) => e.category === category);
-        if (defs.length === 0) return null;
-
-        return (
-          <section key={category}>
-            <h4 className="text-foreground text-base font-bold">
-              {t(titleKey)}
-            </h4>
-            <p className="text-muted-foreground mt-1 mb-3 text-sm">
-              {t(descriptionKey)}
-            </p>
-
-            <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-              {defs.map((def, index) => {
-                const exercise = toExercise(def);
-                return (
-                  <ExerciseCard
-                    key={def.id}
-                    item={exercise}
-                    index={index}
-                    testIdPrefix={`exercise-card-${def.id}`}
-                    isSelected={selectedExercise?.id === exercise.id}
-                    onSelect={() => onSelectExercise(exercise)}
-                    onOpen={() => handleOpen(def)}
-                  />
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
+      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
+        {rlExercises.map((def, index) => {
+          const exercise = toExercise(def);
+          return (
+            <ExerciseCard
+              key={def.id}
+              item={exercise}
+              index={index}
+              testIdPrefix={`exercise-card-${def.id}`}
+              isSelected={selectedExercise?.id === exercise.id}
+              onSelect={() => onSelectExercise(exercise)}
+              onOpen={() => handleOpen(def)}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

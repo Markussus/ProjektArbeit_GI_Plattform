@@ -10,6 +10,10 @@ import {
 import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
 import { languageToGrammar } from "../domain/rlLanguageOps";
 import { rlLanguageTransferCodec } from "../domain/rlLanguageTransfer";
+import {
+  RL_STORAGE_TASK_IDS,
+  useRLPersistedSource,
+} from "../useRLPersistedSource";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
@@ -46,6 +50,14 @@ export function RLLanguageToGrammar({
     setSeededSource(initialSource);
     setSource(initialSource);
   }
+
+  const storageTransferCodec = useRLPersistedSource({
+    taskStorageId: RL_STORAGE_TASK_IDS.languageToGrammar,
+    codec: rlLanguageTransferCodec,
+    source,
+    setSource,
+    hasSeed: initialSource !== undefined,
+  });
 
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
@@ -144,13 +156,6 @@ export function RLLanguageToGrammar({
             </div>
           )}
         </div>
-
-        <SimulatorStringTransferBox
-          value={source}
-          codec={rlLanguageTransferCodec}
-          onLoad={setSource}
-          testIdPrefix="rl-language-transfer"
-        />
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
@@ -187,6 +192,14 @@ export function RLLanguageToGrammar({
           </p>
         )}
       </div>
+
+      <SimulatorStringTransferBox
+        value={source}
+        codec={storageTransferCodec}
+        onLoad={setSource}
+        testIdPrefix="rl-language-transfer"
+        className="lg:col-span-2"
+      />
     </div>
   );
 }

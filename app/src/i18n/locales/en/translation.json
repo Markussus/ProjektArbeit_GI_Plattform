@@ -1959,19 +1959,19 @@
         "step1": "The grammar is converted to an NFA. The NFA is simulated symbol by symbol over the input word. The word is accepted if any path reaches a final state after consuming the complete input."
       },
       "lectureGrammar1": {
-        "title": "Lecture Example",
+        "title": "Zeros Followed by a One",
         "description": "Read this right-linear grammar: words begin with at least one 0 and end with exactly one 1.",
         "step1Title": "1. Enumerate the Language",
         "step1": "Every derivation follows S → 0A → 0…0A → 0…01, so each word consists of one or more zeros followed by a single one. Load it to enumerate L = {01, 001, 0001, …}."
       },
       "lectureGrammar2": {
-        "title": "Exercise 1",
+        "title": "Alternating Zeros and Ones",
         "description": "Read this grammar: strictly alternating zeros and ones, beginning with either symbol, with a minimum length of 1.",
         "step1Title": "1. Enumerate the Language",
         "step1": "The ε-productions on A and B allow the derivation to stop after any symbol, while A and B continue alternating. Load it to enumerate L = {0, 1, 01, 10, 010, 101, 0101, …}."
       },
       "lectureLanguage1": {
-        "title": "Exercise 2",
+        "title": "A Single One Between Zeros",
         "description": "Find a grammar for this language: at least one 0, exactly one 1, followed by at least one 0.",
         "step1Title": "1. Derive the Grammar",
         "step1": "A loop builds the leading zeros, one rule consumes the single 1, and a final loop builds the trailing zeros. Load it to derive S → 0S | 0A, A → 1B, B → 0B | 0."

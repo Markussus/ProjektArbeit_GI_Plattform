@@ -1,3 +1,13 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  Binary,
+  List,
+  ListTree,
+  Repeat,
+  SearchCheck,
+  Sigma,
+  Target,
+} from "lucide-react";
 import type { SimulationMode } from "../domain/rlTypes";
 
 /**
@@ -18,6 +28,8 @@ export interface RLExample {
   mode: SimulationMode;
   /** Which on-page section this example belongs to. */
   category: RLExampleCategory;
+  /** Card icon, chosen to reflect what the example demonstrates. */
+  icon: LucideIcon;
   grammarSource?: string;
   languageSource?: string;
   testWord?: string;
@@ -30,6 +42,7 @@ export const exampleGrammarToLanguage: RLExample = {
   descriptionKey: "rl.examples.grammarToLanguage.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
+  icon: ListTree,
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
   steps: [
     {
@@ -45,6 +58,7 @@ export const exampleLanguageToGrammar: RLExample = {
   descriptionKey: "rl.examples.languageToGrammar.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
+  icon: List,
   languageSource: 'L = {"ab", "abb", "abbb"}',
   steps: [
     {
@@ -64,6 +78,7 @@ export const exampleLanguageSetBuilder: RLExample = {
   descriptionKey: "rl.examples.languageSetBuilder.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
+  icon: Sigma,
   languageSource: "L = {a^n c b^m | n, m > 0}",
   steps: [
     {
@@ -83,6 +98,7 @@ export const exampleRecognizeWord: RLExample = {
   descriptionKey: "rl.examples.recognizeWord.description",
   mode: "recognizeWord",
   category: "recognizeWord",
+  icon: SearchCheck,
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
   testWord: "001",
   steps: [
@@ -104,6 +120,7 @@ export const exampleLectureGrammar1: RLExample = {
   descriptionKey: "rl.examples.lectureGrammar1.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
+  icon: Binary,
   grammarSource: ["S -> 0A", "A -> 0A | 1"].join("\n"),
   steps: [
     {
@@ -119,6 +136,7 @@ export const exampleLectureGrammar2: RLExample = {
   descriptionKey: "rl.examples.lectureGrammar2.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
+  icon: Repeat,
   grammarSource: ["S -> 0A | 1B", "A -> 1B | ε", "B -> 0A | ε"].join("\n"),
   steps: [
     {
@@ -134,6 +152,7 @@ export const exampleLectureLanguage1: RLExample = {
   descriptionKey: "rl.examples.lectureLanguage1.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
+  icon: Target,
   languageSource: 'L = {"010", "0010", "00100", "00010", "000100"}',
   steps: [
     {
@@ -151,27 +170,4 @@ export const rlExamples: RLExample[] = [
   exampleLanguageSetBuilder,
   exampleLectureLanguage1,
   exampleRecognizeWord,
-];
-
-/** Section order + heading/description keys used by the examples tab. */
-export const rlExampleCategories: {
-  category: RLExampleCategory;
-  titleKey: string;
-  descriptionKey: string;
-}[] = [
-  {
-    category: "grammarToLanguage",
-    titleKey: "rl.examples.categories.grammarToLanguage.title",
-    descriptionKey: "rl.examples.categories.grammarToLanguage.description",
-  },
-  {
-    category: "languageToGrammar",
-    titleKey: "rl.examples.categories.languageToGrammar.title",
-    descriptionKey: "rl.examples.categories.languageToGrammar.description",
-  },
-  {
-    category: "recognizeWord",
-    titleKey: "rl.examples.categories.recognizeWord.title",
-    descriptionKey: "rl.examples.categories.recognizeWord.description",
-  },
 ];
