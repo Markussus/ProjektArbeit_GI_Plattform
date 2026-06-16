@@ -347,13 +347,10 @@ function ExpressionWorkspace({
         onCheck={handleCheck}
         onToggleSolution={() => setShowSolution((prev) => !prev)}
         onToggleFullTable={() => setShowFullTable((prev) => !prev)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
-      />
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
     </>
   );
 }

@@ -250,13 +250,10 @@ export function TableToDnfBuilder({
         onCheck={handleCheck}
         onToggleSolution={() => setShowSolution((current) => !current)}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
-      />
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
 
       <SimulatorStringTransferBox
         value={transferValue}

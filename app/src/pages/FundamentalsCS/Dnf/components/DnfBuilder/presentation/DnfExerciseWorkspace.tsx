@@ -9,7 +9,9 @@ import type {
   TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
 import type { TruthTable } from "../domain/truthTable";
+import type { DnfFollowUpSolution } from "../application/dnfFollowUp";
 import { DnfOperatorToolbar } from "./DnfOperatorToolbar";
+import { DnfSolutionBlock } from "./DnfSolutionBlock";
 import { DnfTruthTable } from "./DnfTruthTable";
 import { ExerciseFeedbackPanel } from "./ExerciseFeedbackPanel";
 
@@ -27,6 +29,7 @@ interface DnfExerciseWorkspaceProps {
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
   showFullTable?: boolean;
+  solution?: DnfFollowUpSolution;
   onTruthTableAnswerChange: (rowIndex: number, value: boolean) => void;
   onDnfAnswerChange: (value: string) => void;
   onCheck: () => void;
@@ -46,6 +49,7 @@ export function DnfExerciseWorkspace({
   canEditTruthTableResults = false,
   canToggleFullTable = false,
   showFullTable = false,
+  solution,
   onTruthTableAnswerChange,
   onDnfAnswerChange,
   onCheck,
@@ -352,6 +356,8 @@ export function DnfExerciseWorkspace({
                 : t("dnf.builder.exercise.solutionAfterCheck")}
           </button>
         </div>
+
+        {solution && <DnfSolutionBlock solution={solution} />}
       </section>
     </div>
   );

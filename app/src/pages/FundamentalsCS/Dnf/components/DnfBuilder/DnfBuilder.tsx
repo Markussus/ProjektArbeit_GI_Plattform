@@ -128,13 +128,10 @@ export function DnfBuilder({
         onCheck={builder.checkExercise}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
-      />
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
 
       <SimulatorStringTransferBox
         value={transferValue}
