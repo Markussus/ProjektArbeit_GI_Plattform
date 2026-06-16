@@ -25,6 +25,14 @@ interface RLSimulatorStore {
 
   activeExerciseId: string | null;
   setActiveExercise: (id: string | null) => void;
+
+  /**
+   * Live snapshot of the language the learner is editing in the
+   * Language → Grammar mode, published so the exercise "Check solution" action
+   * can validate it. Null whenever that mode isn't mounted.
+   */
+  studentLanguageSource: string | null;
+  setStudentLanguageSource: (source: string | null) => void;
 }
 
 export const useRLSimulatorStore = create<RLSimulatorStore>((set) => ({
@@ -51,4 +59,7 @@ export const useRLSimulatorStore = create<RLSimulatorStore>((set) => ({
 
   activeExerciseId: null,
   setActiveExercise: (id) => set({ activeExerciseId: id }),
+
+  studentLanguageSource: null,
+  setStudentLanguageSource: (source) => set({ studentLanguageSource: source }),
 }));

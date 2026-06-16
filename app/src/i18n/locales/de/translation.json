@@ -1738,7 +1738,7 @@
       "showHint": "Hinweis",
       "hintsUsed": "{{used}}/{{total}} Hinweise benutzt",
       "noMoreHints": "Alle Hinweise angezeigt",
-      "showSolution": "Lösung anzeigen",
+      "showSolution": "Lösung laden",
       "hintsHeader": "Hinweise",
       "confirmTitle": "Vollständige Lösung anzeigen?",
       "confirmBody": "Ihr aktueller Automat wird durch die Referenzlösung ersetzt. Sie können die Aufgabe jederzeit aus dem Tab „Übungen“ zurücksetzen.",
@@ -2022,19 +2022,19 @@
         "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
       },
       "lectureGrammar1": {
-        "title": "Vorlesungsbeispiel",
+        "title": "Nullen gefolgt von einer Eins",
         "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1.",
         "step1Title": "1. Sprache aufzählen",
         "step1": "Jede Ableitung verläuft S → 0A → 0…0A → 0…01, jedes Wort ist also eine oder mehrere 0en gefolgt von einer einzelnen 1. Laden Sie sie, um L = {01, 001, 0001, …} aufzuzählen."
       },
       "lectureGrammar2": {
-        "title": "Übung 1",
+        "title": "Abwechselnde Nullen und Einsen",
         "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1.",
         "step1Title": "1. Sprache aufzählen",
         "step1": "Die ε-Produktionen auf A und B erlauben das Stoppen nach jedem Symbol, während A und B weiter alternieren. Laden Sie sie, um L = {0, 1, 01, 10, 010, 101, 0101, …} aufzuzählen."
       },
       "lectureLanguage1": {
-        "title": "Übung 2",
+        "title": "Eine Eins zwischen Nullen",
         "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
         "step1Title": "1. Grammatik ableiten",
         "step1": "Eine Schleife baut die führenden 0en, eine einzelne Regel konsumiert die 1, und eine abschließende Schleife baut die nachfolgenden 0en. Laden Sie sie, um S → 0S | 0A, A → 1B, B → 0B | 0 abzuleiten."
@@ -2132,7 +2132,16 @@
       "noMoreHints": "Alle Tipps angezeigt",
       "hintsUsed": "{{used}}/{{total}} Tipps verwendet",
       "hintsHeader": "Tipps",
-      "showSolution": "Lösung anzeigen",
+      "showSolution": "Lösung laden",
+      "check": "Lösung prüfen",
+      "checkMatch": "Sieht korrekt aus!",
+      "checkMatchDetail": "Jedes eingegebene Wort liegt in der Zielsprache, und alle Beispielwörter sind enthalten.",
+      "checkMismatch": "Stimmt noch nicht mit der Zielsprache überein",
+      "checkWrong": "Nicht in der Zielsprache: {{words}}",
+      "checkMissing": "Fehlende Beispielwörter: {{words}}",
+      "checkInvalidFormat": "Geben Sie die Sprache als explizite Wortliste an (z. B. L = {\"01\", \"011\"}), damit sie geprüft werden kann.",
+      "checkEmpty": "Geben Sie mindestens ein Wort ein und prüfen Sie erneut.",
+      "checkUnavailable": "Diese Übung kann nicht automatisch geprüft werden.",
       "confirmTitle": "Vollständige Lösung anzeigen?",
       "confirmBody": "Die Lösung wird hier angezeigt und in den Simulator geladen. Sie können stattdessen weiter probieren.",
       "confirmYes": "Ja, Lösung anzeigen",
