@@ -8,12 +8,9 @@ interface BinaryInputProps {
   /** Additional props forwarded to the <input> element */
   min?: number;
   max?: number;
+  "data-testid"?: string;
 }
 
-/**
- * Einzel-Eingabefeld für binäre (oder numerische) Werte
- * mit einheitlichem locked/unlocked-Styling.
- */
 export function BinaryInput({
   label,
   value,
@@ -22,6 +19,7 @@ export function BinaryInput({
   type = "text",
   min,
   max,
+  "data-testid": testId,
 }: BinaryInputProps) {
   return (
     <div className={locked ? "opacity-60" : ""}>
@@ -29,6 +27,7 @@ export function BinaryInput({
         {label}
       </label>
       <input
+        data-testid={testId}
         type={type}
         value={value}
         min={min}

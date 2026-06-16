@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe, Info } from "lucide-react";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -22,6 +22,10 @@ interface UTF8EncoderProps {
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
   expectedAnswer?: string;
+  onChangeState?: (state: {
+    converterMode: "encode" | "decode";
+    inputValue: string;
+  }) => void;
 }
 
 interface CharEncodingStep {
@@ -237,6 +241,7 @@ export function UTF8Encoder({
   initialValue = "",
   initialConverterMode = "encode",
   expectedAnswer,
+  onChangeState,
 }: UTF8EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -244,6 +249,11 @@ export function UTF8Encoder({
     initialConverterMode,
   );
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    onChangeState?.({ converterMode, inputValue });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [converterMode, inputValue]);
 
   const charSteps = useMemo((): CharEncodingStep[] => {
     if (converterMode !== "encode" || !inputValue) return [];
@@ -503,6 +513,7 @@ export function UTF8Encoder({
           </div>
 
           <BinaryInput
+            data-testid="utf8-input"
             label={inputLabel}
             value={inputValue}
             onChange={handleInputChange}
@@ -514,7 +525,14 @@ export function UTF8Encoder({
               <span className="text-muted-foreground text-xs font-medium">
                 {resultLabel}
               </span>
-              <div className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all">
+              <div
+                data-testid={
+                  converterMode === "encode"
+                    ? "utf8-result-hex"
+                    : "utf8-result-ascii"
+                }
+                className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all"
+              >
                 {result}
               </div>
             </div>
@@ -566,7 +584,10 @@ export function UTF8Encoder({
                           <span className="font-mono text-sm">
                             '{step.char}' → {step.codePointHex} (
                             {step.byteCount}{" "}
-                            {step.byteCount === 1 ? "byte" : "bytes"})
+                            {t("simulator.encoding.byteLabel", {
+                              count: step.byteCount,
+                            })}
+                            )
                           </span>
                         }
                       >

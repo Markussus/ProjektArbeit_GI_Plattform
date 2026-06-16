@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Info, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -26,6 +26,7 @@ export function Shifting({
   onShowSolution,
   onExitExercise,
   initialA,
+  onChangeValues,
   renderModeSelector,
 }: SingleOperandProps) {
   const { t } = useTranslation("translation");
@@ -34,6 +35,15 @@ export function Shifting({
   const [direction, setDirection] = useState<"left" | "right">("left");
   const [showStepByStep, setShowStepByStep] = useState(false);
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (initialA) setValA(initialA);
+  }, [initialA]);
+
+  useEffect(() => {
+    onChangeValues?.(valA, "");
+  }, [valA, onChangeValues]);
 
   const locked = !!isExerciseMode && !showSolution;
 

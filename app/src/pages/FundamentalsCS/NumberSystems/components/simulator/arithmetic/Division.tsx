@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -30,6 +30,7 @@ export function Division({
   onExitExercise,
   initialA,
   initialB,
+  onChangeValues,
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
@@ -37,6 +38,16 @@ export function Division({
   const [valB, setValB] = useState(initialB || "101");
   const [showStepByStep, setShowStepByStep] = useState(false);
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (initialA) setValA(initialA);
+    if (initialB) setValB(initialB);
+  }, [initialA, initialB]);
+
+  useEffect(() => {
+    onChangeValues?.(valA, valB);
+  }, [valA, valB, onChangeValues]);
 
   const locked = !!isExerciseMode && !showSolution;
 

@@ -57,6 +57,9 @@ export function ExercisesTab({
             id: exercise.id as TranslationKey,
             title: exercise.title,
             description: exercise.description,
+            titleKey: exercise.titleKey,
+            descriptionKey: exercise.descriptionKey,
+            descriptionParams: exercise.descriptionParams,
             difficulty: exercise.difficulty,
             icon: exercise.icon,
             kind: "exercise",
@@ -66,7 +69,7 @@ export function ExercisesTab({
               key={exercise.id}
               item={exerciseAsTopic}
               index={index}
-              testIdPrefix={`exercise-card-${exercise.exerciseType}`}
+              testIdPrefix={`exercise-card-${index}`}
               isSelected={selectedExercise?.id === exercise.id}
               onSelect={() => onSelectExercise(exerciseAsTopic)}
               onOpen={() => {

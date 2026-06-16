@@ -7,10 +7,6 @@ interface StepByStepToggleProps {
   className?: string;
 }
 
-/**
- * Toggle-Button für die Schritt-für-Schritt-Anzeige.
- * Zeigt einen List-Icon, den i18n-Label und einen Chevron an.
- */
 export function StepByStepToggle({
   open,
   onToggle,
