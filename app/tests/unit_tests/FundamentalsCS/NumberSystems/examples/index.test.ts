@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { numberSystemsExamples } from "../../../../../src/pages/FundamentalsCS/NumberSystems/examples";
+import { numberSystemsExamples } from "@/pages/FundamentalsCS/NumberSystems/examples";
 
 describe("Number Systems examples", () => {
   describe("example definitions", () => {
-    it("exports 13 examples", () => {
-      expect(numberSystemsExamples).toHaveLength(13);
+    it("exports 35 examples", () => {
+      expect(numberSystemsExamples).toHaveLength(35);
     });
 
     it("defines example_u03_1 for decimal-to-binary conversion", () => {
@@ -93,9 +93,9 @@ describe("Number Systems examples", () => {
       }
     });
 
-    it("all examples are easy difficulty", () => {
+    it("all examples have a valid difficulty", () => {
       for (const example of numberSystemsExamples) {
-        expect(example.difficulty).toBe("easy");
+        expect(["easy", "medium", "hard"]).toContain(example.difficulty);
       }
     });
   });
@@ -116,6 +116,7 @@ describe("Number Systems examples", () => {
       expect(Object.keys(groups)).toContain("04");
       expect(Object.keys(groups)).toContain("05");
       expect(Object.keys(groups)).toContain("06");
+      expect(Object.keys(groups)).toContain("07");
     });
   });
 });

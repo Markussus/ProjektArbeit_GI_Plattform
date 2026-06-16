@@ -71,6 +71,9 @@ export const TOPIC_STORAGE_IDS = {
   javaProgramming: 7,
 } as const;
 
+export const DEFAULT_TUTORIAL_VIDEO_URL =
+  "https://oc-stream.thws.de/static/mh_default_org/api/fc50e633-53d5-4c66-a1ac-9bd74d5ec83d/ebe5bb19-e657-47dd-87c0-8d156efbe342/block_opencast_video_upload2WyzUn_TM_Video.mp4";
+
 export interface ModuleTopicDefinition {
   id: string;
   storageId: number;
@@ -79,6 +82,7 @@ export interface ModuleTopicDefinition {
   path: string;
   icon: LucideIcon;
   accent: TopicAccent;
+  tutorialVideoUrl: string;
   element: ReactElement;
 }
 
@@ -110,6 +114,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/turing-machine",
         icon: Cpu,
         accent: "orange",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <TuringMachineTopicPage />,
       },
       {
@@ -120,6 +125,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/finite-automata",
         icon: GitBranch,
         accent: "blue",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <FiniteAutomataTopicPage />,
       },
       {
@@ -130,6 +136,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/regular-languages",
         icon: Languages,
         accent: "purple",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <RegularLanguagesTopicPage />,
       },
       {
@@ -140,6 +147,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/number-systems",
         icon: Hash,
         accent: "purple",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <NumberSystemsTopicPage />,
       },
       {
@@ -150,6 +158,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/moore-mealy",
         icon: ToggleLeft,
         accent: "green",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <MooreMealyTopicPage />,
       },
       {
@@ -160,6 +169,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/dnf",
         icon: TableProperties,
         accent: "rose",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <DnfTopicPage />,
       },
       {
@@ -170,6 +180,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/encoding",
         icon: Code2,
         accent: "blue",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <EncodingTopicPage />,
       },
     ],
@@ -190,6 +201,7 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/programming-1/java-programming",
         icon: Coffee,
         accent: "orange",
+        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
         element: <JavaProgrammingTopicPage />,
       },
     ],
@@ -218,4 +230,10 @@ export function findModuleByPath(pathname: string) {
       pathname === module.path ||
       module.topics.some((topic) => pathname === topic.path),
   );
+}
+
+export function findTopicById(topicId: string) {
+  return learningModules
+    .flatMap((module) => module.topics)
+    .find((topic) => topic.id === topicId);
 }

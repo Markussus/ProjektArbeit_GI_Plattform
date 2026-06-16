@@ -1,4 +1,4 @@
-import { FileText, Binary, Clock } from "lucide-react";
+import { FileText, Binary } from "lucide-react";
 import type { ExerciseDefinition, DescriptionParams } from "@/types/exercise";
 
 const PRINTABLE_ASCII =
@@ -47,14 +47,18 @@ function bytesToBinary(bytes: number[]): string {
 }
 
 export type EncodingExerciseType =
-  | "ascii_easy"
-  | "utf8_easy"
-  | "time_easy"
-  | "base64_medium"
-  | "utf8_medium"
-  | "time_medium"
-  | "base64_hard"
-  | "utf8_hard";
+  | "base64_encode_easy"
+  | "base64_encode_medium"
+  | "base64_encode_hard"
+  | "base64_decode_easy"
+  | "base64_decode_medium"
+  | "base64_decode_hard"
+  | "utf8_encode_easy"
+  | "utf8_encode_medium"
+  | "utf8_encode_hard"
+  | "utf8_decode_easy"
+  | "utf8_decode_medium"
+  | "utf8_decode_hard";
 
 export interface GeneratedExercise extends ExerciseDefinition {
   id: string;
@@ -69,102 +73,83 @@ interface ExerciseDefWithAnswer extends ExerciseDefinition {
   answer: string;
 }
 
-function generateAsciiExercise(): ExerciseDefWithAnswer {
-  const char = randomPrintableChar();
-  const ascii = char.charCodeAt(0);
-  const hex = ascii.toString(16).toUpperCase().padStart(2, "0");
+// ==========================================
+// Base64 Encode
+// ==========================================
+function generateBase64EncodeEasy(): ExerciseDefWithAnswer {
+  const str = randomString(1);
+  const encoded = toBase64(str);
   return {
-    titleKey: "encoding.ex_ascii_easy",
-    descriptionKey: "encoding.ex_ascii_easy_desc",
-    descriptionParams: { char, ascii, hex } as DescriptionParams,
-    answer: `${ascii}`,
+    titleKey: "encoding.ex_base64_encode_easy",
+    descriptionKey: "encoding.ex_base64_encode_easy_desc",
+    descriptionParams: { str } as DescriptionParams,
+    answer: encoded,
     difficulty: "easy",
     icon: FileText,
   };
 }
 
-function generateUtf8EasyExercise(): ExerciseDefWithAnswer {
-  const codePoint = randInt(0x0000, 0x007f);
-  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const binary = bytesToBinary(bytes);
-  return {
-    titleKey: "encoding.ex_utf8_easy",
-    descriptionKey: "encoding.ex_utf8_easy_desc",
-    descriptionParams: { hex, binary } as DescriptionParams,
-    answer: binary,
-    difficulty: "easy",
-    icon: Binary,
-  };
-}
-
-function generateTimeEasyExercise(): ExerciseDefWithAnswer {
-  const baseTimestamp = randInt(1000000000, 1700000000);
-  const hours = randInt(1, 48);
-  const result = baseTimestamp + hours * 3600;
-  return {
-    titleKey: "encoding.ex_time_easy",
-    descriptionKey: "encoding.ex_time_easy_desc",
-    descriptionParams: { timestamp: baseTimestamp, hours } as DescriptionParams,
-    answer: `${result}`,
-    difficulty: "easy",
-    icon: Clock,
-  };
-}
-
-function generateBase64MediumExercise(): ExerciseDefWithAnswer {
+function generateBase64EncodeMedium(): ExerciseDefWithAnswer {
   const str = randomString(3);
   const encoded = toBase64(str);
   return {
-    titleKey: "encoding.ex_base64_medium",
-    descriptionKey: "encoding.ex_base64_medium_desc",
-    descriptionParams: { str, encoded } as DescriptionParams,
+    titleKey: "encoding.ex_base64_encode_medium",
+    descriptionKey: "encoding.ex_base64_encode_medium_desc",
+    descriptionParams: { str } as DescriptionParams,
     answer: encoded,
     difficulty: "medium",
     icon: FileText,
   };
 }
 
-function generateUtf8MediumExercise(): ExerciseDefWithAnswer {
-  const codePoint = randInt(0x0800, 0xffff);
-  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const binary = bytesToBinary(bytes);
-  return {
-    titleKey: "encoding.ex_utf8_medium",
-    descriptionKey: "encoding.ex_utf8_medium_desc",
-    descriptionParams: { hex, binary } as DescriptionParams,
-    answer: binary,
-    difficulty: "medium",
-    icon: Binary,
-  };
-}
-
-function generateTimeMediumExercise(): ExerciseDefWithAnswer {
-  const now = Math.floor(Date.now() / 1000);
-  const yearsAgo = randInt(16, 25);
-  const birthTimestamp = now - yearsAgo * 365.25 * 24 * 3600;
-  const isAdult = yearsAgo >= 18;
-  return {
-    titleKey: "encoding.ex_time_medium",
-    descriptionKey: "encoding.ex_time_medium_desc",
-    descriptionParams: {
-      birthTimestamp: Math.floor(birthTimestamp),
-      nowTimestamp: now,
-      isAdult: isAdult ? "Ja" : "Nein",
-    } as DescriptionParams,
-    answer: isAdult ? "Ja" : "Nein",
-    difficulty: "medium",
-    icon: Clock,
-  };
-}
-
-function generateBase64HardExercise(): ExerciseDefWithAnswer {
-  const str = randomString(2);
+function generateBase64EncodeHard(): ExerciseDefWithAnswer {
+  const str = randomString(randInt(5, 8));
   const encoded = toBase64(str);
   return {
-    titleKey: "encoding.ex_base64_hard",
-    descriptionKey: "encoding.ex_base64_hard_desc",
+    titleKey: "encoding.ex_base64_encode_hard",
+    descriptionKey: "encoding.ex_base64_encode_hard_desc",
+    descriptionParams: { str } as DescriptionParams,
+    answer: encoded,
+    difficulty: "hard",
+    icon: FileText,
+  };
+}
+
+// ==========================================
+// Base64 Decode
+// ==========================================
+function generateBase64DecodeEasy(): ExerciseDefWithAnswer {
+  const str = randomString(1);
+  const encoded = toBase64(str);
+  return {
+    titleKey: "encoding.ex_base64_decode_easy",
+    descriptionKey: "encoding.ex_base64_decode_easy_desc",
+    descriptionParams: { encoded } as DescriptionParams,
+    answer: str,
+    difficulty: "easy",
+    icon: FileText,
+  };
+}
+
+function generateBase64DecodeMedium(): ExerciseDefWithAnswer {
+  const str = randomString(3);
+  const encoded = toBase64(str);
+  return {
+    titleKey: "encoding.ex_base64_decode_medium",
+    descriptionKey: "encoding.ex_base64_decode_medium_desc",
+    descriptionParams: { encoded } as DescriptionParams,
+    answer: str,
+    difficulty: "medium",
+    icon: FileText,
+  };
+}
+
+function generateBase64DecodeHard(): ExerciseDefWithAnswer {
+  const str = randomString(randInt(5, 8));
+  const encoded = toBase64(str);
+  return {
+    titleKey: "encoding.ex_base64_decode_hard",
+    descriptionKey: "encoding.ex_base64_decode_hard_desc",
     descriptionParams: { encoded } as DescriptionParams,
     answer: str,
     difficulty: "hard",
@@ -172,15 +157,102 @@ function generateBase64HardExercise(): ExerciseDefWithAnswer {
   };
 }
 
-function generateUtf8HardExercise(): ExerciseDefWithAnswer {
+// ==========================================
+// UTF-8 Encode
+// ==========================================
+function generateUtf8EncodeEasy(): ExerciseDefWithAnswer {
+  const codePoint = randInt(0x0000, 0x007f);
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const binary = bytesToBinary(bytes);
+  return {
+    titleKey: "encoding.ex_utf8_encode_easy",
+    descriptionKey: "encoding.ex_utf8_encode_easy_desc",
+    descriptionParams: { hex } as DescriptionParams,
+    answer: binary,
+    difficulty: "easy",
+    icon: Binary,
+  };
+}
+
+function generateUtf8EncodeMedium(): ExerciseDefWithAnswer {
+  const codePoint = randInt(0x0080, 0x07ff);
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const binary = bytesToBinary(bytes);
+  return {
+    titleKey: "encoding.ex_utf8_encode_medium",
+    descriptionKey: "encoding.ex_utf8_encode_medium_desc",
+    descriptionParams: { hex } as DescriptionParams,
+    answer: binary,
+    difficulty: "medium",
+    icon: Binary,
+  };
+}
+
+function generateUtf8EncodeHard(): ExerciseDefWithAnswer {
   const codePoint = randInt(0x0800, 0xffff);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
   const bytes = getUtf8Bytes(codePoint);
   const binary = bytesToBinary(bytes);
   return {
-    titleKey: "encoding.ex_utf8_hard",
-    descriptionKey: "encoding.ex_utf8_hard_desc",
-    descriptionParams: { binary, hex } as DescriptionParams,
+    titleKey: "encoding.ex_utf8_encode_hard",
+    descriptionKey: "encoding.ex_utf8_encode_hard_desc",
+    descriptionParams: { hex } as DescriptionParams,
+    answer: binary,
+    difficulty: "hard",
+    icon: Binary,
+  };
+}
+
+// ==========================================
+// UTF-8 Decode
+// ==========================================
+function generateUtf8DecodeEasy(): ExerciseDefWithAnswer {
+  const codePoint = randInt(0x0000, 0x007f);
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const hexBytes = bytes
+    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
+    .join(" ");
+  return {
+    titleKey: "encoding.ex_utf8_decode_easy",
+    descriptionKey: "encoding.ex_utf8_decode_easy_desc",
+    descriptionParams: { hexBytes } as DescriptionParams,
+    answer: hex,
+    difficulty: "easy",
+    icon: Binary,
+  };
+}
+
+function generateUtf8DecodeMedium(): ExerciseDefWithAnswer {
+  const codePoint = randInt(0x0080, 0x07ff);
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const hexBytes = bytes
+    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
+    .join(" ");
+  return {
+    titleKey: "encoding.ex_utf8_decode_medium",
+    descriptionKey: "encoding.ex_utf8_decode_medium_desc",
+    descriptionParams: { hexBytes } as DescriptionParams,
+    answer: hex,
+    difficulty: "medium",
+    icon: Binary,
+  };
+}
+
+function generateUtf8DecodeHard(): ExerciseDefWithAnswer {
+  const codePoint = randInt(0x0800, 0xffff);
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const hexBytes = bytes
+    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
+    .join(" ");
+  return {
+    titleKey: "encoding.ex_utf8_decode_hard",
+    descriptionKey: "encoding.ex_utf8_decode_hard_desc",
+    descriptionParams: { hexBytes } as DescriptionParams,
     answer: hex,
     difficulty: "hard",
     icon: Binary,
@@ -188,29 +260,40 @@ function generateUtf8HardExercise(): ExerciseDefWithAnswer {
 }
 
 const generators: Record<EncodingExerciseType, () => ExerciseDefWithAnswer> = {
-  ascii_easy: generateAsciiExercise,
-  utf8_easy: generateUtf8EasyExercise,
-  time_easy: generateTimeEasyExercise,
-  base64_medium: generateBase64MediumExercise,
-  utf8_medium: generateUtf8MediumExercise,
-  time_medium: generateTimeMediumExercise,
-  base64_hard: generateBase64HardExercise,
-  utf8_hard: generateUtf8HardExercise,
+  base64_encode_easy: generateBase64EncodeEasy,
+  base64_encode_medium: generateBase64EncodeMedium,
+  base64_encode_hard: generateBase64EncodeHard,
+  base64_decode_easy: generateBase64DecodeEasy,
+  base64_decode_medium: generateBase64DecodeMedium,
+  base64_decode_hard: generateBase64DecodeHard,
+  utf8_encode_easy: generateUtf8EncodeEasy,
+  utf8_encode_medium: generateUtf8EncodeMedium,
+  utf8_encode_hard: generateUtf8EncodeHard,
+  utf8_decode_easy: generateUtf8DecodeEasy,
+  utf8_decode_medium: generateUtf8DecodeMedium,
+  utf8_decode_hard: generateUtf8DecodeHard,
 };
 
 const easyTypes: EncodingExerciseType[] = [
-  "ascii_easy",
-  "utf8_easy",
-  "time_easy",
+  "base64_encode_easy",
+  "base64_decode_easy",
+  "utf8_encode_easy",
+  "utf8_decode_easy",
 ];
 const mediumTypes: EncodingExerciseType[] = [
-  "base64_medium",
-  "utf8_medium",
-  "time_medium",
+  "base64_encode_medium",
+  "base64_decode_medium",
+  "utf8_encode_medium",
+  "utf8_decode_medium",
 ];
-const hardTypes: EncodingExerciseType[] = ["base64_hard", "utf8_hard"];
+const hardTypes: EncodingExerciseType[] = [
+  "base64_encode_hard",
+  "base64_decode_hard",
+  "utf8_encode_hard",
+  "utf8_decode_hard",
+];
 
-function generateExercise(
+export function generateExercise(
   type: EncodingExerciseType,
   index: number,
 ): GeneratedExercise {
@@ -223,27 +306,26 @@ function generateExercise(
 
   if (type.includes("base64")) {
     mode = "base64";
-    converterMode = type.includes("hard") ? "decode" : "encode";
-    initialValue = type.includes("hard")
+    converterMode = type.includes("decode") ? "decode" : "encode";
+    initialValue = type.includes("decode")
       ? String(params.encoded ?? "")
       : String(params.str ?? "");
   } else if (type.includes("utf8")) {
     mode = "utf8";
-    converterMode = type.includes("hard") ? "decode" : "encode";
-    const codePoint = parseInt(String(params.hex ?? "0"), 16);
-    const char = String.fromCodePoint(codePoint);
-    if (type.includes("hard")) {
+    converterMode = type.includes("decode") ? "decode" : "encode";
+
+    if (type.includes("decode")) {
+      const hex = def.answer; // for decode, the answer is hex.
+      const codePoint = parseInt(hex, 16);
       const bytes = getUtf8Bytes(codePoint);
       initialValue = bytes
         .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
         .join(" ");
     } else {
-      initialValue = char;
+      const hex = String(params.hex ?? "0");
+      const codePoint = parseInt(hex, 16);
+      initialValue = String.fromCodePoint(codePoint);
     }
-  } else if (type.includes("ascii")) {
-    mode = "utf8";
-    converterMode = "encode";
-    initialValue = String(params.char ?? "");
   }
 
   return {
@@ -257,14 +339,22 @@ function generateExercise(
 }
 
 export function generateEncodingExercises(
-  count: number = 6,
+  count: number = 12,
 ): GeneratedExercise[] {
   const exercises: GeneratedExercise[] = [];
-  const types = [...easyTypes, ...mediumTypes, ...hardTypes];
+  const difficultyLevels = [
+    { types: easyTypes, count: Math.ceil(count / 3) },
+    { types: mediumTypes, count: Math.ceil(count / 3) },
+    { types: hardTypes, count: count - 2 * Math.ceil(count / 3) },
+  ];
 
-  for (let i = 0; i < count; i++) {
-    const type = types[randInt(0, types.length - 1)];
-    exercises.push(generateExercise(type, i));
+  let exerciseIndex = 0;
+  for (const level of difficultyLevels) {
+    if (level.types.length === 0) continue;
+    for (let i = 0; i < level.count; i++) {
+      const type = level.types[randInt(0, level.types.length - 1)];
+      exercises.push(generateExercise(type, exerciseIndex++));
+    }
   }
 
   return exercises;

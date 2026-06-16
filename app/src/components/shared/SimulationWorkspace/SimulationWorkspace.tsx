@@ -35,7 +35,7 @@ export function SimulationWorkspace({
     ? t(activeItem.titleKey)
     : activeItem?.title;
   const activeItemDescription = activeItem?.descriptionKey
-    ? t(activeItem.descriptionKey)
+    ? t(activeItem.descriptionKey, activeItem.descriptionParams)
     : activeItem?.description;
   const itemLabel =
     activeItem?.kind === "example"
@@ -85,8 +85,8 @@ export function SimulationWorkspace({
       >
         <div
           className={cn(
-            "flex justify-end gap-2",
-            overlayControls ? "absolute top-6 right-6 z-10" : "mb-3",
+            "absolute top-6 right-6 z-20 flex justify-end gap-2",
+            overlayControls && "bg-card/80 rounded-lg backdrop-blur-sm",
           )}
         >
           {onReset && (

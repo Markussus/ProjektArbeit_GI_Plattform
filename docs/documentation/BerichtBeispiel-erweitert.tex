@@ -1,0 +1,242 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{BerichtVorlage-erweitert}		% Stil einbinden
+
+\title{Mein Bericht}
+\author{Richard Schröder}
+\date{\today}
+
+% Optional: Header / Footer anpassen
+% Standardmäßig steht der Autor mittig im Header
+% und die Seitenzahl mittig im Footer.
+% \setheaderleft{abc}
+% \setheadercenter{Autor}
+% \setheaderright{xyz}
+% \setfooterleft{Entwurf}
+% \setfootercenter{Seite}
+% \setfooterright{Vertraulich}
+
+\setheaderleft{\hspace*{-0.68cm}\includegraphics[width=2cm]{THWS.pdf}}
+\setheaderright{Entwurf}
+
+\addbibresource{Literatur.bib}
+
+% Beispiel-Akronyme für das Abkürzungsverzeichnis.
+\newacronym[
+	description={Schnittstelle zur Kommunikation zwischen Softwarekomponenten}
+]{api}{API}{Application Programming Interface}
+
+\newacronym[
+	description={Hochschule aus Würzburg und Schweinfurt (Bayern) \cite{thws2026}}	% Geht nur wegen doppeltem biber Lauf in compile-erweitert.ps1 -> sonst vorher per \nocite{thws2026} laden
+]{thws}{THWS}{Technische Hochschule Würzburg-Schweinfurt}
+
+\begin{document}
+
+\begin{Cover}
+	\begin{center}
+		\includegraphics[width=8cm]{THWS.pdf}
+
+		\maketitle
+
+		\vspace{12em}
+		{Das ist das Deckblatt (ohne Header / Footer) \par}
+	\end{center}
+\end{Cover}
+
+\begin{PreContent}
+	Das ist der Vorinhaltsbereich (römische Seitenzahlen)
+
+	\tableofcontents
+	\listoffigures
+	\listoftables
+\end{PreContent}
+
+\begin{Content}
+	Das ist der Inhaltsbereich (arabische Seitenzahlen)
+
+	\subNsection{0}{Überschrift Ebene 0}
+	Dies ist ein Beispieltext im Inhaltsteil (Ebene 0).
+
+	Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+	\subNsection{1}{Überschrift Ebene 1}{Zusatzinfo}
+	Text auf Ebene 1.
+
+	\subNsection{2}{Überschrift Ebene 2}
+	Text auf Ebene 2.
+
+	\subNsection{3}{Überschrift Ebene 3}
+	Text auf Ebene 3.
+
+	\subNsection{4}{Überschrift Ebene 4}
+	Text auf Ebene 4.
+
+	\subNsection*{1}{Unnummerierter Abschnitt ohne TOC}
+	Dieser Abschnitt erscheint nicht im Inhaltsverzeichnis.
+
+	\subNsection*[toc]{1}{Unnummerierter Abschnitt mit TOC}
+	Dieser Abschnitt erscheint im Inhaltsverzeichnis und ist dorthin verlinkt.
+	
+	\subNsection{0}{Erweiterte Features}{Package berichtvorlage-erweitert}
+	Dieser Abschnitt stellt die zusätzlichen Funktionen aus dem erweiterten Stil vor. Das Basispaket liefert bereits Struktur, Header/Footer, Seitenzählung und den Befehl \verb|\subNsection|. Das Erweiterungspaket ergänzt typische Werkzeuge für technische Berichte.
+
+	\subNsection{1}{Mathematik}{mathtools, amssymb, amsfonts}
+	Mit den Mathematikpaketen können Gleichungen, Ausrichtungen, Mengensymbole und zusätzliche Operatoren sauber gesetzt werden:
+
+	\begin{align}
+		E &= m \cdot c^2 \\
+		A &\coloneqq \{x \in \mathbb{R} \mid x > 0\} \\
+		f(x) &= \begin{cases}
+			x^2, & x \geq 0 \\
+			-x,  & x < 0
+		\end{cases}
+	\end{align}
+
+	\begin{HinweisBox}
+		\texttt{mathtools} erweitert \texttt{amsmath}. Deshalb sind Umgebungen wie \texttt{align} und Komfortbefehle wie \verb|\coloneqq| direkt verfügbar.
+	\end{HinweisBox}
+
+	\subNsection{1}{Abbildungen und feste Platzierung}{graphicx, caption, float}
+	Bilder können direkt eingebunden, skaliert und beschriftet werden. Mit \verb|[H]| wird die Abbildung genau an dieser Stelle platziert.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.35\textwidth]{THWS.pdf}
+		\caption{Beispielhafte Abbildung mit \texttt{graphicx}, \texttt{caption} und \texttt{float}.}
+		\label{fig:thws-logo}
+	\end{figure}
+
+	In \autoref{fig:thws-logo} sieht man das Logo der \gls{thws}.
+
+	\subNsection{1}{TikZ-Diagramm}{tikz}
+	Mit TikZ lassen sich einfache Ablauf- oder Architekturdiagramme direkt in LaTeX zeichnen.
+
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[
+			node distance=1.2cm,
+			box/.style={draw, rounded corners, align=center, minimum width=4.2cm, minimum height=0.9cm},
+			arrow/.style={-{Latex}, thick}
+		]
+			\node[box] (basis) {\texttt{berichtvorlage}\\Grundstruktur};
+			\node[box, below=of basis] (extra) {\texttt{berichtvorlage-erweitert}\\Zusatzfunktionen};
+			\node[box, below left=of extra] (content) {Bericht\\Text, Tabellen, Bilder};
+			\node[box, below right=of extra] (refs) {Verzeichnisse\\Glossar, Literatur};
+
+			\draw[arrow] (basis) -- (extra);
+			\draw[arrow] (extra) -- (content);
+			\draw[arrow] (extra) -- (refs);
+		\end{tikzpicture}
+		\caption{Ein kleines TikZ-Diagramm zur Paketstruktur.}
+		\label{fig:paketstruktur}
+	\end{figure}
+
+	\subNsection{1}{Tabellen}{tabularx, booktabs, array}
+	Mit \texttt{tabularx} werden Tabellen automatisch auf die Textbreite angepasst. \texttt{booktabs} liefert saubere Tabellenlinien. Die Erweiterung definiert außerdem die Spaltentypen \texttt{L}, \texttt{C}, \texttt{R} und \texttt{Y}.
+
+	\begin{table}[H]
+		\centering
+		\caption{Beispieltabelle mit automatischer Breite.}
+		\label{tab:features}
+		\begin{tabularx}{\textwidth}{@{}L{0.28\textwidth}Y C{0.18\textwidth}@{}}
+			\toprule
+			\textbf{Feature} & \textbf{Beschreibung} & \textbf{Paket} \\
+			\midrule
+			Mathematik & Mehrzeilige Gleichungen, Mengenzeichen und zusätzliche Operatoren. & \texttt{mathtools} \\
+			Tabellen & Automatische Spaltenbreiten und professionelle Tabellenlinien. & \texttt{tabularx} \\
+			Boxen & Gerahmte Hinweis-, Beispiel- und Warnboxen. & \texttt{tcolorbox} \\
+			Literatur & Numerische Zitate im IEEE-Stil mit Biber. & \texttt{biblatex} \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+	\subNsection{1}{Mehrseitige Tabellen}{longtable}
+	\texttt{longtable} ist für Tabellen gedacht, die über mehrere Seiten laufen können. Das folgende Mini-Beispiel ist kurz, zeigt aber die Struktur.
+
+	\begin{longtable}{@{}L{0.28\textwidth}L{0.62\textwidth}@{}}
+		\caption{Beispiel für eine Longtable-Struktur.}\label{tab:longtable-demo}\\
+		\toprule
+		\textbf{Bereich} & \textbf{Nutzen} \\
+		\midrule
+		\endfirsthead
+		\toprule
+		\textbf{Bereich} & \textbf{Nutzen} \\
+		\midrule
+		\endhead
+		Glossar & Abkürzungen und Begriffe können zentral gepflegt werden. \\
+		Literatur & Quellen werden mit \verb|\cite| referenziert und am Ende automatisch ausgegeben. \\
+		Tabellen & Lange Tabellen können automatisch auf Folgeseiten fortgesetzt werden. \\
+		\bottomrule
+	\end{longtable}
+
+	\subNsection{1}{Listen}{enumitem}
+	Mit \texttt{enumitem} lassen sich Einrückungen, Labels und Abstände direkt anpassen.
+
+	\begin{itemize}[leftmargin=*, itemsep=0.3em]
+		\item Diese Liste nutzt die volle verfügbare Breite.
+		\item Der Abstand zwischen den Einträgen ist bewusst klein gehalten.
+		\item Das ist praktisch für technische Dokumentation und Anforderungslisten.
+	\end{itemize}
+
+	\begin{enumerate}[label=\alph*)]
+		\item erste Variante,
+		\item zweite Variante,
+		\item dritte Variante.
+	\end{enumerate}
+
+	\subNsection{1}{Code und Konsolenausgaben}{fancyvrb}
+	Mit \texttt{fancyvrb} lassen sich Codeblöcke oder Konsolenausgaben sauber darstellen.
+
+	\begin{Verbatim}[frame=single, fontsize=\small]
+pdflatex -interaction=nonstopmode -halt-on-error BerichtBeispiel-erweitert.tex
+biber BerichtBeispiel-erweitert
+pdflatex -interaction=nonstopmode -halt-on-error BerichtBeispiel-erweitert.tex
+pdflatex -interaction=nonstopmode -halt-on-error BerichtBeispiel-erweitert.tex
+	\end{Verbatim}
+
+	\subNsection{1}{Hinweis-, Beispiel- und Warnboxen}{tcolorbox}
+	Der Erweiterungsstil definiert drei einfache Boxumgebungen.
+
+	\begin{HinweisBox}
+		Das ist eine Hinweisbox. Sie eignet sich für Zusatzinformationen, die nicht im Fließtext untergehen sollen.
+	\end{HinweisBox}
+
+	\begin{BeispielBox}
+		Das ist eine Beispielbox. Hier kann ein konkretes Anwendungsbeispiel oder ein kurzer Merksatz stehen.
+	\end{BeispielBox}
+
+	\begin{WarnungBox}
+		Das ist eine Warnbox. Sie kann für typische Fehler, Einschränkungen oder wichtige Hinweise verwendet werden.
+	\end{WarnungBox}
+
+	\subNsection{1}{Textauszeichnung und Typografie}{ulem, microtype}
+	\texttt{ulem} erlaubt zusätzliche Textauszeichnungen wie \uline{Unterstreichung} oder \sout{Durchstreichung}. Durch die Option \texttt{normalem} bleibt \verb|\emph| weiterhin \emph{kursiv}.
+
+	\texttt{microtype} sieht man nicht direkt als Befehl im Text. Es verbessert im Hintergrund den Randausgleich und die Umbruchqualität.
+
+	\subNsection{1}{Glossar und Akronyme}{glossaries}
+	Beim ersten Auftreten wird ein Akronym ausgeschrieben, danach wird die Kurzform verwendet. Beispiel: Eine \gls{api} kann in Softwareprojekten dokumentiert werden. Außerdem ist eine \gls{api} cool.
+
+	\subNsection{1}{Literaturverweise}{biblatex und biber}
+	Quellen werden mit \verb|\cite{...}| referenziert. Beispielhaft wird hier auf klassische Literatur zu \LaTeX{} und \TeX{} verwiesen \cite{lamport1994latex,knuth1984texbook}. Das Literaturverzeichnis wird später automatisch aus der Datei \texttt{Literatur.bib} erzeugt.
+\end{Content}
+
+\begin{PostContent}
+	Das ist der Nachinhaltsbereich (römische Seitenzahlen)
+
+	\subNsection*[toc]{0}{Anhang}
+	Anhangstext.
+
+	Hier kann man ganz viele Anhänge (z. B. Bilder) einfügen.
+
+	\subNsection*[toc]{1}{Abkürzungsverzeichnis}
+
+	\printacronyms[heading=none]
+
+	\subNsection*[toc]{1}{Literatur}
+
+	Hier kommt das automatisch erzeugte Literaturverzeichnis. Die Option \verb|heading=none| unterdrückt die BibLaTeX-Überschrift, weil sie bereits durch \verb|\subNsection| gesetzt wurde.
+
+	\printbibliography[heading=none]
+\end{PostContent}
+
+\end{document}

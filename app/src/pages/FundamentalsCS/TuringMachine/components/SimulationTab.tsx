@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { Popup } from "@/components/shared/Popup/Popup";
-import { TableView } from "@/components/shared/TableVisual/TableView";
+import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import {
   TMSimulator,
@@ -120,45 +119,30 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         />
       </TopicSimulationTab>
 
-      <Popup
+      <SolutionCheckDialog
         open={checkResult !== null}
         title={t("tm.validation.summary.popupTitle")}
         onClose={() => setCheckResult(null)}
         testId="tm-solution-check-dialog"
-      >
-        <div className="space-y-4">
-          {checkResult?.error && (
-            <p
-              data-testid="tm-solution-check-error"
-              className="text-sm text-red-600"
-            >
-              {checkResult.error}
-            </p>
-          )}
-
-          {checkResult && checkResult.rows.length > 0 && (
-            <TableView
-              testIdPrefix="tm-solution-check-table"
-              headers={[
-                t("tm.validation.table.passed"),
-                t("tm.validation.table.input"),
-                t("tm.validation.table.output"),
-                t("tm.validation.table.expectedOutput"),
-                t("tm.validation.table.validHaltState"),
-              ]}
-              rows={resultRows}
-              getRowTestAttributes={(rowIndex) => ({
-                "data-passed": String(checkResult.rows[rowIndex]?.passed),
-                "data-valid-halt-state": String(
-                  checkResult.rows[rowIndex]?.endedInValidHaltState,
-                ),
-              })}
-              firstColumnWidthClassName="w-[6rem] max-w-[8rem]"
-              dataColumnWidthClassName="w-[11.5rem] max-w-[12rem]"
-            />
-          )}
-        </div>
-      </Popup>
+        error={checkResult?.error}
+        errorTestId="tm-solution-check-error"
+        tableTestIdPrefix="tm-solution-check-table"
+        headers={[
+          t("tm.validation.table.passed"),
+          t("tm.validation.table.input"),
+          t("tm.validation.table.output"),
+          t("tm.validation.table.expectedOutput"),
+          t("tm.validation.table.validHaltState"),
+        ]}
+        rows={resultRows}
+        getRowTestAttributes={(rowIndex) => ({
+          "data-passed": String(checkResult?.rows[rowIndex]?.passed),
+          "data-valid-halt-state": String(
+            checkResult?.rows[rowIndex]?.endedInValidHaltState,
+          ),
+        })}
+        dataColumnWidthClassName="w-[11.5rem] max-w-[12rem]"
+      />
     </>
   );
 }

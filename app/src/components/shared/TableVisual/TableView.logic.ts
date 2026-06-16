@@ -1,5 +1,5 @@
 export const TABLE_CONTAINER_CLASS =
-  "bg-card text-card-foreground w-max max-w-full overflow-x-auto rounded-lg border shadow-sm";
+  "bg-card text-card-foreground w-max max-w-full overflow-x-auto rounded-lg border shadow-sm select-none";
 export const TABLE_CLASS = "w-max table-fixed border-collapse text-sm";
 export const HEADER_ROW_CLASS = "bg-muted/50 border-b";
 export const HEADER_CELL_CLASS =
@@ -20,7 +20,7 @@ export const BODY_CELL_SECONDARY_CLASS = "bg-primary/5";
 export const BODY_CELL_INVALID_CLASS =
   "bg-destructive/10 ring-destructive z-10 ring-2 ring-inset";
 export const CELL_INPUT_CLASS =
-  "focus:ring-primary hover:bg-muted/50 focus:bg-background w-full rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "focus:ring-primary hover:bg-muted/50 focus:bg-background w-full select-text rounded border-none bg-transparent px-2 py-1 font-mono text-sm transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 export const CELL_INPUT_INVALID_CLASS =
   "text-destructive focus:ring-destructive";
 export const READ_ONLY_CELL_CLASS =
@@ -73,6 +73,7 @@ export interface TableViewProps {
   className?: string;
   tableClassName?: string;
   disableActiveCellAutoScroll?: boolean;
+  enableDragScroll?: boolean;
   testIdPrefix?: string;
   getRowTestAttributes?: (
     rowIndex: number,

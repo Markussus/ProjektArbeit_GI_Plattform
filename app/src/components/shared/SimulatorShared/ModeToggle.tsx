@@ -21,6 +21,7 @@ export function ModeToggle<T extends string>({
       {options.map((option) => (
         <button
           key={option.value}
+          data-testid={`mode-toggle-${option.value}`}
           onClick={() => onChange(option.value)}
           disabled={disabled}
           className={`rounded-sm px-3 py-1.5 text-xs font-medium ${

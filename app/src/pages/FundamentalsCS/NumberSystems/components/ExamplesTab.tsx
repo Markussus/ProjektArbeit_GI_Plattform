@@ -7,13 +7,14 @@ import type { Example } from "@/types/exercise";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import type { ExerciseDefinition } from "@/types/exercise";
 
-const exampleGroupOrder = ["03", "04", "05", "06"] as const;
+const exampleGroupOrder = ["03", "04", "05", "06", "07"] as const;
 
 const exampleGroupIcons = {
   "03": Hash,
   "04": Binary,
   "05": Calculator,
   "06": Calculator,
+  "07": BookOpen,
 } as const;
 
 type ExampleGroup = (typeof exampleGroupOrder)[number];

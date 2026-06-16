@@ -4,18 +4,14 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 interface CollapsibleStepProps {
   isOpen: boolean;
   onToggle: () => void;
-  /** Inhalt der immer sichtbaren Zeile (Step-Vorschau) */
+
   header: ReactNode;
-  /** Inhalt des aufgeklappten Bereichs */
+
   children: ReactNode;
-  /** Optionale CSS-Klassen für den Wrapper */
+
   className?: string;
 }
 
-/**
- * Zusammenklappbarer Schritt-Eintrag für Step-by-Step-Listen.
- * Kapselt Border, Hover-Effekte, Chevron und expandierten Bereich.
- */
 export function CollapsibleStep({
   isOpen,
   onToggle,

@@ -1,7 +1,15 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "@/types/exercise";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
+import { buildDnfFollowUpConfiguration } from "./application/dnfFollowUp";
 import { useDnfBuilder } from "./application/useDnfBuilder";
+import {
+  dnfExerciseTransferCodec,
+  type DnfExerciseTransferDraft,
+} from "./domain/dnfTransfer";
 import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "./presentation/DnfFollowUpSections";
 import {
@@ -11,11 +19,45 @@ import {
 
 interface DnfBuilderProps {
   selectedExercise: Exercise;
+  initialAttempt?: DnfExerciseTransferDraft;
+  storageIdentifier: string;
+  storageEnabled: boolean;
+  storageReady: boolean;
+  transferCodec: ISimulatorTransferCodec<DnfExerciseTransferDraft>;
+  onUserChange?: () => void;
 }
 
-export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
-  const builder = useDnfBuilder(selectedExercise);
+export function DnfBuilder({
+  selectedExercise,
+  initialAttempt,
+  storageIdentifier,
+  storageEnabled,
+  storageReady,
+  transferCodec,
+  onUserChange,
+}: DnfBuilderProps) {
+  const builder = useDnfBuilder(selectedExercise, initialAttempt);
   const [showFullTable, setShowFullTable] = useState(false);
+  const transferValue = useMemo<DnfExerciseTransferDraft>(
+    () => ({
+      truthTableAnswers: builder.truthTableAnswers,
+      dnfAnswer: builder.dnfAnswer,
+      simplificationAnswer: builder.simplification.answer,
+    }),
+    [
+      builder.dnfAnswer,
+      builder.simplification.answer,
+      builder.truthTableAnswers,
+    ],
+  );
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfExerciseTransferCodec,
+    enabled: storageEnabled && storageReady,
+  });
+
   const display = useMemo(() => {
     if (!builder.showSolution || builder.analysis.status !== "valid") {
       return null;
@@ -48,35 +90,19 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
 
   const analysis = builder.analysis;
   const truthTable = analysis.truthTable;
-  const simplification = builder.simplification;
-  const simplificationControls = {
-    answer: simplification.answer,
-    feedback: simplification.feedback,
-    showSolution: simplification.showSolution,
-    showWalkthrough: simplification.showWalkthrough,
-    onAnswerChange: simplification.setAnswer,
-    onCheck: () => simplification.check(truthTable),
-    onToggleSolution: simplification.toggleSolution,
-    onToggleWalkthrough: simplification.toggleWalkthrough,
-  };
-  const solution =
-    builder.showSolution && display
-      ? {
-          formattedDnf: analysis.formattedDnf,
-          variableCount: truthTable.variables.length,
-          rowCount: truthTable.rows.length,
-          trueRowCount: analysis.derivation.trueRows.length,
-          derivation: analysis.derivation,
-          display,
-          resultHeader: builder.resultHeader,
-          truthTable,
-        }
-      : undefined;
-  const simplificationFollowUp = {
-    truthTable,
-    controls: simplificationControls,
-    isEnabled: builder.exerciseFeedback?.isCorrect === true,
-  };
+  const { solution, simplification: simplificationFollowUp } =
+    buildDnfFollowUpConfiguration({
+      analysis,
+      display,
+      resultHeader: builder.resultHeader,
+      showSolution: builder.showSolution,
+      feedback: builder.exerciseFeedback,
+      simplification: builder.simplification,
+      simplificationAnswerChange: (value) => {
+        onUserChange?.();
+        builder.simplification.setAnswer(value);
+      },
+    });
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -91,18 +117,30 @@ export function DnfBuilder({ selectedExercise }: DnfBuilderProps) {
         requiresTruthTableAnswers={builder.requiresTruthTableAnswers}
         canToggleFullTable={true}
         showFullTable={showFullTable}
-        onTruthTableAnswerChange={builder.setTruthTableAnswer}
-        onDnfAnswerChange={builder.setDnfAnswer}
+        onTruthTableAnswerChange={(rowIndex, value) => {
+          onUserChange?.();
+          builder.setTruthTableAnswer(rowIndex, value);
+        }}
+        onDnfAnswerChange={(value) => {
+          onUserChange?.();
+          builder.setDnfAnswer(value);
+        }}
         onCheck={builder.checkExercise}
-        onReset={builder.reset}
         onToggleSolution={builder.toggleSolution}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
 
-      <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
-        simplification={simplificationFollowUp}
+      <DnfFollowUpSections simplification={simplificationFollowUp} />
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={(attempt) => {
+          onUserChange?.();
+          builder.loadAttempt(attempt);
+        }}
+        testIdPrefix="dnf-exercise-transfer"
       />
     </div>
   );

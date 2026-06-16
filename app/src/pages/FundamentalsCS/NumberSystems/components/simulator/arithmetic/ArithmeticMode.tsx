@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { Addition } from "./Addition";
@@ -9,14 +9,10 @@ import { Shifting } from "./Shifting";
 import { IEEEAddition } from "./IEEEAddition";
 import { Compare } from "./Compare";
 
-type ArithmeticModeType =
-  | "addition"
-  | "subtraction"
-  | "multiplication"
-  | "division"
-  | "shifting"
-  | "ieee754"
-  | "compare";
+import type {
+  ArithmeticModeState,
+  ArithmeticModeType,
+} from "../nsTransferCodec";
 
 interface ArithmeticModeProps {
   isExerciseMode?: boolean;
@@ -26,6 +22,8 @@ interface ArithmeticModeProps {
   initialMode?: ArithmeticModeType;
   initialValueA?: string;
   initialValueB?: string;
+  initialState?: ArithmeticModeState;
+  onChangeState?: (state: ArithmeticModeState) => void;
 }
 
 export function ArithmeticMode({
@@ -36,10 +34,34 @@ export function ArithmeticMode({
   initialMode = "addition",
   initialValueA,
   initialValueB,
+  initialState,
+  onChangeState,
 }: ArithmeticModeProps) {
   const { t } = useTranslation("translation");
-  const [activeSubMode, setActiveSubMode] =
-    useState<ArithmeticModeType>(initialMode);
+  const locked = !!isExerciseMode && !showSolution;
+  const [activeSubMode, setActiveSubMode] = useState<ArithmeticModeType>(
+    locked ? initialMode : (initialState?.activeSubMode ?? initialMode),
+  );
+  const [valA, setValA] = useState<string>(
+    locked
+      ? initialValueA || ""
+      : (initialState?.valA ?? (initialValueA || "")),
+  );
+  const [valB, setValB] = useState<string>(
+    locked
+      ? initialValueB || ""
+      : (initialState?.valB ?? (initialValueB || "")),
+  );
+
+  useEffect(() => {
+    onChangeState?.({ activeSubMode, valA, valB });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSubMode, valA, valB]);
+
+  const handleChangeValues = (a: string, b: string) => {
+    setValA(a);
+    setValB(b);
+  };
 
   const modeSelector = (
     <div>
@@ -91,8 +113,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
-            initialB={initialValueB}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -102,8 +125,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
-            initialB={initialValueB}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -113,8 +137,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
-            initialB={initialValueB}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -124,8 +149,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
-            initialB={initialValueB}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -135,7 +161,8 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
+            initialA={valA}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -145,6 +172,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}
@@ -154,8 +184,9 @@ export function ArithmeticMode({
             showSolution={showSolution}
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
-            initialA={initialValueA}
-            initialB={initialValueB}
+            initialA={valA}
+            initialB={valB}
+            onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />
         )}

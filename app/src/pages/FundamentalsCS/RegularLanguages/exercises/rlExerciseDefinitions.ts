@@ -250,29 +250,6 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
 ];
 
-/** Section order + heading/description keys used by the exercises tab. */
-export const rlExerciseCategories: {
-  category: RLExerciseCategory;
-  titleKey: TranslationKey;
-  descriptionKey: TranslationKey;
-}[] = [
-  {
-    category: "grammarToLanguage",
-    titleKey: "rl.exercises.categories.grammarToLanguage.title",
-    descriptionKey: "rl.exercises.categories.grammarToLanguage.description",
-  },
-  {
-    category: "languageToGrammar",
-    titleKey: "rl.exercises.categories.languageToGrammar.title",
-    descriptionKey: "rl.exercises.categories.languageToGrammar.description",
-  },
-  {
-    category: "applied",
-    titleKey: "rl.exercises.categories.applied.title",
-    descriptionKey: "rl.exercises.categories.applied.description",
-  },
-];
-
 export function findRLExercise(id: string): RLExerciseDefinition | undefined {
   return rlExercises.find((e) => e.id === id || e.titleKey === id);
 }

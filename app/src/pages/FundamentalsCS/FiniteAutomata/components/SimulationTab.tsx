@@ -1,73 +1,194 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { FASimulator } from "./Simulator/FASimulator";
-import { FAExerciseWorkspacePanel } from "./Simulator/presentation/FAExerciseWorkspacePanel";
 import type { FAProgram } from "./Simulator/domain/faTypes";
+import {
+  validateAgainstSolution,
+  type ValidationResult,
+} from "./Simulator/domain/faExerciseValidation";
 import { findFAExercise } from "../exercises/faExerciseDefinitions";
 import { useFASimulatorStore } from "../store/faSimulatorStore";
 
-export function SimulationTab(props: ModuleSimulationTabProps) {
-  const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
-  const studentProgram = useFASimulatorStore((s) => s.studentProgram);
-  const loadExample = useFASimulatorStore((s) => s.loadExample);
-  const setPendingInputWord = useFASimulatorStore((s) => s.setPendingInputWord);
+type CheckResult = ValidationResult | "unbuilt";
 
-  // Drive the exercise panel from the page-level selection rather than a
-  // separate store flag. The page clears `selectedExercise` whenever the
-  // exercise is exited, a tab switch is confirmed, or an example is opened in
-  // its place — so the workspace panel never lingers behind those actions.
+export function SimulationTab(props: ModuleSimulationTabProps) {
+  const { t } = useTranslation();
+  const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
+  const loadExample = useFASimulatorStore((s) => s.loadExample);
+
+  // The opened exercise (if any) drives the action buttons. Examples still flow
+  // through the shared "Selected example" card with no actions.
   const activeExercise = props.selectedExercise
     ? findFAExercise(props.selectedExercise.id)
     : undefined;
 
-  // Keep the store flag in sync so other store consumers (e.g. solution
-  // seeding) agree with what is actually displayed.
+  const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
+
+  // Keep the store flag in sync so other consumers agree with what is shown.
   useEffect(() => {
     setActiveExercise(activeExercise?.id ?? null);
   }, [activeExercise?.id, setActiveExercise]);
 
-  // The FA panel above is the only "selected exercise" display we use here.
-  // Suppress the shared workspace card unconditionally so closing an exercise
-  // doesn't leak the parent's last-selected exercise back into view.
-  const selectedExercise = null;
-
-  const handleLoadSolution = (solution: FAProgram) => {
+  const handleLoadSolution = () => {
+    if (!activeExercise) {
+      return;
+    }
     const seedInput =
-      activeExercise?.exampleWords?.accept.find((w) => w.length > 0) ?? "";
-    loadExample(solution, seedInput);
+      activeExercise.exampleWords?.accept.find((w) => w.length > 0) ?? "";
+    loadExample(activeExercise.solution, seedInput);
   };
 
-  const handleExitExercise = () => {
-    setActiveExercise(null);
-    props.onExitExercise?.();
+  const handleCheckSolution = () => {
+    if (!activeExercise) {
+      return;
+    }
+    const studentProgram =
+      useFASimulatorStore.getState().studentProgram ?? activeExercise.starter;
+
+    if (isUnbuilt(studentProgram)) {
+      setCheckResult("unbuilt");
+      return;
+    }
+
+    setCheckResult(
+      validateAgainstSolution(studentProgram, activeExercise.solution, {
+        maxLen: activeExercise.maxTestLen ?? 4,
+      }),
+    );
   };
+
+  const headerActions = activeExercise ? (
+    <>
+      <button
+        type="button"
+        onClick={handleLoadSolution}
+        data-testid="fa-load-solution"
+        className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
+      >
+        {t("fa.exerciseWorkspace.showSolution")}
+      </button>
+      <button
+        type="button"
+        onClick={handleCheckSolution}
+        data-testid="fa-check-solution"
+        className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90"
+      >
+        {t("fa.exerciseWorkspace.check")}
+      </button>
+    </>
+  ) : null;
 
   return (
-    <div className="space-y-4">
-      {activeExercise && (
-        // key forces a fresh mount when switching between exercises, so the
-        // panel's local hint/solution state never carries over.
-        <FAExerciseWorkspacePanel
-          key={activeExercise.id}
-          exercise={activeExercise}
-          studentProgram={studentProgram ?? activeExercise.starter}
-          onLoadSolution={handleLoadSolution}
-          onLoadExampleWord={setPendingInputWord}
-          onExit={handleExitExercise}
-        />
-      )}
+    <>
       <TopicSimulationTab
         {...props}
-        selectedExercise={selectedExercise}
-        // While an exercise is active the workspace panel above is its header,
-        // so suppress the shared "Selected exercise" card to avoid showing it
-        // twice. Examples still fall through to the shared card.
-        selectedItem={activeExercise ? null : props.selectedItem}
+        selectedItem={props.selectedItem}
+        selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.automata"
       >
         <FASimulator />
       </TopicSimulationTab>
+
+      <SolutionCheckDialog
+        open={checkResult !== null}
+        title={t("fa.exerciseWorkspace.check")}
+        onClose={() => setCheckResult(null)}
+        testId="fa-solution-check-dialog"
+        summary={checkResult && <CheckSummary result={checkResult} />}
+        tableTestIdPrefix="fa-solution-check-table"
+        headers={[]}
+        rows={[]}
+      />
+    </>
+  );
+}
+
+/** A "fresh starter" automaton has no accept states and no transitions. */
+function isUnbuilt(program: FAProgram): boolean {
+  const noAccept = program.acceptStates.length === 0;
+  const noTransitions = Object.values(program.transitions).every(
+    (row) => Object.keys(row).length === 0,
+  );
+  return noAccept && noTransitions;
+}
+
+function CheckSummary({ result }: { result: CheckResult }) {
+  const { t } = useTranslation();
+
+  if (result === "unbuilt") {
+    return (
+      <div>
+        <p className="text-foreground text-sm font-semibold">
+          {t("fa.exerciseWorkspace.unbuiltTitle")}
+        </p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {t("fa.exerciseWorkspace.unbuiltBody")}
+        </p>
+      </div>
+    );
+  }
+
+  if (result.structuralIssues.length > 0) {
+    return (
+      <div>
+        <p className="text-destructive text-sm font-semibold">
+          {t("fa.exerciseWorkspace.structuralFail")}
+        </p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {t("fa.exerciseWorkspace.structuralHint")}
+        </p>
+      </div>
+    );
+  }
+
+  if (result.passed) {
+    return (
+      <div>
+        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+          {t("fa.exerciseWorkspace.passed")}
+        </p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {t("fa.exerciseWorkspace.passedDetail", {
+            n: result.passedCount,
+            total: result.total,
+          })}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-destructive text-sm font-semibold">
+        {t("fa.exerciseWorkspace.failed")}
+      </p>
+      <p className="text-muted-foreground mt-1 text-sm">
+        {t("fa.exerciseWorkspace.failedDetail", {
+          passed: result.passedCount,
+          total: result.total,
+          failed: result.failedCount,
+        })}
+      </p>
+      {result.firstFailure && (
+        <p className="text-muted-foreground mt-2 text-sm">
+          {t("fa.exerciseWorkspace.counterexample")}{" "}
+          <span className="text-foreground font-mono">
+            {result.firstFailure.word === "" ? "ε" : result.firstFailure.word}
+          </span>{" "}
+          ({t("fa.exerciseWorkspace.expected")}{" "}
+          {result.firstFailure.expected
+            ? t("fa.exerciseWorkspace.accept")
+            : t("fa.exerciseWorkspace.reject")}
+          , {t("fa.exerciseWorkspace.got")}{" "}
+          {result.firstFailure.got
+            ? t("fa.exerciseWorkspace.accept")
+            : t("fa.exerciseWorkspace.reject")}
+          )
+        </p>
+      )}
     </div>
   );
 }

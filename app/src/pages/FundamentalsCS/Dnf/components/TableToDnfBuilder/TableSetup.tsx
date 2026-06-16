@@ -13,6 +13,7 @@ interface TableSetupProps {
   truthTable: TruthTable;
   variableCount: number;
   resultValues: boolean[];
+  transferControl?: ReactNode;
   onVariableCountChange: (value: number) => void;
   onResultValuesChange: (values: boolean[]) => void;
   onResultChange: (rowIndex: number, value: boolean) => void;
@@ -23,6 +24,7 @@ export function TableSetup({
   truthTable,
   variableCount,
   resultValues,
+  transferControl,
   onVariableCountChange,
   onResultValuesChange,
   onResultChange,
@@ -135,6 +137,8 @@ export function TableSetup({
           {t("dnf.simulator.commitTable")}
         </button>
       </div>
+
+      {transferControl}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Info, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { IEEE754ConverterState } from "./nsTransferCodec";
 
 interface IEEE754ConverterProps {
   isExerciseMode?: boolean;
@@ -10,6 +11,8 @@ interface IEEE754ConverterProps {
   onExitExercise?: () => void;
   initialValue?: string;
   initialConverterMode?: "decToIeee" | "ieeeToDec";
+  initialState?: IEEE754ConverterState;
+  onChangeState?: (state: IEEE754ConverterState) => void;
 }
 
 export function IEEE754Converter({
@@ -19,20 +22,27 @@ export function IEEE754Converter({
   onExitExercise,
   initialValue = "",
   initialConverterMode = "decToIeee",
+  initialState,
+  onChangeState,
 }: IEEE754ConverterProps) {
   const { t } = useTranslation("translation");
-  const [inputValue, setInputValue] = useState<string>("12.5");
+  const locked = !!isExerciseMode && !showSolution;
+  const [inputValue, setInputValue] = useState<string>(
+    locked
+      ? initialValue || "12.5"
+      : (initialState?.inputValue ?? (initialValue || "12.5")),
+  );
+
   const [converterMode, setConverterMode] = useState<"decToIeee" | "ieeeToDec">(
-    initialConverterMode,
+    locked
+      ? initialConverterMode
+      : (initialState?.converterMode ?? initialConverterMode),
   );
 
   useEffect(() => {
-    if (initialValue) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInputValue(initialValue);
-      setConverterMode(initialConverterMode);
-    }
-  }, [initialValue, initialConverterMode]);
+    onChangeState?.({ inputValue, converterMode });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, converterMode]);
 
   // PARSE LOGIC
   const cleanBinary = inputValue.replace(/[^01]/g, "");
@@ -95,7 +105,6 @@ export function IEEE754Converter({
 
   const isZero = isValid && floatVal === 0;
   const isInf = isValid && !isFinite(floatVal) && !isNaNVal;
-  const locked = !!isExerciseMode && !showSolution;
 
   // Fraction Math for Explanation
   let sumOfFractions = 0;

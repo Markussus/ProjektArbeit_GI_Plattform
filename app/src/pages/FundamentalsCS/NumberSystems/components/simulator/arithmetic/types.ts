@@ -13,6 +13,7 @@ export interface BaseArithmeticProps {
   onExitExercise?: () => void;
   initialA?: string;
   initialB?: string;
+  onChangeValues?: (valA: string, valB: string) => void;
 }
 
 /**
