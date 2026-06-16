@@ -24,7 +24,6 @@ interface DnfExerciseWorkspaceProps {
   showSolution: boolean;
   resultHeader: string;
   requiresTruthTableAnswers: boolean;
-  canAlwaysShowSolution?: boolean;
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
   showFullTable?: boolean;
@@ -44,7 +43,6 @@ export function DnfExerciseWorkspace({
   showSolution,
   resultHeader,
   requiresTruthTableAnswers,
-  canAlwaysShowSolution = false,
   canEditTruthTableResults = false,
   canToggleFullTable = false,
   showFullTable = false,
@@ -64,7 +62,7 @@ export function DnfExerciseWorkspace({
     (answer) => answer !== null,
   ).length;
   const hasDnfAttempt = dnfAnswer.trim().length > 0;
-  const canShowSolution = canAlwaysShowSolution || feedback !== null;
+  const canShowSolution = feedback !== null;
   const canInteractWithResultColumn =
     requiresTruthTableAnswers || canEditTruthTableResults;
   const isLargeWorkspaceTable =

@@ -242,7 +242,6 @@ export function TableToDnfBuilder({
         showSolution={showSolution}
         resultHeader="f"
         requiresTruthTableAnswers={false}
-        canAlwaysShowSolution={true}
         canEditTruthTableResults={false}
         canToggleFullTable={true}
         showFullTable={showFullTable}

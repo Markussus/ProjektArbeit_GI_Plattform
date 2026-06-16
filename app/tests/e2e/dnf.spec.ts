@@ -134,6 +134,9 @@ test.describe("DNF page", () => {
 
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await expect(page.getByTestId("dnf-reset-answer")).toHaveCount(0);
+    await expect(page.getByTestId("dnf-toggle-solution")).toBeDisabled();
+    await page.getByTestId("dnf-check-answer").click();
+    await expect(page.getByTestId("dnf-toggle-solution")).toBeEnabled();
     await page.getByTestId("dnf-toggle-solution").click();
     await expect(page.getByTestId("dnf-follow-up-solution")).toBeVisible();
     await expect(page.getByTestId("dnf-follow-up-solution-toggle")).toHaveCount(

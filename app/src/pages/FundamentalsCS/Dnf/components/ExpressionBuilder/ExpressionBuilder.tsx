@@ -340,7 +340,6 @@ function ExpressionWorkspace({
         showSolution={showSolution}
         resultHeader={committedSource}
         requiresTruthTableAnswers={true}
-        canAlwaysShowSolution={true}
         canToggleFullTable={true}
         showFullTable={showFullTable}
         onTruthTableAnswerChange={setTruthTableAnswer}
