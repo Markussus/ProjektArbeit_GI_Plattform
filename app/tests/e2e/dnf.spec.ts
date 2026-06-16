@@ -248,7 +248,7 @@ test.describe("DNF page", () => {
       .inputValue();
 
     await switchTab(page, "exercises");
-    await page.getByRole("button", { name: "Switch Tab" }).click();
+    await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
     await page
       .getByTestId(`dnf-exercise-card-${SIMPLE_EXPRESSION_EXERCISE_ID}-select`)
       .click();
