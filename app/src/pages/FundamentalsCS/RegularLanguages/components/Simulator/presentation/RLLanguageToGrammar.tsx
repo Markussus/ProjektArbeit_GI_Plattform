@@ -8,7 +8,10 @@ import {
   type LanguageSpec,
 } from "../domain/rlLanguageSpecParser";
 import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
-import { languageToGrammar } from "../domain/rlLanguageOps";
+import {
+  languageToGrammar,
+  languageToGrammarMinimal,
+} from "../domain/rlLanguageOps";
 import { rlLanguageTransferCodec } from "../domain/rlLanguageTransfer";
 import {
   RL_STORAGE_TASK_IDS,
@@ -43,6 +46,8 @@ export function RLLanguageToGrammar({
   const { t } = useTranslation();
   const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
   const [showFormats, setShowFormats] = useState(false);
+  // Detailed = one non-terminal per prefix; Simplified = minimal merged grammar.
+  const [simplified, setSimplified] = useState(false);
 
   // Adopt a freshly seeded language (e.g. when an exercise reveals its
   // solution) without remounting, so it persists after the store clears it.
@@ -89,8 +94,11 @@ export function RLLanguageToGrammar({
     // Enumeration: build a prefix-tree grammar. If the user wrote a `..`
     // continuation marker, the parser will already have promoted the
     // enumeration to a set-builder above, so this only fires for finite
-    // languages.
-    const grammar = languageToGrammar(parsed.spec.words);
+    // languages. The Simplified mode merges equivalent suffixes into a minimal,
+    // human-readable grammar instead.
+    const grammar = simplified
+      ? languageToGrammarMinimal(parsed.spec.words)
+      : languageToGrammar(parsed.spec.words);
     return {
       ok: true,
       spec: parsed.spec,
@@ -99,7 +107,7 @@ export function RLLanguageToGrammar({
       startSymbol: grammar.startSymbol,
       grammarText: formatGrammar(grammar),
     };
-  }, [source]);
+  }, [source, simplified]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -170,10 +178,46 @@ export function RLLanguageToGrammar({
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
-        <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          <ArrowRight className="text-primary h-4 w-4" />
-          {t("rl.simulator.grammarOutput", "Resulting Grammar")}
-        </h4>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
+            <ArrowRight className="text-primary h-4 w-4" />
+            {t("rl.simulator.grammarOutput", "Resulting Grammar")}
+          </h4>
+          <div
+            className="bg-muted/60 inline-flex rounded-lg p-0.5"
+            role="group"
+            aria-label={t("rl.simulator.grammarMode.label", "Grammar style")}
+          >
+            <button
+              type="button"
+              onClick={() => setSimplified(false)}
+              aria-pressed={!simplified}
+              data-testid="rl-grammar-mode-detailed"
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                !simplified
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t("rl.simulator.grammarMode.detailed", "Detailed")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSimplified(true)}
+              aria-pressed={simplified}
+              data-testid="rl-grammar-mode-simplified"
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                simplified
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t("rl.simulator.grammarMode.simplified", "Simplified")}
+            </button>
+          </div>
+        </div>
         {result.ok ? (
           <>
             <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-sm leading-relaxed whitespace-pre">

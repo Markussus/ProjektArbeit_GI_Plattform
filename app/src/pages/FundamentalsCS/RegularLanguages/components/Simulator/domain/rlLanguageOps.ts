@@ -179,3 +179,141 @@ export function languageToGrammar(words: string[]): RegularGrammar {
     epsilonProducingNonTerminals: epsilonNTs,
   };
 }
+
+/**
+ * Build the *shortest, most readable* right-linear grammar for a finite list of
+ * words. Where {@link languageToGrammar} emits one non-terminal per prefix, this
+ * merges states that accept the same set of suffixes (the minimal acyclic
+ * automaton / DAWG), then prints productions compactly:
+ *
+ *   - equal suffixes share a non-terminal (no redundant duplicate branches),
+ *   - the single accepting "end" state is folded away, so a transition into it
+ *     becomes a terminal-only rule `A -> a` instead of `A -> aE` plus `E -> ε`.
+ *
+ * The result still generates exactly the listed words and stays right-linear.
+ */
+export function languageToGrammarMinimal(words: string[]): RegularGrammar {
+  const cleaned = words
+    .map((w) => w.trim())
+    .filter((w, idx, arr) => arr.indexOf(w) === idx);
+
+  if (cleaned.length === 0) {
+    return {
+      nonTerminals: ["S"],
+      terminals: [],
+      startSymbol: "S",
+      productions: [],
+      epsilonProducingNonTerminals: [],
+    };
+  }
+
+  interface Node {
+    children: Map<string, Node>;
+    accepting: boolean;
+  }
+  const makeNode = (): Node => ({ children: new Map(), accepting: false });
+
+  // 1. Build the prefix tree.
+  const root = makeNode();
+  for (const word of cleaned) {
+    let current = root;
+    if (word.length === 0) {
+      current.accepting = true;
+      continue;
+    }
+    for (const ch of word) {
+      let next = current.children.get(ch);
+      if (!next) {
+        next = makeNode();
+        current.children.set(ch, next);
+      }
+      current = next;
+    }
+    current.accepting = true;
+  }
+
+  // 2. Merge equivalent subtrees bottom-up (replace-or-register). Two nodes are
+  //    equivalent when they have the same accepting flag and the same labelled
+  //    edges to already-canonicalised children.
+  const registry = new Map<string, Node>();
+  const idOf = new Map<Node, number>();
+  let nextId = 0;
+  const signature = (node: Node): string => {
+    const edges = [...node.children.entries()]
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+      .map(([sym, child]) => `${sym}:${idOf.get(child)}`)
+      .join(",");
+    return `${node.accepting ? "1" : "0"}#${edges}`;
+  };
+  const minimize = (node: Node): Node => {
+    for (const [sym, child] of [...node.children.entries()]) {
+      node.children.set(sym, minimize(child));
+    }
+    const sig = signature(node);
+    const existing = registry.get(sig);
+    if (existing) return existing;
+    registry.set(sig, node);
+    idOf.set(node, nextId++);
+    return node;
+  };
+  const canonicalRoot = minimize(root);
+
+  // The unique accepting leaf (accepts only ε, no outgoing edges) is folded away
+  // unless the start symbol itself is that node (language = {ε}).
+  const endLeaf = [...registry.values()].find(
+    (node) => node.accepting && node.children.size === 0,
+  );
+  const dropEndLeaf = endLeaf !== undefined && endLeaf !== canonicalRoot;
+
+  // 3. Name the kept nodes (start = S, then A, B, C, …) in BFS order.
+  const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
+  const names = new Map<Node, string>();
+  names.set(canonicalRoot, "S");
+  const order: Node[] = [canonicalRoot];
+  const queue: Node[] = [canonicalRoot];
+  let letterIdx = 0;
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+    const edges = [...node.children.entries()].sort(([a], [b]) =>
+      a < b ? -1 : a > b ? 1 : 0,
+    );
+    for (const [, child] of edges) {
+      if (dropEndLeaf && child === endLeaf) continue;
+      if (names.has(child)) continue;
+      names.set(child, LETTERS[letterIdx++] ?? `N${letterIdx}`);
+      order.push(child);
+      queue.push(child);
+    }
+  }
+
+  // 4. Emit productions.
+  const nonTerminals: string[] = [];
+  const terminals = new Set<string>();
+  const productions: ProductionRule[] = [];
+  const epsilonNTs: string[] = [];
+  for (const node of order) {
+    const name = names.get(node)!;
+    nonTerminals.push(name);
+    if (node.accepting) epsilonNTs.push(name);
+    const edges = [...node.children.entries()].sort(([a], [b]) =>
+      a < b ? -1 : a > b ? 1 : 0,
+    );
+    for (const [symbol, child] of edges) {
+      terminals.add(symbol);
+      const foldsToEnd = dropEndLeaf && child === endLeaf;
+      productions.push({
+        lhs: name,
+        terminal: symbol,
+        nextNonTerminal: foldsToEnd ? null : names.get(child)!,
+      });
+    }
+  }
+
+  return {
+    nonTerminals,
+    terminals: [...terminals],
+    startSymbol: "S",
+    productions,
+    epsilonProducingNonTerminals: epsilonNTs,
+  };
+}
