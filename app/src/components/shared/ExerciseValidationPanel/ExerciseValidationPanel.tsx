@@ -72,6 +72,7 @@ interface ExerciseValidationPanelProps {
   inputType?: "text" | "number";
   placeholder?: string;
   className?: string;
+  testIdPrefix?: string;
 }
 
 export function ExerciseValidationPanel({
@@ -82,6 +83,7 @@ export function ExerciseValidationPanel({
   inputType = "text",
   placeholder,
   className,
+  testIdPrefix,
 }: ExerciseValidationPanelProps) {
   const { t } = useTranslation("translation");
   const [inputValue, setInputValue] = useState("");
@@ -128,6 +130,7 @@ export function ExerciseValidationPanel({
   return (
     <>
       <div
+        data-testid={testIdPrefix}
         className={cn(
           "bg-card border-border/50 overflow-hidden rounded-xl border shadow-sm",
           className,
@@ -153,6 +156,7 @@ export function ExerciseValidationPanel({
               value={inputValue}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
+              data-testid={testIdPrefix ? `${testIdPrefix}-input` : undefined}
               placeholder={placeholder || "z.B. 10110010"}
               className={cn(
                 "bg-background w-full rounded-md border px-4 py-3 font-mono text-sm focus:outline-none",
@@ -194,6 +198,7 @@ export function ExerciseValidationPanel({
             <button
               onClick={handleVerify}
               disabled={!inputValue.trim() || validationState === "correct"}
+              data-testid={testIdPrefix ? `${testIdPrefix}-verify` : undefined}
               className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium disabled:pointer-events-none disabled:opacity-50"
             >
               {t("simulator.validation.verify", "Lösung überprüfen")}
@@ -201,6 +206,9 @@ export function ExerciseValidationPanel({
 
             <button
               onClick={onShowSolution}
+              data-testid={
+                testIdPrefix ? `${testIdPrefix}-show-solution` : undefined
+              }
               className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium sm:flex-none"
             >
               <Eye className="h-4 w-4" />
@@ -213,6 +221,9 @@ export function ExerciseValidationPanel({
             <div className="border-border/40 border-t pt-4">
               <button
                 onClick={() => setShowExitConfirm(true)}
+                data-testid={
+                  testIdPrefix ? `${testIdPrefix}-exit-exercise` : undefined
+                }
                 className="text-muted-foreground hover:text-destructive hover:border-destructive/30 flex w-full items-center justify-center gap-2 rounded-md border border-transparent px-4 py-2 text-sm font-medium"
               >
                 <LogOut className="h-4 w-4" />
@@ -236,6 +247,7 @@ export function ExerciseValidationPanel({
           }}
           onCancel={() => setShowExitConfirm(false)}
           variant="warning"
+          testId={testIdPrefix ? `${testIdPrefix}-exit-confirm` : undefined}
         />
       )}
     </>

@@ -123,6 +123,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-representation-select"
+              optionTestIdPrefix="moore-representation-option"
             />
           </div>
           <div className="space-y-2">
@@ -139,6 +140,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-start-state-select"
+              optionTestIdPrefix="moore-start-state-option"
             />
           </div>
         </div>

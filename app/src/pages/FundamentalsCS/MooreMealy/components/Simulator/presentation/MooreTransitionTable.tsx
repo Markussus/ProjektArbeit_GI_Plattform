@@ -113,6 +113,7 @@ export function MooreTransitionTable({
                         type="button"
                         onClick={() => onRemoveState(state)}
                         aria-label={t("moore.sim.removeState", { state })}
+                        data-testid={`moore-remove-state-${stateIndex}`}
                         className="text-muted-foreground hover:text-destructive rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                       >
                         <Trash2 className="size-3.5" />
@@ -175,6 +176,7 @@ export function MooreTransitionTable({
                       aria-label={t("moore.sim.removeInput", {
                         symbol: inputSymbol,
                       })}
+                      data-testid={`moore-remove-input-symbol-${inputIndex}`}
                       className="text-muted-foreground hover:text-destructive rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                     >
                       <Trash2 className="size-3.5" />

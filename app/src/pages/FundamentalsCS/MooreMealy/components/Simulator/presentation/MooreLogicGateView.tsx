@@ -71,6 +71,7 @@ export function MooreLogicGateView({
             triggerClassName="h-10 min-w-56 px-3"
             menuClassName="right-0 min-w-56"
             triggerTestId="moore-logic-formula-mode"
+            optionTestIdPrefix="moore-logic-formula-mode-option"
           />
         </div>
         <div className="grid gap-2 md:grid-cols-2">

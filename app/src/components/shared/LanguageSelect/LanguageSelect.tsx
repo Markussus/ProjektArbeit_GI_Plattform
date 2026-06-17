@@ -53,6 +53,7 @@ export function LanguageSelect() {
       optionClassName="text-sm"
       triggerTestId="language-select-trigger"
       menuTestId="language-select-menu"
+      optionTestIdPrefix="language-select-option"
     />
   );
 }

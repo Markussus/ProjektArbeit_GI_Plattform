@@ -90,6 +90,7 @@ export function MealyConfigView(props: Props) {
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-representation-select"
+              optionTestIdPrefix="mealy-representation-option"
             />
           </div>
           <div className="space-y-2">
@@ -106,6 +107,7 @@ export function MealyConfigView(props: Props) {
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-start-state-select"
+              optionTestIdPrefix="mealy-start-state-option"
             />
           </div>
         </div>

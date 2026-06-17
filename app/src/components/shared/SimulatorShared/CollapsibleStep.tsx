@@ -10,6 +10,7 @@ interface CollapsibleStepProps {
   children: ReactNode;
 
   className?: string;
+  testId?: string;
 }
 
 export function CollapsibleStep({
@@ -18,13 +19,16 @@ export function CollapsibleStep({
   header,
   children,
   className = "",
+  testId,
 }: CollapsibleStepProps) {
   return (
     <div
+      data-testid={testId}
       className={`border-border/40 overflow-hidden rounded-lg border ${className}`}
     >
       <button
         onClick={onToggle}
+        data-testid={testId ? `${testId}-toggle` : undefined}
         className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-4">{header}</div>
@@ -35,7 +39,10 @@ export function CollapsibleStep({
         )}
       </button>
       {isOpen && (
-        <div className="bg-muted/30 border-border/40 border-t p-3">
+        <div
+          data-testid={testId ? `${testId}-content` : undefined}
+          className="bg-muted/30 border-border/40 border-t p-3"
+        >
           {children}
         </div>
       )}

@@ -69,10 +69,16 @@ vi.mock(
       <div data-testid="mock-java-editor-panel">
         <div data-testid="mock-java-editor-code">{code}</div>
         <div data-testid="mock-java-editor-file">{fileName}</div>
-        <button onClick={() => onCodeChange("changed code")}>
+        <button
+          data-testid="mock-java-change-code"
+          onClick={() => onCodeChange("changed code")}
+        >
           change code
         </button>
-        <button onClick={() => onImportCode("imported code")}>
+        <button
+          data-testid="mock-java-import-code"
+          onClick={() => onImportCode("imported code")}
+        >
           import code
         </button>
       </div>
@@ -92,8 +98,12 @@ vi.mock("@/components/shared/ExecutionControls", () => ({
   }) => (
     <div data-testid="mock-execution-controls">
       <div data-testid="mock-execution-phase">{phase}</div>
-      <button onClick={onRun}>run code</button>
-      <button onClick={onStop}>stop code</button>
+      <button data-testid="mock-java-run-code" onClick={onRun}>
+        run code
+      </button>
+      <button data-testid="mock-java-stop-code" onClick={onStop}>
+        stop code
+      </button>
     </div>
   ),
 }));
@@ -171,8 +181,8 @@ describe("JavaSimulator", () => {
     it("runs the latest changed editor content", () => {
       render(<JavaSimulator selectedExercise={null} isFocused={false} />);
 
-      fireEvent.click(screen.getByRole("button", { name: "change code" }));
-      fireEvent.click(screen.getByRole("button", { name: "run code" }));
+      fireEvent.click(screen.getByTestId("mock-java-change-code"));
+      fireEvent.click(screen.getByTestId("mock-java-run-code"));
 
       expect(runSpy).toHaveBeenCalledWith({
         source: "changed code",
@@ -188,7 +198,7 @@ describe("JavaSimulator", () => {
       fireEvent.change(screen.getByTestId("java-stdin-input"), {
         target: { value: "hello java\n" },
       });
-      fireEvent.click(screen.getByRole("button", { name: "run code" }));
+      fireEvent.click(screen.getByTestId("mock-java-run-code"));
 
       expect(runSpy).toHaveBeenCalledWith({
         source: expect.any(String),
@@ -201,7 +211,7 @@ describe("JavaSimulator", () => {
     it("replaces the editor content on import and resets execution state", () => {
       render(<JavaSimulator selectedExercise={null} isFocused={false} />);
 
-      fireEvent.click(screen.getByRole("button", { name: "import code" }));
+      fireEvent.click(screen.getByTestId("mock-java-import-code"));
 
       expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
         "imported code",
@@ -229,9 +239,15 @@ describe("JavaSimulator", () => {
       expect(
         screen.getByTestId("java-command-overview-dialog"),
       ).toBeInTheDocument();
-      expect(screen.getByText(/JDK 25/)).toBeInTheDocument();
-      expect(screen.getByText("ArrayList")).toBeInTheDocument();
-      expect(screen.getByText("javac")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("java-command-overview-dialog"),
+      ).toHaveTextContent(/JDK 25/);
+      expect(
+        screen.getByTestId("java-command-overview-dialog"),
+      ).toHaveTextContent("ArrayList");
+      expect(
+        screen.getByTestId("java-command-overview-dialog"),
+      ).toHaveTextContent("javac");
     });
   });
 });
