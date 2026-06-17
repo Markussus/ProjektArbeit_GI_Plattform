@@ -1,15 +1,31 @@
 \subNsection{1}{KI Reflexion}{Richard Schröder}
 
-Nutzung von Gemini 3.1 Pro, ChatGPT und Codex als Entwicklungswerkzeuge – Effizienzsteigerung bei der Implementierung mathematischer Logik und UI-Komponenten
-
 \subNsection{2}{KI als Co-Developer}{Richard Schröder}
 
-Reflektieren und so...
+- Verwendete Tools:
+  - ChatGPT
+  - Codex (in WebStorm und Zed)
+  - Ollama (in Zed)
+  - Ab und zu Gemini für Recherche
+- Hat die Arbeit sehr erleichtert
+- Kontrolle der Ergebnisse aber wichtig (mehr dazu in der Kritischen Reflexion)
+- Allgemeines Vorgehen
+  1. Meinen Wunschzustand des Systems möglichst detailiert beschreiben und einen Architekturvorschlag erzeugen lassen
+  2. Architekturvorschlag verbessern (da dieser manchmal etwas unzureichend war bzw. die Integration in das bestehende System nicht optimal war)
+  3. Verbesserten Vorschlag in Arbeitspakete zerlegen lassen und diese wieder kontrollieren
+  4. Arbeitspakete in einzelnen Prompts (mit gesamt Architektur als Kontext) erledigen lassen und Implementierung überprüfen
+  5. Den generierten Code in einem neuen Chat auf Übereinstimmung mit dem Architekturdokument prüfen lassen bzw. allgemeines Code Review machen lassen
+  6. v. a. auf korrekte und vollständige Tests (Unit und E2E) achten
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Richard Schröder}
 
-Reflektieren und so...
+- Zu Beginn eher mager, da v. a. in der Turingmaschine das richtige Format nicht eingehalten wurde bzw. ChatGPT und Codex allg. nicht die besten Turingmaschinen Entwickler sind
+- Nach dem anlegen von einigen Turingmaschinen und dem verwenden dieser als Kontext wurden die Ergebnisse besser, aber immer noch nicht der TM Experte
+- Nachbauen der Aufgaben aus Skript und Übungsblatt war mit einigen Beispielen als Kontext und einem Screenshot der Folie gut machbar
 
 \subNsection{2}{Kritische Reflexion}{Richard Schröder}
 
-Reflektieren und so...
+- Insgesamt eine große Hilfe um zügig zu arbeiten
+- Man darf nicht zu viel (z. B. komplette TM am Stück) auf einen Schlag verlagen, da sonst evtl. Teile aus dem Kontext laufen und nicht oder falsch gemacht werden
+- Manchmal Tendenz zu viel zu entwickeln -> also es wird etwas eigentlich einfaches extrem komplex gelöst
+- Es wurden ab und zu Änderungen an Stellen gemacht, wo man keine Änderungen will. Also z. B. in einer geshareten (allgemeinen) Komponente anstatt bei sich lokal im Modul, nur weil es dort minimal einfacher ist (aber dann haben alle die Änderungen was ja nicht Ziel der Sache ist)
