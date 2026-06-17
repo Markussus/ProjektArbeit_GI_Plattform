@@ -23,6 +23,7 @@ export function ExercisesTab({
   const { t } = useTranslation();
   const loadScenario = useRLSimulatorStore((s) => s.loadScenario);
   const setActiveExercise = useRLSimulatorStore((s) => s.setActiveExercise);
+  const clearExerciseDrafts = useRLSimulatorStore((s) => s.clearExerciseDrafts);
 
   // Keep a stable id from the translation key so selection survives language
   // changes, matching the shared TopicExercisesTab behaviour.
@@ -49,9 +50,10 @@ export function ExercisesTab({
     onOpenExerciseInSimulation(toExercise(def));
   };
 
-  // RL exercise progress lives in the per-mode simulator sources, which autosave
-  // to their topic slots — clearing them resets the saved exercise work.
+  // RL exercise progress lives in the in-session exercise drafts plus the
+  // per-mode simulator sources that autosave to their topic slots — clear both.
   const handleResetAllExercises = () => {
+    clearExerciseDrafts();
     for (const taskStorageId of Object.values(RL_STORAGE_TASK_IDS)) {
       trainingCenterStorage.delete(
         createTrainingCenterIdentifier(
