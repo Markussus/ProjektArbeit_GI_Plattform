@@ -40,22 +40,44 @@ export function RLSimulator() {
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
       <RLModeSelector mode={mode} onChange={setMode} />
 
-      {mode === "grammarToLanguage" && (
+      {/*
+        All three modes stay mounted and are toggled with `hidden`, mirroring
+        the Moore/Mealy simulator's tab handling. This preserves each mode's
+        in-progress edits when the learner switches between them, so returning
+        to a mode behaves like the initial navigation instead of resetting to
+        its default example. A pending seed is only handed to the mode it
+        targets (the grammar field is shared by two modes).
+      */}
+      <div hidden={mode !== "grammarToLanguage"}>
         <RLGrammarToLanguage
-          initialGrammar={pendingGrammarSource ?? undefined}
+          initialGrammar={
+            mode === "grammarToLanguage"
+              ? (pendingGrammarSource ?? undefined)
+              : undefined
+          }
         />
-      )}
-      {mode === "languageToGrammar" && (
+      </div>
+      <div hidden={mode !== "languageToGrammar"}>
         <RLLanguageToGrammar
-          initialSource={pendingLanguageSource ?? undefined}
+          initialSource={
+            mode === "languageToGrammar"
+              ? (pendingLanguageSource ?? undefined)
+              : undefined
+          }
         />
-      )}
-      {mode === "recognizeWord" && (
+      </div>
+      <div hidden={mode !== "recognizeWord"}>
         <RLWordRecognizer
-          initialGrammar={pendingGrammarSource ?? undefined}
-          initialWord={pendingTestWord ?? undefined}
+          initialGrammar={
+            mode === "recognizeWord"
+              ? (pendingGrammarSource ?? undefined)
+              : undefined
+          }
+          initialWord={
+            mode === "recognizeWord" ? (pendingTestWord ?? undefined) : undefined
+          }
         />
-      )}
+      </div>
     </div>
   );
 }

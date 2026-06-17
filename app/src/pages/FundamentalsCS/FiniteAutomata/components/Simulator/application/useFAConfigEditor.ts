@@ -43,6 +43,18 @@ function parseCSV(value: string): string[] {
     .filter((s) => s.length > 0);
 }
 
+/**
+ * Like {@link parseCSV} but restricts each entry to a single symbol. The
+ * alphabet of a DFA/NFA is a set of one-character symbols, so multi-character
+ * tokens such as "10", "ab", or "xyz" are rejected rather than added.
+ */
+function parseAlphabetCSV(value: string): string[] {
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => [...s].length === 1);
+}
+
 function pruneTransitions(
   transitions: FATransitionMap,
   validStates: string[],
@@ -110,7 +122,7 @@ function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
       return { ...state, states, acceptStates, startState, transitions };
     }
     case "SET_ALPHABET": {
-      const alphabet = parseCSV(action.payload);
+      const alphabet = parseAlphabetCSV(action.payload);
       const transitions = pruneTransitions(
         state.transitions,
         state.states,
