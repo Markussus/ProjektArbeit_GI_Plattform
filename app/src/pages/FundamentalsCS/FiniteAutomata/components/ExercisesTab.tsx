@@ -19,6 +19,7 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
   const { t } = useTranslation();
   const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
   const loadExample = useFASimulatorStore((s) => s.loadExample);
+  const clearExerciseDrafts = useFASimulatorStore((s) => s.clearExerciseDrafts);
 
   const handleOpen = (exercise: Exercise) => {
     const def = findFAExercise(exercise.id);
@@ -28,14 +29,18 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       // user can immediately run the example through the automaton.
       const seedInput =
         def.exampleWords?.accept.find((w) => w.length > 0) ?? "";
-      loadExample(def.starter, seedInput);
+      // Re-open the learner's saved work for this exercise if any; otherwise
+      // start from the blank starter.
+      const draft = useFASimulatorStore.getState().exerciseDrafts[def.id];
+      loadExample(draft ?? def.starter, seedInput);
     }
     props.onOpenExerciseInSimulation(exercise);
   };
 
-  // FA exercise progress is the automaton built in the simulator, which
-  // autosaves to the topic's simulator slot — so clearing it resets the work.
+  // FA exercise progress is the per-exercise automaton draft (plus the free-mode
+  // simulator slot) — clearing both resets the saved work.
   const handleResetAllExercises = () => {
+    clearExerciseDrafts();
     trainingCenterStorage.delete(
       createTrainingCenterIdentifier(
         TOPIC_STORAGE_IDS.finiteAutomata,

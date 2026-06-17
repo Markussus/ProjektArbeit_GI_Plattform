@@ -94,6 +94,16 @@ export function FASimulator() {
     return () => setStudentProgram(null);
   }, [exposedStudentProgram, setStudentProgram]);
 
+  // Persist the in-progress automaton per exercise so re-opening the exercise
+  // restores the learner's work instead of the blank starter.
+  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
+  const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
+  useEffect(() => {
+    if (activeExerciseId) {
+      setExerciseDraft(activeExerciseId, exposedStudentProgram);
+    }
+  }, [activeExerciseId, exposedStudentProgram, setExerciseDraft]);
+
   // Track which pending program has already been applied to avoid double-processing.
   const [prevPendingProgram, setPrevPendingProgram] =
     useState<typeof pendingProgram>(null);
@@ -179,11 +189,13 @@ export function FASimulator() {
     };
   }, [handleImportProgram, storageIdentifier]);
 
+  // While an exercise is active its work persists to the per-exercise draft
+  // above, so the shared free-mode slot is only autosaved outside exercises.
   useTrainingCenterAutoSave({
     identifier: storageIdentifier,
     value: editor.draft,
     codec: faProgramTransferCodec,
-    enabled: isStorageReady,
+    enabled: isStorageReady && activeExerciseId === null,
   });
 
   const handleApplyProgram = () => {
