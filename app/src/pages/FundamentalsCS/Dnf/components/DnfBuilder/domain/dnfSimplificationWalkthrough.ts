@@ -2,7 +2,12 @@ import type { TranslationKey } from "@/types/i18n";
 import type { BooleanAlgebraRuleId } from "./booleanAlgebraRules";
 import { formatBooleanExpressionForDisplay } from "./booleanExpressionFormat";
 import { deriveDnfFromTruthTable, formatDnfExpression } from "./dnfDerivation";
-import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
+import {
+  buildFactoringSteps,
+  countExpressionLiterals,
+  factorMinimalDnf,
+  type Literal,
+} from "./factorMinimalDnf";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,
@@ -39,6 +44,8 @@ export interface DnfSimplificationWalkthrough {
   /** Factored form derived from the minimal DNF; only set when strictly shorter. */
   factoredForm: string | null;
   factoredLiteralCount: number | null;
+  /** Distributivity derivation for the factored form; empty unless it is shorter. */
+  factoredDerivationSteps: DnfDerivationStep[];
   constantCase: "always_false" | "always_true" | null;
 }
 
@@ -77,8 +84,45 @@ export function buildDnfSimplificationWalkthrough(
       ? formatBooleanExpressionForDisplay(factoredExpression)
       : null,
     factoredLiteralCount: factoredIsShorter ? factoredLiteralCount : null,
+    factoredDerivationSteps: factoredIsShorter
+      ? buildFactoringDerivationSteps(minimal, table.variables)
+      : [],
     constantCase: getConstantCase(minimal),
   };
+}
+
+/**
+ * Turn the structural factoring steps into displayable derivation lines: the
+ * starting sum-of-products has no rule; each later snapshot is one distributivity
+ * step labelled with the literal(s) that were factored out.
+ */
+function buildFactoringDerivationSteps(
+  minimal: MinimalDnf,
+  variables: string[],
+): DnfDerivationStep[] {
+  return buildFactoringSteps(minimal, variables).map((step) => {
+    const expression = formatBooleanExpressionForDisplay(step.expression);
+
+    if (step.factoredLiterals.length === 0) {
+      return { expression };
+    }
+
+    return {
+      expression,
+      ruleId: "distributivity",
+      noteKey: "dnf.builder.exercise.derivationNotes.factorOutCommon",
+      noteVars: {
+        variables: step.factoredLiterals
+          .map((literal) => formatFactoredLiteral(literal, variables))
+          .join(", "),
+      },
+    };
+  });
+}
+
+function formatFactoredLiteral(literal: Literal, variables: string[]): string {
+  const name = variables[literal.variableIndex];
+  return literal.negated ? `${NOT}${name}` : name;
 }
 
 function buildGroups(

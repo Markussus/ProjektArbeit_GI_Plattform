@@ -197,6 +197,14 @@ describe("dnfSimplificationWalkthrough", () => {
     expect(walkthrough.factoredLiteralCount).toBe(3);
     expect(walkthrough.factoredForm).not.toBeNull();
     expect(walkthrough.factoredForm).toMatch(/^c ∧ \((a ∨ b|b ∨ a)\)$/);
+
+    // The derivation starts at the sum-of-products and ends at the factored
+    // form, applying distributivity in between.
+    const steps = walkthrough.factoredDerivationSteps;
+    expect(steps.length).toBeGreaterThanOrEqual(2);
+    expect(steps[0].ruleId).toBeUndefined();
+    expect(steps[steps.length - 1].expression).toBe(walkthrough.factoredForm);
+    expect(steps.some((step) => step.ruleId === "distributivity")).toBe(true);
   });
 
   it("leaves the factored form null when nothing can be factored", () => {
@@ -206,6 +214,7 @@ describe("dnfSimplificationWalkthrough", () => {
 
     expect(walkthrough.factoredForm).toBeNull();
     expect(walkthrough.factoredLiteralCount).toBeNull();
+    expect(walkthrough.factoredDerivationSteps).toEqual([]);
   });
 });
 

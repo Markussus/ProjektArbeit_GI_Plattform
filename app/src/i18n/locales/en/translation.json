@@ -696,7 +696,8 @@
         "derivationNotes": {
           "factorOut": "Factor out {{variable}} — the other literals stay.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
-          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out."
+          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out.",
+          "factorOutCommon": "Factor out {{variables}} (distributivity) — shared by these terms."
         },
         "simplificationStatus": {
           "empty": "Nothing entered yet",

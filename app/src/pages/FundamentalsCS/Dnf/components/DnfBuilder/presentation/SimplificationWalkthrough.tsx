@@ -154,6 +154,22 @@ export function SimplificationWalkthrough({
               <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-2 font-mono text-xs leading-relaxed break-words">
                 {walkthrough.factoredForm}
               </code>
+              {walkthrough.factoredDerivationSteps.length > 1 && (
+                <ol
+                  data-testid="dnf-walkthrough-factoring-derivation"
+                  className="border-border/60 mt-3 space-y-1.5 border-l-2 pl-3"
+                >
+                  {walkthrough.factoredDerivationSteps.map(
+                    (step, stepIndex) => (
+                      <DerivationStepLine
+                        key={stepIndex}
+                        step={step}
+                        isFirst={stepIndex === 0}
+                      />
+                    ),
+                  )}
+                </ol>
+              )}
               <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
                 {t("dnf.builder.exercise.walkthroughFactoredNote")}
               </p>

@@ -696,7 +696,8 @@
         "derivationNotes": {
           "factorOut": "{{variable}} ausklammern — die anderen Literale bleiben.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
-          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg."
+          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg.",
+          "factorOutCommon": "{{variables}} ausklammern (Distributivgesetz) — in diesen Termen gemeinsam."
         },
         "simplificationStatus": {
           "empty": "Noch keine Eingabe",
