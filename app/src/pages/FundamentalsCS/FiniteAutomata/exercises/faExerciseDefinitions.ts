@@ -1,15 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Binary,
-  Flag,
-  Hash,
-  Route,
-  Sigma,
-  Spline,
-  Target,
-  Waypoints,
-  Workflow,
-} from "lucide-react";
+import { Target, Workflow } from "lucide-react";
 import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
@@ -155,7 +145,7 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.endsWith01.goal",
     descriptionKey: "fa.exercisesTab.endsWith01.description",
     difficulty: "easy",
-    icon: Flag,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith01Solution,
     hintKeys: [
@@ -192,8 +182,8 @@ export const faExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.evenOnes.title",
     goalKey: "fa.exercisesTab.evenOnes.goal",
     descriptionKey: "fa.exercisesTab.evenOnes.description",
-    difficulty: "medium",
-    icon: Sigma,
+    difficulty: "easy",
+    icon: Target,
     alphabet: ["0", "1"],
     solution: evenOnesSolution,
     hintKeys: [
@@ -212,7 +202,7 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.noConsecOnes.goal",
     descriptionKey: "fa.exercisesTab.noConsecOnes.description",
     difficulty: "medium",
-    icon: Binary,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: noConsecutiveOnesSolution,
     hintKeys: [
@@ -231,7 +221,7 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.divBy3.goal",
     descriptionKey: "fa.exercisesTab.divBy3.description",
     difficulty: "hard",
-    icon: Hash,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: divisibleBy3Solution,
     hintKeys: [
@@ -325,8 +315,8 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.grammarTwoOnesZeros.title",
     goalKey: "fa.exercisesTab.grammarTwoOnesZeros.goal",
     descriptionKey: "fa.exercisesTab.grammarTwoOnesZeros.description",
-    difficulty: "medium",
-    icon: Route,
+    difficulty: "easy",
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", B;', 'B = "0", B | ε;'].join("\n"),
     solution: grammarTwoOnesZerosSolution,
@@ -366,7 +356,7 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.grammar0011.goal",
     descriptionKey: "fa.exercisesTab.grammar0011.description",
     difficulty: "hard",
-    icon: Waypoints,
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: [
       'START = "0", A;',
@@ -393,8 +383,8 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.grammarOnesZero.title",
     goalKey: "fa.exercisesTab.grammarOnesZero.goal",
     descriptionKey: "fa.exercisesTab.grammarOnesZero.description",
-    difficulty: "medium",
-    icon: Spline,
+    difficulty: "easy",
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", A | "0", B;', "B = ε;"].join("\n"),
     solution: grammarOnesZeroSolution,
