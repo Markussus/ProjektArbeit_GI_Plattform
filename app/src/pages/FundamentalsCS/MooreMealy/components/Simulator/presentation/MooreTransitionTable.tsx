@@ -59,6 +59,26 @@ export function MooreTransitionTable({
     10,
     Math.max(...program.states.map((state) => state.length), 0) + 4,
   )}ch`;
+  const outputColumnWidths = program.states.map((state) => ({
+    symbol: getTextInputWidth(
+      getLongestValue(
+        program.inputSymbols.map(
+          (inputSymbol) =>
+            outputControls?.getOutput(inputSymbol, state)?.symbol ?? "",
+        ),
+      ),
+    ),
+    code: getTextInputWidth(
+      getLongestValue(
+        program.inputSymbols.map((inputSymbol) =>
+          formatInternalNumber(
+            outputControls?.getOutput(inputSymbol, state)?.code ?? 0,
+            program.representation,
+          ),
+        ),
+      ),
+    ),
+  }));
 
   useEffect(() => {
     if (program.states.length > previousStateCountRef.current) {
@@ -209,6 +229,8 @@ export function MooreTransitionTable({
                   const target =
                     program.transitions[inputSymbol]?.[state] ?? "";
                   const output = outputControls?.getOutput(inputSymbol, state);
+                  const symbolColumnKey = `${stateIndex}-symbol`;
+                  const codeColumnKey = `${stateIndex}-code`;
                   return (
                     <td
                       key={`${inputSymbol}-${state}`}
@@ -251,12 +273,16 @@ export function MooreTransitionTable({
                                 )
                               }
                               onInput={(event) =>
-                                resizeTextInput(event.currentTarget)
+                                resizeColumnTextInputs(
+                                  event.currentTarget,
+                                  symbolColumnKey,
+                                )
                               }
                               aria-label={`${t("moore.sim.symbolOutput")} ${state} ${inputSymbol}`}
                               data-testid={`${outputControls.testIdPrefix}-symbol-${inputIndex}-${stateIndex}`}
+                              data-output-column={symbolColumnKey}
                               style={{
-                                width: getTextInputWidth(output?.symbol),
+                                width: outputColumnWidths[stateIndex].symbol,
                               }}
                               className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
                             />
@@ -286,7 +312,10 @@ export function MooreTransitionTable({
                                 );
                               }}
                               onInput={(event) =>
-                                resizeTextInput(event.currentTarget)
+                                resizeColumnTextInputs(
+                                  event.currentTarget,
+                                  codeColumnKey,
+                                )
                               }
                               onKeyDown={(event) => {
                                 if (event.key === "Enter") {
@@ -295,13 +324,9 @@ export function MooreTransitionTable({
                               }}
                               aria-label={`${t("moore.sim.internalOutputCode")} ${state} ${inputSymbol}`}
                               data-testid={`${outputControls.testIdPrefix}-code-${inputIndex}-${stateIndex}`}
+                              data-output-column={codeColumnKey}
                               style={{
-                                width: getTextInputWidth(
-                                  formatInternalNumber(
-                                    output?.code ?? 0,
-                                    program.representation,
-                                  ),
-                                ),
+                                width: outputColumnWidths[stateIndex].code,
                               }}
                               className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
                             />
@@ -338,7 +363,43 @@ function getTextInputWidth(value: string | undefined): string {
   return `${Math.max(7, (value ?? "").length + 3)}ch`;
 }
 
+function getLongestValue(values: string[]): string {
+  return values.reduce(
+    (longest, value) => (value.length > longest.length ? value : longest),
+    "",
+  );
+}
+
 function resizeTextInput(input: HTMLInputElement): void {
   input.style.width = "0px";
   input.style.width = `${Math.max(56, input.scrollWidth + 2)}px`;
+}
+
+function resizeColumnTextInputs(
+  input: HTMLInputElement,
+  columnKey: string,
+): void {
+  const table = input.closest("table");
+  if (!table) {
+    resizeTextInput(input);
+    return;
+  }
+  const columnInputs = Array.from(
+    table.querySelectorAll<HTMLInputElement>(
+      `input[data-output-column="${columnKey}"]`,
+    ),
+  );
+  const maxWidth = Math.max(
+    56,
+    ...columnInputs.map((candidate) => {
+      const previousWidth = candidate.style.width;
+      candidate.style.width = "0px";
+      const width = candidate.scrollWidth + 2;
+      candidate.style.width = previousWidth;
+      return width;
+    }),
+  );
+  for (const candidate of columnInputs) {
+    candidate.style.width = `${maxWidth}px`;
+  }
 }
