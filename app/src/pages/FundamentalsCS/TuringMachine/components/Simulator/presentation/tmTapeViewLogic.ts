@@ -18,6 +18,11 @@ export interface TMTapeViewport {
   endIndex: number;
 }
 
+export interface TMTapeContentRange {
+  minIndex: number;
+  maxIndex: number;
+}
+
 export function resolveTapeViewport(
   headPosition: number,
   windowRadius: number,
@@ -44,6 +49,32 @@ export function resolveTapeViewport(
     effectiveHeadWindowRadius,
     startIndex: viewportCenter - effectiveWindowRadius,
     endIndex: viewportCenter + effectiveWindowRadius,
+  };
+}
+
+export function getTapeContentRange(
+  tape: Record<number, string>,
+  blankSymbol: string,
+  fallbackIndex: number,
+): TMTapeContentRange {
+  let minIndex: number | null = null;
+  let maxIndex: number | null = null;
+
+  for (const [rawIndex, rawSymbol] of Object.entries(tape)) {
+    const index = Number(rawIndex);
+    const symbol = rawSymbol ?? blankSymbol;
+
+    if (!Number.isFinite(index) || symbol === "" || symbol === blankSymbol) {
+      continue;
+    }
+
+    minIndex = minIndex === null ? index : Math.min(minIndex, index);
+    maxIndex = maxIndex === null ? index : Math.max(maxIndex, index);
+  }
+
+  return {
+    minIndex: minIndex ?? fallbackIndex,
+    maxIndex: maxIndex ?? fallbackIndex,
   };
 }
 
