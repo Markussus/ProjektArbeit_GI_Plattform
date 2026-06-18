@@ -56,7 +56,7 @@ export function HeaderTransferBox() {
   return (
     <div
       data-testid="header-transfer-root"
-      className="relative hidden min-w-0 max-w-sm flex-1 items-center gap-1.5 md:flex lg:max-w-md"
+      className="relative flex min-w-0 max-w-sm flex-1 items-center gap-1 sm:gap-1.5 lg:max-w-md"
     >
       <input
         type="text"
@@ -73,7 +73,7 @@ export function HeaderTransferBox() {
         }}
         placeholder={t("simulation.transfer.placeholder")}
         className={cn(
-          "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-9 min-w-24 flex-1 rounded-md border px-2 text-xs outline-none focus-visible:ring-2",
+          "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 min-w-4 flex-1 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 sm:h-9 sm:min-w-16 md:min-w-24",
           feedback === "error" && "border-destructive",
         )}
         spellCheck={false}
@@ -87,7 +87,7 @@ export function HeaderTransferBox() {
         disabled
         aria-label={t("simulation.transfer.export")}
         title={t("simulation.transfer.export")}
-        className="bg-brand text-brand-foreground inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-xs font-medium opacity-50 disabled:cursor-not-allowed"
+        className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium opacity-50 disabled:cursor-not-allowed sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Download className="size-3.5" />
         <span className="hidden lg:inline">{t("simulation.transfer.export")}</span>
@@ -100,7 +100,7 @@ export function HeaderTransferBox() {
         disabled={!canImport}
         aria-label={t("simulation.transfer.import")}
         title={t("simulation.transfer.import")}
-        className="bg-secondary text-secondary-foreground hover:bg-secondary/90 inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-secondary text-secondary-foreground hover:bg-secondary/90 inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Upload className="size-3.5" />
         <span className="hidden lg:inline">{t("simulation.transfer.import")}</span>
