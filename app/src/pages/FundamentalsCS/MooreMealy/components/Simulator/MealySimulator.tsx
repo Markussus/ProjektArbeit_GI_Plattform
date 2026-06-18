@@ -155,21 +155,31 @@ export const MealySimulator = forwardRef<
 
   if (mode === "conversion" && conversion)
     return (
-      <MooreConversionView
-        conversion={conversion}
-        onBackToEditor={() => setMode("edit")}
-        onShowSimulator={showSimulation}
-        onShowLogic={() => setMode("logic")}
-      />
+      <div
+        data-testid="mealy-simulator"
+        className="mx-auto w-full max-w-[100rem]"
+      >
+        <MooreConversionView
+          conversion={conversion}
+          onBackToEditor={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowLogic={() => setMode("logic")}
+        />
+      </div>
     );
   if (mode === "logic" && conversion)
     return (
-      <MooreLogicGateView
-        conversion={conversion}
-        onEditDefinition={() => setMode("edit")}
-        onShowSimulator={showSimulation}
-        onShowConversion={() => setMode("conversion")}
-      />
+      <div
+        data-testid="mealy-simulator"
+        className="mx-auto w-full max-w-[100rem]"
+      >
+        <MooreLogicGateView
+          conversion={conversion}
+          onEditDefinition={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowConversion={() => setMode("conversion")}
+        />
+      </div>
     );
 
   return (
