@@ -7,13 +7,13 @@ export interface Literal {
 }
 
 /**
- * Greedily factor a minimal DNF (QMC output) by repeatedly pulling out the
- * literal that appears in the most terms. Produces a potentially nested
- * AND/OR expression that leaves DNF form when factoring shortens the result.
+ * Factor a minimal DNF (QMC output) by pulling out common literals, producing a
+ * potentially nested AND/OR expression that leaves DNF form when factoring
+ * shortens the result.
  *
- * The algorithm is heuristic — for typical small inputs it reaches the
- * shortest equivalent expression, but it is not guaranteed optimal in the
- * worst case (general boolean minimization is NP-hard).
+ * The search is exact within the distributive-factoring model (see `factorTerms`
+ * below): it tries every shared literal at each step and keeps the cheapest
+ * result, not a greedy heuristic.
  */
 export function factorMinimalDnf(
   minimal: MinimalDnf,

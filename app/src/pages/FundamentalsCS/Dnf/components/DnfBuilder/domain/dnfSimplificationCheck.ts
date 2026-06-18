@@ -38,9 +38,9 @@ export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
   /** One concrete minimal expression for display when the user asks for help. */
   minimalExpression: BooleanExpression;
   /**
-   * Greedy-factored expression derived from the minimal DNF. Equals the
-   * minimal DNF when no common factor can be pulled out; otherwise leaves DNF
-   * form and may be strictly shorter.
+   * Factored expression derived from the minimal DNF (exact factoring). Equals
+   * the minimal DNF when no common factor can be pulled out; otherwise leaves
+   * DNF form and may be strictly shorter.
    */
   factoredExpression: BooleanExpression;
   /** Literal count of the factored expression. */
