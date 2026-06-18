@@ -162,7 +162,7 @@ export function MooreTransitionTable({
                         symbol: inputSymbol,
                       })}
                       data-testid={`moore-input-symbol-${inputIndex}`}
-                      className="focus:ring-ring min-w-0 flex-1 rounded bg-transparent px-2 py-1 font-mono outline-none focus:ring-1"
+                      className="border-input bg-background focus:ring-ring h-9 min-w-0 flex-1 rounded-md border px-2 font-mono outline-none focus:ring-1"
                     />
                     <span
                       className="text-muted-foreground font-mono text-xs"
