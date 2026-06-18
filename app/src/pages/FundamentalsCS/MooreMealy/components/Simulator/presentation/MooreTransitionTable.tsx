@@ -4,8 +4,11 @@ import { useTranslation } from "react-i18next";
 import { SearchableCreatableSelect } from "@/components/shared/SearchableCreatableSelect";
 import { cn } from "@/lib/utils";
 import { useDragScroll } from "@/hooks/useDragScroll";
-import { formatInternalNumber } from "../domain/mooreProgram";
-import type { MooreProgram } from "../domain/mooreTypes";
+import {
+  formatInternalNumber,
+  parseInternalNumber,
+} from "../domain/mooreProgram";
+import type { MooreOutput, MooreProgram } from "../domain/mooreTypes";
 
 type TransitionProgram = Pick<
   MooreProgram,
@@ -25,6 +28,16 @@ interface MooreTransitionTableProps {
   onRemoveState: (state: string) => void;
   onAddInputSymbol: () => void;
   onRemoveInputSymbol: (symbol: string) => void;
+  outputControls?: {
+    getOutput: (inputSymbol: string, state: string) => MooreOutput | undefined;
+    onSymbolChange: (
+      inputSymbol: string,
+      state: string,
+      symbol: string,
+    ) => void;
+    onCodeChange: (inputSymbol: string, state: string, code: number) => void;
+    testIdPrefix: string;
+  };
 }
 
 export function MooreTransitionTable({
@@ -36,11 +49,16 @@ export function MooreTransitionTable({
   onRemoveState,
   onAddInputSymbol,
   onRemoveInputSymbol,
+  outputControls,
 }: MooreTransitionTableProps) {
   const { t } = useTranslation();
   const { setElementRef, onMouseDown, isDragging, scrollToEnd } =
     useDragScroll<HTMLDivElement>();
   const previousStateCountRef = useRef(program.states.length);
+  const dropdownWidth = `${Math.max(
+    10,
+    Math.max(...program.states.map((state) => state.length), 0) + 4,
+  )}ch`;
 
   useEffect(() => {
     if (program.states.length > previousStateCountRef.current) {
@@ -80,7 +98,7 @@ export function MooreTransitionTable({
                 <th
                   key={state}
                   className={cn(
-                    "group min-w-44 border-r p-2 text-left",
+                    "group border-r p-2 text-left",
                     state === program.initialState && "bg-brand/10",
                   )}
                 >
@@ -88,6 +106,7 @@ export function MooreTransitionTable({
                     <input
                       key={state}
                       defaultValue={state}
+                      onInput={(event) => resizeTextInput(event.currentTarget)}
                       onBlur={(event) => {
                         if (!onStateRename(state, event.currentTarget.value)) {
                           event.currentTarget.value = state;
@@ -100,6 +119,7 @@ export function MooreTransitionTable({
                       }}
                       aria-label={t("moore.sim.renameState", { state })}
                       data-testid={`moore-state-name-${stateIndex}`}
+                      style={{ width: getTextInputWidth(state) }}
                       className="focus:ring-ring min-w-0 flex-1 rounded bg-transparent px-1 py-1 font-mono font-semibold outline-none focus:ring-1"
                     />
                     <span
@@ -138,11 +158,12 @@ export function MooreTransitionTable({
           <tbody>
             {program.inputSymbols.map((inputSymbol, inputIndex) => (
               <tr key={inputSymbol} className="group border-b last:border-b-0">
-                <td className="min-w-40 border-r p-2">
+                <td className="min-w-[10rem] border-r p-2">
                   <div className="flex items-center gap-2">
                     <input
                       key={inputSymbol}
                       defaultValue={inputSymbol}
+                      onInput={(event) => resizeTextInput(event.currentTarget)}
                       onBlur={(event) => {
                         if (
                           !onInputSymbolRename(
@@ -162,6 +183,7 @@ export function MooreTransitionTable({
                         symbol: inputSymbol,
                       })}
                       data-testid={`moore-input-symbol-${inputIndex}`}
+                      style={{ width: getTextInputWidth(inputSymbol) }}
                       className="border-input bg-background focus:ring-ring h-9 min-w-0 flex-1 rounded-md border px-2 font-mono outline-none focus:ring-1"
                     />
                     <span
@@ -186,6 +208,7 @@ export function MooreTransitionTable({
                 {program.states.map((state, stateIndex) => {
                   const target =
                     program.transitions[inputSymbol]?.[state] ?? "";
+                  const output = outputControls?.getOutput(inputSymbol, state);
                   return (
                     <td
                       key={`${inputSymbol}-${state}`}
@@ -194,21 +217,97 @@ export function MooreTransitionTable({
                         state === program.initialState && "bg-brand/5",
                       )}
                     >
-                      <SearchableCreatableSelect
-                        value={target}
-                        options={program.states}
-                        onChange={(nextState) =>
-                          onTransitionChange(inputSymbol, state, nextState)
-                        }
-                        onCreate={(requestedName) => {
-                          const createdState = onAddState(requestedName);
-                          onTransitionChange(inputSymbol, state, createdState);
-                        }}
-                        ariaLabel={`δ(${state}, ${inputSymbol})`}
-                        createLabel={t("moore.sim.createState")}
-                        notFoundLabel={t("moore.sim.stateNotFound")}
-                        testId={`moore-transition-${inputIndex}-${stateIndex}`}
-                      />
+                      <div className="inline-flex w-max items-center gap-2">
+                        <SearchableCreatableSelect
+                          value={target}
+                          options={program.states}
+                          onChange={(nextState) =>
+                            onTransitionChange(inputSymbol, state, nextState)
+                          }
+                          onCreate={(requestedName) => {
+                            const createdState = onAddState(requestedName);
+                            onTransitionChange(
+                              inputSymbol,
+                              state,
+                              createdState,
+                            );
+                          }}
+                          ariaLabel={`Transition ${state}, ${inputSymbol}`}
+                          createLabel={t("moore.sim.createState")}
+                          notFoundLabel={t("moore.sim.stateNotFound")}
+                          testId={`moore-transition-${inputIndex}-${stateIndex}`}
+                          className="w-full min-w-0"
+                          style={{ width: dropdownWidth }}
+                        />
+                        {outputControls && (
+                          <>
+                            <input
+                              value={output?.symbol ?? ""}
+                              onChange={(event) =>
+                                outputControls.onSymbolChange(
+                                  inputSymbol,
+                                  state,
+                                  event.target.value,
+                                )
+                              }
+                              onInput={(event) =>
+                                resizeTextInput(event.currentTarget)
+                              }
+                              aria-label={`${t("moore.sim.symbolOutput")} ${state} ${inputSymbol}`}
+                              data-testid={`${outputControls.testIdPrefix}-symbol-${inputIndex}-${stateIndex}`}
+                              style={{
+                                width: getTextInputWidth(output?.symbol),
+                              }}
+                              className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
+                            />
+                            <input
+                              key={`${program.representation}-${inputSymbol}-${state}-${output?.code ?? 0}`}
+                              defaultValue={formatInternalNumber(
+                                output?.code ?? 0,
+                                program.representation,
+                              )}
+                              onBlur={(event) => {
+                                const code = parseInternalNumber(
+                                  event.currentTarget.value,
+                                  program.representation,
+                                );
+                                if (code === null) {
+                                  event.currentTarget.value =
+                                    formatInternalNumber(
+                                      output?.code ?? 0,
+                                      program.representation,
+                                    );
+                                  return;
+                                }
+                                outputControls.onCodeChange(
+                                  inputSymbol,
+                                  state,
+                                  code,
+                                );
+                              }}
+                              onInput={(event) =>
+                                resizeTextInput(event.currentTarget)
+                              }
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                  event.currentTarget.blur();
+                                }
+                              }}
+                              aria-label={`${t("moore.sim.internalOutputCode")} ${state} ${inputSymbol}`}
+                              data-testid={`${outputControls.testIdPrefix}-code-${inputIndex}-${stateIndex}`}
+                              style={{
+                                width: getTextInputWidth(
+                                  formatInternalNumber(
+                                    output?.code ?? 0,
+                                    program.representation,
+                                  ),
+                                ),
+                              }}
+                              className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
+                            />
+                          </>
+                        )}
+                      </div>
                     </td>
                   );
                 })}
@@ -233,4 +332,13 @@ export function MooreTransitionTable({
       </div>
     </section>
   );
+}
+
+function getTextInputWidth(value: string | undefined): string {
+  return `${Math.max(7, (value ?? "").length + 3)}ch`;
+}
+
+function resizeTextInput(input: HTMLInputElement): void {
+  input.style.width = "0px";
+  input.style.width = `${Math.max(56, input.scrollWidth + 2)}px`;
 }
