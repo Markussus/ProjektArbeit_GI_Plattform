@@ -128,7 +128,12 @@ export function checkGrammarEnumerationExercise(
 
   const studentWords = uniqueTrimmed(parseEnumerationInput(studentSource));
   if (studentWords.length === 0) {
-    return { status: "invalid", reason: "studentEmpty", wrong: [], missing: [] };
+    return {
+      status: "invalid",
+      reason: "studentEmpty",
+      wrong: [],
+      missing: [],
+    };
   }
 
   const wrong = studentWords.filter(

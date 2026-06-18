@@ -22,9 +22,7 @@ export function RLGrammarEnumerationExercise({
     (s) => s.exerciseDrafts[exercise.id] ?? "",
   );
   const setExerciseDraft = useRLSimulatorStore((s) => s.setExerciseDraft);
-  const revealedEnumeration = useRLSimulatorStore(
-    (s) => s.revealedEnumeration,
-  );
+  const revealedEnumeration = useRLSimulatorStore((s) => s.revealedEnumeration);
   const consumeRevealedEnumeration = useRLSimulatorStore(
     (s) => s.consumeRevealedEnumeration,
   );

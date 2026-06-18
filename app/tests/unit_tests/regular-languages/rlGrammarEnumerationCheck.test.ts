@@ -31,10 +31,7 @@ describe("checkGrammarEnumerationExercise", () => {
   });
 
   it("reports words the grammar does not generate", () => {
-    const result = checkGrammarEnumerationExercise(
-      "100, 999",
-      FINITE_GRAMMAR,
-    );
+    const result = checkGrammarEnumerationExercise("100, 999", FINITE_GRAMMAR);
     expect(result.status).toBe("mismatch");
     expect(result.wrong).toContain("999");
   });

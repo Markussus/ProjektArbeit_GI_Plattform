@@ -30,7 +30,11 @@ describe("checkLanguageToGrammarExercise", () => {
   });
 
   it("rejects an unparseable grammar", () => {
-    const result = checkLanguageToGrammarExercise("not a grammar", SEED, REJECT);
+    const result = checkLanguageToGrammarExercise(
+      "not a grammar",
+      SEED,
+      REJECT,
+    );
     expect(result.status).toBe("invalid");
     expect(result.reason).toBe("studentParse");
   });

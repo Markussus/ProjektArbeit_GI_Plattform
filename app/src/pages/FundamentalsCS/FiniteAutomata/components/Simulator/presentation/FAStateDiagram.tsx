@@ -124,8 +124,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
   };
 
   // Reset is meaningful while the view is zoomed/panned or a node was dragged.
-  const isViewDefault =
-    Math.abs(scale - 1) < 0.01 && nodePositions.size === 0;
+  const isViewDefault = Math.abs(scale - 1) < 0.01 && nodePositions.size === 0;
 
   const showEdgeLabels = scale >= EDGE_LABEL_MIN_SCALE;
   const showNodeLabels = scale >= NODE_LABEL_MIN_SCALE;

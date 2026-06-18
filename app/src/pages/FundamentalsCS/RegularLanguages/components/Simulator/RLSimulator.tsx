@@ -127,7 +127,9 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
               : undefined
           }
           initialWord={
-            mode === "recognizeWord" ? (pendingTestWord ?? undefined) : undefined
+            mode === "recognizeWord"
+              ? (pendingTestWord ?? undefined)
+              : undefined
           }
         />
       </div>
