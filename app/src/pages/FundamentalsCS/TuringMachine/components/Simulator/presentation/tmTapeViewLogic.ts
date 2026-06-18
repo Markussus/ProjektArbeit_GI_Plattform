@@ -14,11 +14,16 @@ export interface TMTapeCell {
 export interface TMTapeViewport {
   effectiveWindowRadius: number;
   effectiveHeadWindowRadius: number;
-  startIndex: number;
-  endIndex: number;
+  minIndex: number;
+  maxIndex: number;
 }
 
 export interface TMTapeContentRange {
+  minIndex: number;
+  maxIndex: number;
+}
+
+export interface TMTapeRenderRange {
   minIndex: number;
   maxIndex: number;
 }
@@ -47,8 +52,8 @@ export function resolveTapeViewport(
   return {
     effectiveWindowRadius,
     effectiveHeadWindowRadius,
-    startIndex: viewportCenter - effectiveWindowRadius,
-    endIndex: viewportCenter + effectiveWindowRadius,
+    minIndex: viewportCenter - effectiveWindowRadius,
+    maxIndex: viewportCenter + effectiveWindowRadius,
   };
 }
 
@@ -75,6 +80,28 @@ export function getTapeContentRange(
   return {
     minIndex: minIndex ?? fallbackIndex,
     maxIndex: maxIndex ?? fallbackIndex,
+  };
+}
+
+export function getTapeRenderRange(params: {
+  viewportStartIndex: number;
+  viewportEndIndex: number;
+  contentRange: TMTapeContentRange;
+  paddingCells: number;
+}): TMTapeRenderRange {
+  const { viewportStartIndex, viewportEndIndex, contentRange, paddingCells } =
+    params;
+  const safePaddingCells = Math.max(paddingCells, 0);
+
+  return {
+    minIndex: Math.min(
+      viewportStartIndex,
+      contentRange.minIndex - safePaddingCells,
+    ),
+    maxIndex: Math.max(
+      viewportEndIndex,
+      contentRange.maxIndex + safePaddingCells,
+    ),
   };
 }
 

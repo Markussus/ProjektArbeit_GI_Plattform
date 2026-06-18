@@ -14,6 +14,7 @@ import {
   DEFAULT_HEAD_WINDOW_RADIUS,
   getResponsiveWindowRadius,
   getTapeContentRange,
+  getTapeRenderRange,
   getTapeTransitionDurationMs,
   resolveTapeViewport,
   shouldAnimateTapeShift,
@@ -49,11 +50,7 @@ export function TMTapeView({
   const focusedCellRef = useRef<HTMLDivElement | null>(null);
   const previousStartIndexRef = useRef<number | null>(null);
   const previousWindowRadiusRef = useRef<number | null>(null);
-  const previousHeadPositionRef = useRef<number | null>(null);
-  const previousTapeRangeRef = useRef<{
-    startIndex: number;
-    endIndex: number;
-  } | null>(null);
+  const previousAutoCenterKeyRef = useRef<string | null>(null);
   const tapeShiftFrameRef = useRef<number | null>(null);
   const headIndicatorFrameRef = useRef<number | null>(null);
   const dragScroll = useDragScroll<HTMLDivElement>();
@@ -65,7 +62,11 @@ export function TMTapeView({
   const maxWindowRadius = Math.max(windowRadius, 0);
   const [responsiveWindowRadius, setResponsiveWindowRadius] =
     useState(maxWindowRadius);
-  const { effectiveWindowRadius, startIndex, endIndex } = useMemo(
+  const {
+    effectiveWindowRadius,
+    minIndex: startIndex,
+    maxIndex: endIndex,
+  } = useMemo(
     () =>
       resolveTapeViewport(
         headPosition,
@@ -75,26 +76,29 @@ export function TMTapeView({
       ),
     [headPosition, headWindowRadius, responsiveWindowRadius, windowRadius],
   );
-  const { minIndex: minContentIndex, maxIndex: maxContentIndex } = useMemo(
+  const contentRange = useMemo(
     () => getTapeContentRange(tape, blankSymbol, headPosition),
     [blankSymbol, headPosition, tape],
   );
-  const visiblePaddingCells = Math.max(effectiveWindowRadius, 0);
-  const tapeStartIndex = Math.min(
-    startIndex,
-    minContentIndex - visiblePaddingCells,
+  const tapeRange = useMemo(
+    () =>
+      getTapeRenderRange({
+        viewportStartIndex: startIndex,
+        viewportEndIndex: endIndex,
+        contentRange,
+        paddingCells: effectiveWindowRadius,
+      }),
+    [contentRange, effectiveWindowRadius, endIndex, startIndex],
   );
-  const tapeEndIndex = Math.max(
-    endIndex,
-    maxContentIndex + visiblePaddingCells,
-  );
+  const autoCenterKey = `${headPosition}:${tapeRange.minIndex}:${tapeRange.maxIndex}`;
   const transitionDurationMs = getTapeTransitionDurationMs(stepDurationMs);
-  const transitionStyle = {
-    transitionDuration: "${transitionDurationMs}ms",
-  };
-  const headIndicatorStyle = {
-    transitionDuration: "${transitionDurationMs}ms",
-  };
+  const transitionStyle = useMemo(
+    () => ({
+      transitionDuration: `${transitionDurationMs}ms`,
+    }),
+    [transitionDurationMs],
+  );
+  const headIndicatorStyle = useMemo(() => ({ transitionDuration: "0ms" }), []);
   const updateHeadIndicatorPosition = useCallback(() => {
     const headIndicator = headIndicatorRef.current;
     const focusedCell = focusedCellRef.current;
@@ -120,15 +124,17 @@ export function TMTapeView({
     headIndicator.style.opacity = "1";
     headIndicator.style.transform = `translateX(${focusedCellCenterPx}px) translateX(-50%)`;
   }, []);
+  const stopHeadIndicatorTracking = useCallback(() => {
+    if (headIndicatorFrameRef.current !== null) {
+      window.cancelAnimationFrame(headIndicatorFrameRef.current);
+      headIndicatorFrameRef.current = null;
+    }
+  }, []);
   const trackHeadIndicatorDuringAnimation = useCallback(
     (durationMs: number) => {
-      if (headIndicatorFrameRef.current !== null) {
-        window.cancelAnimationFrame(headIndicatorFrameRef.current);
-        headIndicatorFrameRef.current = null;
-      }
+      stopHeadIndicatorTracking();
 
-      const startedAt = performance.now();
-      const updateUntil = startedAt + Math.max(durationMs, 0) + 80;
+      const updateUntil = performance.now() + Math.max(durationMs, 0) + 80;
 
       const update = () => {
         updateHeadIndicatorPosition();
@@ -143,17 +149,12 @@ export function TMTapeView({
 
       update();
     },
-    [updateHeadIndicatorPosition],
+    [stopHeadIndicatorTracking, updateHeadIndicatorPosition],
   );
 
   useLayoutEffect(() => {
-    return () => {
-      if (headIndicatorFrameRef.current !== null) {
-        window.cancelAnimationFrame(headIndicatorFrameRef.current);
-        headIndicatorFrameRef.current = null;
-      }
-    };
-  }, []);
+    return stopHeadIndicatorTracking;
+  }, [stopHeadIndicatorTracking]);
 
   useLayoutEffect(() => {
     const observedElement =
@@ -192,10 +193,10 @@ export function TMTapeView({
         tape,
         headPosition,
         blankSymbol,
-        tapeStartIndex,
-        tapeEndIndex,
+        tapeRange.minIndex,
+        tapeRange.maxIndex,
       ),
-    [blankSymbol, headPosition, tapeEndIndex, tapeStartIndex, tape],
+    [blankSymbol, headPosition, tapeRange, tape],
   );
 
   useLayoutEffect(() => {
@@ -206,30 +207,14 @@ export function TMTapeView({
     const tapeScroller = tapeScrollerRef.current;
     const focusedCell = focusedCellRef.current;
     if (!tapeScroller || !focusedCell) {
-      previousHeadPositionRef.current = headPosition;
-      previousTapeRangeRef.current = {
-        startIndex: tapeStartIndex,
-        endIndex: tapeEndIndex,
-      };
+      previousAutoCenterKeyRef.current = autoCenterKey;
       return;
     }
 
-    const previousTapeRange = previousTapeRangeRef.current;
-    const headPositionChanged =
-      previousHeadPositionRef.current !== headPosition;
-    const tapeRangeChanged =
-      !previousTapeRange ||
-      previousTapeRange.startIndex !== tapeStartIndex ||
-      previousTapeRange.endIndex !== tapeEndIndex;
-    previousHeadPositionRef.current = headPosition;
-    previousTapeRangeRef.current = {
-      startIndex: tapeStartIndex,
-      endIndex: tapeEndIndex,
-    };
-
-    if (!headPositionChanged && !tapeRangeChanged) {
+    if (previousAutoCenterKeyRef.current === autoCenterKey) {
       return;
     }
+    previousAutoCenterKeyRef.current = autoCenterKey;
 
     const scrollerRect = tapeScroller.getBoundingClientRect();
     const focusedCellRect = focusedCell.getBoundingClientRect();
@@ -246,9 +231,8 @@ export function TMTapeView({
     });
     trackHeadIndicatorDuringAnimation(transitionDurationMs);
   }, [
+    autoCenterKey,
     headPosition,
-    tapeEndIndex,
-    tapeStartIndex,
     trackHeadIndicatorDuringAnimation,
     transitionDurationMs,
   ]);
@@ -290,13 +274,13 @@ export function TMTapeView({
   useLayoutEffect(() => {
     const tapeTrack = tapeTrackRef.current;
     if (!tapeTrack) {
-      previousStartIndexRef.current = tapeStartIndex;
+      previousStartIndexRef.current = tapeRange.minIndex;
       previousWindowRadiusRef.current = effectiveWindowRadius;
       return;
     }
 
     if (previousStartIndexRef.current === null) {
-      previousStartIndexRef.current = tapeStartIndex;
+      previousStartIndexRef.current = tapeRange.minIndex;
       previousWindowRadiusRef.current = effectiveWindowRadius;
       tapeTrack.style.transitionDuration = "0ms";
       tapeTrack.style.transform = "translateX(0px)";
@@ -309,15 +293,15 @@ export function TMTapeView({
       previousWindowRadius !== null &&
       previousWindowRadius !== effectiveWindowRadius
     ) {
-      previousStartIndexRef.current = tapeStartIndex;
+      previousStartIndexRef.current = tapeRange.minIndex;
       tapeTrack.style.transitionDuration = "0ms";
       tapeTrack.style.transform = "translateX(0px)";
       return;
     }
 
     const previousStartIndex = previousStartIndexRef.current;
-    const shiftedCells = tapeStartIndex - previousStartIndex;
-    previousStartIndexRef.current = tapeStartIndex;
+    const shiftedCells = tapeRange.minIndex - previousStartIndex;
+    previousStartIndexRef.current = tapeRange.minIndex;
 
     if (!shouldAnimateTapeShift(shiftedCells, transitionDurationMs)) {
       tapeTrack.style.transitionDuration = "0ms";
@@ -363,7 +347,7 @@ export function TMTapeView({
     };
   }, [
     effectiveWindowRadius,
-    tapeStartIndex,
+    tapeRange.minIndex,
     trackHeadIndicatorDuringAnimation,
     transitionDurationMs,
     updateHeadIndicatorPosition,
