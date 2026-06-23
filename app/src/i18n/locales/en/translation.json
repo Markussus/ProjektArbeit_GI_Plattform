@@ -1307,6 +1307,7 @@
       "finalFormulaDesc": "For the final decimal number, the sign, true mantissa, and exponent factor are multiplied:",
       "examplesTitle": "Example Exercises",
       "examplesDesc": "Here you can find additional example exercises for the different units:",
+      "lectureScripts": "Lecture Scripts",
       "unit03": "Unit 03: How are numbers represented in computers?",
       "unit03_ex1": "Exercise 1: Convert the following decimal numbers into binary numbers: 1, 5, 7, 26, 63.",
       "unit03_ex2": "Exercise 2: Add the numbers 50 and 13 as binary numbers.",

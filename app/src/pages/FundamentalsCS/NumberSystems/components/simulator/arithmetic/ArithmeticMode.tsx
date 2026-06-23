@@ -6,7 +6,6 @@ import { Subtraction } from "./Subtraction";
 import { Multiplication } from "./Multiplication";
 import { Division } from "./Division";
 import { Shifting } from "./Shifting";
-import { IEEEAddition } from "./IEEEAddition";
 import { Compare } from "./Compare";
 
 import type {
@@ -91,7 +90,6 @@ export function ArithmeticMode({
             value: "shifting",
             label: t("simulator.arithmetic.modes.shifting"),
           },
-          { value: "ieee754", label: t("simulator.arithmetic.modes.ieee754") },
           { value: "compare", label: t("simulator.arithmetic.modes.compare") },
         ]}
         onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
@@ -162,18 +160,6 @@ export function ArithmeticMode({
             onShowSolution={onShowSolution}
             onExitExercise={onExitExercise}
             initialA={valA}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "ieee754" && (
-          <IEEEAddition
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
             onChangeValues={handleChangeValues}
             renderModeSelector={modeSelector}
           />

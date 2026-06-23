@@ -40,6 +40,7 @@ export function useExerciseTabs(initialTab: ModuleTabId = "overview") {
   const clearSimulationExercise = () => {
     setSimulationExercise(null);
     setSelectedExercise(null);
+    setSimulationItem(null);
   };
 
   const clearSimulationItem = () => {

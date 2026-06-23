@@ -1136,6 +1136,7 @@
       "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
       "examplesTitle": "Beispiel-Aufgaben",
       "examplesDesc": "Hier finden Sie zusätzliche Beispiel-Übungen zu den verschiedenen Units:",
+      "lectureScripts": "Vorlesungsskripte",
       "unit03": "Unit 03: Wie werden Zahlen im Computer dargestellt?",
       "unit03_ex1": "Übung 1: Rechnen Sie die folgenden Dezimalzahlen in Binärzahlen um: 1, 5, 7, 26, 63.",
       "unit03_ex2": "Übung 2: Addieren Sie die Zahlen 50 und 13 als Binärzahlen.",

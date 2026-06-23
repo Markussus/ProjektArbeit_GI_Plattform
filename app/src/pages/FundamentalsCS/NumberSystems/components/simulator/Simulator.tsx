@@ -112,7 +112,6 @@ export function Simulator({
     | "multiplication"
     | "division"
     | "shifting"
-    | "ieee754"
     | "compare"
   >("addition");
   const [initialConverterMode, setInitialConverterMode] = useState<
@@ -603,7 +602,6 @@ export function Simulator({
                 | "multiplication"
                 | "division"
                 | "shifting"
-                | "ieee754"
                 | "compare"
             }
             initialValueA={initialValueA}
