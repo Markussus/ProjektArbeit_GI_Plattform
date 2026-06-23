@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
+import {
+  evaluateBooleanExpression,
+  type VariableAssignment,
+} from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+import { countExpressionLiterals } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/factorMinimalDnf";
 import { defaultMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/config/defaultMooreProgram";
-import { buildMooreConversion } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreConversion";
+import {
+  buildFormulas,
+  buildMooreConversion,
+  toBits,
+} from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreConversion";
 
 describe("Moore circuit conversion", () => {
   it("builds grouped transition rows from state and input codes", () => {
@@ -85,5 +94,42 @@ describe("Moore circuit conversion", () => {
       minimizationAvailable: false,
     });
     expect(conversion.transition.formulas[3].expression).not.toBeNull();
+  });
+
+  it("uses the exact global optimizer for Moore/Mealy formulas up to four variables", () => {
+    const variables = ["S0", "S1", "E0", "E1"];
+    const rows = Array.from({ length: 16 }, (_, rowIndex) => {
+      const bits = toBits(rowIndex, 4);
+      const result =
+        (bits[0] === 1 || bits[1] === 1) &&
+        (bits[2] === 1 || bits[3] === 1);
+
+      return {
+        currentState: `q${rowIndex}`,
+        currentBits: bits.slice(0, 2),
+        inputBits: bits.slice(2),
+        resultBits: [result ? 1 : 0],
+      };
+    });
+
+    const [formula] = buildFormulas(["T0"], variables, rows);
+
+    expect(formula.expression).not.toBeNull();
+    expect(countExpressionLiterals(formula.expression!)).toBe(4);
+
+    for (const row of rows) {
+      const bits = [...row.currentBits, ...row.inputBits];
+      const assignment = variables.reduce<VariableAssignment>(
+        (values, variable, index) => ({
+          ...values,
+          [variable]: bits[index] === 1,
+        }),
+        {},
+      );
+
+      expect(evaluateBooleanExpression(formula.expression!, assignment)).toBe(
+        row.resultBits[0] === 1,
+      );
+    }
   });
 });

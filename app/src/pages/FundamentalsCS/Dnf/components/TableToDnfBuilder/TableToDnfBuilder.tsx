@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pencil } from "lucide-react";
+import { Lightbulb, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -8,6 +8,7 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
@@ -18,6 +19,10 @@ import {
   dnfTruthTableTransferCodec,
   type DnfTruthTableTransferDraft,
 } from "../DnfBuilder/domain/dnfTransfer";
+import {
+  computeMinimalDnf,
+  minimalDnfToExpression,
+} from "../DnfBuilder/domain/quineMcCluskey";
 import { createTruthTableFromResults } from "../DnfBuilder/domain/truthTable";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
@@ -62,6 +67,7 @@ export function TableToDnfBuilder({
   );
   const [committed, setCommitted] = useState(initialValue?.committed ?? false);
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoadedVersion, setSolutionLoadedVersion] = useState(0);
   const [showFullTable, setShowFullTable] = useState(false);
   const [dnfAnswer, setDnfAnswer] = useState(initialValue?.dnfAnswer ?? "");
   const truthTable = useMemo(
@@ -188,6 +194,32 @@ export function TableToDnfBuilder({
     simplification.reset();
   };
 
+  // Fill the answer with the reference solution for the user-defined table: the
+  // canonical DNF and the minimal simplification, shown as already checked. The
+  // table itself stays as the user built it.
+  const loadSolution = () => {
+    if (analysis.status !== "valid") return;
+
+    const canonicalDnf = analysis.formattedDnf;
+    const minimalDnf = formatBooleanExpressionForDisplay(
+      minimalDnfToExpression(
+        computeMinimalDnf(analysis.truthTable),
+        analysis.truthTable.variables,
+      ),
+    );
+
+    onUserChange?.();
+    setDnfAnswer(canonicalDnf);
+    setShowSolution(false);
+    setFeedback(
+      checkDnfExerciseAttempt(analysis.truthTable, [], canonicalDnf, {
+        checkTruthTable: false,
+      }),
+    );
+    simplification.loadSolution(minimalDnf, analysis.truthTable);
+    setSolutionLoadedVersion((current) => current + 1);
+  };
+
   const handleImportTable = (value: DnfTruthTableTransferDraft) => {
     onUserChange?.();
     setVariableCount(value.variableCount);
@@ -249,7 +281,7 @@ export function TableToDnfBuilder({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
           data-testid="dnf-edit-table-config"
@@ -259,6 +291,17 @@ export function TableToDnfBuilder({
           <Pencil className="size-4" />
           {t("dnf.simulator.editConfig")}
         </button>
+        {!seedInitialFeedback && (
+          <button
+            type="button"
+            data-testid="dnf-free-load-solution"
+            onClick={loadSolution}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            <Lightbulb className="size-4" />
+            {t("dnf.simulator.loadSolution")}
+          </button>
+        )}
       </div>
 
       <DnfExerciseWorkspace
@@ -282,8 +325,11 @@ export function TableToDnfBuilder({
       />
 
       <DnfFollowUpSections
+        key={`simplification-${solutionLoadedVersion}`}
         simplification={simplificationFollowUp}
-        initiallyOpenSimplification={seedInitialFeedback}
+        initiallyOpenSimplification={
+          seedInitialFeedback || solutionLoadedVersion > 0
+        }
       />
 
       <SimulatorStringTransferBox

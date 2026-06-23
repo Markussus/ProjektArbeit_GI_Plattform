@@ -5,7 +5,11 @@ import {
 } from "./booleanExpression";
 import { deriveDnfFromTruthTable } from "./dnfDerivation";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
-import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
+import { countExpressionLiterals } from "./factorMinimalDnf";
+import {
+  computeSmallestBooleanExpression,
+  type SmallestExpressionSource,
+} from "./minimalExpression";
 import { computeMinimalDnf, minimalDnfToExpression } from "./quineMcCluskey";
 import type { TruthTable } from "./truthTable";
 
@@ -38,15 +42,19 @@ export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
   /** One concrete minimal expression for display when the user asks for help. */
   minimalExpression: BooleanExpression;
   /**
-   * Factored expression derived from the minimal DNF (exact factoring). Equals
-   * the minimal DNF when no common factor can be pulled out; otherwise leaves
-   * DNF form and may be strictly shorter.
+   * Shortest expression shown as an optional form beyond pure DNF. For <=4
+   * variables this is globally optimal; above that it falls back to the
+   * previous DNF-derived factoring.
    */
   factoredExpression: BooleanExpression;
-  /** Literal count of the factored expression. */
+  /** Literal count of the optional shortest expression. */
   factoredLiteralCount: number;
-  /** True when factoring produced a strictly shorter expression than the minimal DNF. */
+  /** True when the optional expression is strictly shorter than the minimal DNF. */
   factoredIsShorter: boolean;
+  /** True when the optional expression is certified globally shortest. */
+  factoredIsExact: boolean;
+  /** Origin of the optional expression, for honest UI labels and notes. */
+  factoredSource: SmallestExpressionSource;
 }
 
 /**
@@ -68,8 +76,9 @@ export function checkDnfSimplification(
 ): DnfSimplificationCheckResult {
   const minimal = computeMinimalDnf(table);
   const minimalExpression = minimalDnfToExpression(minimal, table.variables);
-  const factoredExpression = factorMinimalDnf(minimal, table.variables);
-  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
+  const smallestExpression = computeSmallestBooleanExpression(table, minimal);
+  const factoredExpression = smallestExpression.expression;
+  const factoredLiteralCount = smallestExpression.literalCount;
   const canonicalLiteralCount = getCanonicalLiteralCount(table);
   const baseResult = {
     canonicalLiteralCount,
@@ -79,6 +88,8 @@ export function checkDnfSimplification(
     factoredExpression,
     factoredLiteralCount,
     factoredIsShorter: factoredLiteralCount < minimal.literalCount,
+    factoredIsExact: smallestExpression.exact,
+    factoredSource: smallestExpression.source,
   };
 
   if (userInput.trim() === "") {

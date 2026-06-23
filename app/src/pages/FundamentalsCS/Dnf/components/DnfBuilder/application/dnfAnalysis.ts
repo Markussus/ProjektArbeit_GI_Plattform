@@ -11,10 +11,11 @@ import {
 import { generateTruthTable, type TruthTable } from "../domain/truthTable";
 
 /**
- * Upper bound on variables for the DNF tool. Kept at 4 so the exact
- * minimization (minimal DNF via branch-and-bound and the smallest-formula
- * synthesis) stays fast and provably optimal — and because nobody practices
- * DNF with more than four variables anyway.
+ * Upper bound on variables for the DNF tool. Capped at 4 so every exercise
+ * stays in the range where the exact smallest-form synthesis
+ * (MAX_EXACT_OPTIMAL_VARIABLES) is guaranteed globally optimal — the
+ * DNF-derived fallback above four variables is therefore only reached by other
+ * callers such as Moore/Mealy, never from the DNF tool itself.
  */
 export const MAX_DNF_VARIABLE_COUNT = 4;
 

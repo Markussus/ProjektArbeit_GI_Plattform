@@ -212,17 +212,26 @@ function SimplificationSolution({
         {feedback.factoredIsShorter && (
           <div className="border-border/60 border-t pt-3">
             <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-              {t("dnf.builder.exercise.factoredLabel")}
+              {t(
+                feedback.factoredIsExact
+                  ? "dnf.builder.exercise.factoredLabel"
+                  : "dnf.builder.exercise.factoredFallbackLabel",
+              )}
             </p>
             <code className="text-foreground mt-2 block font-mono text-sm leading-relaxed break-words">
               {formatBooleanExpressionForDisplay(feedback.factoredExpression)}
             </code>
             <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-              {t("dnf.builder.exercise.factoredNote", {
-                literalsLabel: t("dnf.builder.exercise.literalCount", {
-                  count: feedback.factoredLiteralCount,
-                }),
-              })}
+              {t(
+                feedback.factoredIsExact
+                  ? "dnf.builder.exercise.factoredNote"
+                  : "dnf.builder.exercise.factoredFallbackNote",
+                {
+                  literalsLabel: t("dnf.builder.exercise.literalCount", {
+                    count: feedback.factoredLiteralCount,
+                  }),
+                },
+              )}
             </p>
           </div>
         )}

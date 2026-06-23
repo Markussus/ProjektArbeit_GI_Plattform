@@ -175,6 +175,8 @@ describe("DNF simplification check", () => {
     expect(result.factoredLiteralCount).toBeLessThan(
       result.minimumLiteralCount,
     );
+    expect(result.factoredIsExact).toBe(true);
+    expect(result.factoredSource).toBe("factored_dnf");
     expectExpressionEquivalentToTable(result.factoredExpression, table);
   });
 
@@ -187,6 +189,34 @@ describe("DNF simplification check", () => {
 
     expect(result.factoredIsShorter).toBe(false);
     expect(result.factoredLiteralCount).toBe(result.minimumLiteralCount);
+  });
+
+  it("exposes the globally shortest form when it beats literal factoring", () => {
+    const table = generateTruthTable(parse("(a | b) & (c | d)"));
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.minimumLiteralCount).toBe(8);
+    expect(result.factoredIsShorter).toBe(true);
+    expect(result.factoredLiteralCount).toBe(4);
+    expect(result.factoredIsExact).toBe(true);
+    expect(result.factoredSource).toBe("exact");
+    expectExpressionEquivalentToTable(result.factoredExpression, table);
+  });
+
+  it("marks the optional shorter form as non-exact above four variables", () => {
+    const table = generateTruthTable(
+      parse("(a & c) | (b & c)"),
+      ["a", "b", "c", "d", "e"],
+    );
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.factoredIsShorter).toBe(true);
+    expect(result.factoredLiteralCount).toBe(3);
+    expect(result.factoredIsExact).toBe(false);
+    expect(result.factoredSource).toBe("factored_dnf");
+    expectExpressionEquivalentToTable(result.factoredExpression, table);
   });
 });
 

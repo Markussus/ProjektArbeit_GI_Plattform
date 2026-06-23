@@ -4,8 +4,6 @@ import { formatBooleanExpressionForDisplay } from "./booleanExpressionFormat";
 import { deriveDnfFromTruthTable, formatDnfExpression } from "./dnfDerivation";
 import {
   buildFactoringSteps,
-  countExpressionLiterals,
-  factorMinimalDnf,
   type Literal,
 } from "./factorMinimalDnf";
 import {
@@ -14,6 +12,10 @@ import {
   type MinimalDnf,
   type PrimeImplicant,
 } from "./quineMcCluskey";
+import {
+  computeSmallestBooleanExpression,
+  type SmallestExpressionSource,
+} from "./minimalExpression";
 import type { TruthTable } from "./truthTable";
 
 const NOT = "¬";
@@ -46,6 +48,10 @@ export interface DnfSimplificationWalkthrough {
   factoredLiteralCount: number | null;
   /** Distributivity derivation for the factored form; empty unless it is shorter. */
   factoredDerivationSteps: DnfDerivationStep[];
+  /** True when the optional shorter form is certified globally shortest. */
+  factoredIsExact: boolean;
+  /** Origin of the optional shorter form, when one is shown. */
+  factoredSource: SmallestExpressionSource | null;
   constantCase: "always_false" | "always_true" | null;
 }
 
@@ -66,9 +72,12 @@ export function buildDnfSimplificationWalkthrough(
 ): DnfSimplificationWalkthrough {
   const derivation = deriveDnfFromTruthTable(table);
   const minimal = computeMinimalDnf(table);
-  const factoredExpression = factorMinimalDnf(minimal, table.variables);
-  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
+  const smallestExpression = computeSmallestBooleanExpression(table, minimal);
+  const factoredExpression = smallestExpression.expression;
+  const factoredLiteralCount = smallestExpression.literalCount;
   const factoredIsShorter = factoredLiteralCount < minimal.literalCount;
+  const hasFactoringDerivation =
+    factoredIsShorter && smallestExpression.source === "factored_dnf";
 
   return {
     trueRowNumbers: table.rows.flatMap((row, index) =>
@@ -84,9 +93,11 @@ export function buildDnfSimplificationWalkthrough(
       ? formatBooleanExpressionForDisplay(factoredExpression)
       : null,
     factoredLiteralCount: factoredIsShorter ? factoredLiteralCount : null,
-    factoredDerivationSteps: factoredIsShorter
+    factoredDerivationSteps: hasFactoringDerivation
       ? buildFactoringDerivationSteps(minimal, table.variables)
       : [],
+    factoredIsExact: factoredIsShorter ? smallestExpression.exact : true,
+    factoredSource: factoredIsShorter ? smallestExpression.source : null,
     constantCase: getConstantCase(minimal),
   };
 }

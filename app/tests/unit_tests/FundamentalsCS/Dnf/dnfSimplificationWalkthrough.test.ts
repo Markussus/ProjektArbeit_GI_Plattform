@@ -195,6 +195,8 @@ describe("dnfSimplificationWalkthrough", () => {
 
     expect(walkthrough.minimalLiteralCount).toBe(4);
     expect(walkthrough.factoredLiteralCount).toBe(3);
+    expect(walkthrough.factoredIsExact).toBe(true);
+    expect(walkthrough.factoredSource).toBe("factored_dnf");
     expect(walkthrough.factoredForm).not.toBeNull();
     expect(walkthrough.factoredForm).toMatch(/^c ∧ \((a ∨ b|b ∨ a)\)$/);
 
@@ -215,6 +217,33 @@ describe("dnfSimplificationWalkthrough", () => {
     expect(walkthrough.factoredForm).toBeNull();
     expect(walkthrough.factoredLiteralCount).toBeNull();
     expect(walkthrough.factoredDerivationSteps).toEqual([]);
+  });
+
+  it("shows the exact optimum without invented factoring steps", () => {
+    const table = generateTruthTable(parse("(a | b) & (c | d)"));
+
+    const walkthrough = buildDnfSimplificationWalkthrough(table);
+
+    expect(walkthrough.minimalLiteralCount).toBe(8);
+    expect(walkthrough.factoredLiteralCount).toBe(4);
+    expect(walkthrough.factoredIsExact).toBe(true);
+    expect(walkthrough.factoredSource).toBe("exact");
+    expect(walkthrough.factoredForm).not.toBeNull();
+    expect(walkthrough.factoredDerivationSteps).toEqual([]);
+  });
+
+  it("marks fallback factoring as not globally exact above four variables", () => {
+    const table = generateTruthTable(
+      parse("(a & c) | (b & c)"),
+      ["a", "b", "c", "d", "e"],
+    );
+
+    const walkthrough = buildDnfSimplificationWalkthrough(table);
+
+    expect(walkthrough.factoredLiteralCount).toBe(3);
+    expect(walkthrough.factoredIsExact).toBe(false);
+    expect(walkthrough.factoredSource).toBe("factored_dnf");
+    expect(walkthrough.factoredDerivationSteps.length).toBeGreaterThan(1);
   });
 });
 

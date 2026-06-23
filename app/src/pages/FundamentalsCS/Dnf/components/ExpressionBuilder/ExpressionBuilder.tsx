@@ -1,5 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Eraser, Pencil, Play } from "lucide-react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Eraser, Lightbulb, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -8,6 +15,11 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
+import {
+  computeMinimalDnf,
+  minimalDnfToExpression,
+} from "../DnfBuilder/domain/quineMcCluskey";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
 import {
@@ -53,6 +65,7 @@ export function ExpressionBuilder({
 }: ExpressionBuilderProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const workspaceRef = useRef<ExpressionWorkspaceHandle | null>(null);
   const [inputValue, setInputValue] = useState(initialValue?.expression ?? "");
   const [committedSource, setCommittedSource] = useState<string | null>(
     initialValue?.committed ? initialValue.expression : null,
@@ -188,7 +201,7 @@ export function ExpressionBuilder({
           </div>
         </section>
       ) : (
-        <div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
             data-testid="dnf-edit-expression-config"
@@ -198,11 +211,23 @@ export function ExpressionBuilder({
             <Pencil className="size-4" />
             {t("dnf.simulator.editConfig")}
           </button>
+          {!seedInitialFeedback && (
+            <button
+              type="button"
+              data-testid="dnf-free-load-solution"
+              onClick={() => workspaceRef.current?.loadSolution()}
+              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+            >
+              <Lightbulb className="size-4" />
+              {t("dnf.simulator.loadSolution")}
+            </button>
+          )}
         </div>
       )}
 
       {committedSource !== null && (
         <ExpressionWorkspace
+          ref={workspaceRef}
           key={`${committedSource}-${workspaceVersion}`}
           committedSource={committedSource}
           initialAttempt={attempt}
@@ -230,19 +255,30 @@ interface ExpressionWorkspaceProps {
   seedInitialFeedback?: boolean;
 }
 
-function ExpressionWorkspace({
-  committedSource,
-  initialAttempt,
-  onAttemptChange,
-  onUserChange,
-  seedInitialFeedback = false,
-}: ExpressionWorkspaceProps) {
+interface ExpressionWorkspaceHandle {
+  loadSolution: () => void;
+}
+
+const ExpressionWorkspace = forwardRef<
+  ExpressionWorkspaceHandle,
+  ExpressionWorkspaceProps
+>(function ExpressionWorkspace(
+  {
+    committedSource,
+    initialAttempt,
+    onAttemptChange,
+    onUserChange,
+    seedInitialFeedback = false,
+  },
+  ref,
+) {
   const analysis = useMemo(
     () => analyzeDnfSource(committedSource),
     [committedSource],
   );
 
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoadedVersion, setSolutionLoadedVersion] = useState(0);
   const [showFullTable, setShowFullTable] = useState(false);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
     TruthTableAnswer[]
@@ -331,6 +367,40 @@ function ExpressionWorkspace({
     );
   };
 
+  // Fill the free-mode workspace with the reference solution: correct result
+  // column, canonical DNF and minimal simplification, shown as already checked.
+  const loadSolution = () => {
+    if (analysis.status !== "valid") return;
+
+    const solvedAnswers = analysis.truthTable.rows.map((row) => row.result);
+    const canonicalDnf = analysis.formattedDnf;
+    const minimalDnf = formatBooleanExpressionForDisplay(
+      minimalDnfToExpression(
+        computeMinimalDnf(analysis.truthTable),
+        analysis.truthTable.variables,
+      ),
+    );
+
+    onUserChange?.();
+    setTruthTableAnswers(solvedAnswers);
+    setDnfAnswer(canonicalDnf);
+    setShowSolution(false);
+    setFeedback(
+      checkDnfExerciseAttempt(analysis.truthTable, solvedAnswers, canonicalDnf, {
+        checkTruthTable: true,
+      }),
+    );
+    simplification.loadSolution(minimalDnf, analysis.truthTable);
+    setSolutionLoadedVersion((current) => current + 1);
+    onAttemptChange({
+      truthTableAnswers: solvedAnswers,
+      dnfAnswer: canonicalDnf,
+      simplificationAnswer: minimalDnf,
+    });
+  };
+
+  useImperativeHandle(ref, () => ({ loadSolution }), [loadSolution]);
+
   const updateSimplificationAnswer = (value: string) => {
     const normalizedValue = normalizeBooleanOperatorAliases(value);
     onUserChange?.();
@@ -388,9 +458,12 @@ function ExpressionWorkspace({
       />
 
       <DnfFollowUpSections
+        key={`simplification-${solutionLoadedVersion}`}
         simplification={simplificationFollowUp}
-        initiallyOpenSimplification={seedInitialFeedback}
+        initiallyOpenSimplification={
+          seedInitialFeedback || solutionLoadedVersion > 0
+        }
       />
     </>
   );
-}
+});
