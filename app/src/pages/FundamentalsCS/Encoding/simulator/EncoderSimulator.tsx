@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Base64Encoder } from "./Base64Encoder";
 import { UTF8Encoder } from "./UTF8Encoder";
@@ -12,6 +19,7 @@ import {
   createTrainingCenterIdentifier,
   createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import { encTransferCodec } from "./encTransferCodec";
@@ -22,6 +30,10 @@ const ENCODING_SIMULATOR_TASK_STORAGE_ID = createTrainingCenterIdentifier(
 );
 
 type EncoderMode = "base64" | "utf8";
+
+export interface EncoderSimulatorHandle {
+  resetStoredState: () => void;
+}
 
 interface EncoderSimulatorProps {
   selectedExercise?: TopicItem | null;
@@ -49,10 +61,10 @@ function getGeneratedExerciseData(item: TopicItem | null | undefined): {
   return { isGenerated: false };
 }
 
-export function EncoderSimulator({
-  selectedExercise,
-  onExitExercise,
-}: EncoderSimulatorProps) {
+export const EncoderSimulator = forwardRef<
+  EncoderSimulatorHandle,
+  EncoderSimulatorProps
+>(function EncoderSimulator({ selectedExercise, onExitExercise }, ref) {
   const { t } = useTranslation("translation");
 
   const [simulatorState, setSimulatorState] = useState<EncoderState>(() => {
@@ -149,7 +161,7 @@ export function EncoderSimulator({
     if (selectedExercise) {
       const isExample = selectedExercise.id.includes(".example");
       const genData = getGeneratedExerciseData(selectedExercise);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setIsExerciseMode(!isExample);
       setShowSolution(isExample);
 
@@ -204,6 +216,24 @@ export function EncoderSimulator({
       setPendingMode(null);
     }
   };
+
+  const resetStoredState = useCallback(() => {
+    trainingCenterStorage.delete(ENCODING_SIMULATOR_TASK_STORAGE_ID);
+
+    setSimulatorState({ activeMode: "base64" });
+    setInitialValue("");
+    setInitialConverterMode("encode");
+    setExpectedAnswer("");
+    setLoadVersion((v) => v + 1);
+  }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetStoredState,
+    }),
+    [resetStoredState],
+  );
 
   const currentKey = useMemo(() => {
     if (selectedExercise?.id) {
@@ -312,4 +342,4 @@ export function EncoderSimulator({
       />
     </div>
   );
-}
+});
