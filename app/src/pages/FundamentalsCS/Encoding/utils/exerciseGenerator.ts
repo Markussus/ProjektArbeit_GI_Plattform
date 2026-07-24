@@ -12,6 +12,29 @@ function randomPrintableChar(): string {
   return PRINTABLE_ASCII[randInt(0, PRINTABLE_ASCII.length - 1)];
 }
 
+const EMOJI_CHARS = [
+  "😀",
+  "🚀",
+  "🌍",
+  "🎉",
+  "🔥",
+  "💡",
+  "🎯",
+  "📚",
+  "💻",
+  "🧠",
+  "⚡",
+  "🛡️",
+  "🎨",
+  "🎵",
+  "🌟",
+  "🐛",
+  "🔧",
+  "🚦",
+  "🧪",
+  "📡",
+];
+
 function randomString(length: number): string {
   let result = "";
   for (let i = 0; i < length; i++) {
@@ -56,9 +79,11 @@ export type EncodingExerciseType =
   | "utf8_encode_easy"
   | "utf8_encode_medium"
   | "utf8_encode_hard"
+  | "utf8_encode_4byte"
   | "utf8_decode_easy"
   | "utf8_decode_medium"
-  | "utf8_decode_hard";
+  | "utf8_decode_hard"
+  | "utf8_decode_4byte";
 
 export interface GeneratedExercise extends ExerciseDefinition {
   id: string;
@@ -205,6 +230,22 @@ function generateUtf8EncodeHard(): ExerciseDefWithAnswer {
   };
 }
 
+function generateUtf8Encode4Byte(): ExerciseDefWithAnswer {
+  const char = EMOJI_CHARS[randInt(0, EMOJI_CHARS.length - 1)];
+  const codePoint = char.codePointAt(0)!;
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const binary = bytesToBinary(bytes);
+  return {
+    titleKey: "encoding.ex_utf8_encode_4byte",
+    descriptionKey: "encoding.ex_utf8_encode_4byte_desc",
+    descriptionParams: { char, hex } as DescriptionParams,
+    answer: binary,
+    difficulty: "hard",
+    icon: Binary,
+  };
+}
+
 // ==========================================
 // UTF-8 Decode
 // ==========================================
@@ -259,6 +300,24 @@ function generateUtf8DecodeHard(): ExerciseDefWithAnswer {
   };
 }
 
+function generateUtf8Decode4Byte(): ExerciseDefWithAnswer {
+  const char = EMOJI_CHARS[randInt(0, EMOJI_CHARS.length - 1)];
+  const codePoint = char.codePointAt(0)!;
+  const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
+  const bytes = getUtf8Bytes(codePoint);
+  const hexBytes = bytes
+    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
+    .join(" ");
+  return {
+    titleKey: "encoding.ex_utf8_decode_4byte",
+    descriptionKey: "encoding.ex_utf8_decode_4byte_desc",
+    descriptionParams: { hexBytes } as DescriptionParams,
+    answer: hex,
+    difficulty: "hard",
+    icon: Binary,
+  };
+}
+
 const generators: Record<EncodingExerciseType, () => ExerciseDefWithAnswer> = {
   base64_encode_easy: generateBase64EncodeEasy,
   base64_encode_medium: generateBase64EncodeMedium,
@@ -269,9 +328,11 @@ const generators: Record<EncodingExerciseType, () => ExerciseDefWithAnswer> = {
   utf8_encode_easy: generateUtf8EncodeEasy,
   utf8_encode_medium: generateUtf8EncodeMedium,
   utf8_encode_hard: generateUtf8EncodeHard,
+  utf8_encode_4byte: generateUtf8Encode4Byte,
   utf8_decode_easy: generateUtf8DecodeEasy,
   utf8_decode_medium: generateUtf8DecodeMedium,
   utf8_decode_hard: generateUtf8DecodeHard,
+  utf8_decode_4byte: generateUtf8Decode4Byte,
 };
 
 const easyTypes: EncodingExerciseType[] = [
@@ -291,6 +352,8 @@ const hardTypes: EncodingExerciseType[] = [
   "base64_decode_hard",
   "utf8_encode_hard",
   "utf8_decode_hard",
+  "utf8_encode_4byte",
+  "utf8_decode_4byte",
 ];
 
 export function generateExercise(
@@ -338,26 +401,24 @@ export function generateExercise(
   };
 }
 
-export function generateEncodingExercises(
-  count: number = 12,
-): GeneratedExercise[] {
-  const exercises: GeneratedExercise[] = [];
-  const difficultyLevels = [
-    { types: easyTypes, count: Math.ceil(count / 3) },
-    { types: mediumTypes, count: Math.ceil(count / 3) },
-    { types: hardTypes, count: count - 2 * Math.ceil(count / 3) },
+export function generateEncodingExercises(): GeneratedExercise[] {
+  const allTypes: EncodingExerciseType[] = [
+    "base64_encode_easy",
+    "base64_encode_medium",
+    "base64_encode_hard",
+    "base64_decode_easy",
+    "base64_decode_medium",
+    "base64_decode_hard",
+    "utf8_encode_easy",
+    "utf8_encode_medium",
+    "utf8_encode_hard",
+    "utf8_encode_4byte",
+    "utf8_decode_easy",
+    "utf8_decode_medium",
+    "utf8_decode_hard",
+    "utf8_decode_4byte",
   ];
-
-  let exerciseIndex = 0;
-  for (const level of difficultyLevels) {
-    if (level.types.length === 0) continue;
-    for (let i = 0; i < level.count; i++) {
-      const type = level.types[randInt(0, level.types.length - 1)];
-      exercises.push(generateExercise(type, exerciseIndex++));
-    }
-  }
-
-  return exercises;
+  return allTypes.map((type, index) => generateExercise(type, index));
 }
 
 export function generateExerciseByDifficulty(

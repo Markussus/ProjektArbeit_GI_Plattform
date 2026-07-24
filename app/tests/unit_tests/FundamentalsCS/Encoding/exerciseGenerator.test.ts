@@ -53,9 +53,9 @@ describe("exerciseGenerator", () => {
   });
 
   describe("generateEncodingExercises", () => {
-    test("generates default count of 12 exercises with mixed difficulty", () => {
-      const exercises = generateEncodingExercises(12);
-      expect(exercises.length).toBe(12);
+    test("generates all exercise types with mixed difficulty", () => {
+      const exercises = generateEncodingExercises();
+      expect(exercises.length).toBe(14);
 
       const easyCount = exercises.filter((e) => e.difficulty === "easy").length;
       const mediumCount = exercises.filter(
@@ -68,9 +68,9 @@ describe("exerciseGenerator", () => {
       expect(hardCount).toBeGreaterThan(0);
     });
 
-    test("generates correct number of exercises if non-default count provided", () => {
-      const exercises = generateEncodingExercises(6);
-      expect(exercises.length).toBe(6);
+    test("generates correct number of exercises (always 14)", () => {
+      const exercises = generateEncodingExercises();
+      expect(exercises.length).toBe(14);
     });
   });
 

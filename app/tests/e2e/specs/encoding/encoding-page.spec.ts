@@ -21,14 +21,14 @@ test.describe("Encoding page", () => {
       await page.getByTestId(appTestIds.tabExercises).click();
       // We know there are generated exercises. We just check if at least one exercise card exists.
       await expect(page.locator('button[data-testid$="-select"]')).toHaveCount(
-        9,
+        14,
       );
     });
 
     await test.step("The examples tab shows predefined examples", async () => {
       await page.getByTestId(appTestIds.tabExamples).click();
       await expect(
-        page.getByTestId("example-card-encoding.example_base64_1-select"),
+        page.getByTestId("example-card-encoding.example_base64_2-select"),
       ).toBeVisible();
     });
 
@@ -119,20 +119,20 @@ test.describe("Encoding page", () => {
 
     await test.step("Select and open example", async () => {
       await page
-        .getByTestId("example-card-encoding.example_base64_1-select")
+        .getByTestId("example-card-encoding.example_base64_2-select")
         .click();
       await expect(
-        page.getByTestId("example-card-encoding.example_base64_1-open"),
+        page.getByTestId("example-card-encoding.example_base64_2-open"),
       ).toBeVisible();
       await page
-        .getByTestId("example-card-encoding.example_base64_1-open")
+        .getByTestId("example-card-encoding.example_base64_2-open")
         .click();
     });
 
-    await test.step("Simulator shows pre-filled text Hello", async () => {
+    await test.step("Simulator shows pre-filled text THWS", async () => {
       await expect(page.getByTestId("encoding-simulator")).toBeVisible();
-      await expect(page.getByTestId("base64-input")).toHaveValue("Hello");
-      await expect(page.getByTestId("base64-result")).toContainText("SGVsbG8=");
+      await expect(page.getByTestId("base64-input")).toHaveValue("THWS");
+      await expect(page.getByTestId("base64-result")).toContainText("VEhXUw==");
     });
   });
 
