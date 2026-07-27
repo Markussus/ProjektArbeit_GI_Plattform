@@ -45,11 +45,12 @@ export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
     ref,
   ) {
     const builder = useDnfBuilder(selectedExercise, initialAttempt);
+    const { buildSolutionAttempt, loadSolution: applyLoadedSolution } = builder;
     useImperativeHandle(
       ref,
       () => ({
         loadSolution: () => {
-          const solvedAttempt = builder.buildSolutionAttempt();
+          const solvedAttempt = buildSolutionAttempt();
           if (!solvedAttempt) {
             return;
           }
@@ -58,18 +59,13 @@ export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
             if (storageReady) {
               await Promise.resolve(transferCodec.exportValue(solvedAttempt));
             }
-            builder.loadSolution(solvedAttempt);
+            applyLoadedSolution(solvedAttempt);
           })().catch(() => {
-            builder.loadSolution(solvedAttempt);
+            applyLoadedSolution(solvedAttempt);
           });
         },
       }),
-      [
-        builder.buildSolutionAttempt,
-        builder.loadSolution,
-        storageReady,
-        transferCodec,
-      ],
+      [buildSolutionAttempt, applyLoadedSolution, storageReady, transferCodec],
     );
     const [showFullTable, setShowFullTable] = useState(false);
     const transferValue = useMemo<DnfExerciseTransferDraft>(

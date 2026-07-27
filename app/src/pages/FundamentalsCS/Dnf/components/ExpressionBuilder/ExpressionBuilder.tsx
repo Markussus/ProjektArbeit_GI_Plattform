@@ -369,37 +369,44 @@ const ExpressionWorkspace = forwardRef<
 
   // Fill the free-mode workspace with the reference solution: correct result
   // column, canonical DNF and minimal simplification, shown as already checked.
-  const loadSolution = () => {
-    if (analysis.status !== "valid") return;
+  useImperativeHandle(
+    ref,
+    () => ({
+      loadSolution: () => {
+        if (analysis.status !== "valid") return;
 
-    const solvedAnswers = analysis.truthTable.rows.map((row) => row.result);
-    const canonicalDnf = analysis.formattedDnf;
-    const minimalDnf = formatBooleanExpressionForDisplay(
-      minimalDnfToExpression(
-        computeMinimalDnf(analysis.truthTable),
-        analysis.truthTable.variables,
-      ),
-    );
+        const solvedAnswers = analysis.truthTable.rows.map((row) => row.result);
+        const canonicalDnf = analysis.formattedDnf;
+        const minimalDnf = formatBooleanExpressionForDisplay(
+          minimalDnfToExpression(
+            computeMinimalDnf(analysis.truthTable),
+            analysis.truthTable.variables,
+          ),
+        );
 
-    onUserChange?.();
-    setTruthTableAnswers(solvedAnswers);
-    setDnfAnswer(canonicalDnf);
-    setShowSolution(false);
-    setFeedback(
-      checkDnfExerciseAttempt(analysis.truthTable, solvedAnswers, canonicalDnf, {
-        checkTruthTable: true,
-      }),
-    );
-    simplification.loadSolution(minimalDnf, analysis.truthTable);
-    setSolutionLoadedVersion((current) => current + 1);
-    onAttemptChange({
-      truthTableAnswers: solvedAnswers,
-      dnfAnswer: canonicalDnf,
-      simplificationAnswer: minimalDnf,
-    });
-  };
-
-  useImperativeHandle(ref, () => ({ loadSolution }), [loadSolution]);
+        onUserChange?.();
+        setTruthTableAnswers(solvedAnswers);
+        setDnfAnswer(canonicalDnf);
+        setShowSolution(false);
+        setFeedback(
+          checkDnfExerciseAttempt(
+            analysis.truthTable,
+            solvedAnswers,
+            canonicalDnf,
+            { checkTruthTable: true },
+          ),
+        );
+        simplification.loadSolution(minimalDnf, analysis.truthTable);
+        setSolutionLoadedVersion((current) => current + 1);
+        onAttemptChange({
+          truthTableAnswers: solvedAnswers,
+          dnfAnswer: canonicalDnf,
+          simplificationAnswer: minimalDnf,
+        });
+      },
+    }),
+    [analysis, onAttemptChange, onUserChange, simplification],
+  );
 
   const updateSimplificationAnswer = (value: string) => {
     const normalizedValue = normalizeBooleanOperatorAliases(value);
