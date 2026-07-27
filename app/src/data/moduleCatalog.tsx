@@ -13,6 +13,7 @@ import {
   ToggleLeft,
 } from "lucide-react";
 import type { TranslationKey } from "@/types/i18n";
+import type { VideoPlayerTrack } from "@/components/shared/VideoPlayer/VideoPlayer";
 
 const FundamentalsCSPage = lazy(async () => ({
   default: (await import("@/pages/FundamentalsCS/FundamentalsCSPage"))
@@ -83,6 +84,7 @@ export interface ModuleTopicDefinition {
   icon: LucideIcon;
   accent: TopicAccent;
   tutorialVideoUrl: string;
+  tutorialVideoTracks?: VideoPlayerTrack[];
   element: ReactElement;
 }
 
@@ -170,6 +172,10 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: TableProperties,
         accent: "rose",
         tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoTracks: [
+          { src: "/subtitles/test-de.vtt", srcLang: "de", label: "Deutsch" },
+          { src: "/subtitles/test-en.vtt", srcLang: "en", label: "English" },
+        ],
         element: <DnfTopicPage />,
       },
       {

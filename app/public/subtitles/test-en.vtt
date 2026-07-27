@@ -1,0 +1,111 @@
+WEBVTT
+
+NOTE
+Subtitles for the shared tutorial video (Turing machine demo).
+Language: English, from the spoken audio.
+
+1
+00:00:02.000 --> 00:00:08.000
+Hello everyone, this is our training center, and I'm
+giving a quick overview of how the Turing machine works.
+
+2
+00:00:08.000 --> 00:00:14.000
+First of all, you need to select the module
+Fundamentals of Computer Science.
+
+3
+00:00:14.000 --> 00:00:19.000
+Then you have to select the topic of the Turing machines.
+
+4
+00:00:19.000 --> 00:00:24.000
+Here we can go to the simulation tab and just
+
+5
+00:00:24.000 --> 00:00:30.000
+enter some Turing machine that we want.
+For example, one that
+
+6
+00:00:30.000 --> 00:00:39.000
+can bit-flip certain tape contents,
+so that you can
+
+7
+00:00:39.000 --> 00:00:45.000
+basically invert the tape.
+
+8
+00:00:51.000 --> 00:01:01.000
+With our states set up, we can enter something on the
+tape that then gets inverted.
+
+9
+00:01:01.000 --> 00:01:08.000
+You can just automatically let it play and watch
+the Turing machine invert tape contents
+
+10
+00:01:08.000 --> 00:01:11.000
+until the entire tape is inverted.
+
+11
+00:01:11.000 --> 00:01:18.000
+We can also go back to the configuration
+and change stuff around here.
+
+12
+00:01:18.000 --> 00:01:26.000
+For example, add a new state or remove it, or add new
+characters that can also do things on our machine.
+
+13
+00:01:26.000 --> 00:01:33.000
+We can also export the whole machine
+to this compressed string format.
+
+14
+00:01:33.000 --> 00:01:39.000
+We can copy that compressed string, and when we
+come back after doing something else,
+
+15
+00:01:39.000 --> 00:01:44.000
+we can put the string in, import it,
+and our machine is back.
+
+16
+00:01:44.000 --> 00:01:53.000
+We also have the possibility to look at some examples
+to get a better grasp of how everything works.
+
+17
+00:01:53.000 --> 00:02:02.000
+For example, we can look at a binary increment —
+how you would increment this number by one.
+
+18
+00:02:02.000 --> 00:02:09.000
+There are also exercises you can do, like inverting
+a binary word, basically what we just did.
+
+19
+00:02:09.000 --> 00:02:17.000
+Then we can enter a machine, for example what we just
+did, and check if the solution is right.
+
+20
+00:02:17.000 --> 00:02:27.000
+So we halt every time — for example, we end in a
+halt state, and we pass the test.
+
+21
+00:02:27.000 --> 00:02:35.000
+We can also load a pre-built solution, which is
+identical, because I stole that example.
+
+22
+00:02:35.000 --> 00:02:41.000
+And that's it about the Turing machine,
+with this short test video.
