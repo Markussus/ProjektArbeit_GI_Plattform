@@ -34,10 +34,13 @@ describe("computeSmallestBooleanExpression", () => {
   });
 
   it("keeps the existing DNF-derived fallback above four variables", () => {
-    const table = generateTruthTable(
-      parse("(a & c) | (b & c)"),
-      ["a", "b", "c", "d", "e"],
-    );
+    const table = generateTruthTable(parse("(a & c) | (b & c)"), [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+    ]);
 
     const result = computeSmallestBooleanExpression(table);
 

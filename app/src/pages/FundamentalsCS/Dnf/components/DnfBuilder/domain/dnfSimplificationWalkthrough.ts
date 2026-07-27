@@ -2,10 +2,7 @@ import type { TranslationKey } from "@/types/i18n";
 import type { BooleanAlgebraRuleId } from "./booleanAlgebraRules";
 import { formatBooleanExpressionForDisplay } from "./booleanExpressionFormat";
 import { deriveDnfFromTruthTable, formatDnfExpression } from "./dnfDerivation";
-import {
-  buildFactoringSteps,
-  type Literal,
-} from "./factorMinimalDnf";
+import { buildFactoringSteps, type Literal } from "./factorMinimalDnf";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,

@@ -131,7 +131,10 @@ function findExerciseDefinitionByStorageId(
   }
 }
 
-function createExercise(definition: ExerciseDefinition, t: TFunction): Exercise {
+function createExercise(
+  definition: ExerciseDefinition,
+  t: TFunction,
+): Exercise {
   return {
     id: definition.titleKey as TranslationKey,
     title: t(definition.titleKey),

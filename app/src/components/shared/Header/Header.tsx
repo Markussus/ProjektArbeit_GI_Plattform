@@ -26,16 +26,12 @@ export function Header() {
     <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         <Link to="/" className="flex shrink-0 items-center">
-          <img
-            src={ThwsLogo}
-            alt="THWS Logo"
-            className="h-8 w-auto sm:h-9"
-          />
+          <img src={ThwsLogo} alt="THWS Logo" className="h-8 w-auto sm:h-9" />
         </Link>
 
         <div className="bg-border hidden h-7 w-px shrink-0 min-[760px]:block" />
 
-        <span className="text-foreground max-[760px]:hidden truncate text-[clamp(0.875rem,2.25vw,1.25rem)] font-bold tracking-tight">
+        <span className="text-foreground truncate text-[clamp(0.875rem,2.25vw,1.25rem)] font-bold tracking-tight max-[760px]:hidden">
           {headerLabel}
         </span>
       </div>

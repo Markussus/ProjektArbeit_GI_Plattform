@@ -149,9 +149,10 @@ export function buildFormulas(
     for (const assignment of trueAssignments) {
       resultValues[bitsToNumber(assignment)] = true;
     }
-    const { expression: preferredExpression } = computeSmallestBooleanExpression(
-      createTruthTableFromResults(inputVariables, resultValues),
-    );
+    const { expression: preferredExpression } =
+      computeSmallestBooleanExpression(
+        createTruthTableFromResults(inputVariables, resultValues),
+      );
 
     return {
       name,

@@ -1,8 +1,5 @@
 import type { BooleanExpression } from "./booleanExpression";
-import {
-  countExpressionLiterals,
-  factorMinimalDnf,
-} from "./factorMinimalDnf";
+import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,
@@ -163,7 +160,11 @@ function findCheaperExactExpression(
   best[0] = 0;
   best[fullMask] = 0;
 
-  for (let variableIndex = 0; variableIndex < variableCount; variableIndex += 1) {
+  for (
+    let variableIndex = 0;
+    variableIndex < variableCount;
+    variableIndex += 1
+  ) {
     const positiveMask = variableFunctionMask(variableIndex, variableCount);
     if (1 < best[positiveMask]) {
       const expression = setImprovement(positiveMask, 1, {

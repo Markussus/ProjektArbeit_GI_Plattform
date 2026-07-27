@@ -101,8 +101,7 @@ describe("Moore circuit conversion", () => {
     const rows = Array.from({ length: 16 }, (_, rowIndex) => {
       const bits = toBits(rowIndex, 4);
       const result =
-        (bits[0] === 1 || bits[1] === 1) &&
-        (bits[2] === 1 || bits[3] === 1);
+        (bits[0] === 1 || bits[1] === 1) && (bits[2] === 1 || bits[3] === 1);
 
       return {
         currentState: `q${rowIndex}`,

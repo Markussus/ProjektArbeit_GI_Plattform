@@ -233,10 +233,13 @@ describe("dnfSimplificationWalkthrough", () => {
   });
 
   it("marks fallback factoring as not globally exact above four variables", () => {
-    const table = generateTruthTable(
-      parse("(a & c) | (b & c)"),
-      ["a", "b", "c", "d", "e"],
-    );
+    const table = generateTruthTable(parse("(a & c) | (b & c)"), [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+    ]);
 
     const walkthrough = buildDnfSimplificationWalkthrough(table);
 

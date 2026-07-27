@@ -56,7 +56,7 @@ export function HeaderTransferBox() {
   return (
     <div
       data-testid="header-transfer-root"
-      className="relative flex min-w-0 max-w-sm flex-1 items-center gap-1 sm:gap-1.5 lg:max-w-md"
+      className="relative flex max-w-sm min-w-0 flex-1 items-center gap-1 sm:gap-1.5 lg:max-w-md"
     >
       <input
         type="text"
@@ -90,7 +90,9 @@ export function HeaderTransferBox() {
         className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium opacity-50 disabled:cursor-not-allowed sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Download className="size-3.5" />
-        <span className="hidden lg:inline">{t("simulation.transfer.export")}</span>
+        <span className="hidden lg:inline">
+          {t("simulation.transfer.export")}
+        </span>
       </button>
 
       <button
@@ -103,7 +105,9 @@ export function HeaderTransferBox() {
         className="bg-secondary text-secondary-foreground hover:bg-secondary/90 inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Upload className="size-3.5" />
-        <span className="hidden lg:inline">{t("simulation.transfer.import")}</span>
+        <span className="hidden lg:inline">
+          {t("simulation.transfer.import")}
+        </span>
       </button>
 
       {feedback && (
