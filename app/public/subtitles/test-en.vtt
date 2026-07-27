@@ -1,111 +1,58 @@
 WEBVTT
 
-NOTE
-Subtitles for the shared tutorial video (Turing machine demo).
-Language: English, from the spoken audio.
+00:00.000 --> 00:08.000
+Hello everyone, this is our training center and I'm giving a quick overview how the Turing machine works.
 
-1
-00:00:02.000 --> 00:00:08.000
-Hello everyone, this is our training center, and I'm
-giving a quick overview of how the Turing machine works.
+00:08.000 --> 00:13.000
+First of all, you need to select the module Fundamentals of Computer Science.
 
-2
-00:00:08.000 --> 00:00:14.000
-First of all, you need to select the module
-Fundamentals of Computer Science.
-
-3
-00:00:14.000 --> 00:00:19.000
+00:13.000 --> 00:18.000
 Then you have to select the topic of the Turing machines.
 
-4
-00:00:19.000 --> 00:00:24.000
-Here we can go to the simulation tab and just
+00:18.000 --> 00:27.000
+Here we can go to the Simulation tab and just enter some Turing machine that we want.
 
-5
-00:00:24.000 --> 00:00:30.000
-enter some Turing machine that we want.
-For example, one that
+00:27.000 --> 00:41.000
+For example, one that can bit flip certain tape contents so that you can invert the tape.
 
-6
-00:00:30.000 --> 00:00:39.000
-can bit-flip certain tape contents,
-so that you can
+00:41.000 --> 00:57.000
+With our states set up, we can just enter something on the tape that is then getting inverted.
 
-7
-00:00:39.000 --> 00:00:45.000
-basically invert the tape.
+00:57.000 --> 01:10.000
+You can just automatically let it play and watch the Turing machine invert tape contents until the entire tape is inverted.
 
-8
-00:00:51.000 --> 00:01:01.000
-With our states set up, we can enter something on the
-tape that then gets inverted.
+01:10.000 --> 01:17.000
+We can also go back to the configuration and change stuff around here.
 
-9
-00:01:01.000 --> 00:01:08.000
-You can just automatically let it play and watch
-the Turing machine invert tape contents
+01:17.000 --> 01:26.000
+For example, add a new state or remove it or add new characters that also can do things on our machine.
 
-10
-00:01:08.000 --> 00:01:11.000
-until the entire tape is inverted.
+01:26.000 --> 01:32.000
+We can also export the whole machine to this compressed string format.
 
-11
-00:01:11.000 --> 00:01:18.000
-We can also go back to the configuration
-and change stuff around here.
+01:33.000 --> 01:44.000
+We can copy that compressed string and when we just come back after doing something else, we can put the string in, can import it and our machine is back.
 
-12
-00:01:18.000 --> 00:01:26.000
-For example, add a new state or remove it, or add new
-characters that can also do things on our machine.
+01:44.000 --> 01:53.000
+We also have the possibility to watch some examples, like to look at some examples to get a better grasp of how everything works.
 
-13
-00:01:26.000 --> 00:01:33.000
-We can also export the whole machine
-to this compressed string format.
+01:53.000 --> 02:02.000
+For example, we can look at a binary increment, how you would basically increment this number by one.
 
-14
-00:01:33.000 --> 00:01:39.000
-We can copy that compressed string, and when we
-come back after doing something else,
+02:02.000 --> 02:09.000
+There are also exercises you can do, like inverting a binary word, basically what we just did.
 
-15
-00:01:39.000 --> 00:01:44.000
-we can put the string in, import it,
-and our machine is back.
+02:09.000 --> 02:13.000
+Then we can enter a machine, for example what we just did.
 
-16
-00:01:44.000 --> 00:01:53.000
-We also have the possibility to look at some examples
-to get a better grasp of how everything works.
+02:13.000 --> 02:17.000
+We can check if the solution is right.
 
-17
-00:01:53.000 --> 00:02:02.000
-For example, we can look at a binary increment —
-how you would increment this number by one.
+02:17.000 --> 02:27.000
+So we halt in every way and every time, for example, we end it in a halt state and we pass the test.
 
-18
-00:02:02.000 --> 00:02:09.000
-There are also exercises you can do, like inverting
-a binary word, basically what we just did.
+02:27.000 --> 02:34.000
+We can also load a pre-built solution, which is identical because I stole that example.
 
-19
-00:02:09.000 --> 00:02:17.000
-Then we can enter a machine, for example what we just
-did, and check if the solution is right.
-
-20
-00:02:17.000 --> 00:02:27.000
-So we halt every time — for example, we end in a
-halt state, and we pass the test.
-
-21
-00:02:27.000 --> 00:02:35.000
-We can also load a pre-built solution, which is
-identical, because I stole that example.
-
-22
-00:02:35.000 --> 00:02:41.000
-And that's it about the Turing machine,
-with this short test video.
+02:34.000 --> 02:41.000
+And that's it about the Turing machine and with this short test video.

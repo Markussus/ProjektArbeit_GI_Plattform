@@ -1,111 +1,58 @@
 WEBVTT
 
-NOTE
-Untertitel für das gemeinsame Tutorial-Video (Turingmaschinen-Demo).
-Sprache: Deutsch — Übersetzung aus dem englischen Ton, bitte prüfen.
+00:00.000 --> 00:08.000
+Hallo zusammen, dies ist unser Schulungszentrum, und ich gebe einen kurzen Überblick darüber, wie die Turingmaschine funktioniert.
 
-1
-00:00:02.000 --> 00:00:08.000
-Hallo zusammen, das ist unser Training Center, und ich
-gebe einen kurzen Überblick, wie die Turingmaschine funktioniert.
+00:08.000 --> 00:13.000
+Zuerst musst du das Modul „Grundlagen der Informatik“ auswählen.
 
-2
-00:00:08.000 --> 00:00:14.000
-Zuerst musst du das Modul
-Grundlagen der Informatik auswählen.
+00:13.000 --> 00:18.000
+Anschließend musst du das Thema „Turingmaschinen“ auswählen.
 
-3
-00:00:14.000 --> 00:00:19.000
-Dann wählst du das Thema Turingmaschinen aus.
+00:18.000 --> 00:27.000
+Hier können wir zum Reiter „Simulation“ wechseln und einfach eine beliebige Turingmaschine eingeben.
 
-4
-00:00:19.000 --> 00:00:24.000
-Hier gehen wir auf den Simulations-Tab und geben einfach
+00:27.000 --> 00:41.000
+Zum Beispiel eine Maschine, die bestimmte Bandinhalte bitweise umdrehen kann, sodass das Band invertiert wird.
 
-5
-00:00:24.000 --> 00:00:30.000
-eine beliebige Turingmaschine ein.
-Zum Beispiel eine, die
+00:41.000 --> 00:57.000
+Nachdem unsere Zustände eingerichtet sind, können wir einfach etwas auf das Band schreiben, das anschließend invertiert wird.
 
-6
-00:00:30.000 --> 00:00:39.000
-bestimmte Bandinhalte bit-weise umkehren kann,
-sodass man
+00:57.000 --> 01:10.000
+Du kannst die Simulation automatisch abspielen lassen und beobachten, wie die Turingmaschine die Bandinhalte invertiert, bis das gesamte Band umgedreht ist.
 
-7
-00:00:39.000 --> 00:00:45.000
-im Grunde das Band invertiert.
+01:10.000 --> 01:17.000
+Wir können außerdem zur Konfiguration zurückkehren und hier Änderungen vornehmen.
 
-8
-00:00:51.000 --> 00:01:01.000
-Mit den eingerichteten Zuständen können wir etwas auf
-das Band schreiben, das dann invertiert wird.
+01:17.000 --> 01:26.000
+Zum Beispiel können wir einen neuen Zustand hinzufügen oder entfernen oder neue Zeichen ergänzen, die ebenfalls Aktionen in unserer Maschine ausführen können.
 
-9
-00:01:01.000 --> 00:01:08.000
-Man kann es einfach automatisch laufen lassen und zusehen,
-wie die Turingmaschine die Bandinhalte invertiert,
+01:26.000 --> 01:32.000
+Wir können die gesamte Maschine außerdem in dieses komprimierte Zeichenkettenformat exportieren.
 
-10
-00:01:08.000 --> 00:01:11.000
-bis das ganze Band invertiert ist.
+01:33.000 --> 01:44.000
+Wir können diese komprimierte Zeichenkette kopieren und sie später wieder einfügen, importieren und so unsere Maschine wiederherstellen.
 
-11
-00:01:11.000 --> 00:01:18.000
-Wir können auch zur Konfiguration zurückgehen
-und hier Dinge ändern.
+01:44.000 --> 01:53.000
+Außerdem können wir uns einige Beispiele ansehen, um besser zu verstehen, wie alles funktioniert.
 
-12
-00:01:18.000 --> 00:01:26.000
-Zum Beispiel einen neuen Zustand hinzufügen oder entfernen,
-oder neue Zeichen, die auf unserer Maschine etwas bewirken.
+01:53.000 --> 02:02.000
+Zum Beispiel können wir uns eine binäre Inkrementierung ansehen, also wie diese Zahl im Wesentlichen um eins erhöht wird.
 
-13
-00:01:26.000 --> 00:01:33.000
-Wir können die ganze Maschine auch
-in dieses komprimierte String-Format exportieren.
+02:02.000 --> 02:09.000
+Es gibt auch Übungen, etwa das Invertieren eines Binärworts, also im Grunde genau das, was wir gerade gemacht haben.
 
-14
-00:01:33.000 --> 00:01:39.000
-Wir kopieren diesen String, und wenn wir später
-zurückkommen,
+02:09.000 --> 02:13.000
+Anschließend können wir eine Maschine eingeben, zum Beispiel diejenige, die wir gerade erstellt haben.
 
-15
-00:01:39.000 --> 00:01:44.000
-fügen wir den String ein, importieren ihn,
-und unsere Maschine ist wieder da.
+02:13.000 --> 02:17.000
+Wir können überprüfen, ob die Lösung korrekt ist.
 
-16
-00:01:44.000 --> 00:01:53.000
-Wir haben außerdem die Möglichkeit, uns Beispiele
-anzusehen, um alles besser zu verstehen.
+02:17.000 --> 02:27.000
+Wir halten also in jedem Fall an und landen beispielsweise jedes Mal in einem Haltezustand, wodurch der Test bestanden wird.
 
-17
-00:01:53.000 --> 00:02:02.000
-Zum Beispiel einen Binär-Inkrementierer —
-wie man diese Zahl um eins erhöht.
+02:27.000 --> 02:34.000
+Wir können auch eine vorgefertigte Lösung laden, die identisch ist, weil ich dieses Beispiel übernommen habe.
 
-18
-00:02:02.000 --> 00:02:09.000
-Es gibt auch Übungen, etwa ein Binärwort zu invertieren
-— im Grunde das, was wir gerade gemacht haben.
-
-19
-00:02:09.000 --> 00:02:17.000
-Dann geben wir eine Maschine ein, zum Beispiel die von
-eben, und prüfen, ob die Lösung richtig ist.
-
-20
-00:02:17.000 --> 00:02:27.000
-Wir halten also jedes Mal an — zum Beispiel enden wir
-in einem Haltezustand und bestehen den Test.
-
-21
-00:02:27.000 --> 00:02:35.000
-Wir können auch eine vorgefertigte Lösung laden, die
-identisch ist, weil ich dieses Beispiel geklaut habe.
-
-22
-00:02:35.000 --> 00:02:41.000
-Und das war's zur Turingmaschine,
-mit diesem kurzen Testvideo.
+02:34.000 --> 02:41.000
+Das war es zur Turingmaschine und zu diesem kurzen Testvideo.
