@@ -14,8 +14,18 @@ export interface TMTapeCell {
 export interface TMTapeViewport {
   effectiveWindowRadius: number;
   effectiveHeadWindowRadius: number;
-  startIndex: number;
-  endIndex: number;
+  minIndex: number;
+  maxIndex: number;
+}
+
+export interface TMTapeContentRange {
+  minIndex: number;
+  maxIndex: number;
+}
+
+export interface TMTapeRenderRange {
+  minIndex: number;
+  maxIndex: number;
 }
 
 export function resolveTapeViewport(
@@ -42,8 +52,56 @@ export function resolveTapeViewport(
   return {
     effectiveWindowRadius,
     effectiveHeadWindowRadius,
-    startIndex: viewportCenter - effectiveWindowRadius,
-    endIndex: viewportCenter + effectiveWindowRadius,
+    minIndex: viewportCenter - effectiveWindowRadius,
+    maxIndex: viewportCenter + effectiveWindowRadius,
+  };
+}
+
+export function getTapeContentRange(
+  tape: Record<number, string>,
+  blankSymbol: string,
+  fallbackIndex: number,
+): TMTapeContentRange {
+  let minIndex: number | null = null;
+  let maxIndex: number | null = null;
+
+  for (const [rawIndex, rawSymbol] of Object.entries(tape)) {
+    const index = Number(rawIndex);
+    const symbol = rawSymbol ?? blankSymbol;
+
+    if (!Number.isFinite(index) || symbol === "" || symbol === blankSymbol) {
+      continue;
+    }
+
+    minIndex = minIndex === null ? index : Math.min(minIndex, index);
+    maxIndex = maxIndex === null ? index : Math.max(maxIndex, index);
+  }
+
+  return {
+    minIndex: minIndex ?? fallbackIndex,
+    maxIndex: maxIndex ?? fallbackIndex,
+  };
+}
+
+export function getTapeRenderRange(params: {
+  viewportStartIndex: number;
+  viewportEndIndex: number;
+  contentRange: TMTapeContentRange;
+  paddingCells: number;
+}): TMTapeRenderRange {
+  const { viewportStartIndex, viewportEndIndex, contentRange, paddingCells } =
+    params;
+  const safePaddingCells = Math.max(paddingCells, 0);
+
+  return {
+    minIndex: Math.min(
+      viewportStartIndex,
+      contentRange.minIndex - safePaddingCells,
+    ),
+    maxIndex: Math.max(
+      viewportEndIndex,
+      contentRange.maxIndex + safePaddingCells,
+    ),
   };
 }
 
