@@ -51,11 +51,13 @@ export function MooreInputBuilder({
         {inputWord.map((symbol, index) => (
           <span
             key={`${symbol}-${index}`}
+            data-testid={`moore-input-word-token-${index}`}
             className="bg-muted inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono text-sm"
           >
             {symbol}
             <button
               type="button"
+              data-testid={`moore-input-word-token-${index}-remove`}
               onClick={() =>
                 onChange(
                   inputWord.filter((_, itemIndex) => itemIndex !== index),
@@ -90,6 +92,7 @@ export function MooreInputBuilder({
             <button
               key={symbol}
               type="button"
+              data-testid={`moore-input-token-${symbol}`}
               draggable
               onDragStart={(event) => {
                 event.dataTransfer.setData("text/plain", symbol);

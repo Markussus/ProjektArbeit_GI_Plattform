@@ -9,6 +9,7 @@ export function JavaProgrammingPage() {
   return (
     <JavaExecutionProvider>
       <ModuleTopicPage
+        testId="java-topic-page"
         titleKey="java.title"
         descriptionKey="java.description"
         overviewTab={OverviewTab}

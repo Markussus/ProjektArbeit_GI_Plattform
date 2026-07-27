@@ -13,7 +13,7 @@ function encodeJavaTransfer(sourceCode: string) {
 test.describe("Java page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/programming-1/java-programming");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByTestId("java-topic-page")).toBeVisible();
   });
 
   test("switches between overview, exercises, and simulation tabs", async ({

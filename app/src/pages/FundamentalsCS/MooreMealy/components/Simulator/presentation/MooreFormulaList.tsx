@@ -15,6 +15,7 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
         {formulas.map((formula) => (
           <FormulaRow
             key={`canonical-${formula.name}`}
+            testId={`moore-formula-canonical-${formula.name}`}
             name={formula.name}
             value={formula.canonical}
           />
@@ -25,7 +26,11 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
         <h3 className="font-semibold">{t("moore.conversion.minimalDnf")}</h3>
         {formulas.map((formula) => (
           <div key={`minimal-${formula.name}`}>
-            <FormulaRow name={formula.name} value={formula.minimal} />
+            <FormulaRow
+              testId={`moore-formula-minimal-${formula.name}`}
+              name={formula.name}
+              value={formula.minimal}
+            />
             {!formula.minimizationAvailable && (
               <p className="text-muted-foreground mt-1 text-xs">
                 {t("moore.conversion.minimizationLimit")}
@@ -38,9 +43,20 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
   );
 }
 
-function FormulaRow({ name, value }: { name: string; value: string }) {
+function FormulaRow({
+  name,
+  value,
+  testId,
+}: {
+  name: string;
+  value: string;
+  testId: string;
+}) {
   return (
-    <div className="border-border bg-card grid grid-cols-[3rem_minmax(0,1fr)] gap-3 rounded-lg border p-3">
+    <div
+      data-testid={testId}
+      className="border-border bg-card grid grid-cols-[3rem_minmax(0,1fr)] gap-3 rounded-lg border p-3"
+    >
       <span className="text-brand font-mono font-bold">{name} =</span>
       <code className="overflow-x-auto font-mono text-sm whitespace-nowrap">
         {value}

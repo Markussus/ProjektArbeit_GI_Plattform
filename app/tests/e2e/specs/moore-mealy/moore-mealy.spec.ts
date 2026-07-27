@@ -47,14 +47,14 @@ test.describe("Moore and Mealy simulation tab", () => {
     ).toHaveCount(5);
 
     await page.getByTestId("moore-representation-select").click();
-    await page.getByRole("option", { name: "Binary" }).click();
+    await page.getByTestId("moore-representation-option-binary").click();
     await expect(page.getByTestId("moore-state-set")).toContainText(
       "CLOSED_NEW100",
     );
 
     await page
       .getByTestId("moore-input-alphabet")
-      .getByRole("button", { name: /0/ })
+      .getByTestId("moore-input-token-0")
       .click();
     await page.getByTestId("moore-start-simulation").click();
     await page.getByTestId("moore-controls-step").click();
@@ -360,11 +360,11 @@ test.describe("Moore and Mealy simulation tab", () => {
     await expect(
       page.getByTestId("moore-transition-value-table"),
     ).toBeVisible();
-    await expect(page.getByText("y0 =").first()).toHaveCount(0);
+    await expect(page.getByTestId("moore-formula-canonical-y0")).toHaveCount(0);
 
     await page.getByTestId("moore-conversion-tab-output").click();
     await expect(page.getByTestId("moore-output-value-table")).toBeVisible();
-    await expect(page.getByText("y0 =").first()).toBeVisible();
+    await expect(page.getByTestId("moore-formula-canonical-y0")).toBeVisible();
 
     await page.getByTestId("moore-conversion-edit-definition").click();
     await expect(page.getByTestId("moore-config-view")).toBeVisible();
