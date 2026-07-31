@@ -1809,7 +1809,13 @@
       },
       "parseError": "Grammar not parseable yet",
       "epsilonHint": "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
-      "grammar_epsilon_lhs_invalid": "An ε production references a non-terminal that is not in the non-terminal set."
+      "grammar_epsilon_lhs_invalid": "An ε production references a non-terminal that is not in the non-terminal set.",
+      "grammar_no_nonterminals": "The grammar has no non-terminals.",
+      "grammar_no_terminals": "The grammar has no terminal symbols.",
+      "grammar_start_invalid": "The start symbol is not one of the grammar's non-terminals.",
+      "grammar_lhs_invalid": "A rule's left-hand side is not one of the grammar's non-terminals.",
+      "grammar_terminal_invalid": "A rule uses a terminal that is not in the alphabet.",
+      "grammar_rhs_nonterminal_invalid": "A rule points at a non-terminal that the grammar does not define."
     },
     "sim": {
       "emptyWord": "Empty word (ε)",
@@ -2109,6 +2115,19 @@
       "confirmYes": "Yes, Show Solution",
       "confirmNo": "Keep Trying",
       "solutionLoadedNote": "The worked solution has been loaded into the simulator below — run it to inspect the derivation."
+    }
+  },
+  "grammar": {
+    "errors": {
+      "noProductions": "No production rules found. Add at least one rule like 'S -> 0S | 1A'.",
+      "missingArrow": "Cannot read the production '{{line}}'. Expected the form 'LHS -> RHS'.",
+      "emptyAlternative": "There is an empty alternative in '{{line}}'.",
+      "epsilonNotAlone": "ε must stand alone as an alternative — got '{{alternative}}' in '{{line}}'.",
+      "unitProduction": "'{{alternative}}' in '{{line}}' is only a non-terminal. A right-linear rule needs a terminal first, for example 'aB'.",
+      "undefinedNonTerminal": "'{{alternative}}' in '{{line}}' is not right-linear: '{{rest}}' has no rule of its own. Write a single terminal ('A -> a') or a terminal followed by a defined non-terminal ('A -> aB').",
+      "unsupportedType": "Unsupported type '{{type}}'. Only 'type: grammar' is supported.",
+      "structuredLine": "Line {{line}}: expected 'key: value' or a production rule.",
+      "structuredMissingType": "The structured format requires a 'type: grammar' header."
     }
   }
 }

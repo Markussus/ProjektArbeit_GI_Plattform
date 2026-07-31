@@ -1809,7 +1809,13 @@
       },
       "parseError": "Grammatik noch nicht parsebar",
       "epsilonHint": "Um das Symbol für das leere Wort (ε) einzufügen, können Sie es entweder kopieren und einfügen oder das Wort 'epsilon' tippen.",
-      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist."
+      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist.",
+      "grammar_no_nonterminals": "Die Grammatik hat keine Nichtterminale.",
+      "grammar_no_terminals": "Die Grammatik hat keine Terminalsymbole.",
+      "grammar_start_invalid": "Das Startsymbol gehört nicht zu den Nichtterminalen der Grammatik.",
+      "grammar_lhs_invalid": "Die linke Seite einer Regel gehört nicht zu den Nichtterminalen der Grammatik.",
+      "grammar_terminal_invalid": "Eine Regel verwendet ein Terminal, das nicht im Alphabet enthalten ist.",
+      "grammar_rhs_nonterminal_invalid": "Eine Regel verweist auf ein Nichtterminal, das die Grammatik nicht definiert."
     },
     "sim": {
       "emptyWord": "Leeres Wort (ε)",
@@ -2109,6 +2115,19 @@
       "confirmYes": "Ja, Lösung anzeigen",
       "confirmNo": "Weiter probieren",
       "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
+    }
+  },
+  "grammar": {
+    "errors": {
+      "noProductions": "Keine Produktionsregeln gefunden. Fügen Sie mindestens eine Regel hinzu, z. B. 'S -> 0S | 1A'.",
+      "missingArrow": "Die Produktion '{{line}}' ist nicht lesbar. Erwartet wird die Form 'LHS -> RHS'.",
+      "emptyAlternative": "In '{{line}}' steht eine leere Alternative.",
+      "epsilonNotAlone": "ε muss als Alternative allein stehen — gefunden wurde '{{alternative}}' in '{{line}}'.",
+      "unitProduction": "'{{alternative}}' in '{{line}}' ist nur ein Nichtterminal. Eine rechtslineare Regel braucht zuerst ein Terminal, z. B. 'aB'.",
+      "undefinedNonTerminal": "'{{alternative}}' in '{{line}}' ist nicht rechtslinear: '{{rest}}' hat keine eigene Regel. Schreiben Sie ein einzelnes Terminal ('A -> a') oder ein Terminal gefolgt von einem definierten Nichtterminal ('A -> aB').",
+      "unsupportedType": "Nicht unterstützter Typ '{{type}}'. Nur 'type: grammar' wird unterstützt.",
+      "structuredLine": "Zeile {{line}}: erwartet wird 'key: value' oder eine Produktionsregel.",
+      "structuredMissingType": "Das strukturierte Format benötigt eine 'type: grammar'-Kopfzeile."
     }
   }
 }
