@@ -36,12 +36,16 @@ export function enumerateLanguage(
   // Avoid revisiting (state, word) pairs.
   const seen = new Set<string>([`${fa.startState}::`]);
 
-  while (queue.length > 0 && accepted.size < maxWords) {
+  // Collect one word beyond the cap: finding it is what proves the output is
+  // actually truncated. Hitting the cap exactly means the language ended there.
+  const collectLimit = maxWords + 1;
+
+  while (queue.length > 0 && accepted.size < collectLimit) {
     const { state, word } = queue.shift()!;
 
     if (fa.acceptStates.includes(state)) {
       accepted.add(word);
-      if (accepted.size >= maxWords) break;
+      if (accepted.size >= collectLimit) break;
     }
 
     if (word.length >= maxLen) continue;
@@ -63,38 +67,45 @@ export function enumerateLanguage(
     return a.localeCompare(b);
   });
 
-  return { words, truncated: accepted.size >= maxWords };
+  const truncated = words.length > maxWords;
+  return { words: truncated ? words.slice(0, maxWords) : words, truncated };
+}
+
+export interface RecognizeResult {
+  accepted: boolean;
+  /**
+   * Why the run ended, as a translation-key suffix under
+   * `rl.simulator.reason.*` — the UI renders it with the states interpolated.
+   */
+  reasonCode: "accepted" | "rejectedStates" | "rejectedDeadEnd";
+  /** States the run ended in, ready for interpolation. */
+  states: string;
 }
 
 /** Does the grammar derive the given word? Uses NFA simulation. */
 export function recognizeWord(
   grammar: RegularGrammar,
   word: string,
-): { accepted: boolean; reason: string } {
+): RecognizeResult {
   const fa = grammarToAutomaton(grammar);
   return simulateFA(fa, word);
 }
 
-function simulateFA(
-  program: FAProgram,
-  word: string,
-): { accepted: boolean; reason: string } {
+function simulateFA(program: FAProgram, word: string): RecognizeResult {
   let runtime = createInitialRuntime(program, word.split(""));
   let guard = word.length + 8;
   while (!runtime.halted && guard-- > 0) {
     runtime = stepRuntime(program, runtime);
   }
   const accepted = runtime.haltReason?.type === "accepted";
-  const reachedStates = runtime.activeStates.join(", ") || "∅";
-  return {
-    accepted,
-    reason: accepted
-      ? `Halted in accepting state(s): ${reachedStates}`
-      : runtime.haltReason?.type === "rejected" &&
-          runtime.activeStates.length === 0
-        ? "No transition for the next symbol — rejected."
-        : `Halted in non-accepting state(s): ${reachedStates}`,
-  };
+  const states = runtime.activeStates.join(", ") || "∅";
+
+  if (accepted) return { accepted: true, reasonCode: "accepted", states };
+  // An empty state set means the run hit a symbol with no transition.
+  if (runtime.activeStates.length === 0) {
+    return { accepted: false, reasonCode: "rejectedDeadEnd", states };
+  }
+  return { accepted: false, reasonCode: "rejectedStates", states };
 }
 
 /**

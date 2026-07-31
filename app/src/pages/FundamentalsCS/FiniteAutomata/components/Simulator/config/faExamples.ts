@@ -85,17 +85,20 @@ export const exampleGrammar: FAExample = {
     acceptStates: ["sF"],
   },
   inputWord: "0011",
+  // The trap state is named "sE" (error), not "sF" — in the NFA above "sF" is
+  // the accepting state, and reusing that name for a dead end in the paired
+  // DFA is exactly the wrong thing to show side by side.
   secondVariant: {
     type: "DFA",
     program: {
       type: "DFA",
-      states: ["s0", "s1", "s2", "sF"],
+      states: ["s0", "s1", "s2", "sE"],
       alphabet: ["0", "1"],
       transitions: {
-        s0: { "0": ["s1"], "1": ["sF"] },
+        s0: { "0": ["s1"], "1": ["sE"] },
         s1: { "0": ["s1"], "1": ["s2"] },
-        s2: { "0": ["sF"], "1": ["s2"] },
-        sF: { "0": ["sF"], "1": ["sF"] },
+        s2: { "0": ["sE"], "1": ["s2"] },
+        sE: { "0": ["sE"], "1": ["sE"] },
       },
       startState: "s0",
       acceptStates: ["s2"],

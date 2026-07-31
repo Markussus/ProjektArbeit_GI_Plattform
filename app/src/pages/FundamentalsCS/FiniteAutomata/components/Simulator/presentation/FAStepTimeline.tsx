@@ -29,7 +29,7 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
       isCurrent: i === currentStep,
       stateCount: isReached ? runtime.stateHistory[i].length : 0,
       // Step 0 is the initial state, step N means N symbols consumed
-      label: i === 0 ? "Start" : `${i}`,
+      label: i === 0 ? t("fa.sim.stepStart", "Start") : `${i}`,
     };
   });
 
@@ -82,8 +82,11 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
               onClick={() => step.isReached && onJumpToStep(step.index)}
               title={
                 step.isReached
-                  ? `Step ${step.index} · ${step.stateCount} state(s)`
-                  : `Step ${step.index} (not reached yet)`
+                  ? t("fa.sim.stepTooltip", {
+                      step: step.index,
+                      count: step.stateCount,
+                    })
+                  : t("fa.sim.stepTooltipUnreached", { step: step.index })
               }
               style={{
                 width: step.isCurrent ? 36 : 28,
