@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
+import {
+  TopicExercisesTab,
+  type TopicExerciseGroup,
+} from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import {
   SIMULATOR_TASK_STORAGE_ID,
@@ -10,7 +13,8 @@ import {
 } from "@/lib/trainingCenter";
 import type { Exercise } from "@/types/exercise";
 import {
-  allFAExercises,
+  faExercises,
+  faGrammarToAutomatonExercises,
   findFAExercise,
 } from "../exercises/faExerciseDefinitions";
 import { useFASimulatorStore } from "../store/faSimulatorStore";
@@ -49,10 +53,29 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
     );
   };
 
+  // Two kinds of task: build an automaton for a described language, or build
+  // one from a given regular grammar.
+  const groups: TopicExerciseGroup[] = [
+    {
+      id: "languageToAutomaton",
+      titleKey: "fa.exercisesTab.categories.languageToAutomaton.title",
+      descriptionKey:
+        "fa.exercisesTab.categories.languageToAutomaton.description",
+      exercises: faExercises,
+    },
+    {
+      id: "grammarToAutomaton",
+      titleKey: "fa.exercisesTab.categories.grammarToAutomaton.title",
+      descriptionKey:
+        "fa.exercisesTab.categories.grammarToAutomaton.description",
+      exercises: faGrammarToAutomatonExercises,
+    },
+  ];
+
   return (
     <TopicExercisesTab
       {...props}
-      exercises={allFAExercises}
+      groups={groups}
       testId="fa-exercises-tab"
       onOpenExerciseInSimulation={handleOpen}
       headerAction={

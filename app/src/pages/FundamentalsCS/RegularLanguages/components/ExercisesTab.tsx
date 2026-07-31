@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicCategorySection } from "@/components/shared/TopicCategorySection/TopicCategorySection";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import {
   createTrainingCenterIdentifier,
@@ -10,10 +11,18 @@ import {
 import type { Exercise } from "@/types/exercise";
 import {
   rlExercises,
+  type RLExerciseCategory,
   type RLExerciseDefinition,
 } from "../exercises/rlExerciseDefinitions";
 import { RL_STORAGE_TASK_IDS } from "./Simulator/useRLPersistedSource";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
+
+/** Section order on the page — one block per kind of task. */
+const CATEGORY_ORDER: RLExerciseCategory[] = [
+  "grammarToLanguage",
+  "languageToGrammar",
+  "applied",
+];
 
 export function ExercisesTab({
   selectedExercise,
@@ -64,6 +73,9 @@ export function ExercisesTab({
     }
   };
 
+  // Card numbering runs across the whole tab, not per section.
+  let cardIndex = 0;
+
   return (
     <div data-testid="rl-exercises-tab">
       <div className="mb-4 flex items-center gap-2">
@@ -75,19 +87,34 @@ export function ExercisesTab({
         />
       </div>
 
-      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-        {rlExercises.map((def, index) => {
-          const exercise = toExercise(def);
+      <div className="flex flex-col gap-6">
+        {CATEGORY_ORDER.map((category) => {
+          const defs = rlExercises.filter((def) => def.category === category);
+          if (defs.length === 0) return null;
+
           return (
-            <ExerciseCard
-              key={def.id}
-              item={exercise}
-              index={index}
-              testIdPrefix={`exercise-card-${def.id}`}
-              isSelected={selectedExercise?.id === exercise.id}
-              onSelect={() => onSelectExercise(exercise)}
-              onOpen={() => handleOpen(def)}
-            />
+            <TopicCategorySection
+              key={category}
+              testId={`rl-exercises-section-${category}`}
+              title={t(`rl.exercises.categories.${category}.title`)}
+              description={t(`rl.exercises.categories.${category}.description`)}
+            >
+              {defs.map((def) => {
+                const exercise = toExercise(def);
+                const index = cardIndex++;
+                return (
+                  <ExerciseCard
+                    key={def.id}
+                    item={exercise}
+                    index={index}
+                    testIdPrefix={`exercise-card-${def.id}`}
+                    isSelected={selectedExercise?.id === exercise.id}
+                    onSelect={() => onSelectExercise(exercise)}
+                    onOpen={() => handleOpen(def)}
+                  />
+                );
+              })}
+            </TopicCategorySection>
           );
         })}
       </div>

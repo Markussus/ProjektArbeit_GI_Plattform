@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { Sigma, Wand2, Sparkles, CheckCircle2 } from "lucide-react";
 
-const conceptIcons = [Sigma, Wand2, Sparkles, CheckCircle2];
-
+/**
+ * Regular Languages overview. The "Core Concepts" card grid was removed — a
+ * tutorial video takes that spot (see the `develop/video_player` branch, which
+ * adds the shared `TopicTutorialVideoSection`).
+ */
 export function OverviewTab() {
   const { t } = useTranslation();
 
@@ -15,33 +17,6 @@ export function OverviewTab() {
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           {t("rl.overviewText")}
         </p>
-      </div>
-
-      <div>
-        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("rl.concepts")}
-        </h3>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {([1, 2, 3, 4] as const).map((num, i) => {
-            const Icon = conceptIcons[i];
-
-            return (
-              <div
-                key={num}
-                className="bg-card ring-foreground/10 flex items-center gap-3 rounded-lg p-4 ring-1"
-              >
-                <div className="bg-module-purple-bg text-module-purple-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-                  <Icon className="size-4" />
-                </div>
-
-                <span className="text-foreground text-sm font-medium">
-                  {t(`rl.concept${num}`)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );

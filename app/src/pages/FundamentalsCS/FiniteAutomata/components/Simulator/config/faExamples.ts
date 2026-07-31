@@ -10,12 +10,16 @@ export interface FAExampleVariant {
   inputWord: string;
 }
 
+/** Which on-page section an example belongs to. */
+export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
+
 export interface FAExample {
   /** Translation key for the example title */
   id: string;
   titleKey: string;
   descriptionKey: string;
   type: "DFA" | "NFA";
+  category: FAExampleCategory;
   program: FAProgram;
   inputWord: string;
   /** When present, a second paired variant (e.g. NFA + DFA from the same grammar) */
@@ -28,6 +32,7 @@ export const exampleContainsAba: FAExample = {
   titleKey: "fa.examples.containsAba.title",
   descriptionKey: "fa.examples.containsAba.description",
   type: "NFA",
+  category: "nfa",
   program: {
     type: "NFA",
     states: ["S0", "S1", "S2", "S3"],
@@ -50,6 +55,7 @@ export const exampleLecture: FAExample = {
   titleKey: "fa.examples.lecture.title",
   descriptionKey: "fa.examples.lecture.description",
   type: "DFA",
+  category: "dfa",
   program: {
     type: "DFA",
     states: ["S0", "S1", "S2", "S3"],
@@ -72,6 +78,7 @@ export const exampleGrammar: FAExample = {
   titleKey: "fa.examples.grammar.title",
   descriptionKey: "fa.examples.grammar.description",
   type: "NFA",
+  category: "grammarToAutomaton",
   program: {
     type: "NFA",
     states: ["S", "A", "sF"],
