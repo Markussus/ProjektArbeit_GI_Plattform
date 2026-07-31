@@ -49,7 +49,7 @@ export const exampleContainsAba: FAExample = {
   inputWord: "baba",
 };
 
-// ─── DFA: Lecture Example (0+1) ─────────────────────────────────────────────
+// ─── DFA: Lecture Example (00*1) ────────────────────────────────────────────
 export const exampleLecture: FAExample = {
   id: "lecture-example",
   titleKey: "fa.examples.lecture.title",

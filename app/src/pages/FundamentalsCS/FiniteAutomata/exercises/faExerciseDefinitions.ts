@@ -234,7 +234,7 @@ const grammarOnesSolution: FAProgram = {
   acceptStates: ["S2"],
 };
 
-// L = (0011)⁺: one or more repetitions of the block 0011.
+// L = (0011)(0011)*: one or more repetitions of the block 0011.
 const grammar0011Solution: FAProgram = {
   type: "DFA",
   states: ["S0", "S1", "S2", "S3", "S4", "E"],

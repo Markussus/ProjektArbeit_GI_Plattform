@@ -1630,7 +1630,7 @@
         "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
       "grammar0011": {
-        "title": "Automat aus Grammatik: (0011)⁺",
+        "title": "Automat aus Grammatik: (0011)(0011)*",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
         "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
@@ -1694,8 +1694,8 @@
         "step4": "Bei einem DFA müssten wir sorgfältig partielle Übereinstimmungen verfolgen. Mit dem NFA probieren wir einfach \"alle Möglichkeiten\" gleichzeitig aus."
       },
       "lecture": {
-        "title": "Eine oder mehrere 0en, dann eine einzelne 1 (0⁺1)",
-        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
+        "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da die letzte „0“ in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
         "step1Title": "1. Ziel definieren",
         "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach darf kein weiteres Zeichen folgen. Er lehnt das leere Wort, Wörter, die mit '1' beginnen, und Wörter mit mehr als einer '1' ab.",
         "step2Title": "2. Zustände entwerfen",
