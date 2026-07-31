@@ -1,10 +1,13 @@
 import type { StateName } from "./faTypes";
 
+/**
+ * Why a run stopped. A dead end (no transition for the next symbol) is also a
+ * rejection — it is told apart from "input consumed, but no accept state" by
+ * `FARuntime.activeStates` being empty.
+ */
 export type FAHaltReason =
   | { type: "accepted"; states: StateName[] }
-  | { type: "rejected"; states: StateName[] }
-  | { type: "no_transition"; state: StateName; symbol: string }
-  | { type: "input_exhausted"; states: StateName[] };
+  | { type: "rejected"; states: StateName[] };
 
 export interface FARuntime {
   /** Current active state(s). DFA: always 1, NFA: possibly many */

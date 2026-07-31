@@ -63,15 +63,19 @@ export function stepRuntime(program: FAProgram, runtime: FARuntime): FARuntime {
   // Remove duplicates
   nextStates = [...new Set(nextStates)];
 
-  // Epsilon closure for NFA
-  if (program.type === "NFA") {
-    nextStates = epsilonClosure(program, nextStates);
-  }
+  // Always take the ε-closure, exactly like `createInitialRuntime` does. A
+  // valid DFA has no ε-transitions, so this is a no-op there; gating it on the
+  // declared type instead made step 0 and every later step disagree whenever a
+  // program carried ε-transitions under a "DFA" label.
+  nextStates = epsilonClosure(program, nextStates);
 
-  // If no transitions available (dead end)
+  // If no transitions available (dead end). The run has no reachable states
+  // any more, so `activeStates` must be cleared too — otherwise the status
+  // card and the state diagram keep highlighting the state we came from.
   if (nextStates.length === 0) {
     return {
       ...runtime,
+      activeStates: [],
       inputPosition: runtime.inputPosition + 1,
       stepCount: runtime.stepCount + 1,
       halted: true,
