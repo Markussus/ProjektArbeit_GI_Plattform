@@ -4,10 +4,16 @@ import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import {
+  formatLanguageIssue,
   parseLanguageSpec,
+  type LanguageParseIssue,
   type LanguageSpec,
 } from "../domain/rlLanguageSpecParser";
-import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
+import {
+  formatGrammar,
+  minimizeRightLinearGrammar,
+  setBuilderToRightLinearGrammar,
+} from "../domain/rlRegexToGrammar";
 import {
   languageToGrammar,
   languageToGrammarMinimal,
@@ -23,14 +29,16 @@ interface RLLanguageToGrammarProps {
   initialSource?: string;
 }
 
-const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", "00010", "000100", ..}';
+// Kept short enough to sit on one line in the textarea; three words are still
+// enough for the parser to infer the pattern 0ⁿ 1 0ᵐ from the trailing "..".
+const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", ..}';
 
 // Documents the language definition syntax in the "Supported Formats" panel.
 const LANGUAGE_ENUMERATION_EXAMPLE = 'L = {"010", "0010", "00100", ..}';
 const LANGUAGE_SETBUILDER_EXAMPLE = "L = {a^n c b^m | n, m > 0}";
 
 type ConversionResult =
-  | { ok: false; error: string | null }
+  | { ok: false; error: string; issue: LanguageParseIssue }
   | {
       ok: true;
       spec: LanguageSpec;
@@ -78,17 +86,23 @@ export function RLLanguageToGrammar({
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
     if (!parsed.ok) {
-      return { ok: false, error: parsed.error };
+      return { ok: false, error: parsed.error, issue: parsed.issue };
     }
     if (parsed.spec.kind === "setBuilder") {
-      const cfg = setBuilderToGrammar(parsed.spec);
+      // Both views stay right-linear. Simplified merges non-terminals that
+      // derive the same words; when there is nothing to merge it is the very
+      // same grammar as Detailed.
+      const detailed = setBuilderToRightLinearGrammar(parsed.spec);
+      const grammar = simplified
+        ? minimizeRightLinearGrammar(detailed)
+        : detailed;
       return {
         ok: true,
         spec: parsed.spec,
-        nonTerminals: cfg.nonTerminals,
-        terminals: cfg.terminals,
-        startSymbol: cfg.startSymbol,
-        grammarText: cfg.displayText,
+        nonTerminals: grammar.nonTerminals,
+        terminals: grammar.terminals,
+        startSymbol: grammar.startSymbol,
+        grammarText: formatGrammar(grammar),
       };
     }
     // Enumeration: build a prefix-tree grammar. If the user wrote a `..`
@@ -168,10 +182,10 @@ export function RLLanguageToGrammar({
             </div>
           </details>
 
-          {!result.ok && result.error && (
+          {!result.ok && source.trim().length > 0 && (
             <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              <span>{result.error}</span>
+              <span>{formatLanguageIssue(t, result.issue, result.error)}</span>
             </div>
           )}
         </div>

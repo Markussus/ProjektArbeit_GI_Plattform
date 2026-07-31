@@ -1919,7 +1919,10 @@
       "testWordHelp": "Jedes Zeichen wird als Terminalsymbol behandelt. Die Grammatik wird auf das Wort simuliert.",
       "accepted": "AKZEPTIERT — die Grammatik leitet dieses Wort ab.",
       "rejected": "ABGELEHNT — die Grammatik leitet dieses Wort nicht ab.",
-      "emptyOutput": "—"
+      "emptyOutput": "—",
+      "supportedFormats": "Unterstützte Formate",
+      "supportedFormatsExtensional": "Extensional / Mengenschreibweise",
+      "supportedFormatsIntensional": "Intensional / formale Schreibweise"
     },
     "examplesTab": {
       "title": "Vorgefertigte Beispiele",
@@ -1961,7 +1964,7 @@
         "step1Title": "1. Muster und Bedingungen parsen",
         "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
         "step2Title": "2. Grammatik aufbauen",
-        "step2": "Jeder Faktor liefert seinen eigenen Block an Produktionen: a^0 ergibt eine Sternschleife, a^≥1 ein erzwungenes erstes Symbol plus Schleife, a^k k feste Produktionen. Die Blöcke werden so verkettet, dass das Startsymbol das ganze Wort ableitet."
+        "step2": "Jeder Faktor wird zu einem eigenen Teil der Grammatik. „Ausführlich“ läuft das Muster Symbol für Symbol ab und bleibt streng rechtslinear (A -> aB | a | ε); „Vereinfacht“ schreibt dieselbe Sprache kompakt mit einem Regelblock pro Faktor. Alternativen desselben Nichtterminals stehen immer in einer Zeile: A -> aA | a."
       },
       "recognizeWord": {
         "title": "Wort erkennen (Zugehörigkeitstest)",
@@ -1985,13 +1988,13 @@
         "title": "Sprache → Grammatik (Eine Eins zwischen Nullen)",
         "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
         "step1Title": "1. Grammatik ableiten",
-        "step1": "Eine Schleife baut die führenden 0en, eine einzelne Regel konsumiert die 1, und eine abschließende Schleife baut die nachfolgenden 0en. Laden Sie sie, um S → 0S | 0A, A → 1B, B → 0B | 0 abzuleiten."
+        "step1": "Diese Wortliste ist endlich und hat kein abschließendes „..“, daher wird die Grammatik aus einem Präfixbaum über genau diesen fünf Wörtern gebaut — sie erzeugt genau diese und keine weiteren. Schalten Sie die Ausgabe auf „Vereinfacht“, um dieselbe Sprache mit zusammengeführten Zweigen zu sehen."
       },
       "languageDefault": {
         "title": "Sprache → Grammatik (Nullen, eine Eins, Nullen)",
         "description": "Die voreingestellte Wortliste des Sprache-→-Grammatik-Simulators: Nullen, eine einzelne 1, dann Nullen (ein offenes Muster mit abschließendem „..“).",
         "step1Title": "1. Grammatik ableiten",
-        "step1": "Laden Sie die Wortliste, um eine rechtslineare Grammatik dafür abzuleiten. Schalten Sie die Ausgabe auf „Vereinfacht“, um die minimale, zusammengeführte Grammatik mit der ausführlichen Präfixbaum-Version zu vergleichen."
+        "step1": "Das abschließende „..“ kennzeichnet die Liste als offen, sie wird daher als Muster 0ⁿ 1 0ᵐ mit n, m ≥ 1 gelesen. „Ausführlich“ leitet daraus eine streng rechtslineare Grammatik ab; „Vereinfacht“ zeigt dieselbe Sprache kompakt mit einem Regelblock pro Faktor."
       }
     },
     "exercises": {
@@ -2115,6 +2118,19 @@
       "confirmYes": "Ja, Lösung anzeigen",
       "confirmNo": "Weiter probieren",
       "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
+    },
+    "languageErrors": {
+      "empty": "Geben Sie eine Sprachdefinition ein.",
+      "variableReused": "Die Variable '{{name}}' wird in mehr als einem Faktor verwendet. Das beschreibt eine nicht-reguläre Sprache (wie a^n b^n) und lässt sich nicht als reguläre Grammatik schreiben.",
+      "patternUnexpectedChar": "Unerwartetes Zeichen '{{char}}' im Muster an Position {{position}}.",
+      "missingGroupClose": "Es fehlt ein ')', um die Gruppe vor Position {{position}} zu schließen.",
+      "trailingCaret": "Es steht ein '^' ohne Exponent da.",
+      "badExponent": "Nach '^' an Position {{position}} wird ein Variablenbuchstabe oder eine ganze Zahl erwartet.",
+      "constraintVariable": "Am Anfang der Bedingung '{{constraint}}' wird ein Variablenname erwartet.",
+      "expectedNaturals": "Nach '{{op}}' wird ℕ (oder N) erwartet, gefunden wurde '{{got}}'.",
+      "expectedInteger": "Nach '{{op}}' wird eine ganze Zahl erwartet.",
+      "upperBound": "Obere Schranken ('{{op}}') werden nicht unterstützt — sie machen die Sprache endlich. Zählen Sie die Wörter stattdessen auf.",
+      "unexpectedToken": "Unerwartetes Token '{{token}}' in der Bedingung."
     }
   },
   "grammar": {

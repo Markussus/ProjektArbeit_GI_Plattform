@@ -193,105 +193,267 @@ function dedupeProductions(rules: ProductionRule[]): ProductionRule[] {
 }
 
 /**
- * Build a CFG-style grammar directly from a set-builder spec.
+ * Build a strictly right-linear grammar for a set-builder spec.
  *
- * Each factor with a variable exponent gets its own non-terminal so that
- * independent exponents stay independent — e.g. {a^n c b^m | n, m > 0}
- * produces
- *     S -> A c B
- *     A -> aA | a
- *     B -> bB | b
- * instead of the Thompson-NFA expansion that the regex-driven path would
- * emit. The output is a *general* CFG (the S production may contain
- * non-terminals in the middle of the right-hand side), so callers that
- * need a strictly right-linear grammar should not rely on it.
+ * Walks the pattern symbol by symbol and reads the result off as
+ * `A -> aB | a | ε` rules only — the shape this module is actually about. An
+ * earlier version printed a compact `S -> A c B`, which is a general CFG and
+ * therefore not a regular grammar at all; {@link minimizeRightLinearGrammar}
+ * now provides the shorter view without leaving Type 3.
+ *
+ * The pattern is first laid out as a chain of nodes: every mandatory
+ * repetition consumes one symbol and advances, and every variable exponent
+ * adds a self-loop at the position it reached. Node names are then assigned in
+ * chain order (S, A, B, …) and each edge becomes one production.
  */
-export interface SetBuilderGrammar {
-  nonTerminals: string[];
-  terminals: string[];
-  startSymbol: string;
-  /** Pre-rendered production text, one rule group per line. */
-  displayText: string;
-}
+export function setBuilderToRightLinearGrammar(
+  spec: SetBuilderLang,
+): RegularGrammar {
+  interface Node {
+    edges: Array<{ symbol: string; to: Node }>;
+  }
+  const makeNode = (): Node => ({ edges: [] });
 
-export function setBuilderToGrammar(spec: SetBuilderLang): SetBuilderGrammar {
-  const startSymbol = "S";
-  const terminals = new Set<string>();
-  const productionLines: string[] = [];
-  const nonTerminals: string[] = [startSymbol];
+  const start = makeNode();
+  let current = start;
 
-  // Collapse the trivial case `{x^n | n ≥ k}` into a single recursive S so
-  // we don't emit a pointless `S -> A`. Anything more interesting goes
-  // through the general path so the resulting grammar reads naturally.
-  if (spec.pattern.length === 1) {
-    const f = spec.pattern[0];
-    const exp = f.exponent;
-    if (exp.kind === "variable") {
-      const atomText = atomToTerminalString(f.atom);
-      collectTerminals(f.atom, terminals);
-      productionLines.push(
-        formatRecursiveRule(startSymbol, atomText, exp.lowerBound),
-      );
-      return {
-        nonTerminals,
-        terminals: [...terminals],
-        startSymbol,
-        displayText: productionLines.join("\n"),
-      };
+  for (const factor of spec.pattern) {
+    const chars = [...atomToTerminalString(factor.atom)];
+    // `ε` and empty groups contribute nothing — and a zero-length loop would
+    // never terminate.
+    if (chars.length === 0) continue;
+
+    const exponent = factor.exponent;
+    const mandatory =
+      exponent.kind === "literal"
+        ? exponent.count
+        : exponent.kind === "variable"
+          ? exponent.lowerBound
+          : 1;
+
+    for (let repeat = 0; repeat < mandatory; repeat++) {
+      for (const symbol of chars) {
+        const next = makeNode();
+        current.edges.push({ symbol, to: next });
+        current = next;
+      }
+    }
+
+    if (exponent.kind === "variable") {
+      // Any number of extra repetitions: a loop back to where we are now.
+      const loopStart = current;
+      let node = loopStart;
+      chars.forEach((symbol, index) => {
+        const next = index === chars.length - 1 ? loopStart : makeNode();
+        node.edges.push({ symbol, to: next });
+        node = next;
+      });
     }
   }
 
-  // Pool of non-terminal names for variable factors: A, B, C, … (skip S).
+  const accept = current;
+
+  // Name the nodes in breadth-first chain order: S first, then A, B, C, …
   const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
+  const names = new Map<Node, string>([[start, "S"]]);
+  const order: Node[] = [start];
+  const queue: Node[] = [start];
   let letterIdx = 0;
-  const factorNT: (string | null)[] = spec.pattern.map(() => null);
-  for (let i = 0; i < spec.pattern.length; i++) {
-    if (spec.pattern[i].exponent.kind === "variable") {
-      const name = LETTERS[letterIdx++] ?? `N${letterIdx}`;
-      factorNT[i] = name;
-      nonTerminals.push(name);
+  while (queue.length > 0) {
+    const node = queue.shift()!;
+    for (const edge of node.edges) {
+      if (names.has(edge.to)) continue;
+      names.set(edge.to, LETTERS[letterIdx++] ?? `N${letterIdx}`);
+      order.push(edge.to);
+      queue.push(edge.to);
     }
   }
 
-  const startRhsParts: string[] = [];
-  for (let i = 0; i < spec.pattern.length; i++) {
-    const f = spec.pattern[i];
-    if (f.atom.kind === "epsilon" && f.exponent.kind === "none") continue;
-    collectTerminals(f.atom, terminals);
-    const atomText = atomToTerminalString(f.atom);
+  // A transition into the accepting node folds into a terminal-only rule
+  // (`A -> a`) as long as nothing leaves that node — when the last factor has
+  // a variable exponent the accept node carries the loop, so it stays and
+  // becomes ε-producing instead.
+  const acceptIsFoldable = accept.edges.length === 0 && accept !== start;
 
-    if (f.exponent.kind === "none") {
-      startRhsParts.push(atomText);
-    } else if (f.exponent.kind === "literal") {
-      startRhsParts.push(atomText.repeat(f.exponent.count));
-    } else {
-      const nt = factorNT[i]!;
-      startRhsParts.push(nt);
-      productionLines.push(
-        formatRecursiveRule(nt, atomText, f.exponent.lowerBound),
-      );
+  const nonTerminals: string[] = [];
+  const terminals = new Set<string>();
+  const productions: ProductionRule[] = [];
+  const epsilonNTs: string[] = [];
+
+  for (const node of order) {
+    if (acceptIsFoldable && node === accept) continue;
+    const name = names.get(node)!;
+    nonTerminals.push(name);
+    if (node === accept) epsilonNTs.push(name);
+    for (const edge of node.edges) {
+      terminals.add(edge.symbol);
+      productions.push({
+        lhs: name,
+        terminal: edge.symbol,
+        nextNonTerminal:
+          acceptIsFoldable && edge.to === accept ? null : names.get(edge.to)!,
+      });
     }
   }
-
-  const startRhs = startRhsParts.length === 0 ? "ε" : startRhsParts.join(" ");
-  productionLines.unshift(`${startSymbol} -> ${startRhs}`);
 
   return {
     nonTerminals,
     terminals: [...terminals],
-    startSymbol,
-    displayText: productionLines.join("\n"),
+    startSymbol: "S",
+    productions,
+    epsilonProducingNonTerminals: epsilonNTs,
   };
 }
 
-function formatRecursiveRule(
-  nt: string,
-  atomText: string,
-  lowerBound: number,
-): string {
-  if (lowerBound <= 0) return `${nt} -> ${atomText}${nt} | ε`;
-  if (lowerBound === 1) return `${nt} -> ${atomText}${nt} | ${atomText}`;
-  return `${nt} -> ${atomText}${nt} | ${atomText.repeat(lowerBound)}`;
+/** Marker for the implicit accepting state behind `A -> a` rules. */
+const FINAL_NODE = " final";
+
+/**
+ * Collapse a right-linear grammar to its smallest equivalent right-linear
+ * grammar, by merging non-terminals that derive the same set of words.
+ *
+ * This is a bisimulation quotient: start by separating ε-producing (accepting)
+ * non-terminals from the rest, then keep splitting a block whenever two of its
+ * members disagree about which block some terminal leads into. Merging what is
+ * left over never changes the generated language, and it can only shrink the
+ * grammar — a grammar that is already minimal comes back unchanged.
+ *
+ * The result stays strictly right-linear (`A -> aB | a | ε`), so switching to
+ * the simplified view never turns a regular grammar into something else.
+ */
+export function minimizeRightLinearGrammar(
+  grammar: RegularGrammar,
+): RegularGrammar {
+  const epsilonProducers = new Set(grammar.epsilonProducingNonTerminals ?? []);
+  const usesFinalNode = grammar.productions.some(
+    (rule) => rule.nextNonTerminal === null,
+  );
+
+  const nodes = [...grammar.nonTerminals];
+  if (usesFinalNode) nodes.push(FINAL_NODE);
+
+  const edgesOf = new Map<string, Array<{ terminal: string; to: string }>>(
+    nodes.map((node) => [node, []]),
+  );
+  for (const rule of grammar.productions) {
+    edgesOf.get(rule.lhs)?.push({
+      terminal: rule.terminal,
+      to: rule.nextNonTerminal ?? FINAL_NODE,
+    });
+  }
+  const isAccepting = (node: string) =>
+    node === FINAL_NODE || epsilonProducers.has(node);
+
+  // ── Partition refinement ────────────────────────────────────────────────
+  let blockOf = new Map<string, number>(
+    nodes.map((node) => [node, isAccepting(node) ? 0 : 1]),
+  );
+  for (;;) {
+    const signature = (node: string) => {
+      const targets = new Set(
+        (edgesOf.get(node) ?? []).map(
+          (edge) => `${edge.terminal}${blockOf.get(edge.to)}`,
+        ),
+      );
+      return `${blockOf.get(node)}${[...targets].sort().join("")}`;
+    };
+
+    const idBySignature = new Map<string, number>();
+    const next = new Map<string, number>();
+    for (const node of nodes) {
+      const sig = signature(node);
+      let id = idBySignature.get(sig);
+      if (id === undefined) {
+        id = idBySignature.size;
+        idBySignature.set(sig, id);
+      }
+      next.set(node, id);
+    }
+
+    if (idBySignature.size === new Set(blockOf.values()).size) break;
+    blockOf = next;
+  }
+
+  // ── Rebuild one non-terminal per block ──────────────────────────────────
+  const membersOf = new Map<number, string[]>();
+  for (const node of nodes) {
+    const block = blockOf.get(node)!;
+    membersOf.set(block, [...(membersOf.get(block) ?? []), node]);
+  }
+
+  const blockEdges = new Map<number, Array<{ terminal: string; to: number }>>();
+  const blockAccepting = new Map<number, boolean>();
+  for (const [block, members] of membersOf) {
+    blockAccepting.set(block, members.some(isAccepting));
+    const seen = new Set<string>();
+    const edges: Array<{ terminal: string; to: number }> = [];
+    for (const member of members) {
+      for (const edge of edgesOf.get(member) ?? []) {
+        const target = blockOf.get(edge.to)!;
+        const key = `${edge.terminal}${target}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        edges.push({ terminal: edge.terminal, to: target });
+      }
+    }
+    edges.sort((a, b) =>
+      a.terminal < b.terminal ? -1 : a.terminal > b.terminal ? 1 : 0,
+    );
+    blockEdges.set(block, edges);
+  }
+
+  const startBlock = blockOf.get(grammar.startSymbol)!;
+  // A block that only accepts ε folds away: `A -> aB` plus `B -> ε` is just
+  // `A -> a`. The start block is kept even when it qualifies.
+  const foldableBlock = [...membersOf.keys()].find(
+    (block) =>
+      block !== startBlock &&
+      blockAccepting.get(block) === true &&
+      (blockEdges.get(block) ?? []).length === 0,
+  );
+
+  // ── Name the kept blocks in BFS order: S, then A, B, C, … ────────────────
+  const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
+  const names = new Map<number, string>([[startBlock, "S"]]);
+  const order: number[] = [startBlock];
+  const queue: number[] = [startBlock];
+  let letterIdx = 0;
+  while (queue.length > 0) {
+    const block = queue.shift()!;
+    for (const edge of blockEdges.get(block) ?? []) {
+      if (edge.to === foldableBlock || names.has(edge.to)) continue;
+      names.set(edge.to, LETTERS[letterIdx++] ?? `N${letterIdx}`);
+      order.push(edge.to);
+      queue.push(edge.to);
+    }
+  }
+
+  const nonTerminals: string[] = [];
+  const terminals = new Set<string>();
+  const productions: ProductionRule[] = [];
+  const epsilonNTs: string[] = [];
+  for (const block of order) {
+    const name = names.get(block)!;
+    nonTerminals.push(name);
+    if (blockAccepting.get(block)) epsilonNTs.push(name);
+    for (const edge of blockEdges.get(block) ?? []) {
+      terminals.add(edge.terminal);
+      productions.push({
+        lhs: name,
+        terminal: edge.terminal,
+        nextNonTerminal:
+          edge.to === foldableBlock ? null : (names.get(edge.to) ?? null),
+      });
+    }
+  }
+
+  return {
+    nonTerminals,
+    terminals: [...terminals],
+    startSymbol: "S",
+    productions,
+    epsilonProducingNonTerminals: epsilonNTs,
+  };
 }
 
 function atomToTerminalString(node: RegexNode): string {
@@ -304,21 +466,6 @@ function atomToTerminalString(node: RegexNode): string {
   // path is only reachable from a bad call site — fail loudly rather than
   // silently emit garbage.
   throw new Error("Cannot render a non-linear atom as a flat terminal string.");
-}
-
-function collectTerminals(node: RegexNode, out: Set<string>): void {
-  if (node.kind === "symbol") {
-    out.add(node.value);
-    return;
-  }
-  if (node.kind === "concat" || node.kind === "union") {
-    collectTerminals(node.left, out);
-    collectTerminals(node.right, out);
-    return;
-  }
-  if (node.kind === "star") {
-    collectTerminals(node.child, out);
-  }
 }
 
 /**

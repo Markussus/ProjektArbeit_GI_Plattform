@@ -152,7 +152,7 @@ export const exampleLanguageDefault: RLExample = {
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
-  languageSource: 'L = {"010", "0010", "00100", "00010", "000100", ..}',
+  languageSource: 'L = {"010", "0010", "00100", ..}',
   steps: [
     {
       titleKey: "rl.examples.languageDefault.step1Title",

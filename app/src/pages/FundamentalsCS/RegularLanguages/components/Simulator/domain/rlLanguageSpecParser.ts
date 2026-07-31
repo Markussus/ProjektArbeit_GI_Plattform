@@ -1,3 +1,5 @@
+import type { TFunction } from "i18next";
+import type { TranslationKey } from "@/types/i18n";
 import type { RegexNode } from "./rlTypes";
 
 export type ExponentSpec =
@@ -34,9 +36,80 @@ export interface SetBuilderLang {
 
 export type LanguageSpec = EnumerationLang | SetBuilderLang;
 
+/**
+ * A parse failure as a translatable code plus its interpolation values.
+ * The matching strings live under `rl.languageErrors.*`.
+ */
+export interface LanguageParseIssue {
+  code:
+    | "empty"
+    | "variableReused"
+    | "patternUnexpectedChar"
+    | "missingGroupClose"
+    | "trailingCaret"
+    | "badExponent"
+    | "constraintVariable"
+    | "expectedNaturals"
+    | "expectedInteger"
+    | "upperBound"
+    | "unexpectedToken";
+  params?: Record<string, string>;
+}
+
 export type ParseLanguageResult =
   | { ok: true; spec: LanguageSpec }
-  | { ok: false; error: string };
+  | { ok: false; error: string; issue: LanguageParseIssue };
+
+/** Translation key for a language-spec issue, for use with i18next's `t()`. */
+export function languageIssueKey(issue: LanguageParseIssue): string {
+  return `rl.languageErrors.${issue.code}`;
+}
+
+/** Render a language-spec issue in the active language. */
+export function formatLanguageIssue(
+  t: TFunction,
+  issue: LanguageParseIssue,
+  fallback: string,
+): string {
+  return t(languageIssueKey(issue) as TranslationKey, {
+    ...issue.params,
+    defaultValue: fallback,
+  });
+}
+
+/** Thrown internally; the parse entry points convert it into a failure. */
+class LanguageParseError extends Error {
+  readonly issue: LanguageParseIssue;
+
+  constructor(issue: LanguageParseIssue, message: string) {
+    super(message);
+    this.issue = issue;
+  }
+}
+
+function fail(
+  code: LanguageParseIssue["code"],
+  message: string,
+  params?: Record<string, string>,
+): never {
+  throw new LanguageParseError({ code, params }, message);
+}
+
+function toFailure(e: unknown): {
+  ok: false;
+  error: string;
+  issue: LanguageParseIssue;
+} {
+  if (e instanceof LanguageParseError) {
+    return { ok: false, error: e.message, issue: e.issue };
+  }
+  const message = e instanceof Error ? e.message : String(e);
+  return {
+    ok: false,
+    error: message,
+    issue: { code: "patternUnexpectedChar", params: { char: message } },
+  };
+}
 
 /**
  * Parse a language description in either enumeration or set-builder form.
@@ -61,7 +134,11 @@ export type ParseLanguageResult =
 export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
   let source = rawSource.trim();
   if (source.length === 0) {
-    return { ok: false, error: "Language definition is empty." };
+    return {
+      ok: false,
+      error: "Language definition is empty.",
+      issue: { code: "empty" },
+    };
   }
 
   // Strip optional "L = " / "L_1 = " / "L1 = " prefix.
@@ -248,19 +325,22 @@ function parseSetBuilderBody(
     }
     for (const [name, count] of usage) {
       if (count > 1) {
-        return {
-          ok: false,
-          error: `Variable '${name}' is used in more than one factor. That describes a non-regular language (like a^n b^n) and cannot be expressed as a regular grammar.`,
-        };
+        fail(
+          "variableReused",
+          `Variable '${name}' is used in more than one factor. That describes a non-regular language (like a^n b^n) and cannot be expressed as a regular grammar.`,
+          { name },
+        );
       }
     }
 
     const constraintGroups = parseConstraintsText(constraintsText);
     const lowerBound = new Map<string, number>();
+    const exactCount = new Map<string, number>();
     for (const group of constraintGroups) {
       for (const v of group.vars) {
         const prev = lowerBound.get(v) ?? 0;
         lowerBound.set(v, Math.max(prev, group.lowerBound));
+        if (group.exact !== null) exactCount.set(v, group.exact);
       }
     }
     // Variables introduced in the pattern but unconstrained default to ≥ 0.
@@ -269,11 +349,17 @@ function parseSetBuilderBody(
         lowerBound.set(f.exponent.name, 0);
       }
     }
-    // Apply bounds to the factors.
+    // Apply bounds to the factors. `n = k` pins the exponent to exactly k, so
+    // the factor stops being variable — `{a^n | n = 3}` is the finite {aaa},
+    // not a^3 a*.
     for (const f of factors) {
-      if (f.exponent.kind === "variable") {
-        f.exponent.lowerBound = lowerBound.get(f.exponent.name) ?? 0;
+      if (f.exponent.kind !== "variable") continue;
+      const exact = exactCount.get(f.exponent.name);
+      if (exact !== undefined) {
+        f.exponent = { kind: "literal", count: exact };
+        continue;
       }
+      f.exponent.lowerBound = lowerBound.get(f.exponent.name) ?? 0;
     }
 
     const regex = patternToRegex(factors);
@@ -298,7 +384,7 @@ function parseSetBuilderBody(
       },
     };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    return toFailure(e);
   }
 }
 
@@ -307,8 +393,10 @@ function parseSetBuilderBody(
 function parsePatternText(text: string): PatternFactor[] {
   const result = parsePattern(text, 0);
   if (result.endIdx !== text.length) {
-    throw new Error(
+    fail(
+      "patternUnexpectedChar",
       `Unexpected character '${text[result.endIdx]}' in pattern at position ${result.endIdx}.`,
+      { char: text[result.endIdx], position: String(result.endIdx) },
     );
   }
   return result.factors;
@@ -336,8 +424,10 @@ function parsePattern(
       i++;
       const sub = parsePattern(source, i);
       if (source[sub.endIdx] !== ")") {
-        throw new Error(
+        fail(
+          "missingGroupClose",
           `Missing ')' to close group starting before position ${i}.`,
+          { position: String(i) },
         );
       }
       atom = patternToRegex(sub.factors);
@@ -352,8 +442,10 @@ function parsePattern(
       atomText = c;
       i++;
     } else {
-      throw new Error(
+      fail(
+        "patternUnexpectedChar",
         `Unexpected character '${c}' in pattern at position ${i}.`,
+        { char: c, position: String(i) },
       );
     }
 
@@ -364,7 +456,7 @@ function parsePattern(
       rawSuffix = "^";
       const next = source[i];
       if (next === undefined) {
-        throw new Error("Trailing '^' without exponent.");
+        fail("trailingCaret", "Trailing '^' without exponent.");
       }
       if (/[0-9]/.test(next)) {
         let numStr = "";
@@ -379,8 +471,10 @@ function parsePattern(
         rawSuffix += next;
         i++;
       } else {
-        throw new Error(
+        fail(
+          "badExponent",
           `Expected a variable letter or an integer after '^' at position ${i}.`,
+          { position: String(i) },
         );
       }
     }
@@ -438,6 +532,8 @@ function repeatExactly(atom: RegexNode, n: number): RegexNode {
 interface ConstraintGroup {
   vars: string[];
   lowerBound: number;
+  /** Set when the constraint pins the variable with `=`, e.g. `n = 3`. */
+  exact: number | null;
 }
 
 function parseConstraintsText(text: string): ConstraintGroup[] {
@@ -453,8 +549,10 @@ function parseConstraintsText(text: string): ConstraintGroup[] {
     // Find first whitespace or operator-ish boundary after the leading identifier.
     const headMatch = piece.match(/^([A-Za-z])\s*(.*)$/);
     if (!headMatch) {
-      throw new Error(
+      fail(
+        "constraintVariable",
         `Expected a variable name at start of constraint '${piece}'.`,
+        { constraint: piece },
       );
     }
     const varName = headMatch[1];
@@ -467,18 +565,20 @@ function parseConstraintsText(text: string): ConstraintGroup[] {
 
     const vars = [...buffered, varName];
     buffered.length = 0;
-    const lowerBound = computeLowerBound(rest);
-    groups.push({ vars, lowerBound });
+    groups.push({ vars, ...computeBound(rest) });
   }
 
   if (buffered.length > 0) {
     // Variables with no constraint default to ≥ 0.
-    groups.push({ vars: buffered.slice(), lowerBound: 0 });
+    groups.push({ vars: buffered.slice(), lowerBound: 0, exact: null });
   }
   return groups;
 }
 
-function computeLowerBound(text: string): number {
+function computeBound(text: string): {
+  lowerBound: number;
+  exact: number | null;
+} {
   // Normalise so the simple split works on `n>0` and `n >= 1` alike.
   const normalised = text
     .replace(/∈/g, " ∈ ")
@@ -489,6 +589,7 @@ function computeLowerBound(text: string): number {
 
   const tokens = normalised.length === 0 ? [] : normalised.split(" ");
   let lb = 0;
+  let exact: number | null = null;
   let i = 0;
   while (i < tokens.length) {
     const t = tokens[i];
@@ -503,30 +604,38 @@ function computeLowerBound(text: string): number {
         i += 2;
         continue;
       }
-      throw new Error(
+      fail(
+        "expectedNaturals",
         `Expected ℕ (or N) after '${t}', got '${next ?? "end of input"}'.`,
+        { op: t, got: next ?? "end of input" },
       );
     }
     if (t === ">" || t === ">=" || t === "≥" || t === "=") {
       const numStr = tokens[i + 1];
       if (numStr === undefined || !/^\d+$/.test(numStr)) {
-        throw new Error(`Expected an integer after '${t}'.`);
+        fail("expectedInteger", `Expected an integer after '${t}'.`, { op: t });
       }
       const num = parseInt(numStr, 10);
+      // `=` pins the exponent exactly; the others only raise the lower bound.
+      if (t === "=") exact = num;
       const opLb = t === ">" ? num + 1 : num;
       if (opLb > lb) lb = opLb;
       i += 2;
       continue;
     }
     if (t === "<" || t === "<=" || t === "≤") {
-      throw new Error(
+      fail(
+        "upperBound",
         `Upper bounds ('${t}') are not supported — they would make the language finite. Use enumeration instead.`,
+        { op: t },
       );
     }
-    throw new Error(`Unexpected token '${t}' in constraint.`);
+    fail("unexpectedToken", `Unexpected token '${t}' in constraint.`, {
+      token: t,
+    });
   }
 
-  return lb;
+  return { lowerBound: lb, exact };
 }
 
 /* ── Shared helpers ────────────────────────────────────────────────── */

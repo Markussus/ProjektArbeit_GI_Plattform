@@ -1919,7 +1919,10 @@
       "testWordHelp": "Each character is treated as a terminal symbol. The grammar is simulated on the word.",
       "accepted": "ACCEPTED — the grammar derives this word.",
       "rejected": "REJECTED — the grammar does not derive this word.",
-      "emptyOutput": "—"
+      "emptyOutput": "—",
+      "supportedFormats": "Supported Formats",
+      "supportedFormatsExtensional": "Extensional / set notation",
+      "supportedFormatsIntensional": "Intensional / formal notation"
     },
     "examplesTab": {
       "title": "Predefined Examples",
@@ -1961,7 +1964,7 @@
         "step1Title": "1. Parse the Pattern and Conditions",
         "step1": "The pattern is read as a sequence of factors, such as a^n, c, b^m. The conditions determine a lower bound for each variable. The same variable may not occur in two factors because that would not be regular, as in a^n b^n.",
         "step2Title": "2. Build the Grammar",
-        "step2": "Each factor contributes its own production block: a^0 creates a Kleene-star loop, a^≥1 creates a required first symbol followed by a loop, and a^k creates k fixed productions. The blocks are chained so the start symbol derives the complete word."
+        "step2": "Each factor becomes its own piece of the grammar. Detailed walks the pattern symbol by symbol and stays strictly right-linear (A -> aB | a | ε); Simplified prints the same language compactly, with one rule block per factor. Alternatives of the same non-terminal always share a line: A -> aA | a."
       },
       "recognizeWord": {
         "title": "Recognize Word (Membership Test)",
@@ -1985,13 +1988,13 @@
         "title": "Language → Grammar (A Single One Between Zeros)",
         "description": "Find a grammar for this language: at least one 0, exactly one 1, followed by at least one 0.",
         "step1Title": "1. Derive the Grammar",
-        "step1": "A loop builds the leading zeros, one rule consumes the single 1, and a final loop builds the trailing zeros. Load it to derive S → 0S | 0A, A → 1B, B → 0B | 0."
+        "step1": "This word list is finite and has no trailing \"..\", so the grammar is built from a prefix tree over exactly these five words — it generates them and nothing else. Switch the output to Simplified to see the same language with equivalent branches merged."
       },
       "languageDefault": {
         "title": "Language → Grammar (Zeros, a One, Zeros)",
         "description": "The default word list of the Language → Grammar simulator: zeros, a single 1, then zeros (an open-ended pattern written with a trailing \"..\").",
         "step1Title": "1. Derive the Grammar",
-        "step1": "Load the word list to derive a right-linear grammar for it. Switch the output to Simplified to compare the minimal, merged grammar with the detailed prefix-tree version."
+        "step1": "The trailing \"..\" marks the list as open-ended, so it is read as the pattern 0ⁿ 1 0ᵐ with n, m ≥ 1. Detailed derives a strictly right-linear grammar for it; Simplified shows the same language written compactly, one rule block per factor."
       }
     },
     "exercises": {
@@ -2115,6 +2118,19 @@
       "confirmYes": "Yes, Show Solution",
       "confirmNo": "Keep Trying",
       "solutionLoadedNote": "The worked solution has been loaded into the simulator below — run it to inspect the derivation."
+    },
+    "languageErrors": {
+      "empty": "Enter a language definition.",
+      "variableReused": "Variable '{{name}}' is used in more than one factor. That describes a non-regular language (like a^n b^n) and cannot be written as a regular grammar.",
+      "patternUnexpectedChar": "Unexpected character '{{char}}' in the pattern at position {{position}}.",
+      "missingGroupClose": "Missing ')' to close the group that starts before position {{position}}.",
+      "trailingCaret": "There is a '^' without an exponent.",
+      "badExponent": "Expected a variable letter or an integer after '^' at position {{position}}.",
+      "constraintVariable": "Expected a variable name at the start of the condition '{{constraint}}'.",
+      "expectedNaturals": "Expected ℕ (or N) after '{{op}}', got '{{got}}'.",
+      "expectedInteger": "Expected an integer after '{{op}}'.",
+      "upperBound": "Upper bounds ('{{op}}') are not supported — they make the language finite. List the words instead.",
+      "unexpectedToken": "Unexpected token '{{token}}' in the condition."
     }
   },
   "grammar": {
