@@ -1,14 +1,16 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{berichtvorlage}[02.04.2026 Schlanke Vorlage für Berichte]
+\ProvidesPackage{BerichtVorlage}[10.06.2026 Schlanke Vorlage für Berichte]
 
 % --- Notwendige Pakete ---
-\RequirePackage[T1]{fontenc}
-\RequirePackage[ngerman]{babel}
-\RequirePackage[a4paper,margin=20mm]{geometry}
-\RequirePackage{lmodern}
-\RequirePackage{parskip}
-\RequirePackage{fancyhdr}
-\RequirePackage[hidelinks,hypertexnames=false]{hyperref}
+\RequirePackage[T1]{fontenc}						% T1-Schriftkodierung für saubere Umlaute, Silbentrennung und PDF-Ausgabe
+\RequirePackage[utf8]{inputenc}						% Erlaubt UTF-8-Eingabe, z. B. direkte Umlaute, bei pdflatex
+\RequirePackage[ngerman]{babel}						% Deutsche Sprache, Silbentrennung und Standardbegriffe
+\RequirePackage[a4paper,margin=20mm]{geometry}		% A4-Papier und Seitenraender von 20 mm
+\RequirePackage{lmodern}							% Latin-Modern-Schriftfamilie als skalierbare Standardschrift
+\RequirePackage{parskip}							% Absatzabstand statt Absatzeinzug
+\RequirePackage{fancyhdr}							% Frei konfigurierbare Kopf- und Fusszeilen
+\RequirePackage[hidelinks,hypertexnames=false]{hyperref}	% Klickbare Links ohne sichtbare Linkrahmen und doppelte Linkanker
+\RequirePackage{xurl}								% Verbessert automatische Zeilenumbrüche in langen URLs
 
 % --- Gliederung bis Ebene 4 (section ... subparagraph) ---
 \setcounter{secnumdepth}{5}
@@ -99,57 +101,73 @@
 
 % --- Gliederungsbefehl: Ebene 0..4, optional sternfoermig, optional mit TOC-Eintrag ---
 % Verwendung:
-%	\subNsection{0}{Titel}				-> nummerierte section
-%	\subNsection{1}{Titel}				-> nummerierte subsection
-%	\subNsection*{2}{Titel}				-> unnummerierte subsubsection, nicht im TOC
-%	\subNsection*[toc]{3}{Titel}		-> unnummerierte paragraph, aber im TOC mit Link
+%	\subNsection{0}{Titel}					-> nummerierte section
+%	\subNsection{1}{Titel}{Zusatz}			-> nummerierte section mit Zusatz in Klammern
+%	\subNsection*{2}{Titel}					-> unnummeriert, nicht im TOC
+%	\subNsection*[toc]{3}{Titel}{Zusatz}	-> unnummeriert, aber im TOC mit Link
 
-\newcommand{\PBVsubNnumbered}[2]{%
+\newcommand{\PBVsubNtitle}[2]{%
+	\if\relax\detokenize{#2}\relax
+		#1%
+	\else
+		\texorpdfstring{#1 {\mdseries\small(#2)}}{#1 (#2)}%
+	\fi
+}
+
+\newcommand{\PBVsubNtitleToc}[2]{%
+	\if\relax\detokenize{#2}\relax
+		#1%
+	\else
+		\texorpdfstring{#1 {\mdseries\footnotesize(#2)}}{#1 (#2)}%
+	\fi
+}
+
+\newcommand{\PBVsubNnumbered}[3]{%
 	\ifcase#1
-		\section{#2}%
+		\section[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
 	\or
-		\subsection{#2}%
+		\subsection[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
 	\or
-		\subsubsection{#2}%
+		\subsubsection[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
 	\or
-		\paragraph{#2}%
+		\paragraph[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
 	\or
-		\subparagraph{#2}%
+		\subparagraph[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
 	\else
 		\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
 	\fi
 }
 
-\newcommand{\PBVsubNstarred}[3]{%
+\newcommand{\PBVsubNstarred}[4]{%
 	\def\PBVtocarg{#3}%
 	\def\PBVtocflag{toc}%
 	\ifx\PBVtocarg\PBVtocflag
 		\phantomsection
 		\ifcase#1
-			\section*{#2}\addcontentsline{toc}{section}{#2}%
+			\section*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{section}{\PBVsubNtitleToc{#2}{#4}}%
 		\or
-			\subsection*{#2}\addcontentsline{toc}{subsection}{#2}%
+			\subsection*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subsection}{\PBVsubNtitleToc{#2}{#4}}%
 		\or
-			\subsubsection*{#2}\addcontentsline{toc}{subsubsection}{#2}%
+			\subsubsection*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subsubsection}{\PBVsubNtitleToc{#2}{#4}}%
 		\or
-			\paragraph*{#2}\addcontentsline{toc}{paragraph}{#2}%
+			\paragraph*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{paragraph}{\PBVsubNtitleToc{#2}{#4}}%
 		\or
-			\subparagraph*{#2}\addcontentsline{toc}{subparagraph}{#2}%
+			\subparagraph*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subparagraph}{\PBVsubNtitleToc{#2}{#4}}%
 		\else
 			\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
 		\fi
 	\else
 		\if\relax\detokenize{#3}\relax
 			\ifcase#1
-				\section*{#2}%
+				\section*{\PBVsubNtitle{#2}{#4}}%
 			\or
-				\subsection*{#2}%
+				\subsection*{\PBVsubNtitle{#2}{#4}}%
 			\or
-				\subsubsection*{#2}%
+				\subsubsection*{\PBVsubNtitle{#2}{#4}}%
 			\or
-				\paragraph*{#2}%
+				\paragraph*{\PBVsubNtitle{#2}{#4}}%
 			\or
-				\subparagraph*{#2}%
+				\subparagraph*{\PBVsubNtitle{#2}{#4}}%
 			\else
 				\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
 			\fi
@@ -159,10 +177,32 @@
 	\fi
 }
 
+\makeatletter
+\newcommand{\PBVsubNmaybeextraNumbered}[2]{%
+	\@ifnextchar\bgroup
+		{\PBVsubNnumberedExtra{#1}{#2}}%
+		{\PBVsubNnumbered{#1}{#2}{}}%
+}
+
+\newcommand{\PBVsubNnumberedExtra}[3]{%
+	\PBVsubNnumbered{#1}{#2}{#3}%
+}
+
+\newcommand{\PBVsubNmaybeextraStarred}[3]{%
+	\@ifnextchar\bgroup
+		{\PBVsubNstarredExtra{#1}{#2}{#3}}%
+		{\PBVsubNstarred{#1}{#2}{#3}{}}%
+}
+
+\newcommand{\PBVsubNstarredExtra}[4]{%
+	\PBVsubNstarred{#1}{#2}{#3}{#4}%
+}
+\makeatother
+
 \NewDocumentCommand{\subNsection}{s O{} m m}{%
 	\IfBooleanTF{#1}
-		{\PBVsubNstarred{#3}{#4}{#2}}%
-		{\PBVsubNnumbered{#3}{#4}}%
+		{\PBVsubNmaybeextraStarred{#3}{#4}{#2}}%
+		{\PBVsubNmaybeextraNumbered{#3}{#4}}%
 }
 
 % --- Dokumentbereiche mit Seitenzahlschema ---
