@@ -21,8 +21,6 @@ export interface FAExerciseDefinition extends ExerciseDefinition {
   grammar?: string;
   /** The reference automaton that defines the target language. */
   solution: FAProgram;
-  /** Hints in order of increasing specificity. */
-  hintKeys: TranslationKey[];
   /** Starter program loaded when the user clicks "Open in simulation". */
   starter: FAProgram;
   /** Max length for enumerated test strings. Default 4. */
@@ -148,10 +146,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith01Solution,
-    hintKeys: [
-      "fa.exercisesTab.endsWith01.hint1",
-      "fa.exercisesTab.endsWith01.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1001", "01", "001", "101", "1101"],
@@ -167,10 +161,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith00Solution,
-    hintKeys: [
-      "fa.exercisesTab.endsWith00.hint1",
-      "fa.exercisesTab.endsWith00.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1100", "00", "100", "0100"],
@@ -186,10 +176,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: evenOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.evenOnes.hint1",
-      "fa.exercisesTab.evenOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1100", "11", "00", "0110", "0000"],
@@ -205,10 +191,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: noConsecutiveOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.noConsecOnes.hint1",
-      "fa.exercisesTab.noConsecOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["10101", "0", "1", "01", "010"],
@@ -224,11 +206,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: divisibleBy3Solution,
-    hintKeys: [
-      "fa.exercisesTab.divBy3.hint1",
-      "fa.exercisesTab.divBy3.hint2",
-      "fa.exercisesTab.divBy3.hint3",
-    ],
     starter: emptyStarter(["0", "1"]),
     maxTestLen: 5,
     exampleWords: {
@@ -320,10 +297,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", B;', 'B = "0", B | ε;'].join("\n"),
     solution: grammarTwoOnesZerosSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarTwoOnesZeros.hint1",
-      "fa.exercisesTab.grammarTwoOnesZeros.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["11", "110", "1100", "11000"],
@@ -340,10 +313,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "0", A | "1", B;', "B = ε;"].join("\n"),
     solution: grammarOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarOnes.hint1",
-      "fa.exercisesTab.grammarOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["11", "101", "1001", "10001"],
@@ -366,11 +335,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
       'D = "0", A | ε;',
     ].join("\n"),
     solution: grammar0011Solution,
-    hintKeys: [
-      "fa.exercisesTab.grammar0011.hint1",
-      "fa.exercisesTab.grammar0011.hint2",
-      "fa.exercisesTab.grammar0011.hint3",
-    ],
     starter: emptyStarter(["0", "1"]),
     maxTestLen: 8,
     exampleWords: {
@@ -388,10 +352,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", A | "0", B;', "B = ε;"].join("\n"),
     solution: grammarOnesZeroSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarOnesZero.hint1",
-      "fa.exercisesTab.grammarOnesZero.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["10", "110", "1110"],

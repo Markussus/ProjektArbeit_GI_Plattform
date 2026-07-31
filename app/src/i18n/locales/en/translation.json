@@ -1604,67 +1604,47 @@
       "endsWith01": {
         "title": "Strings ending with \"01\"",
         "goal": "Build a DFA that accepts binary strings ending with \"01\".",
-        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are \"0\" followed by \"1\" (e.g. \"01\", \"101\", \"1001\"). Strings ending in any other pattern must be rejected.",
-        "hint1": "Track how much of the pattern \"01\" you have matched so far. Three states are enough: nothing, just saw a 0, just saw \"01\".",
-        "hint2": "From the accept state, reading a 0 should fall back to \"just saw a 0\" (you might still be on track), and reading a 1 should reset to \"nothing\"."
+        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are \"0\" followed by \"1\" (e.g. \"01\", \"101\", \"1001\"). Strings ending in any other pattern must be rejected."
       },
       "endsWith00": {
         "title": "Strings ending with \"00\"",
         "goal": "Build a DFA that accepts binary strings ending with two zeros.",
-        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are both 0 (e.g. \"00\", \"100\", \"1100\"). Single zeros or strings ending in 1 must be rejected.",
-        "hint1": "You need to remember how many trailing zeros you have just seen. Three states (0, 1, or 2 trailing zeros) are enough.",
-        "hint2": "From the \"two trailing zeros\" state, reading another 0 should stay there, but reading a 1 should jump back to \"zero trailing zeros\"."
+        "description": "Design a DFA over {0, 1} that accepts exactly those strings whose last two symbols are both 0 (e.g. \"00\", \"100\", \"1100\"). Single zeros or strings ending in 1 must be rejected."
       },
       "evenOnes": {
         "title": "Even number of 1s",
         "goal": "Accept binary strings containing an even number of 1s (including zero 1s).",
-        "description": "Design a DFA that tracks the parity of 1s seen so far. The empty string should be accepted (zero is even).",
-        "hint1": "You only need two states — one for \"even\" and one for \"odd\".",
-        "hint2": "Reading 0 never changes the parity, but reading 1 always flips it."
+        "description": "Design a DFA that tracks the parity of 1s seen so far. The empty string should be accepted (zero is even)."
       },
       "noConsecOnes": {
         "title": "No two consecutive 1s",
         "goal": "Accept binary strings that never contain \"11\" as a substring.",
-        "description": "Design a DFA that rejects any string in which two 1s appear next to each other. Strings like \"0\", \"01\", \"010\" are accepted; \"11\", \"0110\" are rejected.",
-        "hint1": "Track whether the last symbol you read was a 1. Reading another 1 immediately after must lead to a dead state.",
-        "hint2": "A dead (trap) state has self-loops on every symbol and is not accepting."
+        "description": "Design a DFA that rejects any string in which two 1s appear next to each other. Strings like \"0\", \"01\", \"010\" are accepted; \"11\", \"0110\" are rejected."
       },
       "divBy3": {
         "title": "Binary numbers divisible by 3",
         "goal": "Accept binary strings whose decimal value is divisible by 3.",
-        "description": "Build a DFA that tracks the running remainder of the binary value modulo 3. Accept the states representing remainder 0.",
-        "hint1": "You only need three states — one for each possible remainder (0, 1, 2).",
-        "hint2": "When you are in state with remainder r and read bit b, the new remainder is (2·r + b) mod 3.",
-        "hint3": "The start state and the single accept state are both the same: remainder 0."
+        "description": "Build a DFA that tracks the running remainder of the binary value modulo 3. Accept the states representing remainder 0."
       },
       "grammarTwoOnesZeros": {
         "title": "Automaton from Grammar: 11 0ⁿ",
         "goal": "Build a DFA for the language L = { 11 0ⁿ | n ≥ 0 }: two ones followed by any number of zeros.",
-        "description": "Given the right-linear grammar S → \"1\" A, A → \"1\" B, B → \"0\" B | ε, build the corresponding finite automaton and then check whether the word \"11001\" belongs to the language.",
-        "hint1": "After the two required ones, only zeros may follow — another one leads to a trap state.",
-        "hint2": "You need three useful states (start, after the first 1, after the second 1 = accept state) plus a trap state. The word \"11001\" ends in the trap state and therefore is not in the language."
+        "description": "Given the right-linear grammar S → \"1\" A, A → \"1\" B, B → \"0\" B | ε, build the corresponding finite automaton and then check whether the word \"11001\" belongs to the language."
       },
       "grammarOnes": {
         "title": "Automaton from Grammar: 1 0ⁿ 1",
         "goal": "Build a DFA for the language generated by the grammar below.",
-        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
-        "hint1": "Create one state per non-terminal (START, A, B) plus a trap state for invalid input.",
-        "hint2": "ε at B means that B is accepting; direct every undefined transition to the trap state."
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state."
       },
       "grammar0011": {
         "title": "Automaton from Grammar: (0011)⁺",
         "goal": "Build a DFA for the language generated by the grammar below.",
-        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
-        "hint1": "Chain one state per non-terminal: START→A→B→C→D along the symbols 0, 0, 1, 1.",
-        "hint2": "D = \"0\",A jumps back to read another 0011 block, so D's transition on 0 returns to A.",
-        "hint3": "ε at D makes D the accepting state; every unexpected symbol leads to the trap state."
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state."
       },
       "grammarOnesZero": {
         "title": "Automaton from Grammar: 1ⁿ 0",
         "goal": "Build a DFA for the language generated by the grammar below.",
-        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state.",
-        "hint1": "A = \"1\",A is a loop on 1; A = \"0\",B leaves the loop on a 0 and enters the accepting state B.",
-        "hint2": "B is accepting (ε); every input from B leads to the trap state."
+        "description": "Construct a DFA that accepts exactly the words derived by this right-linear grammar. Each non-terminal becomes a state; the ε-production marks an accepting state."
       }
     },
     "exerciseWorkspace": {
@@ -1672,11 +1652,7 @@
       "completed": "Completed",
       "exit": "Exit exercise mode",
       "check": "Check Solution",
-      "showHint": "Hint",
-      "hintsUsed": "{{used}}/{{total}} Hints Used",
-      "noMoreHints": "All hints revealed",
       "showSolution": "Load solution",
-      "hintsHeader": "Hints",
       "confirmTitle": "Reveal the full solution?",
       "confirmBody": "Your current automaton will be replaced with the reference solution. You can still reset the exercise from the Exercises tab.",
       "confirmYes": "Yes, show solution",
@@ -2019,76 +1995,52 @@
       "g2lFiniteBinary": {
         "title": "Grammar → Language (Three-bit Words)",
         "description": "Enumerate every word that can be derived by this grammar.",
-        "goal": "List the complete finite language L(G).",
-        "hint1": "Every derivation has the form START → 1A → 1xB → 1xy, so every word has exactly three symbols.",
-        "hint2": "A and B each offer 0 or 1 — producing 2 × 2 = 4 words, all beginning with 1."
+        "goal": "List the complete finite language L(G)."
       },
       "g2lTrailingZero": {
         "title": "Grammar → Language (Ones between Zeros)",
         "description": "Determine the language generated by this grammar.",
-        "goal": "Describe the infinite language and list its first words.",
-        "hint1": "A → 1A repeats and appends ones; the derivation can end only through A → 0B → 00.",
-        "hint2": "Every word therefore consists of a leading 0, any number of ones, and then 00."
+        "goal": "Describe the infinite language and list its first words."
       },
       "g2lEpsilonLoop": {
         "title": "Grammar → Language (Recursion with ε)",
         "description": "List the derivable words when B is also allowed to generate the empty word.",
-        "goal": "Enumerate the shortest words and account for B's ε-production.",
-        "hint1": "B → ε lets a derivation end immediately after a 1; B → 0A returns to A.",
-        "hint2": "Words begin with 0 and alternate between blocks of zeros and ones — trace every A/B transition."
+        "goal": "Enumerate the shortest words and account for B's ε-production."
       },
       "g2lGrouped": {
         "title": "Grammar → Language (Grouped Alternatives)",
         "description": "Resolve the grouped rules and enumerate the generated language.",
-        "goal": "Read the parentheses as ordinary alternatives and list the words.",
-        "hint1": "The parentheses only group alternatives: A = \"0\",A | \"1\",B and B = \"1\",B | \"0\".",
-        "hint2": "A adds leading zeros; B adds ones and must end with a single zero."
+        "goal": "Read the parentheses as ordinary alternatives and list the words."
       },
       "l2gZeroOnesZero": {
         "title": "Language → Grammar (One 0, Some 1s, One 0)",
         "description": "Find a regular grammar that generates exactly these words.",
-        "goal": "Write right-linear rules that generate 0 1ⁿ 0 for n ≥ 1.",
-        "hint1": "Every word is a 0, followed by one or more ones, followed by a final 0.",
-        "hint2": "Use a state that loops on 1 (B → \"1\",B) and terminates on the final 0."
+        "goal": "Write right-linear rules that generate 0 1ⁿ 0 for n ≥ 1."
       },
       "l2gFourWords": {
         "title": "Language → Grammar (Four Fixed Words)",
         "description": "Write a grammar that derives exactly this finite language.",
-        "goal": "Generate exactly these four 4-bit words and nothing else.",
-        "hint1": "All four words share the suffix 11; only the first two bits vary.",
-        "hint2": "Let START and A freely choose 0 or 1, then enforce B → \"1\",C and C → \"1\"."
+        "goal": "Generate exactly these four 4-bit words and nothing else."
       },
       "l2gNestedZeros": {
         "title": "Language → Grammar (Blocks of Zeros)",
         "description": "Construct a grammar that generates this language.",
-        "goal": "Generate words of the form 1 0ⁿ 1 0ᵐ 1 with n, m ≥ 1.",
-        "hint1": "Every word begins and ends with 1 and has another 1 in the middle.",
-        "hint2": "Between the ones are blocks containing one or more zeros — this requires a loop on 0.",
-        "hint3": "Chain START→A→B for the first zero block and then →C→D for the second; B and D loop on 0."
+        "goal": "Generate words of the form 1 0ⁿ 1 0ᵐ 1 with n, m ≥ 1."
       },
       "appliedIntegers": {
         "title": "Language → Grammar (Integers)",
         "description": "Write a grammar for valid integers: an optional minus sign and no leading zeros.",
-        "goal": "Accept 0, 42, -100…, but reject 007 and a minus sign by itself.",
-        "hint1": "Handle \"0\" as a separate case so a leading zero cannot begin a longer number.",
-        "hint2": "A first nonzero digit (1–9) may be followed by any number of digits (0–9).",
-        "hint3": "Make the state for following digits ε-producing so the number can end at any point."
+        "goal": "Accept 0, 42, -100…, but reject 007 and a minus sign by itself."
       },
       "appliedIdentifiers": {
         "title": "Language → Grammar (Identifiers)",
         "description": "Write a grammar for variable names: a lowercase first letter followed by uppercase or lowercase letters, with no digits.",
-        "goal": "Accept x, foo, myVar…, but reject uppercase letters or digits at the beginning.",
-        "hint1": "The first symbol must be a lowercase letter from a–z.",
-        "hint2": "Then loop over any letters (a–z or A–Z) and allow ε to terminate."
+        "goal": "Accept x, foo, myVar…, but reject uppercase letters or digits at the beginning."
       }
     },
     "exerciseWorkspace": {
       "selectedExercise": "Selected Exercise",
       "exit": "Exit Exercise Mode",
-      "showHint": "Hint",
-      "noMoreHints": "All hints revealed",
-      "hintsUsed": "{{used}}/{{total}} hints used",
-      "hintsHeader": "Hints",
       "showSolution": "Load solution",
       "check": "Check Solution",
       "checkMatch": "Looks correct!",

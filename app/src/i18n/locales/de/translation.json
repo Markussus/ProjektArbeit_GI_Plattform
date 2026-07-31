@@ -1604,67 +1604,47 @@
       "endsWith01": {
         "title": "Wörter, die mit \"01\" enden",
         "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit \"01\" enden.",
-        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden.",
-        "hint1": "Verfolgen Sie, wie viel des Musters \"01\" Sie bereits gesehen haben. Drei Zustände reichen: nichts, gerade eine 0 gesehen, gerade \"01\" gesehen.",
-        "hint2": "Aus dem Akzeptanzzustand sollte eine 0 in den Zustand \"gerade 0 gesehen\" zurückfallen (Muster könnte erneut starten), und eine 1 zurück auf \"nichts\" gehen."
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden."
       },
       "endsWith00": {
         "title": "Wörter, die mit \"00\" enden",
         "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit zwei Nullen enden.",
-        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden.",
-        "hint1": "Sie müssen sich merken, wie viele abschließende Nullen Sie gerade gesehen haben. Drei Zustände (0, 1 oder 2 abschließende Nullen) reichen aus.",
-        "hint2": "Aus dem Zustand \"zwei abschließende Nullen\" sollte eine weitere 0 dort bleiben, eine 1 aber zurück zu \"keine abschließende Null\" springen."
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden."
       },
       "evenOnes": {
         "title": "Gerade Anzahl von 1en",
         "goal": "Akzeptieren Sie binäre Wörter mit einer geraden Anzahl von 1en (einschließlich null).",
-        "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade).",
-        "hint1": "Sie benötigen nur zwei Zustände — einen für \"gerade\" und einen für \"ungerade\".",
-        "hint2": "Das Lesen einer 0 ändert die Parität nie, das Lesen einer 1 kippt sie immer."
+        "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade)."
       },
       "noConsecOnes": {
         "title": "Keine zwei aufeinanderfolgenden 1en",
         "goal": "Akzeptieren Sie binäre Wörter, die nie \"11\" als Teilwort enthalten.",
-        "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt.",
-        "hint1": "Merken Sie sich, ob das zuletzt gelesene Symbol eine 1 war. Eine weitere 1 direkt danach muss in einen Fallen-Zustand führen.",
-        "hint2": "Ein Fallen-Zustand (Trap) hat Selbstschleifen auf jedem Symbol und ist nicht akzeptierend."
+        "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt."
       },
       "divBy3": {
         "title": "Binärzahlen teilbar durch 3",
         "goal": "Akzeptieren Sie binäre Wörter, deren Dezimalwert durch 3 teilbar ist.",
-        "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren.",
-        "hint1": "Sie benötigen nur drei Zustände — einen pro möglichem Rest (0, 1, 2).",
-        "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
-        "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
+        "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren."
       },
       "grammarTwoOnesZeros": {
         "title": "Automat aus Grammatik: 11 0ⁿ",
         "goal": "Bauen Sie einen DFA für die Sprache L = { 11 0ⁿ | n ≥ 0 }: zwei Einsen, gefolgt von beliebig vielen Nullen.",
-        "description": "Gegeben ist die rechtslineare Grammatik S → \"1\" A, A → \"1\" B, B → \"0\" B | ε. Bauen Sie den passenden endlichen Automaten und prüfen Sie anschließend, ob das Wort \"11001\" zur Sprache gehört.",
-        "hint1": "Nach den beiden Pflicht-Einsen darf nur noch die Null beliebig oft folgen – eine weitere Eins führt in einen Fehlerzustand.",
-        "hint2": "Sie brauchen drei nützliche Zustände (Start, nach der ersten 1, nach der zweiten 1 = Endzustand) plus einen Fangzustand. Das Wort \"11001\" endet im Fangzustand und gehört daher nicht zur Sprache."
+        "description": "Gegeben ist die rechtslineare Grammatik S → \"1\" A, A → \"1\" B, B → \"0\" B | ε. Bauen Sie den passenden endlichen Automaten und prüfen Sie anschließend, ob das Wort \"11001\" zur Sprache gehört."
       },
       "grammarOnes": {
         "title": "Automat aus Grammatik: 1 0ⁿ 1",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "Erstellen Sie einen Zustand pro Nichtterminal (START, A, B) plus einen Fehlerzustand für ungültige Eingaben.",
-        "hint2": "ε bei B bedeutet, dass B akzeptierend ist; leiten Sie jeden undefinierten Übergang in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
       "grammar0011": {
         "title": "Automat aus Grammatik: (0011)⁺",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "Verketten Sie einen Zustand pro Nichtterminal: START→A→B→C→D entlang der Symbole 0,0,1,1.",
-        "hint2": "D = \"0\",A springt zurück, um einen weiteren 0011-Block zu lesen, also führt D's 0-Übergang zurück nach A.",
-        "hint3": "ε bei D macht D zum akzeptierenden Zustand; jedes unerwartete Symbol führt in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
       "grammarOnesZero": {
         "title": "Automat aus Grammatik: 1ⁿ 0",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "A = \"1\",A ist eine Schleife auf 1; A = \"0\",B verlässt sie bei einer 0 zum akzeptierenden Zustand B.",
-        "hint2": "B ist akzeptierend (ε); jede Eingabe in B führt in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       }
     },
     "exerciseWorkspace": {
@@ -1672,11 +1652,7 @@
       "completed": "Abgeschlossen",
       "exit": "Aufgabenmodus verlassen",
       "check": "Lösung prüfen",
-      "showHint": "Hinweis",
-      "hintsUsed": "{{used}}/{{total}} Hinweise benutzt",
-      "noMoreHints": "Alle Hinweise angezeigt",
       "showSolution": "Lösung laden",
-      "hintsHeader": "Hinweise",
       "confirmTitle": "Vollständige Lösung anzeigen?",
       "confirmBody": "Ihr aktueller Automat wird durch die Referenzlösung ersetzt. Sie können die Aufgabe jederzeit aus dem Tab „Übungen“ zurücksetzen.",
       "confirmYes": "Ja, Lösung anzeigen",
@@ -2019,76 +1995,52 @@
       "g2lFiniteBinary": {
         "title": "Grammatik → Sprache (Drei-Bit-Wörter)",
         "description": "Zählen Sie jedes Wort auf, das diese Grammatik ableiten kann.",
-        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf.",
-        "hint1": "Jede Ableitung lautet START → 1A → 1xB → 1xy, jedes Wort hat also genau drei Symbole.",
-        "hint2": "A und B bieten je 0 oder 1 — das ergibt 2 × 2 = 4 Wörter, alle mit 1 beginnend."
+        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf."
       },
       "g2lTrailingZero": {
         "title": "Grammatik → Sprache (Einsen zwischen Nullen)",
         "description": "Bestimmen Sie die von dieser Grammatik erzeugte Sprache.",
-        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter.",
-        "hint1": "A → 1A wiederholt sich und fügt 1en an; beenden lässt sich nur über A → 0B → 00.",
-        "hint2": "Jedes Wort ist also eine führende 0, dann beliebig viele 1en, dann 00."
+        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter."
       },
       "g2lEpsilonLoop": {
         "title": "Grammatik → Sprache (Rekursion mit ε)",
         "description": "Listen Sie die ableitbaren Wörter auf, wenn B auch das leere Wort erzeugen darf.",
-        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B.",
-        "hint1": "B → ε lässt eine Ableitung direkt nach einer 1 enden; B → 0A führt zurück nach A.",
-        "hint2": "Wörter beginnen mit 0 und wechseln zwischen 0- und 1-Blöcken — verfolgen Sie jeden A/B-Wechsel."
+        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B."
       },
       "g2lGrouped": {
         "title": "Grammatik → Sprache (Gruppierte Alternativen)",
         "description": "Lösen Sie die gruppierten Regeln auf und zählen Sie die erzeugte Sprache auf.",
-        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf.",
-        "hint1": "Die Klammern dienen nur der Gruppierung: A = \"0\",A | \"1\",B und B = \"1\",B | \"0\".",
-        "hint2": "A fügt führende 0en hinzu; B fügt 1en hinzu und muss mit einer einzelnen 0 enden."
+        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf."
       },
       "l2gZeroOnesZero": {
         "title": "Sprache → Grammatik (Eine 0, einige 1en, eine 0)",
         "description": "Finden Sie eine reguläre Grammatik, die genau diese Wörter erzeugt.",
-        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen.",
-        "hint1": "Jedes Wort ist eine 0, dann eine oder mehrere 1en, dann eine abschließende 0.",
-        "hint2": "Nutzen Sie einen Zustand, der auf 1 schleift (B → \"1\",B) und bei der letzten 0 endet."
+        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen."
       },
       "l2gFourWords": {
         "title": "Sprache → Grammatik (Vier feste Wörter)",
         "description": "Schreiben Sie eine Grammatik, die genau diese endliche Sprache ableitet.",
-        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst.",
-        "hint1": "Alle vier Wörter teilen die Endung 11; nur die ersten beiden Bits variieren.",
-        "hint2": "Lassen Sie START und A frei auf 0/1, erzwingen Sie dann B → \"1\",C und C → \"1\"."
+        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst."
       },
       "l2gNestedZeros": {
         "title": "Sprache → Grammatik (Blöcke von Nullen)",
         "description": "Konstruieren Sie eine Grammatik, die diese Sprache erzeugt.",
-        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1.",
-        "hint1": "Jedes Wort beginnt und endet mit 1 und hat eine 1 in der Mitte.",
-        "hint2": "Zwischen den 1en stehen Blöcke aus einer oder mehreren 0en — das erfordert eine 0-Schleife.",
-        "hint3": "Verketten Sie START→A→B (erster 0-Block) →C→D (zweiter 0-Block), B und D schleifen auf 0."
+        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1."
       },
       "appliedIntegers": {
         "title": "Sprache → Grammatik (Ganzzahlen)",
         "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen.",
-        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab.",
-        "hint1": "Behandeln Sie \"0\" als eigenen Fall, damit keine führende Null eine längere Zahl beginnt.",
-        "hint2": "Auf eine erste Ziffer ungleich null (1–9) dürfen beliebige Ziffern (0–9) folgen.",
-        "hint3": "Machen Sie den Zustand für Folgeziffern ε-erzeugend, damit die Zahl überall enden kann."
+        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab."
       },
       "appliedIdentifiers": {
         "title": "Sprache → Grammatik (Bezeichner)",
         "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener erster Buchstabe, gefolgt von Groß- oder Kleinbuchstaben, keine Ziffern.",
-        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab.",
-        "hint1": "Das erste Symbol muss ein Kleinbuchstabe a–z sein.",
-        "hint2": "Danach schleifen Sie über beliebige Buchstaben (a–z oder A–Z) und erlauben ε zum Beenden."
+        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab."
       }
     },
     "exerciseWorkspace": {
       "selectedExercise": "Ausgewählte Übung",
       "exit": "Übungsmodus verlassen",
-      "showHint": "Tipp",
-      "noMoreHints": "Alle Tipps angezeigt",
-      "hintsUsed": "{{used}}/{{total}} Tipps verwendet",
-      "hintsHeader": "Tipps",
       "showSolution": "Lösung laden",
       "check": "Lösung prüfen",
       "checkMatch": "Sieht korrekt aus!",

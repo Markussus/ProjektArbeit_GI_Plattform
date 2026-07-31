@@ -33,8 +33,6 @@ export interface RLExerciseDefinition extends ExerciseDefinition {
   prompt: string;
   /** The monospaced answer revealed by "Show solution". */
   solution: string;
-  /** Hints in order of increasing specificity (translation keys). */
-  hintKeys: TranslationKey[];
   /** Which simulator mode the exercise opens in. */
   mode: SimulationMode;
   /**
@@ -94,10 +92,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       "\n",
     ),
     solution: "L = {100, 101, 110, 111}",
-    hintKeys: [
-      "rl.exercises.g2lFiniteBinary.hint1",
-      "rl.exercises.g2lFiniteBinary.hint2",
-    ],
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 1A", "A -> 0B | 1B", "B -> 0 | 1"].join("\n"),
@@ -113,10 +107,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     category: "grammarToLanguage",
     prompt: ['START = "0", A', 'A = "0", B | "1", A', 'B = "0"'].join("\n"),
     solution: "L = {000, 0100, 01100, 011100, …}",
-    hintKeys: [
-      "rl.exercises.g2lTrailingZero.hint1",
-      "rl.exercises.g2lTrailingZero.hint2",
-    ],
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 0A", "A -> 0B | 1A", "B -> 0"].join("\n"),
@@ -134,10 +124,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       "\n",
     ),
     solution: "L = {01, 001, 0101, 0001, 00001, …}",
-    hintKeys: [
-      "rl.exercises.g2lEpsilonLoop.hint1",
-      "rl.exercises.g2lEpsilonLoop.hint2",
-    ],
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 0A", "A -> 0A | 1B", "B -> 0A | ε"].join("\n"),
@@ -157,10 +143,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'B = ("1", B) | "0"',
     ].join("\n"),
     solution: "L = {010, 0010, 00010, 0110, 00110, …}",
-    hintKeys: [
-      "rl.exercises.g2lGrouped.hint1",
-      "rl.exercises.g2lGrouped.hint2",
-    ],
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["S -> 0A", "A -> 0A | 1B", "B -> 1B | 0"].join("\n"),
@@ -178,10 +160,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     category: "languageToGrammar",
     prompt: "L = {010, 0110, 01110, 011110, …}",
     solution: ['START = "0", A', 'A = "1", B', 'B = "1", B | "0"'].join("\n"),
-    hintKeys: [
-      "rl.exercises.l2gZeroOnesZero.hint1",
-      "rl.exercises.l2gZeroOnesZero.hint2",
-    ],
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"010", "0110", "01110", "011110"}' },
     referenceGrammar: ["START -> 0A", "A -> 1B", "B -> 1B | 0"].join("\n"),
@@ -202,10 +180,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'B = "1", C',
       'C = "1"',
     ].join("\n"),
-    hintKeys: [
-      "rl.exercises.l2gFourWords.hint1",
-      "rl.exercises.l2gFourWords.hint2",
-    ],
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"1011", "0011", "0111", "1111"}' },
     referenceGrammar: [
@@ -232,11 +206,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'C = "0", D',
       'D = "0", D | "1"',
     ].join("\n"),
-    hintKeys: [
-      "rl.exercises.l2gNestedZeros.hint1",
-      "rl.exercises.l2gNestedZeros.hint2",
-      "rl.exercises.l2gNestedZeros.hint3",
-    ],
     mode: "languageToGrammar",
     seed: {
       languageSource: 'L = {"10101", "100101", "1001001", "1000101"}',
@@ -266,11 +235,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'A = "1", B | … | "9", B',
       'B = "0", B | "1", B | … | "9", B | ε',
     ].join("\n"),
-    hintKeys: [
-      "rl.exercises.appliedIntegers.hint1",
-      "rl.exercises.appliedIntegers.hint2",
-      "rl.exercises.appliedIntegers.hint3",
-    ],
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"0", "-1", "42", "-100", "2025"}' },
     referenceGrammar: integersReferenceGrammar,
@@ -289,10 +253,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'START = "a", A | "b", A | … | "z", A',
       'A = "a", A | … | "z", A | "A", A | … | "Z", A | ε',
     ].join("\n"),
-    hintKeys: [
-      "rl.exercises.appliedIdentifiers.hint1",
-      "rl.exercises.appliedIdentifiers.hint2",
-    ],
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"x", "foo", "myVar", "camelCase"}' },
     referenceGrammar: identifiersReferenceGrammar,
