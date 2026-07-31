@@ -1629,7 +1629,7 @@
       "grammarTwoOnesZeros": {
         "title": "Automaton from Grammar: 11 0ⁿ",
         "goal": "Build a DFA for the language L = { 11 0ⁿ | n ≥ 0 }: two ones followed by any number of zeros.",
-        "description": "Given the right-linear grammar S → \"1\" A, A → \"1\" B, B → \"0\" B | ε, build the corresponding finite automaton and then check whether the word \"11001\" belongs to the language."
+        "description": "Construct a DFA that accepts exactly the words derived by the right-linear grammar shown below, then check whether the word \"11001\" belongs to the language."
       },
       "grammarOnes": {
         "title": "Automaton from Grammar: 1 0ⁿ 1",
