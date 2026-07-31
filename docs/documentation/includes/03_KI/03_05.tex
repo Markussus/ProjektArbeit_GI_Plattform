@@ -72,6 +72,20 @@ Teilgraphen abfragen.
 Das sparte Zeit und hielt vor allem den Kontext über mehrere
 Entwicklungssitzungen hinweg stabil.
 
+Am meisten Zeit gespart hat die KI bei wiederkehrenden Arbeiten:
+Refactorings und Optimierungen am Quellcode, das Erzeugen von Boilerplate-Code,
+das Schreiben von Unit-Tests sowie die Internationalisierung der Oberfläche,
+die im Projekt zweisprachig in Deutsch und Englisch vorliegt.
+Am klarsten gelohnt hat sich der Einsatz bei den Tests: Für die Automatenlogik,
+das Parsen der Grammatiken und die Validierung der Programme ließen sich aus der
+vorhandenen Implementierung zügig Testfälle ableiten, auch für Eingaben, an die
+ich beim Schreiben des Codes nicht gedacht hatte.
+
+Hilfreich war sie außerdem beim Aufräumen: TypeScript-Warnungen aufspüren,
+Benennungen vereinheitlichen, Kommentare und Methodendokumentation vorformulieren.
+Wörtlich übernehmen ließ sich davon allerdings wenig, weil den Vorschlägen der
+Projektkontext fehlte; als Ausgangspunkt waren sie trotzdem brauchbar.
+
 Ein eigener Punkt war die Konfiguration der KI\@.
 Anstatt die Modelle frei entscheiden zu lassen, habe ich sie über dauerhaft im
 Projekt hinterlegte Anweisungen dazu verpflichtet, bei Architektur- und
@@ -85,21 +99,28 @@ und verhindert, dass ein Vorschlag ungeprüft im Projekt landet.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Kristian Popov}
 
-Bei wiederkehrenden Arbeiten hat die KI am meisten Zeit gespart.
-Dazu zählten Refactorings und Optimierungen am Quellcode, das Erzeugen von
-Boilerplate-Code, das Schreiben von Unit-Tests sowie die Internationalisierung
-der Benutzeroberfläche, die im Projekt zweisprachig in Deutsch und Englisch vorliegt.
+Eine Übung besteht in beiden Modulen aus mehr als der Aufgabenstellung.
+Hinterlegt sind zusätzlich eine Referenzlösung, ein Startprogramm, mit dem die
+Bearbeitung beginnt, und Beispielwörter, die akzeptiert oder abgelehnt werden.
+Erst diese Kombination ergibt ein Lernangebot, das ohne Betreuung funktioniert,
+weil sich die Eingabe der Studierenden automatisch prüfen lässt.
 
-Am klarsten gelohnt hat sich der Einsatz bei den Tests.
-Für die Automatenlogik, das Parsen der Grammatiken und die Validierung der
-Programme ließen sich aus der vorhandenen Implementierung zügig Testfälle
-ableiten, auch für Eingaben, an die ich beim Schreiben des Codes nicht gedacht
-hatte.
+Die KI habe ich hier vor allem zur Variantenbildung eingesetzt.
+Ausgehend von einer selbst entworfenen Referenzaufgabe ließen sich weitere
+Aufgaben desselben Typs erzeugen, mit anderem Alphabet, anderer Wortlänge oder
+anderem Schwierigkeitsgrad.
+Das ist genau die Art von Fleißarbeit, die sich delegieren lässt:
+Die Struktur steht fest, variiert wird nur der Inhalt.
 
-Hilfreich war sie außerdem beim Aufräumen: TypeScript-Warnungen aufspüren,
-Benennungen vereinheitlichen, Kommentare und Methodendokumentation vorformulieren.
-Wörtlich übernehmen ließ sich davon allerdings wenig, weil den Vorschlägen der
-Projektkontext fehlte; als Ausgangspunkt waren sie trotzdem brauchbar.
+Die Korrektheitsprüfung habe ich der KI dagegen bewusst nicht überlassen.
+Sie läuft deterministisch ab: Verglichen werden alle Wörter über dem gemeinsamen
+Alphabet bis zu einer festgelegten Maximallänge, und für jedes dieser Wörter
+muss der Automat der Studierenden dieselbe Entscheidung treffen wie die
+Referenzlösung.
+Bewertet wird damit das tatsächliche Verhalten des Automaten und nicht die
+Einschätzung eines Sprachmodells.
+Aus demselben Grund musste jede generierte Aufgabe gegen die Simulation
+gegengeprüft werden, bevor sie in den Aufgabenkatalog aufgenommen wurde.
 
 \subNsection{2}{Kritische Reflexion}{Kristian Popov}
 
