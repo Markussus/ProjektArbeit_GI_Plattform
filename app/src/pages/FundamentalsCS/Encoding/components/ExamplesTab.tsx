@@ -49,16 +49,6 @@ export function ExamplesTab({
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-500">
-      <div className="bg-card ring-foreground/10 flex flex-col gap-4 rounded-xl p-6 shadow-sm ring-1">
-        <h2 className="text-foreground flex items-center gap-2 text-xl font-bold">
-          <FileText className="text-primary h-6 w-6" />
-          {t("simulator.encoding.examplesTitle")}
-        </h2>
-        <p className="text-muted-foreground">
-          {t("simulator.encoding.examplesDesc")}
-        </p>
-      </div>
-
       {exampleGroupOrder.map((group) => {
         const groupExamples = groups[group];
         if (!groupExamples?.length) return null;

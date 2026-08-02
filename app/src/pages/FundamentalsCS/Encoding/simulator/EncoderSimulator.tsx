@@ -170,15 +170,25 @@ export const EncoderSimulator = forwardRef<
         setInitialConverterMode(genData.converterMode || "encode");
         setInitialValue(genData.initialValue || "");
         setExpectedAnswer(genData.answer || "");
-      } else if (selectedExercise.id === "encoding.example_base64_1") {
+      } else if (selectedExercise.id === "encoding.example_base64_2") {
         setActiveMode("base64");
         setInitialConverterMode("encode");
-        setInitialValue("Hello");
+        setInitialValue("THWS");
         setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_utf8_1") {
+      } else if (selectedExercise.id === "encoding.example_base64_3") {
+        setActiveMode("base64");
+        setInitialConverterMode("decode");
+        setInitialValue("RklY");
+        setExpectedAnswer("");
+      } else if (selectedExercise.id === "encoding.example_utf8_2") {
         setActiveMode("utf8");
         setInitialConverterMode("encode");
-        setInitialValue("Hello");
+        setInitialValue("႐");
+        setExpectedAnswer("");
+      } else if (selectedExercise.id === "encoding.example_utf8_3") {
+        setActiveMode("utf8");
+        setInitialConverterMode("decode");
+        setInitialValue("E1 A0 A0");
         setExpectedAnswer("");
       }
     } else {

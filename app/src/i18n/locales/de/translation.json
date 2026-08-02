@@ -232,10 +232,14 @@
     "tutorialAnswer2": "UTF-8 kodiert jeden Unicode-Codepunkt in 1 bis 4 Bytes. ASCII-Zeichen (U+0000-U+007F) belegen 1 Byte und bleiben mit ASCII kompatibel. Nicht-ASCII-Zeichen belegen 2-4 Bytes mit spezifischen Bitmustern: 110xxxxx für 2 Byte, 1110xxxx für 3 Byte und 11110xxx für 4 Byte.",
     "tutorialQuestion3": "Was ist der Unterschied zwischen Kodierung und Verschlüsselung?",
     "tutorialAnswer3": "Kodierung wandelt Daten in ein anderes Format um (z.B. Base64, UTF-8) und ist ohne Schlüssel umkehrbar. Verschlüsselung schützt Daten durch Geheimhaltung und benötigt einen Schlüssel zur Umkehrung (z.B. AES, RSA). Kodierung bietet keine Sicherheit, Verschlüsselung schon.",
-    "example_base64_1": "Base64 kodiere 'Hello'",
-    "example_base64_1_desc": "Kodieren Sie den Text 'Hello' in Base64.",
-    "example_utf8_1": "UTF-8 kodiere 'Hello'",
-    "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes.",
+    "example_base64_2": "Base64 kodiere 'THWS'",
+    "example_base64_2_desc": "Kodieren Sie den Text 'THWS' in Base64.",
+    "example_base64_3": "Base64 dekodiere 'RklY'",
+    "example_base64_3_desc": "Dekodieren Sie den Base64-Wert 'RklY' (dritter Buchstabe ist kleines L).",
+    "example_utf8_2": "UTF-8 kodiere U+1090",
+    "example_utf8_2_desc": "Das Unicode-Zeichen Myanmar Shan Ziffer Null hat den Code U+1090. Wandeln Sie es in die UTF-8 Binärdarstellung um.",
+    "example_utf8_3": "UTF-8 dekodiere 3-Byte-Folge",
+    "example_utf8_3_desc": "Welches Unicode-Zeichen wird durch die UTF-8-Binärfolge 1110 0001 1010 0000 1010 0000 kodiert?",
     "ex_base64_encode_easy": "Base64-Kodierung (1 Zeichen)",
     "ex_base64_encode_easy_desc": "Kodiere den String '{{str}}' in Base64.",
     "ex_base64_encode_medium": "Base64-Kodierung (3 Zeichen)",
@@ -259,7 +263,11 @@
     "ex_utf8_decode_medium": "UTF-8-Dekodierung (2 Bytes)",
     "ex_utf8_decode_medium_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'.",
     "ex_utf8_decode_hard": "UTF-8-Dekodierung (3 Bytes)",
-    "ex_utf8_decode_hard_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'."
+    "ex_utf8_decode_hard_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'.",
+    "ex_utf8_encode_4byte": "UTF-8-Kodierung (4 Bytes – Emoji)",
+    "ex_utf8_encode_4byte_desc": "Wandle das Unicode-Zeichen '{{char}}' (U+{{hex}}) in die UTF-8 Binärdarstellung um.",
+    "ex_utf8_decode_4byte": "UTF-8-Dekodierung (4 Bytes – Emoji)",
+    "ex_utf8_decode_4byte_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'."
   },
   "moore": {
     "exercises": {
