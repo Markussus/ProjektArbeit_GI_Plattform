@@ -216,7 +216,7 @@ function generateUtf8EncodeMedium(): ExerciseDefWithAnswer {
 }
 
 function generateUtf8EncodeHard(): ExerciseDefWithAnswer {
-  const codePoint = randInt(0x0800, 0xffff);
+  const codePoint = randInt(0x0800, 0xd7ff);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
   const bytes = getUtf8Bytes(codePoint);
   const binary = bytesToBinary(bytes);
@@ -284,7 +284,7 @@ function generateUtf8DecodeMedium(): ExerciseDefWithAnswer {
 }
 
 function generateUtf8DecodeHard(): ExerciseDefWithAnswer {
-  const codePoint = randInt(0x0800, 0xffff);
+  const codePoint = randInt(0x0800, 0xd7ff);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
   const bytes = getUtf8Bytes(codePoint);
   const hexBytes = bytes
