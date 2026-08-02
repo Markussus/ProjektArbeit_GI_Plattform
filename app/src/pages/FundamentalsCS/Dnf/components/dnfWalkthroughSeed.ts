@@ -10,10 +10,7 @@ import {
   type DnfTransferValue,
   type DnfTruthTableTransferDraft,
 } from "./DnfBuilder/domain/dnfTransfer";
-import {
-  computeMinimalDnf,
-  minimalDnfToExpression,
-} from "./DnfBuilder/domain/quineMcCluskey";
+import { computeSmallestBooleanExpression } from "./DnfBuilder/domain/minimalExpression";
 import {
   createTruthTableFromResults,
   type TruthTable,
@@ -90,13 +87,12 @@ function buildSolvedAttempt(
   return {
     truthTableAnswers: truthTable.rows.map((row) => row.result),
     dnfAnswer: formattedDnf,
-    simplificationAnswer: formatMinimalDnf(truthTable),
+    simplificationAnswer: formatMinimalExpression(truthTable),
   };
 }
 
-function formatMinimalDnf(truthTable: TruthTable): string {
-  const minimal = computeMinimalDnf(truthTable);
-  const expression = minimalDnfToExpression(minimal, truthTable.variables);
-
-  return formatBooleanExpressionForDisplay(expression);
+function formatMinimalExpression(truthTable: TruthTable): string {
+  return formatBooleanExpressionForDisplay(
+    computeSmallestBooleanExpression(truthTable).expression,
+  );
 }

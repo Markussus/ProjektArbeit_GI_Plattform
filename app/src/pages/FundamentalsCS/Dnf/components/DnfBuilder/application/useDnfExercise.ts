@@ -6,10 +6,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../domain/dnfExerciseCheck";
-import {
-  computeMinimalDnf,
-  minimalDnfToExpression,
-} from "../domain/quineMcCluskey";
+import { computeSmallestBooleanExpression } from "../domain/minimalExpression";
 import type { DnfBuilderAnalysis } from "./dnfAnalysis";
 import type { DnfExerciseTransferDraft } from "../domain/dnfTransfer";
 import { useDnfSimplification } from "./useDnfSimplification";
@@ -108,17 +105,14 @@ export function useDnfExercise({
     const { truthTable } = analysis;
     const solvedAnswers = truthTable.rows.map((row) => row.result);
     const canonicalDnf = analysis.formattedDnf;
-    const minimalDnf = formatBooleanExpressionForDisplay(
-      minimalDnfToExpression(
-        computeMinimalDnf(truthTable),
-        truthTable.variables,
-      ),
+    const minimalExpression = formatBooleanExpressionForDisplay(
+      computeSmallestBooleanExpression(truthTable).expression,
     );
 
     return {
       truthTableAnswers: solvedAnswers,
       dnfAnswer: canonicalDnf,
-      simplificationAnswer: minimalDnf,
+      simplificationAnswer: minimalExpression,
     };
   };
 

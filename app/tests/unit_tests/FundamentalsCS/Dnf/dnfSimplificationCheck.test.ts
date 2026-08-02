@@ -123,6 +123,20 @@ describe("DNF simplification check", () => {
     expect(result.userLiteralCount).toBe(4);
   });
 
+  it("does not mark an intermediate non-DNF form as globally minimal", () => {
+    const table = generateTruthTable(parse("(a | b) & (c | d)"));
+
+    const result = checkDnfSimplification(
+      table,
+      "(a & (c | d)) | (b & (c | d))",
+    );
+
+    expect(result.minimumLiteralCount).toBe(8);
+    expect(result.acceptedMinimumLiteralCount).toBe(4);
+    expect(result.userLiteralCount).toBe(6);
+    expect(result.status).toBe("accepted_not_minimal");
+  });
+
   it("handles constants: tautology", () => {
     const table = generateTruthTable(parse("a ∨ ¬a"));
 

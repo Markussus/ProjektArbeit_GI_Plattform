@@ -193,6 +193,18 @@ describe("DNF parser error reporting", () => {
     expect(issue.code).toBe("empty_expression");
   });
 
+  it("rejects expressions that exceed the parser safety limits", () => {
+    expect(expectParseFailure("!".repeat(65) + "a").code).toBe(
+      "expression_too_complex",
+    );
+    expect(expectParseFailure("a|".repeat(300) + "a").code).toBe(
+      "expression_too_complex",
+    );
+    expect(expectParseFailure("a".repeat(2049)).code).toBe(
+      "expression_too_complex",
+    );
+  });
+
   it("reports unknown characters with their position", () => {
     const issue = expectParseFailure("a $ b");
     expect(issue.code).toBe("unexpected_character");

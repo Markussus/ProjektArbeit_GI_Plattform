@@ -16,10 +16,7 @@ import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
 import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
-import {
-  computeMinimalDnf,
-  minimalDnfToExpression,
-} from "../DnfBuilder/domain/quineMcCluskey";
+import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
 import {
@@ -377,11 +374,8 @@ const ExpressionWorkspace = forwardRef<
 
         const solvedAnswers = analysis.truthTable.rows.map((row) => row.result);
         const canonicalDnf = analysis.formattedDnf;
-        const minimalDnf = formatBooleanExpressionForDisplay(
-          minimalDnfToExpression(
-            computeMinimalDnf(analysis.truthTable),
-            analysis.truthTable.variables,
-          ),
+        const minimalExpression = formatBooleanExpressionForDisplay(
+          computeSmallestBooleanExpression(analysis.truthTable).expression,
         );
 
         onUserChange?.();
@@ -396,12 +390,12 @@ const ExpressionWorkspace = forwardRef<
             { checkTruthTable: true },
           ),
         );
-        simplification.loadSolution(minimalDnf, analysis.truthTable);
+        simplification.loadSolution(minimalExpression, analysis.truthTable);
         setSolutionLoadedVersion((current) => current + 1);
         onAttemptChange({
           truthTableAnswers: solvedAnswers,
           dnfAnswer: canonicalDnf,
-          simplificationAnswer: minimalDnf,
+          simplificationAnswer: minimalExpression,
         });
       },
     }),

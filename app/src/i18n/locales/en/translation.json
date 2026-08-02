@@ -769,6 +769,7 @@
       "errors": {
         "title": "Expression cannot be parsed",
         "emptyExpression": "Enter a boolean expression first.",
+        "expressionTooComplex": "The expression is too long or nested too deeply.",
         "unexpectedCharacter": "Unexpected character '{{value}}' at position {{index}}.",
         "unexpectedToken": "Unexpected token '{{value}}' at position {{index}}.",
         "unexpectedEnd": "The expression ends too early at position {{index}}.",

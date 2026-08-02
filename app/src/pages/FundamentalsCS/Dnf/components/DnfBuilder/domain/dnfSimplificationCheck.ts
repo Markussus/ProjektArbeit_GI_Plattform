@@ -36,6 +36,8 @@ export interface DnfSimplificationCheck {
   minimumLiteralCount: number;
   /** Term count of the minimum DNF. */
   minimumTermCount: number;
+  /** Literal count that an answer must reach to count as minimal. */
+  acceptedMinimumLiteralCount: number;
 }
 
 export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
@@ -64,8 +66,8 @@ export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
  * Pass criteria, in order:
  *   1. parse + variables must be valid
  *   2. expression must be logically equivalent to the truth table
- *   3. reaching the QMC minimum literal count counts as "minimal" — this also
- *      covers already-minimal DNFs whose canonical form cannot be shortened
+ *   3. reaching the globally smallest literal count counts as "minimal"; for
+ *      callers above the exact-search limit, the QMC minimum remains the fallback
  *   4. otherwise an answer not shorter than the canonical DNF simplified
  *      nothing ("equivalent_not_shorter"); shorter-but-not-minimal is
  *      "accepted_not_minimal"
@@ -79,11 +81,15 @@ export function checkDnfSimplification(
   const smallestExpression = computeSmallestBooleanExpression(table, minimal);
   const factoredExpression = smallestExpression.expression;
   const factoredLiteralCount = smallestExpression.literalCount;
+  const acceptedMinimumLiteralCount = smallestExpression.exact
+    ? factoredLiteralCount
+    : minimal.literalCount;
   const canonicalLiteralCount = getCanonicalLiteralCount(table);
   const baseResult = {
     canonicalLiteralCount,
     minimumLiteralCount: minimal.literalCount,
     minimumTermCount: minimal.termCount,
+    acceptedMinimumLiteralCount,
     minimalExpression,
     factoredExpression,
     factoredLiteralCount,
@@ -139,10 +145,7 @@ export function checkDnfSimplification(
     };
   }
 
-  // Reaching the QMC minimum is accepted as minimal even when it is not shorter
-  // than the canonical DNF — that is exactly the already-minimal case, where no
-  // shorter equivalent form exists.
-  if (userLiteralCount <= minimal.literalCount) {
+  if (userLiteralCount <= acceptedMinimumLiteralCount) {
     return {
       ...baseResult,
       status: "accepted_minimal",

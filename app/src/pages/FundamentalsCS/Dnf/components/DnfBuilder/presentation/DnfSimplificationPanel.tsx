@@ -53,8 +53,10 @@ export function DnfSimplificationPanel({
   const statusTone = getStatusTone(feedback?.status);
   const walkthrough = useMemo(
     () =>
-      feedback !== null ? buildDnfSimplificationWalkthrough(truthTable) : null,
-    [feedback, truthTable],
+      feedback !== null && showSolution
+        ? buildDnfSimplificationWalkthrough(truthTable)
+        : null,
+    [feedback, showSolution, truthTable],
   );
 
   return (
@@ -358,13 +360,13 @@ function buildDetail(
         "dnf.builder.exercise.simplificationDetail.accepted_not_minimal",
         {
           userLiterals: feedback.userLiteralCount ?? 0,
-          minimumLiterals: feedback.minimumLiteralCount,
+          minimumLiterals: feedback.acceptedMinimumLiteralCount,
         },
       );
     case "accepted_minimal":
       return t("dnf.builder.exercise.simplificationDetail.accepted_minimal", {
         userLiterals: feedback.userLiteralCount ?? 0,
-        minimumLiterals: feedback.minimumLiteralCount,
+        minimumLiterals: feedback.acceptedMinimumLiteralCount,
       });
   }
 }

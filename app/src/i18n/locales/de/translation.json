@@ -769,6 +769,7 @@
       "errors": {
         "title": "Ausdruck kann nicht gelesen werden",
         "emptyExpression": "Geben Sie zuerst einen booleschen Ausdruck ein.",
+        "expressionTooComplex": "Der Ausdruck ist zu lang oder zu tief verschachtelt.",
         "unexpectedCharacter": "Unerwartetes Zeichen '{{value}}' an Position {{index}}.",
         "unexpectedToken": "Unerwartetes Symbol '{{value}}' an Position {{index}}.",
         "unexpectedEnd": "Der Ausdruck endet zu früh an Position {{index}}.",

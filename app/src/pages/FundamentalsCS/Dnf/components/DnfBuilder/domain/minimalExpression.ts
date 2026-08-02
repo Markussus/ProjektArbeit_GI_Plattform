@@ -44,6 +44,7 @@ interface SearchState {
 }
 
 const INFINITE_COST = 32767;
+const resultCache = new WeakMap<TruthTable, SmallestBooleanExpression>();
 
 /**
  * Return the shortest known boolean expression for a table.
@@ -55,18 +56,29 @@ const INFINITE_COST = 32767;
  */
 export function computeSmallestBooleanExpression(
   table: TruthTable,
-  minimal = computeMinimalDnf(table),
+  minimal?: MinimalDnf,
 ): SmallestBooleanExpression {
-  const fallback = computeDnfDerivedExpression(minimal, table.variables);
+  const cached = resultCache.get(table);
+  if (cached) {
+    return cached;
+  }
+
+  const resolvedMinimal = minimal ?? computeMinimalDnf(table);
+  const fallback = computeDnfDerivedExpression(
+    resolvedMinimal,
+    table.variables,
+  );
 
   if (
-    minimal.type === "constant" ||
+    resolvedMinimal.type === "constant" ||
     table.variables.length > MAX_EXACT_OPTIMAL_VARIABLES
   ) {
-    return {
+    const result = {
       ...fallback,
-      exact: minimal.type === "constant",
+      exact: resolvedMinimal.type === "constant",
     };
+    resultCache.set(table, result);
+    return result;
   }
 
   const exactImprovement = findCheaperExactExpression(
@@ -74,18 +86,22 @@ export function computeSmallestBooleanExpression(
     fallback.literalCount,
   );
   if (exactImprovement) {
-    return {
+    const result: SmallestBooleanExpression = {
       expression: exactImprovement.expression,
       literalCount: exactImprovement.literalCount,
       exact: true,
       source: "exact",
     };
+    resultCache.set(table, result);
+    return result;
   }
 
-  return {
+  const result: SmallestBooleanExpression = {
     ...fallback,
     exact: true,
   };
+  resultCache.set(table, result);
+  return result;
 }
 
 function computeDnfDerivedExpression(
