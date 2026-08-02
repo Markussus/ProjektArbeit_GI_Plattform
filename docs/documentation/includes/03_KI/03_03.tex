@@ -1,15 +1,33 @@
 \subNsection{1}{KI Reflexion}{Enrico Ebert}
 
-Nutzung von Gemini 3.1 Pro, ChatGPT und Codex als Entwicklungswerkzeuge – Effizienzsteigerung bei der Implementierung mathematischer Logik und UI-Komponenten
+Im Rahmen des Programmierprojekts zur Entwicklung der interaktiven Lernplattform für das Modul „Grundlagen Informatik“ wurden KI-gestützte Werkzeuge intensiv in den Softwareentwicklungsprozess eingebunden. Der Einsatz von Künstlicher Intelligenz beschränkte sich dabei nicht nur auf die Unterstützung bei der Quelltextgenerierung, sondern beeinflusste auch die Konzeption und Strukturierung einzelner Anwendungsmodule. Im folgenden Kapitel werden die praktischen Erfahrungen beim Einsatz verschiedener KI-Systeme dokumentiert, die Realisierung KI-inspirierter Features analysiert sowie eine kritische Einordnung der Grenzen und Potenziale generativer Modelle im Kontext der Informatiklehre vorgenommen.
 
 \subNsection{2}{KI als Co-Developer}{Enrico Ebert}
 
-Reflektieren und so...
+Während der Entwicklungsphase kamen drei unterschiedliche KI-Werkzeuge als unterstützende „Co-Developer“ zum Einsatz. Die praktischen Erfahrungen zeigten je nach System und Aufgabenstellung spezifische Stärken und Schwächen:
 
-\subNsection{2}{Automatisierte Aufgabengenerierung}{Enrico Ebert}
+\begin{itemize}
+  \item \textbf{\texttt{google/Gemma agentMode} (WebStorm):} Dieses System zeigte eine gute Leistungsfähigkeit bei lokalen Refactorings und der Implementierung isolierter neuer Features. Als maßgeblicher Schwachpunkt erwies sich jedoch der begrenzte Überblick über den globalen Projektkontext. Dies führte regelmäßig zu unvollständigen Implementierungen; insbesondere das modulübergreifende i18n-System (Internationalisierung über spezifische Translation Keys) wurde von der KI systematisch ignoriert und musste manuell ergänzt werden.
 
-Reflektieren und so...
+  \item \textbf{\texttt{google/Antigravity Gemini 3.1 Pro}:} Dieses Modell eignete sich hervorragend zur Erstellung initialer Prototypen und generierte strukturierte Entwicklungspläne, die den Gesamtprozess spürbar strukturierten. Allerdings übersah das System häufig technische Spezialfälle und erzeugte teils unintuitiv gestaltete Benutzeroberflächen. Zudem benötigte die KI wiederholte Aufforderungen bezüglich der einzuhaltenden Projektstruktur sowie des i18n-Systems, woraus ein mehrstufiger Iterationsprozess für eine korrekte Lokalisierung resultierte.
+
+  \item \textbf{\texttt{OpenCode} (BigPickle):} Dieses Werkzeug erwies sich als äußerst effizient für punktuelle, kleinere Quelltextanpassungen, insbesondere wenn vorab der integrierte Planungsmodus zur Strukturierung der Änderungen genutzt wurde.
+\end{itemize}
+
+Aus der vergleichenden Beobachtung dieser Werkzeuge ergab sich ein klares Gesamtmuster: \textit{„Planung und Prototyping stark, Kontext und Vollständigkeit schwach“}. Da bei jedem Werkzeug das Anlegen von i18n-Schlüsseln sowie die Einhaltung der bestehenden Verzeichnis- und Systemarchitektur unzureichend gelöst wurden, ergab sich für die tägliche Entwicklungsarbeit eine strukturierte, dreistufige Arbeitsweise:
+\begin{enumerate}
+  \item Erstellung eines detaillierten Umsetzungsplans unter Nutzung des KI-Planungsmodus.
+  \item Generierung des primären Quelltext-Gerüsts durch das jeweilige Modell.
+  \item Manuelle Nacharbeit zur Sicherstellung der i18n-Konformität, Typsicherheit und Einbettung in die Projektstruktur.
+\end{enumerate}
+
 
 \subNsection{2}{Kritische Reflexion}{Enrico Ebert}
 
-Reflektieren und so...
+Die praktischen Erfahrungen im Projektverlauf offenbaren deutliche Grenzen beim Einsatz generativer Sprachmodelle für die Erstellung exakter, deterministischer Informatik-Modelle. Bei komplexen mathematischen und bitweisen Transformationen — etwa Umrechnungen mittels \texttt{BigInt}, Bitmanipulationen im Rahmen des IEEE-754-Standards oder der Zerlegung von UTF-8-Byte-Sequenzen — erzeugten die Modelle regelmäßig fehlerhafte oder unvollständige Logiken. Der generierte Quelltext musste in allen Fällen manuell überprüft, korrigiert und refaktoriert werden.
+
+Ein zentrales Problem stellte das Übersehen von randständigen Spezialfällen (\textit{Edge Cases}) dar. Kritische Zustände wie die Erkennung von \textit{NaN} und \(\pm\text{Infinity}\) bei Gleitkommazahlen, das Abfangen überlanger UTF-8-Kodierungen (\textit{Overlong Encodings}) oder die exakte Überlauferkennung (\texttt{carryInto} \(\neq\) \texttt{carryOut}) wurden von den KI-Modellen nicht selbstständig berücksichtigt. Die Absicherung dieser Pfade musste daher durch manuelle Testreihen — bestehend aus Unit-Tests mit Vitest sowie End-to-End-Tests (E2E) mit Playwright — eigenhändig aufgebaut werden.
+
+Zudem zeigte sich eine ausgeprägte Kontextfenster-Problematik bei umfangreicheren Dateien. In zentralen Komponenten wie dem \texttt{Simulator.tsx} (mit einem Umfang von 678 Zeilen Quellcode) verloren die KI-Werkzeuge zunehmend den Überblick über bereits existierende i18n-Schlüssel, wiederverwendbare Shared Components (vgl. Commit \texttt{533add6} \textit{"feat: shared components"}) und projektweite Konventionen. Dies machte iterative Verifizierungen erforderlich, wie sie auch in den Commits \texttt{dd16c1b} (\textit{"Add exercise solution verification"}), \texttt{9c63f90} (\textit{"feat(encoding): initial Prototype"}) und \texttt{83ddae5} (\textit{"import/export for encoding"}) dokumentiert sind.
+
+Fazit der eigenen Entwicklungserfahrung: KI-Tools als Co-Developer bieten einen erheblichen Mehrwert bei der Beschleunigung von Prototyping, beim Entwurf technischer Konzepte sowie beim Schreiben von Repetitions-Quelltext (\textit{Boilerplate}). Sie ersetzen jedoch an keiner Stelle die manuelle Qualitätssicherung, die architektonische Kontrolle und die ingenieurmäßige Sorgfaltspflicht. Der größte Nutzen lag im strukturierten Planungsmodell und der gezielten Refaktorisierung kleiner, klar abgegrenzter Code-Einheiten.
