@@ -71,7 +71,6 @@ export function TopicTutorialVideoSection({
         <VideoPlayer
           url={topic.tutorialVideoUrl}
           title={t(videoTitleKey)}
-          tracks={topic.tutorialVideoTracks}
           testId={`${testIdPrefix}-video`}
           className="max-w-none"
         />
