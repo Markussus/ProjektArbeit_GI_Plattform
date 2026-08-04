@@ -1801,6 +1801,18 @@
       "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
       "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
       "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+    },
+    "diagram": {
+      "title": "Zustandsdiagramm",
+      "violations_one": "{{count}} DFA-Verletzung",
+      "violations_other": "{{count}} DFA-Verletzungen",
+      "violationEpsilon": "Zustand {{state}} hat einen ε-Übergang — in einem DFA nicht erlaubt.",
+      "violationNondeterministic": "Zustand {{state}} geht bei Symbol „{{symbol}}“ nach {{targets}} — das verletzt den DFA-Determinismus.",
+      "start": "Start",
+      "usageHint": "Knoten ziehen zum Verschieben · Fläche ziehen zum Schwenken · scrollen zum Zoomen",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "resetView": "Ansicht zurücksetzen"
     }
   },
   "rl": {
@@ -1890,55 +1902,35 @@
       },
       "grammarToLanguage": {
         "title": "Grammatik → Sprache (Breitensuche-Aufzählung)",
-        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt.",
-        "step1Title": "1. BFS über Ableitungen",
-        "step1": "Ausgehend vom Startsymbol expandiert die BFS Produktionen und merkt sich jedes akzeptierte Präfix bis zur gewählten Längengrenze. Wörter werden längen-lexikografisch zurückgegeben."
+        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt."
       },
       "languageToGrammar": {
         "title": "Sprache → Grammatik (Wortliste)",
-        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden.",
-        "step1Title": "1. Aufzählung erkennen",
-        "step1": "Der Mengeninhalt besteht aus komma-getrennten Wörtern (mit oder ohne Anführungszeichen). Jedes Wort wird einzeln verarbeitet.",
-        "step2Title": "2. Präfixbaum bauen",
-        "step2": "Jedes eindeutige Präfix wird zu einem neuen Nichtterminal. Jede Baumkante ergibt eine Produktion A → aB, und jedes Wortende markiert das zugehörige Nichtterminal als ε-produzierend."
+        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden."
       },
       "languageSetBuilder": {
         "title": "Sprache → Grammatik (Mengen-Muster)",
-        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt.",
-        "step1Title": "1. Muster und Bedingungen parsen",
-        "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
-        "step2Title": "2. Grammatik aufbauen",
-        "step2": "Jeder Faktor wird zu einem eigenen Teil der Grammatik. „Ausführlich“ läuft das Muster Symbol für Symbol ab und bleibt streng rechtslinear (A -> aB | a | ε); „Vereinfacht“ schreibt dieselbe Sprache kompakt mit einem Regelblock pro Faktor. Alternativen desselben Nichtterminals stehen immer in einer Zeile: A -> aA | a."
+        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt."
       },
       "recognizeWord": {
         "title": "Wort erkennen (Zugehörigkeitstest)",
-        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt.",
-        "step1Title": "1. Grammatik → NFA → simulieren",
-        "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
+        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt."
       },
       "lectureGrammar1": {
         "title": "Grammatik → Sprache (Nullen gefolgt von einer Eins)",
-        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1.",
-        "step1Title": "1. Sprache aufzählen",
-        "step1": "Jede Ableitung verläuft S → 0A → 0…0A → 0…01, jedes Wort ist also eine oder mehrere 0en gefolgt von einer einzelnen 1. Laden Sie sie, um L = {01, 001, 0001, …} aufzuzählen."
+        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1."
       },
       "lectureGrammar2": {
         "title": "Grammatik → Sprache (Abwechselnde Nullen und Einsen)",
-        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1.",
-        "step1Title": "1. Sprache aufzählen",
-        "step1": "Die ε-Produktionen auf A und B erlauben das Stoppen nach jedem Symbol, während A und B weiter alternieren. Laden Sie sie, um L = {0, 1, 01, 10, 010, 101, 0101, …} aufzuzählen."
+        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1."
       },
       "lectureLanguage1": {
         "title": "Sprache → Grammatik (Eine Eins zwischen Nullen)",
-        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
-        "step1Title": "1. Grammatik ableiten",
-        "step1": "Diese Wortliste ist endlich und hat kein abschließendes „..“, daher wird die Grammatik aus einem Präfixbaum über genau diesen fünf Wörtern gebaut — sie erzeugt genau diese und keine weiteren. Schalten Sie die Ausgabe auf „Vereinfacht“, um dieselbe Sprache mit zusammengeführten Zweigen zu sehen."
+        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0."
       },
       "languageDefault": {
         "title": "Sprache → Grammatik (Nullen, eine Eins, Nullen)",
-        "description": "Die voreingestellte Wortliste des Sprache-→-Grammatik-Simulators: Nullen, eine einzelne 1, dann Nullen (ein offenes Muster mit abschließendem „..“).",
-        "step1Title": "1. Grammatik ableiten",
-        "step1": "Das abschließende „..“ kennzeichnet die Liste als offen, sie wird daher als Muster 0ⁿ 1 0ᵐ mit n, m ≥ 1 gelesen. „Ausführlich“ leitet daraus eine streng rechtslineare Grammatik ab; „Vereinfacht“ zeigt dieselbe Sprache kompakt mit einem Regelblock pro Faktor."
+        "description": "Die voreingestellte Wortliste des Sprache-→-Grammatik-Simulators: Nullen, eine einzelne 1, dann Nullen (ein offenes Muster mit abschließendem „..“)."
       }
     },
     "exercises": {
@@ -2030,7 +2022,6 @@
       "l2gTargetLanguage": "Zielsprache",
       "l2gYourGrammar": "Ihre Grammatik",
       "l2gHelp": "Schreiben Sie eine rechtslineare Grammatik, die die Zielsprache erzeugt, und klicken Sie dann auf „Lösung prüfen“.",
-      "checkInvalidFormat": "Geben Sie die Sprache als explizite Wortliste an (z. B. L = {\"01\", \"011\"}), damit sie geprüft werden kann.",
       "checkEmpty": "Geben Sie mindestens ein Wort ein und prüfen Sie erneut.",
       "checkUnavailable": "Diese Übung kann nicht automatisch geprüft werden.",
       "confirmTitle": "Vollständige Lösung anzeigen?",
@@ -2046,6 +2037,7 @@
       "missingGroupClose": "Es fehlt ein ')', um die Gruppe vor Position {{position}} zu schließen.",
       "trailingCaret": "Es steht ein '^' ohne Exponent da.",
       "badExponent": "Nach '^' an Position {{position}} wird ein Variablenbuchstabe oder eine ganze Zahl erwartet.",
+      "nestedRepetition": "„{{factor}}“ wiederholt sich innerhalb einer Gruppe. Schreiben Sie die Wiederholung einmal, z. B. „a^n b“ statt „(a^n)b“.",
       "constraintVariable": "Am Anfang der Bedingung '{{constraint}}' wird ein Variablenname erwartet.",
       "expectedNaturals": "Nach '{{op}}' wird ℕ (oder N) erwartet, gefunden wurde '{{got}}'.",
       "expectedInteger": "Nach '{{op}}' wird eine ganze Zahl erwartet.",

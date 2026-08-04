@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FAProgram } from "../domain/faTypes";
+import { EPSILON } from "../domain/faTypes";
+import { buildTransitionTableSymbols } from "../adapters/faTableAdapter";
 
 interface FATransitionTableEditorProps {
   program: FAProgram;
@@ -21,14 +23,11 @@ export function FATransitionTableEditor({
 
   const [showEpsilon, setShowEpsilon] = useState(false);
 
-  const symbols = [...program.alphabet];
-  if (program.type === "NFA") {
-    const hasEpsilon = Object.values(program.transitions).some(
-      (m) => m["ε"] && m["ε"].length > 0,
-    );
-    if ((showEpsilon || hasEpsilon) && !symbols.includes("ε")) {
-      symbols.push("ε");
-    }
+  // Same rows as the read-only table, plus an empty ε row once the user has
+  // asked for one — that is the only way to enter the first ε-transition.
+  const symbols = buildTransitionTableSymbols(program);
+  if (program.type === "NFA" && showEpsilon && !symbols.includes(EPSILON)) {
+    symbols.push(EPSILON);
   }
 
   const inputClass =
@@ -113,7 +112,7 @@ export function FATransitionTableEditor({
                 {onAddState && <td aria-hidden="true" />}
               </tr>
             ))}
-            {program.type === "NFA" && !symbols.includes("ε") && (
+            {program.type === "NFA" && !symbols.includes(EPSILON) && (
               <tr className="bg-muted/10 border-b last:border-b-0">
                 <td
                   colSpan={program.states.length + 1 + (onAddState ? 1 : 0)}

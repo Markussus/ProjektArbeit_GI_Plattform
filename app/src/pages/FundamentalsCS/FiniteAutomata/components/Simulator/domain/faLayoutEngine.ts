@@ -38,7 +38,8 @@ const DEFAULT_OPTIONS: LayoutOptions = {
   padding: 70,
 };
 
-const FORCE_THRESHOLD = 9;
+/** From this many states on, a circle gets too crowded — use forces instead. */
+const FORCE_LAYOUT_MIN_STATES = 9;
 
 export function computeLayout(
   program: FAProgram,
@@ -73,7 +74,7 @@ export function computeLayout(
       x: (i - 0.5) * 2 * dx,
       y: 0,
     }));
-  } else if (n <= FORCE_THRESHOLD - 1) {
+  } else if (n < FORCE_LAYOUT_MIN_STATES) {
     strategy = "circular";
     nodes = circularLayout(program.states, opts.nodeRadius);
   } else {

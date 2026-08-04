@@ -33,7 +33,7 @@ export function createInitialRuntime(
 /**
  * Can we still step?
  */
-export function canStep(_program: FAProgram, runtime: FARuntime): boolean {
+export function canStep(runtime: FARuntime): boolean {
   return !runtime.halted;
 }
 
@@ -41,7 +41,7 @@ export function canStep(_program: FAProgram, runtime: FARuntime): boolean {
  * Execute a single step: read the current symbol, compute next states.
  */
 export function stepRuntime(program: FAProgram, runtime: FARuntime): FARuntime {
-  if (!canStep(program, runtime)) {
+  if (!canStep(runtime)) {
     return runtime;
   }
 

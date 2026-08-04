@@ -1,4 +1,4 @@
-import { enumerateLanguage, recognizeWord } from "./rlLanguageOps";
+import { enumerateLanguage, recognizeWords } from "./rlLanguageOps";
 import { parseGrammar } from "./rlGrammarValidation";
 import { parseLanguageSpec } from "./rlLanguageSpecParser";
 
@@ -26,11 +26,7 @@ export type RLCheckStatus = "match" | "mismatch" | "invalid";
 export interface RLCheckResult {
   status: RLCheckStatus;
   /** Why the input couldn't be checked (only set when status is "invalid"). */
-  reason?:
-    | "studentParse"
-    | "studentNotEnumerated"
-    | "studentEmpty"
-    | "reference";
+  reason?: "studentParse" | "studentEmpty" | "reference";
   /** Words the student listed that the target language does not contain. */
   wrong: string[];
   /** Example words the student did not include. */
@@ -50,15 +46,14 @@ function uniqueTrimmed(words: string[]): string[] {
   return result;
 }
 
-function enumerationWords(
-  source: string,
-): string[] | "parse" | "notEnumerated" {
+/**
+ * The example words of a fixed exercise language. Exercise seeds are authored
+ * as explicit word lists, so anything else yields no words to check against.
+ */
+function enumerationWords(source: string): string[] {
   const parsed = parseLanguageSpec(source);
-  if (!parsed.ok) {
-    return "parse";
-  }
-  if (parsed.spec.kind !== "enumeration") {
-    return "notEnumerated";
+  if (!parsed.ok || parsed.spec.kind !== "enumeration") {
+    return [];
   }
   return uniqueTrimmed(parsed.spec.words);
 }
@@ -89,14 +84,15 @@ export function checkLanguageToGrammarExercise(
   }
   const grammar = parsed.grammar;
 
-  const acceptParsed = enumerationWords(seedLanguageSource);
-  const acceptWords = Array.isArray(acceptParsed) ? acceptParsed : [];
+  const acceptWords = enumerationWords(seedLanguageSource);
+  const forbiddenWords = uniqueTrimmed(rejectWords);
 
-  const missing = acceptWords.filter(
-    (word) => !recognizeWord(grammar, word).accepted,
-  );
-  const wrong = uniqueTrimmed(rejectWords).filter(
-    (word) => recognizeWord(grammar, word).accepted,
+  // One pass over both lists, so the grammar is compiled once rather than
+  // once per word.
+  const verdicts = recognizeWords(grammar, [...acceptWords, ...forbiddenWords]);
+  const missing = acceptWords.filter((_, i) => !verdicts[i].accepted);
+  const wrong = forbiddenWords.filter(
+    (_, i) => verdicts[acceptWords.length + i].accepted,
   );
 
   return {
@@ -136,9 +132,8 @@ export function checkGrammarEnumerationExercise(
     };
   }
 
-  const wrong = studentWords.filter(
-    (word) => !recognizeWord(grammar, word).accepted,
-  );
+  const verdicts = recognizeWords(grammar, studentWords);
+  const wrong = studentWords.filter((_, i) => !verdicts[i].accepted);
 
   const { words: expected } = enumerateLanguage(grammar, {
     maxLen: G2L_EXERCISE_ENUMERATION.maxLen,

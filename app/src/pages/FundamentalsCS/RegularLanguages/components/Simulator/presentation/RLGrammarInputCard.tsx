@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import { formatGrammarIssue } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faGrammarParsing";
@@ -23,7 +23,8 @@ export function RLGrammarInputCard({
   children,
 }: RLGrammarInputCardProps) {
   const { t } = useTranslation();
-  const parsed = parseGrammar(value);
+  // Re-parse only when the text changes, not on every parent re-render.
+  const parsed = useMemo(() => parseGrammar(value), [value]);
 
   const errorText = parsed.issue
     ? formatGrammarIssue(t, parsed.issue, parsed.error ?? "")

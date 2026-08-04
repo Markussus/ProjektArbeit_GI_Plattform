@@ -1,5 +1,6 @@
 import type { ProductionRule, RegexNode, RegularGrammar } from "./rlTypes";
 import type { SetBuilderLang } from "./rlLanguageSpecParser";
+import { emitRightLinearGrammar } from "./rlGrammarNaming";
 
 /**
  * Thompson-style ε-NFA used internally as the bridge between a regex AST
@@ -210,7 +211,7 @@ export function setBuilderToRightLinearGrammar(
   spec: SetBuilderLang,
 ): RegularGrammar {
   interface Node {
-    edges: Array<{ symbol: string; to: Node }>;
+    edges: Array<{ terminal: string; to: Node }>;
   }
   const makeNode = (): Node => ({ edges: [] });
 
@@ -232,9 +233,9 @@ export function setBuilderToRightLinearGrammar(
           : 1;
 
     for (let repeat = 0; repeat < mandatory; repeat++) {
-      for (const symbol of chars) {
+      for (const terminal of chars) {
         const next = makeNode();
-        current.edges.push({ symbol, to: next });
+        current.edges.push({ terminal, to: next });
         current = next;
       }
     }
@@ -243,9 +244,9 @@ export function setBuilderToRightLinearGrammar(
       // Any number of extra repetitions: a loop back to where we are now.
       const loopStart = current;
       let node = loopStart;
-      chars.forEach((symbol, index) => {
+      chars.forEach((terminal, index) => {
         const next = index === chars.length - 1 ? loopStart : makeNode();
-        node.edges.push({ symbol, to: next });
+        node.edges.push({ terminal, to: next });
         node = next;
       });
     }
@@ -253,60 +254,26 @@ export function setBuilderToRightLinearGrammar(
 
   const accept = current;
 
-  // Name the nodes in breadth-first chain order: S first, then A, B, C, …
-  const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
-  const names = new Map<Node, string>([[start, "S"]]);
-  const order: Node[] = [start];
-  const queue: Node[] = [start];
-  let letterIdx = 0;
-  while (queue.length > 0) {
-    const node = queue.shift()!;
-    for (const edge of node.edges) {
-      if (names.has(edge.to)) continue;
-      names.set(edge.to, LETTERS[letterIdx++] ?? `N${letterIdx}`);
-      order.push(edge.to);
-      queue.push(edge.to);
-    }
-  }
-
   // A transition into the accepting node folds into a terminal-only rule
   // (`A -> a`) as long as nothing leaves that node — when the last factor has
   // a variable exponent the accept node carries the loop, so it stays and
   // becomes ε-producing instead.
   const acceptIsFoldable = accept.edges.length === 0 && accept !== start;
 
-  const nonTerminals: string[] = [];
-  const terminals = new Set<string>();
-  const productions: ProductionRule[] = [];
-  const epsilonNTs: string[] = [];
-
-  for (const node of order) {
-    if (acceptIsFoldable && node === accept) continue;
-    const name = names.get(node)!;
-    nonTerminals.push(name);
-    if (node === accept) epsilonNTs.push(name);
-    for (const edge of node.edges) {
-      terminals.add(edge.symbol);
-      productions.push({
-        lhs: name,
-        terminal: edge.symbol,
-        nextNonTerminal:
-          acceptIsFoldable && edge.to === accept ? null : names.get(edge.to)!,
-      });
-    }
-  }
-
-  return {
-    nonTerminals,
-    terminals: [...terminals],
-    startSymbol: "S",
-    productions,
-    epsilonProducingNonTerminals: epsilonNTs,
-  };
+  return emitRightLinearGrammar<Node>({
+    start,
+    edgesOf: (node) => node.edges,
+    isAccepting: (node) => node === accept,
+    foldedNode: acceptIsFoldable ? accept : undefined,
+  });
 }
 
-/** Marker for the implicit accepting state behind `A -> a` rules. */
-const FINAL_NODE = " final";
+/**
+ * Marker for the implicit accepting state behind `A -> a` rules. The leading
+ * space keeps it distinct from every real non-terminal: the grammar parser
+ * reads a left-hand side as `\S+`, so a name can never contain whitespace.
+ */
+const FINAL_NODE = " final";
 
 /**
  * Collapse a right-linear grammar to its smallest equivalent right-linear
@@ -412,48 +379,12 @@ export function minimizeRightLinearGrammar(
       (blockEdges.get(block) ?? []).length === 0,
   );
 
-  // ── Name the kept blocks in BFS order: S, then A, B, C, … ────────────────
-  const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
-  const names = new Map<number, string>([[startBlock, "S"]]);
-  const order: number[] = [startBlock];
-  const queue: number[] = [startBlock];
-  let letterIdx = 0;
-  while (queue.length > 0) {
-    const block = queue.shift()!;
-    for (const edge of blockEdges.get(block) ?? []) {
-      if (edge.to === foldableBlock || names.has(edge.to)) continue;
-      names.set(edge.to, LETTERS[letterIdx++] ?? `N${letterIdx}`);
-      order.push(edge.to);
-      queue.push(edge.to);
-    }
-  }
-
-  const nonTerminals: string[] = [];
-  const terminals = new Set<string>();
-  const productions: ProductionRule[] = [];
-  const epsilonNTs: string[] = [];
-  for (const block of order) {
-    const name = names.get(block)!;
-    nonTerminals.push(name);
-    if (blockAccepting.get(block)) epsilonNTs.push(name);
-    for (const edge of blockEdges.get(block) ?? []) {
-      terminals.add(edge.terminal);
-      productions.push({
-        lhs: name,
-        terminal: edge.terminal,
-        nextNonTerminal:
-          edge.to === foldableBlock ? null : (names.get(edge.to) ?? null),
-      });
-    }
-  }
-
-  return {
-    nonTerminals,
-    terminals: [...terminals],
-    startSymbol: "S",
-    productions,
-    epsilonProducingNonTerminals: epsilonNTs,
-  };
+  return emitRightLinearGrammar<number>({
+    start: startBlock,
+    edgesOf: (block) => blockEdges.get(block) ?? [],
+    isAccepting: (block) => blockAccepting.get(block) === true,
+    foldedNode: foldableBlock,
+  });
 }
 
 function atomToTerminalString(node: RegexNode): string {

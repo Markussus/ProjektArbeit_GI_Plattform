@@ -104,12 +104,12 @@ const evenOnesSolution: FAProgram = {
 
 const noConsecutiveOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2"],
+  states: ["S0", "S1"],
   alphabet: ["0", "1"],
   transitions: {
     S0: { "0": ["S0"], "1": ["S1"] },
-    S1: { "0": ["S0"], "1": ["S2"] },
-    S2: { "0": ["S2"], "1": ["S2"] },
+    // A second 1 has no transition, which is exactly the rejection.
+    S1: { "0": ["S0"] },
   },
   startState: "S0",
   acceptStates: ["S0", "S1"],
@@ -219,16 +219,18 @@ export const faExercises: FAExerciseDefinition[] = [
    Constructing a finite automaton from a regular grammar
    ════════════════════════════════════════════════════════════ */
 
+// These reference automata are partial DFAs: a symbol with no transition is
+// the rejection, so none of them carries a trap state.
+
 // L = 1 0ⁿ 1 (n ≥ 0): a 1, any number of 0s, a closing 1.
 const grammarOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
+    S0: { "1": ["S1"] },
     S1: { "0": ["S1"], "1": ["S2"] },
-    S2: { "0": ["E"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S2: {},
   },
   startState: "S0",
   acceptStates: ["S2"],
@@ -237,15 +239,14 @@ const grammarOnesSolution: FAProgram = {
 // L = (0011)(0011)*: one or more repetitions of the block 0011.
 const grammar0011Solution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "S3", "S4", "E"],
+  states: ["S0", "S1", "S2", "S3", "S4"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["S1"], "1": ["E"] },
-    S1: { "0": ["S2"], "1": ["E"] },
-    S2: { "0": ["E"], "1": ["S3"] },
-    S3: { "0": ["E"], "1": ["S4"] },
-    S4: { "0": ["S1"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S0: { "0": ["S1"] },
+    S1: { "0": ["S2"] },
+    S2: { "1": ["S3"] },
+    S3: { "1": ["S4"] },
+    S4: { "0": ["S1"] },
   },
   startState: "S0",
   acceptStates: ["S4"],
@@ -254,13 +255,12 @@ const grammar0011Solution: FAProgram = {
 // L = 1 1 0ⁿ (n ≥ 0): exactly two 1s followed by any number of 0s.
 const grammarTwoOnesZerosSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
-    S1: { "0": ["E"], "1": ["S2"] },
-    S2: { "0": ["S2"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S0: { "1": ["S1"] },
+    S1: { "1": ["S2"] },
+    S2: { "0": ["S2"] },
   },
   startState: "S0",
   acceptStates: ["S2"],
@@ -269,13 +269,12 @@ const grammarTwoOnesZerosSolution: FAProgram = {
 // L = 1ⁿ 0 (n ≥ 1): one or more 1s followed by a single 0.
 const grammarOnesZeroSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
+    S0: { "1": ["S1"] },
     S1: { "0": ["S2"], "1": ["S1"] },
-    S2: { "0": ["E"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S2: {},
   },
   startState: "S0",
   acceptStates: ["S2"],
@@ -283,8 +282,8 @@ const grammarOnesZeroSolution: FAProgram = {
 
 /**
  * "Construct a DFA from a regular grammar" exercises. They share the FA
- * exercise machinery (workspace panel, hints, Show solution loads the
- * reference automaton) but additionally carry a `grammar` prompt.
+ * exercise machinery (workspace panel, "Show solution" loading the reference
+ * automaton) but additionally carry a `grammar` prompt.
  */
 export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   {
