@@ -1,5 +1,11 @@
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import {
+  BitReader,
+  BitWriter,
+  assertCollectionSize,
+  createSymbolDictionaryCodec,
+} from "@/lib/trainingCenter";
+import {
   EPSILON,
   type AutomatonType,
   type FAProgram,
@@ -7,38 +13,34 @@ import {
 } from "./faTypes";
 import { isFAProgramValid } from "./faProgramValidation";
 
-const BASE64_URL_ALPHABET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const PROGRAM_INVALID = "fa_transfer_program_invalid";
+const PAYLOAD_INVALID = "fa_transfer_payload_invalid";
 
-// Every entry in SYMBOL_REGISTRY costs 1 bit in the registry mask. Keep it
-// small and focused on the symbols that real automata use so the mask stays
-// cheaper than raw UTF-8 storage.
-const SYMBOL_REGISTRY = [
-  "0",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-] as const;
-const MAX_COLLECTION_SIZE = 1_000_000;
 const MAX_TRANSITION_CELLS = 10_000_000;
 
-const SymbolMode = {
-  Registry: 0,
-  RawUtf8: 1,
-} as const;
-type SymbolMode = (typeof SymbolMode)[keyof typeof SymbolMode];
+const symbolDictionary = createSymbolDictionaryCodec({
+  registry: [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+  ],
+  payloadError: PAYLOAD_INVALID,
+  // ε is written as its own transition row, never as an alphabet symbol.
+  isReserved: (symbol) => symbol === EPSILON,
+});
 
 const TransitionMode = {
   Dense: 0,
@@ -64,8 +66,8 @@ interface TransitionEncoding {
 export const faProgramTransferCodec: ISimulatorTransferCodec<FAProgram> = {
   async exportValue(program) {
     const normalizedProgram = normalizeProgram(program);
-    const writer = new BitWriter();
-    const symbolMode = chooseSymbolMode(normalizedProgram.symbols);
+    const writer = new BitWriter(PROGRAM_INVALID);
+    const symbolMode = symbolDictionary.chooseMode(normalizedProgram.symbols);
     const transitionEncoding = chooseTransitionEncoding(normalizedProgram);
 
     writer.writeVarUint(normalizedProgram.stateCount);
@@ -78,11 +80,13 @@ export const faProgramTransferCodec: ISimulatorTransferCodec<FAProgram> = {
       writer.writeBit(isAccepting ? 1 : 0);
     }
 
-    writeSymbolDictionary(writer, normalizedProgram.symbols, symbolMode);
+    symbolDictionary.write(writer, normalizedProgram.symbols, symbolMode);
 
     const readableSymbols = new Set(normalizedProgram.readableSymbolIds);
-    const readableSymbolCount =
-      normalizedProgram.symbols.length + (normalizedProgram.isNFA ? 1 : 0);
+    const readableSymbolCount = countReadableSymbols(
+      normalizedProgram.symbols.length,
+      normalizedProgram.isNFA,
+    );
     for (let symbolId = 0; symbolId < readableSymbolCount; symbolId++) {
       writer.writeBit(readableSymbols.has(symbolId) ? 1 : 0);
     }
@@ -95,6 +99,11 @@ export const faProgramTransferCodec: ISimulatorTransferCodec<FAProgram> = {
   },
 };
 
+/** The alphabet plus, for an NFA, the trailing ε row. */
+function countReadableSymbols(symbolCount: number, isNFA: boolean): number {
+  return symbolCount + (isNFA ? 1 : 0);
+}
+
 function normalizeProgram(program: FAProgram): NormalizedProgram {
   const isNFA = program.type === "NFA";
 
@@ -104,7 +113,7 @@ function normalizeProgram(program: FAProgram): NormalizedProgram {
     new Set(program.states).size !== program.states.length ||
     new Set(program.alphabet).size !== program.alphabet.length
   ) {
-    throw new Error("fa_transfer_program_invalid");
+    throw new Error(PROGRAM_INVALID);
   }
 
   // State ID 0 is always the start state; the rest keep declaration order.
@@ -114,16 +123,12 @@ function normalizeProgram(program: FAProgram): NormalizedProgram {
   ];
   const stateIds = new Map(orderedStates.map((state, index) => [state, index]));
 
-  const symbolMode = chooseSymbolMode(program.alphabet);
-  const symbols =
-    symbolMode === SymbolMode.Registry
-      ? SYMBOL_REGISTRY.filter((symbol) => program.alphabet.includes(symbol))
-      : [...program.alphabet];
+  const symbolMode = symbolDictionary.chooseMode(program.alphabet);
+  const symbols = symbolDictionary.order(program.alphabet, symbolMode);
   const acceptStates = new Set(program.acceptStates);
   const acceptMask = orderedStates.map((state) => acceptStates.has(state));
 
-  // Readable symbol IDs span the alphabet plus, for an NFA, the epsilon row.
-  const readableSymbolCount = symbols.length + (isNFA ? 1 : 0);
+  const readableSymbolCount = countReadableSymbols(symbols.length, isNFA);
   const readableSymbolIds: number[] = [];
   const transitionCells: number[][] = [];
 
@@ -141,6 +146,8 @@ function normalizeProgram(program: FAProgram): NormalizedProgram {
       rowCells.push(targets);
     }
 
+    // Rows with no transitions at all are skipped entirely — the row mask
+    // written above records which ones made it into the payload.
     if (rowHasTransition) {
       readableSymbolIds.push(symbolId);
       transitionCells.push(...rowCells);
@@ -176,37 +183,7 @@ function collectCellTargets(
   return [...ids].sort((left, right) => left - right);
 }
 
-function chooseSymbolMode(symbols: string[]): SymbolMode {
-  return symbols.every((symbol) =>
-    (SYMBOL_REGISTRY as readonly string[]).includes(symbol),
-  )
-    ? SymbolMode.Registry
-    : SymbolMode.RawUtf8;
-}
-
-function writeSymbolDictionary(
-  writer: BitWriter,
-  symbols: string[],
-  symbolMode: SymbolMode,
-): void {
-  if (symbolMode === SymbolMode.Registry) {
-    const usedSymbols = new Set(symbols);
-    for (const symbol of SYMBOL_REGISTRY) {
-      writer.writeBit(usedSymbols.has(symbol) ? 1 : 0);
-    }
-    return;
-  }
-
-  const encoder = new TextEncoder();
-  for (const symbol of symbols) {
-    const bytes = encoder.encode(symbol);
-    writer.writeVarUint(bytes.length);
-    for (const byte of bytes) {
-      writer.writeBits(byte, 8);
-    }
-  }
-}
-
+/** Try both layouts and keep whichever produced fewer bits. */
 function chooseTransitionEncoding(
   program: NormalizedProgram,
 ): TransitionEncoding {
@@ -222,7 +199,7 @@ function encodeTransitions(
   program: NormalizedProgram,
   sparse: boolean,
 ): number[] {
-  const writer = new BitWriter();
+  const writer = new BitWriter(PROGRAM_INVALID);
 
   for (const targets of program.transitionCells) {
     if (sparse) {
@@ -252,20 +229,20 @@ function restoreImportedProgram(serializedProgram: string): FAProgram {
   try {
     return decodeProgram(serializedProgram);
   } catch {
-    throw new Error("fa_transfer_payload_invalid");
+    throw new Error(PAYLOAD_INVALID);
   }
 }
 
 function decodeProgram(serializedProgram: string): FAProgram {
-  const reader = BitReader.fromBase64Url(serializedProgram);
+  const reader = BitReader.fromBase64Url(serializedProgram, PAYLOAD_INVALID);
   const stateCount = reader.readVarUint();
   const symbolCount = reader.readVarUint();
 
-  assertCollectionSize(stateCount);
-  assertCollectionSize(symbolCount);
+  assertCollectionSize(stateCount, PAYLOAD_INVALID);
+  assertCollectionSize(symbolCount, PAYLOAD_INVALID);
 
   if (stateCount < 1) {
-    throw new Error("fa_transfer_payload_invalid");
+    throw new Error(PAYLOAD_INVALID);
   }
 
   const isNFA = reader.readBit() === 1;
@@ -276,16 +253,16 @@ function decodeProgram(serializedProgram: string): FAProgram {
     transitionMode !== TransitionMode.Dense &&
     transitionMode !== TransitionMode.Sparse
   ) {
-    throw new Error("fa_transfer_payload_invalid");
+    throw new Error(PAYLOAD_INVALID);
   }
 
   const acceptMask = Array.from(
     { length: stateCount },
     () => reader.readBit() === 1,
   );
-  const symbols = readSymbolDictionary(reader, symbolMode, symbolCount);
+  const symbols = symbolDictionary.read(reader, symbolMode, symbolCount);
 
-  const readableSymbolCount = symbolCount + (isNFA ? 1 : 0);
+  const readableSymbolCount = countReadableSymbols(symbolCount, isNFA);
   const readableSymbolIds: number[] = [];
   for (let symbolId = 0; symbolId < readableSymbolCount; symbolId++) {
     if (reader.readBit() === 1) {
@@ -294,12 +271,11 @@ function decodeProgram(serializedProgram: string): FAProgram {
   }
 
   const possibleCellCount = readableSymbolIds.length * stateCount;
-  if (
-    !Number.isSafeInteger(possibleCellCount) ||
-    possibleCellCount > MAX_TRANSITION_CELLS
-  ) {
-    throw new Error("fa_transfer_payload_invalid");
-  }
+  assertCollectionSize(
+    possibleCellCount,
+    PAYLOAD_INVALID,
+    MAX_TRANSITION_CELLS,
+  );
 
   const states = createCanonicalStateNames(stateCount);
   const transitions: FATransitionMap = {};
@@ -333,65 +309,10 @@ function decodeProgram(serializedProgram: string): FAProgram {
   };
 
   if (!isFAProgramValid(program)) {
-    throw new Error("fa_transfer_payload_invalid");
+    throw new Error(PAYLOAD_INVALID);
   }
 
   return program;
-}
-
-function readSymbolDictionary(
-  reader: BitReader,
-  symbolMode: number,
-  symbolCount: number,
-): string[] {
-  if (symbolMode === SymbolMode.Registry) {
-    const symbols: string[] = [];
-
-    for (const symbol of SYMBOL_REGISTRY) {
-      if (reader.readBit() === 1) {
-        symbols.push(symbol);
-      }
-    }
-
-    if (symbols.length !== symbolCount) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-
-    return symbols;
-  }
-
-  if (symbolMode !== SymbolMode.RawUtf8) {
-    throw new Error("fa_transfer_payload_invalid");
-  }
-
-  const decoder = new TextDecoder("utf-8", { fatal: true });
-  const symbols: string[] = [];
-
-  for (let symbolId = 0; symbolId < symbolCount; symbolId++) {
-    const byteLength = reader.readVarUint();
-    assertCollectionSize(byteLength);
-
-    if (byteLength === 0) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-
-    const bytes = Uint8Array.from({ length: byteLength }, () =>
-      reader.readBits(8),
-    );
-    const symbol = decoder.decode(bytes);
-
-    if (
-      Array.from(symbol).length !== 1 ||
-      symbol === EPSILON ||
-      symbols.includes(symbol)
-    ) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-
-    symbols.push(symbol);
-  }
-
-  return symbols;
 }
 
 function readCell(
@@ -415,141 +336,4 @@ function readCell(
 
 function createCanonicalStateNames(stateCount: number): string[] {
   return Array.from({ length: stateCount }, (_, stateId) => `S${stateId}`);
-}
-
-function assertCollectionSize(value: number): void {
-  if (
-    !Number.isSafeInteger(value) ||
-    value < 0 ||
-    value > MAX_COLLECTION_SIZE
-  ) {
-    throw new Error("fa_transfer_payload_invalid");
-  }
-}
-
-class BitWriter {
-  readonly bits: number[] = [];
-
-  writeBit(bit: number): void {
-    this.bits.push(bit === 0 ? 0 : 1);
-  }
-
-  writeBits(value: number, bitCount: number): void {
-    if (
-      !Number.isSafeInteger(value) ||
-      value < 0 ||
-      (bitCount === 0 ? value !== 0 : value >= 2 ** bitCount)
-    ) {
-      throw new Error("fa_transfer_program_invalid");
-    }
-
-    for (let bitIndex = bitCount - 1; bitIndex >= 0; bitIndex--) {
-      this.writeBit(Math.floor(value / 2 ** bitIndex) % 2);
-    }
-  }
-
-  writeVarUint(value: number): void {
-    if (!Number.isSafeInteger(value) || value < 0) {
-      throw new Error("fa_transfer_program_invalid");
-    }
-
-    let remaining = value;
-    do {
-      const data = remaining % 128;
-      remaining = Math.floor(remaining / 128);
-      this.writeBits(data + (remaining > 0 ? 128 : 0), 8);
-    } while (remaining > 0);
-  }
-
-  writeBitArray(bits: number[]): void {
-    for (const bit of bits) {
-      this.writeBit(bit);
-    }
-  }
-
-  toBase64Url(): string {
-    let result = "";
-
-    for (let offset = 0; offset < this.bits.length; offset += 6) {
-      let value = 0;
-      for (let bitIndex = 0; bitIndex < 6; bitIndex++) {
-        value = value * 2 + (this.bits[offset + bitIndex] ?? 0);
-      }
-      result += BASE64_URL_ALPHABET[value];
-    }
-
-    return result;
-  }
-}
-
-class BitReader {
-  private offset = 0;
-  private readonly bits: number[];
-
-  private constructor(bits: number[]) {
-    this.bits = bits;
-  }
-
-  static fromBase64Url(value: string): BitReader {
-    if (!value || !/^[A-Za-z0-9_-]+$/u.test(value)) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-
-    const bits: number[] = [];
-    for (const character of value) {
-      const valueIndex = BASE64_URL_ALPHABET.indexOf(character);
-      for (let bitIndex = 5; bitIndex >= 0; bitIndex--) {
-        bits.push(Math.floor(valueIndex / 2 ** bitIndex) % 2);
-      }
-    }
-
-    return new BitReader(bits);
-  }
-
-  readBit(): number {
-    if (this.offset >= this.bits.length) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-
-    return this.bits[this.offset++];
-  }
-
-  readBits(bitCount: number): number {
-    let value = 0;
-
-    for (let bitIndex = 0; bitIndex < bitCount; bitIndex++) {
-      value = value * 2 + this.readBit();
-    }
-
-    return value;
-  }
-
-  readVarUint(): number {
-    let value = 0;
-    let multiplier = 1;
-
-    for (let byteIndex = 0; byteIndex < 8; byteIndex++) {
-      const byte = this.readBits(8);
-      value += (byte % 128) * multiplier;
-
-      if (!Number.isSafeInteger(value)) {
-        throw new Error("fa_transfer_payload_invalid");
-      }
-
-      if (byte < 128) {
-        return value;
-      }
-
-      multiplier *= 128;
-    }
-
-    throw new Error("fa_transfer_payload_invalid");
-  }
-
-  assertOnlyPaddingRemains(): void {
-    const remainingBits = this.bits.slice(this.offset);
-    if (remainingBits.length > 5 || remainingBits.some((bit) => bit !== 0)) {
-      throw new Error("fa_transfer_payload_invalid");
-    }
-  }
 }
