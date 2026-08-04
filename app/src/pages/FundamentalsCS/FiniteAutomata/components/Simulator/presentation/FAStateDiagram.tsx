@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { RotateCcw } from "lucide-react";
 import type { FAProgram } from "../domain/faTypes";
 import type { FARuntime } from "../domain/faRuntime";
@@ -38,6 +39,7 @@ const NODE_LABEL_MIN_SCALE = 0.32;
  * and zoom/pan controls.
  */
 export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
+  const { t } = useTranslation();
   const layout = useMemo<GraphLayout>(
     () => computeLayout(program, { nodeRadius: NODE_RADIUS }),
     [program],
@@ -147,7 +149,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           className="text-sm font-semibold"
           style={{ color: "var(--fa-text)" }}
         >
-          State Diagram
+          {t("fa.diagram.title", "State Diagram")}
         </h3>
         <div className="flex items-center gap-2">
           {violations.length > 0 && (
@@ -159,8 +161,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 border: "1px solid rgba(255, 82, 82, 0.3)",
               }}
             >
-              ⚠ {violations.length} DFA violation
-              {violations.length > 1 ? "s" : ""}
+              ⚠ {t("fa.diagram.violations", { count: violations.length })}
             </span>
           )}
           <ZoomControls
@@ -356,7 +357,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                   fontSize="10"
                   fontWeight="500"
                 >
-                  start
+                  {t("fa.diagram.start", "start")}
                 </text>
               </g>
             );
@@ -479,8 +480,11 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
         {/* Hint overlay for first-time discovery */}
         <div className="text-foreground bg-background/80 border-border pointer-events-none absolute right-2 bottom-2 rounded border px-2 py-0.5 text-[10px]">
-          drag node to move · drag canvas to pan · scroll to zoom ·{" "}
-          {Math.round(scale * 100)}%
+          {t(
+            "fa.diagram.usageHint",
+            "drag node to move · drag canvas to pan · scroll to zoom",
+          )}{" "}
+          · {Math.round(scale * 100)}%
         </div>
       </div>
 
@@ -511,6 +515,7 @@ function ZoomControls({
   onReset: () => void;
   resetDisabled: boolean;
 }) {
+  const { t } = useTranslation();
   const btnStyle: React.CSSProperties = {
     background: "var(--fa-surface)",
     border: "1px solid var(--fa-border)",
@@ -526,12 +531,16 @@ function ZoomControls({
     alignItems: "center",
     justifyContent: "center",
   };
+  const zoomOutLabel = t("fa.diagram.zoomOut", "Zoom out");
+  const resetLabel = t("fa.diagram.resetView", "Reset view");
+  const zoomInLabel = t("fa.diagram.zoomIn", "Zoom in");
+
   return (
     <div className="flex items-center gap-1" data-no-pan>
       <button
         type="button"
-        aria-label="Zoom out"
-        title="Zoom out"
+        aria-label={zoomOutLabel}
+        title={zoomOutLabel}
         onClick={onZoomOut}
         style={btnStyle}
       >
@@ -539,8 +548,8 @@ function ZoomControls({
       </button>
       <button
         type="button"
-        aria-label="Reset view"
-        title="Reset view"
+        aria-label={resetLabel}
+        title={resetLabel}
         onClick={onReset}
         disabled={resetDisabled}
         style={{ ...btnStyle, opacity: resetDisabled ? 0.5 : 1 }}
@@ -549,8 +558,8 @@ function ZoomControls({
       </button>
       <button
         type="button"
-        aria-label="Zoom in"
-        title="Zoom in"
+        aria-label={zoomInLabel}
+        title={zoomInLabel}
         onClick={onZoomIn}
         style={btnStyle}
       >
@@ -563,6 +572,8 @@ function ZoomControls({
 /* ── Violation tooltip ──────────────────────────────────────────────── */
 
 function ViolationTooltip({ violation }: { violation: DFAViolation }) {
+  const { t } = useTranslation();
+
   return (
     <div
       className="mb-1 flex items-start gap-2 rounded px-2 py-1.5 text-xs"
@@ -573,19 +584,13 @@ function ViolationTooltip({ violation }: { violation: DFAViolation }) {
     >
       <span style={{ flexShrink: 0, marginTop: 1 }}>⚠</span>
       <span>
-        {violation.type === "epsilon" ? (
-          <>
-            State <strong>{violation.state}</strong> has an ε-transition — not
-            allowed in a DFA.
-          </>
-        ) : (
-          <>
-            State <strong>{violation.state}</strong> on symbol{" "}
-            <strong>'{violation.symbol}'</strong> goes to{" "}
-            <strong>{violation.targets.join(", ")}</strong> — this violates DFA
-            determinism.
-          </>
-        )}
+        {violation.type === "epsilon"
+          ? t("fa.diagram.violationEpsilon", { state: violation.state })
+          : t("fa.diagram.violationNondeterministic", {
+              state: violation.state,
+              symbol: violation.symbol,
+              targets: violation.targets.join(", "),
+            })}
       </span>
     </div>
   );
