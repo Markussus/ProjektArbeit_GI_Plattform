@@ -4,6 +4,7 @@ import type {
   AutomatonType,
   FATransitionMap,
 } from "../domain/faTypes";
+import { EPSILON } from "../domain/faTypes";
 import { validateFAProgram } from "../domain/faProgramValidation";
 import type { FAProgramIssue } from "../domain/faProgramValidation";
 import {
@@ -73,7 +74,8 @@ function pruneTransitions(
 
     const filtered: Record<string, string[]> = {};
     for (const symbol of Object.keys(symMap)) {
-      if (!symbolSet.has(symbol) && symbol !== "ε") continue;
+      // ε is never in the alphabet but is always a legal transition symbol.
+      if (!symbolSet.has(symbol) && symbol !== EPSILON) continue;
       const targets = (symMap[symbol] || []).filter((t) => stateSet.has(t));
       if (targets.length > 0) {
         filtered[symbol] = targets;
