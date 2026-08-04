@@ -5,6 +5,7 @@ import {
   stepRuntime,
 } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faMachine";
 import type { ProductionRule, RegularGrammar } from "./rlTypes";
+import { NON_TERMINAL_NAMES, emitRightLinearGrammar } from "./rlGrammarNaming";
 
 export interface EnumerateResult {
   words: string[];
@@ -29,10 +30,13 @@ export function enumerateLanguage(
   const maxWords = opts.maxWords ?? DEFAULT_MAX_WORDS;
 
   const fa = grammarToAutomaton(grammar);
+  const acceptStates = new Set(fa.acceptStates);
   const accepted = new Set<string>();
   // Each entry: [currentState, prefix]
   type Frame = { state: string; word: string };
+  // Read with a moving index rather than `shift()`, which is O(queue length).
   const queue: Frame[] = [{ state: fa.startState, word: "" }];
+  let head = 0;
   // Avoid revisiting (state, word) pairs.
   const seen = new Set<string>([`${fa.startState}::`]);
 
@@ -40,10 +44,10 @@ export function enumerateLanguage(
   // actually truncated. Hitting the cap exactly means the language ended there.
   const collectLimit = maxWords + 1;
 
-  while (queue.length > 0 && accepted.size < collectLimit) {
-    const { state, word } = queue.shift()!;
+  while (head < queue.length && accepted.size < collectLimit) {
+    const { state, word } = queue[head++];
 
-    if (fa.acceptStates.includes(state)) {
+    if (acceptStates.has(state)) {
       accepted.add(word);
       if (accepted.size >= collectLimit) break;
     }
@@ -87,8 +91,20 @@ export function recognizeWord(
   grammar: RegularGrammar,
   word: string,
 ): RecognizeResult {
+  return simulateFA(grammarToAutomaton(grammar), word);
+}
+
+/**
+ * {@link recognizeWord} for a batch of words. Converts the grammar to an
+ * automaton once instead of once per word — which is what the word recognizer
+ * (re-running on every keystroke) and the exercise checkers actually do.
+ */
+export function recognizeWords(
+  grammar: RegularGrammar,
+  words: string[],
+): RecognizeResult[] {
   const fa = grammarToAutomaton(grammar);
-  return simulateFA(fa, word);
+  return words.map((word) => simulateFA(fa, word));
 }
 
 function simulateFA(program: FAProgram, word: string): RecognizeResult {
@@ -108,6 +124,79 @@ function simulateFA(program: FAProgram, word: string): RecognizeResult {
   return { accepted: false, reasonCode: "rejectedStates", states };
 }
 
+interface PrefixNode {
+  children: Map<string, PrefixNode>;
+  accepting: boolean;
+}
+
+const makePrefixNode = (): PrefixNode => ({
+  children: new Map(),
+  accepting: false,
+});
+
+/** Trim, drop duplicates, and keep the order the learner typed. */
+function cleanWords(words: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const raw of words) {
+    const word = raw.trim();
+    if (seen.has(word)) continue;
+    seen.add(word);
+    result.push(word);
+  }
+  return result;
+}
+
+interface PrefixTree {
+  root: PrefixNode;
+  /** Every node below the root, in the order the words created them. */
+  created: PrefixNode[];
+}
+
+/**
+ * The prefix tree (trie) of `words`: one node per distinct prefix, edges
+ * labelled with the symbol that extends it, and a node marked accepting when
+ * some word ends there.
+ */
+function buildPrefixTree(words: string[]): PrefixTree {
+  const root = makePrefixNode();
+  const created: PrefixNode[] = [];
+  for (const word of words) {
+    let current = root;
+    for (const ch of word) {
+      let next = current.children.get(ch);
+      if (!next) {
+        next = makePrefixNode();
+        created.push(next);
+        current.children.set(ch, next);
+      }
+      current = next;
+    }
+    current.accepting = true;
+  }
+  return { root, created };
+}
+
+/** A grammar with a start symbol and no productions: the empty language. */
+function emptyLanguageGrammar(): RegularGrammar {
+  return {
+    nonTerminals: [NON_TERMINAL_NAMES.start],
+    terminals: [],
+    startSymbol: NON_TERMINAL_NAMES.start,
+    productions: [],
+    epsilonProducingNonTerminals: [],
+  };
+}
+
+/** Child edges in a stable order, so the printed grammar never shuffles. */
+function sortedChildren(
+  node: PrefixNode,
+): Array<{ terminal: string; to: PrefixNode }> {
+  return [...node.children.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([terminal, to]) => ({ terminal, to }));
+}
+
 /**
  * Build a right-linear regular grammar that derives at least every word in
  * `words`. Uses a prefix tree: each unique prefix becomes a non-terminal and
@@ -115,77 +204,46 @@ function simulateFA(program: FAProgram, word: string): RecognizeResult {
  * as ε-producing.
  */
 export function languageToGrammar(words: string[]): RegularGrammar {
-  const cleaned = words
-    .map((w) => w.trim())
-    .filter((w, idx, arr) => arr.indexOf(w) === idx);
+  const cleaned = cleanWords(words);
 
   // Distinguish "no productions" from "accepts only ε".
   if (cleaned.length === 0) {
-    return {
-      nonTerminals: ["S"],
-      terminals: [],
-      startSymbol: "S",
-      productions: [],
-      epsilonProducingNonTerminals: [],
-    };
+    return emptyLanguageGrammar();
   }
 
-  interface Node {
-    name: string;
-    children: Map<string, Node>;
-    accepting: boolean;
-  }
+  const { root, created } = buildPrefixTree(cleaned);
 
-  let counter = 0;
-  const root: Node = { name: "S", children: new Map(), accepting: false };
-
-  for (const word of cleaned) {
-    let current = root;
-    if (word.length === 0) {
-      current.accepting = true;
-      continue;
-    }
-    for (let i = 0; i < word.length; i++) {
-      const ch = word[i];
-      let next = current.children.get(ch);
-      if (!next) {
-        next = {
-          name: `A${++counter}`,
-          children: new Map(),
-          accepting: false,
-        };
-        current.children.set(ch, next);
-      }
-      current = next;
-    }
-    current.accepting = true;
-  }
+  // One non-terminal per prefix, numbered in the order the words introduced
+  // them. Deliberately *not* the shared A, B, C… naming: numbered names are the
+  // visible cue that this view keeps one state per prefix rather than merging.
+  const names = new Map<PrefixNode, string>([[root, NON_TERMINAL_NAMES.start]]);
+  created.forEach((node, index) => names.set(node, `A${index + 1}`));
 
   const nonTerminals: string[] = [];
   const terminals = new Set<string>();
   const productions: ProductionRule[] = [];
   const epsilonNTs: string[] = [];
 
-  const walk = (node: Node) => {
-    nonTerminals.push(node.name);
-    if (node.accepting) epsilonNTs.push(node.name);
-    for (const [symbol, child] of node.children.entries()) {
-      terminals.add(symbol);
+  const walk = (node: PrefixNode) => {
+    const name = names.get(node)!;
+    nonTerminals.push(name);
+    if (node.accepting) epsilonNTs.push(name);
+    for (const [terminal, child] of node.children) {
+      terminals.add(terminal);
       productions.push({
-        lhs: node.name,
-        terminal: symbol,
-        nextNonTerminal: child.name,
+        lhs: name,
+        terminal,
+        nextNonTerminal: names.get(child)!,
       });
       walk(child);
     }
   };
-
   walk(root);
 
   return {
     nonTerminals,
     terminals: [...terminals],
-    startSymbol: root.name,
+    startSymbol: NON_TERMINAL_NAMES.start,
     productions,
     epsilonProducingNonTerminals: epsilonNTs,
   };
@@ -204,61 +262,29 @@ export function languageToGrammar(words: string[]): RegularGrammar {
  * The result still generates exactly the listed words and stays right-linear.
  */
 export function languageToGrammarMinimal(words: string[]): RegularGrammar {
-  const cleaned = words
-    .map((w) => w.trim())
-    .filter((w, idx, arr) => arr.indexOf(w) === idx);
+  const cleaned = cleanWords(words);
 
   if (cleaned.length === 0) {
-    return {
-      nonTerminals: ["S"],
-      terminals: [],
-      startSymbol: "S",
-      productions: [],
-      epsilonProducingNonTerminals: [],
-    };
+    return emptyLanguageGrammar();
   }
 
-  interface Node {
-    children: Map<string, Node>;
-    accepting: boolean;
-  }
-  const makeNode = (): Node => ({ children: new Map(), accepting: false });
+  const { root } = buildPrefixTree(cleaned);
 
-  // 1. Build the prefix tree.
-  const root = makeNode();
-  for (const word of cleaned) {
-    let current = root;
-    if (word.length === 0) {
-      current.accepting = true;
-      continue;
-    }
-    for (const ch of word) {
-      let next = current.children.get(ch);
-      if (!next) {
-        next = makeNode();
-        current.children.set(ch, next);
-      }
-      current = next;
-    }
-    current.accepting = true;
-  }
-
-  // 2. Merge equivalent subtrees bottom-up (replace-or-register). Two nodes are
-  //    equivalent when they have the same accepting flag and the same labelled
-  //    edges to already-canonicalised children.
-  const registry = new Map<string, Node>();
-  const idOf = new Map<Node, number>();
+  // Merge equivalent subtrees bottom-up (replace-or-register). Two nodes are
+  // equivalent when they have the same accepting flag and the same labelled
+  // edges to already-canonicalised children.
+  const registry = new Map<string, PrefixNode>();
+  const idOf = new Map<PrefixNode, number>();
   let nextId = 0;
-  const signature = (node: Node): string => {
-    const edges = [...node.children.entries()]
-      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([sym, child]) => `${sym}:${idOf.get(child)}`)
+  const signature = (node: PrefixNode): string => {
+    const edges = sortedChildren(node)
+      .map(({ terminal, to }) => `${terminal}:${idOf.get(to)}`)
       .join(",");
     return `${node.accepting ? "1" : "0"}#${edges}`;
   };
-  const minimize = (node: Node): Node => {
-    for (const [sym, child] of [...node.children.entries()]) {
-      node.children.set(sym, minimize(child));
+  const minimize = (node: PrefixNode): PrefixNode => {
+    for (const [terminal, child] of [...node.children]) {
+      node.children.set(terminal, minimize(child));
     }
     const sig = signature(node);
     const existing = registry.get(sig);
@@ -274,57 +300,11 @@ export function languageToGrammarMinimal(words: string[]): RegularGrammar {
   const endLeaf = [...registry.values()].find(
     (node) => node.accepting && node.children.size === 0,
   );
-  const dropEndLeaf = endLeaf !== undefined && endLeaf !== canonicalRoot;
 
-  // 3. Name the kept nodes (start = S, then A, B, C, …) in BFS order.
-  const LETTERS = "ABCDEFGHIJKLMNOPQRTUVWXYZ";
-  const names = new Map<Node, string>();
-  names.set(canonicalRoot, "S");
-  const order: Node[] = [canonicalRoot];
-  const queue: Node[] = [canonicalRoot];
-  let letterIdx = 0;
-  while (queue.length > 0) {
-    const node = queue.shift()!;
-    const edges = [...node.children.entries()].sort(([a], [b]) =>
-      a < b ? -1 : a > b ? 1 : 0,
-    );
-    for (const [, child] of edges) {
-      if (dropEndLeaf && child === endLeaf) continue;
-      if (names.has(child)) continue;
-      names.set(child, LETTERS[letterIdx++] ?? `N${letterIdx}`);
-      order.push(child);
-      queue.push(child);
-    }
-  }
-
-  // 4. Emit productions.
-  const nonTerminals: string[] = [];
-  const terminals = new Set<string>();
-  const productions: ProductionRule[] = [];
-  const epsilonNTs: string[] = [];
-  for (const node of order) {
-    const name = names.get(node)!;
-    nonTerminals.push(name);
-    if (node.accepting) epsilonNTs.push(name);
-    const edges = [...node.children.entries()].sort(([a], [b]) =>
-      a < b ? -1 : a > b ? 1 : 0,
-    );
-    for (const [symbol, child] of edges) {
-      terminals.add(symbol);
-      const foldsToEnd = dropEndLeaf && child === endLeaf;
-      productions.push({
-        lhs: name,
-        terminal: symbol,
-        nextNonTerminal: foldsToEnd ? null : names.get(child)!,
-      });
-    }
-  }
-
-  return {
-    nonTerminals,
-    terminals: [...terminals],
-    startSymbol: "S",
-    productions,
-    epsilonProducingNonTerminals: epsilonNTs,
-  };
+  return emitRightLinearGrammar<PrefixNode>({
+    start: canonicalRoot,
+    edgesOf: sortedChildren,
+    isAccepting: (node) => node.accepting,
+    foldedNode: endLeaf === canonicalRoot ? undefined : endLeaf,
+  });
 }
