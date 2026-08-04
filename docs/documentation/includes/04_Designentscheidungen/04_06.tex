@@ -1,17 +1,17 @@
-\subNsection{1}{Disjunktive Normalform}{Author}
+\subNsection{1}{Disjunktive Normalform}{Duy Tan Pham}
 
 Die \glqq Disjunktive Normalform\grqq{} (DNF) ist ein eigener Themenbereich im Modul
 \glqq Grundlagen der Informatik\grqq{}. Sie folgt dem gleichen Aufbau wie die anderen
-Themen: Übersicht, Übungen, Beispiele und eine freie Simulation. Der Bereich baut
-inhaltlich aufeinander auf; er geht von der kanonischen DNF über die minimale DNF bis zur
-optional kleinsten Formel; die einzelnen Schritte der Ableitung werden dabei sichtbar
-gemacht. Die Git-Historie zeigt die Entwicklung Schritt für Schritt: zuerst das
+Themen: Übersicht, Übungen, Beispiele und eine freie Simulation. Die Inhalte bauen
+schrittweise aufeinander auf: von der kanonischen DNF über die minimale DNF bis zur
+optional global kleinsten Formel. Die einzelnen Schritte der Ableitung werden dabei
+sichtbar gemacht. Die Git-Historie zeigt die Entwicklung Schritt für Schritt: zuerst das
 Datenmodell und die Ableitung aus der Wahrheitstabelle, dann der zweite Aufgabenmodus
-(Tabelle nach DNF), danach die Übungs- und Feedbacklogik, die Vereinfachung mit Lösungsweg
-und zuletzt die Umstellung der Minimierung von einer greedy Auswahl auf ein exaktes
-Verfahren.
+(Wahrheitstabelle nach DNF), danach die Übungs- und Feedbacklogik, die Vereinfachung mit
+Lösungsweg und zuletzt die Umstellung der Minimierung von einer Greedy-Auswahl auf ein
+exaktes Verfahren.
 
-\subNsection{2}{Entscheidungen in der Architektur}{Author}
+\subNsection{2}{Entscheidungen in der Architektur}{Duy Tan Pham}
 
 \begin{itemize}
   \item Der Bereich ist klar in \texttt{domain}, \texttt{application}, \texttt{adapters}
@@ -28,22 +28,25 @@ Verfahren.
 
   \item Die Ableitung trennt drei Ergebnisstufen sauber: die kanonische DNF
   (\texttt{dnfDerivation.ts}, ein Vollminterm je Eins-Zeile), die minimale DNF
-  (\texttt{quineMcCluskey.ts}) und die optional kleinste Formel
+  (\texttt{quineMcCluskey.ts}) und die optional global kleinste Formel
   (\texttt{minimalExpression.ts}). Darstellung und Rechenform sind getrennt; so ist die
   Anzeige nicht an die interne Bitdarstellung der Implikanten gebunden.
 
   \item Die wichtigste fachliche Entscheidung betrifft die Minimierung. Die erste Version
   wählte die restliche Überdeckung nach Quine-McCluskey \emph{greedy} aus; dadurch konnte
   sie die beste Lösung verpassen. Diese Auswahl wurde durch ein exaktes Branch-and-Bound
-  über den zyklischen Kern ersetzt (Funktion \texttt{selectCover}). Das Verfahren gibt die
-  gleiche Garantie wie das Petrick-Verfahren; es findet immer die Lösung mit den wenigsten
-  Literalen; durch das Abschneiden von Zweigen (Pruning) ist es schneller als das
-  vollständige Ausmultiplizieren.
+  über den zyklischen Kern ersetzt (Funktion \texttt{selectCover}). Das Verfahren liefert
+  dieselbe Optimalitätsgarantie wie das Petrick-Verfahren und findet eine DNF mit minimaler
+  Literalzahl. Durch das Abschneiden von Zweigen (Pruning) verwirft es Teile des Suchraums,
+  die keine bessere Lösung mehr liefern können, ohne den Petrick-Ausdruck vollständig
+  auszumultiplizieren.
 
   \item Für die optional kleinste Formel wird zusätzlich eine exakte Synthese über den
-  Funktionsraum berechnet; sie ist bis vier Variablen garantiert die kleinstmögliche
-  Lösung. Ab fünf Variablen wird dieser Zustandsraum (\(2^{2^{n}}\)) zu groß; deshalb ist
-  das Werkzeug bewusst auf vier Variablen begrenzt.
+  Funktionsraum berechnet. Für Ausdrücke aus Literalen, die mit UND und ODER verbunden
+  werden, liefert sie bis vier Variablen das globale Literalminimum; Negationen stehen
+  dabei nur direkt an Variablen. Ab fünf Variablen wird der Zustandsraum
+  (\(2^{2^{n}}\)) praktisch zu groß; deshalb ist das Werkzeug bewusst auf vier Variablen
+  begrenzt.
 
   \item Die Vier-Variablen-Grenze ist an drei Stellen abgesichert: in der Prüfung der
   Anwendungsschicht, in der Tabellen-Eingabe der Oberfläche und im Import. So bleibt jede
@@ -61,7 +64,7 @@ Verfahren.
   sich der DNF-Bereich beim Speichern und Teilen genauso wie der Rest der Plattform.
 \end{itemize}
 
-\subNsection{2}{Entscheidungen im UI}{Author}
+\subNsection{2}{Entscheidungen im UI}{Duy Tan Pham}
 
 \begin{itemize}
   \item Der DNF-Bereich bietet zwei Aufgabenmodi: \glqq Ausdruck nach
@@ -74,15 +77,14 @@ Verfahren.
   Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg; so ist es
   für die Lernenden leichter nachzuvollziehen.
 
-  \item Die Wahrheitstabelle hat immer die gleiche Größe. Ab \texttt{16} Zeilen (also bei
-  vier Variablen) gibt es eine kompakte, scrollbare Ansicht, die sich auf eine Vollansicht
-  umschalten lässt; so springt die Tabelle nicht je nach Variablenzahl zwischen groß und
-  klein.
+  \item Kleinere Wahrheitstabellen werden vollständig angezeigt. Bei \texttt{16} Zeilen,
+  also bei vier Variablen, gibt es eine kompakte, scrollbare Ansicht, die sich auf eine
+  Vollansicht umschalten lässt. Dadurch bleibt die maximale Darstellungshöhe begrenzt.
 
-  \item Aktionen bleiben dauerhaft sichtbar und werden bei Bedarf ausgegraut, statt
-  plötzlich aufzutauchen. Schaltflächen, die im aktuellen Zustand nichts bewirken, werden
-  ausgeblendet. Beides wurde nach und nach entschieden, damit die Bedienung besser
-  vorhersehbar ist.
+  \item Folgeaktionen bleiben sichtbar und werden ausgegraut, bis ihre Voraussetzungen
+  erfüllt sind, statt plötzlich aufzutauchen. Rein kontextabhängige Schaltflächen, etwa für
+  die Vollansicht einer großen Tabelle, erscheinen dagegen nur dann, wenn sie tatsächlich
+  benötigt werden. Dadurch bleibt die Bedienung vorhersehbar.
 
   \item Eingaben werden vereinheitlicht: Lernende dürfen \texttt{!}, \texttt{\&} und
   \texttt{|} tippen, angezeigt wird aber immer \(\lnot\), \(\land\), \(\lor\). Das macht die
@@ -94,7 +96,7 @@ Verfahren.
   wie die anderen Module verhält.
 \end{itemize}
 
-\subNsection{2}{Andere Entscheidungen}{Author}
+\subNsection{2}{Andere Entscheidungen}{Duy Tan Pham}
 
 \begin{itemize}
   \item Eine bewusste Entscheidung ist es, kanonische und minimale Form getrennt zu zeigen.
@@ -103,7 +105,7 @@ Verfahren.
   Variablen enthält. Genau diese Hürde soll das Werkzeug sichtbar machen: den Unterschied
   zwischen vollständiger und minimaler DNF.
 
-  \item Der Bereich ist breit getestet: rund 120 Unit-Tests für die Domain-Logik und elf
+  \item Der Bereich ist breit getestet: 120 Unit-Tests für die Domain-Logik und elf
   End-to-End-Tests für die sichtbaren Abläufe. Weil die Fachlogik kein Framework braucht,
   lässt sie sich gezielt und in großer Zahl absichern.
 
@@ -115,8 +117,9 @@ Verfahren.
   wie man eine Annahme prüft und eine Zusatzlösung bei Bedarf wieder zurücknimmt.
 
   \item Auch eine kurz eingeführte gemeinsame Zustands-Abstraktion der Eingabe-Komponenten
-  wurde wieder zurückgebaut. Die einfacheren, eigenständigen Komponenten waren uns lieber
-  als die zusätzliche Abstraktion, weil sie leichter zu verstehen und zu erklären sind.
+  wurde wieder zurückgebaut. Die einfacheren, eigenständigen Komponenten wurden der
+  zusätzlichen Abstraktion vorgezogen, weil sie leichter zu verstehen und zu erklären
+  sind.
 
   \item Für die Qualität dienten Linting, Formatierung, Typprüfung und die Testsuite als
   Freigabekriterien. Ein statisches Analysewerkzeug (\texttt{fallow}) gab zusätzliche
