@@ -4,7 +4,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import type { TranslationKey } from "@/types/i18n";
-import { recognizeWord } from "../domain/rlLanguageOps";
+import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import {
@@ -67,15 +67,14 @@ export function RLWordRecognizer({
     // Treat the input as a comma-separated list of test words. A bare
     // empty piece represents ε (the empty word).
     const pieces = word.split(",").map((w) => w.trim());
-    const results = pieces.map((w): PerWordResult => {
-      const outcome = recognizeWord(grammar, w);
-      return {
-        word: w,
+    const results = recognizeWords(grammar, pieces).map(
+      (outcome, index): PerWordResult => ({
+        word: pieces[index],
         accepted: outcome.accepted,
         reasonCode: outcome.reasonCode,
         states: outcome.states,
-      };
-    });
+      }),
+    );
     return { ok: true, results };
   }, [source, word]);
 
@@ -146,7 +145,7 @@ export function RLWordRecognizer({
           <p className="text-muted-foreground text-sm">
             {t(
               "rl.simulator.grammarInvalid",
-              "Enter a valid right-linear grammar to derive a regex.",
+              "Enter a valid right-linear grammar.",
             )}
           </p>
         )}
