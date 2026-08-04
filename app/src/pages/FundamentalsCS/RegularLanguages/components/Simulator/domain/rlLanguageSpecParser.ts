@@ -30,8 +30,6 @@ export interface SetBuilderLang {
   kind: "setBuilder";
   pattern: PatternFactor[];
   variableBounds: VariableBound[];
-  /** Internal AST that the grammar builder consumes — not displayed. */
-  regex: RegexNode;
 }
 
 export type LanguageSpec = EnumerationLang | SetBuilderLang;
@@ -48,6 +46,7 @@ export interface LanguageParseIssue {
     | "missingGroupClose"
     | "trailingCaret"
     | "badExponent"
+    | "nestedRepetition"
     | "constraintVariable"
     | "expectedNaturals"
     | "expectedInteger"
@@ -303,7 +302,6 @@ function buildInferredSetBuilder(input: {
     kind: "setBuilder",
     pattern: factors,
     variableBounds,
-    regex: patternToRegex(factors),
   };
 }
 
@@ -316,7 +314,22 @@ function parseSetBuilderBody(
   try {
     const factors = parsePatternText(patternText);
 
-    // A pattern with no factors means ε.
+    // A variable exponent inside a group, as in `(a^n)b`, makes the group's
+    // atom a repetition rather than a fixed word. The grammar builder walks
+    // atoms symbol by symbol and has nothing to walk here, so reject it with a
+    // message instead of letting it throw out of the render.
+    for (const factor of factors) {
+      if (!isFixedWordAtom(factor.atom)) {
+        fail(
+          "nestedRepetition",
+          `'${factor.rawText}' repeats inside a group. Write the repetition once, e.g. 'a^n b' instead of '(a^n)b'.`,
+          { factor: factor.rawText },
+        );
+      }
+    }
+
+    // The same variable in two factors correlates their lengths (a^n b^n),
+    // which is not a regular language — reject rather than silently drop it.
     const usage = new Map<string, number>();
     for (const f of factors) {
       if (f.exponent.kind === "variable") {
@@ -362,7 +375,6 @@ function parseSetBuilderBody(
       f.exponent.lowerBound = lowerBound.get(f.exponent.name) ?? 0;
     }
 
-    const regex = patternToRegex(factors);
     const variableBounds: VariableBound[] = [];
     // Preserve the order variables first appear in the pattern.
     for (const f of factors) {
@@ -380,7 +392,6 @@ function parseSetBuilderBody(
         kind: "setBuilder",
         pattern: factors,
         variableBounds,
-        regex,
       },
     };
   } catch (e) {
@@ -490,6 +501,23 @@ function parsePattern(
   return { factors, endIdx: i };
 }
 
+/**
+ * Whether an atom spells out one fixed word, so the grammar builder can walk
+ * it symbol by symbol. `ε`, a symbol and a concatenation of those qualify;
+ * a `star` (from a variable exponent inside a group) does not.
+ */
+function isFixedWordAtom(node: RegexNode): boolean {
+  switch (node.kind) {
+    case "epsilon":
+    case "symbol":
+      return true;
+    case "concat":
+      return isFixedWordAtom(node.left) && isFixedWordAtom(node.right);
+    default:
+      return false;
+  }
+}
+
 function isSymbolChar(c: string): boolean {
   // A terminal symbol is any printable single char that's not a special token.
   if (c === "(" || c === ")" || c === "^" || c === "|" || c === ",")
@@ -595,12 +623,8 @@ function computeBound(text: string): {
     const t = tokens[i];
     if (t === "in" || t === "∈") {
       const next = tokens[i + 1];
-      if (next === "N" || next === "ℕ") {
-        // Default lb is 0 — no change.
-        i += 2;
-        continue;
-      }
-      if (next === "N0" || next === "ℕ0") {
+      // ℕ and ℕ0 both say "≥ 0", which is already the default lower bound.
+      if (next === "N" || next === "ℕ" || next === "N0" || next === "ℕ0") {
         i += 2;
         continue;
       }
