@@ -1,18 +1,12 @@
 import type { FAProgram } from "../domain/faTypes";
 
+/** Which on-page section an example belongs to. */
+export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
+
 /**
  * Each example bundles the automaton definition and a sample input word that
  * is loaded into the simulator when the example is opened.
  */
-export interface FAExampleVariant {
-  type: "DFA" | "NFA";
-  program: FAProgram;
-  inputWord: string;
-}
-
-/** Which on-page section an example belongs to. */
-export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
-
 export interface FAExample {
   /** Translation key for the example title */
   id: string;
@@ -22,8 +16,6 @@ export interface FAExample {
   category: FAExampleCategory;
   program: FAProgram;
   inputWord: string;
-  /** When present, a second paired variant (e.g. NFA + DFA from the same grammar) */
-  secondVariant?: FAExampleVariant;
 }
 
 // ─── NFA: Contains substring "aba" ──────────────────────────────────────────
@@ -56,15 +48,15 @@ export const exampleLecture: FAExample = {
   descriptionKey: "fa.examples.lecture.description",
   type: "DFA",
   category: "dfa",
+  // Partial DFA: a missing transition rejects, so no trap state is drawn.
   program: {
     type: "DFA",
-    states: ["S0", "S1", "S2", "S3"],
+    states: ["S0", "S1", "S2"],
     alphabet: ["0", "1"],
     transitions: {
-      S0: { "0": ["S1"], "1": ["S3"] },
+      S0: { "0": ["S1"] },
       S1: { "0": ["S1"], "1": ["S2"] },
-      S2: { "0": ["S3"], "1": ["S3"] },
-      S3: { "0": ["S3"], "1": ["S3"] },
+      S2: {},
     },
     startState: "S0",
     acceptStates: ["S2"],
@@ -92,26 +84,6 @@ export const exampleGrammar: FAExample = {
     acceptStates: ["sF"],
   },
   inputWord: "0011",
-  // The trap state is named "sE" (error), not "sF" — in the NFA above "sF" is
-  // the accepting state, and reusing that name for a dead end in the paired
-  // DFA is exactly the wrong thing to show side by side.
-  secondVariant: {
-    type: "DFA",
-    program: {
-      type: "DFA",
-      states: ["s0", "s1", "s2", "sE"],
-      alphabet: ["0", "1"],
-      transitions: {
-        s0: { "0": ["s1"], "1": ["sE"] },
-        s1: { "0": ["s1"], "1": ["s2"] },
-        s2: { "0": ["sE"], "1": ["s2"] },
-        sE: { "0": ["sE"], "1": ["sE"] },
-      },
-      startState: "s0",
-      acceptStates: ["s2"],
-    },
-    inputWord: "0011",
-  },
 };
 
 /** All predefined examples */
