@@ -305,8 +305,12 @@ export function setBuilderToRightLinearGrammar(
   };
 }
 
-/** Marker for the implicit accepting state behind `A -> a` rules. */
-const FINAL_NODE = " final";
+/**
+ * Marker for the implicit accepting state behind `A -> a` rules. The leading
+ * space keeps it distinct from every real non-terminal: the grammar parser
+ * reads a left-hand side as `\S+`, so a name can never contain whitespace.
+ */
+const FINAL_NODE = " final";
 
 /**
  * Collapse a right-linear grammar to its smallest equivalent right-linear
