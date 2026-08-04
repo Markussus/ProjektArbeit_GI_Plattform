@@ -71,8 +71,9 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
       pendingLanguageSource !== null ||
       pendingTestWord !== null
     ) {
-      const t = setTimeout(() => consumePending(), 0);
-      return () => clearTimeout(t);
+      // Named so it does not shadow the `t` from useTranslation above.
+      const clearPending = setTimeout(() => consumePending(), 0);
+      return () => clearTimeout(clearPending);
     }
   }, [
     pendingGrammarSource,

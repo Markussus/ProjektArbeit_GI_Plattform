@@ -16,7 +16,11 @@ export interface ParsedGrammarState {
   validationCodes: string[];
 }
 
-const OK: ParsedGrammarState = {
+/**
+ * Nothing typed yet: not usable (`ok: false`), but not an error either — the
+ * UI shows no complaint until the learner has actually written something.
+ */
+const EMPTY_SOURCE: ParsedGrammarState = {
   ok: false,
   grammar: null,
   error: null,
@@ -31,7 +35,7 @@ const OK: ParsedGrammarState = {
  */
 export function parseGrammar(source: string): ParsedGrammarState {
   if (source.trim().length === 0) {
-    return OK;
+    return EMPTY_SOURCE;
   }
   const parsed = parseGrammarSource(source);
   if (!parsed.ok) {
