@@ -1,15 +1,71 @@
 \subNsection{1}{KI Reflexion}{Duy Tan Pham}
 
-Nutzung von Gemini 3.1 Pro, ChatGPT und Codex als Entwicklungswerkzeuge – Effizienzsteigerung bei der Implementierung mathematischer Logik und UI-Komponenten
+Für meinen Teil, die Disjunktive Normalform, habe ich durchgehend mit KI-Werkzeugen
+gearbeitet. Codex war das Hauptwerkzeug beim Bauen und direkt in VS Code eingebunden. Claude
+habe ich für Analyse, Refactorings und für Kontext- und Wissensdokumente genutzt; Gemini kam
+ergänzend für Recherche dazu. Die KI war für mich aber nicht nur ein Code-Werkzeug, sondern
+auch ein Tutor. Einen Teil der Theorie habe ich mir von ihr erklären lassen, zum Beispiel
+mit Fragen wie \glqq kannst du mir erklären, wie DNF funktioniert?\grqq{} oder
+\glqq erkläre mir Quine-McCluskey und Karnaugh-Diagramme\grqq{}. So hat die KI nicht nur das
+Schreiben von Code beschleunigt, sondern auch das Verstehen des Stoffs.
 
 \subNsection{2}{KI als Co-Developer}{Duy Tan Pham}
 
-Reflektieren und so...
+Meine Arbeitsweise mit der KI war vor allem dialogisch und nicht befehlend. Statt fertige
+Anweisungen zu geben, habe ich meistens Fragen gestellt und um einen Ansatz gebeten, bevor
+etwas umgesetzt wurde; entschieden wurde dann im Hin und Her. Typische Sätze von mir waren
+\glqq bevor du was machst, was denkst du?\grqq{}, \glqq ansatz?\grqq{},
+\glqq macht das sinn?\grqq{} und \glqq brauchen wir das noch oder eher nicht?\grqq{}. Diese
+Fragen waren gleichzeitig meine Kontrolle. Weil ich vor dem Übernehmen nachgehakt habe,
+blieb die Entscheidung bei mir und Fehler fielen früher auf.
+
+Konkret haben sich ein paar Muster wiederholt. Zuerst der Ansatz, dann der Code; ich habe
+oft \glqq bitte noch nichts machen, erstmal Ansatz\grqq{} gesagt, also erst planen und dann
+umsetzen. Dazu kam ein \glqq sei ehrlich\grqq{}-Prinzip. Ich habe die Vorschläge bewusst
+hinterfragt, zum Beispiel mit \glqq sei ehrlich, ist der Name so gut?\grqq{} oder
+\glqq schau mal durch, gibt es noch unsaubere Stellen und Edge Cases?\grqq{}. Die Oberfläche
+habe ich oft über Screenshots beurteilen und nachbessern lassen, bis sie sauber und
+einheitlich war. Einheitlichkeit war dabei eine wichtige Leitplanke; ich habe den DNF-Bereich
+ständig mit der Turing-Maschine und den Zahlensystemen abgeglichen, damit kein Modul aus der
+Reihe fällt. Am Ende gehörten Verifikation und saubere Commits fest dazu: gezielte Tests,
+Linting, Build, Prettier und punktuell das Analysewerkzeug \texttt{fallow} als zusätzlicher
+Audit.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Duy Tan Pham}
 
-Reflektieren und so...
+Für den DNF-Bereich habe ich die Übungsaufgaben nicht von einer KI erzeugen lassen. Die
+Aufgaben entstehen im Code selbst und bauen auf Wahrheitstabellen im erlaubten Bereich bis
+vier Variablen auf. Die erwartete Lösung wird von derselben Fachlogik berechnet, gegen die
+später die Eingabe geprüft wird; dadurch ist jede Aufgabe von sich aus korrekt und lösbar.
+Die KI hat hier eher beim Bauen dieser Logik und bei einzelnen Beispielausdrücken geholfen,
+nicht bei den Aufgaben selbst.
 
 \subNsection{2}{Kritische Reflexion}{Duy Tan Pham}
 
-Reflektieren und so...
+Am wichtigsten war für mich die Erkenntnis, dass die KI bei deterministischer
+Informatik-Logik kein Autopilot ist. Ein Beispiel ist die Minimierung. Die damalige Lösung
+hat die Restüberdeckung greedy gewählt. Erst meine konkrete Nachfrage, ob damit das globale
+Optimum übersehen werden kann, führte zur Diagnose und danach zur exakten Lösung. Ich musste
+das Korrektheitskriterium also selbst benennen und am Code prüfen; die KI hat es nicht von
+allein sichergestellt.
+
+Ein zweites Thema war das begrenzte Kontextfenster. In langen Chats ging Kontext verloren,
+deshalb habe ich mir Zusammenfassungen für neue Chats schreiben lassen und wichtige Fakten in
+ein eigenes Wissensdokument ausgelagert. Solche Dokumente helfen mir und einem neuen KI-Chat
+gleichzeitig, ohne den ganzen Verlauf noch einmal zu lesen. Außerdem musste ich beim Umfang
+aufpassen; zu große Aufgaben auf einmal wurden unzuverlässig, kleinere Schritte waren besser.
+Auch Over-Engineering war ein wiederkehrendes Muster. Ich habe Vorschläge bewusst wieder
+zurückgenommen, etwa das Untertitel-Feature und einen unnötigen Refactor der
+Eingabe-Komponenten.
+
+Der deutlichste Fall war eine Halluzination, die ich selbst dokumentiert habe. Die KI nahm
+an, dass sich die Untertitel des Übersichtsvideos aus dem Opencast-Link extrahieren lassen.
+Eine Prüfung der Quelle mit \texttt{ffprobe} auf die veröffentlichte Videodatei zeigte aber,
+dass diese gar keine Untertitelspuren enthält; die Spuren lagen nur in der lokalen
+Originaldatei. Aufgefallen ist die falsche Annahme erst durch einen Cross-Check zwischen zwei
+Werkzeugen und die Prüfung an der Quelle. Am Ende wurde das Feature wieder entfernt. Für mich
+ist das der beste Beleg dafür, dass Verifikation vor Vertrauen gehen muss. Dazu passt eine
+letzte Beobachtung: über die Projektzeit habe ich mehrere Modelle benutzt, und auch neuere
+Modelle können sachlich falsch liegen. Die Konsequenz ist für mich nicht die Suche nach dem
+einen richtigen Modell, sondern eine konsequente Prüfung an Quelle und Code, egal welches
+Modell gerade antwortet.
