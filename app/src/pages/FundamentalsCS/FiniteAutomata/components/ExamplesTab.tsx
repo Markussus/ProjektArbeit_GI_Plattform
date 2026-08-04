@@ -80,9 +80,9 @@ export function ExamplesTab({
 }
 
 // Match the icons the example cards used before the shared-card refactor:
-// the paired grammar example uses Book, plain NFAs use Zap, DFAs use GitBranch.
+// grammar-derived automata use Book, plain NFAs use Zap, DFAs use GitBranch.
 function exampleIcon(example: FAExample) {
-  if (example.secondVariant) return Book;
+  if (example.category === "grammarToAutomaton") return Book;
   return example.type === "NFA" ? Zap : GitBranch;
 }
 

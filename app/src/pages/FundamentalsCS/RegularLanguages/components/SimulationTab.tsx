@@ -178,11 +178,9 @@ function CheckSummary({
     const messageKey =
       result.reason === "studentParse"
         ? "rl.exerciseWorkspace.checkInvalidGrammar"
-        : result.reason === "studentNotEnumerated"
-          ? "rl.exerciseWorkspace.checkInvalidFormat"
-          : result.reason === "reference"
-            ? "rl.exerciseWorkspace.checkUnavailable"
-            : "rl.exerciseWorkspace.checkEmpty";
+        : result.reason === "reference"
+          ? "rl.exerciseWorkspace.checkUnavailable"
+          : "rl.exerciseWorkspace.checkEmpty";
     return <p className="text-muted-foreground text-sm">{t(messageKey)}</p>;
   }
 

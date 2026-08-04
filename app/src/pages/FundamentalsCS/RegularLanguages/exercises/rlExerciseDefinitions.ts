@@ -31,8 +31,6 @@ export interface RLExerciseDefinition extends ExerciseDefinition {
    * lives here rather than in the translation files. Use "ε" for the empty word.
    */
   prompt: string;
-  /** The monospaced answer revealed by "Show solution". */
-  solution: string;
   /** Which simulator mode the exercise opens in. */
   mode: SimulationMode;
   /**
@@ -91,7 +89,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     prompt: ['START = "1", A', 'A = "0", B | "1", B', 'B = "0" | "1"'].join(
       "\n",
     ),
-    solution: "L = {100, 101, 110, 111}",
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 1A", "A -> 0B | 1B", "B -> 0 | 1"].join("\n"),
@@ -106,7 +103,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: ListOrdered,
     category: "grammarToLanguage",
     prompt: ['START = "0", A', 'A = "0", B | "1", A', 'B = "0"'].join("\n"),
-    solution: "L = {000, 0100, 01100, 011100, …}",
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 0A", "A -> 0B | 1A", "B -> 0"].join("\n"),
@@ -123,7 +119,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     prompt: ['START = "0", A', 'A = "0", A | "1", B', 'B = "0", A | ε'].join(
       "\n",
     ),
-    solution: "L = {01, 001, 0101, 0001, 00001, …}",
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["START -> 0A", "A -> 0A | 1B", "B -> 0A | ε"].join("\n"),
@@ -142,7 +137,6 @@ export const rlExercises: RLExerciseDefinition[] = [
       'A = ("0", A) | ("1", B)',
       'B = ("1", B) | "0"',
     ].join("\n"),
-    solution: "L = {010, 0010, 00010, 0110, 00110, …}",
     mode: "grammarToLanguage",
     seed: {
       grammarSource: ["S -> 0A", "A -> 0A | 1B", "B -> 1B | 0"].join("\n"),
@@ -159,7 +153,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: FileText,
     category: "languageToGrammar",
     prompt: "L = {010, 0110, 01110, 011110, …}",
-    solution: ['START = "0", A', 'A = "1", B', 'B = "1", B | "0"'].join("\n"),
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"010", "0110", "01110", "011110"}' },
     referenceGrammar: ["START -> 0A", "A -> 1B", "B -> 1B | 0"].join("\n"),
@@ -174,12 +167,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: FileText,
     category: "languageToGrammar",
     prompt: "L = {1011, 0011, 0111, 1111}",
-    solution: [
-      'START = "0", A | "1", A',
-      'A = "0", B | "1", B',
-      'B = "1", C',
-      'C = "1"',
-    ].join("\n"),
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"1011", "0011", "0111", "1111"}' },
     referenceGrammar: [
@@ -199,13 +186,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: FileText,
     category: "languageToGrammar",
     prompt: "L = {10101, 100101, 1001001, 1000101, …}",
-    solution: [
-      'START = "1", A',
-      'A = "0", B',
-      'B = "0", B | "1", C',
-      'C = "0", D',
-      'D = "0", D | "1"',
-    ].join("\n"),
     mode: "languageToGrammar",
     seed: {
       languageSource: 'L = {"10101", "100101", "1001001", "1000101"}',
@@ -230,11 +210,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: Code,
     category: "applied",
     prompt: "e.g. 0, -1, 42, -100, 2025  (no leading zeros)",
-    solution: [
-      'START = "-", A | "0" | "1", B | … | "9", B',
-      'A = "1", B | … | "9", B',
-      'B = "0", B | "1", B | … | "9", B | ε',
-    ].join("\n"),
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"0", "-1", "42", "-100", "2025"}' },
     referenceGrammar: integersReferenceGrammar,
@@ -249,10 +224,6 @@ export const rlExercises: RLExerciseDefinition[] = [
     icon: Code,
     category: "applied",
     prompt: "e.g. x, foo, myVar, camelCase  (letters only, starts lowercase)",
-    solution: [
-      'START = "a", A | "b", A | … | "z", A',
-      'A = "a", A | … | "z", A | "A", A | … | "Z", A | ε',
-    ].join("\n"),
     mode: "languageToGrammar",
     seed: { languageSource: 'L = {"x", "foo", "myVar", "camelCase"}' },
     referenceGrammar: identifiersReferenceGrammar,
