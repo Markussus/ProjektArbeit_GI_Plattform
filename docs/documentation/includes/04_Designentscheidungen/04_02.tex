@@ -1,9 +1,203 @@
-\subNsection{1}{Endliche Automaten}{Author}
+\subNsection{1}{Endliche Automaten}{Kristian Popov}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Author}
+Im Modul \emph{Endliche Automaten} können Studierende deterministische und
+nichtdeterministische endliche Automaten selbst definieren und ein Eingabewort
+Schritt für Schritt ausführen.
+Jeder Schritt erscheint gleichzeitig in der
+Übergangstabelle und im Zustandsdiagramm.
+Die grafische Sicht macht dabei sichtbar,
+was aus der Tabelle allein nur mit Mühe hervorgeht: Zustände, Übergänge und den
+Weg, den das Wort durch den Automaten nimmt.
+Ergänzt wird die Einzelsimulation
+unter anderem durch einen Stapeltest für mehrere Wörter, die Umwandlung rechtslinearer
+Grammatiken in Automaten und Übungen mit automatischer Rückmeldung.
 
-\subNsection{2}{Entscheidungen im UI}{Author}
+\subNsection{2}{Entscheidungen in der Architektur}{Kristian Popov}
 
-\subNsection{2}{Andere Entscheidungen}{Author}
+Ursprünglich sollte das Modul nur deterministische endliche Automaten unterstützen.
+Die Unterstützung für nichtdeterministische Automaten kam erst später hinzu.
+Ein Symbol darf in mehrere Zustände zugleich führen, wodurch sich ein Automat oft
+unmittelbar aus der Beschreibung der Sprache ablesen lässt und zudem deutlich
+kompakter ausfällt.
+Der Schritt zum DFA, bei dem jede Mehrdeutigkeit aufgelöst werden muss, wird damit
+erst im Anschluss notwendig.
 
-Die Punkte sind nur Vorschläge ...
+Für die Ausführung ergibt sich daraus eine einfache Konsequenz:
+Jeder DFA ist zugleich ein NFA\@.
+Zwei getrennte Ausführungspfade wären deshalb überflüssig gewesen.
+Der Kern arbeitet deshalb stets mit einer Menge aktiver Zustände; beim DFA enthält
+diese Menge höchstens ein Element.
+Der deklarierte Typ steuert nur die Validierung, nicht die Ausführung.
+
+Der Simulator ist in fünf Verzeichnisse getrennt, die jeweils eine klar umrissene
+Aufgabe haben:
+
+\begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
+	\item[\texttt{domain}]
+		enthält die Fachlogik: den Datentyp des Automaten, die Schrittfunktion
+		samt $\varepsilon$-Hülle, die Validierung, die Prüfung auf
+		Determinismusverstöße, die Umwandlung aus einer Grammatik, den Stapellauf,
+		die Auswertung der Übungen sowie die Berechnung des Diagrammlayouts.
+
+	\item[\texttt{application}]
+		verbindet diese Logik mit React: ein Hook für den Ablauf der Simulation
+		und ein Hook für den Editor, der die Eingaben über einen Reducer verwaltet.
+
+	\item[\texttt{adapters}]
+		bereitet den Automaten für die Tabellendarstellung auf, also Kopfzeile,
+		Zeilen je Symbol und die jeweils hervorzuhebende Zelle.
+
+	\item[\texttt{presentation}]
+		enthält die Komponenten: Zustandsdiagramm, Übergangstabelle, Eingabewort,
+		Statuskarte, Stapeltest und Grammatikeingabe.
+
+	\item[\texttt{config}]
+		hält die Standardautomaten und die Beispiele.
+\end{description}
+
+Entscheidend an dieser Aufteilung ist, dass \verb|domain| keine Abhängigkeit zu
+React besitzt.
+Die Automatenlogik bleibt dadurch ohne gerenderte Oberfläche testbar, und dieselben
+Funktionen konnten später im Modul \emph{Reguläre Sprachen} unverändert
+wiederverwendet werden.
+
+Ein Simulationsschritt verändert den bisherigen Laufzustand nicht, sondern erzeugt einen neuen.
+Dieser hält die Historie der aktiven Zustände und der genommenen Übergänge fest.
+Dadurch sind sowohl ein Schritt zurück als auch der Sprung zu einem
+früheren Schritt möglich, ohne dass die Oberfläche eine zweite, eigene Historie führen muss.
+
+Die Validierung liefert keine fertigen Texte, sondern Fehlercodes und die
+dazugehörigen Werte, etwa den betroffenen Zustand und das Symbol.
+Erst die Oberfläche übersetzt diese Informationen in Meldungen.
+So bleibt die Fachlogik von der Oberflächensprache unabhängig,
+und dieselben Fehler lassen sich konsistent mehrsprachig ausgeben.
+
+Alle mitgelieferten Automaten sind partiell definiert: Fehlt für ein Symbol ein
+Übergang, wird das Wort abgelehnt.
+Auf einen zusätzlich gezeichneten Fangzustand, der nur noch sich selbst erreicht,
+wurde bewusst verzichtet.
+Er verändert die erkannte Sprache nicht, vergrößert aber das Diagramm und lenkt
+von der eigentlichen Struktur ab.
+Ein automatisierter Test stellt sicher, dass weder ein Beispiel noch eine
+Referenzlösung einen solchen Zustand enthält.
+
+\subNsection{2}{Entscheidungen im UI}{Kristian Popov}
+
+Ursprünglich war für die Simulation nur die Übergangstabelle zusammen mit dem
+Eingabewort vorgesehen.
+Formal genügt das: Die Tabelle definiert den Automaten vollständig, das Eingabewort
+zeigt die aktuelle Leseposition.
+Während der Entwicklung zeigte sich jedoch, dass sich der Ablauf so nur schwer verfolgen lässt.
+Welchen Weg ein Wort nimmt, ist aus der Tabelle nicht unmittelbar ersichtlich;
+Zyklen und Sackgassen werden erst sichtbar, wenn man mehrere Zeilen gedanklich
+miteinander verknüpft.
+Deshalb ergänzt ein Zustandsdiagramm die Tabelle.
+
+Beide Sichten sind an denselben Simulationsschritt gebunden.
+Die Tabelle hebt genau die Zelle hervor, die dem im Diagramm markierten Übergang
+entspricht.
+Damit bleiben beide Darstellungen synchron: Die Tabelle liefert die
+formale Definition, das Diagramm die anschauliche Darstellung, und ihre Verbindung
+wird unmittelbar sichtbar.
+
+Die Anordnung der Zustände wird aus der Größe des Automaten abgeleitet.
+Kleine Automaten werden auf einem Kreis angeordnet, größere über ein
+kräftebasiertes Verfahren verteilt, bei dem sich Zustände gegenseitig abstoßen und
+Übergänge sie zusammenziehen.
+Die Startpositionen werden aus dem Zustandsnamen berechnet und sind damit
+reproduzierbar.
+Ohne diese feste Streuung können symmetrische Automaten in einer ungeeigneten Lage
+zusammenfallen; zudem würde derselbe Automat bei jedem Aufruf anders aussehen.
+Das Diagramm lässt sich zoomen und verschieben, einzelne Zustände auch frei ziehen.
+Unterhalb einer Zoomstufe werden Beschriftungen ausgeblendet; aktive und
+fehlerhafte Übergänge behalten ihre Beschriftung jedoch immer, weil gerade sie in
+diesem Moment die relevante Information tragen.
+
+Verstöße gegen den Determinismus werden nicht nur als Liste ausgegeben, sondern
+unmittelbar im Diagramm markiert.
+Damit ist die Ursache dort sichtbar, wo sie entsteht.
+
+Der Editor umfasst alle Bestandteile der Definition eines Automaten:
+die Wahl zwischen DFA und NFA, das Eingabealphabet, genau einen Startzustand,
+beliebig viele Endzustände sowie das Eingabewort für den anschließenden Lauf.
+Die Zustandsmenge wird nicht als Text gepflegt, sondern direkt in der
+Übergangstabelle über Schaltflächen erweitert und verkleinert.
+Die Tabelle dient damit zugleich als Eingabemaske und als Anzeige.
+Alphabetsymbole sind auf jeweils ein Zeichen beschränkt, damit eine Eingabe wie
+\verb|10| nicht versehentlich als ein einzelnes Symbol aufgenommen wird.
+Die Zeile für $\varepsilon$-Übergänge erscheint erst, wenn sie tatsächlich benötigt
+oder ausdrücklich angefordert wird; für einen DFA wäre sie nur eine Fehlerquelle.
+
+\subNsection{2}{Andere Entscheidungen}{Kristian Popov}
+
+Neben dem Einzelschritt gibt es einen Schrittverlauf, über den sich jeder bereits
+erreichte Zustand direkt auswählen lässt.
+Der gewünschte Schritt wird dabei vom Anfang des Laufs an neu berechnet, statt ein
+separates Ergebnis zwischenzuspeichern.
+Bei den hier üblichen Wortlängen ist das unkritisch und stellt sicher, dass Anzeige und
+tatsächlicher Ablauf immer übereinstimmen.
+
+Der Stapeltest ergänzt die schrittweise Simulation um den umgekehrten Blick.
+Statt ein einzelnes Wort genau zu verfolgen, werden mehrere Wörter auf einmal
+geprüft und mit ihrem Ergebnis aufgelistet.
+So lässt sich besser einschätzen, ob ein Automat die beabsichtigte Sprache erkennt
+und nicht nur das gerade ausprobierte Wort.
+Ein Klick auf ein Ergebnis übernimmt das Wort wieder in die Einzelsimulation, um
+den Ablauf gezielt nachzuvollziehen.
+
+Ein Automat lässt sich außerdem aus einer rechtslinearen Grammatik erzeugen,
+also aus den Regeln, nach denen die Wörter der Sprache gebildet werden.
+Jedes Nichtterminal wird dabei zu einem Zustand, und eine Regel der Form
+\verb|A -> aB| wird zum Übergang von \verb|A| nach \verb|B| beim Lesen von \verb|a|.
+Regeln der Form \verb|A -> a| führen in einen zusätzlichen akzeptierenden Zustand,
+Regeln, die auf das leere Wort abbilden, machen den jeweiligen Zustand selbst
+akzeptierend.
+Für die Eingabe werden zwei Schreibweisen akzeptiert, eine knappe mit einer
+Produktion pro Zeile und eine strukturierte mit Kopfzeile.
+Das Format wird automatisch erkannt und angezeigt, sodass zuvor keine Syntax
+ausgewählt werden muss.
+Die Aufteilung einer Alternative in Terminal und Nichtterminal erfolgt in zwei
+Durchläufen: Erst werden alle definierten Nichtterminale gesammelt, dann wird
+zerlegt.
+Das ist notwendig, weil Terminale und Nichtterminale denselben Namen tragen dürfen
+und sich \verb|A -> AA| nicht aus den Zeichen allein auflösen lässt.
+
+Beispiele und Übungen sind bewusst getrennt.
+Ein Beispiel ist ein fertiger Automat mit passendem Eingabewort und wird unverändert
+in die Simulation geladen; es dient dem Nachvollziehen eines vorhandenen Aufbaus.
+Eine Übung beginnt dagegen mit einem leeren Automaten und bringt Aufgabenstellung,
+Schwierigkeitsgrad, Referenzlösung und automatische Kontrolle mit.
+
+Innerhalb beider Bereiche sind die Einträge danach gruppiert, was gegeben und was
+gesucht ist.
+Die Übungen zerfallen in zwei Kategorien: Bei \emph{Sprache} $\rightarrow$
+\emph{Automat} ist die gesuchte Wortmenge umgangssprachlich beschrieben, bei
+\emph{Grammatik} $\rightarrow$ \emph{Automat} ist stattdessen eine rechtslineare
+Grammatik vorgegeben.
+Beide benutzen dieselbe Aufgabenmechanik und dieselbe Kontrolle; die zweite Kategorie
+trägt lediglich zusätzlich die Grammatik als Vorgabe.
+Die Beispiele sind entsprechend in deterministische Automaten, nichtdeterministische
+Automaten und die Umwandlung aus einer Grammatik unterteilt.
+Ohne diese Gliederung stünden Aufgaben mit unterschiedlicher Ausgangslage
+nebeneinander, und die Grammatikaufgaben wären allein an ihrem zusätzlichen
+Grammatikfeld zu erkennen.
+
+Die Kontrolle der Übungen vergleicht nicht die Struktur zweier Automaten, sondern
+deren Verhalten.
+Sie prüft alle Wörter über dem gemeinsamen Alphabet bis zu einer
+festgelegten Länge; für jedes muss der Automat der Studierenden dieselbe
+Entscheidung treffen wie die Referenzlösung.
+Ein Strukturvergleich würde korrekte Lösungen ablehnen, die lediglich anders
+aufgebaut sind.
+Weicht eine Lösung ab, wird das erste unterscheidende Wort als Gegenbeispiel
+ausgegeben statt nur einer allgemeinen Fehlermeldung.
+Die begrenzte Wortmenge ist dabei bewusst eine didaktische Rückmeldung und kein formaler
+Äquivalenznachweis.
+Strukturelle Mängel wie ungültige Übergänge werden vorrangig gemeldet, da sie
+meist die eigentliche Ursache sind und eine Auflistung fehlgeschlagener Testwörter
+in diesem Fall in die Irre führen würde.
+
+Der Bearbeitungsstand wird je Übung gespeichert und beim erneuten Öffnen
+wiederhergestellt.
+Ohne diese Trennung hätte das Wechseln zwischen zwei Übungen die jeweils andere
+Bearbeitung überschrieben.
