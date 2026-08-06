@@ -1,3 +1,22 @@
 \subNsection{1}{Abgleich mit dem Lastenheft}{Author}
 
 Wurden die Qualitätsziele (Performance, Usability, Barrierefreiheit durch Dark Mode und i18n) erreicht?
+
+\subNsection{2}{Abgleich des DNF-Bereichs}{Duy Tan Pham}
+
+Das Lastenheft führte die Disjunktive Normalform als Soll-Thema auf. Vorgesehen waren die
+Eingabe und Syntaxprüfung logischer Formeln, die Umwandlung in DNF, eine schrittweise
+Darstellung, Regeln der booleschen Algebra, Lösungsprüfung sowie Übungs- und
+Beispielaufgaben. Als optionale Erweiterungen wurden alternative Lösungswege,
+Vereinfachung und Fehlerfeedback genannt. Der umgesetzte Bereich deckt diese Anforderungen
+ab. Eingaben werden über einen Parser geprüft, Herleitungen werden schrittweise angezeigt,
+äquivalente Lösungen werden fachlich statt durch reinen Textvergleich bewertet, und die
+optionale Vereinfachung besitzt einen eigenen Lösungsweg mit gezieltem Feedback.
+
+Ein historischer Work-Item-Stand konkretisierte die Planung zusätzlich. \texttt{WI-DNF-1}
+forderte den Weg von der Wahrheitstabelle zum Ausdruck mit Validierung,
+\texttt{WI-DNF-2} die Minimierung mit verständlicher Erklärung und \texttt{WI-DNF-3}
+Regeln der booleschen Algebra mit direktem Bezug zu den Übungen. Diese drei Punkte lassen
+sich im heutigen Modul den beiden Aufgabenmodi, der exakten Vereinfachung mit Walkthrough
+und dem eingebundenen Regel-Spickzettel zuordnen. Die Work Items dienen dabei als
+historischer Planungsbeleg. Der aktuelle Umsetzungsstand wird durch Code und Tests belegt.

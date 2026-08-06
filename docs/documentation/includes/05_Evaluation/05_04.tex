@@ -1,3 +1,20 @@
 \subNsection{1}{Design-Iterationen}{Author}
 
 Welche Entscheidungen mussten im Prozess revidiert werden?
+
+\subNsection{2}{Revidierte Entscheidungen im DNF-Bereich}{Duy Tan Pham}
+
+Die wichtigste fachliche Korrektur betraf die Minimierung. Die erste Version wählte die
+noch benötigten Primimplikanten greedy aus und konnte dadurch eine literalminimale DNF
+verpassen. Nach einer erneuten Prüfung wurde diese Auswahl durch ein exaktes
+Branch-and-Bound-Verfahren ersetzt. Die Oberfläche blieb dabei unverändert. Ausgetauscht
+wurde nur die fachlich unzureichende Auswahlstrategie.
+
+Auch zwei Erweiterungen wurden bewusst zurückgenommen. Eine eigene Untertitel-Lösung für
+das DNF-Video beruhte auf der falschen Annahme, die veröffentlichte Opencast-Datei enthalte
+Untertitelspuren. Die Quellenprüfung widerlegte dies. Zugunsten eines einheitlichen
+Themenaufbaus wurde die Sonderlösung entfernt. Außerdem wurde die gemeinsame
+Zustands-Abstraktion \texttt{useDnfAttempt} wieder aus den Eingabe-Komponenten entfernt.
+Die eigenständigen Komponenten enthielten weniger indirekte Logik und waren leichter zu
+verstehen. Beide Fälle zeigen, dass ein Rückbau sinnvoll sein kann, wenn eine Erweiterung
+keinen ausreichenden Nutzen bringt.
