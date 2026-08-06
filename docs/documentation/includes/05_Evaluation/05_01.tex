@@ -1,17 +1,3 @@
 \subNsection{1}{Qualitätssicherung}{Author}
 
 CI/CD-Pipeline (GitLab Runner auf Raspberry Pi), automatisiertes Linting, Formatierung (Prettier), Unit-Tests (Vitest) und E2E-Tests (Playwright)
-
-\subNsection{2}{Qualitätssicherung im DNF-Bereich}{Duy Tan Pham}
-
-Die DNF-Fachlogik ist unabhängig von React implementiert und kann deshalb direkt mit
-Unit-Tests geprüft werden. Zum verifizierten Stand vom 3. August 2026 umfasst der Bereich
-120 DNF-Unit-Tests. Sie decken unter anderem Parser, Wahrheitstabellen, kanonische DNF,
-exakte Minimierung, globale Formelsynthese, Import und Export sowie die verschiedenen
-Prüfstatus ab. Zusätzlich sichern elf End-to-End-Tests die sichtbaren Abläufe im Browser,
-beispielsweise Aufgabenprüfung, Vereinfachung, Zurücksetzen sowie Import und Export.
-
-Vor der Freigabe wurden außerdem der App-Build, ESLint und Prettier ausgeführt. Das
-Analysewerkzeug \texttt{fallow} lieferte zusätzliche Hinweise zu projektweiten Altlasten,
-war jedoch kein vollständig grünes Qualitäts-Gate. Für den DNF-Bereich waren daher die
-gezielten Tests und die regulären Projektprüfungen entscheidend.

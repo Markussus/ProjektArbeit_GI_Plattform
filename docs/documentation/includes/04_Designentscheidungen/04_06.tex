@@ -95,39 +95,16 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   \texttt{|} tippen, angezeigt wird aber immer \(\lnot\), \(\land\), \(\lor\). Das macht die
   Eingabe leichter, ohne die Darstellung uneinheitlich zu machen.
 
-  \item Für die Fehlersuche gibt es Import und Export, angelehnt an die Turing-Maschine. So
-  können Lernende einen Aufgabenstand teilen und nachvollziehen. Der DNF-Bereich nutzt
-  außerdem den gemeinsamen Themenaufbau (Kopfbereich, Tabs, globale Sidebar), damit er sich
-  wie die anderen Module verhält.
+  \item Für die Fehlersuche stehen die projektweiten Funktionen für Import und Export zur
+  Verfügung. So können Lernende einen Aufgabenstand teilen und nachvollziehen. Der
+  DNF-Bereich nutzt außerdem den gemeinsamen Themenaufbau mit Kopfbereich, Tabs und globaler
+  Sidebar, damit er sich wie ein Teil derselben Lernplattform anfühlt.
 \end{itemize}
 
 \subNsection{2}{Andere Entscheidungen}{Duy Tan Pham}
 
-\begin{itemize}
-  \item Eine bewusste Entscheidung ist es, kanonische und minimale Form getrennt zu zeigen.
-  Beim Vereinfachen kommt oft die Frage auf, warum ein Ausdruck wie
-  \((a \land c) \lor (b \land c)\) schon als Lösung gilt, obwohl nicht jeder Term alle
-  Variablen enthält. Genau diese Hürde soll das Werkzeug sichtbar machen: den Unterschied
-  zwischen vollständiger und minimaler DNF.
-
-  \item Der Bereich ist breit getestet: 120 Unit-Tests für die Domain-Logik und elf
-  End-to-End-Tests für die sichtbaren Abläufe. Weil die Fachlogik kein Framework braucht,
-  lässt sie sich gezielt und in großer Zahl absichern.
-
-  \item Eine Funktion wurde bewusst wieder zurückgenommen: Für das Übersichtsvideo war
-  zeitweise eine eigene Untertitel-Lösung mit CI-Extraktion geplant. Eine Prüfung der
-  Quelle ergab aber, dass die veröffentlichte Videodatei keine Untertitelspuren enthält.
-  die frühere Annahme war also falsch. Die Sonderlösung wurde entfernt, und die Übersicht
-  nutzt wieder die gleiche geteilte Struktur wie die anderen Module. Der Vorgang zeigt gut,
-  wie man eine Annahme prüft und eine Zusatzlösung bei Bedarf wieder zurücknimmt.
-
-  \item Auch eine kurz eingeführte gemeinsame Zustands-Abstraktion der Eingabe-Komponenten
-  wurde wieder zurückgebaut. Die einfacheren, eigenständigen Komponenten wurden der
-  zusätzlichen Abstraktion vorgezogen, weil sie leichter zu verstehen und zu erklären
-  sind.
-
-  \item Für die Qualität dienten Linting, Formatierung, Typprüfung und die Testsuite als
-  Freigabekriterien. Ein statisches Analysewerkzeug (\texttt{fallow}) gab zusätzliche
-  Hinweise, war im ganzen Projekt aber nicht vollständig grün. Für den DNF-Bereich blieben
-  die genannten Prüfungen die entscheidenden Kriterien.
-\end{itemize}
+Die kanonische und die minimale DNF werden bewusst getrennt dargestellt. In der
+kanonischen DNF enthält jeder Minterm alle Variablen. Eine minimale DNF kann dagegen
+kürzere Terme besitzen, etwa \((a \land c) \lor (b \land c)\). Die getrennte Darstellung
+macht diesen fachlichen Unterschied nachvollziehbar und verhindert, dass eine korrekte
+Vereinfachung fälschlich als unvollständig angesehen wird.
