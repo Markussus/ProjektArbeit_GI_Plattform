@@ -25,18 +25,18 @@ Benennung von Funktionen oder zu möglichen unsauberen Stellen und Sonderfällen
 Oberfläche habe ich häufig anhand von Screenshots beurteilen und schrittweise verbessern
 lassen, bis sie sauber und einheitlich war. Einheitlichkeit war dabei eine wichtige
 Leitplanke. Ich habe den DNF-Bereich an den gemeinsamen Gestaltungs- und
-Interaktionsmustern der Lernplattform ausgerichtet. Zum Abschluss gehörten Verifikation
-und saubere Commits fest zum Vorgehen: gezielte Tests, Linting, Build, Formatierung mit Prettier
-und punktuell das Analysewerkzeug \texttt{fallow} als zusätzliche Prüfung.
+Interaktionsmustern der Lernplattform ausgerichtet. Zum Abschluss gehörten gezielte Tests,
+Linting, Build, Formatierung mit Prettier und punktuell das Analysewerkzeug
+\texttt{fallow} als zusätzliche Prüfung.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Duy Tan Pham}
 
 Für den DNF-Bereich habe ich die Übungsaufgaben nicht von einer KI erzeugen lassen. Die
-Aufgaben entstehen im Code selbst und bauen auf Wahrheitstabellen im erlaubten Bereich bis
-vier Variablen auf. Die erwartete Lösung wird von derselben Fachlogik berechnet, gegen die
-später die Eingabe geprüft wird. Dadurch ist jede Aufgabe von sich aus korrekt und lösbar.
-Die KI hat hier eher bei der Umsetzung dieser Logik und bei einzelnen Beispielausdrücken
-unterstützt, nicht bei den Aufgaben selbst.
+Aufgaben sind als feste Übungsdefinitionen im Code hinterlegt und verwenden Ausdrücke oder
+Wahrheitstabellen mit höchstens vier Variablen. Die erwarteten Ergebnisse werden mit der
+DNF-Fachlogik bestimmt. Dadurch bleiben die Aufgaben reproduzierbar und benötigen für die
+Prüfung keine separat gepflegten Lösungstexte. Die KI hat hier bei der Umsetzung der Logik
+und bei einzelnen Beispielausdrücken unterstützt, nicht bei der Auswahl der Aufgaben.
 
 \subNsection{2}{Kritische Reflexion}{Duy Tan Pham}
 
@@ -45,7 +45,7 @@ Informatik-Logik nicht blind auf die KI verlassen kann. Ein Beispiel ist die Min
 Die damalige Lösung hat die Restüberdeckung greedy gewählt. Erst meine konkrete Nachfrage,
 ob damit die literalminimale DNF übersehen werden kann, führte zur Diagnose und anschließend
 zur exakten Lösung. Ich musste das Korrektheitskriterium also selbst benennen und am Code
-prüfen. Die KI hat es nicht von allein sichergestellt.
+prüfen. Die KI stellte dieses Korrektheitskriterium nicht eigenständig sicher.
 
 Ein zweites Thema war das begrenzte Kontextfenster. In langen Chats ging Kontext verloren,
 deshalb habe ich mir Zusammenfassungen für neue Chats erstellen lassen und wichtige Fakten

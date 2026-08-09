@@ -57,12 +57,14 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   Anwendungsschicht, in der Tabellen-Eingabe der Oberfläche und im Import. So bleibt jede
   Aufgabe in dem Bereich, in dem die exakte Synthese sicher funktioniert.
 
-  \item Die Prüfung ist von der Darstellung getrennt und liefert klar benannte Status. Die
-  Übungsprüfung (\texttt{dnfExerciseCheck.ts}) unterscheidet zum Beispiel
-  \glqq korrekt\grqq{}, \glqq äquivalent, aber nicht kanonisch\grqq{} und
-  \glqq nicht äquivalent\grqq{}. Sie benennt außerdem fehlende oder überzählige Terme. Die
-  Vereinfachungsprüfung (\texttt{dnfSimplificationCheck.ts}) vergleicht die Eingabe mit dem
-  exakten Minimum.
+  \item Die Prüfung ist von der Darstellung getrennt. Ein eingegebener Ausdruck wird für
+  jede Zeile der Wahrheitstabelle ausgewertet und nicht durch einen reinen Textvergleich
+  bewertet. Dadurch werden logisch gleichwertige Schreibweisen erkannt. Die Übungsprüfung
+  (\texttt{dnfExerciseCheck.ts}) unterscheidet zusätzlich zwischen \glqq korrekt\grqq{},
+  \glqq äquivalent, aber nicht kanonisch\grqq{} und \glqq nicht äquivalent\grqq{}. Sie
+  benennt außerdem fehlende oder überzählige Terme. Die Vereinfachungsprüfung
+  (\texttt{dnfSimplificationCheck.ts}) prüft zuerst die logische Gleichwertigkeit und
+  anschließend, ob die Literalzahl das exakte Minimum erreicht.
 
   \item Import und Export nutzen wie die anderen Simulatoren einen kompakten, URL-sicheren
   Base64-Code und sind an den gemeinsamen Training-Center-Speicher angebunden. So verhält
@@ -82,6 +84,11 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg. So ist es
   für die Lernenden leichter nachzuvollziehen.
 
+  \item Die Beispiele zeigen einen vollständig vorbereiteten Lösungsweg und dienen dem
+  schrittweisen Nachvollziehen. In den Übungen bearbeiten die Lernenden dagegen
+  Wahrheitstabellen oder DNF-Ausdrücke selbst. Die Rückmeldung wird dabei aus der
+  DNF-Fachlogik abgeleitet.
+
   \item Kleinere Wahrheitstabellen werden vollständig angezeigt. Bei \texttt{16} Zeilen,
   also bei vier Variablen, gibt es eine kompakte, scrollbare Ansicht, die sich auf eine
   Vollansicht umschalten lässt. Dadurch bleibt die maximale Darstellungshöhe begrenzt.
@@ -95,10 +102,10 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   \texttt{|} tippen, angezeigt wird aber immer \(\lnot\), \(\land\), \(\lor\). Das macht die
   Eingabe leichter, ohne die Darstellung uneinheitlich zu machen.
 
-  \item Für die Fehlersuche stehen die projektweiten Funktionen für Import und Export zur
-  Verfügung. So können Lernende einen Aufgabenstand teilen und nachvollziehen. Der
-  DNF-Bereich nutzt außerdem den gemeinsamen Themenaufbau mit Kopfbereich, Tabs und globaler
-  Sidebar, damit er sich wie ein Teil derselben Lernplattform anfühlt.
+  \item Für die Fehlersuche stehen Import und Export zur Verfügung. So können Lernende
+  einen Aufgabenstand teilen und nachvollziehen. Der DNF-Bereich nutzt außerdem den
+  gemeinsamen Themenaufbau mit Kopfbereich, Tabs und globaler Sidebar, damit er sich wie
+  ein Teil derselben Lernplattform anfühlt.
 \end{itemize}
 
 \subNsection{2}{Andere Entscheidungen}{Duy Tan Pham}
