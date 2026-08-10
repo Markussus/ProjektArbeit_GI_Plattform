@@ -73,29 +73,7 @@
     "title": "Endliche Automaten",
     "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Erstellen Sie DFAs und NFAs, konvertieren Sie reguläre Grammatiken und durchlaufen Sie Eingabewörter Schritt für Schritt.",
     "overviewTitle": "Was sind Endliche Automaten?",
-    "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke.",
-    "comparison": "DFA vs. NFA",
-    "dfaSubtitle": "Deterministischer Endlicher Automat",
-    "dfaPoint1": "Genau ein Übergang pro (Zustand, Symbol)",
-    "dfaPoint2": "Genau ein aktiver Zustand zu jeder Zeit",
-    "dfaPoint3": "Keine ε-Übergänge",
-    "nfaSubtitle": "Nichtdeterministischer Endlicher Automat",
-    "nfaPoint1": "Mehrere Ziele pro (Zustand, Symbol)",
-    "nfaPoint2": "Menge aktiver Zustände, parallel verfolgt",
-    "nfaPoint3": "Unterstützt ε-Übergänge",
-    "whatYouCanDo": "Was Sie hier tun können",
-    "feature1": "DFAs und NFAs visuell mit einer Übergangstabelle erstellen",
-    "feature2": "Eine rechtslineare reguläre Grammatik in einen Automaten umwandeln",
-    "feature3": "Ein Eingabewort schrittweise durchlaufen und das Zustandsdiagramm beobachten",
-    "feature4": "Mehrere Wörter im Stapeltest prüfen und Akzeptanz/Ablehnung einsehen",
-    "exercise1": "DFA erstellen",
-    "exercise1Desc": "Erstellen Sie einen DFA, der Zeichenketten akzeptiert, die auf '01' enden",
-    "exercise2": "NFA Entwurf",
-    "exercise2Desc": "Entwerfen Sie einen NFA für einen gegebenen regulären Ausdruck",
-    "exercise3": "DFA minimieren",
-    "exercise3Desc": "Entfernen Sie unerreichbare und äquivalente Zustände",
-    "exercise4": "NFA zu DFA",
-    "exercise4Desc": "Konvertierung mittels Teilmengenkonstruktion"
+    "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke."
   },
   "number": {
     "title": "Zahlensysteme",
@@ -1683,33 +1661,15 @@
     "examples": {
       "containsAba": {
         "title": "Enthält Teilwort \"aba\"",
-        "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Wir wollen jeden String akzeptieren, der irgendwo \"aba\" enthält. Vor und nach dem Muster ist jede Kombination von 'a' und 'b' erlaubt.",
-        "step2Title": "2. Warum ein NFA?",
-        "step2": "Ein NFA ist hier natürlich, weil wir nicht wissen, wann \"aba\" beginnt. Der NFA kann nichtdeterministisch \"raten\" — in s0, wenn er 'a' liest, bleibt er sowohl in s0 als auch geht er zu s1.",
-        "step3Title": "3. Zustände entwerfen",
-        "step3": "Vier Zustände: s0 (kein Match begonnen), s1 (\"a\" gematcht), s2 (\"ab\" gematcht), s3 (\"aba\" gematcht — Akzeptanzzustand, bleibt hier für immer).",
-        "step4Title": "4. Wie Nichtdeterminismus hilft",
-        "step4": "Bei einem DFA müssten wir sorgfältig partielle Übereinstimmungen verfolgen. Mit dem NFA probieren wir einfach \"alle Möglichkeiten\" gleichzeitig aus."
+        "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus."
       },
       "lecture": {
         "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
-        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da die letzte „0“ in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach darf kein weiteres Zeichen folgen. Er lehnt das leere Wort, Wörter, die mit '1' beginnen, und Wörter mit mehr als einer '1' ab.",
-        "step2Title": "2. Zustände entwerfen",
-        "step2": "s0 ist der Startzustand. Beim Lesen einer '0' wechselt der Automat zu s1, da nun mindestens eine 0 gelesen wurde. Von s1 führt eine '1' zu s2, dem Akzeptanzzustand. Jede andere Eingabe führt zu s3, einem Fangzustand, da das Wort ungültig ist."
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da für die letzte „0“ in S2 kein Übergang definiert ist. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
       },
       "grammar": {
         "title": "Grammatik → Automat",
-        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Konstruiere einen endlichen Automaten für die reguläre Grammatik: G = {S → 0S | 0A, A → 1A | 1} über dem Alphabet Σ = {0, 1}. Diese Grammatik erzeugt erst '0'en, dann '1'en. Jedes Nichtterminalsymbol wird zu einem Zustand und jede Produktion zu einem Übergang.",
-        "step2Title": "2. NFA-Konstruktion",
-        "step2": "Überführung der Produktionen in Übergänge: (S → 0S) wird zu δ(S,0)=S; (S → 0A) wird zu δ(S,0)=A. Dies erzeugt Nichtdeterminismus im Zustand S bei der Eingabe '0'. Die Regel (A → 1) impliziert einen Übergang in einen dedizierten Akzeptanzzustand (sF). Ergebnis: Ein 3-Zustand-NFA {S, A, sF}.",
-        "step3Title": "3. DFA-Konstruktion",
-        "step3": "Wir gruppieren NFA-Zustände in Mengen, um genau einen Übergang pro Eingabe zu garantieren.\n1. Start bei q0 = {S}.\n2. δ(q0, 0) = {S, A} → neuer Zustand q1.\n3. δ(q0, 1) = ∅ → Fangzustand qD.\n4. δ(q1, 0) = {S, A} → Schleife zurück zu q1.\n5. δ(q1, 1) = {A, sF} → neuer Zustand q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → Schleife zurück zu q2.\nq2 ist der Akzeptanzzustand (enthält sF). qD ist ein toter Zustand (Fangzustand)."
+        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}."
       },
       "categories": {
         "dfa": {
