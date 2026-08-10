@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { useState } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -151,6 +152,49 @@ describe("FATransitionTableEditor — onTransitionChange callback", () => {
     const input = getByLabelText("δ(S0, a)");
     fireEvent.change(input, { target: { value: "S1, S2" } });
     expect(onChange).toHaveBeenCalledWith("S0", "a", "S1, S2");
+  });
+
+  it("keeps a trailing separator visible so a second NFA target can be typed", () => {
+    // Mirrors the real parent: the program only ever holds parsed targets, so
+    // a naively controlled input would render "S1," back as "S1" and swallow
+    // the comma on every keystroke.
+    function Harness() {
+      const [program, setProgram] = useState<FAProgram>(defaultNFAProgram);
+      return (
+        <FATransitionTableEditor
+          program={program}
+          onTransitionChange={(from, symbol, value) => {
+            const targets = value
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            setProgram((prev) => ({
+              ...prev,
+              transitions: {
+                ...prev.transitions,
+                [from]: { ...prev.transitions[from], [symbol]: targets },
+              },
+            }));
+          }}
+        />
+      );
+    }
+
+    render(<Harness />);
+    const symbol = defaultNFAProgram.alphabet[0];
+    const input = screen.getByLabelText(
+      `δ(${defaultNFAProgram.states[0]}, ${symbol})`,
+    ) as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: "S1," } });
+    expect(input.value).toBe("S1,");
+
+    fireEvent.change(input, { target: { value: "S1, S2" } });
+    expect(input.value).toBe("S1, S2");
+
+    // Blurring hands the cell back to the canonical parsed rendering.
+    fireEvent.blur(input);
+    expect(input.value).toBe("S1, S2");
   });
 
   it("is called exactly once per change event", () => {

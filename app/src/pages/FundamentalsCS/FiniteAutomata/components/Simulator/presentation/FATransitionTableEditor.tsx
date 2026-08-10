@@ -23,6 +23,16 @@ export function FATransitionTableEditor({
 
   const [showEpsilon, setShowEpsilon] = useState(false);
 
+  // A cell normally shows its parsed target list, but that round-trip erases
+  // the separator as it is typed: "S1," parses to ["S1"] and renders back as
+  // "S1", so an NFA cell could never reach a second target. While one cell is
+  // being edited we show the raw text instead and let the parsed program
+  // follow behind it; on blur the canonical form takes over again.
+  const [editedCell, setEditedCell] = useState<{
+    key: string;
+    text: string;
+  } | null>(null);
+
   // Same rows as the read-only table, plus an empty ε row once the user has
   // asked for one — that is the only way to enter the first ε-transition.
   const symbols = buildTransitionTableSymbols(program);
@@ -95,13 +105,20 @@ export function FATransitionTableEditor({
                 <td className="border-r p-2 font-mono font-medium">{symbol}</td>
                 {program.states.map((state) => {
                   const targets = program.transitions[state]?.[symbol] ?? [];
+                  const cellKey = `${state}-${symbol}`;
                   return (
-                    <td key={`${state}-${symbol}`} className="border-r p-1">
+                    <td key={cellKey} className="border-r p-1">
                       <input
-                        value={targets.join(", ")}
-                        onChange={(e) =>
-                          onTransitionChange(state, symbol, e.target.value)
+                        value={
+                          editedCell?.key === cellKey
+                            ? editedCell.text
+                            : targets.join(", ")
                         }
+                        onChange={(e) => {
+                          setEditedCell({ key: cellKey, text: e.target.value });
+                          onTransitionChange(state, symbol, e.target.value);
+                        }}
+                        onBlur={() => setEditedCell(null)}
                         className={inputClass}
                         placeholder="–"
                         aria-label={`δ(${state}, ${symbol})`}

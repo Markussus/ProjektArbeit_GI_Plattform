@@ -73,29 +73,7 @@
     "title": "Finite Automata",
     "description": "Study deterministic and non-deterministic finite automata. Build DFAs and NFAs, convert regular grammars, and step through input words.",
     "overviewTitle": "What are Finite Automata?",
-    "overviewText": "Finite Automata are the simplest computational models used to recognize patterns. They consist of states, transitions, and accept/reject decisions. DFAs and NFAs form the foundation for lexical analysis, pattern matching, and regular expression engines.",
-    "comparison": "DFA vs. NFA",
-    "dfaSubtitle": "Deterministic Finite Automaton",
-    "dfaPoint1": "Exactly one transition per (state, symbol)",
-    "dfaPoint2": "Exactly one active state at any time",
-    "dfaPoint3": "No ε-transitions",
-    "nfaSubtitle": "Nondeterministic Finite Automaton",
-    "nfaPoint1": "Multiple targets per (state, symbol)",
-    "nfaPoint2": "Set of active states explored in parallel",
-    "nfaPoint3": "Supports ε-transitions",
-    "whatYouCanDo": "What you can do here",
-    "feature1": "Build DFAs and NFAs visually using a transition table",
-    "feature2": "Convert a right-linear regular grammar into an automaton",
-    "feature3": "Step through an input word and watch the state diagram update",
-    "feature4": "Batch-test multiple words and inspect accept/reject results",
-    "exercise1": "Build a DFA",
-    "exercise1Desc": "Create a DFA that accepts strings ending in '01'",
-    "exercise2": "NFA Design",
-    "exercise2Desc": "Design an NFA for a given regular expression",
-    "exercise3": "Minimize a DFA",
-    "exercise3Desc": "Remove unreachable and equivalent states",
-    "exercise4": "NFA to DFA",
-    "exercise4Desc": "Convert using subset construction"
+    "overviewText": "Finite Automata are the simplest computational models used to recognize patterns. They consist of states, transitions, and accept/reject decisions. DFAs and NFAs form the foundation for lexical analysis, pattern matching, and regular expression engines."
   },
   "number": {
     "title": "Number Systems",
@@ -1683,33 +1661,15 @@
     "examples": {
       "containsAba": {
         "title": "Contains substring \"aba\"",
-        "description": "An NFA that accepts any string over {a, b} that contains \"aba\" as a substring anywhere within it. Demonstrates nondeterminism.",
-        "step1Title": "1. Define the goal",
-        "step1": "We want to accept any string that contains \"aba\" somewhere inside it. Before and after the pattern, any combination of 'a' and 'b' is allowed.",
-        "step2Title": "2. Why use an NFA?",
-        "step2": "An NFA is natural here because we don't know when \"aba\" starts. The NFA can \"guess\" nondeterministically — in state s0, when it reads 'a', it both stays in s0 (in case this isn't the start of the pattern) AND moves to s1 (in case it is). If any path leads to acceptance, the string is accepted.",
-        "step3Title": "3. Design the states",
-        "step3": "Four states: s0 (haven't started matching), s1 (matched \"a\"), s2 (matched \"ab\"), s3 (matched \"aba\" — accept state, stays here forever on any input).",
-        "step4Title": "4. How nondeterminism helps",
-        "step4": "In a DFA, we'd need to carefully track partial matches and overlaps. With the NFA, we simply \"try all possibilities\" at once. The simulator tracks all active states in parallel, showing how the NFA explores multiple paths simultaneously."
+        "description": "An NFA that accepts any string over {a, b} that contains \"aba\" as a substring anywhere within it. Demonstrates nondeterminism."
       },
       "lecture": {
         "title": "One or more 0s, then a single 1 (00*1)",
-        "description": "A DFA from the lecture exercise that accepts one or more '0's followed by exactly one '1' (Regex: 00*1).",
-        "step1Title": "1. Define the goal",
-        "step1": "The automaton requires at least one '0', followed by exactly one '1', and then nothing else. It rejects empty strings, strings starting with '1', or strings with more than one '1'.",
-        "step2Title": "2. Design the states",
-        "step2": "s0 is the start state. Reading '0' moves to s1 (we have our 0s). From s1, reading '1' moves to s2 (the accept state). Any other input leads to s3, which is a \"sink\" or \"trap\" state because the string is invalid."
+        "description": "A DFA from the lecture exercise that accepts one or more '0's followed by exactly one '1' (Regex: 00*1)."
       },
       "grammar": {
         "title": "Grammar → Automat",
-        "description": "The right-linear grammar G = {S → 0S | 0A, A → 1A | 1} is converted into an NFA and then into a minimal DFA via subset construction. Both recognize the language L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
-        "step1Title": "1. Define the goal",
-        "step1": "Construct a finite automaton for the regular grammar: G = {S → 0S | 0A, A → 1A | 1} over Σ = {0, 1}. This grammar generates '0's then '1's. Each non-terminal becomes a state, and each production becomes a transition.",
-        "step2Title": "2. NFA Construction",
-        "step2": "Map productions to transitions: (S → 0S) becomes δ(S,0)=S; (S → 0A) becomes δ(S,0)=A. This creates non-determinism at state S on input '0'. The rule (A → 1) implies a transition to a dedicated accept state (sF). Result: A 3-state NFA {S, A, sF}.",
-        "step3Title": "3. DFA Construction",
-        "step3": "We group NFA states into sets to ensure one transition per input.\n1. Start at q0 = {S}.\n2. Move on '0': δ(q0, 0) = {S, A} → new state q1.\n3. Move on '1': δ(q0, 1) = ∅ → sink state qD.\n4. δ(q1, 0) = {S, A} → loops back to q1.\n5. δ(q1, 1) = {A, sF} → new state q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → loops back to q2.\nq2 is the accept state (contains sF). qD is a dead/trap state."
+        "description": "The right-linear grammar G = {S → 0S | 0A, A → 1A | 1} is converted into an NFA and then into a minimal DFA via subset construction. Both recognize the language L = {0ⁿ 1ᵐ | n,m ≥ 1}."
       },
       "categories": {
         "dfa": {
