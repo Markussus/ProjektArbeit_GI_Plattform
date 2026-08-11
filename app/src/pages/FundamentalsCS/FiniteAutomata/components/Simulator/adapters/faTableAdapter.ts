@@ -1,4 +1,30 @@
 import type { FAProgram } from "../domain/faTypes";
+import { EPSILON } from "../domain/faTypes";
+import type { FARuntime } from "../domain/faRuntime";
+
+/** True when any state has an ε-transition. */
+export function hasEpsilonTransitions(program: FAProgram): boolean {
+  return Object.values(program.transitions).some(
+    (row) => (row[EPSILON]?.length ?? 0) > 0,
+  );
+}
+
+/**
+ * The table's row symbols: the alphabet, plus a trailing ε row for an NFA that
+ * actually uses ε-transitions. This is the single definition of the row order,
+ * so the table, its highlight, and the editor can never disagree about it.
+ */
+export function buildTransitionTableSymbols(program: FAProgram): string[] {
+  const symbols = [...program.alphabet];
+  if (
+    program.type === "NFA" &&
+    hasEpsilonTransitions(program) &&
+    !symbols.includes(EPSILON)
+  ) {
+    symbols.push(EPSILON);
+  }
+  return symbols;
+}
 
 /**
  * Build transition table headers: ["δ", ...states]
@@ -14,18 +40,7 @@ export function buildTransitionTableHeaders(states: string[]): string[] {
  * For NFA: "{q0, q1}" or "–"
  */
 export function buildTransitionTableRows(program: FAProgram): string[][] {
-  const symbols = [...program.alphabet];
-  if (program.type === "NFA") {
-    // Include epsilon if any epsilon transitions exist
-    const hasEpsilon = Object.values(program.transitions).some(
-      (m) => m["ε"] && m["ε"].length > 0,
-    );
-    if (hasEpsilon && !symbols.includes("ε")) {
-      symbols.push("ε");
-    }
-  }
-
-  return symbols.map((symbol) => {
+  return buildTransitionTableSymbols(program).map((symbol) => {
     const cells: string[] = [symbol];
     for (const state of program.states) {
       const targets = program.transitions[state]?.[symbol] ?? [];
@@ -48,16 +63,7 @@ export function buildTransitionTableRows(program: FAProgram): string[][] {
  */
 export function getActiveTransitionCell(
   program: FAProgram,
-  runtime: {
-    activeStates: string[];
-    inputWord: string[];
-    inputPosition: number;
-    transitionHistory: Array<{
-      fromStates: string[];
-      symbol: string;
-      toStates: string[];
-    }>;
-  },
+  runtime: Pick<FARuntime, "transitionHistory">,
 ): { row: number; col: number } | null {
   const lastTransition =
     runtime.transitionHistory.length > 0
@@ -68,17 +74,9 @@ export function getActiveTransitionCell(
     return null;
   }
 
-  const symbols = [...program.alphabet];
-  if (program.type === "NFA") {
-    const hasEpsilon = Object.values(program.transitions).some(
-      (m) => m["ε"] && m["ε"].length > 0,
-    );
-    if (hasEpsilon && !symbols.includes("ε")) {
-      symbols.push("ε");
-    }
-  }
-
-  const rowIndex = symbols.indexOf(lastTransition.symbol);
+  const rowIndex = buildTransitionTableSymbols(program).indexOf(
+    lastTransition.symbol,
+  );
   if (rowIndex < 0) return null;
 
   const colIndex = program.states.indexOf(lastTransition.fromStates[0]);

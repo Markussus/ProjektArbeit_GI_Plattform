@@ -4,6 +4,7 @@ import type {
   AutomatonType,
   FATransitionMap,
 } from "../domain/faTypes";
+import { EPSILON } from "../domain/faTypes";
 import { validateFAProgram } from "../domain/faProgramValidation";
 import type { FAProgramIssue } from "../domain/faProgramValidation";
 import {
@@ -43,6 +44,18 @@ function parseCSV(value: string): string[] {
     .filter((s) => s.length > 0);
 }
 
+/**
+ * Like {@link parseCSV} but restricts each entry to a single symbol. The
+ * alphabet of a DFA/NFA is a set of one-character symbols, so multi-character
+ * tokens such as "10", "ab", or "xyz" are rejected rather than added.
+ */
+function parseAlphabetCSV(value: string): string[] {
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => [...s].length === 1);
+}
+
 function pruneTransitions(
   transitions: FATransitionMap,
   validStates: string[],
@@ -61,7 +74,8 @@ function pruneTransitions(
 
     const filtered: Record<string, string[]> = {};
     for (const symbol of Object.keys(symMap)) {
-      if (!symbolSet.has(symbol) && symbol !== "ε") continue;
+      // ε is never in the alphabet but is always a legal transition symbol.
+      if (!symbolSet.has(symbol) && symbol !== EPSILON) continue;
       const targets = (symMap[symbol] || []).filter((t) => stateSet.has(t));
       if (targets.length > 0) {
         filtered[symbol] = targets;
@@ -110,7 +124,7 @@ function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
       return { ...state, states, acceptStates, startState, transitions };
     }
     case "SET_ALPHABET": {
-      const alphabet = parseCSV(action.payload);
+      const alphabet = parseAlphabetCSV(action.payload);
       const transitions = pruneTransitions(
         state.transitions,
         state.states,

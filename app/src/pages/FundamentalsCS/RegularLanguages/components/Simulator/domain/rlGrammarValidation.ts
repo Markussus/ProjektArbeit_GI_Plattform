@@ -1,12 +1,32 @@
-import { parseGrammarSource } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faGrammarParsing";
+import {
+  parseGrammarSource,
+  type GrammarParseIssue,
+} from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faGrammarParsing";
 import { validateRegularGrammar } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faGrammarConversion";
 import type { RegularGrammar } from "./rlTypes";
 
 export interface ParsedGrammarState {
   ok: boolean;
   grammar: RegularGrammar | null;
+  /** Untranslated fallback text; prefer {@link ParsedGrammarState.issue}. */
   error: string | null;
+  /** Translatable failure, or null when the source is empty / valid. */
+  issue: GrammarParseIssue | null;
+  /** Structural problems reported by `validateRegularGrammar`. */
+  validationCodes: string[];
 }
+
+/**
+ * Nothing typed yet: not usable (`ok: false`), but not an error either — the
+ * UI shows no complaint until the learner has actually written something.
+ */
+const EMPTY_SOURCE: ParsedGrammarState = {
+  ok: false,
+  grammar: null,
+  error: null,
+  issue: null,
+  validationCodes: [],
+};
 
 /**
  * Parse + validate grammar source text in one step. Returns a state object
@@ -15,11 +35,17 @@ export interface ParsedGrammarState {
  */
 export function parseGrammar(source: string): ParsedGrammarState {
   if (source.trim().length === 0) {
-    return { ok: false, grammar: null, error: null };
+    return EMPTY_SOURCE;
   }
   const parsed = parseGrammarSource(source);
   if (!parsed.ok) {
-    return { ok: false, grammar: null, error: parsed.error };
+    return {
+      ok: false,
+      grammar: null,
+      error: parsed.error,
+      issue: parsed.issue,
+      validationCodes: [],
+    };
   }
   const validationErrors = validateRegularGrammar(parsed.grammar);
   if (validationErrors.length > 0) {
@@ -27,7 +53,15 @@ export function parseGrammar(source: string): ParsedGrammarState {
       ok: false,
       grammar: null,
       error: validationErrors.join(", "),
+      issue: null,
+      validationCodes: validationErrors,
     };
   }
-  return { ok: true, grammar: parsed.grammar, error: null };
+  return {
+    ok: true,
+    grammar: parsed.grammar,
+    error: null,
+    issue: null,
+    validationCodes: [],
+  };
 }

@@ -3,10 +3,22 @@ import { useTranslation } from "react-i18next";
 import { Book, BookOpen, GitBranch, Zap } from "lucide-react";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicCategorySection } from "@/components/shared/TopicCategorySection/TopicCategorySection";
 import type { Example } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
-import { faExamples, type FAExample } from "./Simulator/config/faExamples";
+import {
+  faExamples,
+  type FAExample,
+  type FAExampleCategory,
+} from "./Simulator/config/faExamples";
 import { useFASimulatorStore } from "../store/faSimulatorStore";
+
+/** Section order on the page — one block per kind of automaton. */
+const CATEGORY_ORDER: FAExampleCategory[] = [
+  "dfa",
+  "nfa",
+  "grammarToAutomaton",
+];
 
 export function ExamplesTab({
   selectedExample,
@@ -24,37 +36,53 @@ export function ExamplesTab({
     [loadExample, onOpenExampleInSimulation, t],
   );
 
+  // Card numbering runs across the whole tab, not per section.
+  let cardIndex = 0;
+
   return (
-    <div data-testid="fa-examples-tab" className="space-y-4">
+    <div data-testid="fa-examples-tab" className="flex flex-col gap-6">
       <div className="text-muted-foreground flex items-center gap-2">
         <BookOpen className="size-4" />
         <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
       </div>
 
-      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-        {faExamples.map((example, index) => {
-          const item = toTopicExample(example, t);
-          return (
-            <ExerciseCard
-              key={example.id}
-              item={item}
-              index={index}
-              testIdPrefix={`fa-example-card-${example.id}`}
-              isSelected={selectedExample?.id === item.id}
-              onSelect={() => onSelectExample(item)}
-              onOpen={() => handleOpen(example)}
-            />
-          );
-        })}
-      </div>
+      {CATEGORY_ORDER.map((category) => {
+        const examples = faExamples.filter((e) => e.category === category);
+        if (examples.length === 0) return null;
+
+        return (
+          <TopicCategorySection
+            key={category}
+            testId={`fa-examples-section-${category}`}
+            title={t(`fa.examples.categories.${category}.title`)}
+            description={t(`fa.examples.categories.${category}.description`)}
+          >
+            {examples.map((example) => {
+              const item = toTopicExample(example, t);
+              const index = cardIndex++;
+              return (
+                <ExerciseCard
+                  key={example.id}
+                  item={item}
+                  index={index}
+                  testIdPrefix={`fa-example-card-${example.id}`}
+                  isSelected={selectedExample?.id === item.id}
+                  onSelect={() => onSelectExample(item)}
+                  onOpen={() => handleOpen(example)}
+                />
+              );
+            })}
+          </TopicCategorySection>
+        );
+      })}
     </div>
   );
 }
 
 // Match the icons the example cards used before the shared-card refactor:
-// the paired grammar example uses Book, plain NFAs use Zap, DFAs use GitBranch.
+// grammar-derived automata use Book, plain NFAs use Zap, DFAs use GitBranch.
 function exampleIcon(example: FAExample) {
-  if (example.secondVariant) return Book;
+  if (example.category === "grammarToAutomaton") return Book;
   return example.type === "NFA" ? Zap : GitBranch;
 }
 

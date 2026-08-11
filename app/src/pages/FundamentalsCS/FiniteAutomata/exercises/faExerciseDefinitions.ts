@@ -1,15 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Binary,
-  Flag,
-  Hash,
-  Route,
-  Sigma,
-  Spline,
-  Target,
-  Waypoints,
-  Workflow,
-} from "lucide-react";
+import { Target, Workflow } from "lucide-react";
 import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
@@ -31,8 +21,6 @@ export interface FAExerciseDefinition extends ExerciseDefinition {
   grammar?: string;
   /** The reference automaton that defines the target language. */
   solution: FAProgram;
-  /** Hints in order of increasing specificity. */
-  hintKeys: TranslationKey[];
   /** Starter program loaded when the user clicks "Open in simulation". */
   starter: FAProgram;
   /** Max length for enumerated test strings. Default 4. */
@@ -116,12 +104,12 @@ const evenOnesSolution: FAProgram = {
 
 const noConsecutiveOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2"],
+  states: ["S0", "S1"],
   alphabet: ["0", "1"],
   transitions: {
     S0: { "0": ["S0"], "1": ["S1"] },
-    S1: { "0": ["S0"], "1": ["S2"] },
-    S2: { "0": ["S2"], "1": ["S2"] },
+    // A second 1 has no transition, which is exactly the rejection.
+    S1: { "0": ["S0"] },
   },
   startState: "S0",
   acceptStates: ["S0", "S1"],
@@ -155,13 +143,9 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.endsWith01.goal",
     descriptionKey: "fa.exercisesTab.endsWith01.description",
     difficulty: "easy",
-    icon: Flag,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith01Solution,
-    hintKeys: [
-      "fa.exercisesTab.endsWith01.hint1",
-      "fa.exercisesTab.endsWith01.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1001", "01", "001", "101", "1101"],
@@ -177,10 +161,6 @@ export const faExercises: FAExerciseDefinition[] = [
     icon: Target,
     alphabet: ["0", "1"],
     solution: endsWith00Solution,
-    hintKeys: [
-      "fa.exercisesTab.endsWith00.hint1",
-      "fa.exercisesTab.endsWith00.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1100", "00", "100", "0100"],
@@ -192,14 +172,10 @@ export const faExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.evenOnes.title",
     goalKey: "fa.exercisesTab.evenOnes.goal",
     descriptionKey: "fa.exercisesTab.evenOnes.description",
-    difficulty: "medium",
-    icon: Sigma,
+    difficulty: "easy",
+    icon: Target,
     alphabet: ["0", "1"],
     solution: evenOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.evenOnes.hint1",
-      "fa.exercisesTab.evenOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["1100", "11", "00", "0110", "0000"],
@@ -212,13 +188,9 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.noConsecOnes.goal",
     descriptionKey: "fa.exercisesTab.noConsecOnes.description",
     difficulty: "medium",
-    icon: Binary,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: noConsecutiveOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.noConsecOnes.hint1",
-      "fa.exercisesTab.noConsecOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["10101", "0", "1", "01", "010"],
@@ -231,14 +203,9 @@ export const faExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.divBy3.goal",
     descriptionKey: "fa.exercisesTab.divBy3.description",
     difficulty: "hard",
-    icon: Hash,
+    icon: Target,
     alphabet: ["0", "1"],
     solution: divisibleBy3Solution,
-    hintKeys: [
-      "fa.exercisesTab.divBy3.hint1",
-      "fa.exercisesTab.divBy3.hint2",
-      "fa.exercisesTab.divBy3.hint3",
-    ],
     starter: emptyStarter(["0", "1"]),
     maxTestLen: 5,
     exampleWords: {
@@ -252,33 +219,34 @@ export const faExercises: FAExerciseDefinition[] = [
    Constructing a finite automaton from a regular grammar
    ════════════════════════════════════════════════════════════ */
 
+// These reference automata are partial DFAs: a symbol with no transition is
+// the rejection, so none of them carries a trap state.
+
 // L = 1 0ⁿ 1 (n ≥ 0): a 1, any number of 0s, a closing 1.
 const grammarOnesSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
+    S0: { "1": ["S1"] },
     S1: { "0": ["S1"], "1": ["S2"] },
-    S2: { "0": ["E"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S2: {},
   },
   startState: "S0",
   acceptStates: ["S2"],
 };
 
-// L = (0011)⁺: one or more repetitions of the block 0011.
+// L = (0011)(0011)*: one or more repetitions of the block 0011.
 const grammar0011Solution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "S3", "S4", "E"],
+  states: ["S0", "S1", "S2", "S3", "S4"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["S1"], "1": ["E"] },
-    S1: { "0": ["S2"], "1": ["E"] },
-    S2: { "0": ["E"], "1": ["S3"] },
-    S3: { "0": ["E"], "1": ["S4"] },
-    S4: { "0": ["S1"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S0: { "0": ["S1"] },
+    S1: { "0": ["S2"] },
+    S2: { "1": ["S3"] },
+    S3: { "1": ["S4"] },
+    S4: { "0": ["S1"] },
   },
   startState: "S0",
   acceptStates: ["S4"],
@@ -287,13 +255,12 @@ const grammar0011Solution: FAProgram = {
 // L = 1 1 0ⁿ (n ≥ 0): exactly two 1s followed by any number of 0s.
 const grammarTwoOnesZerosSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
-    S1: { "0": ["E"], "1": ["S2"] },
-    S2: { "0": ["S2"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S0: { "1": ["S1"] },
+    S1: { "1": ["S2"] },
+    S2: { "0": ["S2"] },
   },
   startState: "S0",
   acceptStates: ["S2"],
@@ -302,13 +269,12 @@ const grammarTwoOnesZerosSolution: FAProgram = {
 // L = 1ⁿ 0 (n ≥ 1): one or more 1s followed by a single 0.
 const grammarOnesZeroSolution: FAProgram = {
   type: "DFA",
-  states: ["S0", "S1", "S2", "E"],
+  states: ["S0", "S1", "S2"],
   alphabet: ["0", "1"],
   transitions: {
-    S0: { "0": ["E"], "1": ["S1"] },
+    S0: { "1": ["S1"] },
     S1: { "0": ["S2"], "1": ["S1"] },
-    S2: { "0": ["E"], "1": ["E"] },
-    E: { "0": ["E"], "1": ["E"] },
+    S2: {},
   },
   startState: "S0",
   acceptStates: ["S2"],
@@ -316,8 +282,8 @@ const grammarOnesZeroSolution: FAProgram = {
 
 /**
  * "Construct a DFA from a regular grammar" exercises. They share the FA
- * exercise machinery (workspace panel, hints, Show solution loads the
- * reference automaton) but additionally carry a `grammar` prompt.
+ * exercise machinery (workspace panel, "Show solution" loading the reference
+ * automaton) but additionally carry a `grammar` prompt.
  */
 export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   {
@@ -325,15 +291,11 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.grammarTwoOnesZeros.title",
     goalKey: "fa.exercisesTab.grammarTwoOnesZeros.goal",
     descriptionKey: "fa.exercisesTab.grammarTwoOnesZeros.description",
-    difficulty: "medium",
-    icon: Route,
+    difficulty: "easy",
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", B;', 'B = "0", B | ε;'].join("\n"),
     solution: grammarTwoOnesZerosSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarTwoOnesZeros.hint1",
-      "fa.exercisesTab.grammarTwoOnesZeros.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["11", "110", "1100", "11000"],
@@ -350,10 +312,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "0", A | "1", B;', "B = ε;"].join("\n"),
     solution: grammarOnesSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarOnes.hint1",
-      "fa.exercisesTab.grammarOnes.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["11", "101", "1001", "10001"],
@@ -366,7 +324,7 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     goalKey: "fa.exercisesTab.grammar0011.goal",
     descriptionKey: "fa.exercisesTab.grammar0011.description",
     difficulty: "hard",
-    icon: Waypoints,
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: [
       'START = "0", A;',
@@ -376,11 +334,6 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
       'D = "0", A | ε;',
     ].join("\n"),
     solution: grammar0011Solution,
-    hintKeys: [
-      "fa.exercisesTab.grammar0011.hint1",
-      "fa.exercisesTab.grammar0011.hint2",
-      "fa.exercisesTab.grammar0011.hint3",
-    ],
     starter: emptyStarter(["0", "1"]),
     maxTestLen: 8,
     exampleWords: {
@@ -393,15 +346,11 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     titleKey: "fa.exercisesTab.grammarOnesZero.title",
     goalKey: "fa.exercisesTab.grammarOnesZero.goal",
     descriptionKey: "fa.exercisesTab.grammarOnesZero.description",
-    difficulty: "medium",
-    icon: Spline,
+    difficulty: "easy",
+    icon: Workflow,
     alphabet: ["0", "1"],
     grammar: ['START = "1", A;', 'A = "1", A | "0", B;', "B = ε;"].join("\n"),
     solution: grammarOnesZeroSolution,
-    hintKeys: [
-      "fa.exercisesTab.grammarOnesZero.hint1",
-      "fa.exercisesTab.grammarOnesZero.hint2",
-    ],
     starter: emptyStarter(["0", "1"]),
     exampleWords: {
       accept: ["10", "110", "1110"],

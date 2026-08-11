@@ -1,4 +1,5 @@
 import type { FAProgram } from "./faTypes";
+import { EPSILON } from "./faTypes";
 
 export type FAProgramIssueCode =
   | "states_empty"
@@ -54,14 +55,14 @@ export function validateFAProgram(program: FAProgram): FAProgramIssue[] {
 
     const symbolMap = program.transitions[fromState];
     for (const symbol of Object.keys(symbolMap)) {
-      if (symbol !== "ε" && !program.alphabet.includes(symbol)) {
+      if (symbol !== EPSILON && !program.alphabet.includes(symbol)) {
         issues.push({
           code: "transition_symbol_invalid",
           params: { symbol, state: fromState },
         });
       }
 
-      if (program.type === "DFA" && symbol === "ε") {
+      if (program.type === "DFA" && symbol === EPSILON) {
         issues.push({
           code: "dfa_epsilon_transition",
           params: { state: fromState },

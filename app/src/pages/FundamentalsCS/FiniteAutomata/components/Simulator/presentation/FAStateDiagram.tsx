@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { RotateCcw } from "lucide-react";
 import type { FAProgram } from "../domain/faTypes";
 import type { FARuntime } from "../domain/faRuntime";
 import {
@@ -18,6 +20,11 @@ interface FAStateDiagramProps {
   runtime: FARuntime;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 const NODE_RADIUS = 28;
 const ACCEPT_RING_GAP = 5;
 
@@ -32,10 +39,25 @@ const NODE_LABEL_MIN_SCALE = 0.32;
  * and zoom/pan controls.
  */
 export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
+  const { t } = useTranslation();
   const layout = useMemo<GraphLayout>(
     () => computeLayout(program, { nodeRadius: NODE_RADIUS }),
     [program],
   );
+
+  // User-dragged node positions override the computed layout. Cleared by reset.
+  const [nodePositions, setNodePositions] = useState<Map<string, Point>>(
+    () => new Map(),
+  );
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
+  const svgElementRef = useRef<SVGSVGElement | null>(null);
+
+  const resolvePos = (id: string): NodeLayout | undefined => {
+    const base = layout.nodeMap.get(id);
+    if (!base) return undefined;
+    const override = nodePositions.get(id);
+    return override ? { ...base, x: override.x, y: override.y } : base;
+  };
 
   const violations = useMemo(() => findDFAViolations(program), [program]);
   const violationEdgeKeys = useMemo(
@@ -66,6 +88,46 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
     reset,
   } = useGraphZoomPan(layout.width, layout.height);
 
+  // Drag a node by tracking the pointer at window level (so it keeps working
+  // even if the cursor leaves the SVG mid-drag), mapping client coordinates
+  // into the SVG's user space so it stays accurate at any zoom level.
+  useEffect(() => {
+    if (!draggedNodeId) {
+      return;
+    }
+    const handleMove = (event: MouseEvent) => {
+      const svg = svgElementRef.current;
+      const matrix = svg?.getScreenCTM();
+      if (!svg || !matrix) {
+        return;
+      }
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const transformed = point.matrixTransform(matrix.inverse());
+      setNodePositions((current) => {
+        const next = new Map(current);
+        next.set(draggedNodeId, { x: transformed.x, y: transformed.y });
+        return next;
+      });
+    };
+    const handleUp = () => setDraggedNodeId(null);
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [draggedNodeId]);
+
+  const resetGraph = () => {
+    setNodePositions(new Map());
+    reset();
+  };
+
+  // Reset is meaningful while the view is zoomed/panned or a node was dragged.
+  const isViewDefault = Math.abs(scale - 1) < 0.01 && nodePositions.size === 0;
+
   const showEdgeLabels = scale >= EDGE_LABEL_MIN_SCALE;
   const showNodeLabels = scale >= NODE_LABEL_MIN_SCALE;
   const isLargeGraph = layout.strategy === "force";
@@ -87,7 +149,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           className="text-sm font-semibold"
           style={{ color: "var(--fa-text)" }}
         >
-          State Diagram
+          {t("fa.diagram.title", "State Diagram")}
         </h3>
         <div className="flex items-center gap-2">
           {violations.length > 0 && (
@@ -99,15 +161,14 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 border: "1px solid rgba(255, 82, 82, 0.3)",
               }}
             >
-              ⚠ {violations.length} DFA violation
-              {violations.length > 1 ? "s" : ""}
+              ⚠ {t("fa.diagram.violations", { count: violations.length })}
             </span>
           )}
           <ZoomControls
-            scale={scale}
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
-            onReset={reset}
+            onReset={resetGraph}
+            resetDisabled={isViewDefault}
           />
         </div>
       </div>
@@ -118,7 +179,10 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
         }}
       >
         <svg
-          ref={setSvgRef}
+          ref={(element) => {
+            svgElementRef.current = element;
+            setSvgRef(element);
+          }}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           preserveAspectRatio="xMidYMid meet"
           className="block w-full select-none"
@@ -237,7 +301,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
             const showLabel = showEdgeLabels || isActive || isViolation;
 
             if (edge.from === edge.to) {
-              const node = layout.nodeMap.get(edge.from);
+              const node = resolvePos(edge.from);
               if (!node) return null;
               return (
                 <SelfLoop
@@ -251,8 +315,8 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
               );
             }
 
-            const fromNode = layout.nodeMap.get(edge.from);
-            const toNode = layout.nodeMap.get(edge.to);
+            const fromNode = resolvePos(edge.from);
+            const toNode = resolvePos(edge.to);
             if (!fromNode || !toNode) return null;
 
             return (
@@ -271,7 +335,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
           {/* Start arrow */}
           {(() => {
-            const start = layout.nodeMap.get(program.startState);
+            const start = resolvePos(program.startState);
             if (!start) return null;
             const ax = start.x - NODE_RADIUS - 4;
             return (
@@ -293,7 +357,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                   fontSize="10"
                   fontWeight="500"
                 >
-                  start
+                  {t("fa.diagram.start", "start")}
                 </text>
               </g>
             );
@@ -304,16 +368,29 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
             const isActive = activeSet.has(node.id);
             const isAccept = acceptSet.has(node.id);
             const hasViolation = violatingStates.has(node.id);
+            const override = nodePositions.get(node.id);
+            const cx = override?.x ?? node.x;
+            const cy = override?.y ?? node.y;
 
             return (
               <g
                 key={node.id}
                 filter={isActive ? "url(#fa-glow-cyan)" : undefined}
+                onMouseDown={(event) => {
+                  // Left-button only; stop the SVG pan handler from also firing.
+                  if (event.button !== 0) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setDraggedNodeId(node.id);
+                }}
+                style={{
+                  cursor: draggedNodeId === node.id ? "grabbing" : "grab",
+                }}
               >
                 {isAccept && (
                   <circle
-                    cx={node.x}
-                    cy={node.y}
+                    cx={cx}
+                    cy={cy}
                     r={NODE_RADIUS + ACCEPT_RING_GAP}
                     fill="none"
                     stroke={isActive ? "var(--fa-cyan)" : "var(--fa-green)"}
@@ -324,8 +401,8 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
                 {hasViolation && !isActive && (
                   <circle
-                    cx={node.x}
-                    cy={node.y}
+                    cx={cx}
+                    cy={cy}
                     r={
                       NODE_RADIUS +
                       (isAccept ? ACCEPT_RING_GAP + 4 : ACCEPT_RING_GAP)
@@ -339,8 +416,8 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 )}
 
                 <circle
-                  cx={node.x}
-                  cy={node.y}
+                  cx={cx}
+                  cy={cy}
                   r={NODE_RADIUS}
                   fill={
                     isActive
@@ -362,8 +439,8 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
                 {(showNodeLabels || isActive || hasViolation) && (
                   <text
-                    x={node.x}
-                    y={node.y + 4}
+                    x={cx}
+                    y={cy + 4}
                     textAnchor="middle"
                     fill={
                       isActive ? "var(--fa-cyan)" : "var(--fa-text, #e0e0e0)"
@@ -379,14 +456,14 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 {hasViolation && (
                   <g>
                     <circle
-                      cx={node.x + NODE_RADIUS * 0.7}
-                      cy={node.y - NODE_RADIUS * 0.7}
+                      cx={cx + NODE_RADIUS * 0.7}
+                      cy={cy - NODE_RADIUS * 0.7}
                       r={7}
                       fill="var(--fa-red)"
                     />
                     <text
-                      x={node.x + NODE_RADIUS * 0.7}
-                      y={node.y - NODE_RADIUS * 0.7 + 3.5}
+                      x={cx + NODE_RADIUS * 0.7}
+                      y={cy - NODE_RADIUS * 0.7 + 3.5}
                       textAnchor="middle"
                       fill="#fff"
                       fontSize="9"
@@ -403,7 +480,11 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
         {/* Hint overlay for first-time discovery */}
         <div className="text-foreground bg-background/80 border-border pointer-events-none absolute right-2 bottom-2 rounded border px-2 py-0.5 text-[10px]">
-          drag to pan · scroll to zoom · {Math.round(scale * 100)}%
+          {t(
+            "fa.diagram.usageHint",
+            "drag node to move · drag canvas to pan · scroll to zoom",
+          )}{" "}
+          · {Math.round(scale * 100)}%
         </div>
       </div>
 
@@ -424,16 +505,17 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 /* ── Zoom controls ──────────────────────────────────────────────────── */
 
 function ZoomControls({
-  scale,
   onZoomIn,
   onZoomOut,
   onReset,
+  resetDisabled,
 }: {
-  scale: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onReset: () => void;
+  resetDisabled: boolean;
 }) {
+  const { t } = useTranslation();
   const btnStyle: React.CSSProperties = {
     background: "var(--fa-surface)",
     border: "1px solid var(--fa-border)",
@@ -449,13 +531,16 @@ function ZoomControls({
     alignItems: "center",
     justifyContent: "center",
   };
-  const isAtDefault = Math.abs(scale - 1) < 0.01;
+  const zoomOutLabel = t("fa.diagram.zoomOut", "Zoom out");
+  const resetLabel = t("fa.diagram.resetView", "Reset view");
+  const zoomInLabel = t("fa.diagram.zoomIn", "Zoom in");
+
   return (
     <div className="flex items-center gap-1" data-no-pan>
       <button
         type="button"
-        aria-label="Zoom out"
-        title="Zoom out"
+        aria-label={zoomOutLabel}
+        title={zoomOutLabel}
         onClick={onZoomOut}
         style={btnStyle}
       >
@@ -463,23 +548,18 @@ function ZoomControls({
       </button>
       <button
         type="button"
-        aria-label="Reset view"
-        title="Reset view"
+        aria-label={resetLabel}
+        title={resetLabel}
         onClick={onReset}
-        disabled={isAtDefault}
-        style={{
-          ...btnStyle,
-          width: 44,
-          fontSize: 11,
-          opacity: isAtDefault ? 0.5 : 1,
-        }}
+        disabled={resetDisabled}
+        style={{ ...btnStyle, opacity: resetDisabled ? 0.5 : 1 }}
       >
-        {Math.round(scale * 100)}%
+        <RotateCcw size={14} />
       </button>
       <button
         type="button"
-        aria-label="Zoom in"
-        title="Zoom in"
+        aria-label={zoomInLabel}
+        title={zoomInLabel}
         onClick={onZoomIn}
         style={btnStyle}
       >
@@ -492,6 +572,8 @@ function ZoomControls({
 /* ── Violation tooltip ──────────────────────────────────────────────── */
 
 function ViolationTooltip({ violation }: { violation: DFAViolation }) {
+  const { t } = useTranslation();
+
   return (
     <div
       className="mb-1 flex items-start gap-2 rounded px-2 py-1.5 text-xs"
@@ -502,19 +584,13 @@ function ViolationTooltip({ violation }: { violation: DFAViolation }) {
     >
       <span style={{ flexShrink: 0, marginTop: 1 }}>⚠</span>
       <span>
-        {violation.type === "epsilon" ? (
-          <>
-            State <strong>{violation.state}</strong> has an ε-transition — not
-            allowed in a DFA.
-          </>
-        ) : (
-          <>
-            State <strong>{violation.state}</strong> on symbol{" "}
-            <strong>'{violation.symbol}'</strong> goes to{" "}
-            <strong>{violation.targets.join(", ")}</strong> — this violates DFA
-            determinism.
-          </>
-        )}
+        {violation.type === "epsilon"
+          ? t("fa.diagram.violationEpsilon", { state: violation.state })
+          : t("fa.diagram.violationNondeterministic", {
+              state: violation.state,
+              symbol: violation.symbol,
+              targets: violation.targets.join(", "),
+            })}
       </span>
     </div>
   );

@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
-import { recognizeWord } from "../domain/rlLanguageOps";
+import type { TranslationKey } from "@/types/i18n";
+import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import {
@@ -23,7 +24,8 @@ const DEFAULT_WORD = "001, 010, 1, 00";
 interface PerWordResult {
   word: string;
   accepted: boolean;
-  reason: string;
+  reasonCode: string;
+  states: string;
 }
 
 export function RLWordRecognizer({
@@ -65,10 +67,14 @@ export function RLWordRecognizer({
     // Treat the input as a comma-separated list of test words. A bare
     // empty piece represents ε (the empty word).
     const pieces = word.split(",").map((w) => w.trim());
-    const results = pieces.map((w): PerWordResult => {
-      const outcome = recognizeWord(grammar, w);
-      return { word: w, accepted: outcome.accepted, reason: outcome.reason };
-    });
+    const results = recognizeWords(grammar, pieces).map(
+      (outcome, index): PerWordResult => ({
+        word: pieces[index],
+        accepted: outcome.accepted,
+        reasonCode: outcome.reasonCode,
+        states: outcome.states,
+      }),
+    );
     return { ok: true, results };
   }, [source, word]);
 
@@ -125,7 +131,12 @@ export function RLWordRecognizer({
                   <span className="font-mono text-sm font-semibold">
                     {r.word === "" ? "ε" : r.word}
                   </span>
-                  <span className="text-foreground/70 text-xs">{r.reason}</span>
+                  <span className="text-foreground/70 text-xs">
+                    {t(
+                      `rl.simulator.reason.${r.reasonCode}` as TranslationKey,
+                      { states: r.states },
+                    )}
+                  </span>
                 </div>
               </li>
             ))}
@@ -134,7 +145,7 @@ export function RLWordRecognizer({
           <p className="text-muted-foreground text-sm">
             {t(
               "rl.simulator.grammarInvalid",
-              "Enter a valid right-linear grammar to derive a regex.",
+              "Enter a valid right-linear grammar.",
             )}
           </p>
         )}

@@ -3,10 +3,22 @@ import { useTranslation } from "react-i18next";
 import { BookOpen } from "lucide-react";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicCategorySection } from "@/components/shared/TopicCategorySection/TopicCategorySection";
 import type { Example } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
-import { rlExamples, type RLExample } from "./Simulator/config/rlExamples";
+import {
+  rlExamples,
+  type RLExample,
+  type RLExampleCategory,
+} from "./Simulator/config/rlExamples";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
+
+/** Section order on the page — one block per kind of task. */
+const CATEGORY_ORDER: RLExampleCategory[] = [
+  "grammarToLanguage",
+  "languageToGrammar",
+  "recognizeWord",
+];
 
 export function ExamplesTab({
   selectedExample,
@@ -29,29 +41,45 @@ export function ExamplesTab({
     [loadScenario, onOpenExampleInSimulation, t],
   );
 
+  // Card numbering runs across the whole tab, not per section.
+  let cardIndex = 0;
+
   return (
-    <div data-testid="rl-examples-tab">
-      <div className="text-muted-foreground mb-4 flex items-center gap-2">
+    <div data-testid="rl-examples-tab" className="flex flex-col gap-6">
+      <div className="text-muted-foreground flex items-center gap-2">
         <BookOpen className="size-4" />
         <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
       </div>
 
-      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
-        {rlExamples.map((example, index) => {
-          const item = toTopicExample(example, t);
-          return (
-            <ExerciseCard
-              key={example.id}
-              item={item}
-              index={index}
-              testIdPrefix={`rl-example-card-${example.id}`}
-              isSelected={selectedExample?.id === item.id}
-              onSelect={() => onSelectExample(item)}
-              onOpen={() => handleOpen(example)}
-            />
-          );
-        })}
-      </div>
+      {CATEGORY_ORDER.map((category) => {
+        const examples = rlExamples.filter((e) => e.category === category);
+        if (examples.length === 0) return null;
+
+        return (
+          <TopicCategorySection
+            key={category}
+            testId={`rl-examples-section-${category}`}
+            title={t(`rl.examples.categories.${category}.title`)}
+            description={t(`rl.examples.categories.${category}.description`)}
+          >
+            {examples.map((example) => {
+              const item = toTopicExample(example, t);
+              const index = cardIndex++;
+              return (
+                <ExerciseCard
+                  key={example.id}
+                  item={item}
+                  index={index}
+                  testIdPrefix={`rl-example-card-${example.id}`}
+                  isSelected={selectedExample?.id === item.id}
+                  onSelect={() => onSelectExample(item)}
+                  onOpen={() => handleOpen(example)}
+                />
+              );
+            })}
+          </TopicCategorySection>
+        );
+      })}
     </div>
   );
 }

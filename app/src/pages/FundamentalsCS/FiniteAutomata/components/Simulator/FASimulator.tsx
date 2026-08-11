@@ -25,8 +25,10 @@ import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
 import { FAConfigView } from "./presentation/FAConfigView";
+import { FAExercisePrompt } from "./presentation/FAExercisePrompt";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
+import { findFAExercise } from "../../exercises/faExerciseDefinitions";
 import { useFASimulatorStore } from "../../store/faSimulatorStore";
 
 type EditorMode = "manual" | "grammar";
@@ -93,6 +95,16 @@ export function FASimulator() {
     setStudentProgram(exposedStudentProgram);
     return () => setStudentProgram(null);
   }, [exposedStudentProgram, setStudentProgram]);
+
+  // Persist the in-progress automaton per exercise so re-opening the exercise
+  // restores the learner's work instead of the blank starter.
+  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
+  const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
+  useEffect(() => {
+    if (activeExerciseId) {
+      setExerciseDraft(activeExerciseId, exposedStudentProgram);
+    }
+  }, [activeExerciseId, exposedStudentProgram, setExerciseDraft]);
 
   // Track which pending program has already been applied to avoid double-processing.
   const [prevPendingProgram, setPrevPendingProgram] =
@@ -179,11 +191,13 @@ export function FASimulator() {
     };
   }, [handleImportProgram, storageIdentifier]);
 
+  // While an exercise is active its work persists to the per-exercise draft
+  // above, so the shared free-mode slot is only autosaved outside exercises.
   useTrainingCenterAutoSave({
     identifier: storageIdentifier,
     value: editor.draft,
     codec: faProgramTransferCodec,
-    enabled: isStorageReady,
+    enabled: isStorageReady && activeExerciseId === null,
   });
 
   const handleApplyProgram = () => {
@@ -210,6 +224,12 @@ export function FASimulator() {
     setEditorMode("manual");
   };
 
+  // The open exercise's problem statement stays visible while building and
+  // while simulating — the grammar family cannot be solved without it.
+  const activeExercise = activeExerciseId
+    ? findFAExercise(activeExerciseId)
+    : undefined;
+
   return (
     <div
       className={cn(
@@ -217,6 +237,8 @@ export function FASimulator() {
         isEditMode ? "max-w-none" : "max-w-7xl",
       )}
     >
+      {activeExercise && <FAExercisePrompt exercise={activeExercise} />}
+
       {isEditMode ? (
         <div className="flex flex-col gap-6">
           {/* Mode Toggle */}
