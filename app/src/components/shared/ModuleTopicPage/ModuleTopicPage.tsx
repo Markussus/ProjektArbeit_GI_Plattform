@@ -1,11 +1,17 @@
 import type { ComponentType } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
+import {
+  createTrainingCenterExerciseFromImport,
+  resolveTrainingCenterImportForPath,
+  type TrainingCenterImportRouteState,
+} from "@/lib/trainingCenter/trainingCenterImportNavigation";
 import { useUiStore } from "@/store/uiStore";
 import type { Example, Exercise, TopicItem } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
@@ -57,8 +63,11 @@ export function ModuleTopicPage({
   clearSimulationSelectionOnTabExit = false,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
+  const consumedImportValueRef = useRef<string | null>(null);
 
   const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
@@ -78,6 +87,44 @@ export function ModuleTopicPage({
     clearSimulationItem,
     clearSimulationSelection,
   } = useExerciseTabs();
+
+  useEffect(() => {
+    const routeState = location.state as TrainingCenterImportRouteState | null;
+    const storageValue = routeState?.trainingCenterImport?.storageValue;
+
+    if (!storageValue || consumedImportValueRef.current === storageValue) {
+      return;
+    }
+
+    const parsed = resolveTrainingCenterImportForPath(
+      location.pathname,
+      storageValue,
+    );
+
+    if (!parsed) {
+      return;
+    }
+
+    consumedImportValueRef.current = storageValue;
+    const exercise = createTrainingCenterExerciseFromImport(parsed, t);
+
+    if (exercise) {
+      openInSimulation(exercise);
+    } else {
+      clearSimulationSelection();
+      setActiveTab("simulation");
+    }
+
+    navigate(location.pathname, { replace: true, state: null });
+  }, [
+    clearSimulationSelection,
+    location.pathname,
+    location.state,
+    navigate,
+    openInSimulation,
+    setActiveTab,
+    t,
+  ]);
 
   const handleToggleSimulationFocus = () => {
     setIsSimulationFocused((prev) => {

@@ -106,10 +106,7 @@ export async function ensureSidebarExpanded(page: Page) {
 export async function switchLanguage(page: Page, language: "de" | "en") {
   await page.getByTestId(appTestIds.languageSelectTrigger).click();
   await expect(page.getByTestId(appTestIds.languageSelectMenu)).toBeVisible();
-  await page
-    .getByTestId(appTestIds.languageSelectMenu)
-    .getByRole("option", { name: language.toUpperCase() })
-    .click();
+  await page.getByTestId(`language-select-option-${language}`).click();
 }
 
 export async function readResolvedTheme(page: Page) {

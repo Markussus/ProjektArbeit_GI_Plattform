@@ -10,7 +10,14 @@ import {
 } from "../domain/dnfParser";
 import { generateTruthTable, type TruthTable } from "../domain/truthTable";
 
-export const MAX_DNF_VARIABLE_COUNT = 8;
+/**
+ * Upper bound on variables for the DNF tool. Capped at 4 so every exercise
+ * stays in the range where the exact smallest-form synthesis
+ * (MAX_EXACT_OPTIMAL_VARIABLES) is guaranteed globally optimal — the
+ * DNF-derived fallback above four variables is therefore only reached by other
+ * callers such as Moore/Mealy, never from the DNF tool itself.
+ */
+export const MAX_DNF_VARIABLE_COUNT = 4;
 
 export type DnfBuilderAnalysis =
   | {

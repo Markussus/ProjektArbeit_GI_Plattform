@@ -8,7 +8,6 @@ import type {
   MooreProgram,
 } from "../domain/mooreTypes";
 import { MooreInputBuilder } from "./MooreInputBuilder";
-import { MooreOutputTable } from "./MooreOutputTable";
 import { MooreTransitionTable } from "./MooreTransitionTable";
 
 export interface MooreConfigViewProps {
@@ -123,6 +122,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-representation-select"
+              optionTestIdPrefix="moore-representation-option"
             />
           </div>
           <div className="space-y-2">
@@ -139,6 +139,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-start-state-select"
+              optionTestIdPrefix="moore-start-state-option"
             />
           </div>
         </div>
@@ -154,47 +155,49 @@ export function MooreConfigView({
           onRemoveState={onRemoveState}
           onAddInputSymbol={onAddInputSymbol}
           onRemoveInputSymbol={onRemoveInputSymbol}
+          outputControls={{
+            getOutput: (_inputSymbol, state) => program.outputs[state],
+            onSymbolChange: (_inputSymbol, state, symbol) =>
+              onOutputSymbolChange(state, symbol),
+            onCodeChange: (_inputSymbol, state, code) =>
+              onOutputCodeChange(state, code),
+            testIdPrefix: "moore-transition-output",
+          }}
         />
-        <SymbolSetPanel
-          title={t("moore.sim.states")}
-          emptyText={t("moore.sim.noSymbols")}
-          testId="moore-state-set"
-          items={program.states.map((state, index) => ({
-            key: state,
-            content: (
-              <>
-                {state}
-                <span className="text-muted-foreground ml-1 text-xs">
-                  {formatInternalNumber(index, program.representation)}
-                </span>
-              </>
-            ),
-          }))}
-        />
-      </div>
-
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_15rem] xl:items-start">
-        <MooreOutputTable
-          program={program}
-          onOutputSymbolChange={onOutputSymbolChange}
-          onOutputCodeChange={onOutputCodeChange}
-        />
-        <SymbolSetPanel
-          title={t("moore.sim.outputAlphabet")}
-          emptyText={t("moore.sim.noSymbols")}
-          testId="moore-output-alphabet"
-          items={outputAlphabet.map((output) => ({
-            key: output.symbol,
-            content: (
-              <>
-                {output.symbol}
-                <span className="text-muted-foreground ml-1 text-xs">
-                  {formatInternalNumber(output.code, program.representation)}
-                </span>
-              </>
-            ),
-          }))}
-        />
+        <div className="space-y-4">
+          <SymbolSetPanel
+            title={t("moore.sim.states")}
+            emptyText={t("moore.sim.noSymbols")}
+            testId="moore-state-set"
+            items={program.states.map((state, index) => ({
+              key: state,
+              content: (
+                <>
+                  {state}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(index, program.representation)}
+                  </span>
+                </>
+              ),
+            }))}
+          />
+          <SymbolSetPanel
+            title={t("moore.sim.outputAlphabet")}
+            emptyText={t("moore.sim.noSymbols")}
+            testId="moore-output-alphabet"
+            items={outputAlphabet.map((output) => ({
+              key: output.symbol,
+              content: (
+                <>
+                  {output.symbol}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(output.code, program.representation)}
+                  </span>
+                </>
+              ),
+            }))}
+          />
+        </div>
       </div>
     </div>
   );

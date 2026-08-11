@@ -57,6 +57,23 @@ describe("DNF transfer codec", () => {
     expect(importedValue).toEqual(session);
   });
 
+  it("round-trips a truth-table session at the four-variable limit", async () => {
+    const session = {
+      variableCount: 4,
+      resultValues: Array.from({ length: 16 }, (_value, index) => index === 0),
+      committed: false,
+      truthTableAnswers: [],
+      dnfAnswer: "",
+      simplificationAnswer: "",
+    };
+
+    const exportedValue = await dnfTruthTableTransferCodec.exportValue(session);
+    const importedValue =
+      await dnfTruthTableTransferCodec.importValue(exportedValue);
+
+    expect(importedValue).toEqual(session);
+  });
+
   it("round-trips an exercise attempt with unanswered rows", async () => {
     const exportedValue = await dnfExerciseTransferCodec.exportValue({
       truthTableAnswers: [true, null, false],

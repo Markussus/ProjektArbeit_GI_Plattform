@@ -93,6 +93,17 @@ export function useDragScroll<
       if (!element) {
         return;
       }
+      const rect = element.getBoundingClientRect();
+      const scrollbarSize = 16;
+      const isOnHorizontalScrollbar =
+        element.scrollWidth > element.clientWidth &&
+        event.clientY >= rect.bottom - scrollbarSize;
+      const isOnVerticalScrollbar =
+        element.scrollHeight > element.clientHeight &&
+        event.clientX >= rect.right - scrollbarSize;
+      if (isOnHorizontalScrollbar || isOnVerticalScrollbar) {
+        return;
+      }
       dragRef.current = {
         x: event.clientX,
         y: event.clientY,

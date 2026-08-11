@@ -7,7 +7,8 @@ import type { TruthTable } from "../DnfBuilder/domain/truthTable";
 import { DnfTruthTable } from "../DnfBuilder/presentation/DnfTruthTable";
 
 export const EDITABLE_TABLE_MIN_VARIABLE_COUNT = 1;
-export const EDITABLE_TABLE_MAX_VARIABLE_COUNT = 8;
+// Matches MAX_DNF_VARIABLE_COUNT — see dnfAnalysis.ts for the rationale.
+export const EDITABLE_TABLE_MAX_VARIABLE_COUNT = 4;
 
 interface TableSetupProps {
   truthTable: TruthTable;

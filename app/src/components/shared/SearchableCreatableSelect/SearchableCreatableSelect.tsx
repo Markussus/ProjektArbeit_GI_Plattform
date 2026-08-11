@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
@@ -19,6 +20,8 @@ export interface SearchableCreatableSelectProps {
   notFoundLabel: string;
   disabled?: boolean;
   testId?: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
 export function SearchableCreatableSelect({
@@ -31,6 +34,8 @@ export function SearchableCreatableSelect({
   notFoundLabel,
   disabled = false,
   testId,
+  className,
+  style,
 }: SearchableCreatableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -185,7 +190,11 @@ export function SearchableCreatableSelect({
   };
 
   return (
-    <div ref={containerRef} className="relative min-w-32">
+    <div
+      ref={containerRef}
+      style={style}
+      className={cn("relative min-w-32", className)}
+    >
       <button
         type="button"
         onClick={() => !disabled && setIsOpen((current) => !current)}

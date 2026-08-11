@@ -143,19 +143,48 @@ export function SimplificationWalkthrough({
           walkthrough.factoredLiteralCount !== null && (
             <WalkthroughStep index={hasGroups ? 5 : 4}>
               <p className="text-foreground font-semibold">
-                {t("dnf.builder.exercise.walkthroughFactoredTitle")}
+                {t(
+                  walkthrough.factoredIsExact
+                    ? "dnf.builder.exercise.walkthroughFactoredTitle"
+                    : "dnf.builder.exercise.walkthroughFactoredFallbackTitle",
+                )}
               </p>
               <p className="text-muted-foreground mt-1 leading-relaxed">
-                {t("dnf.builder.exercise.walkthroughFactoredText", {
-                  minimalLiterals: walkthrough.minimalLiteralCount,
-                  factoredLiterals: walkthrough.factoredLiteralCount,
-                })}
+                {t(
+                  walkthrough.factoredIsExact
+                    ? "dnf.builder.exercise.walkthroughFactoredText"
+                    : "dnf.builder.exercise.walkthroughFactoredFallbackText",
+                  {
+                    minimalLiterals: walkthrough.minimalLiteralCount,
+                    factoredLiterals: walkthrough.factoredLiteralCount,
+                  },
+                )}
               </p>
               <code className="border-border bg-card text-foreground mt-2 block rounded-md border p-2 font-mono text-xs leading-relaxed break-words">
                 {walkthrough.factoredForm}
               </code>
+              {walkthrough.factoredDerivationSteps.length > 1 && (
+                <ol
+                  data-testid="dnf-walkthrough-factoring-derivation"
+                  className="border-border/60 mt-3 space-y-1.5 border-l-2 pl-3"
+                >
+                  {walkthrough.factoredDerivationSteps.map(
+                    (step, stepIndex) => (
+                      <DerivationStepLine
+                        key={stepIndex}
+                        step={step}
+                        isFirst={stepIndex === 0}
+                      />
+                    ),
+                  )}
+                </ol>
+              )}
               <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                {t("dnf.builder.exercise.walkthroughFactoredNote")}
+                {t(
+                  walkthrough.factoredIsExact
+                    ? "dnf.builder.exercise.walkthroughFactoredNote"
+                    : "dnf.builder.exercise.walkthroughFactoredFallbackNote",
+                )}
               </p>
             </WalkthroughStep>
           )}

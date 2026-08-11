@@ -12,15 +12,19 @@ import { DnfSimplificationPanel } from "./DnfSimplificationPanel";
 type DnfFollowUpSectionsProps = Pick<
   DnfFollowUpConfiguration,
   "simplification"
->;
+> & {
+  initiallyOpenSimplification?: boolean;
+};
 
 export function DnfFollowUpSections({
   simplification,
+  initiallyOpenSimplification = false,
 }: DnfFollowUpSectionsProps) {
   const { t } = useTranslation();
-  const [isSimplificationOpen, setIsSimplificationOpen] = useState(false);
-
   const isSimplificationEnabled = simplification.isEnabled === true;
+  const [isSimplificationOpen, setIsSimplificationOpen] = useState(
+    initiallyOpenSimplification && isSimplificationEnabled,
+  );
 
   return (
     <section data-testid="dnf-follow-up-sections" className="space-y-4">

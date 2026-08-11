@@ -2,13 +2,17 @@ import type { TranslationKey } from "@/types/i18n";
 import type { BooleanAlgebraRuleId } from "./booleanAlgebraRules";
 import { formatBooleanExpressionForDisplay } from "./booleanExpressionFormat";
 import { deriveDnfFromTruthTable, formatDnfExpression } from "./dnfDerivation";
-import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
+import { buildFactoringSteps, type Literal } from "./factorMinimalDnf";
 import {
   computeMinimalDnf,
   minimalDnfToExpression,
   type MinimalDnf,
   type PrimeImplicant,
 } from "./quineMcCluskey";
+import {
+  computeSmallestBooleanExpression,
+  type SmallestExpressionSource,
+} from "./minimalExpression";
 import type { TruthTable } from "./truthTable";
 
 const NOT = "¬";
@@ -39,6 +43,12 @@ export interface DnfSimplificationWalkthrough {
   /** Factored form derived from the minimal DNF; only set when strictly shorter. */
   factoredForm: string | null;
   factoredLiteralCount: number | null;
+  /** Distributivity derivation for the factored form; empty unless it is shorter. */
+  factoredDerivationSteps: DnfDerivationStep[];
+  /** True when the optional shorter form is certified globally shortest. */
+  factoredIsExact: boolean;
+  /** Origin of the optional shorter form, when one is shown. */
+  factoredSource: SmallestExpressionSource | null;
   constantCase: "always_false" | "always_true" | null;
 }
 
@@ -59,9 +69,12 @@ export function buildDnfSimplificationWalkthrough(
 ): DnfSimplificationWalkthrough {
   const derivation = deriveDnfFromTruthTable(table);
   const minimal = computeMinimalDnf(table);
-  const factoredExpression = factorMinimalDnf(minimal, table.variables);
-  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
+  const smallestExpression = computeSmallestBooleanExpression(table, minimal);
+  const factoredExpression = smallestExpression.expression;
+  const factoredLiteralCount = smallestExpression.literalCount;
   const factoredIsShorter = factoredLiteralCount < minimal.literalCount;
+  const hasFactoringDerivation =
+    factoredIsShorter && smallestExpression.source === "factored_dnf";
 
   return {
     trueRowNumbers: table.rows.flatMap((row, index) =>
@@ -77,8 +90,47 @@ export function buildDnfSimplificationWalkthrough(
       ? formatBooleanExpressionForDisplay(factoredExpression)
       : null,
     factoredLiteralCount: factoredIsShorter ? factoredLiteralCount : null,
+    factoredDerivationSteps: hasFactoringDerivation
+      ? buildFactoringDerivationSteps(minimal, table.variables)
+      : [],
+    factoredIsExact: factoredIsShorter ? smallestExpression.exact : true,
+    factoredSource: factoredIsShorter ? smallestExpression.source : null,
     constantCase: getConstantCase(minimal),
   };
+}
+
+/**
+ * Turn the structural factoring steps into displayable derivation lines: the
+ * starting sum-of-products has no rule; each later snapshot is one distributivity
+ * step labelled with the literal(s) that were factored out.
+ */
+function buildFactoringDerivationSteps(
+  minimal: MinimalDnf,
+  variables: string[],
+): DnfDerivationStep[] {
+  return buildFactoringSteps(minimal, variables).map((step) => {
+    const expression = formatBooleanExpressionForDisplay(step.expression);
+
+    if (step.factoredLiterals.length === 0) {
+      return { expression };
+    }
+
+    return {
+      expression,
+      ruleId: "distributivity",
+      noteKey: "dnf.builder.exercise.derivationNotes.factorOutCommon",
+      noteVars: {
+        variables: step.factoredLiterals
+          .map((literal) => formatFactoredLiteral(literal, variables))
+          .join(", "),
+      },
+    };
+  });
+}
+
+function formatFactoredLiteral(literal: Literal, variables: string[]): string {
+  const name = variables[literal.variableIndex];
+  return literal.negated ? `${NOT}${name}` : name;
 }
 
 function buildGroups(

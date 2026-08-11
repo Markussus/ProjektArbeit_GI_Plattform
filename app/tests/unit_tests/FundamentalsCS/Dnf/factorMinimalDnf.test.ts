@@ -9,7 +9,10 @@ import {
   countExpressionLiterals,
   factorMinimalDnf,
 } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/factorMinimalDnf";
-import { computeMinimalDnf } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
+import {
+  computeMinimalDnf,
+  getImplicantLiterals,
+} from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
 import {
   createTruthTableFromResults,
   generateTruthTable,
@@ -94,7 +97,84 @@ describe("factorMinimalDnf", () => {
     expect(countExpressionLiterals(factored)).toBe(3);
     expectEquivalent(factored, table);
   });
+
+  it("reaches the minimum factored literal count for every 3-variable function", () => {
+    const variables = ["a", "b", "c"];
+
+    for (let functionMask = 0; functionMask < 256; functionMask += 1) {
+      const results = Array.from(
+        { length: 8 },
+        (_, row) => (functionMask & (1 << row)) !== 0,
+      );
+      const table = createTruthTableFromResults(variables, results);
+      const minimal = computeMinimalDnf(table);
+      const factored = factorMinimalDnf(minimal, variables);
+
+      expectEquivalent(factored, table);
+
+      const optimum =
+        minimal.type === "constant"
+          ? 0
+          : bruteForceMinFactorLiterals(
+              minimal.implicants.map((implicant) =>
+                getImplicantLiterals(implicant, variables.length).map(
+                  (literal) => `${literal.variableIndex}:${literal.negated}`,
+                ),
+              ),
+            );
+
+      expect(countExpressionLiterals(factored)).toBe(optimum);
+    }
+  });
 });
+
+/**
+ * Independent oracle: minimum literal count obtainable by factoring common
+ * literals out of all their terms (reverse distributivity). Written without
+ * memoisation and over a different representation so it cross-checks the
+ * production search and cost bookkeeping rather than mirroring it.
+ */
+function bruteForceMinFactorLiterals(terms: string[][]): number {
+  if (terms.length <= 1) {
+    return terms[0]?.length ?? 0;
+  }
+
+  let best = terms.reduce((sum, term) => sum + term.length, 0);
+
+  for (const factor of commonFactorKeys(terms)) {
+    const withGroup: string[][] = [];
+    const withoutGroup: string[][] = [];
+    for (const term of terms) {
+      if (term.includes(factor)) {
+        withGroup.push(term.filter((literal) => literal !== factor));
+      } else {
+        withoutGroup.push(term);
+      }
+    }
+
+    const withCost = withGroup.some((term) => term.length === 0)
+      ? 1
+      : 1 + bruteForceMinFactorLiterals(withGroup);
+    const restCost =
+      withoutGroup.length === 0 ? 0 : bruteForceMinFactorLiterals(withoutGroup);
+
+    best = Math.min(best, withCost + restCost);
+  }
+
+  return best;
+}
+
+function commonFactorKeys(terms: string[][]): string[] {
+  const counts = new Map<string, number>();
+  for (const term of terms) {
+    for (const literal of new Set(term)) {
+      counts.set(literal, (counts.get(literal) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .filter(([, count]) => count >= 2)
+    .map(([literal]) => literal);
+}
 
 describe("countExpressionLiterals", () => {
   it("counts variable references regardless of negation", () => {

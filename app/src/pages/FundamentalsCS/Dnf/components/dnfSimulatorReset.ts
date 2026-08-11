@@ -2,6 +2,7 @@ import {
   createDnfAttemptDraft,
   type DnfTransferValue,
 } from "./DnfBuilder/domain/dnfTransfer";
+import { buildDnfWalkthroughTransferValue } from "./dnfWalkthroughSeed";
 import type { DnfWalkthroughExample } from "../examples/walkthroughExamples";
 
 export type DnfSimulatorMode =
@@ -47,12 +48,7 @@ function buildExpressionResetValue(
       : null;
 
   if (exampleValue) {
-    return {
-      mode: "expression_to_truth_table",
-      expression: exampleValue.expression,
-      committed: currentValue?.committed ?? false,
-      ...createDnfAttemptDraft(),
-    };
+    return buildDnfWalkthroughTransferValue(exampleValue);
   }
 
   if (currentValue?.committed) {
@@ -79,13 +75,7 @@ function buildTruthTableResetValue(
       : null;
 
   if (exampleValue) {
-    return {
-      mode: "truth_table_to_dnf",
-      variableCount: exampleValue.variables.length,
-      resultValues: exampleValue.resultValues,
-      committed: currentValue?.committed ?? false,
-      ...createDnfAttemptDraft(),
-    };
+    return buildDnfWalkthroughTransferValue(exampleValue);
   }
 
   const variableCount = currentValue?.variableCount ?? 3;

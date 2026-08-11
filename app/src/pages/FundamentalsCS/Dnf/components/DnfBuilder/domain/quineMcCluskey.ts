@@ -63,8 +63,8 @@ export function getImplicantLiterals(
  *     no further combination is possible. Uncombined entries are the prime
  *     implicants.
  *  3. Pick essential prime implicants (those uniquely covering some minterm).
- *  4. Cover the remaining minterms with a greedy choice that minimises
- *     total literal count.
+ *  4. Cover the remaining minterms exactly: branch-and-bound over the cyclic
+ *     core to find the cover with the minimum total literal count.
  */
 export function computeMinimalDnf(table: TruthTable): MinimalDnf {
   const variableCount = table.variables.length;
@@ -287,73 +287,141 @@ function mergeCovers(left: number[], right: number[]): number[] {
   return [...merged].sort((a, b) => a - b);
 }
 
+/**
+ * Choose a minimum-literal subset of prime implicants covering every minterm.
+ * This is an exact solution, not a greedy approximation:
+ *
+ *  1. Repeatedly pull out essential prime implicants — the only cover of some
+ *     still-uncovered minterm — which must appear in every valid cover.
+ *  2. On the remaining "cyclic core" (no minterm forces a single implicant),
+ *     branch over the implicants covering the most-constrained minterm and keep
+ *     the cheapest complete cover. Branches whose accumulated literal cost
+ *     already reaches the best known cover are pruned.
+ */
 function selectCover(
   primes: PrimeImplicant[],
   minterms: number[],
 ): PrimeImplicant[] {
-  const remaining = new Set(minterms);
-  const chosen: PrimeImplicant[] = [];
-  const available = new Set(primes);
+  // Every minterm is covered by at least one prime implicant, so `primes` is
+  // always a valid cover; it serves as the non-null seed for the search.
+  let bestCover: PrimeImplicant[] = primes;
+  let bestCost = Number.POSITIVE_INFINITY;
 
-  // Repeatedly extract essential prime implicants: a prime implicant is
-  // essential if it is the only one in `available` that covers some still-
-  // uncovered minterm.
-  let pickedEssential = true;
-  while (pickedEssential && remaining.size > 0) {
-    pickedEssential = false;
+  const search = (
+    remaining: Set<number>,
+    available: PrimeImplicant[],
+    chosen: PrimeImplicant[],
+    chosenCost: number,
+  ): void => {
+    if (chosenCost >= bestCost) {
+      return;
+    }
 
-    for (const minterm of remaining) {
-      const covering = [...available].filter((pi) =>
-        pi.covers.includes(minterm),
+    const reduced = extractEssentials(remaining, available);
+    const cover = chosen.concat(reduced.forced);
+    const coverCost = chosenCost + totalLiterals(reduced.forced);
+
+    if (coverCost >= bestCost) {
+      return;
+    }
+
+    if (reduced.remaining.size === 0) {
+      bestCover = cover;
+      bestCost = coverCost;
+      return;
+    }
+
+    const minterm = mostConstrainedMinterm(
+      reduced.remaining,
+      reduced.available,
+    );
+    const candidates = reduced.available
+      .filter((pi) => pi.covers.includes(minterm))
+      .sort((a, b) => a.literals - b.literals);
+
+    for (const candidate of candidates) {
+      const nextRemaining = new Set(reduced.remaining);
+      for (const covered of candidate.covers) {
+        nextRemaining.delete(covered);
+      }
+      const nextAvailable = reduced.available.filter((pi) => pi !== candidate);
+      search(
+        nextRemaining,
+        nextAvailable,
+        cover.concat(candidate),
+        coverCost + candidate.literals,
       );
+    }
+  };
+
+  search(new Set(minterms), primes, [], 0);
+
+  return bestCover;
+}
+
+/** Sum of literals across a set of implicants (the cost we minimise). */
+function totalLiterals(implicants: PrimeImplicant[]): number {
+  return implicants.reduce((sum, pi) => sum + pi.literals, 0);
+}
+
+/**
+ * Pull out essential prime implicants to a fixpoint: whenever a minterm is
+ * covered by exactly one available implicant, that implicant is forced. Returns
+ * the still-uncovered minterms, the implicants left to choose from, and the
+ * forced implicants. Inputs are not mutated.
+ */
+function extractEssentials(
+  remaining: Set<number>,
+  available: PrimeImplicant[],
+): {
+  remaining: Set<number>;
+  available: PrimeImplicant[];
+  forced: PrimeImplicant[];
+} {
+  const open = new Set(remaining);
+  let pool = available;
+  const forced: PrimeImplicant[] = [];
+
+  let changed = true;
+  while (changed && open.size > 0) {
+    changed = false;
+
+    for (const minterm of open) {
+      const covering = pool.filter((pi) => pi.covers.includes(minterm));
 
       if (covering.length === 1) {
         const essential = covering[0];
-        chosen.push(essential);
-        available.delete(essential);
+        forced.push(essential);
+        pool = pool.filter((pi) => pi !== essential);
         for (const covered of essential.covers) {
-          remaining.delete(covered);
+          open.delete(covered);
         }
-        pickedEssential = true;
+        changed = true;
         break;
       }
     }
   }
 
-  // Greedy fill: at each step, pick the prime implicant that covers the
-  // most still-uncovered minterms; break ties by preferring fewer literals.
-  while (remaining.size > 0) {
-    let best: PrimeImplicant | null = null;
-    let bestNewlyCovered = -1;
+  return { remaining: open, available: pool, forced };
+}
 
-    for (const candidate of available) {
-      const newlyCovered = candidate.covers.filter((minterm) =>
-        remaining.has(minterm),
-      ).length;
+/** The uncovered minterm with the fewest covering implicants (branch here). */
+function mostConstrainedMinterm(
+  remaining: Set<number>,
+  available: PrimeImplicant[],
+): number {
+  let chosen = -1;
+  let fewest = Number.POSITIVE_INFINITY;
 
-      if (newlyCovered === 0) {
-        continue;
-      }
+  for (const minterm of remaining) {
+    const count = available.reduce(
+      (total, pi) => (pi.covers.includes(minterm) ? total + 1 : total),
+      0,
+    );
 
-      if (
-        newlyCovered > bestNewlyCovered ||
-        (newlyCovered === bestNewlyCovered &&
-          best !== null &&
-          candidate.literals < best.literals)
-      ) {
-        best = candidate;
-        bestNewlyCovered = newlyCovered;
-      }
-    }
-
-    if (best === null) {
-      break;
-    }
-
-    chosen.push(best);
-    available.delete(best);
-    for (const covered of best.covers) {
-      remaining.delete(covered);
+    if (count < fewest) {
+      fewest = count;
+      chosen = minterm;
     }
   }
 

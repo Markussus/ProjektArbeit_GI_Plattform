@@ -460,6 +460,14 @@
     "description": "Learn how boolean expressions are evaluated with truth tables and how the Disjunctive Normal Form is derived from the rows with result 1.",
     "overviewTitle": "What is DNF?",
     "overviewText": "Disjunctive Normal Form (DNF) writes a boolean expression as OR-linked AND terms. In the lecture style, each truth-table row with result 1 contributes exactly one term.",
+    "tutorialVideo": "Tutorial video",
+    "tutorialQuestionLabel": "Question {{index}}",
+    "tutorialQuestion1": "What is Disjunctive Normal Form?",
+    "tutorialAnswer1": "DNF writes a boolean function as an OR of AND terms. Each truth-table row with result 1 contributes exactly one AND term.",
+    "tutorialQuestion2": "How do I build the DNF from a truth table?",
+    "tutorialAnswer2": "For each 1-row you form an AND term: variables with value 1 stay positive, with value 0 negated. All terms are joined with OR.",
+    "tutorialQuestion3": "What does the simplification do?",
+    "tutorialAnswer3": "It reduces the canonical DNF with Quine-McCluskey to the minimal form – the equivalent DNF with the fewest literals.",
     "concepts": "Key Concepts",
     "concept1": "Boolean polynomials",
     "concept2": "Truth Tables",
@@ -514,24 +522,12 @@
     "examples": {
       "walkthroughs": {
         "lectureExpression": {
-          "title": "Expression with an AND group",
-          "explanation": "The expression is true when a=1 or b and c are both 1."
+          "title": "Lecture example: a ∨ (b ∧ c)",
+          "explanation": "The lecture truth table shows where a is 1 or b and c are both 1."
         },
         "parentheses": {
-          "title": "Parentheses change the result",
-          "explanation": "Here c=1, and a=1 or b=1 must also hold."
-        },
-        "negation": {
-          "title": "Negation restricts the true rows",
-          "explanation": "Because ¬a is set, only rows with a=0 can be true. Additionally, b or c must equal 1."
-        },
-        "xor": {
-          "title": "Half-adder sum as XOR",
-          "explanation": "The sum is 1 when exactly one input is 1."
-        },
-        "carry": {
-          "title": "Half-adder carry",
-          "explanation": "The carry bit is only 1 when both inputs are 1 — a single AND term."
+          "title": "Exercise 1: (a ∨ b) ∧ c",
+          "explanation": "The lecture exercise changes only the parentheses and compares the result with the previous table."
         },
         "dnfIntro": {
           "title": "DNF introduction from the lecture",
@@ -580,8 +576,7 @@
       }
     },
     "exprBuilder": {
-      "evaluate": "Evaluate",
-      "newExpression": "Enter a different expression"
+      "evaluate": "Evaluate"
     },
     "simulator": {
       "tabs": {
@@ -600,7 +595,8 @@
       "setupPreviewTitle": "Set up the truth table",
       "setupPreviewHint": "Set the f column for each row. Once the table is ready, click \"Commit table\" to start the DNF exercise.",
       "commitTable": "Commit table",
-      "newTable": "New table"
+      "loadSolution": "Load solution",
+      "editConfig": "Edit config"
     },
     "builder": {
       "inputTitle": "Boolean expression",
@@ -700,8 +696,10 @@
         "revealRequiresCheck": "available after check",
         "minimalDnfLabel": "One possible minimal DNF",
         "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF form (OR of AND-terms), e.g. result of Quine-McCluskey.",
-        "factoredLabel": "Mathematically minimal (factored)",
-        "factoredNote": "{{literalsLabel}} — shorter than the minimal DNF by factoring out common literals, but no longer in DNF form.",
+        "factoredLabel": "Mathematically shortest form",
+        "factoredNote": "{{literalsLabel}} — shorter than the minimal DNF and mathematically equivalent, but no longer in DNF form.",
+        "factoredFallbackLabel": "Best found form",
+        "factoredFallbackNote": "{{literalsLabel}} — equivalent and shorter than the minimal DNF. For more than 4 variables, this form is not guaranteed to be globally minimal.",
         "literalCount_one": "{{count}} literal",
         "literalCount_other": "{{count}} literals",
         "termCount_one": "{{count}} term",
@@ -725,14 +723,18 @@
         "walkthroughCoverTitle": "Cover all 1-rows",
         "walkthroughCoverText": "The selected groups cover all 1-rows — no 1-row is left over.",
         "walkthroughResultTitle": "Possible minimal form",
-        "walkthroughFactoredTitle": "Optional: factor for an even shorter form",
-        "walkthroughFactoredText": "The minimal DNF has {{minimalLiterals}} literals. By factoring out common literals (reverse distributivity) the expression can be shortened to {{factoredLiterals}} literals — but the DNF form is lost.",
-        "walkthroughFactoredNote": "This form is mathematically equivalent but no longer a DNF (the outer operator is ∧). It is only relevant when the shortest boolean expression is asked for, not the shortest DNF.",
+        "walkthroughFactoredTitle": "Optional: shortest form outside DNF",
+        "walkthroughFactoredText": "The minimal DNF has {{minimalLiterals}} literals. The shorter equivalent form needs only {{factoredLiterals}} literals — but the DNF form is lost.",
+        "walkthroughFactoredNote": "This form is mathematically equivalent but no longer a DNF. When it comes from factoring, the distributivity steps are shown as well.",
+        "walkthroughFactoredFallbackTitle": "Optional: best found form outside DNF",
+        "walkthroughFactoredFallbackText": "The minimal DNF has {{minimalLiterals}} literals. The found equivalent form needs only {{factoredLiterals}} literals — but the DNF form is lost.",
+        "walkthroughFactoredFallbackNote": "For more than 4 variables, the safe fallback is used here. The form is correct and simplified, but it is not guaranteed to be the globally shortest boolean formula.",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
         "derivationNotes": {
           "factorOut": "Factor out {{variable}} — the other literals stay.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
-          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out."
+          "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out.",
+          "factorOutCommon": "Factor out {{variables}} (distributivity) — shared by these terms."
         },
         "simplificationStatus": {
           "empty": "Nothing entered yet",
@@ -791,6 +793,7 @@
       "errors": {
         "title": "Expression cannot be parsed",
         "emptyExpression": "Enter a boolean expression first.",
+        "expressionTooComplex": "The expression is too long or nested too deeply.",
         "unexpectedCharacter": "Unexpected character '{{value}}' at position {{index}}.",
         "unexpectedToken": "Unexpected token '{{value}}' at position {{index}}.",
         "unexpectedEnd": "The expression ends too early at position {{index}}.",
