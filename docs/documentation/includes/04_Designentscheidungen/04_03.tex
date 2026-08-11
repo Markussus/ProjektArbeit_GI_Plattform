@@ -1,9 +1,165 @@
-\subNsection{1}{Reguläre Sprachen}{Author}
+\subNsection{1}{Reguläre Sprachen}{Kristian Popov}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Author}
+Das Modul \emph{Reguläre Sprachen} unterstützt die Arbeit mit regulären Sprachen
+und rechtslinearen Grammatiken.
+Es bietet drei miteinander verknüpfte Funktionen:
+Die Aufzählung der von einer Grammatik erzeugten Wörter, die Erzeugung einer
+passenden Grammatik aus einer Sprachbeschreibung sowie die Prüfung einzelner Wörter.
+Sprachbeschreibungen können entweder als Aufzählung oder in Mengenschreibweise
+eingegeben werden.
+Bei der Aufzählung einer Sprache werden die Wörter nach ihrer Länge sortiert.
+Die Ausgabe ist dabei auf eine maximale Wortlänge und Wortanzahl begrenzt.
+Bei der Wortprüfung zeigt das Modul neben der Annahme oder Ablehnung auch den Grund
+für ein abweichendes Ergebnis an, beispielsweise einen nicht möglichen Übergang.
+Beide Umwandlungsrichtungen sind zusätzlich als Übungen mit automatischer Rückmeldung verfügbar.
 
-\subNsection{2}{Entscheidungen im UI}{Author}
+\subNsection{2}{Entscheidungen in der Architektur}{Kristian Popov}
 
-\subNsection{2}{Andere Entscheidungen}{Author}
+Der Simulator besteht aus einer koordinierenden Komponente und fachlich getrennten Bausteinen.
+Die Komponente \texttt{RLSimulator} verwaltet die drei Arbeitsmodi,
+den Wechsel zwischen ihnen und den Einstieg in Übungen.
+Sie enthält selbst keine formale Logik.
+Diese liegt vollständig im Verzeichnis \texttt{domain} und ist damit
+unabhängig von React testbar.
 
-Die Punkte sind nur Vorschläge ...
+Die fachlichen Bausteine sind wie folgt aufgeteilt:
+
+\begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
+	\item[Grammatikverarbeitung]
+		Der Grammatikparser und die Validierung lesen die Eingabe ein, prüfen die
+		Struktur einer rechtslinearen Grammatik und überführen sie in gemeinsame
+		Datentypen.
+
+	\item[Sprachbeschreibung]
+		Ein eigener Parser verarbeitet Aufzählungen und Mengenschreibweisen.
+    Er liefert eine strukturierte Beschreibung aus Faktoren, Exponenten und
+		Nebenbedingungen, die anschließend in eine Grammatik umgewandelt werden
+		kann.
+
+	\item[Umwandlung und Vereinfachung]
+		Die Umwandlung erzeugt aus einer Sprachbeschreibung eine strikt
+		rechtslineare Grammatik.
+    Ergänzende Funktionen fassen gleichwertige Nichtterminale zusammen und
+    formatieren das Ergebnis für die Ausgabe.
+
+	\item[Sprachauswertung]
+		Die Aufzählung erzeugt Wörter bis zu den festgelegten Grenzen; die
+		Worterkennung prüft ein einzelnes Wort gegen eine Grammatik.
+    Die Übungsprüfung baut auf denselben Funktionen auf und ergänzt sie um die
+		Auswertung der vorgegebenen Testfälle.
+\end{description}
+
+Wiederverwendet werden der Grammatikparser, die Grammatikvalidierung und die gemeinsamen
+Datentypen.
+Eine eigene Ableitungslogik direkt auf den Produktionen hätte zwei
+Implementierungen erfordert, die dasselbe Verhalten abbilden müssen.
+Mit der gemeinsamen Grundlage stimmen Aufzählung, Worterkennung und Übungsprüfung
+stets überein.
+
+Für die Sprachbeschreibung habe ich einen eigenen Parser geschrieben, der zwei
+Formen versteht:
+
+\begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
+	\item[Aufzählung]
+		listet die Wörter unmittelbar auf:\\
+		\verb|L = {"010", "0010"}|
+
+	\item[Mengenschreibweise]
+		beschreibt ein Muster mit Variablen und Nebenbedingungen:\\
+		\verb+L = {a^n c b^m | n, m > 0}+
+\end{description}
+
+Endet eine Aufzählung mit einer Fortsetzungsmarkierung, versucht der Parser, daraus
+ein wiederkehrendes Muster abzuleiten, statt die Wörter nur wörtlich zu übernehmen.
+So lässt sich eine unendliche Sprache angeben, ohne die Mengenschreibweise schon
+beherrschen zu müssen.
+
+Bestimmte Eingaben werden bewusst abgelehnt, auch wenn sie sich formal beschreiben lassen.
+Verwendet dieselbe Variable mehrere Faktoren, wie in \verb|a^n b^n|, koppelt das
+deren Längen aneinander.
+Der Musterfall \verb|a^n b^n| ist nicht regulär; die unterstützte Sprachbeschreibung
+lässt solche gekoppelten Längenbedingungen deshalb generell nicht zu und weist sie
+mit einer eigenen Meldung zurück.
+Obere Schranken werden ebenfalls nicht unterstützt,
+obwohl sie endliche und damit reguläre Sprachen beschreiben.
+Sie würden die Eingabesprache unnötig erweitern und lassen sich klarer als Aufzählung angeben.
+Diese Fälle ausdrücklich zu erklären, ist lehrreicher, als sie stillschweigend zu verwerfen.
+
+Die erzeugte Grammatik ist strikt rechtslinear, es entstehen also ausschließlich
+Regeln der Form \verb|A -> aB| und \verb|A -> a| sowie die Regel
+$A \rightarrow \varepsilon$.
+Eine frühere Fassung gab eine kompaktere Form wie \verb|S -> A c B| aus.
+Diese Schreibweise ist zwar kürzer, aber eine allgemeine kontextfreie Regel und
+verlässt damit die Typ-3-Grammatiken, um die es in diesem Modul gerade geht.
+
+Um trotzdem eine lesbare Ausgabe zu bieten, gibt es zwei Sichten auf dasselbe
+Ergebnis statt zweier Formalismen:
+Die detaillierte Sicht zeigt ein Nichtterminal je Präfix, die vereinfachte Sicht
+führt Nichtterminale zusammen, die dieselben Wörter ableiten.
+Bei der vereinfachten Sicht werden äquivalente Teilbäume zusammengeführt.
+Sie bleibt rechtslinear und kann die Grammatik nur verkleinern, nie ihre Sprache verändern.
+
+Alle Stellen, die eine rechtslineare Grammatik ausgeben, benutzen dieselbe
+Namensvergabe und Ausgabefunktion.
+Zuvor lag diese Logik in drei leicht unterschiedlichen Kopien vor.
+In einer davon verbrauchte ein weggelassener Endzustand einen Buchstaben, sodass in der Ausgabe
+eine Lücke entstand und etwa \verb|E| übersprungen wurde.
+Eine gemeinsame Funktion schließt solche Abweichungen aus und stellt sicher, dass
+eine exportierte Grammatik nach dem Import dieselben Namen trägt.
+
+\subNsection{2}{Entscheidungen im UI}{Kristian Popov}
+
+Die drei Arbeitsweisen sind über eine Modulauswahl erreichbar.
+Ihre Komponenten bleiben im Hintergrund erhalten und werden nur ein- oder ausgeblendet.
+Dadurch bleiben Eingaben beim Wechsel zwischen den Modi bestehen.
+Würden die Modi jeweils neu aufgebaut, ginge die begonnene Arbeit verloren
+und die Ansicht spränge auf ihr Standardbeispiel zurück.
+
+Ist eine Übung geöffnet, ersetzt eine geführte Arbeitsfläche den freien Umwandler.
+Vorgabe und Aufgabe stehen dabei nebeneinander:
+In der einen Richtung ist die Grammatik gegeben und die Sprache gesucht, in der
+anderen umgekehrt.
+Ein Moduswechsel während einer offenen Übung würde den aktuellen Bearbeitungsstand
+verwerfen. Deshalb wird vorher eine Bestätigung verlangt.
+
+Fehlermeldungen erscheinen unmittelbar unter dem jeweiligen Eingabefeld, aber erst,
+nachdem überhaupt etwas eingegeben wurde.
+Ein leeres Feld ist kein Fehler, sondern der Ausgangszustand.
+Zusätzlich lässt sich die unterstützte Syntax direkt neben dem Eingabefeld
+aufklappen, damit die Schreibweise nicht erst gesucht werden muss.
+
+\subNsection{2}{Andere Entscheidungen}{Kristian Popov}
+
+Die Kontrolle der Übungen vergleicht keine Texte.
+Für die Richtung \emph{Sprache}$\rightarrow$ \emph{Grammatik} sind zu jeder Aufgabe Wörter hinterlegt,
+die erzeugt werden müssen, und Wörter, die nicht erzeugt werden dürfen.
+Geprüft wird, ob die eingegebene Grammatik alle geforderten Wörter ableitet und
+alle ausgeschlossenen ablehnt.
+Ein Textvergleich mit einer Musterlösung wäre hier unbrauchbar, da dieselbe Sprache
+von vielen unterschiedlichen Grammatiken erzeugt werden kann und die Sprachen zum
+Teil unendlich sind.
+Die Rückmeldung nennt daher falsch erzeugte und fehlende Wörter statt nur einer
+Ja-Nein-Aussage.
+Da nur vorbereitete Beispiele geprüft werden, dient auch diese Kontrolle
+der gezielten Rückmeldung und ist kein allgemeiner Beweis für die Gleichheit zweier Sprachen.
+
+Für die Richtung \emph{Grammatik} $\rightarrow$ \emph{Sprache} verwendet die
+Kontrolle dieselben Grenzen für Wortlänge und Wortanzahl wie die Schaltfläche zum
+Anzeigen der Lösung.
+Andernfalls könnte eine angezeigte Lösung die anschließende Prüfung nicht bestehen.
+
+Beim Import und Export unterscheiden sich die beiden Formate bewusst.
+Eine Grammatik wird strukturiert kodiert, also in Nichtterminale, Terminale und
+Produktionen zerlegt und bitweise gepackt.
+Eine Sprachbeschreibung wird dagegen als Text übernommen, weil sie vom Benutzer
+selbst formuliert ist und ihre Schreibweise erhalten bleiben soll.
+Beide Seiten prüfen beim Kodieren und beim Dekodieren, dass der Inhalt gültig ist.
+
+Jeder Modus speichert seinen Stand in einem eigenen Bereich der lokalen Ablage.
+Ohne diese Trennung hätten sich die Grammatik des Aufzählungsmodus und die des
+Worterkenners gegenseitig überschrieben, da beide auf demselben Eingabetyp arbeiten.
+
+Die Aufgabenstellungen selbst sind in einer sprachneutralen Notation hinterlegt und
+nicht in den Übersetzungsdateien.
+Eine Produktion wie \verb|START = "1", A| ist in beiden Oberflächensprachen
+identisch; eine Übersetzung würde hier nur zusätzliche Fehlerquellen schaffen.
