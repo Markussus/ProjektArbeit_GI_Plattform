@@ -1,55 +1,48 @@
 import type { FAProgram } from "./faTypes";
-import { EPSILON } from "./faTypes";
+import { epsilonClosure } from "./faMachine";
 import { validateFAProgram } from "./faProgramValidation";
 
 /* ────────────────────────────────────────────────────────────
-   Configuration-based simulator shared by both programs so the
-   same evaluator is used regardless of DFA/NFA type.
+   Acceptance check shared by both programs so the same evaluator
+   is used regardless of DFA/NFA type. This is the set-at-a-time
+   equivalent of stepping `faMachine`, without building the step
+   history a run needs — validation only cares about the verdict.
    ──────────────────────────────────────────────────────────── */
 
-function epsilonClosure(
-  program: FAProgram,
-  seed: Iterable<string>,
-): Set<string> {
-  const result = new Set<string>(seed);
-  const stack = [...result];
-  while (stack.length > 0) {
-    const s = stack.pop()!;
-    const eps = program.transitions[s]?.[EPSILON] ?? [];
-    for (const t of eps) {
-      if (!result.has(t)) {
-        result.add(t);
-        stack.push(t);
-      }
+function step(program: FAProgram, active: string[], symbol: string): string[] {
+  const next = new Set<string>();
+  for (const state of active) {
+    for (const target of program.transitions[state]?.[symbol] ?? []) {
+      next.add(target);
     }
   }
-  return result;
+  return epsilonClosure(program, [...next]);
 }
 
-function step(
-  program: FAProgram,
-  active: Set<string>,
-  symbol: string,
-): Set<string> {
-  const next = new Set<string>();
-  for (const s of active) {
-    const targets = program.transitions[s]?.[symbol] ?? [];
-    for (const t of targets) next.add(t);
-  }
-  return epsilonClosure(program, next);
+/**
+ * An acceptance test for one program. Validation runs the same program over
+ * hundreds of words, so the set lookups and the start closure are built once
+ * up front rather than per word.
+ */
+function createAcceptor(program: FAProgram): (word: string) => boolean {
+  const alphabet = new Set(program.alphabet);
+  const acceptStates = new Set(program.acceptStates);
+  const startClosure = epsilonClosure(program, [program.startState]);
+
+  return (word) => {
+    let active = startClosure;
+    for (const ch of word) {
+      if (!alphabet.has(ch)) return false;
+      active = step(program, active, ch);
+      if (active.length === 0) return false;
+    }
+    return active.some((state) => acceptStates.has(state));
+  };
 }
 
 /** Run `program` on `word`; return true iff any active state is accepting. */
 export function accepts(program: FAProgram, word: string): boolean {
-  let active = epsilonClosure(program, [program.startState]);
-  for (const ch of word) {
-    if (!program.alphabet.includes(ch)) return false;
-    active = step(program, active, ch);
-    if (active.size === 0) return false;
-  }
-  const acceptSet = new Set(program.acceptStates);
-  for (const s of active) if (acceptSet.has(s)) return true;
-  return false;
+  return createAcceptor(program)(word);
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -127,11 +120,14 @@ export function validateAgainstSolution(
   let passedCount = 0;
   let firstFailure: TestCase | null = null;
 
+  const solutionAccepts = createAcceptor(solution);
+  const studentAccepts = createAcceptor(student);
+
   for (const word of words) {
-    const expected = accepts(solution, word);
-    // If the student's alphabet doesn't cover a symbol, `accepts` returns
+    const expected = solutionAccepts(word);
+    // If the student's alphabet doesn't cover a symbol, the acceptor returns
     // false — which is a legitimate rejection to report, not a crash.
-    const got = accepts(student, word);
+    const got = studentAccepts(word);
     const passed = expected === got;
     const tc: TestCase = { word, expected, got, passed };
     if (passed) passedCount++;

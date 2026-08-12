@@ -10,7 +10,10 @@ const TRANSFER_MODE_BITS = 2;
 const MAX_TEXT_BYTES = 100_000;
 const MAX_TRUTH_TABLE_ANSWERS = 256;
 const MIN_VARIABLE_COUNT = 1;
-const MAX_VARIABLE_COUNT = 8;
+// Matches MAX_DNF_VARIABLE_COUNT — see dnfAnalysis.ts for the rationale.
+// Only a validation bound (the count is varuint-encoded), so changing it keeps
+// the transfer format intact and just accepts or rejects different payloads.
+const MAX_VARIABLE_COUNT = 4;
 
 const TransferMode = {
   ExpressionToTruthTable: 0,

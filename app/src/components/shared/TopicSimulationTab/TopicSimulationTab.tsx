@@ -14,6 +14,8 @@ interface TopicSimulationTabProps {
   resetDisabled?: boolean;
   overlayControls?: boolean;
   selectedItemActions?: ReactNode;
+  onExitExercise?: () => void;
+  onExitExample?: () => void;
   children?: ReactNode;
 }
 
@@ -27,9 +29,21 @@ export function TopicSimulationTab({
   resetDisabled,
   overlayControls,
   selectedItemActions,
+  onExitExercise,
+  onExitExample,
   children,
 }: TopicSimulationTabProps) {
   const { t } = useTranslation();
+
+  const activeItem = selectedItem ?? selectedExercise;
+
+  const handleCloseItem = () => {
+    if (activeItem?.kind === "example") {
+      onExitExample?.();
+    } else {
+      onExitExercise?.();
+    }
+  };
 
   return (
     <SimulationWorkspace
@@ -42,6 +56,7 @@ export function TopicSimulationTab({
       onReset={onReset}
       resetDisabled={resetDisabled}
       overlayControls={overlayControls}
+      onCloseItem={activeItem ? handleCloseItem : undefined}
     >
       {children}
     </SimulationWorkspace>

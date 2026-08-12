@@ -13,7 +13,6 @@ export type ArithmeticModeType =
   | "multiplication"
   | "division"
   | "shifting"
-  | "ieee754"
   | "compare";
 export type NegativeStepMode = "twos" | "ones" | "sign";
 
@@ -99,7 +98,7 @@ function parseNumberSystemState(serializedValue: string): NumberSystemState {
     m: "multiplication",
     d: "division",
     h: "shifting",
-    e: "ieee754",
+    e: "addition", // Fallback for old states
     c: "compare",
   };
 
@@ -176,7 +175,6 @@ export const nsTransferCodec: ISimulatorTransferCodec<NumberSystemState> = {
         multiplication: "m",
         division: "d",
         shifting: "h",
-        ieee754: "e",
         compare: "c",
       };
 

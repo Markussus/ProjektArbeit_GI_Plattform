@@ -194,7 +194,7 @@ export function RLGrammarToLanguage({
           <p className="text-muted-foreground text-sm">
             {t(
               "rl.simulator.grammarInvalid",
-              "Enter a valid right-linear grammar to derive a regex.",
+              "Enter a valid right-linear grammar.",
             )}
           </p>
         )}

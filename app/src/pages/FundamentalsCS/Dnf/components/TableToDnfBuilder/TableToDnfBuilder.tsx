@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { Lightbulb, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -8,11 +8,14 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
+import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
 import {
   dnfTruthTableTransferCodec,
   type DnfTruthTableTransferDraft,
@@ -35,6 +38,7 @@ interface TableToDnfBuilderProps {
   transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
   onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 export function TableToDnfBuilder({
@@ -45,6 +49,7 @@ export function TableToDnfBuilder({
   transferCodec,
   onTransferValueChange,
   onUserChange,
+  seedInitialFeedback = false,
 }: TableToDnfBuilderProps) {
   const { t } = useTranslation();
   const initialVariableCount = clampVariableCount(
@@ -59,12 +64,9 @@ export function TableToDnfBuilder({
   );
   const [committed, setCommitted] = useState(initialValue?.committed ?? false);
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoadedVersion, setSolutionLoadedVersion] = useState(0);
   const [showFullTable, setShowFullTable] = useState(false);
   const [dnfAnswer, setDnfAnswer] = useState(initialValue?.dnfAnswer ?? "");
-  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
-  const simplification = useDnfSimplification(
-    initialValue?.simplificationAnswer,
-  );
   const truthTable = useMemo(
     () =>
       createTruthTableFromResults(
@@ -76,6 +78,34 @@ export function TableToDnfBuilder({
   const analysis = useMemo(
     () => analyzeDnfTruthTable(truthTable),
     [truthTable],
+  );
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(() =>
+    seedInitialFeedback &&
+    analysis.status === "valid" &&
+    (initialValue?.dnfAnswer ?? "").trim().length > 0
+      ? checkDnfExerciseAttempt(
+          analysis.truthTable,
+          [],
+          initialValue?.dnfAnswer ?? "",
+          { checkTruthTable: false },
+        )
+      : null,
+  );
+  const initialSimplificationFeedback = useMemo(
+    () =>
+      seedInitialFeedback &&
+      analysis.status === "valid" &&
+      (initialValue?.simplificationAnswer ?? "").trim().length > 0
+        ? checkDnfSimplification(
+            analysis.truthTable,
+            initialValue?.simplificationAnswer ?? "",
+          )
+        : null,
+    [analysis, initialValue?.simplificationAnswer, seedInitialFeedback],
+  );
+  const simplification = useDnfSimplification(
+    initialValue?.simplificationAnswer,
+    { initialFeedback: initialSimplificationFeedback },
   );
   const transferValue = useMemo(
     () => ({
@@ -161,6 +191,29 @@ export function TableToDnfBuilder({
     simplification.reset();
   };
 
+  // Fill the answer with the reference solution for the user-defined table: the
+  // canonical DNF and the minimal simplification, shown as already checked. The
+  // table itself stays as the user built it.
+  const loadSolution = () => {
+    if (analysis.status !== "valid") return;
+
+    const canonicalDnf = analysis.formattedDnf;
+    const minimalExpression = formatBooleanExpressionForDisplay(
+      computeSmallestBooleanExpression(analysis.truthTable).expression,
+    );
+
+    onUserChange?.();
+    setDnfAnswer(canonicalDnf);
+    setShowSolution(false);
+    setFeedback(
+      checkDnfExerciseAttempt(analysis.truthTable, [], canonicalDnf, {
+        checkTruthTable: false,
+      }),
+    );
+    simplification.loadSolution(minimalExpression, analysis.truthTable);
+    setSolutionLoadedVersion((current) => current + 1);
+  };
+
   const handleImportTable = (value: DnfTruthTableTransferDraft) => {
     onUserChange?.();
     setVariableCount(value.variableCount);
@@ -222,15 +275,27 @@ export function TableToDnfBuilder({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
+          data-testid="dnf-edit-table-config"
           onClick={handleNewTable}
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
+          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
         >
-          <ArrowLeft className="size-4" />
-          {t("dnf.simulator.newTable")}
+          <Pencil className="size-4" />
+          {t("dnf.simulator.editConfig")}
         </button>
+        {!seedInitialFeedback && (
+          <button
+            type="button"
+            data-testid="dnf-free-load-solution"
+            onClick={loadSolution}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            <Lightbulb className="size-4" />
+            {t("dnf.simulator.loadSolution")}
+          </button>
+        )}
       </div>
 
       <DnfExerciseWorkspace
@@ -253,7 +318,13 @@ export function TableToDnfBuilder({
         solution={solution}
       />
 
-      <DnfFollowUpSections simplification={simplificationFollowUp} />
+      <DnfFollowUpSections
+        key={`simplification-${solutionLoadedVersion}`}
+        simplification={simplificationFollowUp}
+        initiallyOpenSimplification={
+          seedInitialFeedback || solutionLoadedVersion > 0
+        }
+      />
 
       <SimulatorStringTransferBox
         value={transferValue}

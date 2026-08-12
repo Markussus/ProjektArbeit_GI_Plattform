@@ -1,0 +1,496 @@
+\ProvidesPackage{thwsbeamertheme}
+
+% README
+% 
+% Use this package to create slides in the corporate design of the THWS.
+% \usepackage{thwsbeamertheme} 
+% 
+% Options:
+% - bs: Bullet symbol for itemize lists (default: $\blacksquare$, see below for more examples)
+% - bc: Bullet color for itemize lists (default: thwsorange)
+% - titlebg: Background color of the title slide (default: thwsblue)
+% - refbg: Background color of the literature slides (default: thwsgrey)
+% - thwslogoh: Filename of the horizontal THWS logo (default: thws-logo_horiz_de_white.png)
+% - thwslogov: Filename of the vertical THWS logo (default: thws-logo_vert_de_orange-rgb.png)
+%
+\PassOptionsToPackage{normalem}{ulem}
+\RequirePackage{hyperref}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{listings}
+\RequirePackage{graphicx}
+\RequirePackage{ulem}
+\RequirePackage{accsupp}
+\RequirePackage[sfdefault]{roboto}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\RequirePackage{setspace}
+\RequirePackage{xkeyval}
+\RequirePackage{fontawesome}
+\RequirePackage{booktabs}
+\RequirePackage{etoolbox}
+\RequirePackage[backend=biber]{biblatex}
+
+% Color schema of THWS 
+\definecolor{thwsorange}{rgb}{1.0,0.416,0.000} 
+\definecolor{thwsblue}{rgb}{0.088,0.236,0.412} 
+\definecolor{thwsgrey}{rgb}{0.85,0.85,0.85} 
+\definecolor{thwspetrol}{rgb}{0.0,0.333,0.392} 
+
+\newcommand{\modulename}[1]{\def\@modulename{#1}}
+\newcommand{\@modulename}{} % Leerer Default
+
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{palette primary}{fg=black,bg=white}
+
+
+% Define an option for the bullet symbol in itemize lists
+% Further examples: $\bullet$ $\blacktriangleright$ $\checkmark$ $\rightarrow$ $\bigstar$ $\blacksquare$
+\DeclareOptionX{bs}{\def\bulletsymbol{#1}}
+\def\bulletsymbol{$\blacksquare$}
+
+% Define an option for the bullet color in itemize lists
+\DeclareOptionX{bc}{\def\bulletcolor{#1}}
+\def\bulletcolor{thwsorange}
+
+% Defne an option for the background color of the title slide
+\DeclareOptionX{titlebg}{\def\titlebgcolor{#1}}
+\def\titlebgcolor{thwsblue}
+
+% Define an option for the title color
+\DeclareOptionX{titlecolor}{\def\titlecolor{#1}}
+\def\titlecolor{thwsorange}
+
+% Define an option for the title color
+\DeclareOptionX{authorcolor}{\def\authorcolor{#1}}
+\def\authorcolor{thwsorange}
+
+% Define an option for the background color of the literature slides
+\DeclareOptionX{refbg}{\def\refbgcolor{#1}}
+\def\refbgcolor{thwsgrey}
+
+% Define an option for the background color of the learnign goals slide
+\DeclareOptionX{learninggoalsbg}{\def\learninggoalsbgcolor{#1}}
+\def\learninggoalsbgcolor{thwsgrey}
+
+% Define default file name of the two logos used in this template 
+\def\thwslogovertical{thws-logo_vert_de_orange-rgb.png}
+\def\thwslogohorizontal{thws-logo_horiz_de_white.png}
+
+% Define an option for the file name of the two THWS logos
+\DeclareOptionX{thwslogoh}{\def\thwslogohorizontal{#1}}
+\DeclareOptionX{thwslogov}{\def\thwslogovertical{#1}}
+
+% Define an option for the space for the speaker on the right side of the slides
+\newtoggle{speakerspace}
+\DeclareOptionX{speakerspace}{\toggletrue{speakerspace}}
+\DeclareOptionX{nospeakerspace}{\togglefalse{speakerspace}}
+\togglefalse{speakerspace}
+
+\newtoggle{showslidenumber}
+\DeclareOptionX{slidenumber}{\toggletrue{showslidenumber}}
+\togglefalse{showslidenumber} 
+
+\ProcessOptionsX\relax
+
+% Define the template for the title slide 
+\setbeamertemplate{title page}{
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[\titlebgcolor] (current page.south west) rectangle (current page.north east);
+        \node[anchor=north west] at (current page.north west) {
+            \includegraphics[height=1.0cm]{\thwslogohorizontal}
+        };
+         %\fill[white] (current page.north east) ++(-6cm,0) rectangle (current page.south east);
+        
+        \node[anchor=north east, inner sep=0pt, yshift=+0.035cm] at (current page.north east) {
+            \includegraphics[height=1.01\paperheight]{id23_code.png}
+        };
+    \end{tikzpicture}
+
+    \parbox{0.65\textwidth}{ 
+    \setstretch{1.5} 
+    {\large \textcolor{\titlecolor}{\@modulename}}\\[0.5cm]
+    {\LARGE \textbf{\textcolor{\titlecolor}{\MakeUppercase{\inserttitle}}}} \\[1cm]
+    {\Large \textcolor{\authorcolor}{\insertauthor}}
+    }
+}
+
+% Define the template for the frametitle
+\setbeamertemplate{frametitle}{
+    \nointerlineskip
+    \begin{minipage}{\textwidth} 
+        \hspace{-32pt} 
+        \includegraphics[height=1.3cm]{\thwslogovertical} 
+        \hfill 
+        \raisebox{16pt}{\usebeamercolor[black]{frametitle} \Large \textbf{\MakeUppercase{\insertframetitle}}}  
+    \end{minipage}
+}
+
+\setbeamertemplate{footline}{
+  \iftoggle{showslidenumber}{
+    \ifnum\value{framenumber}>1
+      \leavevmode%
+      \hbox{%
+        \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.25ex,dp=1ex,left,leftskip=1em]{date in head/foot}%
+        \usebeamerfont{date in head/foot}\insertframenumber{}%
+        \hspace{1ex}%
+        \end{beamercolorbox}%
+      }
+    \fi
+  }{}
+}
+
+\newenvironment{learninggoals}[1]{%
+  \setbeamercolor{background canvas}{bg=\learninggoalsbgcolor}%
+  \begin{frame}
+    \frametitle{#1}%
+}{%
+  \end{frame}%
+}
+%
+% Define a new environment for a slide that can be used to separate sections
+% This slide has a blue background and a large title but no space for the speaker
+\newenvironment{sectionframe}[1]{
+    \setbeamercolor{background canvas}{bg=thwsblue} 
+    \begin{frame}
+    \vspace{1cm}
+    \begin{center}
+        \setstretch{1.5}
+        {\LARGE\textbf{\textcolor{white}{\MakeUppercase{#1}}}} 
+    \end{center}
+}{
+    \end{frame}
+    \setbeamercolor{background canvas}{bg=} 
+}
+
+\newcommand{\addsectionframe}[1]{\begin{sectionframe}{#1}\end{sectionframe}}
+
+% Define a new environment for a slide that can be used to separate sections
+% This slide has a blue background and a large title and some space for the speaker
+% Don't try to optimize the two environments sectionframe and speakersectionframe. The 
+% name is used as marker for the DTU script for video production. In case of a 
+% speakersectionframe there must be a video for this slide. In case of a sectionframe
+% the script will put some music in the background. 
+\newenvironment{speakersectionframe}[1]
+{
+    \setbeamercolor{background canvas}{bg=thwsblue} 
+    \begin{frame}[fragile,environment=speakersectionframe]
+    \begin{columns}
+        \begin{column}{0.7\textwidth} 
+        \begin{center}
+            \setstretch{1.5}
+            {\LARGE \textbf{\textcolor{white}{\MakeUppercase{#1}}}} 
+        \end{center}
+}{
+        \end{column}
+        \begin{column}{0.3\textwidth} 
+        \end{column}
+    \end{columns}
+    \end{frame}
+    \setbeamercolor{background canvas}{bg=} 
+}
+
+\newcommand{\addspeakersectionframe}[1]{\begin{speakersectionframe}{#1}\end{speakersectionframe}}
+
+% Define a new environment for the content slides. In this environment, the speaker is placed on the right
+% side and the content on the left side. You are free to put anything in the left column. 
+\newenvironment{contentsframe}[1] 
+{
+    \begin{frame}[fragile,environment=contentsframe]
+    \frametitle{#1}
+    \iftoggle{speakerspace}{
+    \begin{columns}
+        \begin{column}{0.7\textwidth}}{}
+}
+{
+    \iftoggle{speakerspace}{
+        \end{column}
+        \begin{column}{0.3\textwidth} 
+        \end{column}
+    \end{columns}}{}
+    \end{frame}
+}
+
+% Define a new environment for the content slides. In this environment, the speaker is placed on the right
+% side and the content on the left side. The left column is used for an itemize list and you only have to 
+% add some items.
+\newenvironment{itemframe}[1] 
+{
+  \begin{frame}[fragile,environment=itemframe]
+    \frametitle{#1}
+    \iftoggle{speakerspace}{
+    \begin{columns}
+        \begin{column}{0.7\textwidth}}{}
+        \begin{itemize}
+}
+{
+        \end{itemize}
+    \iftoggle{speakerspace}{
+        \end{column}
+        \begin{column}{0.3\textwidth} 
+        \end{column}
+    \end{columns}}{}
+    \end{frame}
+}
+
+% Define a new environment for a slide that covers the whole frame. No space for the speaker is provided.
+\newenvironment{fullframe}[1] 
+{
+    \begin{frame}[containsverbatim]
+    \frametitle{#1}
+}
+{
+    \end{frame}
+}
+
+% Define a new environment for a slide that will be replaced by a video
+\newenvironment{video}[1] 
+{
+    \begin{frame}[containsverbatim]
+    \frametitle{#1}
+}
+{
+    \end{frame}
+}
+
+% Define a new environment for a slide that will be replaced by a screencast
+\newenvironment{screencast}[1] 
+{
+    \begin{frame}[containsverbatim]
+    \frametitle{#1}
+}
+{
+    \end{frame}
+}
+
+% Define a new environment for a slide that will be replaced by a lightboard video
+\newenvironment{lightboard}[1] 
+{
+    \begin{frame}[containsverbatim]
+    \frametitle{#1}
+}
+{
+    \end{frame}
+}
+
+\newenvironment{exercise}[1] 
+{
+    \begin{frame}[containsverbatim]
+    \frametitle{#1}
+    \iftoggle{speakerspace}{
+    \begin{columns}
+        \begin{column}{0.7\textwidth}}{}
+}
+{
+    \iftoggle{speakerspace}{
+        \end{column}
+        \begin{column}{0.3\textwidth} 
+        \end{column}
+    \end{columns}}{}
+    \end{frame}
+}
+%
+% Define a new environment for a slide that contains literature references. The background color is set 
+% to the color of the literature slides. Add and itemize list to add references.
+\newenvironment{literature}[1]{%
+  \setbeamercolor{background canvas}{bg=\refbgcolor}%
+  \begin{frame}
+    \frametitle{#1}%
+    \sloppy
+    \setlength{\emergencystretch}{3em}%
+}{%
+  \end{frame}%
+}
+
+% Define headline and footline to be empty
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+%\setbeamertemplate{footline}{}
+
+% Move the itemize list to the left to align it with the logo
+\addtolength{\leftmargini}{-0.5em}  
+
+% Define a new command to add some vertical space to be used in itemize lists
+\newcommand{\vspacedef}{\vspace{5mm}}
+
+% Define the colors for the bullet symbols
+\setbeamertemplate{itemize item}{\textcolor{\bulletcolor}\bulletsymbol}
+\setbeamertemplate{itemize subitem}{\textcolor{\bulletcolor}{\bulletsymbol}}
+
+% Define new environments for code listings
+\lstnewenvironment{xml}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=xml,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          columns=fullflexible,escapechar=\§,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{java}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=Java,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{bash}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=Bash,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{langc}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=C,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{python}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=Python,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{html}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=html,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          columns=fullflexible,escapechar=\§,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{lstblock}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=Java,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{httpmessage}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=xml,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          columns=fullflexible,escapechar=\§,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{dart}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=Java,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+\lstnewenvironment{tex}{%
+  \lstset{numbers=left,numberstyle=\tiny,numbersep=6pt,%
+          language=[LaTeX]TeX,frame=lines,xleftmargin=2em,basicstyle=\scriptsize,%
+          literate={~} {$\sim$}{1},%
+          columns=fullflexible,showstringspaces=false,breaklines=true,inputencoding=latin1}}{}
+
+
+\lstdefinelanguage{CSS}{
+  keywords={color,background-image:,margin,padding,font,weight,display,position,top,left,right,bottom,list,style,border,size,white,space,min,width, transition:, transform:, transition-property, transition-duration, transition-timing-function},	
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  alsoletter={:},
+  alsodigit={-}
+}
+
+\lstdefinelanguage{Kotlin}{
+  morekeywords={
+    as,as?,break,class,continue,do,else,false,for,fun,if,in,!in,
+    interface,is,!is,null,object,package,return,super,this,throw,true,try,
+    typealias,val,var,when,while,
+    by,catch,constructor,delegate,dynamic,field,file,finally,get,import,
+    init,param,property,receiver,set,setparam,value,where,
+    abstract,actual,annotation,companion,const,crossinline,data,enum,
+    expect,external,final,infix,inline,inner,internal,lateinit,noinline,
+    open,operator,out,override,private,protected,public,reified,sealed,
+    suspend,tailrec,vararg
+  },
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]'
+}
+
+\lstdefinelanguage{JavaScript}{
+  morekeywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, await, async, case, catch, class, const, default, do, enum, export, extends, finally, from, implements, import, instanceof, let, static, super, switch, throw, try},
+  morecomment=[s]{/*}{*/},
+  morecomment=[l]//,
+  morestring=[b]",
+  morestring=[b]'
+}
+
+\lstdefinelanguage{SimpleHTML}{
+  morecomment=[s]{<!--}{-->},
+  morestring=[b]",
+  morekeywords={html, meta, head, body, div, span, h1, h2, h3, p, a, img, input, script, style, form},
+  sensitive=false
+}
+
+
+\lstdefinelanguage{HTML5}{
+  language=html,
+  sensitive=true,
+  alsoletter={<>=-},
+  morecomment=[s]{<!--}{-->},
+  tag=[s],
+  otherkeywords={
+    <!DOCTYPE, <html, </html>, <head, </head>, <title, </title>, <style, </style>, <link, <meta, />,
+    <body>, </body>, <div, </div>, <p, </p>, <a, </a>,
+    <script, </script>, <b>, </b>, <i, </i>, <br>, <br/>, <ul, </ul>, <ol, </ol>, <li, </li>, <h1, </h1>,
+    <h2, </h2>, <h3, </h3>, <h4, </h4>, <h5, </h5>, <h6, </h6>, <form, </form>, <input, <button, </button>,
+    <select, </select>, <option, </option>, <label, </label>, <table, </table>, <thead, </thead>, <tr, </tr>,
+    <th, </th>, <td, </td>, <article, </article>, <section, </section>, <nav, </nav>, <header, </header>,
+    <footer, </footer>, <main, </main>, <aside, </aside>, <figure, </figure>, <figcaption, </figcaption>,
+    <canvas, </canvas>, <svg, </svg>, <rect, </rect>, <video, </video>, <source, <iframe, </iframe>,
+    <img, <header, </header>, <article, </article>
+  },
+  ndkeywords={
+    =, charset=, src=, id=, width=, height=, style=, type=, rel=, href=, lang=,
+    fill=, attributeName=, begin=, dur=, from=, to=, poster=, controls=, x=, y=, repeatCount=, xlink:href=,
+    margin:, padding:, background-image:, border:, top:, left:, position:, font-size:, line-height:,
+    transform:, -moz-transform:, -webkit-transform:,
+    animation:, -webkit-animation:,
+    transition:, transition-duration:, transition-property:, transition-timing-function:
+  }
+}
+
+\lstnewenvironment{htmlcssjs}{%
+\lstset{%
+  basicstyle=\scriptsize,   
+  frame=lines,
+  xleftmargin=2em,
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  firstnumber=1,
+  numberfirstline=true,	
+  identifierstyle=\color{black},
+  keywordstyle=\color{black}\bfseries,
+  ndkeywordstyle=\color{thwsblue}\bfseries,
+  stringstyle=\color{black}\ttfamily,
+  commentstyle=\color{thwsorange}\ttfamily,
+  language=SimpleHTML,
+  alsolanguage=JavaScript,
+  alsodigit={.:;},	
+  tabsize=2,
+  showtabs=false,
+  showspaces=false,
+  showstringspaces=false,
+  extendedchars=true,
+  breaklines=true,
+  literate={\<}{{\textless}}1 {\>}{{\textgreater}}1
+}}{}
+
+
+\setbeamercolor{block body alerted}{bg=thwsgrey!50,fg=black}
+\setbeamercolor{block title alerted}{bg=thwsorange,fg=white}
+\setbeamercolor{block body}{bg=thwsgrey!50,fg=black}
+\setbeamercolor{block title}{bg=thwsblue,fg=white}
+\setbeamercolor{block body example}{bg=thwsgrey!50,fg=black}
+\setbeamercolor{block title example}{bg=thwspetrol,fg=white}
+
+\setbeamercolor{bibliography entry author}{fg=black}
+\setbeamercolor{bibliography entry title}{fg=black}
+\setbeamercolor{bibliography entry location}{fg=black}
+\setbeamercolor{bibliography entry note}{fg=black}
+\setbeamercolor{bibliography entry label}{fg=black} 
+\setbeamercolor{bibliography item}{fg=black}
+
+\newcommand{\dtujumptoscene}[1]{} % label
+\newcommand{\dtujumptourl}[2]{} % first: text; second: URL
+\newcommand{\dtushowtext}[1]{} % only text

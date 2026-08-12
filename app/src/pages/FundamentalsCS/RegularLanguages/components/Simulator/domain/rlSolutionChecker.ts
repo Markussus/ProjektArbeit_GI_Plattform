@@ -1,17 +1,32 @@
-import { recognizeWord } from "./rlLanguageOps";
+import { enumerateLanguage, recognizeWords } from "./rlLanguageOps";
 import { parseGrammar } from "./rlGrammarValidation";
 import { parseLanguageSpec } from "./rlLanguageSpecParser";
+
+/**
+ * Enumeration bounds for Grammar → Language exercises. "Load solution" reveals
+ * exactly this set, so a coverage check against it always matches afterwards.
+ */
+export const G2L_EXERCISE_ENUMERATION = { maxLen: 6, maxWords: 12 } as const;
+
+/**
+ * Parse a learner's enumeration input: words separated by commas or newlines.
+ * "ε" denotes the empty word; surrounding whitespace and empty pieces (e.g. a
+ * trailing comma) are ignored.
+ */
+export function parseEnumerationInput(source: string): string[] {
+  return source
+    .split(/[\n,]/)
+    .map((piece) => piece.trim())
+    .filter((piece) => piece.length > 0)
+    .map((piece) => (piece === "ε" ? "" : piece));
+}
 
 export type RLCheckStatus = "match" | "mismatch" | "invalid";
 
 export interface RLCheckResult {
   status: RLCheckStatus;
   /** Why the input couldn't be checked (only set when status is "invalid"). */
-  reason?:
-    | "studentParse"
-    | "studentNotEnumerated"
-    | "studentEmpty"
-    | "reference";
+  reason?: "studentParse" | "studentEmpty" | "reference";
   /** Words the student listed that the target language does not contain. */
   wrong: string[];
   /** Example words the student did not include. */
@@ -31,43 +46,35 @@ function uniqueTrimmed(words: string[]): string[] {
   return result;
 }
 
-function enumerationWords(
-  source: string,
-): string[] | "parse" | "notEnumerated" {
+/**
+ * The example words of a fixed exercise language. Exercise seeds are authored
+ * as explicit word lists, so anything else yields no words to check against.
+ */
+function enumerationWords(source: string): string[] {
   const parsed = parseLanguageSpec(source);
-  if (!parsed.ok) {
-    return "parse";
-  }
-  if (parsed.spec.kind !== "enumeration") {
-    return "notEnumerated";
+  if (!parsed.ok || parsed.spec.kind !== "enumeration") {
+    return [];
   }
   return uniqueTrimmed(parsed.spec.words);
 }
 
 /**
- * Approximate, practice-oriented check for the Language → Grammar exercises.
+ * Check for the Language → Grammar exercises: the target language is fixed and
+ * the learner writes a grammar for it. We validate with example words (robust
+ * for infinite languages):
+ *  - coverage: the grammar must generate every word of the given language;
+ *  - correctness: the grammar must reject the supplied counter-examples.
  *
- * The learner enters the target language as an explicit word list (the
- * simulator then derives a grammar from it). We confirm two things against the
- * reference solution grammar:
- *  - correctness: every word they listed is actually in the target language;
- *  - coverage: they included all of the worked example words.
- *
- * This guarantees "Load solution" → "Check" always matches, and is meant as a
- * learning aid rather than a formal grader.
+ * `missing` holds required words the grammar fails to generate; `wrong` holds
+ * forbidden words it wrongly generates.
  */
-export function checkLanguageExercise(
-  studentSource: string,
-  referenceGrammarSource: string,
+export function checkLanguageToGrammarExercise(
+  studentGrammarSource: string,
   seedLanguageSource: string,
+  rejectWords: string[],
 ): RLCheckResult {
-  const referenceGrammar = parseGrammar(referenceGrammarSource);
-  if (!referenceGrammar.ok || !referenceGrammar.grammar) {
-    return { status: "invalid", reason: "reference", wrong: [], missing: [] };
-  }
-
-  const studentWords = enumerationWords(studentSource);
-  if (studentWords === "parse") {
+  const parsed = parseGrammar(studentGrammarSource);
+  if (!parsed.ok || !parsed.grammar) {
     return {
       status: "invalid",
       reason: "studentParse",
@@ -75,14 +82,47 @@ export function checkLanguageExercise(
       missing: [],
     };
   }
-  if (studentWords === "notEnumerated") {
-    return {
-      status: "invalid",
-      reason: "studentNotEnumerated",
-      wrong: [],
-      missing: [],
-    };
+  const grammar = parsed.grammar;
+
+  const acceptWords = enumerationWords(seedLanguageSource);
+  const forbiddenWords = uniqueTrimmed(rejectWords);
+
+  // One pass over both lists, so the grammar is compiled once rather than
+  // once per word.
+  const verdicts = recognizeWords(grammar, [...acceptWords, ...forbiddenWords]);
+  const missing = acceptWords.filter((_, i) => !verdicts[i].accepted);
+  const wrong = forbiddenWords.filter(
+    (_, i) => verdicts[acceptWords.length + i].accepted,
+  );
+
+  return {
+    status: wrong.length === 0 && missing.length === 0 ? "match" : "mismatch",
+    wrong,
+    missing,
+  };
+}
+
+/**
+ * Check for the Grammar → Language exercises: the given grammar is fixed, and
+ * the learner lists the words they believe it generates. We confirm:
+ *  - correctness: every word they listed is actually generated by the grammar;
+ *  - coverage: they found all the shortest words (the same set "Load solution"
+ *    reveals), so the two actions stay consistent.
+ *
+ * `wrong` holds listed words the grammar does not generate; `missing` holds
+ * required words the learner has not listed yet.
+ */
+export function checkGrammarEnumerationExercise(
+  studentSource: string,
+  givenGrammarSource: string,
+): RLCheckResult {
+  const parsed = parseGrammar(givenGrammarSource);
+  if (!parsed.ok || !parsed.grammar) {
+    return { status: "invalid", reason: "reference", wrong: [], missing: [] };
   }
+  const grammar = parsed.grammar;
+
+  const studentWords = uniqueTrimmed(parseEnumerationInput(studentSource));
   if (studentWords.length === 0) {
     return {
       status: "invalid",
@@ -92,15 +132,15 @@ export function checkLanguageExercise(
     };
   }
 
-  const grammar = referenceGrammar.grammar;
-  const wrong = studentWords.filter(
-    (word) => !recognizeWord(grammar, word).accepted,
-  );
+  const verdicts = recognizeWords(grammar, studentWords);
+  const wrong = studentWords.filter((_, i) => !verdicts[i].accepted);
 
-  const parsedSeed = enumerationWords(seedLanguageSource);
-  const seedWords = Array.isArray(parsedSeed) ? parsedSeed : [];
+  const { words: expected } = enumerateLanguage(grammar, {
+    maxLen: G2L_EXERCISE_ENUMERATION.maxLen,
+    maxWords: G2L_EXERCISE_ENUMERATION.maxWords,
+  });
   const studentSet = new Set(studentWords);
-  const missing = seedWords.filter((word) => !studentSet.has(word));
+  const missing = expected.filter((word) => !studentSet.has(word));
 
   return {
     status: wrong.length === 0 && missing.length === 0 ? "match" : "mismatch",

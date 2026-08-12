@@ -14,6 +14,7 @@ interface SimulationWorkspaceProps {
   onReset?: () => void;
   resetDisabled?: boolean;
   overlayControls?: boolean;
+  onCloseItem?: () => void;
   children?: ReactNode;
 }
 
@@ -27,6 +28,7 @@ export function SimulationWorkspace({
   onReset,
   resetDisabled = false,
   overlayControls = false,
+  onCloseItem,
   children,
 }: SimulationWorkspaceProps) {
   const { t } = useTranslation();
@@ -49,10 +51,20 @@ export function SimulationWorkspace({
           data-testid="simulation-selected-exercise"
           data-item-id={activeItem.id}
           data-item-kind={activeItem.kind}
-          className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
+          className="bg-card ring-foreground/10 relative rounded-xl p-6 ring-1"
         >
+          {onCloseItem && (
+            <button
+              onClick={onCloseItem}
+              className="text-primary hover:text-primary/80 absolute top-4 right-4 p-1 transition-colors"
+              aria-label={t("simulation.close")}
+              title={t("simulation.close")}
+            >
+              <X className="size-6" />
+            </button>
+          )}
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="min-w-0">
+            <div className="min-w-0 pr-6">
               <p className="text-foreground text-sm font-semibold">
                 {itemLabel}
               </p>

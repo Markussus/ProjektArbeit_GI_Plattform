@@ -237,3 +237,15 @@ export function findTopicById(topicId: string) {
     .flatMap((module) => module.topics)
     .find((topic) => topic.id === topicId);
 }
+
+export function findTopicByStorageId(topicStorageId: number) {
+  return learningModules
+    .flatMap((module) => module.topics)
+    .find((topic) => topic.storageId === topicStorageId);
+}
+
+export function findTopicByPath(pathname: string) {
+  return learningModules
+    .flatMap((module) => module.topics)
+    .find((topic) => topic.path === pathname);
+}

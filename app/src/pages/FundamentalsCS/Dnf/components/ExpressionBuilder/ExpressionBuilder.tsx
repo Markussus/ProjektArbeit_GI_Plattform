@@ -1,5 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Eraser, Play } from "lucide-react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Eraser, Lightbulb, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -8,6 +15,8 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
+import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";
 import {
@@ -15,6 +24,7 @@ import {
   type DnfExerciseCheckResult,
   type TruthTableAnswer,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
 import {
   createDnfAttemptDraft,
   dnfExpressionTransferCodec,
@@ -37,6 +47,7 @@ interface ExpressionBuilderProps {
   transferCodec: ISimulatorTransferCodec<DnfExpressionTransferDraft>;
   onTransferValueChange?: (value: DnfExpressionTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 export function ExpressionBuilder({
@@ -47,9 +58,11 @@ export function ExpressionBuilder({
   transferCodec,
   onTransferValueChange,
   onUserChange,
+  seedInitialFeedback = false,
 }: ExpressionBuilderProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const workspaceRef = useRef<ExpressionWorkspaceHandle | null>(null);
   const [inputValue, setInputValue] = useState(initialValue?.expression ?? "");
   const [committedSource, setCommittedSource] = useState<string | null>(
     initialValue?.committed ? initialValue.expression : null,
@@ -94,6 +107,13 @@ export function ExpressionBuilder({
   const handleClear = () => {
     onUserChange?.();
     setInputValue("");
+    setCommittedSource(null);
+    setAttempt(createDnfAttemptDraft());
+    setWorkspaceVersion((current) => current + 1);
+  };
+
+  const handleEditConfig = () => {
+    onUserChange?.();
     setCommittedSource(null);
     setAttempt(createDnfAttemptDraft());
     setWorkspaceVersion((current) => current + 1);
@@ -178,26 +198,39 @@ export function ExpressionBuilder({
           </div>
         </section>
       ) : (
-        <div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
-            data-testid="dnf-new-expression"
-            onClick={handleClear}
-            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
+            data-testid="dnf-edit-expression-config"
+            onClick={handleEditConfig}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
           >
-            <ArrowLeft className="size-4" />
-            {t("dnf.exprBuilder.newExpression")}
+            <Pencil className="size-4" />
+            {t("dnf.simulator.editConfig")}
           </button>
+          {!seedInitialFeedback && (
+            <button
+              type="button"
+              data-testid="dnf-free-load-solution"
+              onClick={() => workspaceRef.current?.loadSolution()}
+              className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+            >
+              <Lightbulb className="size-4" />
+              {t("dnf.simulator.loadSolution")}
+            </button>
+          )}
         </div>
       )}
 
       {committedSource !== null && (
         <ExpressionWorkspace
+          ref={workspaceRef}
           key={`${committedSource}-${workspaceVersion}`}
           committedSource={committedSource}
           initialAttempt={attempt}
           onAttemptChange={setAttempt}
           onUserChange={onUserChange}
+          seedInitialFeedback={seedInitialFeedback}
         />
       )}
 
@@ -216,28 +249,65 @@ interface ExpressionWorkspaceProps {
   initialAttempt: DnfAttemptTransferDraft;
   onAttemptChange: (attempt: DnfAttemptTransferDraft) => void;
   onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
-function ExpressionWorkspace({
-  committedSource,
-  initialAttempt,
-  onAttemptChange,
-  onUserChange,
-}: ExpressionWorkspaceProps) {
+interface ExpressionWorkspaceHandle {
+  loadSolution: () => void;
+}
+
+const ExpressionWorkspace = forwardRef<
+  ExpressionWorkspaceHandle,
+  ExpressionWorkspaceProps
+>(function ExpressionWorkspace(
+  {
+    committedSource,
+    initialAttempt,
+    onAttemptChange,
+    onUserChange,
+    seedInitialFeedback = false,
+  },
+  ref,
+) {
   const analysis = useMemo(
     () => analyzeDnfSource(committedSource),
     [committedSource],
   );
 
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoadedVersion, setSolutionLoadedVersion] = useState(0);
   const [showFullTable, setShowFullTable] = useState(false);
   const [truthTableAnswers, setTruthTableAnswers] = useState<
     TruthTableAnswer[]
   >(() => initialAttempt.truthTableAnswers);
   const [dnfAnswer, setDnfAnswer] = useState(initialAttempt.dnfAnswer);
-  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(() =>
+    seedInitialFeedback &&
+    analysis.status === "valid" &&
+    initialAttempt.dnfAnswer.trim().length > 0
+      ? checkDnfExerciseAttempt(
+          analysis.truthTable,
+          initialAttempt.truthTableAnswers,
+          initialAttempt.dnfAnswer,
+          { checkTruthTable: true },
+        )
+      : null,
+  );
+  const initialSimplificationFeedback = useMemo(
+    () =>
+      seedInitialFeedback &&
+      analysis.status === "valid" &&
+      initialAttempt.simplificationAnswer.trim().length > 0
+        ? checkDnfSimplification(
+            analysis.truthTable,
+            initialAttempt.simplificationAnswer,
+          )
+        : null,
+    [analysis, initialAttempt.simplificationAnswer, seedInitialFeedback],
+  );
   const simplification = useDnfSimplification(
     initialAttempt.simplificationAnswer,
+    { initialFeedback: initialSimplificationFeedback },
   );
 
   const normalizedAnswers = useMemo(
@@ -293,6 +363,44 @@ function ExpressionWorkspace({
       ),
     );
   };
+
+  // Fill the free-mode workspace with the reference solution: correct result
+  // column, canonical DNF and minimal simplification, shown as already checked.
+  useImperativeHandle(
+    ref,
+    () => ({
+      loadSolution: () => {
+        if (analysis.status !== "valid") return;
+
+        const solvedAnswers = analysis.truthTable.rows.map((row) => row.result);
+        const canonicalDnf = analysis.formattedDnf;
+        const minimalExpression = formatBooleanExpressionForDisplay(
+          computeSmallestBooleanExpression(analysis.truthTable).expression,
+        );
+
+        onUserChange?.();
+        setTruthTableAnswers(solvedAnswers);
+        setDnfAnswer(canonicalDnf);
+        setShowSolution(false);
+        setFeedback(
+          checkDnfExerciseAttempt(
+            analysis.truthTable,
+            solvedAnswers,
+            canonicalDnf,
+            { checkTruthTable: true },
+          ),
+        );
+        simplification.loadSolution(minimalExpression, analysis.truthTable);
+        setSolutionLoadedVersion((current) => current + 1);
+        onAttemptChange({
+          truthTableAnswers: solvedAnswers,
+          dnfAnswer: canonicalDnf,
+          simplificationAnswer: minimalExpression,
+        });
+      },
+    }),
+    [analysis, onAttemptChange, onUserChange, simplification],
+  );
 
   const updateSimplificationAnswer = (value: string) => {
     const normalizedValue = normalizeBooleanOperatorAliases(value);
@@ -350,7 +458,13 @@ function ExpressionWorkspace({
         solution={solution}
       />
 
-      <DnfFollowUpSections simplification={simplificationFollowUp} />
+      <DnfFollowUpSections
+        key={`simplification-${solutionLoadedVersion}`}
+        simplification={simplificationFollowUp}
+        initiallyOpenSimplification={
+          seedInitialFeedback || solutionLoadedVersion > 0
+        }
+      />
     </>
   );
-}
+});

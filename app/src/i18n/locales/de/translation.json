@@ -73,42 +73,21 @@
     "title": "Endliche Automaten",
     "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Erstellen Sie DFAs und NFAs, konvertieren Sie reguläre Grammatiken und durchlaufen Sie Eingabewörter Schritt für Schritt.",
     "overviewTitle": "Was sind Endliche Automaten?",
-    "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke.",
-    "concepts": "Schlüsselkonzepte",
-    "concept1": "DFA & NFA",
-    "concept1Desc": "Beide Typen können erstellt werden – der Editor markiert Nichtdeterminismus in Ihrer Übergangstabelle.",
-    "concept2": "Grammatik → Automat",
-    "concept2Desc": "Fügen Sie eine rechtslineare reguläre Grammatik ein und wandeln Sie sie mit einem Klick in einen NFA um.",
-    "concept3": "Schrittweise Simulation",
-    "concept4": "Stapeltest von Wörtern",
-    "comparison": "DFA vs. NFA",
-    "dfaSubtitle": "Deterministischer Endlicher Automat",
-    "dfaPoint1": "Genau ein Übergang pro (Zustand, Symbol)",
-    "dfaPoint2": "Genau ein aktiver Zustand zu jeder Zeit",
-    "dfaPoint3": "Keine ε-Übergänge",
-    "nfaSubtitle": "Nichtdeterministischer Endlicher Automat",
-    "nfaPoint1": "Mehrere Ziele pro (Zustand, Symbol)",
-    "nfaPoint2": "Menge aktiver Zustände, parallel verfolgt",
-    "nfaPoint3": "Unterstützt ε-Übergänge",
-    "whatYouCanDo": "Was Sie hier tun können",
-    "feature1": "DFAs und NFAs visuell mit einer Übergangstabelle erstellen",
-    "feature2": "Eine rechtslineare reguläre Grammatik in einen Automaten umwandeln",
-    "feature3": "Ein Eingabewort schrittweise durchlaufen und das Zustandsdiagramm beobachten",
-    "feature4": "Mehrere Wörter im Stapeltest prüfen und Akzeptanz/Ablehnung einsehen",
-    "exercise1": "DFA erstellen",
-    "exercise1Desc": "Erstellen Sie einen DFA, der Zeichenketten akzeptiert, die auf '01' enden",
-    "exercise2": "NFA Entwurf",
-    "exercise2Desc": "Entwerfen Sie einen NFA für einen gegebenen regulären Ausdruck",
-    "exercise3": "DFA minimieren",
-    "exercise3Desc": "Entfernen Sie unerreichbare und äquivalente Zustände",
-    "exercise4": "NFA zu DFA",
-    "exercise4Desc": "Konvertierung mittels Teilmengenkonstruktion"
+    "overviewText": "Endliche Automaten sind die einfachsten Berechnungsmodelle zur Mustererkennung. Sie bestehen aus Zuständen, Übergängen und Akzeptanz-/Ablehnungsentscheidungen. DFAs und NFAs bilden die Grundlage für lexikalische Analyse, Mustererkennung und reguläre Ausdrücke."
   },
   "number": {
     "title": "Zahlensysteme",
     "description": "Meistern Sie Konvertierungen zwischen Binär, Oktal, Dezimal und Hexadezimal. Verstehen Sie die IEEE 754 Gleitkommadarstellung.",
     "overviewTitle": "Warum Zahlensysteme wichtig sind",
     "overviewText": "Zahlensysteme sind grundlegend dafür, wie Computer Daten speichern und verarbeiten. Das Verständnis von Binär-, Oktal- und Hexadezimaldarstellungen ist essentiell für systemnahe Programmierung, Netzwerke und digitales Design.",
+    "tutorialVideo": "Tutorial-Video",
+    "tutorialQuestionLabel": "Frage {{index}}",
+    "tutorialQuestion1": "Was sind die wichtigsten Zahlensysteme in der Informatik?",
+    "tutorialAnswer1": "Die wichtigsten Zahlensysteme sind das Binär- (Basis 2), Oktal- (Basis 8), Dezimal- (Basis 10) und Hexadezimalsystem (Basis 16).",
+    "tutorialQuestion2": "Warum ist das Binärsystem so wichtig für Computer?",
+    "tutorialAnswer2": "Computer basieren auf elektronischen Schaltkreisen, die primär zwei Zustände kennen: an (1) und aus (0).",
+    "tutorialQuestion3": "Wie werden Dezimalzahlen in Binärzahlen umgewandelt?",
+    "tutorialAnswer3": "Man teilt die Dezimalzahl wiederholt durch 2 und notiert den Rest (0 oder 1), der von unten nach oben gelesen die Binärzahl ergibt.",
     "concepts": "Schlüsselkonzepte",
     "concept1": "Binär (Basis-2)",
     "concept2": "Oktal (Basis-8)",
@@ -216,10 +195,22 @@
     "concept2": "Base64-Dekodierung",
     "concept3": "UTF-8 Zeichenkodierung",
     "concept4": "ASCII vs UTF-8",
-    "example_base64_1": "Base64 kodiere 'Hello'",
-    "example_base64_1_desc": "Kodieren Sie den Text 'Hello' in Base64.",
-    "example_utf8_1": "UTF-8 kodiere 'Hello'",
-    "example_utf8_1_desc": "Kodieren Sie den Text 'Hello' in UTF-8-Bytes.",
+    "tutorialVideo": "Tutorial-Video zur Kodierung",
+    "tutorialQuestionLabel": "Frage {{index}}",
+    "tutorialQuestion1": "Was ist Base64-Kodierung und wofür wird sie verwendet?",
+    "tutorialAnswer1": "Base64 kodiert Binärdaten in ASCII-Zeichen (A-Z, a-z, 0-9, +, /). Es wird verwendet, um Binärdaten sicher über textbasierte Protokolle wie E-Mail (MIME) oder JSON zu übertragen, wo nur druckbare ASCII-Zeichen erlaubt sind.",
+    "tutorialQuestion2": "Wie kodiert UTF-8 Unicode-Zeichen?",
+    "tutorialAnswer2": "UTF-8 kodiert jeden Unicode-Codepunkt in 1 bis 4 Bytes. ASCII-Zeichen (U+0000-U+007F) belegen 1 Byte und bleiben mit ASCII kompatibel. Nicht-ASCII-Zeichen belegen 2-4 Bytes mit spezifischen Bitmustern: 110xxxxx für 2 Byte, 1110xxxx für 3 Byte und 11110xxx für 4 Byte.",
+    "tutorialQuestion3": "Was ist der Unterschied zwischen Kodierung und Verschlüsselung?",
+    "tutorialAnswer3": "Kodierung wandelt Daten in ein anderes Format um (z.B. Base64, UTF-8) und ist ohne Schlüssel umkehrbar. Verschlüsselung schützt Daten durch Geheimhaltung und benötigt einen Schlüssel zur Umkehrung (z.B. AES, RSA). Kodierung bietet keine Sicherheit, Verschlüsselung schon.",
+    "example_base64_2": "Base64 kodiere 'THWS'",
+    "example_base64_2_desc": "Kodieren Sie den Text 'THWS' in Base64.",
+    "example_base64_3": "Base64 dekodiere 'RklY'",
+    "example_base64_3_desc": "Dekodieren Sie den Base64-Wert 'RklY' (dritter Buchstabe ist kleines L).",
+    "example_utf8_2": "UTF-8 kodiere U+1090",
+    "example_utf8_2_desc": "Das Unicode-Zeichen Myanmar Shan Ziffer Null hat den Code U+1090. Wandeln Sie es in die UTF-8 Binärdarstellung um.",
+    "example_utf8_3": "UTF-8 dekodiere 3-Byte-Folge",
+    "example_utf8_3_desc": "Welches Unicode-Zeichen wird durch die UTF-8-Binärfolge 1110 0001 1010 0000 1010 0000 kodiert?",
     "ex_base64_encode_easy": "Base64-Kodierung (1 Zeichen)",
     "ex_base64_encode_easy_desc": "Kodiere den String '{{str}}' in Base64.",
     "ex_base64_encode_medium": "Base64-Kodierung (3 Zeichen)",
@@ -243,7 +234,11 @@
     "ex_utf8_decode_medium": "UTF-8-Dekodierung (2 Bytes)",
     "ex_utf8_decode_medium_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'.",
     "ex_utf8_decode_hard": "UTF-8-Dekodierung (3 Bytes)",
-    "ex_utf8_decode_hard_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'."
+    "ex_utf8_decode_hard_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'.",
+    "ex_utf8_encode_4byte": "UTF-8-Kodierung (4 Bytes – Emoji)",
+    "ex_utf8_encode_4byte_desc": "Wandle das Unicode-Zeichen '{{char}}' (U+{{hex}}) in die UTF-8 Binärdarstellung um.",
+    "ex_utf8_decode_4byte": "UTF-8-Dekodierung (4 Bytes – Emoji)",
+    "ex_utf8_decode_4byte_desc": "Ermittle den Unicode-Hex-Wert für die UTF-8 Hex-Sequenz '{{hexBytes}}'."
   },
   "moore": {
     "exercises": {
@@ -436,6 +431,14 @@
     "description": "Lernen Sie, wie boolesche Ausdrücke mit Wahrheitstabellen ausgewertet werden und wie daraus die Disjunktive Normalform entsteht.",
     "overviewTitle": "Was ist DNF?",
     "overviewText": "Die Disjunktive Normalform (DNF) schreibt einen booleschen Ausdruck als ODER-Verknüpfung von UND-Termen. Im Stil der Vorlesung liefert jede Wahrheitstabellen-Zeile mit Ergebnis 1 genau einen Term.",
+    "tutorialVideo": "Tutorial-Video",
+    "tutorialQuestionLabel": "Frage {{index}}",
+    "tutorialQuestion1": "Was ist die Disjunktive Normalform?",
+    "tutorialAnswer1": "Die DNF schreibt eine boolesche Funktion als ODER-Verknüpfung von UND-Termen. Jede Zeile der Wahrheitstabelle mit Ergebnis 1 liefert genau einen UND-Term.",
+    "tutorialQuestion2": "Wie baue ich aus einer Wahrheitstabelle die DNF?",
+    "tutorialAnswer2": "Für jede 1-Zeile bildest du einen UND-Term: Variablen mit Wert 1 stehen positiv, mit Wert 0 negiert. Alle Terme werden mit ODER verbunden.",
+    "tutorialQuestion3": "Was macht die Vereinfachung?",
+    "tutorialAnswer3": "Sie kürzt die kanonische DNF mit Quine-McCluskey zur minimalen Form – der äquivalenten DNF mit den wenigsten Literalen.",
     "concepts": "Schlüsselkonzepte",
     "concept1": "Boolesche Polynome",
     "concept2": "Wahrheitstabellen",
@@ -490,24 +493,12 @@
     "examples": {
       "walkthroughs": {
         "lectureExpression": {
-          "title": "Ausdruck mit UND-Klammer",
-          "explanation": "Wahr ist der Ausdruck bei a=1 oder wenn b und c beide 1 sind."
+          "title": "Vorlesungsbeispiel: a ∨ (b ∧ c)",
+          "explanation": "Die Wertetafel aus der Vorlesung zeigt, wo a gleich 1 ist oder b und c beide 1 sind."
         },
         "parentheses": {
-          "title": "Klammerung verändert das Ergebnis",
-          "explanation": "Hier gilt c=1 und zusätzlich a=1 oder b=1."
-        },
-        "negation": {
-          "title": "Negation schränkt die wahren Zeilen ein",
-          "explanation": "Da ¬a gesetzt ist, können nur Zeilen mit a=0 wahr werden. Zusätzlich muss b oder c gleich 1 sein."
-        },
-        "xor": {
-          "title": "Halbaddierer-Summe als XOR",
-          "explanation": "Die Summe ist 1, wenn genau ein Eingang 1 ist."
-        },
-        "carry": {
-          "title": "Halbaddierer-Carry",
-          "explanation": "Das Übertragsbit ist nur dann 1, wenn beide Eingänge 1 sind — ein einzelner UND-Term."
+          "title": "Übung 1: (a ∨ b) ∧ c",
+          "explanation": "Die Vorlesungsübung verändert nur die Klammerung und vergleicht das Ergebnis mit der vorherigen Wertetafel."
         },
         "dnfIntro": {
           "title": "DNF-Einführung aus der Vorlesung",
@@ -556,8 +547,7 @@
       }
     },
     "exprBuilder": {
-      "evaluate": "Auswerten",
-      "newExpression": "Anderen Ausdruck eingeben"
+      "evaluate": "Auswerten"
     },
     "simulator": {
       "tabs": {
@@ -576,7 +566,8 @@
       "setupPreviewTitle": "Wertetafel festlegen",
       "setupPreviewHint": "Setzen Sie die f-Spalte für jede Zeile. Wenn die Tabelle steht, mit \"Tabelle übernehmen\" weiter zur DNF-Übung.",
       "commitTable": "Tabelle übernehmen",
-      "newTable": "Neue Tabelle"
+      "loadSolution": "Lösung laden",
+      "editConfig": "Konfiguration bearbeiten"
     },
     "builder": {
       "inputTitle": "Boolescher Ausdruck",
@@ -676,8 +667,10 @@
         "revealRequiresCheck": "erst nach Prüfen",
         "minimalDnfLabel": "Eine mögliche minimale DNF",
         "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF-Form (ODER von UND-Termen), z. B. Ergebnis von Quine-McCluskey.",
-        "factoredLabel": "Mathematisch minimal (mit Faktorisierung)",
-        "factoredNote": "{{literalsLabel}} — durch Ausklammern gemeinsamer Literale noch kürzer als die DNF, aber keine DNF-Form mehr.",
+        "factoredLabel": "Mathematisch kürzeste Form",
+        "factoredNote": "{{literalsLabel}} — kürzer als die minimale DNF und mathematisch äquivalent, aber keine DNF-Form mehr.",
+        "factoredFallbackLabel": "Beste gefundene Form",
+        "factoredFallbackNote": "{{literalsLabel}} — äquivalent und kürzer als die minimale DNF. Für mehr als 4 Variablen ist diese Form aber nicht garantiert global minimal.",
         "literalCount_one": "{{count}} Literal",
         "literalCount_other": "{{count}} Literale",
         "termCount_one": "{{count}} Term",
@@ -701,14 +694,18 @@
         "walkthroughCoverTitle": "Alle 1-Zeilen abdecken",
         "walkthroughCoverText": "Die ausgewählten Gruppen decken alle 1-Zeilen ab — keine 1-Zeile bleibt übrig.",
         "walkthroughResultTitle": "Mögliche minimale Form",
-        "walkthroughFactoredTitle": "Optional: faktorisieren für noch kürzere Form",
-        "walkthroughFactoredText": "Die minimale DNF hat {{minimalLiterals}} Literale. Durch Ausklammern gemeinsamer Literale (Distributivgesetz rückwärts) lässt sich der Ausdruck auf {{factoredLiterals}} Literale verkürzen — die DNF-Form geht dabei verloren.",
-        "walkthroughFactoredNote": "Diese Form ist mathematisch äquivalent, aber keine DNF mehr (außen steht ∧). Sie ist nur dann gefragt, wenn der kürzeste boolesche Ausdruck gesucht ist, nicht die kürzeste DNF.",
+        "walkthroughFactoredTitle": "Optional: kürzeste Form außerhalb der DNF",
+        "walkthroughFactoredText": "Die minimale DNF hat {{minimalLiterals}} Literale. Die kürzere äquivalente Form braucht nur {{factoredLiterals}} Literale — die DNF-Form geht dabei verloren.",
+        "walkthroughFactoredNote": "Diese Form ist mathematisch äquivalent, aber keine DNF mehr. Wenn sie durch Ausklammern entsteht, werden die Distributivitätsschritte zusätzlich angezeigt.",
+        "walkthroughFactoredFallbackTitle": "Optional: beste gefundene Form außerhalb der DNF",
+        "walkthroughFactoredFallbackText": "Die minimale DNF hat {{minimalLiterals}} Literale. Die gefundene äquivalente Form braucht nur {{factoredLiterals}} Literale — die DNF-Form geht dabei verloren.",
+        "walkthroughFactoredFallbackNote": "Für mehr als 4 Variablen wird hier der sichere Fallback verwendet. Die Form ist korrekt und vereinfacht, aber nicht garantiert die global kürzeste boolesche Formel.",
         "walkthroughRowListMore": "{{visible}}, ... (+{{count}} weitere)",
         "derivationNotes": {
           "factorOut": "{{variable}} ausklammern — die anderen Literale bleiben.",
           "complementToOne": "{{variable}} ∨ ¬{{variable}} ergibt 1.",
-          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg."
+          "andOneEqualsTerm": "Jeder Term ∧ 1 ergibt sich selbst — die 1 fällt weg.",
+          "factorOutCommon": "{{variables}} ausklammern (Distributivgesetz) — in diesen Termen gemeinsam."
         },
         "simplificationStatus": {
           "empty": "Noch keine Eingabe",
@@ -767,6 +764,7 @@
       "errors": {
         "title": "Ausdruck kann nicht gelesen werden",
         "emptyExpression": "Geben Sie zuerst einen booleschen Ausdruck ein.",
+        "expressionTooComplex": "Der Ausdruck ist zu lang oder zu tief verschachtelt.",
         "unexpectedCharacter": "Unerwartetes Zeichen '{{value}}' an Position {{index}}.",
         "unexpectedToken": "Unerwartetes Symbol '{{value}}' an Position {{index}}.",
         "unexpectedEnd": "Der Ausdruck endet zu früh an Position {{index}}.",
@@ -1136,6 +1134,7 @@
       "finalFormulaDesc": "Für die finale Dezimalzahl werden Vorzeichen, echte Mantisse und der Faktor aus Exponent multipliziert:",
       "examplesTitle": "Beispiel-Aufgaben",
       "examplesDesc": "Hier finden Sie zusätzliche Beispiel-Übungen zu den verschiedenen Units:",
+      "lectureScripts": "Vorlesungsskripte",
       "unit03": "Unit 03: Wie werden Zahlen im Computer dargestellt?",
       "unit03_ex1": "Übung 1: Rechnen Sie die folgenden Dezimalzahlen in Binärzahlen um: 1, 5, 7, 26, 63.",
       "unit03_ex2": "Übung 2: Addieren Sie die Zahlen 50 und 13 als Binärzahlen.",
@@ -1352,7 +1351,7 @@
       "exitExerciseDesc": "Dein Fortschritt in dieser Übung geht verloren. Bist du sicher, dass du den Übungsmodus verlassen möchtest?",
       "exitExerciseConfirm": "Verlassen",
       "exitTabTitle": "Tab wechseln?",
-      "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs wird die aktuelle Übung beendet und dein Fortschritt geht verloren.",
+      "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs verlässt du die aktuelle Übung — dein Fortschritt bleibt gespeichert und kann über „Alle Übungen zurücksetzen“ im Übungen-Tab gelöscht werden.",
       "exitTabConfirm": "Tab wechseln"
     },
     "encoding": {
@@ -1667,67 +1666,57 @@
       "endsWith01": {
         "title": "Wörter, die mit \"01\" enden",
         "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit \"01\" enden.",
-        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden.",
-        "hint1": "Verfolgen Sie, wie viel des Musters \"01\" Sie bereits gesehen haben. Drei Zustände reichen: nichts, gerade eine 0 gesehen, gerade \"01\" gesehen.",
-        "hint2": "Aus dem Akzeptanzzustand sollte eine 0 in den Zustand \"gerade 0 gesehen\" zurückfallen (Muster könnte erneut starten), und eine 1 zurück auf \"nichts\" gehen."
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden."
       },
       "endsWith00": {
         "title": "Wörter, die mit \"00\" enden",
         "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit zwei Nullen enden.",
-        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden.",
-        "hint1": "Sie müssen sich merken, wie viele abschließende Nullen Sie gerade gesehen haben. Drei Zustände (0, 1 oder 2 abschließende Nullen) reichen aus.",
-        "hint2": "Aus dem Zustand \"zwei abschließende Nullen\" sollte eine weitere 0 dort bleiben, eine 1 aber zurück zu \"keine abschließende Null\" springen."
+        "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden."
       },
       "evenOnes": {
         "title": "Gerade Anzahl von 1en",
         "goal": "Akzeptieren Sie binäre Wörter mit einer geraden Anzahl von 1en (einschließlich null).",
-        "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade).",
-        "hint1": "Sie benötigen nur zwei Zustände — einen für \"gerade\" und einen für \"ungerade\".",
-        "hint2": "Das Lesen einer 0 ändert die Parität nie, das Lesen einer 1 kippt sie immer."
+        "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade)."
       },
       "noConsecOnes": {
         "title": "Keine zwei aufeinanderfolgenden 1en",
         "goal": "Akzeptieren Sie binäre Wörter, die nie \"11\" als Teilwort enthalten.",
-        "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt.",
-        "hint1": "Merken Sie sich, ob das zuletzt gelesene Symbol eine 1 war. Eine weitere 1 direkt danach muss in einen Fallen-Zustand führen.",
-        "hint2": "Ein Fallen-Zustand (Trap) hat Selbstschleifen auf jedem Symbol und ist nicht akzeptierend."
+        "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt."
       },
       "divBy3": {
         "title": "Binärzahlen teilbar durch 3",
         "goal": "Akzeptieren Sie binäre Wörter, deren Dezimalwert durch 3 teilbar ist.",
-        "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren.",
-        "hint1": "Sie benötigen nur drei Zustände — einen pro möglichem Rest (0, 1, 2).",
-        "hint2": "Im Zustand mit Rest r und Lesen des Bits b ergibt sich der neue Rest als (2·r + b) mod 3.",
-        "hint3": "Der Startzustand und der einzige Endzustand sind derselbe: Rest 0."
+        "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren."
       },
       "grammarTwoOnesZeros": {
         "title": "Automat aus Grammatik: 11 0ⁿ",
         "goal": "Bauen Sie einen DFA für die Sprache L = { 11 0ⁿ | n ≥ 0 }: zwei Einsen, gefolgt von beliebig vielen Nullen.",
-        "description": "Gegeben ist die rechtslineare Grammatik S → \"1\" A, A → \"1\" B, B → \"0\" B | ε. Bauen Sie den passenden endlichen Automaten und prüfen Sie anschließend, ob das Wort \"11001\" zur Sprache gehört.",
-        "hint1": "Nach den beiden Pflicht-Einsen darf nur noch die Null beliebig oft folgen – eine weitere Eins führt in einen Fehlerzustand.",
-        "hint2": "Sie brauchen drei nützliche Zustände (Start, nach der ersten 1, nach der zweiten 1 = Endzustand) plus einen Fangzustand. Das Wort \"11001\" endet im Fangzustand und gehört daher nicht zur Sprache."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die die unten stehende rechtslineare Grammatik ableitet, und prüfen Sie anschließend, ob das Wort „11001“ zur Sprache gehört."
       },
       "grammarOnes": {
         "title": "Automat aus Grammatik: 1 0ⁿ 1",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "Erstellen Sie einen Zustand pro Nichtterminal (START, A, B) plus einen Fehlerzustand für ungültige Eingaben.",
-        "hint2": "ε bei B bedeutet, dass B akzeptierend ist; leiten Sie jeden undefinierten Übergang in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
       "grammar0011": {
-        "title": "Automat aus Grammatik: (0011)⁺",
+        "title": "Automat aus Grammatik: (0011)(0011)*",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "Verketten Sie einen Zustand pro Nichtterminal: START→A→B→C→D entlang der Symbole 0,0,1,1.",
-        "hint2": "D = \"0\",A springt zurück, um einen weiteren 0011-Block zu lesen, also führt D's 0-Übergang zurück nach A.",
-        "hint3": "ε bei D macht D zum akzeptierenden Zustand; jedes unerwartete Symbol führt in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
       },
       "grammarOnesZero": {
         "title": "Automat aus Grammatik: 1ⁿ 0",
         "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
-        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand.",
-        "hint1": "A = \"1\",A ist eine Schleife auf 1; A = \"0\",B verlässt sie bei einer 0 zum akzeptierenden Zustand B.",
-        "hint2": "B ist akzeptierend (ε); jede Eingabe in B führt in den Fehlerzustand."
+        "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
+      },
+      "categories": {
+        "languageToAutomaton": {
+          "title": "Sprache → Automat",
+          "description": "Bauen Sie einen Automaten, der genau die beschriebene Wortmenge akzeptiert."
+        },
+        "grammarToAutomaton": {
+          "title": "Grammatik → Automat",
+          "description": "Jede rechtslineare Grammatik definiert eine Sprache. Bauen Sie den DFA zu der in der Aufgabe gezeigten Grammatik."
+        }
       }
     },
     "exerciseWorkspace": {
@@ -1735,11 +1724,7 @@
       "completed": "Abgeschlossen",
       "exit": "Aufgabenmodus verlassen",
       "check": "Lösung prüfen",
-      "showHint": "Hinweis",
-      "hintsUsed": "{{used}}/{{total}} Hinweise benutzt",
-      "noMoreHints": "Alle Hinweise angezeigt",
       "showSolution": "Lösung laden",
-      "hintsHeader": "Hinweise",
       "confirmTitle": "Vollständige Lösung anzeigen?",
       "confirmBody": "Ihr aktueller Automat wird durch die Referenzlösung ersetzt. Sie können die Aufgabe jederzeit aus dem Tab „Übungen“ zurücksetzen.",
       "confirmYes": "Ja, Lösung anzeigen",
@@ -1755,95 +1740,41 @@
       "got": "erhalten",
       "accept": "akzeptieren",
       "reject": "ablehnen",
-      "exampleWordsHeader": "Probiere diese Wörter",
-      "exampleWordsHint": "Klicke ein Wort an, um es als Eingabe zu laden und durch den Automaten laufen zu lassen.",
+      "exampleWordsHeader": "Probieren Sie diese Wörter",
+      "exampleWordsHint": "Wählen Sie ein Wort aus, um es als Eingabe zu laden und durch den Automaten laufen zu lassen.",
       "exampleAccept": "Akzeptiert",
       "exampleReject": "Abgelehnt",
-      "unbuiltTitle": "Bau zuerst deinen Automaten",
-      "unbuiltBody": "Füge Zustände, Übergänge und mindestens einen Endzustand hinzu, danach klicke erneut auf 'Lösung prüfen'.",
+      "unbuiltTitle": "Bauen Sie zuerst Ihren Automaten",
+      "unbuiltBody": "Fügen Sie Zustände, Übergänge und mindestens einen Endzustand hinzu und klicken Sie dann erneut auf „Lösung prüfen“.",
       "grammarLabel": "Grammatik",
       "grammarEpsilonNote": "ε steht für das leere Wort und kennzeichnet einen akzeptierenden (End-)Zustand."
     },
-    "grammarToAutomaton": {
-      "sectionTitle": "Konstruktion eines endlichen Automaten aus einer regulären Grammatik",
-      "sectionDescription": "Jede rechtslineare Grammatik definiert eine Sprache. Öffnen Sie eine Übung, um den DFA im Simulator zu bauen — nutzen Sie die Hinweise und blenden Sie bei Bedarf den Referenzautomaten zur Kontrolle ein."
-    },
     "examples": {
-      "endsWith01": {
-        "title": "Binärstrings die auf 01 enden",
-        "description": "Ein DFA, der alle Binärstrings akzeptiert, die mit \"01\" enden. Eines der häufigsten einführenden DFA-Beispiele.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Wir wollen genau die Binärstrings akzeptieren, die mit \"01\" enden. Der Automat muss sich merken, ob die letzten zwei gelesenen Symbole \"0\" gefolgt von \"1\" waren.",
-        "step2Title": "2. Zustände entwerfen",
-        "step2": "Wir brauchen drei Zustände: s0 (Start — noch kein Anfang von \"01\" gesehen), s1 (gerade eine \"0\" gelesen — könnte der erste Teil von \"01\" sein), und s2 (gerade \"01\" gelesen — Akzeptanzzustand).",
-        "step3Title": "3. Übergänge aufbauen",
-        "step3": "Von s0: \"0\" lesen geht zu s1 (möglicher Start von \"01\"), \"1\" lesen bleibt in s0. Von s1: \"1\" lesen geht zu s2 (\"01\" gefunden!), \"0\" lesen bleibt in s1. Von s2: \"0\" lesen geht zu s1, \"1\" lesen geht zurück zu s0.",
-        "step4Title": "4. Warum es funktioniert",
-        "step4": "Der Automat verfolgt immer, wie viel des Musters \"01\" bisher übereinstimmt. Egal wie lang der String ist, er braucht nur 3 Zustände, weil er sich nur um die letzten zwei Zeichen kümmert."
-      },
-      "evenOnes": {
-        "title": "Gerade Anzahl von 1en",
-        "description": "Ein DFA, der Binärstrings mit einer geraden Anzahl von 1en akzeptiert (einschließlich null 1en). Ein klassisches Paritätsbeispiel.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Wir wollen Strings akzeptieren, bei denen die Anzahl der '1'-Symbole gerade ist (0, 2, 4, ...). Der Automat muss nur die Parität (gerade oder ungerade) der bisher gesehenen 1en verfolgen.",
-        "step2Title": "2. Zustände entwerfen",
-        "step2": "Nur zwei Zustände nötig: 'even' (gerade Anzahl gesehen) und 'odd' (ungerade Anzahl gesehen). Startzustand ist 'even', da null 1en gerade ist. Akzeptanzzustand ist ebenfalls 'even'.",
-        "step3Title": "3. Übergänge aufbauen",
-        "step3": "Eine '0' ändert die Parität nie, also bleiben beide Zustände bei '0' bei sich. Eine '1' wechselt die Parität: even→odd und odd→even. Das ist der gesamte Automat!"
-      },
       "containsAba": {
         "title": "Enthält Teilwort \"aba\"",
-        "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Wir wollen jeden String akzeptieren, der irgendwo \"aba\" enthält. Vor und nach dem Muster ist jede Kombination von 'a' und 'b' erlaubt.",
-        "step2Title": "2. Warum ein NFA?",
-        "step2": "Ein NFA ist hier natürlich, weil wir nicht wissen, wann \"aba\" beginnt. Der NFA kann nichtdeterministisch \"raten\" — in s0, wenn er 'a' liest, bleibt er sowohl in s0 als auch geht er zu s1.",
-        "step3Title": "3. Zustände entwerfen",
-        "step3": "Vier Zustände: s0 (kein Match begonnen), s1 (\"a\" gematcht), s2 (\"ab\" gematcht), s3 (\"aba\" gematcht — Akzeptanzzustand, bleibt hier für immer).",
-        "step4Title": "4. Wie Nichtdeterminismus hilft",
-        "step4": "Bei einem DFA müssten wir sorgfältig partielle Übereinstimmungen verfolgen. Mit dem NFA probieren wir einfach \"alle Möglichkeiten\" gleichzeitig aus."
-      },
-      "epsilonNfa": {
-        "title": "NFA mit ε-Übergängen",
-        "description": "Ein NFA, der Epsilon-Übergänge verwendet — Übergänge ohne Eingabesymbol. Demonstriert spontane Zustandswechsel.",
-        "step1Title": "1. Was sind ε-Übergänge?",
-        "step1": "Ein ε-Übergang erlaubt dem Automaten, von einem Zustand in einen anderen zu wechseln, ohne ein Eingabesymbol zu verbrauchen. Der Automat kann in mehreren Zuständen gleichzeitig sein.",
-        "step2Title": "2. Wie ε-Abschluss funktioniert",
-        "step2": "Vor der Verarbeitung berechnen wir den ε-Abschluss des Startzustands — alle durch ε-Übergänge erreichbaren Zustände. Hier hat q0 einen ε-Übergang zu q1, also sind die Anfangszustände {q0, q1}.",
-        "step3Title": "3. Aufbau dieses Automaten",
-        "step3": "q0 liest 'a' und kann spontan über ε zu q1 springen. q1 liest ein 'b' und geht zu q2. q2 springt spontan über ε zu q3. q3 ist der Akzeptanzzustand.",
-        "step4Title": "4. Warum ε-Übergänge wichtig sind",
-        "step4": "ε-Übergänge erleichtern das Kombinieren von Automaten (z.B. für Vereinigung oder Verkettung von Sprachen). Sie fügen keine Berechnungskraft hinzu, machen aber die Konstruktion modularer."
-      },
-      "divisibleBy3": {
-        "title": "Durch 3 teilbare Binärzahlen",
-        "description": "Ein DFA, der Binärzahlen akzeptiert, deren Dezimalwert durch 3 teilbar ist. Ein elegantes Beispiel für arithmetische Automaten.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Wir wollen Binärstrings akzeptieren, die Zahlen darstellen, die durch 3 teilbar sind (Rest 0 bei Division durch 3). Zum Beispiel: \"0\" (0), \"11\" (3), \"110\" (6), \"1001\" (9).",
-        "step2Title": "2. Die Schlüsselidee",
-        "step2": "Beim Lesen einer Binärzahl von links nach rechts verdoppelt jedes neue Bit den aktuellen Wert und addiert das neue Bit. Wir müssen nur V mod 3 verfolgen, das nur 3 mögliche Werte hat: 0, 1, oder 2.",
-        "step3Title": "3. Zustände aufbauen",
-        "step3": "Drei Zustände repräsentieren die drei möglichen Reste: s0 (Rest 0 — Akzeptanzzustand), s1 (Rest 1), s2 (Rest 2). Startzustand ist s0.",
-        "step4Title": "4. Übergänge herleiten",
-        "step4": "Für jeden Zustand (Rest r) und Eingabebit b: neuer Rest = (2r + b) mod 3. Zum Beispiel: von s1 mit '0': (2×1+0) mod 3 = 2 → gehe zu s2."
+        "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus."
       },
       "lecture": {
-        "title": "Worterkennung: 0⁺1",
-        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 0+1). Zum Beispiel wird „001\" akzeptiert, da es im Endzustand S2 endet, während „010\" abgelehnt wird, da die letzte „0\" in den Fehlerzustand S3 führt. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Der Automat verlangt mindestens eine '0', gefolgt von genau einer '1', und danach darf kein weiteres Zeichen folgen. Er lehnt das leere Wort, Wörter, die mit '1' beginnen, und Wörter mit mehr als einer '1' ab.",
-        "step2Title": "2. Zustände entwerfen",
-        "step2": "s0 ist der Startzustand. Beim Lesen einer '0' wechselt der Automat zu s1, da nun mindestens eine 0 gelesen wurde. Von s1 führt eine '1' zu s2, dem Akzeptanzzustand. Jede andere Eingabe führt zu s3, einem Fangzustand, da das Wort ungültig ist."
+        "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
+        "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da für die letzte „0“ in S2 kein Übergang definiert ist. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
       },
       "grammar": {
         "title": "Grammatik → Automat",
-        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}.",
-        "step1Title": "1. Ziel definieren",
-        "step1": "Konstruiere einen endlichen Automaten für die reguläre Grammatik: G = {S → 0S | 0A, A → 1A | 1} über dem Alphabet Σ = {0, 1}. Diese Grammatik erzeugt erst '0'en, dann '1'en. Jedes Nichtterminalsymbol wird zu einem Zustand und jede Produktion zu einem Übergang.",
-        "step2Title": "2. NFA-Konstruktion",
-        "step2": "Überführung der Produktionen in Übergänge: (S → 0S) wird zu δ(S,0)=S; (S → 0A) wird zu δ(S,0)=A. Dies erzeugt Nichtdeterminismus im Zustand S bei der Eingabe '0'. Die Regel (A → 1) impliziert einen Übergang in einen dedizierten Akzeptanzzustand (sF). Ergebnis: Ein 3-Zustand-NFA {S, A, sF}.",
-        "step3Title": "3. DFA-Konstruktion",
-        "step3": "Wir gruppieren NFA-Zustände in Mengen, um genau einen Übergang pro Eingabe zu garantieren.\n1. Start bei q0 = {S}.\n2. δ(q0, 0) = {S, A} → neuer Zustand q1.\n3. δ(q0, 1) = ∅ → Fangzustand qD.\n4. δ(q1, 0) = {S, A} → Schleife zurück zu q1.\n5. δ(q1, 1) = {A, sF} → neuer Zustand q2.\n6. δ(q2, 0) = ∅ → qD. δ(q2, 1) = {A, sF} → Schleife zurück zu q2.\nq2 ist der Akzeptanzzustand (enthält sF). qD ist ein toter Zustand (Fangzustand)."
+        "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}."
+      },
+      "categories": {
+        "dfa": {
+          "title": "Deterministische Automaten (DFA)",
+          "description": "Verfolgen Sie einen einzelnen Lauf: genau ein Übergang pro Zustand und Symbol."
+        },
+        "nfa": {
+          "title": "Nichtdeterministische Automaten (NFA)",
+          "description": "Mehrere Zustände können gleichzeitig aktiv sein — das Wort wird akzeptiert, wenn irgendein Pfad einen Endzustand erreicht."
+        },
+        "grammarToAutomaton": {
+          "title": "Grammatik → Automat",
+          "description": "Überführen Sie eine rechtslineare Grammatik in einen Automaten und vergleichen Sie den NFA mit einem äquivalenten DFA."
+        }
       }
     },
     "batch": {
@@ -1872,7 +1803,13 @@
       },
       "parseError": "Grammatik noch nicht parsebar",
       "epsilonHint": "Um das Symbol für das leere Wort (ε) einzufügen, können Sie es entweder kopieren und einfügen oder das Wort 'epsilon' tippen.",
-      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist."
+      "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist.",
+      "grammar_no_nonterminals": "Die Grammatik hat keine Nichtterminale.",
+      "grammar_no_terminals": "Die Grammatik hat keine Terminalsymbole.",
+      "grammar_start_invalid": "Das Startsymbol gehört nicht zu den Nichtterminalen der Grammatik.",
+      "grammar_lhs_invalid": "Die linke Seite einer Regel gehört nicht zu den Nichtterminalen der Grammatik.",
+      "grammar_terminal_invalid": "Eine Regel verwendet ein Terminal, das nicht im Alphabet enthalten ist.",
+      "grammar_rhs_nonterminal_invalid": "Eine Regel verweist auf ein Nichtterminal, das die Grammatik nicht definiert."
     },
     "sim": {
       "emptyWord": "Leeres Wort (ε)",
@@ -1899,7 +1836,11 @@
         "accepted": "Das Wort wird akzeptiert. Die finalen Zustände {{states}} enthalten einen Akzeptanzzustand.",
         "rejectedDead": "Das Wort wird abgelehnt. Keine erreichbaren Zustände (Sackgasse).",
         "rejected": "Das Wort wird abgelehnt. Die finalen Zustände {{states}} enthalten keinen Akzeptanzzustand."
-      }
+      },
+      "inputWordLength": "{{count}} Symbole",
+      "stepStart": "Start",
+      "stepTooltip": "Schritt {{step}} · {{count}} Zustand/Zustände",
+      "stepTooltipUnreached": "Schritt {{step}} (noch nicht erreicht)"
     },
     "validation": {
       "statesEmpty": "Zustände dürfen nicht leer sein.",
@@ -1911,6 +1852,18 @@
       "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
       "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
       "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+    },
+    "diagram": {
+      "title": "Zustandsdiagramm",
+      "violations_one": "{{count}} DFA-Verletzung",
+      "violations_other": "{{count}} DFA-Verletzungen",
+      "violationEpsilon": "Zustand {{state}} hat einen ε-Übergang — in einem DFA nicht erlaubt.",
+      "violationNondeterministic": "Zustand {{state}} geht bei Symbol „{{symbol}}“ nach {{targets}} — das verletzt den DFA-Determinismus.",
+      "start": "Start",
+      "usageHint": "Knoten ziehen zum Verschieben · Fläche ziehen zum Schwenken · scrollen zum Zoomen",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "resetView": "Ansicht zurücksetzen"
     }
   },
   "rl": {
@@ -1918,14 +1871,6 @@
     "description": "Arbeiten Sie mit regulären Sprachen und ihren rechtslinearen Grammatiken — zählen Sie die Wörter einer Grammatik auf, leiten Sie eine Grammatik aus einer Sprachdefinition ab und prüfen Sie Wortzugehörigkeit.",
     "overviewTitle": "Was sind reguläre Sprachen?",
     "overviewText": "Eine reguläre Sprache ist eine Menge von Wörtern, die sich durch eine reguläre Grammatik oder einen endlichen Automaten beschreiben lässt. Hier liegt der Fokus auf der rechtslinearen (Typ-3-)Grammatik.",
-    "concepts": "Kernkonzepte",
-    "concept1": "Rechtslineare Grammatiken",
-    "concept1Desc": "Eine rechtslineare (Typ-3-)Grammatik hat Regeln der Form A → aB oder A → a (optional A → ε). Das macht sie äquivalent zu NFAs.",
-    "concept2": "Aufzählung vs. Mengen-Schreibweise",
-    "concept2Desc": "Eine reguläre Sprache kann entweder als endliche Wortliste oder per Mengen-Schreibweise wie { a^n c b^m | n, m > 0 } mit Exponenten und unteren Schranken angegeben werden.",
-    "concept3": "Wortzugehörigkeit",
-    "concept3Desc": "Ob ein Wort in L(G) liegt, entscheidet man durch Simulation des zur Grammatik äquivalenten NFA — akzeptiert genau dann, wenn eine Ableitung das Wort vollständig verarbeitet.",
-    "concept4": "Abschlusseigenschaften",
     "whatYouCanDo": "Was Sie hier tun können",
     "feature1": "Die von einer Grammatik erzeugte Sprache bis zu einer Längenobergrenze aufzählen",
     "feature2": "Eine Grammatik aus einer Wortaufzählung oder einer Mengen-Schreibweise erzeugen",
@@ -1938,6 +1883,11 @@
       },
       "grammarInput": "Grammatik",
       "grammarOutput": "Ergebnis-Grammatik",
+      "grammarMode": {
+        "label": "Grammatik-Stil",
+        "detailed": "Ausführlich",
+        "simplified": "Vereinfacht"
+      },
       "grammarHelp": "Eine Produktion pro Zeile, z. B. 'S -> 0S | 1A'. ε (oder das Wort 'epsilon') steht für das leere Wort.",
       "grammarInvalid": "Geben Sie eine gültige rechtslineare Grammatik ein.",
       "languageOutput": "Aufzählung der Sprache",
@@ -1966,12 +1916,20 @@
         "aStar": "a^n",
         "abGroup": "(ab)^n"
       },
-      "testWord": "Zu testendes Wort",
-      "testWordPlaceholder": "Leer = ε",
-      "testWordHelp": "Jedes Zeichen wird als Terminalsymbol behandelt. Die Grammatik wird auf das Wort simuliert.",
+      "testWord": "Zu testende Wörter",
+      "testWordPlaceholder": "Kommagetrennte Wörter; leer = ε",
+      "testWordHelp": "Trennen Sie mehrere Wörter durch Kommas. Jedes Zeichen zählt als ein Terminalsymbol, Leerzeichen um die Kommas werden ignoriert. Ein leerer Eintrag steht für ε.",
       "accepted": "AKZEPTIERT — die Grammatik leitet dieses Wort ab.",
       "rejected": "ABGELEHNT — die Grammatik leitet dieses Wort nicht ab.",
-      "emptyOutput": "—"
+      "emptyOutput": "—",
+      "supportedFormats": "Unterstützte Formate",
+      "supportedFormatsExtensional": "Extensional / Mengenschreibweise",
+      "supportedFormatsIntensional": "Intensional / formale Schreibweise",
+      "reason": {
+        "accepted": "Lauf endete in: {{states}} (akzeptierend)",
+        "rejectedStates": "Lauf endete in: {{states}} (nicht akzeptierend)",
+        "rejectedDeadEnd": "Kein Übergang für das nächste Symbol — abgelehnt."
+      }
     },
     "examplesTab": {
       "title": "Vorgefertigte Beispiele",
@@ -1994,50 +1952,36 @@
         }
       },
       "grammarToLanguage": {
-        "title": "Grammatik → Sprache",
-        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt.",
-        "step1Title": "1. BFS über Ableitungen",
-        "step1": "Ausgehend vom Startsymbol expandiert die BFS Produktionen und merkt sich jedes akzeptierte Präfix bis zur gewählten Längengrenze. Wörter werden längen-lexikografisch zurückgegeben."
+        "title": "Grammatik → Sprache (Breitensuche-Aufzählung)",
+        "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt."
       },
       "languageToGrammar": {
-        "title": "Wortliste → Grammatik",
-        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden.",
-        "step1Title": "1. Aufzählung erkennen",
-        "step1": "Der Mengeninhalt besteht aus komma-getrennten Wörtern (mit oder ohne Anführungszeichen). Jedes Wort wird einzeln verarbeitet.",
-        "step2Title": "2. Präfixbaum bauen",
-        "step2": "Jedes eindeutige Präfix wird zu einem neuen Nichtterminal. Jede Baumkante ergibt eine Produktion A → aB, und jedes Wortende markiert das zugehörige Nichtterminal als ε-produzierend."
+        "title": "Sprache → Grammatik (Wortliste)",
+        "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden."
       },
       "languageSetBuilder": {
-        "title": "Muster → Grammatik",
-        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt.",
-        "step1Title": "1. Muster und Bedingungen parsen",
-        "step1": "Das Muster wird als Folge von Faktoren gelesen (z. B. a^n, c, b^m). Aus den Bedingungen wird für jede Variable eine untere Schranke bestimmt. Dieselbe Variable darf nicht in zwei Faktoren auftauchen — das wäre nicht regulär (z. B. a^n b^n).",
-        "step2Title": "2. Grammatik aufbauen",
-        "step2": "Jeder Faktor liefert seinen eigenen Block an Produktionen: a^0 ergibt eine Sternschleife, a^≥1 ein erzwungenes erstes Symbol plus Schleife, a^k k feste Produktionen. Die Blöcke werden so verkettet, dass das Startsymbol das ganze Wort ableitet."
+        "title": "Sprache → Grammatik (Mengen-Muster)",
+        "description": "Liest eine Mengen-Schreibweise mit Exponenten und Bedingungen ein und leitet daraus direkt eine rechtslineare Grammatik ab, die genau diese Sprache erzeugt."
       },
       "recognizeWord": {
-        "title": "Wort erkennen",
-        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt.",
-        "step1Title": "1. Grammatik → NFA → simulieren",
-        "step1": "Die Grammatik wird in einen NFA überführt. Der NFA wird Symbol für Symbol über das Eingabewort simuliert. Erreicht irgendein Pfad bei vollständig konsumierter Eingabe einen Endzustand, wird das Wort akzeptiert."
+        "title": "Wort erkennen (Zugehörigkeitstest)",
+        "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt."
       },
       "lectureGrammar1": {
-        "title": "Nullen gefolgt von einer Eins",
-        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1.",
-        "step1Title": "1. Sprache aufzählen",
-        "step1": "Jede Ableitung verläuft S → 0A → 0…0A → 0…01, jedes Wort ist also eine oder mehrere 0en gefolgt von einer einzelnen 1. Laden Sie sie, um L = {01, 001, 0001, …} aufzuzählen."
+        "title": "Grammatik → Sprache (Nullen gefolgt von einer Eins)",
+        "description": "Lesen Sie diese rechtslineare Grammatik: Wörter beginnen mit mindestens einer 0 und enden mit genau einer 1."
       },
       "lectureGrammar2": {
-        "title": "Abwechselnde Nullen und Einsen",
-        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1.",
-        "step1Title": "1. Sprache aufzählen",
-        "step1": "Die ε-Produktionen auf A und B erlauben das Stoppen nach jedem Symbol, während A und B weiter alternieren. Laden Sie sie, um L = {0, 1, 01, 10, 010, 101, 0101, …} aufzuzählen."
+        "title": "Grammatik → Sprache (Abwechselnde Nullen und Einsen)",
+        "description": "Lesen Sie diese Grammatik: strikt alternierende 0en und 1en, beginnend mit beliebigem Symbol, Mindestlänge 1."
       },
       "lectureLanguage1": {
-        "title": "Eine Eins zwischen Nullen",
-        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0.",
-        "step1Title": "1. Grammatik ableiten",
-        "step1": "Eine Schleife baut die führenden 0en, eine einzelne Regel konsumiert die 1, und eine abschließende Schleife baut die nachfolgenden 0en. Laden Sie sie, um S → 0S | 0A, A → 1B, B → 0B | 0 abzuleiten."
+        "title": "Sprache → Grammatik (Eine Eins zwischen Nullen)",
+        "description": "Finden Sie eine Grammatik für diese Sprache: mindestens eine 0, genau eine 1, dann mindestens eine 0."
+      },
+      "languageDefault": {
+        "title": "Sprache → Grammatik (Nullen, eine Eins, Nullen)",
+        "description": "Die voreingestellte Wortliste des Sprache-→-Grammatik-Simulators: Nullen, eine einzelne 1, dann Nullen (ein offenes Muster mit abschließendem „..“)."
       }
     },
     "exercises": {
@@ -2060,78 +2004,54 @@
         }
       },
       "g2lFiniteBinary": {
-        "title": "Drei-Bit-Wörter",
+        "title": "Grammatik → Sprache (Drei-Bit-Wörter)",
         "description": "Zählen Sie jedes Wort auf, das diese Grammatik ableiten kann.",
-        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf.",
-        "hint1": "Jede Ableitung lautet START → 1A → 1xB → 1xy, jedes Wort hat also genau drei Symbole.",
-        "hint2": "A und B bieten je 0 oder 1 — das ergibt 2 × 2 = 4 Wörter, alle mit 1 beginnend."
+        "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf."
       },
       "g2lTrailingZero": {
-        "title": "Einsen zwischen Nullen",
+        "title": "Grammatik → Sprache (Einsen zwischen Nullen)",
         "description": "Bestimmen Sie die von dieser Grammatik erzeugte Sprache.",
-        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter.",
-        "hint1": "A → 1A wiederholt sich und fügt 1en an; beenden lässt sich nur über A → 0B → 00.",
-        "hint2": "Jedes Wort ist also eine führende 0, dann beliebig viele 1en, dann 00."
+        "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter."
       },
       "g2lEpsilonLoop": {
-        "title": "Rekursion mit ε",
+        "title": "Grammatik → Sprache (Rekursion mit ε)",
         "description": "Listen Sie die ableitbaren Wörter auf, wenn B auch das leere Wort erzeugen darf.",
-        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B.",
-        "hint1": "B → ε lässt eine Ableitung direkt nach einer 1 enden; B → 0A führt zurück nach A.",
-        "hint2": "Wörter beginnen mit 0 und wechseln zwischen 0- und 1-Blöcken — verfolgen Sie jeden A/B-Wechsel."
+        "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B."
       },
       "g2lGrouped": {
-        "title": "Gruppierte Alternativen",
+        "title": "Grammatik → Sprache (Gruppierte Alternativen)",
         "description": "Lösen Sie die gruppierten Regeln auf und zählen Sie die erzeugte Sprache auf.",
-        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf.",
-        "hint1": "Die Klammern dienen nur der Gruppierung: A = \"0\",A | \"1\",B und B = \"1\",B | \"0\".",
-        "hint2": "A fügt führende 0en hinzu; B fügt 1en hinzu und muss mit einer einzelnen 0 enden."
+        "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf."
       },
       "l2gZeroOnesZero": {
-        "title": "Eine 0, einige 1en, eine 0",
+        "title": "Sprache → Grammatik (Eine 0, einige 1en, eine 0)",
         "description": "Finden Sie eine reguläre Grammatik, die genau diese Wörter erzeugt.",
-        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen.",
-        "hint1": "Jedes Wort ist eine 0, dann eine oder mehrere 1en, dann eine abschließende 0.",
-        "hint2": "Nutzen Sie einen Zustand, der auf 1 schleift (B → \"1\",B) und bei der letzten 0 endet."
+        "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen."
       },
       "l2gFourWords": {
-        "title": "Vier feste Wörter",
+        "title": "Sprache → Grammatik (Vier feste Wörter)",
         "description": "Schreiben Sie eine Grammatik, die genau diese endliche Sprache ableitet.",
-        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst.",
-        "hint1": "Alle vier Wörter teilen die Endung 11; nur die ersten beiden Bits variieren.",
-        "hint2": "Lassen Sie START und A frei auf 0/1, erzwingen Sie dann B → \"1\",C und C → \"1\"."
+        "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst."
       },
       "l2gNestedZeros": {
-        "title": "Blöcke von Nullen",
+        "title": "Sprache → Grammatik (Blöcke von Nullen)",
         "description": "Konstruieren Sie eine Grammatik, die diese Sprache erzeugt.",
-        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1.",
-        "hint1": "Jedes Wort beginnt und endet mit 1 und hat eine 1 in der Mitte.",
-        "hint2": "Zwischen den 1en stehen Blöcke aus einer oder mehreren 0en — das erfordert eine 0-Schleife.",
-        "hint3": "Verketten Sie START→A→B (erster 0-Block) →C→D (zweiter 0-Block), B und D schleifen auf 0."
+        "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1."
       },
       "appliedIntegers": {
-        "title": "Ganzzahlen",
+        "title": "Sprache → Grammatik (Ganzzahlen)",
         "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen.",
-        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab.",
-        "hint1": "Behandeln Sie \"0\" als eigenen Fall, damit keine führende Null eine längere Zahl beginnt.",
-        "hint2": "Auf eine erste Ziffer ungleich null (1–9) dürfen beliebige Ziffern (0–9) folgen.",
-        "hint3": "Machen Sie den Zustand für Folgeziffern ε-erzeugend, damit die Zahl überall enden kann."
+        "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab."
       },
       "appliedIdentifiers": {
-        "title": "Bezeichner",
+        "title": "Sprache → Grammatik (Bezeichner)",
         "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener erster Buchstabe, gefolgt von Groß- oder Kleinbuchstaben, keine Ziffern.",
-        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab.",
-        "hint1": "Das erste Symbol muss ein Kleinbuchstabe a–z sein.",
-        "hint2": "Danach schleifen Sie über beliebige Buchstaben (a–z oder A–Z) und erlauben ε zum Beenden."
+        "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab."
       }
     },
     "exerciseWorkspace": {
       "selectedExercise": "Ausgewählte Übung",
       "exit": "Übungsmodus verlassen",
-      "showHint": "Tipp",
-      "noMoreHints": "Alle Tipps angezeigt",
-      "hintsUsed": "{{used}}/{{total}} Tipps verwendet",
-      "hintsHeader": "Tipps",
       "showSolution": "Lösung laden",
       "check": "Lösung prüfen",
       "checkMatch": "Sieht korrekt aus!",
@@ -2139,7 +2059,20 @@
       "checkMismatch": "Stimmt noch nicht mit der Zielsprache überein",
       "checkWrong": "Nicht in der Zielsprache: {{words}}",
       "checkMissing": "Fehlende Beispielwörter: {{words}}",
-      "checkInvalidFormat": "Geben Sie die Sprache als explizite Wortliste an (z. B. L = {\"01\", \"011\"}), damit sie geprüft werden kann.",
+      "checkMatchDetailG2L": "Jedes von Ihnen genannte Wort wird von der Grammatik erzeugt, und Sie haben alle kürzesten Wörter gefunden.",
+      "checkWrongG2L": "Diese Wörter werden von der Grammatik nicht erzeugt: {{words}}",
+      "checkMissingG2L": "Diese Wörter fehlen noch in Ihrer Liste: {{words}}",
+      "g2lGivenGrammar": "Gegebene Grammatik",
+      "g2lYourEnumeration": "Ihre Aufzählung",
+      "g2lHelp": "Listen Sie die Wörter auf, die die Grammatik erzeugt, getrennt durch Kommas oder Zeilenumbrüche. Verwenden Sie ε für das leere Wort und klicken Sie dann auf „Lösung prüfen“.",
+      "g2lPlaceholder": "z. B. 100, 101, 110",
+      "checkMatchDetailL2G": "Ihre Grammatik erzeugt alle geforderten Wörter und lehnt die Gegenbeispiele ab.",
+      "checkWrongL2G": "Ihre Grammatik erzeugt auch Wörter, die sie nicht erzeugen sollte: {{words}}",
+      "checkMissingL2G": "Ihre Grammatik erzeugt diese geforderten Wörter nicht: {{words}}",
+      "checkInvalidGrammar": "Geben Sie eine gültige rechtslineare Grammatik ein und prüfen Sie erneut.",
+      "l2gTargetLanguage": "Zielsprache",
+      "l2gYourGrammar": "Ihre Grammatik",
+      "l2gHelp": "Schreiben Sie eine rechtslineare Grammatik, die die Zielsprache erzeugt, und klicken Sie dann auf „Lösung prüfen“.",
       "checkEmpty": "Geben Sie mindestens ein Wort ein und prüfen Sie erneut.",
       "checkUnavailable": "Diese Übung kann nicht automatisch geprüft werden.",
       "confirmTitle": "Vollständige Lösung anzeigen?",
@@ -2147,6 +2080,33 @@
       "confirmYes": "Ja, Lösung anzeigen",
       "confirmNo": "Weiter probieren",
       "solutionLoadedNote": "Die ausgearbeitete Lösung ist in den Simulator unten geladen — führen Sie sie aus, um die Ableitung zu sehen."
+    },
+    "languageErrors": {
+      "empty": "Geben Sie eine Sprachdefinition ein.",
+      "variableReused": "Die Variable '{{name}}' wird in mehr als einem Faktor verwendet. Das beschreibt eine nicht-reguläre Sprache (wie a^n b^n) und lässt sich nicht als reguläre Grammatik schreiben.",
+      "patternUnexpectedChar": "Unerwartetes Zeichen '{{char}}' im Muster an Position {{position}}.",
+      "missingGroupClose": "Es fehlt ein ')', um die Gruppe vor Position {{position}} zu schließen.",
+      "trailingCaret": "Es steht ein '^' ohne Exponent da.",
+      "badExponent": "Nach '^' an Position {{position}} wird ein Variablenbuchstabe oder eine ganze Zahl erwartet.",
+      "nestedRepetition": "„{{factor}}“ wiederholt sich innerhalb einer Gruppe. Schreiben Sie die Wiederholung einmal, z. B. „a^n b“ statt „(a^n)b“.",
+      "constraintVariable": "Am Anfang der Bedingung '{{constraint}}' wird ein Variablenname erwartet.",
+      "expectedNaturals": "Nach '{{op}}' wird ℕ (oder N) erwartet, gefunden wurde '{{got}}'.",
+      "expectedInteger": "Nach '{{op}}' wird eine ganze Zahl erwartet.",
+      "upperBound": "Obere Schranken ('{{op}}') werden nicht unterstützt — sie machen die Sprache endlich. Zählen Sie die Wörter stattdessen auf.",
+      "unexpectedToken": "Unerwartetes Token '{{token}}' in der Bedingung."
+    }
+  },
+  "grammar": {
+    "errors": {
+      "noProductions": "Keine Produktionsregeln gefunden. Fügen Sie mindestens eine Regel hinzu, z. B. 'S -> 0S | 1A'.",
+      "missingArrow": "Die Produktion '{{line}}' ist nicht lesbar. Erwartet wird die Form 'LHS -> RHS'.",
+      "emptyAlternative": "In '{{line}}' steht eine leere Alternative.",
+      "epsilonNotAlone": "ε muss als Alternative allein stehen — gefunden wurde '{{alternative}}' in '{{line}}'.",
+      "unitProduction": "'{{alternative}}' in '{{line}}' ist nur ein Nichtterminal. Eine rechtslineare Regel braucht zuerst ein Terminal, z. B. 'aB'.",
+      "undefinedNonTerminal": "'{{alternative}}' in '{{line}}' ist nicht rechtslinear: '{{rest}}' hat keine eigene Regel. Schreiben Sie ein einzelnes Terminal ('A -> a') oder ein Terminal gefolgt von einem definierten Nichtterminal ('A -> aB').",
+      "unsupportedType": "Nicht unterstützter Typ '{{type}}'. Nur 'type: grammar' wird unterstützt.",
+      "structuredLine": "Zeile {{line}}: erwartet wird 'key: value' oder eine Produktionsregel.",
+      "structuredMissingType": "Das strukturierte Format benötigt eine 'type: grammar'-Kopfzeile."
     }
   }
 }

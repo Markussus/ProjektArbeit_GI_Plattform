@@ -1,4 +1,4 @@
-import { Fragment, useRef } from "react";
+import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import type { FARuntime } from "../domain/faRuntime";
 
@@ -9,11 +9,10 @@ interface FAStepTimelineProps {
 
 export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   const { t } = useTranslation();
-  const scrollRef = useRef<HTMLDivElement>(null);
   const currentStep = runtime.stepCount;
 
-  // The view is fully manual: do NOT auto-scroll the timeline when the active
-  // step changes. The user pans/scrolls the dot row themselves.
+  // The dot row is scrolled by hand — deliberately no auto-scroll on step
+  // change, so the view never jumps out from under the user.
 
   // Render one slot per step the run will take (Start + one per input symbol),
   // not just the steps reached so far. Reached steps are interactive; the rest
@@ -29,7 +28,7 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
       isCurrent: i === currentStep,
       stateCount: isReached ? runtime.stateHistory[i].length : 0,
       // Step 0 is the initial state, step N means N symbols consumed
-      label: i === 0 ? "Start" : `${i}`,
+      label: i === 0 ? t("fa.sim.stepStart", "Start") : `${i}`,
     };
   });
 
@@ -51,7 +50,6 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
       </div>
 
       <div
-        ref={scrollRef}
         className="flex flex-1 items-center overflow-x-auto pb-1"
         style={{ scrollbarWidth: "thin" }}
       >
@@ -82,8 +80,11 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
               onClick={() => step.isReached && onJumpToStep(step.index)}
               title={
                 step.isReached
-                  ? `Step ${step.index} · ${step.stateCount} state(s)`
-                  : `Step ${step.index} (not reached yet)`
+                  ? t("fa.sim.stepTooltip", {
+                      step: step.index,
+                      count: step.stateCount,
+                    })
+                  : t("fa.sim.stepTooltipUnreached", { step: step.index })
               }
               style={{
                 width: step.isCurrent ? 36 : 28,

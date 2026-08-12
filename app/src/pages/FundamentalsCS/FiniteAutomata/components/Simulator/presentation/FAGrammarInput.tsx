@@ -7,6 +7,7 @@ import {
   validateRegularGrammar,
 } from "../domain/faGrammarConversion";
 import {
+  formatGrammarIssue,
   parseGrammarSource,
   type ParseGrammarResult,
 } from "../domain/faGrammarParsing";
@@ -37,9 +38,13 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
     [source],
   );
 
+  const parseErrorText = parsed.ok
+    ? null
+    : formatGrammarIssue(t, parsed.issue, parsed.error);
+
   const handleConvert = () => {
     if (!parsed.ok) {
-      setSubmitErrors([parsed.error]);
+      setSubmitErrors([formatGrammarIssue(t, parsed.issue, parsed.error)]);
       return;
     }
     const validationErrors = validateRegularGrammar(parsed.grammar);
@@ -129,7 +134,7 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
             <div className="text-xs font-semibold tracking-wide uppercase">
               {t("fa.grammar.parseError", "Grammar not parseable yet")}
             </div>
-            <div className="font-mono text-xs">{parsed.error}</div>
+            <div className="text-xs">{parseErrorText}</div>
           </div>
         </div>
       )}

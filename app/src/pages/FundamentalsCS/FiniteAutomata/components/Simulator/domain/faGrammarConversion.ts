@@ -13,7 +13,10 @@ import type { FAProgram, RegularGrammar, FATransitionMap } from "./faTypes";
  * - Start symbol → start state
  */
 export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
-  const FINAL_STATE = "sF";
+  // The synthetic accept state must not clash with a non-terminal the user
+  // happened to name "sF" — otherwise `A -> a` and `A -> asF` would collapse
+  // into the same transition and the grammar's own sF would become accepting.
+  const FINAL_STATE = uniqueFinalStateName(grammar.nonTerminals);
 
   const epsilonProducers = new Set(grammar.epsilonProducingNonTerminals ?? []);
   const needsFinalState = grammar.productions.some(
@@ -21,7 +24,7 @@ export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
   );
 
   const states = [...grammar.nonTerminals];
-  if (needsFinalState && !states.includes(FINAL_STATE)) {
+  if (needsFinalState) {
     states.push(FINAL_STATE);
   }
 
@@ -87,6 +90,15 @@ export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
     startState: grammar.startSymbol,
     acceptStates,
   };
+}
+
+/** "sF", or "sF2", "sF3", … if the grammar already uses that name. */
+function uniqueFinalStateName(nonTerminals: string[]): string {
+  const taken = new Set(nonTerminals);
+  if (!taken.has("sF")) return "sF";
+  let suffix = 2;
+  while (taken.has(`sF${suffix}`)) suffix++;
+  return `sF${suffix}`;
 }
 
 /**

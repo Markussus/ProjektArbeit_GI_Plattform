@@ -4,6 +4,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,9 +18,8 @@ import {
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
-import { DnfBuilder } from "./DnfBuilder/DnfBuilder";
+import { DnfBuilder, type DnfBuilderHandle } from "./DnfBuilder/DnfBuilder";
 import {
-  createDnfAttemptDraft,
   dnfExerciseTransferCodec,
   dnfExpressionTransferCodec,
   dnfTransferCodec,
@@ -31,6 +31,10 @@ import {
 import { ExpressionBuilder } from "./ExpressionBuilder/ExpressionBuilder";
 import { TableToDnfBuilder } from "./TableToDnfBuilder/TableToDnfBuilder";
 import { buildDnfResetValue, type DnfSimulatorMode } from "./dnfSimulatorReset";
+import {
+  buildDnfExpressionWalkthroughValue,
+  buildDnfTruthTableWalkthroughValue,
+} from "./dnfWalkthroughSeed";
 import { getDnfExerciseDefinition } from "../exercises";
 import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
 
@@ -44,15 +48,23 @@ interface DnfSimulatorProps {
   selectedExample?: Example | null;
   onExitExercise?: () => void;
   onExitExample?: () => void;
+  onStorageReadyChange?: (ready: boolean) => void;
 }
 
 export interface DnfSimulatorHandle {
   resetStoredState: () => void;
+  loadSolution: () => void;
 }
 
 export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
   function DnfSimulator(
-    { selectedExercise, selectedExample, onExitExercise, onExitExample },
+    {
+      selectedExercise,
+      selectedExample,
+      onExitExercise,
+      onExitExample,
+      onStorageReadyChange,
+    },
     ref,
   ) {
     const { t } = useTranslation();
@@ -83,6 +95,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     const [hasStoredState, setHasStoredState] = useState(false);
     const [hasUserChanges, setHasUserChanges] = useState(false);
     const [resetVersion, setResetVersion] = useState(0);
+    const dnfBuilderRef = useRef<DnfBuilderHandle | null>(null);
 
     // Seed the active mode from a walkthrough example (if any) so the example
     // opens in its native mode, but let the user override by clicking a tab.
@@ -131,6 +144,10 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           : dnfExerciseTransferCodec,
       [isStorageEnabled, storageIdentifier],
     );
+
+    useEffect(() => {
+      onStorageReadyChange?.(isStorageReady);
+    }, [isStorageReady, onStorageReadyChange]);
 
     useEffect(() => {
       let isCancelled = false;
@@ -195,8 +212,14 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           setHasUserChanges(false);
           setResetVersion((current) => current + 1);
         },
+        loadSolution: () => {
+          if (!isStorageReady) {
+            return;
+          }
+          dnfBuilderRef.current?.loadSolution();
+        },
       }),
-      [buildResetValue, isStorageEnabled, storageIdentifier],
+      [buildResetValue, isStorageEnabled, isStorageReady, storageIdentifier],
     );
 
     const handleExpressionChange = useCallback(
@@ -245,6 +268,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         return (
           <DnfBuilder
             key={`${selectedExercise.id}-${contentKey}`}
+            ref={dnfBuilderRef}
             selectedExercise={selectedExercise}
             initialAttempt={
               storedValue?.mode === "exercise_attempt" ? storedValue : undefined
@@ -261,11 +285,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           storedValue?.mode === "expression_to_truth_table"
             ? storedValue
             : activeWalkthroughExample?.mode === "expression_to_truth_table"
-              ? {
-                  expression: activeWalkthroughExample.expression,
-                  committed: false,
-                  ...createDnfAttemptDraft(),
-                }
+              ? buildDnfExpressionWalkthroughValue(activeWalkthroughExample)
               : undefined;
 
         return (
@@ -277,6 +297,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
               isStorageReady ? handleExpressionChange : undefined
             }
             onUserChange={handleUserChange}
+            seedInitialFeedback={activeWalkthroughExample !== null}
             {...commonStorageProps}
           />
         );
@@ -286,12 +307,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         storedValue?.mode === "truth_table_to_dnf"
           ? storedValue
           : activeWalkthroughExample?.mode === "truth_table_to_dnf"
-            ? {
-                variableCount: activeWalkthroughExample.variables.length,
-                resultValues: activeWalkthroughExample.resultValues,
-                committed: false,
-                ...createDnfAttemptDraft(),
-              }
+            ? buildDnfTruthTableWalkthroughValue(activeWalkthroughExample)
             : undefined;
 
       return (
@@ -303,6 +319,7 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
             isStorageReady ? handleTruthTableChange : undefined
           }
           onUserChange={handleUserChange}
+          seedInitialFeedback={activeWalkthroughExample !== null}
           {...commonStorageProps}
         />
       );
