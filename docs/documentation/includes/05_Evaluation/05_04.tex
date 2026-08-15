@@ -1,3 +1,45 @@
 \subNsection{1}{Design-Iterationen}{Duy Tan Pham}
 
-Welche Entscheidungen mussten im Prozess revidiert werden?
+Die Anforderungen wurden im Projekt nicht einmalig festgelegt. Das Lastenheft bildete den
+Ausgangspunkt. Rückmeldungen des Professors, neue fachliche Wünsche und Erfahrungen mit
+den ersten Prototypen führten im weiteren Verlauf zu Anpassungen. Die grundlegenden Ziele
+blieben erhalten. Dazu gehören das selbstständige Lernen, eine einheitliche Bedienung und
+der Betrieb ohne Backend. Der Umfang und die technische Umsetzung entwickelten sich
+dagegen schrittweise weiter.
+
+Zunächst lag der Schwerpunkt auf den im Lastenheft genannten Themen aus Grundlagen
+Informatik. Später wurden unter anderem reguläre Sprachen und Kodierungsverfahren in die
+Plattform aufgenommen. Mit Programmieren 1 und der Java-Umgebung kam außerdem ein
+ergänzender Lernbereich hinzu. Java war kein ursprünglicher Kernbestandteil. Die
+Erweiterung vergrößert jedoch den nutzbaren Umfang und zeigt, dass die gemeinsame
+Plattformstruktur nicht auf einen einzelnen Lehrbereich beschränkt ist.
+
+Auch die Seitenarchitektur wurde nach den ersten Umsetzungen überarbeitet. Anfangs
+enthielten die Themenseiten ähnliche Strukturen und Routingeinträge an mehreren Stellen.
+Mit wachsendem Umfang führte das zu Wiederholungen und erschwerte eine einheitliche
+Weiterentwicklung. Heute registriert \texttt{moduleCatalog.tsx} Lernbereiche,
+Themenbereiche, Routen und Darstellungsinformationen an einer zentralen Stelle. Navigation,
+Routing und Übersichtsseiten greifen auf diese Informationen zurück. Wiederkehrende
+Abläufe liegen in gemeinsamen Seitengerüsten wie \texttt{ModuleTopicPage}.
+
+Die unabhängig entwickelten Themen unterschieden sich zunächst auch im Aufbau ihrer
+Übersichten, Beispiele und Übungen. Diese Bereiche wurden während der Integration
+schrittweise vereinheitlicht. Gemeinsame Tabs, Aufgabenkomponenten und Simulationsrahmen
+sorgen heute für einen wiedererkennbaren Ablauf. Gleichzeitig bleibt die Fachlogik in den
+jeweiligen Themenbereichen. Diese Aufteilung wurde der vollständigen Zentralisierung
+vorgezogen, weil sich die fachlichen Modelle und Prüfverfahren deutlich unterscheiden.
+
+Eine weitere Änderung betraf Import, Export und die Speicherung von Aufgabenständen.
+Import und Export waren anfangs nur als optionale Funktionen vorgesehen und wurden zuerst
+in einzelnen Simulatoren umgesetzt. Später wurden das Datenformat und der Einstieg über
+den globalen Kopfbereich zusammengeführt. Daraus entstand die gemeinsame
+Training-Center-Struktur. Zusätzlich werden geeignete Aufgabenstände und Einstellungen im
+lokalen Speicher des Browsers gesichert. Damit bleiben Ergebnisse zwischen Aufrufen
+erhalten, ohne die ursprüngliche Entscheidung gegen Benutzerkonten und ein Backend
+aufzugeben.
+
+Die Iterationen zeigen, dass die gemeinsame Struktur nicht vollständig im Voraus feststand.
+Sie entstand aus den wiederkehrenden Abläufen der Fachthemen und wurde angepasst, sobald
+mehrere unabhängige Lösungen dieselbe Aufgabe erfüllten. Dadurch konnten neue
+Anforderungen aufgenommen werden, ohne die Plattform in voneinander getrennte Werkzeuge
+aufzuteilen.
