@@ -14,8 +14,8 @@ describe("tmTapeViewLayout", () => {
       expect(resolveTapeViewport(12, 10, 5, 8)).toEqual({
         effectiveWindowRadius: 8,
         effectiveHeadWindowRadius: 5,
-        startIndex: -1,
-        endIndex: 15,
+        minIndex: -1,
+        maxIndex: 15,
       });
     });
   });
