@@ -146,7 +146,146 @@ describe("Quine-McCluskey minimization", () => {
       );
     }
   });
+
+  it("reaches the exact minimum literal count for every 3-variable function", () => {
+    // Exhaustively compares the QMC result against an independent brute-force
+    // minimum sum-of-products oracle for all 256 functions of 3 variables. This
+    // is what guards against the old greedy cover overshooting the optimum.
+    const variables = ["a", "b", "c"];
+
+    for (let functionMask = 0; functionMask < 256; functionMask += 1) {
+      const results = Array.from(
+        { length: 8 },
+        (_, row) => (functionMask & (1 << row)) !== 0,
+      );
+      const table = createTruthTableFromResults(variables, results);
+
+      const minimal = computeMinimalDnf(table);
+
+      expect(minimal.literalCount).toBe(bruteForceMinSopLiterals(results, 3));
+      expectExpressionMatchesTable(minimal, table);
+    }
+  });
 });
+
+/**
+ * Independent oracle: the minimum total literal count of any sum-of-products
+ * form for the given truth-table results. Enumerates every product term that is
+ * an implicant (covers only 1-rows) and solves the exact minimum-cost cover by
+ * memoised recursion. Deliberately written differently from the production
+ * algorithm so it cross-checks rather than mirrors it.
+ */
+function bruteForceMinSopLiterals(
+  results: boolean[],
+  variableCount: number,
+): number {
+  const rowCount = results.length;
+  const minterms = results.flatMap((value, row) => (value ? [row] : []));
+
+  if (minterms.length === 0 || minterms.length === rowCount) {
+    return 0;
+  }
+
+  const implicants = enumerateImplicants(results, variableCount);
+  const fullTarget = minterms.reduce((mask, row) => mask | (1 << row), 0);
+  const memo = new Map<number, number>();
+
+  const solve = (remaining: number): number => {
+    if (remaining === 0) {
+      return 0;
+    }
+    const cached = memo.get(remaining);
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    // Cover the lowest still-uncovered minterm; branch over every implicant
+    // that includes it.
+    const firstRow = remaining & -remaining;
+    let best = Number.POSITIVE_INFINITY;
+
+    for (const implicant of implicants) {
+      if ((implicant.cover & firstRow) === 0) {
+        continue;
+      }
+      best = Math.min(
+        best,
+        implicant.literals + solve(remaining & ~implicant.cover),
+      );
+    }
+
+    memo.set(remaining, best);
+    return best;
+  };
+
+  return solve(fullTarget);
+}
+
+interface OracleImplicant {
+  cover: number;
+  literals: number;
+}
+
+/** All product terms that cover only 1-rows, deduped to the cheapest per cover. */
+function enumerateImplicants(
+  results: boolean[],
+  variableCount: number,
+): OracleImplicant[] {
+  const rowCount = results.length;
+  const cheapestByCover = new Map<number, number>();
+
+  // Each variable is fixed to 0, fixed to 1, or "don't care" — base-3 digits.
+  const termCount = 3 ** variableCount;
+  for (let term = 0; term < termCount; term += 1) {
+    const fixed: Array<0 | 1 | null> = [];
+    let digits = term;
+    let literals = 0;
+    for (let position = 0; position < variableCount; position += 1) {
+      const digit = digits % 3;
+      digits = Math.floor(digits / 3);
+      if (digit === 0) {
+        fixed.push(null);
+      } else {
+        fixed.push(digit === 1 ? 0 : 1);
+        literals += 1;
+      }
+    }
+
+    let cover = 0;
+    let valid = literals > 0;
+    for (let row = 0; row < rowCount && valid; row += 1) {
+      const matches = fixed.every((bit, variableIndex) => {
+        if (bit === null) {
+          return true;
+        }
+        const bitPosition = variableCount - variableIndex - 1;
+        return ((row >> bitPosition) & 1) === bit;
+      });
+      if (!matches) {
+        continue;
+      }
+      if (!results[row]) {
+        valid = false; // covers a 0-row → not an implicant
+        break;
+      }
+      cover |= 1 << row;
+    }
+
+    if (!valid || cover === 0) {
+      continue;
+    }
+
+    const existing = cheapestByCover.get(cover);
+    if (existing === undefined || literals < existing) {
+      cheapestByCover.set(cover, literals);
+    }
+  }
+
+  return [...cheapestByCover.entries()].map(([cover, literals]) => ({
+    cover,
+    literals,
+  }));
+}
 
 function parse(source: string): BooleanExpression {
   const result = parseBooleanExpression(source);

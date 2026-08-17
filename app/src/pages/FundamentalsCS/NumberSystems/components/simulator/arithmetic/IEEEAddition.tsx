@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
-import type { ReactNode } from "react";
 import {
   SimulatorLayout,
   BinaryInput,
@@ -12,13 +11,7 @@ import {
   useToggleSet,
 } from "@/components/shared/SimulatorShared";
 
-interface IEEEAdditionProps {
-  renderModeSelector?: ReactNode;
-  isExerciseMode?: boolean;
-  showSolution?: boolean;
-  onShowSolution?: () => void;
-  onExitExercise?: () => void;
-}
+import type { BaseArithmeticProps } from "./types";
 
 interface IEEEParsedValue {
   sign: number;
@@ -43,13 +36,26 @@ export function IEEEAddition({
   showSolution = true,
   onShowSolution,
   onExitExercise,
+  initialA,
+  initialB,
+  onChangeValues,
   renderModeSelector,
-}: IEEEAdditionProps) {
+}: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState("13.37");
-  const [valB, setValB] = useState("2.5");
+  const [valA, setValA] = useState(initialA || "13.37");
+  const [valB, setValB] = useState(initialB || "2.5");
   const [showStepByStep, setShowStepByStep] = useState(false);
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (initialA) setValA(initialA);
+    if (initialB) setValB(initialB);
+  }, [initialA, initialB]);
+
+  useEffect(() => {
+    onChangeValues?.(valA, valB);
+  }, [valA, valB, onChangeValues]);
 
   const locked = !!isExerciseMode && !showSolution;
 

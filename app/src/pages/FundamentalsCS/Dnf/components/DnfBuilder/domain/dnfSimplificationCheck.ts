@@ -5,7 +5,11 @@ import {
 } from "./booleanExpression";
 import { deriveDnfFromTruthTable } from "./dnfDerivation";
 import { parseBooleanExpression, type DnfParseIssue } from "./dnfParser";
-import { countExpressionLiterals, factorMinimalDnf } from "./factorMinimalDnf";
+import { countExpressionLiterals } from "./factorMinimalDnf";
+import {
+  computeSmallestBooleanExpression,
+  type SmallestExpressionSource,
+} from "./minimalExpression";
 import { computeMinimalDnf, minimalDnfToExpression } from "./quineMcCluskey";
 import type { TruthTable } from "./truthTable";
 
@@ -32,33 +36,41 @@ export interface DnfSimplificationCheck {
   minimumLiteralCount: number;
   /** Term count of the minimum DNF. */
   minimumTermCount: number;
+  /** Literal count that an answer must reach to count as minimal. */
+  acceptedMinimumLiteralCount: number;
 }
 
 export interface DnfSimplificationCheckResult extends DnfSimplificationCheck {
   /** One concrete minimal expression for display when the user asks for help. */
   minimalExpression: BooleanExpression;
   /**
-   * Greedy-factored expression derived from the minimal DNF. Equals the
-   * minimal DNF when no common factor can be pulled out; otherwise leaves DNF
-   * form and may be strictly shorter.
+   * Shortest expression shown as an optional form beyond pure DNF. For <=4
+   * variables this is globally optimal; above that it falls back to the
+   * previous DNF-derived factoring.
    */
   factoredExpression: BooleanExpression;
-  /** Literal count of the factored expression. */
+  /** Literal count of the optional shortest expression. */
   factoredLiteralCount: number;
-  /** True when factoring produced a strictly shorter expression than the minimal DNF. */
+  /** True when the optional expression is strictly shorter than the minimal DNF. */
   factoredIsShorter: boolean;
+  /** True when the optional expression is certified globally shortest. */
+  factoredIsExact: boolean;
+  /** Origin of the optional expression, for honest UI labels and notes. */
+  factoredSource: SmallestExpressionSource;
 }
 
 /**
  * Check whether the user's simplified expression is an acceptable simplification
  * of the canonical DNF for the given truth table.
  *
- * Pass criteria, in order of severity:
+ * Pass criteria, in order:
  *   1. parse + variables must be valid
  *   2. expression must be logically equivalent to the truth table
- *   3. literal count must be strictly less than the canonical DNF
- *   4. literal count is compared to the QMC minimum to distinguish
- *      "good but not optimal" from "minimal"
+ *   3. reaching the globally smallest literal count counts as "minimal"; for
+ *      callers above the exact-search limit, the QMC minimum remains the fallback
+ *   4. otherwise an answer not shorter than the canonical DNF simplified
+ *      nothing ("equivalent_not_shorter"); shorter-but-not-minimal is
+ *      "accepted_not_minimal"
  */
 export function checkDnfSimplification(
   table: TruthTable,
@@ -66,17 +78,24 @@ export function checkDnfSimplification(
 ): DnfSimplificationCheckResult {
   const minimal = computeMinimalDnf(table);
   const minimalExpression = minimalDnfToExpression(minimal, table.variables);
-  const factoredExpression = factorMinimalDnf(minimal, table.variables);
-  const factoredLiteralCount = countExpressionLiterals(factoredExpression);
+  const smallestExpression = computeSmallestBooleanExpression(table, minimal);
+  const factoredExpression = smallestExpression.expression;
+  const factoredLiteralCount = smallestExpression.literalCount;
+  const acceptedMinimumLiteralCount = smallestExpression.exact
+    ? factoredLiteralCount
+    : minimal.literalCount;
   const canonicalLiteralCount = getCanonicalLiteralCount(table);
   const baseResult = {
     canonicalLiteralCount,
     minimumLiteralCount: minimal.literalCount,
     minimumTermCount: minimal.termCount,
+    acceptedMinimumLiteralCount,
     minimalExpression,
     factoredExpression,
     factoredLiteralCount,
     factoredIsShorter: factoredLiteralCount < minimal.literalCount,
+    factoredIsExact: smallestExpression.exact,
+    factoredSource: smallestExpression.source,
   };
 
   if (userInput.trim() === "") {
@@ -126,20 +145,20 @@ export function checkDnfSimplification(
     };
   }
 
-  if (isNotShorterThanCanonical(userLiteralCount, canonicalLiteralCount)) {
+  if (userLiteralCount <= acceptedMinimumLiteralCount) {
     return {
       ...baseResult,
-      status: "equivalent_not_shorter",
+      status: "accepted_minimal",
       unknownVariables: [],
       userLiteralCount,
       userTermCount,
     };
   }
 
-  if (userLiteralCount <= minimal.literalCount) {
+  if (isNotShorterThanCanonical(userLiteralCount, canonicalLiteralCount)) {
     return {
       ...baseResult,
-      status: "accepted_minimal",
+      status: "equivalent_not_shorter",
       unknownVariables: [],
       userLiteralCount,
       userTermCount,

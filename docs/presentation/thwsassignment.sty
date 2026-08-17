@@ -1,0 +1,29 @@
+\ProvidesPackage{thwsassignment}
+\RequirePackage{geometry}
+\geometry{margin=2cm}
+
+\providecommand{\moduleInstructor}{Prof.\ Dr.\ Default Name}
+\providecommand{\moduleTitle}{Default Title}
+\providecommand{\assignmentTitle}{Assignment Title}
+\providecommand{\moduleLogo}{thws-logo_vert_de_orange-rgb.png}
+
+\newcommand{\moduleHeaderFigure}{%
+  \noindent
+  \begin{minipage}[t]{0.30\textwidth}
+    \vspace{-20mm}%
+    \hspace*{-20mm}% 
+    \includegraphics[width=60mm]{\moduleLogo}%
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.65\textwidth}
+    \vspace{-13mm}%
+    \raggedleft
+    {\Large\textbf{\sffamily \moduleTitle}}\\[2mm]
+    {\large\textbf{\sffamily \assignmentTitle}}\\[2mm]
+    \sffamily \moduleInstructor
+  \end{minipage}
+}
+
+\AtBeginDocument{%
+  \moduleHeaderFigure
+}

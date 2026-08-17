@@ -10,57 +10,64 @@ export interface UseDnfSimplificationResult {
   answer: string;
   feedback: DnfSimplificationCheckResult | null;
   showSolution: boolean;
-  showWalkthrough: boolean;
   setAnswer: (value: string) => void;
   check: (truthTable: TruthTable) => void;
+  loadSolution: (value: string, truthTable: TruthTable) => void;
   toggleSolution: () => void;
-  toggleWalkthrough: () => void;
   reset: () => void;
 }
 
-export function useDnfSimplification(): UseDnfSimplificationResult {
-  const [answer, setAnswerInternal] = useState("");
+interface UseDnfSimplificationOptions {
+  initialFeedback?: DnfSimplificationCheckResult | null;
+}
+
+export function useDnfSimplification(
+  initialAnswer = "",
+  options: UseDnfSimplificationOptions = {},
+): UseDnfSimplificationResult {
+  const [answer, setAnswerInternal] = useState(initialAnswer);
   const [feedback, setFeedback] = useState<DnfSimplificationCheckResult | null>(
-    null,
+    options.initialFeedback ?? null,
   );
   const [showSolution, setShowSolution] = useState(false);
-  const [showWalkthrough, setShowWalkthrough] = useState(false);
 
   const reset = () => {
     setAnswerInternal("");
     setFeedback(null);
     setShowSolution(false);
-    setShowWalkthrough(false);
   };
 
   const setAnswer = (value: string) => {
     setAnswerInternal(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
-    setShowWalkthrough(false);
   };
 
   const check = (truthTable: TruthTable) => {
     setFeedback(checkDnfSimplification(truthTable, answer));
   };
 
-  const toggleSolution = () => {
-    setShowSolution((current) => !current);
+  // Set the answer and its feedback together from the given value (not from the
+  // possibly-stale answer state), so a loaded solution shows as already checked.
+  const loadSolution = (value: string, truthTable: TruthTable) => {
+    const normalized = normalizeBooleanOperatorAliases(value);
+    setAnswerInternal(normalized);
+    setFeedback(checkDnfSimplification(truthTable, normalized));
+    setShowSolution(false);
   };
 
-  const toggleWalkthrough = () => {
-    setShowWalkthrough((current) => !current);
+  const toggleSolution = () => {
+    setShowSolution((current) => !current);
   };
 
   return {
     answer,
     feedback,
     showSolution,
-    showWalkthrough,
     setAnswer,
     check,
+    loadSolution,
     toggleSolution,
-    toggleWalkthrough,
     reset,
   };
 }

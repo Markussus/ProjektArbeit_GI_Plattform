@@ -7,7 +7,6 @@ import type { InternalRepresentation } from "../domain/mooreTypes";
 import type { MealyProgram } from "../domain/mealyTypes";
 import { MooreInputBuilder } from "./MooreInputBuilder";
 import { MooreTransitionTable } from "./MooreTransitionTable";
-import { MealyOutputTable } from "./MealyOutputTable";
 
 interface Props {
   program: MealyProgram;
@@ -90,6 +89,7 @@ export function MealyConfigView(props: Props) {
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-representation-select"
+              optionTestIdPrefix="mealy-representation-option"
             />
           </div>
           <div className="space-y-2">
@@ -106,6 +106,7 @@ export function MealyConfigView(props: Props) {
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-start-state-select"
+              optionTestIdPrefix="mealy-start-state-option"
             />
           </div>
         </div>
@@ -120,30 +121,31 @@ export function MealyConfigView(props: Props) {
           onRemoveState={props.onRemoveState}
           onAddInputSymbol={props.onAddInput}
           onRemoveInputSymbol={props.onRemoveInput}
+          outputControls={{
+            getOutput: (input, state) => program.outputs[input]?.[state],
+            onSymbolChange: props.onOutputSymbolChange,
+            onCodeChange: props.onOutputCodeChange,
+            testIdPrefix: "mealy-transition-output",
+          }}
         />
-        <SymbolSetPanel
-          title={t("moore.sim.states")}
-          emptyText={t("moore.sim.noSymbols")}
-          items={program.states.map((state, index) => ({
-            key: state,
-            content: `${state} ${formatInternalNumber(index, program.representation)}`,
-          }))}
-        />
-      </div>
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <MealyOutputTable
-          program={program}
-          onSymbolChange={props.onOutputSymbolChange}
-          onCodeChange={props.onOutputCodeChange}
-        />
-        <SymbolSetPanel
-          title={t("moore.sim.outputAlphabet")}
-          emptyText={t("moore.sim.noSymbols")}
-          items={outputs.map(([code, symbol]) => ({
-            key: String(code),
-            content: `${symbol} ${formatInternalNumber(code, program.representation)}`,
-          }))}
-        />
+        <div className="space-y-4">
+          <SymbolSetPanel
+            title={t("moore.sim.states")}
+            emptyText={t("moore.sim.noSymbols")}
+            items={program.states.map((state, index) => ({
+              key: state,
+              content: `${state} ${formatInternalNumber(index, program.representation)}`,
+            }))}
+          />
+          <SymbolSetPanel
+            title={t("moore.sim.outputAlphabet")}
+            emptyText={t("moore.sim.noSymbols")}
+            items={outputs.map(([code, symbol]) => ({
+              key: String(code),
+              content: `${symbol} ${formatInternalNumber(code, program.representation)}`,
+            }))}
+          />
+        </div>
       </div>
     </div>
   );

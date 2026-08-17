@@ -1,48 +1,30 @@
-import { useTranslation } from "react-i18next";
-import { BookOpen, Lightbulb, Layers, Cpu } from "lucide-react";
+import { TopicTutorialVideoSection } from "@/components/shared/TopicTutorialVideoSection/TopicTutorialVideoSection";
 
-const conceptIcons = [BookOpen, Layers, Lightbulb, Cpu];
+const tutorialQuestions = [
+  {
+    titleKey: "dnf.tutorialQuestion1",
+    answerKey: "dnf.tutorialAnswer1",
+  },
+  {
+    titleKey: "dnf.tutorialQuestion2",
+    answerKey: "dnf.tutorialAnswer2",
+  },
+  {
+    titleKey: "dnf.tutorialQuestion3",
+    answerKey: "dnf.tutorialAnswer3",
+  },
+] as const;
 
 export function OverviewTab() {
-  const { t } = useTranslation();
-
   return (
     <div className="space-y-6">
-      <div className="bg-card ring-foreground/10 rounded-xl p-6 ring-1">
-        <h3 className="text-foreground text-lg font-semibold">
-          {t("dnf.overviewTitle")}
-        </h3>
-        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-          {t("dnf.overviewText")}
-        </p>
-      </div>
-
-      <div>
-        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("dnf.concepts")}
-        </h3>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {([1, 2, 3, 4] as const).map((num, i) => {
-            const Icon = conceptIcons[i];
-
-            return (
-              <div
-                key={num}
-                className="bg-card ring-foreground/10 flex items-center gap-3 rounded-lg p-4 ring-1"
-              >
-                <div className="bg-module-rose-bg text-module-rose-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-                  <Icon className="size-4" />
-                </div>
-
-                <span className="text-foreground text-sm font-medium">
-                  {t(`dnf.concept${num}`)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <TopicTutorialVideoSection
+        topicId="dnf"
+        videoTitleKey="dnf.tutorialVideo"
+        questionLabelKey="dnf.tutorialQuestionLabel"
+        questions={tutorialQuestions}
+        testIdPrefix="dnf-tutorial"
+      />
     </div>
   );
 }

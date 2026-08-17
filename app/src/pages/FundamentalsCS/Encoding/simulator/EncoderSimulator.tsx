@@ -1,4 +1,11 @@
-import { useState, useEffect } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Base64Encoder } from "./Base64Encoder";
 import { UTF8Encoder } from "./UTF8Encoder";
@@ -6,8 +13,27 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import type { GeneratedExercise } from "../utils/exerciseGenerator";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import {
+  createTrainingCenterIdentifier,
+  createTrainingCenterTransferCodec,
+  loadTrainingCenterValue,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { encTransferCodec } from "./encTransferCodec";
+import type { EncoderState } from "./encTransferCodec";
+
+const ENCODING_SIMULATOR_TASK_STORAGE_ID = createTrainingCenterIdentifier(
+  TOPIC_STORAGE_IDS.encoding,
+);
 
 type EncoderMode = "base64" | "utf8";
+
+export interface EncoderSimulatorHandle {
+  resetStoredState: () => void;
+}
 
 interface EncoderSimulatorProps {
   selectedExercise?: TopicItem | null;
@@ -35,15 +61,31 @@ function getGeneratedExerciseData(item: TopicItem | null | undefined): {
   return { isGenerated: false };
 }
 
-export function EncoderSimulator({
-  selectedExercise,
-  onExitExercise,
-}: EncoderSimulatorProps) {
+export const EncoderSimulator = forwardRef<
+  EncoderSimulatorHandle,
+  EncoderSimulatorProps
+>(function EncoderSimulator({ selectedExercise, onExitExercise }, ref) {
   const { t } = useTranslation("translation");
-  const [activeMode, setActiveMode] = useState<EncoderMode>("base64");
 
-  const [isExerciseMode, setIsExerciseMode] = useState(false);
-  const [showSolution, setShowSolution] = useState(true);
+  const [simulatorState, setSimulatorState] = useState<EncoderState>(() => {
+    return {
+      activeMode: "base64",
+    };
+  });
+  const [isStorageReady, setIsStorageReady] = useState(false);
+  const [loadVersion, setLoadVersion] = useState(0);
+
+  const activeMode = simulatorState.activeMode;
+  const setActiveMode = (mode: EncoderMode) => {
+    setSimulatorState((prev) => ({ ...prev, activeMode: mode }));
+  };
+
+  const [isExerciseMode, setIsExerciseMode] = useState(() => {
+    return selectedExercise ? !selectedExercise.id.includes(".example") : false;
+  });
+  const [showSolution, setShowSolution] = useState(() => {
+    return selectedExercise ? selectedExercise.id.includes(".example") : true;
+  });
 
   const [pendingMode, setPendingMode] = useState<EncoderMode | null>(null);
   const [showTabConfirm, setShowTabConfirm] = useState(false);
@@ -52,14 +94,74 @@ export function EncoderSimulator({
   const [initialConverterMode, setInitialConverterMode] = useState<
     "encode" | "decode"
   >("encode");
-
   const [expectedAnswer, setExpectedAnswer] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function initStorage() {
+      if (selectedExercise) {
+        setIsStorageReady(true);
+        return;
+      }
+
+      try {
+        const tcCodec = createTrainingCenterTransferCodec(
+          ENCODING_SIMULATOR_TASK_STORAGE_ID,
+          encTransferCodec,
+        );
+        const stored = await loadTrainingCenterValue(
+          ENCODING_SIMULATOR_TASK_STORAGE_ID,
+          tcCodec,
+        );
+
+        if (active && stored) {
+          setSimulatorState(stored);
+          setLoadVersion((v) => v + 1);
+
+          if (stored.activeMode === "base64" && stored.base64) {
+            setInitialValue(stored.base64.inputValue);
+            setInitialConverterMode(stored.base64.converterMode);
+          } else if (stored.activeMode === "utf8" && stored.utf8) {
+            setInitialValue(stored.utf8.inputValue);
+            setInitialConverterMode(stored.utf8.converterMode);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load initial storage state:", err);
+      } finally {
+        if (active) {
+          setIsStorageReady(true);
+        }
+      }
+    }
+    initStorage();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedExercise]);
+
+  const tcCodec = useMemo(() => {
+    return createTrainingCenterTransferCodec(
+      ENCODING_SIMULATOR_TASK_STORAGE_ID,
+      encTransferCodec,
+    );
+  }, []);
+
+  useTrainingCenterAutoSave({
+    identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
+    value: simulatorState,
+    codec: tcCodec,
+    enabled: isStorageReady && !isExerciseMode,
+    intervalMs: 500,
+  });
 
   useEffect(() => {
     if (selectedExercise) {
       const isExample = selectedExercise.id.includes(".example");
       const genData = getGeneratedExerciseData(selectedExercise);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setIsExerciseMode(!isExample);
       setShowSolution(isExample);
 
@@ -68,35 +170,37 @@ export function EncoderSimulator({
         setInitialConverterMode(genData.converterMode || "encode");
         setInitialValue(genData.initialValue || "");
         setExpectedAnswer(genData.answer || "");
-      } else if (selectedExercise.id === "encoding.ex_base64_placeholder") {
+      } else if (selectedExercise.id === "encoding.example_base64_2") {
         setActiveMode("base64");
         setInitialConverterMode("encode");
-        setInitialValue("Hello");
+        setInitialValue("THWS");
         setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.ex_utf8_placeholder") {
-        setActiveMode("utf8");
-        setInitialConverterMode("encode");
-        setInitialValue("A");
-        setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_base64_1") {
+      } else if (selectedExercise.id === "encoding.example_base64_3") {
         setActiveMode("base64");
-        setInitialConverterMode("encode");
-        setInitialValue("Hello");
+        setInitialConverterMode("decode");
+        setInitialValue("RklY");
         setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_utf8_1") {
+      } else if (selectedExercise.id === "encoding.example_utf8_2") {
         setActiveMode("utf8");
         setInitialConverterMode("encode");
-        setInitialValue("Hello");
+        setInitialValue("႐");
+        setExpectedAnswer("");
+      } else if (selectedExercise.id === "encoding.example_utf8_3") {
+        setActiveMode("utf8");
+        setInitialConverterMode("decode");
+        setInitialValue("E1 A0 A0");
         setExpectedAnswer("");
       }
     } else {
       setIsExerciseMode(false);
       setShowSolution(true);
-      setInitialValue("");
-      setInitialConverterMode("encode");
-      setExpectedAnswer("");
+      // We only reset to default if we aren't loading from storage
+      // To avoid flashing/overwriting loaded state on mount
+      if (isStorageReady) {
+        setExpectedAnswer("");
+      }
     }
-  }, [selectedExercise]);
+  }, [selectedExercise, isStorageReady]);
 
   const handleExitExercise = () => {
     setIsExerciseMode(false);
@@ -123,11 +227,57 @@ export function EncoderSimulator({
     }
   };
 
+  const resetStoredState = useCallback(() => {
+    trainingCenterStorage.delete(ENCODING_SIMULATOR_TASK_STORAGE_ID);
+
+    setSimulatorState({ activeMode: "base64" });
+    setInitialValue("");
+    setInitialConverterMode("encode");
+    setExpectedAnswer("");
+    setLoadVersion((v) => v + 1);
+  }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetStoredState,
+    }),
+    [resetStoredState],
+  );
+
+  const currentKey = useMemo(() => {
+    if (selectedExercise?.id) {
+      return `${selectedExercise.id}-${initialValue}-${loadVersion}`;
+    }
+    return `free-${activeMode}-${loadVersion}`;
+  }, [selectedExercise?.id, activeMode, initialValue, loadVersion]);
+
   return (
     <div
       data-testid="encoding-simulator"
       className="flex h-full flex-col space-y-6"
     >
+      {isStorageReady && !isExerciseMode && (
+        <SimulatorStringTransferBox
+          testIdPrefix="encoding-transfer"
+          value={simulatorState}
+          codec={tcCodec}
+          onLoad={(newState) => {
+            setSimulatorState(newState);
+            setLoadVersion((v) => v + 1);
+            setActiveMode(newState.activeMode);
+
+            if (newState.activeMode === "base64" && newState.base64) {
+              setInitialValue(newState.base64.inputValue);
+              setInitialConverterMode(newState.base64.converterMode);
+            } else if (newState.activeMode === "utf8" && newState.utf8) {
+              setInitialValue(newState.utf8.inputValue);
+              setInitialConverterMode(newState.utf8.converterMode);
+            }
+          }}
+          className="shrink-0"
+        />
+      )}
       <div className="border-border flex gap-1 border-b">
         {(["base64", "utf8"] as EncoderMode[]).map((mode) => (
           <button
@@ -152,11 +302,7 @@ export function EncoderSimulator({
       <div className="flex-1 overflow-auto">
         {activeMode === "base64" && (
           <Base64Encoder
-            key={
-              selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-base64"
-            }
+            key={currentKey}
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
@@ -164,15 +310,17 @@ export function EncoderSimulator({
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
             expectedAnswer={expectedAnswer || undefined}
+            onChangeState={(state) => {
+              setSimulatorState((prev) => ({
+                ...prev,
+                base64: { ...state },
+              }));
+            }}
           />
         )}
         {activeMode === "utf8" && (
           <UTF8Encoder
-            key={
-              selectedExercise?.id
-                ? `${selectedExercise.id}-${initialValue}`
-                : "free-utf8"
-            }
+            key={currentKey}
             isExerciseMode={isExerciseMode}
             showSolution={showSolution}
             onShowSolution={() => setShowSolution(true)}
@@ -180,6 +328,12 @@ export function EncoderSimulator({
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
             expectedAnswer={expectedAnswer || undefined}
+            onChangeState={(state) => {
+              setSimulatorState((prev) => ({
+                ...prev,
+                utf8: { ...state },
+              }));
+            }}
           />
         )}
       </div>
@@ -198,4 +352,4 @@ export function EncoderSimulator({
       />
     </div>
   );
-}
+});

@@ -6,11 +6,13 @@ import type { TruthTable } from "../components/DnfBuilder/domain/truthTable";
 const DEFAULT_DNF_SOURCE = "a ∨ (b ∧ c)";
 
 interface DnfExpressionExerciseDefinition extends ExerciseDefinition {
+  storageId: number;
   mode: "expression_to_truth_table";
   expression: string;
 }
 
 interface DnfTruthTableExerciseDefinition extends ExerciseDefinition {
+  storageId: number;
   mode: "truth_table_to_dnf";
   truthTable: TruthTable;
 }
@@ -21,6 +23,7 @@ export type DnfExerciseDefinition =
 
 export const dnfExercises: DnfExerciseDefinition[] = [
   {
+    storageId: 0,
     titleKey: "dnf.exercises.worksheet02bTruthTable1.title",
     descriptionKey: "dnf.exercises.worksheet02bTruthTable1.description",
     difficulty: "easy",
@@ -32,6 +35,7 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     ),
   },
   {
+    storageId: 1,
     titleKey: "dnf.exercises.simpleExpression.title",
     descriptionKey: "dnf.exercises.simpleExpression.description",
     difficulty: "easy",
@@ -40,6 +44,7 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     expression: "(a ∨ b) ∧ c",
   },
   {
+    storageId: 2,
     titleKey: "dnf.exercises.overlappingGroups.title",
     descriptionKey: "dnf.exercises.overlappingGroups.description",
     difficulty: "medium",
@@ -51,6 +56,7 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     ),
   },
   {
+    storageId: 3,
     titleKey: "dnf.exercises.negatedExpression.title",
     descriptionKey: "dnf.exercises.negatedExpression.description",
     difficulty: "medium",
@@ -59,6 +65,7 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     expression: "¬a ∨ (b ∧ ¬c)",
   },
   {
+    storageId: 4,
     titleKey: "dnf.exercises.worksheet02bTruthTable2.title",
     descriptionKey: "dnf.exercises.worksheet02bTruthTable2.description",
     difficulty: "hard",
@@ -87,6 +94,7 @@ export const dnfExercises: DnfExerciseDefinition[] = [
     ),
   },
   {
+    storageId: 5,
     titleKey: "dnf.exercises.complexExpression.title",
     descriptionKey: "dnf.exercises.complexExpression.description",
     difficulty: "hard",

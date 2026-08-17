@@ -5,21 +5,20 @@ interface StepByStepToggleProps {
   open: boolean;
   onToggle: () => void;
   className?: string;
+  testId?: string;
 }
 
-/**
- * Toggle-Button für die Schritt-für-Schritt-Anzeige.
- * Zeigt einen List-Icon, den i18n-Label und einen Chevron an.
- */
 export function StepByStepToggle({
   open,
   onToggle,
   className = "",
+  testId,
 }: StepByStepToggleProps) {
   const { t } = useTranslation("translation");
   return (
     <button
       onClick={onToggle}
+      data-testid={testId}
       className={`text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium ${className}`}
     >
       <List className="h-4 w-4" />

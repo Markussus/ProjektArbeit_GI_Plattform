@@ -1,16 +1,10 @@
 import type { ReactNode } from "react";
 
 interface SimulatorLayoutProps {
-  /** Linke Spalte: Inputs & Operanden */
   inputPanel: ReactNode;
-  /** Rechte Spalte: Ergebnis oder ExerciseValidationPanel */
   resultPanel: ReactNode;
 }
 
-/**
- * Zwei-Spalten-Grid-Layout für alle Arithmetic-Simulator-Komponenten.
- * Links: Eingabefelder. Rechts: Ergebnis oder Validation.
- */
 export function SimulatorLayout({
   inputPanel,
   resultPanel,

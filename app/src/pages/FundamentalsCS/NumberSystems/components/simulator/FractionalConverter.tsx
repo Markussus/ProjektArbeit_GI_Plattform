@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { FractionalConverterState } from "./nsTransferCodec";
 
 interface FractionalConverterProps {
   isExerciseMode?: boolean;
@@ -9,6 +10,8 @@ interface FractionalConverterProps {
   onShowSolution?: () => void;
   onExitExercise?: () => void;
   initialValue?: string;
+  initialState?: FractionalConverterState;
+  onChangeState?: (state: FractionalConverterState) => void;
 }
 
 export function FractionalConverter({
@@ -17,19 +20,24 @@ export function FractionalConverter({
   onShowSolution,
   onExitExercise,
   initialValue = "",
+  initialState,
+  onChangeState,
 }: FractionalConverterProps) {
   const { t } = useTranslation("translation");
-  const [inputValue, setInputValue] = useState<string>("10.5");
+  const locked = !!isExerciseMode && !showSolution;
+  const [inputValue, setInputValue] = useState<string>(
+    locked
+      ? initialValue || "10.5"
+      : (initialState?.inputValue ?? (initialValue || "10.5")),
+  );
   const [converterMode, setConverterMode] = useState<"decToBin" | "binToDec">(
-    "decToBin",
+    locked ? "decToBin" : (initialState?.converterMode ?? "decToBin"),
   );
 
   useEffect(() => {
-    if (initialValue) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInputValue(initialValue);
-    }
-  }, [initialValue]);
+    onChangeState?.({ inputValue, converterMode });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, converterMode]);
 
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;

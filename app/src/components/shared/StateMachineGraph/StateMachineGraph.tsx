@@ -306,6 +306,7 @@ export function StateMachineGraph({
               ? "Show transition symbols as a vertical list"
               : "Show transition symbols comma-separated"
           }
+          testId={testId ? `${testId}-label-layout-toggle` : undefined}
           onClick={() =>
             setLabelLayout((current) =>
               current === "wrapped" ? "list" : "wrapped",
@@ -318,13 +319,25 @@ export function StateMachineGraph({
             <WrapText className="size-4" />
           )}
         </GraphButton>
-        <GraphButton label="Zoom out" onClick={zoomOut}>
+        <GraphButton
+          label="Zoom out"
+          testId={testId ? `${testId}-zoom-out` : undefined}
+          onClick={zoomOut}
+        >
           <Minus className="size-4" />
         </GraphButton>
-        <GraphButton label="Reset view" onClick={resetGraph}>
+        <GraphButton
+          label="Reset view"
+          testId={testId ? `${testId}-reset-view` : undefined}
+          onClick={resetGraph}
+        >
           <RotateCcw className="size-4" />
         </GraphButton>
-        <GraphButton label="Zoom in" onClick={zoomIn}>
+        <GraphButton
+          label="Zoom in"
+          testId={testId ? `${testId}-zoom-in` : undefined}
+          onClick={zoomIn}
+        >
           <Plus className="size-4" />
         </GraphButton>
       </div>
@@ -332,6 +345,7 @@ export function StateMachineGraph({
         type="button"
         onClick={resetGraph}
         aria-label="Reset zoom to 100%"
+        data-testid={testId ? `${testId}-zoom-percent-reset` : undefined}
         className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
       >
         {Math.round(scale * 100)}%
@@ -343,10 +357,12 @@ export function StateMachineGraph({
 function GraphButton({
   label,
   onClick,
+  testId,
   children,
 }: {
   label: string;
   onClick: () => void;
+  testId?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -355,6 +371,7 @@ function GraphButton({
         type="button"
         aria-label={label}
         onClick={onClick}
+        data-testid={testId}
         className="border-border bg-background hover:bg-muted inline-flex size-8 items-center justify-center rounded-md border shadow-sm"
       >
         {children}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FileText, Info } from "lucide-react";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -25,6 +25,10 @@ interface Base64EncoderProps {
   initialValue?: string;
   initialConverterMode?: "encode" | "decode";
   expectedAnswer?: string;
+  onChangeState?: (state: {
+    converterMode: "encode" | "decode";
+    inputValue: string;
+  }) => void;
 }
 
 interface EncodingStep {
@@ -64,6 +68,7 @@ export function Base64Encoder({
   initialValue = "",
   initialConverterMode = "encode",
   expectedAnswer,
+  onChangeState,
 }: Base64EncoderProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(initialValue);
@@ -71,6 +76,11 @@ export function Base64Encoder({
     initialConverterMode,
   );
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    onChangeState?.({ converterMode, inputValue });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [converterMode, inputValue]);
 
   const encodingSteps = useMemo((): EncodingStep[] => {
     if (converterMode !== "encode" || !inputValue) return [];
@@ -270,6 +280,7 @@ export function Base64Encoder({
           </div>
 
           <BinaryInput
+            data-testid="base64-input"
             label={inputLabel}
             value={inputValue}
             onChange={handleInputChange}
@@ -281,7 +292,10 @@ export function Base64Encoder({
               <span className="text-muted-foreground text-xs font-medium">
                 {resultLabel}
               </span>
-              <div className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all">
+              <div
+                data-testid="base64-result"
+                className="bg-background mt-2 rounded-md border px-3 py-2 font-mono text-sm break-all"
+              >
                 {result}
               </div>
             </div>
@@ -370,7 +384,7 @@ export function Base64Encoder({
                     <div className="space-y-2">
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          ASCII-Hex:
+                          {t("simulator.encoding.asciiHexLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.hex).join(" ")}
@@ -378,7 +392,7 @@ export function Base64Encoder({
                       </div>
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          Binary (concatenated):
+                          {t("simulator.encoding.binaryConcatLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.binary).join("")}

@@ -8,6 +8,7 @@ interface ExerciseCardProps {
   item: TopicItem;
   index: number;
   isSelected?: boolean;
+  label?: string;
   onSelect?: () => void;
   onOpen?: () => void;
   testIdPrefix?: string;
@@ -29,6 +30,7 @@ export function ExerciseCard({
   item,
   index,
   isSelected = false,
+  label,
   onSelect,
   onOpen,
   testIdPrefix,
@@ -47,9 +49,10 @@ export function ExerciseCard({
       )
     : rawDescription;
   const itemLabel =
-    item.kind === "example"
+    label ??
+    (item.kind === "example"
       ? t("example.label", { index: index + 1 })
-      : t("exercise.label", { index: index + 1 });
+      : t("exercise.label", { index: index + 1 }));
   const openLabel =
     item.kind === "example"
       ? t("example.openInSimulation")
@@ -124,16 +127,20 @@ export function ExerciseCard({
               {itemDescription}
             </p>
 
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={onOpen}
-                data-testid={testIdPrefix ? `${testIdPrefix}-open` : undefined}
-                className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
-              >
-                {openLabel}
-              </button>
-            </div>
+            {onOpen && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={onOpen}
+                  data-testid={
+                    testIdPrefix ? `${testIdPrefix}-open` : undefined
+                  }
+                  className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {openLabel}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

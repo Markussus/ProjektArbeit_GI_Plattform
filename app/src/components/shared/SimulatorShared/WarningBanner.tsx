@@ -35,10 +35,6 @@ const VARIANT_STYLES: Record<
   },
 };
 
-/**
- * Wiederverwendbares Warning/Info-Banner mit linkem farbigen Border.
- * Varianten: "destructive" (rot), "warning" (orange), "info" (grau).
- */
 export function WarningBanner({
   variant,
   title,

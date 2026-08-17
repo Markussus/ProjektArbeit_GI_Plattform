@@ -22,6 +22,7 @@ interface TokenReadResult {
 
 export type DnfParseIssueCode =
   | "empty_expression"
+  | "expression_too_complex"
   | "unexpected_character"
   | "unexpected_token"
   | "unexpected_end"
@@ -41,12 +42,20 @@ type TokenizeResult =
   | { ok: true; tokens: Token[] }
   | { ok: false; issue: DnfParseIssue };
 
+const MAX_EXPRESSION_LENGTH = 2048;
+const MAX_TOKEN_COUNT = 512;
+const MAX_RECURSION_DEPTH = 64;
+
 export function parseBooleanExpression(source: string): DnfParseResult {
   if (source.trim() === "") {
     return {
       ok: false,
       issue: { code: "empty_expression", index: 0 },
     };
+  }
+
+  if (source.length > MAX_EXPRESSION_LENGTH) {
+    return expressionTooComplex(MAX_EXPRESSION_LENGTH);
   }
 
   const tokenizeResult = tokenize(source);
@@ -56,6 +65,12 @@ export function parseBooleanExpression(source: string): DnfParseResult {
 
   let position = 0;
   const tokens = tokenizeResult.tokens;
+
+  if (tokens.length > MAX_TOKEN_COUNT) {
+    return expressionTooComplex(
+      tokens[MAX_TOKEN_COUNT]?.index ?? source.length,
+    );
+  }
 
   const peek = (): Token | null => tokens[position] ?? null;
 
@@ -69,8 +84,8 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     return token;
   };
 
-  const parseOr = (): DnfParseResult => {
-    const leftResult = parseAnd();
+  const parseOr = (depth: number): DnfParseResult => {
+    const leftResult = parseAnd(depth);
     if (!leftResult.ok) {
       return leftResult;
     }
@@ -78,7 +93,7 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     let expression = leftResult.expression;
 
     while (consume("or")) {
-      const rightResult = parseAnd();
+      const rightResult = parseAnd(depth);
       if (!rightResult.ok) {
         return rightResult;
       }
@@ -94,8 +109,8 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     return { ok: true, expression };
   };
 
-  const parseAnd = (): DnfParseResult => {
-    const leftResult = parseUnary();
+  const parseAnd = (depth: number): DnfParseResult => {
+    const leftResult = parseUnary(depth);
     if (!leftResult.ok) {
       return leftResult;
     }
@@ -103,7 +118,7 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     let expression = leftResult.expression;
 
     while (consume("and")) {
-      const rightResult = parseUnary();
+      const rightResult = parseUnary(depth);
       if (!rightResult.ok) {
         return rightResult;
       }
@@ -119,9 +134,14 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     return { ok: true, expression };
   };
 
-  const parseUnary = (): DnfParseResult => {
-    if (consume("not")) {
-      const operandResult = parseUnary();
+  const parseUnary = (depth: number): DnfParseResult => {
+    const negation = consume("not");
+    if (negation) {
+      if (depth >= MAX_RECURSION_DEPTH) {
+        return expressionTooComplex(negation.index);
+      }
+
+      const operandResult = parseUnary(depth + 1);
       if (!operandResult.ok) {
         return operandResult;
       }
@@ -132,10 +152,10 @@ export function parseBooleanExpression(source: string): DnfParseResult {
       };
     }
 
-    return parsePrimary();
+    return parsePrimary(depth);
   };
 
-  const parsePrimary = (): DnfParseResult => {
+  const parsePrimary = (depth: number): DnfParseResult => {
     const token = peek();
 
     if (!token) {
@@ -159,8 +179,13 @@ export function parseBooleanExpression(source: string): DnfParseResult {
       };
     }
 
-    if (consume("left_paren")) {
-      const expressionResult = parseOr();
+    const leftParenthesis = consume("left_paren");
+    if (leftParenthesis) {
+      if (depth >= MAX_RECURSION_DEPTH) {
+        return expressionTooComplex(leftParenthesis.index);
+      }
+
+      const expressionResult = parseOr(depth + 1);
       if (!expressionResult.ok) {
         return expressionResult;
       }
@@ -190,7 +215,7 @@ export function parseBooleanExpression(source: string): DnfParseResult {
     };
   };
 
-  const expressionResult = parseOr();
+  const expressionResult = parseOr(0);
   if (!expressionResult.ok) {
     return expressionResult;
   }
@@ -208,6 +233,13 @@ export function parseBooleanExpression(source: string): DnfParseResult {
   }
 
   return expressionResult;
+}
+
+function expressionTooComplex(index: number): DnfParseResult {
+  return {
+    ok: false,
+    issue: { code: "expression_too_complex", index },
+  };
 }
 
 function tokenize(source: string): TokenizeResult {

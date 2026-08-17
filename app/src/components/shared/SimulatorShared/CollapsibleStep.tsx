@@ -4,31 +4,31 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 interface CollapsibleStepProps {
   isOpen: boolean;
   onToggle: () => void;
-  /** Inhalt der immer sichtbaren Zeile (Step-Vorschau) */
+
   header: ReactNode;
-  /** Inhalt des aufgeklappten Bereichs */
+
   children: ReactNode;
-  /** Optionale CSS-Klassen für den Wrapper */
+
   className?: string;
+  testId?: string;
 }
 
-/**
- * Zusammenklappbarer Schritt-Eintrag für Step-by-Step-Listen.
- * Kapselt Border, Hover-Effekte, Chevron und expandierten Bereich.
- */
 export function CollapsibleStep({
   isOpen,
   onToggle,
   header,
   children,
   className = "",
+  testId,
 }: CollapsibleStepProps) {
   return (
     <div
+      data-testid={testId}
       className={`border-border/40 overflow-hidden rounded-lg border ${className}`}
     >
       <button
         onClick={onToggle}
+        data-testid={testId ? `${testId}-toggle` : undefined}
         className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-4">{header}</div>
@@ -39,7 +39,10 @@ export function CollapsibleStep({
         )}
       </button>
       {isOpen && (
-        <div className="bg-muted/30 border-border/40 border-t p-3">
+        <div
+          data-testid={testId ? `${testId}-content` : undefined}
+          className="bg-muted/30 border-border/40 border-t p-3"
+        >
           {children}
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -46,6 +46,7 @@ export function Subtraction({
   onExitExercise,
   initialA,
   initialB,
+  onChangeValues,
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
@@ -53,6 +54,16 @@ export function Subtraction({
   const [valB, setValB] = useState(initialB || "00001010");
   const [showStepByStep, setShowStepByStep] = useState(false);
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (initialA) setValA(initialA);
+    if (initialB) setValB(initialB);
+  }, [initialA, initialB]);
+
+  useEffect(() => {
+    onChangeValues?.(valA, valB);
+  }, [valA, valB, onChangeValues]);
 
   const locked = !!isExerciseMode && !showSolution;
 

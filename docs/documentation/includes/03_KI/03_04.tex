@@ -1,15 +1,72 @@
 \subNsection{1}{KI Reflexion}{Duy Tan Pham}
 
-Nutzung von Gemini 3.1 Pro, ChatGPT und Codex als Entwicklungswerkzeuge – Effizienzsteigerung bei der Implementierung mathematischer Logik und UI-Komponenten
+Für meinen Teil, die Disjunktive Normalform, habe ich durchgehend mit KI-Werkzeugen
+gearbeitet. Codex war das Hauptwerkzeug beim Entwickeln und direkt in VS Code eingebunden.
+Claude habe ich für Analyse, Refactorings sowie für Kontext- und Wissensdokumente genutzt.
+Die KI diente dabei nicht nur als Entwicklungswerkzeug, sondern auch zur Aufarbeitung der
+fachlichen Grundlagen. Einzelne
+Themen wie die Funktionsweise der DNF, das Verfahren von Quine-McCluskey und die
+Karnaugh-Diagramme habe ich mir von der KI erklären lassen. Dadurch wurde nicht nur das
+Schreiben des Codes beschleunigt, sondern auch das Verständnis des Stoffs unterstützt.
 
 \subNsection{2}{KI als Co-Developer}{Duy Tan Pham}
 
-Reflektieren und so...
+Meine Arbeitsweise mit der KI war vor allem dialogisch und nicht befehlend. Statt fertige
+Vorgaben zu machen, habe ich die KI meist zuerst nach einer Einschätzung und einem
+Lösungsansatz gefragt, bevor etwas umgesetzt wurde. Die eigentliche Entscheidung ist dann
+schrittweise im Austausch entstanden. Dieses Nachfragen war zugleich meine Kontrolle. Weil
+ich die Vorschläge hinterfragt habe, bevor ich sie übernahm, blieb die fachliche
+Entscheidung bei mir, und Fehler fielen früher auf.
+
+Dabei haben sich einige feste Muster herausgebildet. Grundsätzlich stand der Lösungsansatz
+vor der Umsetzung. Die KI sollte einen Vorschlag zuerst erklären, bevor sie Code erzeugt.
+Ergänzend habe ich sie ausdrücklich um eine ehrliche Einschätzung gebeten, etwa zur
+Benennung von Funktionen oder zu möglichen unsauberen Stellen und Sonderfällen. Die
+Oberfläche habe ich häufig anhand von Screenshots beurteilen und schrittweise verbessern
+lassen, bis sie sauber und einheitlich war. Einheitlichkeit war dabei eine wichtige
+Leitplanke. Ich habe den DNF-Bereich an den gemeinsamen Gestaltungs- und
+Interaktionsmustern der Lernplattform ausgerichtet. Zum Abschluss gehörten gezielte Tests,
+Linting, Build, Formatierung mit Prettier und punktuell das Analysewerkzeug
+\texttt{fallow} als zusätzliche Prüfung.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Duy Tan Pham}
 
-Reflektieren und so...
+Für den DNF-Bereich habe ich die Übungsaufgaben nicht von einer KI erzeugen lassen. Die
+Aufgaben sind als feste Übungsdefinitionen im Code hinterlegt und verwenden Ausdrücke oder
+Wahrheitstabellen mit höchstens vier Variablen. Die erwarteten Ergebnisse werden mit der
+DNF-Fachlogik bestimmt. Dadurch bleiben die Aufgaben reproduzierbar und benötigen für die
+Prüfung keine separat gepflegten Lösungstexte. Die KI hat hier bei der Umsetzung der Logik
+und bei einzelnen Beispielausdrücken unterstützt, nicht bei der Auswahl der Aufgaben.
 
 \subNsection{2}{Kritische Reflexion}{Duy Tan Pham}
 
-Reflektieren und so...
+Die wichtigste Erkenntnis war für mich, dass man sich bei deterministischer
+Informatik-Logik nicht blind auf die KI verlassen kann. Ein Beispiel ist die Minimierung.
+Die damalige Lösung hat die Restüberdeckung greedy gewählt. Erst meine konkrete Nachfrage,
+ob damit die literalminimale DNF übersehen werden kann, führte zur Diagnose und anschließend
+zur exakten Lösung. Ich musste das Korrektheitskriterium also selbst benennen und am Code
+prüfen. Die KI stellte dieses Korrektheitskriterium nicht eigenständig sicher.
+
+Ein zweites Thema war das begrenzte Kontextfenster. In langen Chats ging Kontext verloren,
+deshalb habe ich mir Zusammenfassungen für neue Chats erstellen lassen und wichtige Fakten
+in eigene Wissensdokumente ausgelagert. Um das Repository herum entstand dadurch ein lokaler
+Arbeitsbereich mit Vorlesungsunterlagen, Übungsblättern, Lastenheft, Work-Item-Exporten,
+Videoquellen und ausgewählten Chatprotokollen. Kurze Handoff-Dateien und
+aufgabenspezifische Skills steuerten, welche Quellen ein neuer Agent für eine Aufgabe lesen
+und welche Prüfungen er durchführen sollte. Dadurch musste nicht jeder Chat den gesamten
+Projektverlauf neu einlesen. Die zusätzlichen Dateien waren dabei nur Orientierung und
+Prozessbelege. Technische Aussagen wurden weiterhin am aktuellen Code, an Tests oder an
+Commits geprüft.
+
+Außerdem musste ich auf den Umfang der Anfragen achten. Zu große Aufgaben auf einmal wurden
+unzuverlässig, kleinere Schritte lieferten bessere Ergebnisse. Auch eine Tendenz zu unnötig
+komplexen Lösungen war ein wiederkehrendes Muster. Solche Vorschläge habe ich bewusst wieder
+zurückgenommen, etwa einen unnötigen Refactor der Eingabe-Komponenten.
+
+Ein wiederkehrendes Risiko waren unbelegte technische Annahmen. Aussagen der KI zu
+externen Quellen oder Dateieigenschaften habe ich deshalb mit passenden Werkzeugen und am
+aktuellen Code geprüft. Dabei zeigte sich, dass auch plausible und von mehreren Modellen
+wiederholte Aussagen falsch sein können. Für mich ist das ein wichtiger Beleg dafür, dass
+Verifikation vor Vertrauen stehen muss. Die Konsequenz ist nicht die Suche nach dem einen
+richtigen Modell, sondern eine konsequente Prüfung an Quelle und Code, unabhängig davon,
+welches Modell gerade antwortet.

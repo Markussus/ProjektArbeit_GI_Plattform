@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
+import type { NegativeNumbersState, NegativeStepMode } from "./nsTransferCodec";
 
 interface NegativeNumbersProps {
   isExerciseMode?: boolean;
@@ -9,6 +10,8 @@ interface NegativeNumbersProps {
   onShowSolution?: () => void;
   onExitExercise?: () => void;
   initialValue?: string;
+  initialState?: NegativeNumbersState;
+  onChangeState?: (state: NegativeNumbersState) => void;
 }
 
 export function NegativeNumbers({
@@ -17,18 +20,23 @@ export function NegativeNumbers({
   onShowSolution,
   onExitExercise,
   initialValue = "",
+  initialState,
+  onChangeState,
 }: NegativeNumbersProps) {
   const { t } = useTranslation("translation");
-  const [inputValue, setInputValue] = useState<string>("-5");
-  type StepMode = "sign" | "ones" | "twos";
-  const [activeMode, setActiveMode] = useState<StepMode>("twos");
+  const [inputValue, setInputValue] = useState<string>(
+    initialState?.inputValue ?? (initialValue || "-5"),
+  );
+  const [activeMode, setActiveMode] = useState<NegativeStepMode>(
+    initialState?.activeMode ?? "twos",
+  );
+
+  const locked = !!isExerciseMode && !showSolution;
 
   useEffect(() => {
-    if (isExerciseMode && initialValue) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInputValue(initialValue);
-    }
-  }, [isExerciseMode, initialValue]);
+    onChangeState?.({ inputValue, activeMode });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, activeMode]);
 
   const parsed = parseInt(inputValue, 10);
   const isValid = !isNaN(parsed) && parsed >= -128 && parsed <= 127;
@@ -72,8 +80,6 @@ export function NegativeNumbers({
       twosComplement = twos;
     }
   }
-
-  const locked = !!isExerciseMode && !showSolution;
 
   return (
     <div className="animate-in fade-in zoom-in-95 space-y-8 duration-300">

@@ -131,6 +131,7 @@ export function MealyOutputTable({
                             }))
                           }
                           aria-label={t("moore.mealy.addOutputRule", { state })}
+                          data-testid={`mealy-add-output-rule-${stateIndex}`}
                           className="border-brand text-brand hover:bg-brand/10 mt-3 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold disabled:opacity-40"
                         >
                           <Plus className="size-3.5" />
@@ -139,6 +140,7 @@ export function MealyOutputTable({
                       </td>
                     )}
                     <td
+                      data-testid={`mealy-output-input-cell-${stateIndex}-${ruleIndex}`}
                       onDragOver={(event) => {
                         event.preventDefault();
                         setDragTarget(targetKey);
@@ -152,7 +154,11 @@ export function MealyOutputTable({
                     >
                       <div className="flex min-h-9 flex-wrap items-center gap-1.5">
                         {rule.inputs.map((input) => (
-                          <InputChip key={input} input={input} />
+                          <InputChip
+                            key={input}
+                            input={input}
+                            testId={`mealy-output-rule-input-${stateIndex}-${ruleIndex}-${input}`}
+                          />
                         ))}
                       </div>
                     </td>
@@ -160,6 +166,7 @@ export function MealyOutputTable({
                       <input
                         value={rule.output.symbol}
                         disabled={rule.inputs.length === 0}
+                        data-testid={`mealy-output-symbol-${stateIndex}-${ruleIndex}`}
                         onChange={(event) =>
                           rule.inputs.forEach((input) =>
                             onSymbolChange(input, state, event.target.value),
@@ -172,6 +179,7 @@ export function MealyOutputTable({
                       <input
                         key={`${program.representation}-${rule.output.code}`}
                         disabled={rule.inputs.length === 0}
+                        data-testid={`mealy-output-code-${stateIndex}-${ruleIndex}`}
                         defaultValue={formatInternalNumber(
                           rule.output.code,
                           program.representation,
@@ -203,6 +211,7 @@ export function MealyOutputTable({
         </table>
       </div>
       <div
+        data-testid="mealy-output-new-rule-dropzone"
         onDragOver={(event) => {
           event.preventDefault();
           setDragTarget("new-rule");
@@ -237,7 +246,11 @@ export function MealyOutputTable({
           className="border-border flex min-h-12 flex-wrap gap-2 rounded-lg border p-2"
         >
           {program.inputSymbols.map((input) => (
-            <InputChip key={input} input={input} />
+            <InputChip
+              key={input}
+              input={input}
+              testId={`mealy-output-input-token-${input}`}
+            />
           ))}
         </div>
       </div>
@@ -245,10 +258,11 @@ export function MealyOutputTable({
   );
 }
 
-function InputChip({ input }: { input: string }) {
+function InputChip({ input, testId }: { input: string; testId?: string }) {
   return (
     <span
       draggable
+      data-testid={testId}
       onDragStart={(event) => {
         event.dataTransfer.setData("application/x-mealy-input", input);
         event.dataTransfer.effectAllowed = "move";

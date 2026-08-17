@@ -1,15 +1,25 @@
-import { useMemo, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Lightbulb, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
   type DnfExerciseCheckResult,
 } from "../DnfBuilder/domain/dnfExerciseCheck";
+import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
+import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
+import {
+  dnfTruthTableTransferCodec,
+  type DnfTruthTableTransferDraft,
+} from "../DnfBuilder/domain/dnfTransfer";
 import { createTruthTableFromResults } from "../DnfBuilder/domain/truthTable";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
@@ -21,31 +31,42 @@ import {
 const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 interface TableToDnfBuilderProps {
-  initialVariables?: string[];
-  initialResultValues?: boolean[];
+  initialValue?: DnfTruthTableTransferDraft;
+  storageIdentifier: string;
+  storageEnabled: boolean;
+  storageReady: boolean;
+  transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
+  onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
+  onUserChange?: () => void;
+  seedInitialFeedback?: boolean;
 }
 
 export function TableToDnfBuilder({
-  initialVariables,
-  initialResultValues,
-}: TableToDnfBuilderProps = {}) {
+  initialValue,
+  storageIdentifier,
+  storageEnabled,
+  storageReady,
+  transferCodec,
+  onTransferValueChange,
+  onUserChange,
+  seedInitialFeedback = false,
+}: TableToDnfBuilderProps) {
   const { t } = useTranslation();
   const initialVariableCount = clampVariableCount(
-    initialVariables?.length ?? 3,
+    initialValue?.variableCount ?? 3,
   );
   const [variableCount, setVariableCount] = useState(initialVariableCount);
   const [resultValues, setResultValues] = useState<boolean[]>(() =>
-    initialResultValues &&
-    initialResultValues.length === 2 ** initialVariableCount
-      ? [...initialResultValues]
+    initialValue?.resultValues &&
+    initialValue.resultValues.length === 2 ** initialVariableCount
+      ? [...initialValue.resultValues]
       : Array.from({ length: 2 ** initialVariableCount }, () => false),
   );
-  const [committed, setCommitted] = useState(false);
+  const [committed, setCommitted] = useState(initialValue?.committed ?? false);
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoadedVersion, setSolutionLoadedVersion] = useState(0);
   const [showFullTable, setShowFullTable] = useState(false);
-  const [dnfAnswer, setDnfAnswer] = useState("");
-  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(null);
-  const simplification = useDnfSimplification();
+  const [dnfAnswer, setDnfAnswer] = useState(initialValue?.dnfAnswer ?? "");
   const truthTable = useMemo(
     () =>
       createTruthTableFromResults(
@@ -58,6 +79,56 @@ export function TableToDnfBuilder({
     () => analyzeDnfTruthTable(truthTable),
     [truthTable],
   );
+  const [feedback, setFeedback] = useState<DnfExerciseCheckResult | null>(() =>
+    seedInitialFeedback &&
+    analysis.status === "valid" &&
+    (initialValue?.dnfAnswer ?? "").trim().length > 0
+      ? checkDnfExerciseAttempt(
+          analysis.truthTable,
+          [],
+          initialValue?.dnfAnswer ?? "",
+          { checkTruthTable: false },
+        )
+      : null,
+  );
+  const initialSimplificationFeedback = useMemo(
+    () =>
+      seedInitialFeedback &&
+      analysis.status === "valid" &&
+      (initialValue?.simplificationAnswer ?? "").trim().length > 0
+        ? checkDnfSimplification(
+            analysis.truthTable,
+            initialValue?.simplificationAnswer ?? "",
+          )
+        : null,
+    [analysis, initialValue?.simplificationAnswer, seedInitialFeedback],
+  );
+  const simplification = useDnfSimplification(
+    initialValue?.simplificationAnswer,
+    { initialFeedback: initialSimplificationFeedback },
+  );
+  const transferValue = useMemo(
+    () => ({
+      variableCount,
+      resultValues,
+      committed,
+      truthTableAnswers: [],
+      dnfAnswer,
+      simplificationAnswer: simplification.answer,
+    }),
+    [committed, dnfAnswer, resultValues, simplification.answer, variableCount],
+  );
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfTruthTableTransferCodec,
+    enabled: storageEnabled && storageReady,
+  });
+
+  useEffect(() => {
+    onTransferValueChange?.(transferValue);
+  }, [onTransferValueChange, transferValue]);
 
   const display = useMemo(() => {
     if (!showSolution || analysis.status !== "valid") return null;
@@ -65,7 +136,7 @@ export function TableToDnfBuilder({
     return buildTruthTableDisplay(analysis.truthTable, analysis.derivation);
   }, [analysis, showSolution]);
 
-  const resetAttempt = () => {
+  const clearAttempt = () => {
     setShowSolution(false);
     setDnfAnswer("");
     setFeedback(null);
@@ -73,22 +144,25 @@ export function TableToDnfBuilder({
   };
 
   const handleNewTable = () => {
+    onUserChange?.();
     setCommitted(false);
     setShowFullTable(false);
-    resetAttempt();
+    clearAttempt();
   };
 
   const updateVariableCount = (nextVariableCount: number) => {
     const boundedVariableCount = clampVariableCount(nextVariableCount);
 
+    onUserChange?.();
     setVariableCount(boundedVariableCount);
     setResultValues(
       Array.from({ length: 2 ** boundedVariableCount }, () => false),
     );
-    resetAttempt();
+    clearAttempt();
   };
 
   const updateResultValue = (rowIndex: number, value: boolean) => {
+    onUserChange?.();
     setResultValues((currentValues) => {
       const nextValues = [...currentValues];
       nextValues[rowIndex] = value;
@@ -110,10 +184,46 @@ export function TableToDnfBuilder({
   };
 
   const updateDnfAnswer = (value: string) => {
+    onUserChange?.();
     setDnfAnswer(normalizeBooleanOperatorAliases(value));
     setFeedback(null);
     setShowSolution(false);
     simplification.reset();
+  };
+
+  // Fill the answer with the reference solution for the user-defined table: the
+  // canonical DNF and the minimal simplification, shown as already checked. The
+  // table itself stays as the user built it.
+  const loadSolution = () => {
+    if (analysis.status !== "valid") return;
+
+    const canonicalDnf = analysis.formattedDnf;
+    const minimalExpression = formatBooleanExpressionForDisplay(
+      computeSmallestBooleanExpression(analysis.truthTable).expression,
+    );
+
+    onUserChange?.();
+    setDnfAnswer(canonicalDnf);
+    setShowSolution(false);
+    setFeedback(
+      checkDnfExerciseAttempt(analysis.truthTable, [], canonicalDnf, {
+        checkTruthTable: false,
+      }),
+    );
+    simplification.loadSolution(minimalExpression, analysis.truthTable);
+    setSolutionLoadedVersion((current) => current + 1);
+  };
+
+  const handleImportTable = (value: DnfTruthTableTransferDraft) => {
+    onUserChange?.();
+    setVariableCount(value.variableCount);
+    setResultValues([...value.resultValues]);
+    setCommitted(value.committed);
+    setDnfAnswer(normalizeBooleanOperatorAliases(value.dnfAnswer));
+    simplification.setAnswer(value.simplificationAnswer);
+    setFeedback(null);
+    setShowSolution(false);
+    setShowFullTable(false);
   };
 
   if (analysis.status !== "valid") {
@@ -128,6 +238,10 @@ export function TableToDnfBuilder({
       showSolution,
       feedback,
       simplification,
+      simplificationAnswerChange: (value) => {
+        onUserChange?.();
+        simplification.setAnswer(value);
+      },
     });
 
   if (!committed) {
@@ -136,28 +250,52 @@ export function TableToDnfBuilder({
         truthTable={analysis.truthTable}
         variableCount={variableCount}
         resultValues={resultValues}
+        transferControl={
+          <SimulatorStringTransferBox
+            value={transferValue}
+            codec={transferCodec}
+            onLoad={handleImportTable}
+            testIdPrefix="dnf-table-transfer"
+          />
+        }
         onVariableCountChange={updateVariableCount}
         onResultValuesChange={(values) => {
+          onUserChange?.();
           setResultValues(values);
-          resetAttempt();
+          clearAttempt();
         }}
         onResultChange={updateResultValue}
-        onCommit={() => setCommitted(true)}
+        onCommit={() => {
+          onUserChange?.();
+          setCommitted(true);
+        }}
       />
     );
   }
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
+          data-testid="dnf-edit-table-config"
           onClick={handleNewTable}
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
+          className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
         >
-          <ArrowLeft className="size-4" />
-          {t("dnf.simulator.newTable")}
+          <Pencil className="size-4" />
+          {t("dnf.simulator.editConfig")}
         </button>
+        {!seedInitialFeedback && (
+          <button
+            type="button"
+            data-testid="dnf-free-load-solution"
+            onClick={loadSolution}
+            className="border-border hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+          >
+            <Lightbulb className="size-4" />
+            {t("dnf.simulator.loadSolution")}
+          </button>
+        )}
       </div>
 
       <DnfExerciseWorkspace
@@ -169,22 +307,30 @@ export function TableToDnfBuilder({
         showSolution={showSolution}
         resultHeader="f"
         requiresTruthTableAnswers={false}
-        canAlwaysShowSolution={true}
         canEditTruthTableResults={false}
         canToggleFullTable={true}
         showFullTable={showFullTable}
         onTruthTableAnswerChange={updateResultValue}
         onDnfAnswerChange={updateDnfAnswer}
         onCheck={handleCheck}
-        onReset={resetAttempt}
         onToggleSolution={() => setShowSolution((current) => !current)}
         onToggleFullTable={() => setShowFullTable((current) => !current)}
+        solution={solution}
       />
 
       <DnfFollowUpSections
-        key={solution ? "solution-visible" : "solution-hidden"}
-        solution={solution}
+        key={`simplification-${solutionLoadedVersion}`}
         simplification={simplificationFollowUp}
+        initiallyOpenSimplification={
+          seedInitialFeedback || solutionLoadedVersion > 0
+        }
+      />
+
+      <SimulatorStringTransferBox
+        value={transferValue}
+        codec={transferCodec}
+        onLoad={handleImportTable}
+        testIdPrefix="dnf-table-transfer"
       />
     </div>
   );
