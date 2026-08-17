@@ -1,6 +1,6 @@
 \subNsection{1}{KI Reflexion}{Duy Tan Pham}
 
-Für meinen Teil, die Disjunktive Normalform, habe ich durchgehend mit KI-Werkzeugen
+Für meinen Teil, die \gls{dnf}, habe ich durchgehend mit KI-Werkzeugen
 gearbeitet. Codex war das Hauptwerkzeug beim Entwickeln und direkt in VS Code eingebunden.
 Claude habe ich für Analyse, Refactorings sowie für Kontext- und Wissensdokumente genutzt.
 Die KI diente dabei nicht nur als Entwicklungswerkzeug, sondern auch zur Aufarbeitung der
@@ -26,9 +26,9 @@ Gestaltungs- und Interaktionsmustern der Lernplattform ausgerichtet.
 
 Zusätzlich gab es feste Regeln, die die Arbeit mit der KI absicherten. Vorgegebene Skills
 und Anweisungen legten fest, wie die KI eine Aufgabe angehen und wie genau sie das Ergebnis
-danach prüfen sollte, abhängig davon, wie riskant eine Änderung war. Zwei automatische
-Prüfungen blockierten außerdem gefährliche Befehle und das versehentliche Preisgeben von
-Zugangsdaten, bevor sie ausgeführt wurden.
+danach prüfen sollte, abhängig davon, wie riskant eine Änderung war. Bei der Arbeit mit
+Claude blockierten außerdem zwei automatische Prüfungen gefährliche Befehle und das
+versehentliche Preisgeben von Zugangsdaten, bevor sie ausgeführt wurden.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Duy Tan Pham}
 
@@ -44,10 +44,10 @@ anschließend als feste Definitionen im Code hinterlegt und werden nicht erst w�
 Nutzung erzeugt.
 
 Ein wichtiger Punkt war dabei, dass die KI keine Lösung mitliefern musste. Die erwarteten
-Ergebnisse berechnet die DNF-Fachlogik für jede Aufgabe selbst, unabhängig davon, wie die
-Aufgabe entstanden ist. Eine ergänzte Aufgabe konnte dadurch fachlich nicht falsch sein. Zu
-beurteilen blieb nur, ob sie didaktisch sinnvoll war und sich ausreichend von den bereits
-vorhandenen Aufgaben unterschied.
+Ergebnisse berechnet die DNF-Fachlogik direkt aus den Aufgabendaten. Dadurch kann kein
+separat gepflegter Lösungsschlüssel von der Aufgabe abweichen. Syntax, Schwierigkeitsgrad
+und didaktische Eignung mussten trotzdem geprüft werden. Zu beurteilen blieb außerdem, ob
+sich eine ergänzte Aufgabe ausreichend von den bereits vorhandenen unterschied.
 
 \subNsection{2}{Kritische Reflexion}{Duy Tan Pham}
 

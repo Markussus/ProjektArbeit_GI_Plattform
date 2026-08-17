@@ -32,17 +32,18 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   \(\lnot\), \(\land\), \(\lor\)) und meldet Fehler mit Position.
 
   \item Die Ableitung trennt drei Ergebnisstufen sauber: die kanonische DNF
-  (\texttt{dnfDerivation.ts}, ein Vollminterm je Eins-Zeile), die minimale DNF
+  (\texttt{dnfDerivation.ts}, ein Vollminterm je Eins-Zeile \cite[S.~163]{schiffmann2003}), die minimale DNF
   (\texttt{quineMcCluskey.ts}) und die optional global kleinste Formel
   (\texttt{minimalExpression.ts}). Darstellung und Rechenform sind getrennt. So ist die
   Anzeige nicht an die interne Bitdarstellung der Implikanten gebunden.
 
   \item Die wichtigste fachliche Entscheidung betrifft die Minimierung. Die erste Version
-  wählte die restliche Überdeckung nach Quine-McCluskey \emph{greedy} aus. Dadurch konnte
+  wählte die restliche Überdeckung nach Quine-McCluskey
+  \cite[S.~172]{schiffmann2003} \emph{greedy} aus. Dadurch konnte
   sie die beste Lösung verpassen. Diese Auswahl wurde durch ein exaktes Branch-and-Bound
   über den zyklischen Kern ersetzt (Funktion \texttt{selectCover}). Das Verfahren liefert
-  dieselbe Optimalitätsgarantie wie das Petrick-Verfahren und findet eine DNF mit minimaler
-  Literalzahl. Durch das Abschneiden von Zweigen (Pruning) verwirft es Teile des Suchraums,
+  dieselbe Optimalitätsgarantie wie das Petrick-Verfahren und findet
+  eine DNF mit minimaler Literalzahl. Durch das Abschneiden von Zweigen (Pruning) verwirft es Teile des Suchraums,
   die keine bessere Lösung mehr liefern können, ohne den Petrick-Ausdruck vollständig
   auszumultiplizieren.
 
