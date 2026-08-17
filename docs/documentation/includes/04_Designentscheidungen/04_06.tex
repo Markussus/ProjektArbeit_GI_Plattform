@@ -1,6 +1,6 @@
 \subNsection{1}{Disjunktive Normalform}{Duy Tan Pham}
 
-Die \glqq Disjunktive Normalform\grqq{} (DNF) ist ein eigener Themenbereich im Modul
+Die \gls{dnf} ist ein eigener Themenbereich im Modul
 \glqq Grundlagen der Informatik\grqq{}. Sie folgt dem gleichen Aufbau wie die anderen
 Themen: Übersicht, Übungen, Beispiele und eine freie Simulation. Die Inhalte bauen
 schrittweise aufeinander auf: von der kanonischen DNF über die minimale DNF bis zur
@@ -21,9 +21,8 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
 \begin{itemize}
   \item Der Bereich ist klar in \texttt{domain}, \texttt{application}, \texttt{adapters}
   und \texttt{presentation} getrennt. Die gesamte Fachlogik liegt in \texttt{domain}:
-  Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und Prüfung. Diese Funktionen
-  brauchen kein Framework. Sie sind unabhängig von React und lassen sich dadurch einzeln
-  testen.
+  Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und Prüfung. Diese Funktionen sind
+  unabhängig von React und lassen sich dadurch einzeln testen.
 
   \item Der boolesche Ausdruck wird von einem eigenen Parser (\texttt{dnfParser.ts}) in
   einen Syntaxbaum umgewandelt. Aus diesem Baum wird die Wahrheitstabelle erzeugt. Die
@@ -82,8 +81,7 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
 
   \item Die einzelnen Schritte der Ableitung werden sichtbar gemacht: von den Eins-Zeilen
   der Tabelle über die passenden kanonischen Terme bis zur minimalen Form. Bei der
-  Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg. So ist es
-  für die Lernenden leichter nachzuvollziehen.
+  Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg.
 
   \item Die Beispiele zeigen einen vollständig vorbereiteten Lösungsweg und dienen dem
   schrittweisen Nachvollziehen. In den Übungen bearbeiten die Lernenden dagegen
