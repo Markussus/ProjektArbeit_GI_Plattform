@@ -1,0 +1,15 @@
+\addsectionframe{5. Qualität und Deployment-Strategie}
+
+\begin{itemframe}{Qualitätssicherung}
+  \item GitLab-Pipeline prüft Abhängigkeitssignaturen, Formatierung und Linting.
+  \item Vitest prüft Unit-Tests; Playwright prüft zentrale Abläufe im Browser.
+  \item Der Build erzeugt das Frontend-Artefakt; Lighthouse prüft die ausgelieferte Anwendung.
+  \item Ein GitLab Runner auf einem Raspberry Pi führt die ARM-basierten Container-Jobs aus.
+\end{itemframe}
+
+\begin{itemframe}{Deployment-Strategie}
+  \item Die Anwendung ist ein Vite-Frontend. Der Build erzeugt statische Dateien in \texttt{app/dist}.
+  \item Nach erfolgreicher Pipeline ist dieses Artefakt der auslieferbare Stand.
+  \item Für eine Produktivsetzung fehlen im Repository noch Zielsystem, Freigabeschritt und Rollback-Ablauf.
+  \item Für die Demo nutzen wir einen vorab geprüften Build und einen zweiten Browser als Rückfallebene.
+\end{itemframe}
