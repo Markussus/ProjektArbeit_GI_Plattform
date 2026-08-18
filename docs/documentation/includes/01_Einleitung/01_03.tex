@@ -1,46 +1,16 @@
 \subNsection{1}{Methodik}{Markus Nöth}
-Kapitle beschreibt: Vorgehensweise im Team und Rollenverteilung
+Das Team arbeitete agil orientiert und iterativ, setzte dabei jedoch kein formales Vorgehensmodell wie Scrum oder Kanban ein. Stattdessen wurde eine leichtgewichtige und flexible Organisation gewählt, die sich gut mit den weiteren Anforderungen des Studiums vereinbaren ließ. Die Zeiträume zwischen den Abstimmungsterminen mit dem Auftraggeber wurden als Entwicklungszyklen verstanden, in denen Zwischenstände umgesetzt und anschließend überprüft wurden.
 
-Keine formale Anwendung eines agilen Frameworks wie Scrum oder Kanban
-Vorgehensweise grundsätzlich agil orientiert und iterativ
-Bewusst leichtgewichtige und flexible Organisation, damit die Projektarbeit mit Studium, Vorlesungen und weiteren Semesteraufgaben vereinbar bleibt
+Git und der GitLab-Server der THWS bildeten die zentrale technische und organisatorische Arbeitsgrundlage. Neben der Versionsverwaltung wurde GitLab auch zur Aufgabenplanung und Koordination eingesetzt. Anstehende Arbeiten wurden als Work Items beziehungsweise Tasks erfasst, Teammitgliedern zugeordnet und über Milestones gebündelt. Die Milestones orientierten sich häufig an den nächsten Terminen mit Prof. Dr. Peter Braun und machten sichtbar, welche Arbeitspakete bis zum jeweiligen Zwischenziel bearbeitet werden sollten.
 
-Zusammenarbeit über Git und GitLab-Server der THWS
-GitLab nicht nur für Versionsverwaltung, sondern auch zur Organisation der Projektarbeit verwendet
-Anstehende Aufgaben als Work Items bzw. Tasks in GitLab angelegt
-Aufgaben jeweils einem Teammitglied zugeordnet
-Mehrere Aufgaben in Milestones zusammengefasst
-Milestones orientierten sich häufig am nächsten Abstimmungstermin mit dem Kunden (Prof. Braun)
-Dadurch klar erkennbar, welche Aufgaben bis zum jeweiligen Zwischenziel bearbeitet werden sollten
-Commit-Historie dokumentiert zusätzlich in kurzer Form die vorgenommenen technischen Änderungen
+Für die technische Entwicklung wurde mit Feature-Branches, Merge Requests und Releases gearbeitet. Änderungen wurden zunächst auf eigenen Feature-Branches umgesetzt und anschließend über Merge Requests in den development-Branch integriert. Für einen erfolgreichen Merge war eine Zustimmung erforderlich. Zusätzlich musste die zugehörige Pipeline erfolgreich durchlaufen. Dadurch wurde ein einheitlicher Ablauf für die Integration von Änderungen geschaffen und gleichzeitig sichergestellt, dass mehrere Teammitglieder parallel an unterschiedlichen Modulen arbeiten konnten. Die Commit-Historie ergänzte diese Struktur, da die umgesetzten Änderungen mit Autor, Zeitpunkt und Message nachvollziehbar blieben.
 
-Wöchentliches internes Teammeeting
-Besprechung des aktuellen Entwicklungsstands
-Klärung, was seit dem letzten Treffen umgesetzt wurde
-Besprechung aktueller Probleme und offener Fragestellungen
-Gemeinsames Brainstorming zu möglichen Lösungsansätzen
-Probleme wurden möglichst gemeinsam im Team behandelt und nicht ausschließlich von einzelnen Personen isoliert gelöst
-Entscheidungen grundsätzlich gemeinsam getroffen
-Keine Person hatte eine besondere fachliche Entscheidungsmacht
-Verschiedene Lösungsansätze wurden gemeinsam diskutiert
-Entscheidung möglichst konsensbasiert für die aus Sicht des Teams geeignetste Lösung
+Innerhalb des Teams fand einmal pro Woche ein festes gemeinsames Meeting am Dienstag statt. In diesen Treffen wurden der aktuelle Entwicklungsstand, seit dem letzten Treffen erledigte Aufgaben, anstehende Arbeitspakete, technische Probleme und offene Fragen besprochen. Bei Problemen wurden verschiedene Lösungsansätze gemeinsam entwickelt und gegeneinander abgewogen. Entscheidungen wurden grundsätzlich gemeinsam und möglichst konsensbasiert getroffen. Die Teammitglieder waren fachlich gleichgestellt und verfügten über keine unterschiedlichen Entscheidungsbefugnisse.
 
-Teammitglieder grundsätzlich gleichgestellt
-Markus übernahm zusätzlich die Rolle des Teamkoordinators bzw. organisatorischen Ansprechpartners
-Dazu gehörten insbesondere organisatorische Kommunikation und beispielsweise das Schreiben von E-Mails
-Diese Rolle war keine hierarchische Führungsposition und brachte keine zusätzliche Entscheidungsbefugnis mit sich
+Markus übernahm zusätzlich die Funktion eines Teamkoordinators und organisatorischen Ansprechpartners. Dazu gehörten vor allem organisatorische Kommunikation und das Verfassen von E-Mails. Diese Rolle war keine hierarchische Führungsposition und brachte keine zusätzliche fachliche Entscheidungsmacht mit sich. Die inhaltliche und technische Verantwortung blieb innerhalb des Teams geteilt.
 
-Aufgabenverteilung flexibel innerhalb des Teams
-Persönliche Interessen und vorhandene Kenntnisse wurden bei der Verteilung berücksichtigt
-Gleichzeitig sollte der Arbeitsaufwand möglichst gleichmäßig auf alle Teammitglieder verteilt werden
-Verantwortlichkeiten wurden über die zugeordneten Work Items sichtbar gemacht
+Die Aufgabenverteilung erfolgte flexibel. Bei der Zuordnung wurden persönliche Interessen und vorhandene Kenntnisse berücksichtigt. Gleichzeitig wurde darauf geachtet, den Arbeitsaufwand möglichst gleichmäßig auf die Teammitglieder zu verteilen. Die jeweiligen Zuständigkeiten waren über die zugeordneten Work Items und Tasks in GitLab nachvollziehbar.
 
-Regelmäßige Abstimmung mit dem Kunden, Herrn Braun
-Aktueller Entwicklungsstand wurde vorgestellt und Feedback eingeholt
-Rückmeldungen wurden in die weitere Entwicklung übernommen
-Dadurch entstanden wiederkehrende Entwicklungszyklen zwischen den Kundenterminen
-Zusammenarbeit mit dem Kunden an dieser Stelle nur kurz erwähnen, da sie später in einem eigenen Abschnitt genauer beschrieben wird
+Der Auftraggeber, Prof. Dr. Peter Braun, wurde regelmäßig in den Entwicklungsprozess einbezogen. In den gemeinsamen Terminen stellte das Team den aktuellen Stand vor und holte Feedback ein, das anschließend in die folgende Iteration einfloss.
 
-Projektdokumentation und Nachvollziehbarkeit hauptsächlich über Work Items, Milestones und Commit-Historie
-Nicht sämtliche internen Überlegungen oder Gesprächsnotizen wurden im Repository dokumentiert
-Daher keine Aussage treffen, dass jede Entscheidung vollständig formal dokumentiert wurde
+Die Nachvollziehbarkeit des Projektfortschritts wurde insbesondere durch die in GitLab gepflegten Arbeitspakete, Milestones, Merge Requests und die Commit-Historie unterstützt. Dadurch ließen sich sowohl geplante Aufgaben als auch wesentliche technische Änderungen und deren Entwicklung über den Projektverlauf hinweg nachvollziehen.
