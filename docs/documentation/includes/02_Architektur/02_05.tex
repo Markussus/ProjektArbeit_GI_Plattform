@@ -1,3 +1,24 @@
-\subNsection{1}{Datenmodellierung}{Richard Schröder}
+\subNsection{1}{Datenmodellierung und Transfer}{Richard Schröder}
 
-Import/Export über \verb|ISimulatorTransferCodec| mit Base64-Kodierung für Vorlesungskompatibilität
+Die Simulatoren beschreiben ihre fachlichen Daten mit TypeScript-Typen und trennen diese von Laufzeit- und Darstellungszuständen:
+
+\begin{itemize}
+    \item \textbf{Automaten:} \verb|TMProgram|, \verb|FAProgram|, \verb|MooreProgram| und \verb|MealyProgram| enthalten die editierbare Konfiguration, etwa Zustände, Alphabet, Übergänge, Startzustand und Eingabewort. Die Übergänge sind als verschachtelte \verb|Record|-Strukturen modelliert; die Namen der Zustände und Symbole sind Zeichenketten.
+    \item \textbf{Ausführung:} Der jeweilige Laufzeittyp, beispielsweise \verb|TMRuntime|, \verb|FARuntime|, \verb|MooreRuntime| oder \verb|MealyRuntime|, hält den aktuellen Zustand, die Position im Eingabewort beziehungsweise auf dem Band, die ausgegebenen Symbole und den Ablaufverlauf. Die fachliche Schrittausführung arbeitet auf diesen Daten; temporäre UI-Zustände wie ein geöffneter Dialog oder eine laufende Animation bleiben in den React-Komponenten.
+    \item \textbf{Übungs- und Umwandlungsaufgaben:} Das DNF-Modul hält je nach Aufgabe einen Ausdruck, eine Wahrheitstabelle oder einen Bearbeitungsstand mit Antworten getrennt vor. Der Zahlensystem-Simulator verwendet \verb|NumberSystemState| mit \verb|activeMode| und zustandsspezifischen Feldern für Ganzzahlen, negative Zahlen, Brüche, IEEE~754 und Arithmetik; der Java-Simulator überträgt den Quelltext als Zeichenkette.
+\end{itemize}
+
+Das generische Interface \verb|ISimulatorTransferCodec<TValue>| definiert die Serialisierung und Deserialisierung eines Simulationswertes. \verb|exportValue| wandelt einen Wert des Typs \verb|TValue| in einen String um; \verb|importValue| rekonstruiert ihn aus einem String. Beide Methoden dürfen ihr Ergebnis unmittelbar oder asynchron als \verb|Promise| liefern. Die daraus entstehenden Zeichenketten werden für den manuellen Import und Export sowie für die Speicherung von Training-Center-Fortschritten verwendet. Ihr Format legt die jeweilige Implementierung fest; es reicht von Base64URL-kodiertem Text bis zu einem kompakten Bitstrom.
+
+\begin{itemize}
+    \item \textbf{Gemeinsame Verwendung:} \verb|SimulatorStringTransferBox| stellt ein Eingabefeld sowie Schaltflächen zum Erzeugen, Kopieren und Laden eines Transfer-Strings bereit. Fehler beim Export oder Import werden in der Komponente abgefangen und angezeigt.
+    \item \textbf{Training Center:} \verb|useTrainingCenterAutoSave| exportiert den aktuellen Wert standardmäßig alle zehn Sekunden und zusätzlich beim Aufräumen des Hooks. \texttt{exportAndStoreTrainingCenter\allowbreak Value} speichert den Payload zusammen mit einem Bezeichner; \texttt{createTrainingCenter\allowbreak TransferCodec} verpackt einen fachlichen Codec so, dass ein exportierter String diesen Speicherwert enthält und beim Import der Bezeichner geprüft wird.
+    \item \textbf{Binärstrom:} Mehrere Codecs verwenden \verb|BitWriter| und \verb|BitReader|. Die resultierenden Bits werden als Base64URL ausgegeben; beim Import prüfen die Implementierungen Versionsfelder, Größenlimits, IDs und verbleibende Füllbits.
+\end{itemize}
+
+Die folgenden zwei Codecs zeigen unterschiedliche Transferstrategien:
+
+\begin{itemize}
+    \item \verb|tmProgramTransferCodec| normalisiert Turingmaschinenprogramme, entfernt ungenutzte Zustände und Symbole und vergibt kompakte numerische IDs. Für Symbole wählt der Codec zwischen einer festen Registry und UTF-8; für Übergänge vergleicht er dichte und dünn besetzte Kodierungen, jeweils mit oder ohne Zustands- und Symboldictionary, und verwendet die kürzeste Variante.
+    \item \verb|javaCodeTransferCodec| kodiert Java-Quelltext als Base64URL mit einem Präfix für direkte Tokens, deflatierte Tokens oder deflatiertes UTF-8. Häufige Java-Ausdrücke und erlaubte Sonderzeichen erhalten einzelne Tokens; anschließend wählt der Codec unter den verfügbaren Varianten die kürzeste Darstellung und prüft beim Import Größenlimits sowie das Token- und UTF-8-Format.
+\end{itemize}
