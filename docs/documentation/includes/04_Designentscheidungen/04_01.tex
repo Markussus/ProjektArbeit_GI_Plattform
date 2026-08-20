@@ -1,224 +1,47 @@
 \subNsection{1}{Turing Maschine}{Richard Schröder}
 
-Die Turing-Maschine ist als eigenständiger Themenbereich innerhalb des Moduls
-\glqq Grundlagen der Informatik\grqq{} umgesetzt. Der Bereich besteht nicht nur
-aus einem Simulator, sondern aus einem vollständigen Lern-Workflow mit
-Übersicht, Übungen, Beispielen und einer freien Simulation. Die Git-Historie
-zeigt dabei eine schrittweise Entwicklung: Zuerst wurden Datenmodell,
-Simulator-Schnittstelle und Debugger aufgebaut, danach folgten die editierbare
-Konfiguration, die responsive Banddarstellung, Beispiele und Übungen,
-Internationalisierung, Import/Export, automatische Speicherung und zuletzt
-weitere Tests sowie die Integration in gemeinsam genutzte Komponenten.
+Die Turing-Maschine ist als eigenständiger Themenbereich innerhalb des Moduls \glqq Grundlagen der Informatik\grqq{} umgesetzt. Sie umfasst Übersicht, Übungen, Beispiele und eine freie Simulation. Die Turingmaschine wurde schrittweise entwickelt vom Datenmodell, der Simulator-Schnittstelle und dem Debugger über die editierbare Konfiguration und die responsive Banddarstellung bis zu Internationalisierung, Import und Export, automatischer Speicherung, Tests und gemeinsam genutzten Komponenten.
 
 \subNsection{2}{Entscheidungen in der Architektur}{Richard Schröder}
 
-\begin{itemize}
-  \item Die Implementierung trennt die Turing-Maschine konsequent in
-  \texttt{domain}, \texttt{application}, \texttt{presentation} und
-  \texttt{adapters}. Dadurch liegen fachliche Regeln, React-Zustand,
-  UI-Komponenten und die Abbildung auf generische Tabellenkomponenten in
-  getrennten Schichten.
+Die Implementierung trennt die Turing-Maschine in die Schichten \verb|domain|, \verb|application|, \verb|presentation| und \verb|adapters|. Fachliche Regeln, React-Zustand, UI-Komponenten und die Abbildung auf generische Tabellenkomponenten bleiben dadurch voneinander getrennt. Das statische Maschinenprogramm und der Laufzeitzustand sind ebenfalls unterschiedliche Modelle. \verb|TMProgram| beschreibt Zustände, Alphabete, Blank-Symbol, Startzustand, Haltezustände, Übergänge und Anfangsband. \verb|TMRuntime| hält dagegen den aktuellen Zustand, die Kopfposition, den Bandinhalt, den Schrittzähler und die Halteinformation.
 
-  \item Das statische Maschinenprogramm und der Laufzeitzustand sind getrennte
-  Modelle. \texttt{TMProgram} beschreibt Zustände, Alphabete, Blank-Symbol,
-  Startzustand, Haltezustände, Übergänge und Anfangsband. \texttt{TMRuntime}
-  beschreibt aktuellen Zustand, Kopfposition, Bandinhalt, Schrittzähler und
-  Halteinformation.
+Die Schrittausführung liegt in gekapselten Funktionen wie \verb|createInitialRuntime|, \verb|readCurrentSymbol| und \verb|stepRuntime|. Sie hängen weder von React noch von Internationalisierung oder Darstellung ab und können daher isoliert getestet werden. Die Klasse \verb|TuringMachineSimulator| erfüllt den gemeinsamen Vertrag \verb|ISimulator| der Anwendung und verwendet intern weiterhin diese Domain-Funktionen. Damit bleibt die Turing-Maschine mit der allgemeinen Simulationsengine kompatibel, ohne Fachlogik in Hooks oder UI-Komponenten zu verlagern. Die Anwendungsschicht speichert außerdem eine Historie der Laufzeitzustände. Sie ermöglicht neben dem Schritt vorwärts auch den Schritt zurück und bleibt von der Darstellung unabhängig.
 
-  \item Die eigentliche Simulation liegt in reinen Funktionen wie
-  \texttt{createInitialRuntime}, \texttt{readCurrentSymbol} und
-  \texttt{stepRuntime}. Diese Funktionen hängen nicht von React, i18n oder der
-  Darstellung ab und sind deshalb gut isoliert testbar.
+Fehlende Übergänge werden fachlich als reguläres Halten und nicht als technischer Fehler behandelt. Ein nicht definierter Übergang erzeugt einen \verb|haltReason| vom Typ \verb|missing_transition|, während ein regulärer Haltezustand den Typ \verb|halt_state| setzt. Die UI kann damit zwischen dem erwartbaren Verhalten einer partiell definierten Turing-Maschine und echten Implementierungsfehlern unterscheiden. Entsprechend prüft die Validierung Struktur und Konsistenz, nicht jedoch die Vollständigkeit der Übergangsfunktion. Sie stellt unter anderem sicher, dass Start- und Haltezustände existieren, Symbole aus einzelnen Zeichen bestehen, das Blank-Symbol gültig ist und Übergänge auf vorhandene Zustände und Bandsymbole verweisen. Unvollständige Übergangstabellen bleiben zulässig, weil sie sowohl fachlich als auch didaktisch sinnvoll sind.
 
-  \item Fehlende Übergänge werden fachlich als normales Halten modelliert und
-  nicht als technischer Fehler. Ein fehlender Übergang erzeugt einen
-  \texttt{haltReason} vom Typ \texttt{missing\_transition}; ein regulärer
-  Haltezustand erzeugt einen \texttt{haltReason} vom Typ
-  \texttt{halt\_state}. Dadurch kann die UI sauber zwischen einem erwartbaren
-  Verhalten einer partiell definierten Turing-Maschine und echten
-  Implementierungsfehlern unterscheiden.
+Die Editorlogik ist in \verb|tmEditorReducer| und \verb|useTMConfigEditor| ausgelagert. Der Reducer führt Operationen zum Hinzufügen und Umbenennen von Zuständen und Bandsymbolen, zum Aktualisieren von Übergängen sowie zum Verwalten von Haltezuständen aus. Beim Umbenennen eines Zustands werden die betroffenen Referenzen mitgeführt, also der Startzustand, die Haltezustände und die Zielzustände der Übergänge. Die Übergangstabelle ist intern als verschachtelte Struktur aus Lesesymbol und Zustand modelliert. Erst \verb|tmTableAdapter| übersetzt diese Struktur für die Darstellung in Header, Zeilen und eine gegebenenfalls aktive Tabellenzelle. Die Domain-Schicht bleibt dadurch frei von Tabellen- und UI-Wissen.
 
-  \item Die Validierung prüft Struktur und Konsistenz, aber nicht die
-  Vollständigkeit der Übergangsfunktion. Es wird unter anderem geprüft, ob
-  Start- und Haltezustände existieren, Symbole nur aus einzelnen Zeichen
-  bestehen, das Blank-Symbol gültig ist und Übergänge auf existierende
-  Zustände und Bandsymbole verweisen. Unvollständige Tabellen bleiben dagegen
-  erlaubt, weil sie didaktisch und fachlich sinnvoll sind.
+Eingabealphabet und Bandalphabet werden nicht vollständig manuell gepflegt. Das Eingabealphabet wird aus dem Anfangsband abgeleitet. Das Bandalphabet ergibt sich aus dem vorhandenen Bandalphabet, dem Blank-Symbol sowie den Lese- und Schreibsymbolen der Übergänge. Dadurch bleibt die Konfiguration für Lernende einfacher, während die fachliche Modellierung beide Konzepte weiterhin unterscheidet.
 
-  \item Für die Simulation wird eine Klasse \texttt{TuringMachineSimulator}
-  verwendet, die den gemeinsamen \texttt{ISimulator}-Vertrag der Anwendung
-  erfüllt. Intern nutzt sie aber weiterhin die reinen Domain-Funktionen. Damit
-  bleibt die Turing-Maschine kompatibel zur allgemeinen Simulationsengine,
-  ohne die Fachlogik in Hooks oder UI-Komponenten zu verschieben.
+Import und Export sind als eigener Transfer-Codec umgesetzt. Dieser verwendet eine Bitstream-basierte, Base64URL-sichere Kodierung mit Symbolregistern, einem Roh-UTF-8-Fallback und mehreren Kodierungen für Übergangstabellen. Für gespeicherte Aufgabenstände nutzt die Turing-Maschine den gemeinsamen Training-Center-Speicher. Eingebaute Beispiele werden bewusst nicht dauerhaft überschrieben, während freie Simulationen und Übungen eigene Speicherkennungen verwenden. Damit bleiben Beispiele reproduzierbar und Übungsfortschritte lokal erhalten.
 
-  \item Der Simulator speichert eine Historie der Laufzeitzustände. Dadurch
-  kann die UI neben \glqq Schritt vorwärts\grqq{} auch \glqq Schritt zurück\grqq{}
-  anbieten. Die Historie liegt in der Simulator-Anwendungsschicht und bleibt
-  von der Darstellung unabhängig.
-
-  \item Die Editorlogik ist in \texttt{tmEditorReducer} und
-  \texttt{useTMConfigEditor} ausgelagert. Der Reducer kümmert sich um
-  Operationen wie Zustände hinzufügen, Zustände umbenennen, Bandsymbole
-  umbenennen, Übergänge aktualisieren und Haltezustände verwalten. Wichtig ist
-  dabei, dass Referenzen mitgeführt werden: Wird ein Zustand umbenannt, werden
-  auch Startzustand, Haltezustände und Zielzustände in Übergängen angepasst.
-
-  \item Die Übergangstabelle ist intern als verschachtelte Struktur aus
-  Lesesymbol und Zustand modelliert. Für die Darstellung wird sie über
-  \texttt{tmTableAdapter} in Header, Zeilen und aktive Tabellenzelle
-  übersetzt. Diese Adapterentscheidung verhindert, dass die Domain-Schicht
-  Tabellen- oder UI-Wissen enthält.
-
-  \item Eingabealphabet und Bandalphabet werden nicht vollständig manuell
-  gepflegt. Das Eingabealphabet wird aus dem Anfangsband abgeleitet; das
-  Bandalphabet wird aus vorhandenem Bandalphabet, Anfangsband, Blank-Symbol,
-  Lesesymbolen und Schreibsymbolen abgeleitet. Dadurch bleibt die
-  Konfiguration für Lernende einfacher, während die Domain dennoch beide
-  Konzepte kennt.
-
-  \item Der Import und Export ist als eigener Transfer-Codec umgesetzt. Die
-  aktuelle Architektur verwendet eine Bitstream-basierte, Base64-URL-sichere
-  Kodierung mit Symbolregistern, Roh-UTF-8-Fallback und verschiedenen
-  Übergangstabellen-Kodierungen. Die Historie zeigt, dass dies aus einem
-  einfachen Base64-Proof-of-Concept zu einer kompakten, robusteren
-  Speicherform weiterentwickelt wurde.
-
-  \item Für gespeicherte Aufgabenstände wird der gemeinsame
-  Training-Center-Speicher genutzt. Beispiele werden bewusst nicht dauerhaft
-  überschrieben, während freie Simulationen und Übungen eigene
-  Speicherkennungen verwenden. Dadurch bleiben eingebaute Beispiele
-  reproduzierbar und Übungsfortschritte lokal erhalten.
-
-  \item Die Übungsprüfung ist von der sichtbaren Simulation getrennt. Für jeden
-  Validierungsfall wird ein Simulator mit dem jeweiligen Eingabewort gestartet,
-  bis zum Halten oder bis zu einer Schrittgrenze ausgeführt und dann mit der
-  erwarteten Ausgabe verglichen. Zusätzlich reicht eine passende Ausgabe nicht:
-  Die Maschine muss in einem gültigen Haltezustand enden.
-\end{itemize}
+Die Übungsprüfung ist von der sichtbaren Simulation getrennt. Für jeden Validierungsfall startet sie einen Simulator mit dem jeweiligen Eingabewort, führt ihn bis zum Halten oder bis zu einer Schrittgrenze aus und vergleicht das Ergebnis mit der erwarteten Ausgabe. Eine passende Ausgabe genügt dabei nicht, die Maschine muss zusätzlich in einem gültigen Haltezustand enden.
 
 \subNsection{2}{Entscheidungen im UI}{Richard Schröder}
 
-\begin{itemize}
-  \item Die Turing-Maschine nutzt den gemeinsamen Themenaufbau der Plattform:
-  Kopfbereich mit Titel und Beschreibung, Tabs für Übersicht, Übungen,
-  Beispiele und Simulation sowie die globale Sidebar mit Sprach- und
-  Theme-Umschaltung.
+Die Turing-Maschine verwendet den gemeinsamen Themenaufbau der Plattform mit Kopfbereich, Titel und Beschreibung sowie Tabs für Übersicht, Übungen, Beispiele und Simulation. Die globale Sidebar stellt außerdem die Sprach- und Theme-Umschaltung bereit. Die Simulation beginnt im Konfigurationsmodus. Hier werden Anfangsbandwort, Startzustand, Übergangstabelle, Haltezustände, Eingabealphabet, Bandalphabet sowie Import und Export bearbeitet. Erst nach dem Anwenden der Konfiguration wechselt die Ansicht in den Laufzeitmodus.
 
-  \item Die Simulation startet im Konfigurationsmodus. Lernende sehen zuerst
-  Anfangsbandwort, Startzustand, Übergangstabelle, Haltezustände,
-  Eingabealphabet, Bandalphabet sowie Import/Export. Erst nach dem Anwenden
-  der Konfiguration wechselt die Ansicht in den Laufzeitmodus.
+Die Übergangstabelle bildet den zentralen Editor. Ihre Zeilen stehen für Bandsymbole, ihre Spalten für Nicht-Haltezustände. Haltezustände erscheinen bewusst nicht als editierbare Übergangsspalten, da von ihnen keine weiteren Übergänge erwartet werden. Die Eingabe eines Übergangs folgt dem Schema \verb|(Next State, Write Symbol, Movement)|. Leere Zellen bleiben erlaubt und werden als nicht definierte Übergänge interpretiert, was die Darstellung an die fachlich erlaubten partiellen Übergangsfunktionen anpasst.
 
-  \item Die Übergangstabelle ist der zentrale Editor. Zeilen stehen für
-  Bandsymbole, Spalten für Nicht-Haltezustände. Haltezustände werden bewusst
-  nicht als editierbare Übergangsspalten angezeigt, weil von ihnen aus keine
-  weiteren Übergänge erwartet werden.
+Fehlerhafte Tabellenzellen blockieren den Editor gezielt. Bei ungültigen Symbolen oder einem ungültigen Übergangsformat bleibt die betroffene Zelle editierbar, während weitere Änderungen und der Start der Simulation deaktiviert sind. So kann kein halbvalider Tabellenzustand unbemerkt übernommen werden. Das Blank-Symbol wird sichtbar als \(\diamond\) dargestellt. Für die Eingabe steht zusätzlich die Tastaturform \verb|<>| zur Verfügung, die in das Blank-Symbol umgewandelt wird. Dies vermeidet ein uneindeutiges Leerzeichen und senkt zugleich die Eingabehürde.
 
-  \item Übergänge werden in der Form
-  \texttt{(Next State, Write Symbol, Movement)} eingegeben. Das UI erlaubt
-  leere Zellen und behandelt sie als nicht definierte Übergänge. Damit passt
-  die Darstellung zur Architekturentscheidung, partielle Übergangsfunktionen
-  zuzulassen.
+Die Laufzeitansicht besteht aus Band, Steuerleiste, Statuskarte und Übergangstabelle. Das Band zeigt ein Fenster um die Kopfposition mit Indexbeschriftungen und einer Pfeilmarkierung für den aktuellen Kopf. Über den Adapter kann die Tabellenzelle für den aktuellen Zustand und das gelesene Symbol als aktiv markiert werden. Die Anzahl sichtbarer Bandzellen wird aus der verfügbaren Breite berechnet. Animationen erfolgen nur bei kleinen Verschiebungen und sinnvollen Geschwindigkeiten, sodass die Darstellung auch bei kleinen Viewports und schnellen Simulationen beherrschbar bleibt.
 
-  \item Fehler in einzelnen Tabellenzellen blockieren den Editor gezielt. Bei
-  ungültigen Symbolen oder ungültigem Übergangsformat bleibt die betroffene
-  Zelle editierbar, andere Änderungen und der Start der Simulation werden
-  deaktiviert. So wird verhindert, dass ein halbvalider Tabellenzustand
-  unbemerkt übernommen wird.
+Für die Steuerung verwendet die Turing-Maschine die gemeinsamen Simulator-Controls der Plattform: Play, Pause, Schritt, Schritt zurück, Reset und Geschwindigkeitsregler. Die Statuskarte zeigt den aktuellen Zustand, das aktuelle Symbol, die Schrittzahl und den Haltestatus. Fehlt ein Übergang, erläutert sie diesen fachlich, indem sie darauf hinweist, dass für den aktuellen Zustand und das aktuelle Symbol kein Übergang definiert ist.
 
-  \item Das Blank-Symbol wird sichtbar als \(\diamond\) dargestellt. Für die
-  Eingabe ist zusätzlich die Tastaturform \texttt{<>} vorgesehen, die in das
-  Blank-Symbol umgewandelt wird. Das reduziert Eingabehürden, ohne in der
-  Darstellung ein uneindeutiges Leerzeichen verwenden zu müssen.
-
-  \item Die Laufzeitansicht besteht aus Band, Steuerleiste, Statuskarte und
-  Übergangstabelle. Das Band zeigt ein Fenster um die Kopfposition mit
-  Indexbeschriftungen und einer Pfeilmarkierung für den aktuellen Kopf. Die
-  Tabellenzelle des aktuellen Zustands und Symbols kann über den Adapter als
-  aktive Zelle markiert werden.
-
-  \item Das Band ist responsiv ausgelegt. Die Anzahl sichtbarer Bandzellen wird
-  aus der verfügbaren Breite berechnet; Animationen werden nur für kleine
-  Verschiebungen und sinnvolle Geschwindigkeiten ausgeführt. Dadurch bleibt
-  die Darstellung auch bei kleinen Viewports und schnellen Simulationen
-  beherrschbar.
-
-  \item Die Steuerung verwendet die gemeinsamen Simulator-Controls der
-  Plattform: Play, Pause, Schritt, Schritt zurück, Reset und
-  Geschwindigkeitsregler. Damit verhält sich die Turing-Maschine ähnlich wie
-  andere Simulatoren der Anwendung.
-
-  \item Die Statuskarte zeigt aktuellen Zustand, aktuelles Symbol,
-  Schrittzahl, Haltestatus und bei fehlenden Übergängen eine fachliche
-  Erklärung. Bei der Live-Prüfung hielt die Maschine ohne definierten Übergang
-  mit der Meldung, dass für den aktuellen Zustand und das aktuelle Symbol kein
-  Übergang definiert ist.
-
-  \item Übungen erweitern die Simulation um die Aktionen
-  \glqq Lösung laden\grqq{} und \glqq Lösung prüfen\grqq{}. Das Prüfergebnis
-  wird in einem Dialog als Tabelle mit Eingabe, Ausgabe, erwarteter Ausgabe,
-  Bestehen und gültigem Haltezustand angezeigt.
-
-  \item Die Oberfläche ist weitgehend lokalisiert. Eine sichtbare Auffälligkeit
-  in der deutschen UI ist jedoch, dass in der Übergangstabelle der
-  Zeilen-Hinzufügen-Text noch als \glqq Add new row\grqq{} erscheint. Das
-  deutet auf einen fehlenden oder nicht angebundenen Übersetzungseintrag in
-  einer gemeinsam genutzten Tabellenkomponente hin.
-\end{itemize}
+Übungen ergänzen die Simulation um die Aktionen \glqq Lösung laden\grqq{} und \glqq Lösung prüfen\grqq{}. Das Prüfergebnis erscheint in einem Dialog als Tabelle mit Eingabe, Ausgabe, erwarteter Ausgabe, Bestehen und gültigem Haltezustand. Die Oberfläche ist in deutsch und englisch lokalisiert.
 
 \subNsection{2}{Andere Entscheidungen}{Richard Schröder}
 
-\begin{itemize}
-  \item Die Beispiele und Übungen sind als Szenarien modelliert. Beispiele
-  enthalten ein fertiges Programm; Übungen enthalten zusätzlich ein
-  Starterprogramm, ein Lösungsprogramm, eine Speicher-ID und mehrere
-  Validierungsfälle. Damit kann derselbe Simulator für freie Arbeit, Beispiele
-  und bewertbare Übungen genutzt werden.
+Beispiele und Übungen sind als Szenarien modelliert. Ein Beispiel enthält ein fertiges Programm. Eine Übung ergänzt dieses um ein Starterprogramm, ein Lösungsprogramm, eine Speicher-ID und mehrere Validierungsfälle. Derselbe Simulator kann damit für freie Arbeit, Beispiele und bewertbare Übungen verwendet werden. Die enthaltenen Szenarien decken typische Aufgaben wie Bit-Invertierung, unäres und binäres Inkrementieren, das Löschen des Bandes, die Mustersuche, das Duplizieren von Nullen, Binäraddition und einfache Worterkennung ab. Die Übungen sind nach Schwierigkeitsgrad sortiert.
 
-  \item Die enthaltenen Beispiele und Übungen decken verschiedene typische
-  Aufgaben ab, etwa Bit-Invertierung, unäres und binäres Inkrementieren,
-  Löschen des Bandes, Suchen von Mustern, Duplizieren von Nullen,
-  Binäraddition und einfache Worterkennung. Die Übungen sind nach
-  Schwierigkeitsgrad sortiert.
+Es gibt eine umfangreiche Testsuite für die Turingmaschine, um alle Funktionen auf Korrektheit zu prüfen. Unit-Tests prüfen Domain-Logik, Formatierung, Programmvalidierung, Transfer-Codec, Editor-Reducer, Tabellenadapter, Bandlogik, Lösungskontrolle und Simulator-Hook. Ergänzende E2E-Tests decken die sichtbare Bedienung, die Navigation zwischen Beispielen und Übungen, das Local-Storage-Verhalten, Import und Export, Fehlervalidierung sowie das schrittweise Erstellen einer Bit-Inverter-Maschine ab. Stabile \verb|data-testid|-Attribute an den UI-Elementen erleichtern diese Tests und die Live-Inspektion.
 
-  \item Die Testsuite ist für diesen Bereich vergleichsweise breit. Es gibt
-  Unit-Tests für Domain-Logik, Formatierung, Programmvalidierung,
-  Transfer-Codec, Editor-Reducer, Tabellenadapter, Bandlogik,
-  Lösungskontrolle und Simulator-Hook. Die E2E-Tests prüfen zusätzlich die
-  sichtbare Bedienung, Beispiel- und Übungsnavigation, Local-Storage-Verhalten,
-  Import/Export, Fehlervalidierung und das Erstellen einer Bit-Inverter-Maschine
-  von Grund auf.
+Die Architektur wurde nach einem ersten Datenmodell und Simulator bzw. Proof of Concenpt gezielt stabilisiert. Größere Refactorings nach einer Architekturplanung wurden von responsiven Verbesserungen, Internationalisierung, Test-IDs, Übungsintegration und persistenter Speicherung ergänzt.
 
-  \item Die Git-Historie legt nahe, dass die Architektur bewusst nachträglich
-  stabilisiert wurde. Nach einem ersten Datenmodell und Simulator folgten
-  größere Refactorings nach einer Architekturplanung, danach responsive
-  Verbesserungen, Internationalisierung, Test-IDs, Übungsintegration und
-  persistente Speicherung. Das spricht für eine iterative Entwicklung, bei der
-  die UI zunächst funktionsfähig gemacht und anschließend stärker in Schichten
-  getrennt wurde.
+Die Behandlung fehlender Übergänge als reguläres Halten ist für den Lernkontext in meinen Augen sinnvoll. Eine unvollständige Turing-Maschine ist beim Konstruieren ein normaler Zwischenstand. Die Übungsprüfung kann dennoch streng bleiben, weil sie nicht nur die korrekte Ausgabe, sondern auch das Halten in einem vorgesehenen Haltezustand verlangt.
 
-  \item Besonders sinnvoll ist die Entscheidung, \glqq fehlender Übergang\grqq{}
-  nicht als Programmfehler zu behandeln. Für Lernende ist eine unvollständige
-  Turing-Maschine ein normaler Zwischenzustand beim Konstruieren. Gleichzeitig
-  kann die Übungsprüfung streng bleiben, weil sie nur dann besteht, wenn die
-  Maschine nicht nur die richtige Ausgabe produziert, sondern auch in einem
-  vorgesehenen Haltezustand endet.
+Das Transferformat bündelt die Nutzereingaben in eine kompakte Bitstream-Kodierung. Diese erzeugt kurze Exportstrings und eignet sich für die lokale Speicherung, ist aber nicht unmittelbar lesbar. Da Import und Export als Kopier- und Austauschfunktion und nicht als primäres Bearbeitungsformat vorgesehen sind, wurde diese Entscheidung so getroffen.
 
-  \item Ein technischer Zielkonflikt liegt im Transferformat. Die kompakte
-  Bitstream-Kodierung ist gut für kurze Exportstrings und lokale Speicherung,
-  erschwert aber die manuelle Lesbarkeit. Diese Entscheidung ist plausibel,
-  weil der Import/Export im UI als Kopier- und Austauschfunktion gedacht ist
-  und nicht als primäres Bearbeitungsformat.
-
-  \item Ein weiterer Zielkonflikt liegt in der abgeleiteten Alphabetpflege.
-  Sie reduziert Eingabeaufwand und verhindert viele Inkonsistenzen, kann aber
-  für fortgeschrittene theoretische Diskussionen weniger explizit sein als ein
-  separat editierbares Eingabealphabet. Die aktuelle Lösung wirkt für die
-  Lernplattform angemessen, weil sie den Editor einfacher hält.
-
-  \item Aus Wartungssicht ist positiv, dass die meisten UI-Elemente stabile
-  \texttt{data-testid}-Attribute besitzen. Das erleichtert E2E-Tests und war
-  auch bei der Live-Inspektion hilfreich. Gleichzeitig sollten kleine
-  Lokalisierungslücken in gemeinsam genutzten Komponenten weiter beobachtet
-  werden, damit deutsche und englische Oberfläche konsistent bleiben.
-\end{itemize}
+Die automatische Alphabetpflege senkt den Eingabeaufwand und verhindert viele Inkonsistenzen, macht das Eingabealphabet für weiterführende theoretische Betrachtungen jedoch weniger explizit als ein separat editierbares Feld. Für die Lernplattform ist die gewählte Lösung angemessen, weil sie den Editor übersichtlich hält. Kleine Lokalisierungslücken in gemeinsam genutzten Komponenten sollten dennoch weiter beobachtet werden, damit die deutsche und englische Oberfläche konsistent bleiben.
