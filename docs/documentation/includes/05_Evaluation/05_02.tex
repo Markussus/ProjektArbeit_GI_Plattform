@@ -8,8 +8,8 @@ wurden mit dem Auftraggeber abgestimmt und in die bestehende Plattform integrier
 (siehe Abschnitt~\ref{5_4_DI}).
 
 Die didaktische Kernanforderung, nicht nur Ergebnisse, sondern auch Zwischenschritte
-sichtbar zu machen, wurde in allen Fachmodulen berücksichtigt. Simulationen können
-schrittweise ausgeführt, zurückgesetzt und beobachtet werden. Die Übungen geben
+sichtbar zu machen, wurde in allen Themenbereichen berücksichtigt. Simulationen können
+schrittweise ausgeführt, angehalten und zurückgesetzt werden. Die Übungen geben
 begründete Rückmeldungen, statt sich auf eine reine Ja-Nein-Aussage zu beschränken.
 Auch der Betrieb ohne Backend ist umgesetzt: Aufgabenstände werden im lokalen Speicher
 des Browsers abgelegt, während Aufgaben über Import und Export ausgetauscht werden können.
@@ -18,21 +18,23 @@ Die Erweiterbarkeit der Plattform hat sich während der Entwicklung praktisch be
 Neue Themenbereiche wurden über den zentralen Modulkatalog registriert, ohne Navigation
 oder Routing der bestehenden Bereiche umbauen zu müssen. Das Unified UI-Konzept sorgt
 dabei dafür, dass Aufbau, Tabs und Rückmeldungen über die Themen hinweg wiedererkennbar
-bleiben.
+bleiben. Eine systematische Usability-Erhebung, etwa durch Nutzertests mit Studierenden,
+fand jedoch nicht statt.
 
 Für das Qualitätsziel Performance liegt ein messbarer Nachweis vor. Die Pipeline prüft
-alle Seiten der Anwendung mit Lighthouse und schlägt fehl, sobald der Median der größten
-Inhaltsdarstellung aus drei Durchläufen mehr als 1,25 Sekunden beträgt (siehe
-Abschnitt~\ref{5_1_QS}). Die Themenseiten werden einzeln nachgeladen, sodass beim
-Aufruf nur der jeweils benötigte Teil der Anwendung übertragen wird. Die Messung erfolgte
-jedoch unter Desktop-Bedingungen; Werte für langsame mobile Verbindungen wurden nicht
-erhoben.
+alle Modul- und Themenseiten sowie die zentralen Einstiegsseiten mit Lighthouse und
+schlägt fehl, sobald der Median des \gls{lcp} aus drei Durchläufen mehr als 1,25
+Sekunden beträgt (siehe Abschnitt~\ref{5_1_QS}). Die Themenseiten werden einzeln
+nachgeladen, sodass beim Aufruf nur der jeweils benötigte Teil der Anwendung übertragen
+wird. Die Messung erfolgte jedoch unter Desktop-Bedingungen; Werte für langsame mobile
+Verbindungen wurden nicht erhoben.
 
-Auch die Zweisprachigkeit und die Anpassung des Erscheinungsbilds sind umgesetzt. Die
-Oberfläche steht vollständig auf Deutsch und Englisch zur Verfügung; das Farbschema kann
-der Systemeinstellung folgen oder manuell gewählt werden. Diese Funktionen verbessern
-die Zugänglichkeit, ersetzen aber keine vollständige Barrierefreiheitsprüfung. Tests mit
-Screenreadern oder gegen einschlägige Richtlinien sowie automatisierte Prüfungen in der
-Pipeline wurden bisher nicht durchgeführt. Entsprechendes gilt für die Nutzung auf
-kleinen Bildschirmen. Der Abgleich fällt daher insgesamt positiv aus, lässt aber bei
-Barrierefreiheit und mobiler Nutzung noch offene Punkte erkennen.
+Die Zweisprachigkeit und die Anpassung des Erscheinungsbilds sind ebenfalls umgesetzt.
+Die Oberfläche steht vollständig auf Deutsch und Englisch zur Verfügung; das Farbschema
+kann der Systemeinstellung folgen oder manuell gewählt werden. Diese Funktionen
+verbessern die Zugänglichkeit, ersetzen aber keine vollständige
+Barrierefreiheitsprüfung. Tests mit Screenreadern oder gegen einschlägige Richtlinien
+sowie automatisierte Prüfungen in der Pipeline wurden bisher nicht durchgeführt. Die
+Nutzung auf kleinen Bildschirmen wurde ebenfalls nicht systematisch geprüft. Der
+Abgleich fällt daher insgesamt positiv aus, lässt aber bei der Usability-Bewertung, der
+Barrierefreiheit und der mobilen Nutzung noch offene Punkte erkennen.
