@@ -1,35 +1,37 @@
 \subNsection{1}{Design-Iterationen}{Duy Tan Pham} \label{5_4_DI}
 
-Die Anforderungen wurden im Projekt nicht einmalig festgelegt. Das Lastenheft bildete den
-Ausgangspunkt. Rückmeldungen des Professors, neue fachliche Wünsche und Erfahrungen mit
-den ersten Prototypen führten im weiteren Verlauf zu Anpassungen. Die grundlegenden Ziele
-blieben erhalten. Dazu gehören das selbstständige Lernen, eine einheitliche Bedienung und
-der Betrieb ohne Backend. Der Umfang und die technische Umsetzung entwickelten sich
-dagegen schrittweise weiter.
+Die Anforderungen entwickelten sich während des Projekts weiter. Den fachlichen und
+technischen Ausgangspunkt bildeten die im Lastenheft festgehaltenen Ziele. Rückmeldungen
+des Professors, neue fachliche Wünsche und Erfahrungen mit den ersten Prototypen führten
+im weiteren Verlauf zu Anpassungen. Die grundlegenden Ziele blieben erhalten. Dazu
+gehören das selbstständige Lernen, eine einheitliche Bedienung und der Betrieb ohne
+Backend. Der Umfang und die technische Umsetzung entwickelten sich dagegen schrittweise
+weiter.
 
-Zunächst lag der Schwerpunkt auf den im Lastenheft genannten Themen aus Grundlagen
-Informatik. Der Umfang wuchs danach auf zwei Ebenen. Zum einen kamen mit den regulären
-Sprachen und den Kodierungsverfahren zwei weitere Fachthemen hinzu. Zum anderen wurden
-vorhandene Themen erweitert, etwa der DNF-Bereich um das Vereinfachen als zusätzliche
-Aufgabenart. Mit Programmieren 1 und der Java-Umgebung kam später ein ergänzender
-Lernbereich außerhalb von Grundlagen Informatik hinzu. Die Erweiterungen wurden jeweils
-vorher abgestimmt. Für die Plattform bedeutete das, dass die gemeinsame Struktur mehrmals
-neue Themen aufnehmen musste, ohne die bestehenden Bereiche dafür umzubauen.
+Der anfangs vorgesehene fachliche Umfang konzentrierte sich auf Themen aus Grundlagen
+Informatik. Später wuchs er auf zwei Ebenen. Zum einen kamen mit den regulären Sprachen
+und den Kodierungsverfahren zwei weitere Fachthemen hinzu. Zum anderen wurden vorhandene
+Themen erweitert, etwa der DNF-Bereich um das Vereinfachen als zusätzliche Aufgabenart.
+Mit Programmieren 1 und der Java-Umgebung kam später ein ergänzender Lernbereich außerhalb
+von Grundlagen Informatik hinzu. Die Erweiterungen wurden jeweils vorher abgestimmt. Für
+die Plattform bedeutete das, dass die gemeinsame Struktur mehrmals neue Themen aufnehmen
+musste, ohne die bestehenden Bereiche dafür umzubauen.
 
-Auch die Seitenarchitektur wurde nach den ersten Umsetzungen überarbeitet. Anfangs
-enthielten die Themenseiten ähnliche Strukturen und Routingeinträge an mehreren Stellen.
-Mit wachsendem Umfang führte das zu Wiederholungen und erschwerte eine einheitliche
-Weiterentwicklung. Heute registriert \texttt{moduleCatalog.tsx} Lernbereiche,
-Themenbereiche, Routen und Darstellungsinformationen an einer zentralen Stelle. Navigation,
-Routing und Übersichtsseiten greifen auf diese Informationen zurück. Wiederkehrende
-Abläufe liegen in gemeinsamen Seitengerüsten wie \texttt{ModuleTopicPage}.
+Die grobe Seitenarchitektur wurde bereits zu Beginn des Projekts festgelegt. Schon das
+frühe Plattformgerüst registrierte Lernbereiche, Themenbereiche, Routen und
+Darstellungsinformationen zentral in \texttt{moduleCatalog.tsx}. Mit
+\texttt{ModuleTopicPage} stand außerdem ein gemeinsamer Aufbau für die Themenseiten bereit.
+Dadurch konnten die Fachmodule auf einer einheitlichen Grundlage entwickelt werden. Im
+weiteren Verlauf wurden diese Bausteine anhand der konkreten Anforderungen der Module
+erweitert und präzisiert.
 
-Die unabhängig entwickelten Themen unterschieden sich zunächst auch im Aufbau ihrer
-Übersichten, Beispiele und Übungen. Diese Bereiche wurden während der Integration
-schrittweise vereinheitlicht. Gemeinsame Tabs, Aufgabenkomponenten und Simulationsrahmen
-sorgen heute für einen wiedererkennbaren Ablauf. Gleichzeitig bleibt die Fachlogik in den
-jeweiligen Themenbereichen. Diese Aufteilung wurde der vollständigen Zentralisierung
-vorgezogen, weil sich die fachlichen Modelle und Prüfverfahren deutlich unterscheiden.
+Trotz dieser gemeinsamen Grundlage unterschieden sich die parallel entwickelten Themen
+zunächst im konkreten Aufbau ihrer Übersichten, Beispiele und Übungen. Diese Bereiche
+wurden während der Integration schrittweise vereinheitlicht. Gemeinsame Tabs,
+Aufgabenkomponenten und Simulationsrahmen sorgen heute für einen wiedererkennbaren Ablauf.
+Gleichzeitig bleibt die Fachlogik in den jeweiligen Themenbereichen. Diese Aufteilung wurde
+der vollständigen Zentralisierung vorgezogen, weil sich die fachlichen Modelle und
+Prüfverfahren deutlich unterscheiden.
 
 Bei Endlichen Automaten und Regulären Sprachen war das besonders deutlich. Beide Themen
 wurden zunächst unabhängig umgesetzt. Bei der Integration wurden dann gemeinsame Grammatik-
