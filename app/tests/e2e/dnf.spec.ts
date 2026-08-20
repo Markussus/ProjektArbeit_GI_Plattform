@@ -54,22 +54,83 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("tab-button-examples")).toBeVisible();
     await expect(page.getByTestId("tab-button-simulation")).toBeVisible();
 
+    await expect(page.getByTestId("dnf-tutorial-questions")).toBeVisible();
+    await expect(
+      page.getByTestId("dnf-tutorial-question-1-select"),
+    ).toContainText("What is Disjunctive Normal Form?");
+    await expect(
+      page.getByTestId("dnf-tutorial-question-2-select"),
+    ).toContainText("How is the canonical DNF derived from a truth table?");
+    await page.getByTestId("dnf-tutorial-question-3-select").click();
+    await expect(
+      page.getByTestId("dnf-tutorial-question-3-description"),
+    ).toContainText("The canonical DNF contains one complete minterm");
+
     await switchTab(page, "exercises");
     await expect(page.getByTestId("dnf-exercises-tab")).toBeVisible();
+    const expressionExerciseSection = page.getByTestId(
+      "dnf-exercises-tab-section-expression_to_truth_table",
+    );
+    const tableExerciseSection = page.getByTestId(
+      "dnf-exercises-tab-section-truth_table_to_dnf",
+    );
+    await expect(expressionExerciseSection).toBeVisible();
+    await expect(tableExerciseSection).toBeVisible();
     await expect(
-      page.getByTestId(`dnf-exercise-card-${FIRST_DNF_EXERCISE_ID}-select`),
+      expressionExerciseSection.getByRole("heading", {
+        name: "Expression as the starting point",
+      }),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`dnf-exercise-card-${COMPLEX_DNF_EXERCISE_ID}-select`),
+      expressionExerciseSection.getByText(
+        "Evaluate an expression, create its truth table, derive the DNF, and simplify it.",
+      ),
+    ).toBeVisible();
+    await expect(
+      tableExerciseSection.getByRole("heading", {
+        name: "Truth table as the starting point",
+      }),
+    ).toBeVisible();
+    await expect(
+      tableExerciseSection.getByTestId(
+        `dnf-exercise-card-${FIRST_DNF_EXERCISE_ID}-select`,
+      ),
+    ).toBeVisible();
+    await expect(
+      expressionExerciseSection.getByTestId(
+        `dnf-exercise-card-${COMPLEX_DNF_EXERCISE_ID}-select`,
+      ),
     ).toBeVisible();
 
     await switchTab(page, "examples");
     await expect(page.getByTestId("dnf-examples-tab")).toBeVisible();
+    const expressionExampleSection = page.getByTestId(
+      "dnf-examples-section-expression_to_truth_table",
+    );
+    const tableExampleSection = page.getByTestId(
+      "dnf-examples-section-truth_table_to_dnf",
+    );
+    await expect(expressionExampleSection).toBeVisible();
+    await expect(tableExampleSection).toBeVisible();
     await expect(
-      page.getByTestId(`dnf-example-${LECTURE_EXPRESSION_EXAMPLE_ID}-select`),
+      expressionExampleSection.getByRole("heading", {
+        name: "Expression as the starting point",
+      }),
     ).toBeVisible();
     await expect(
-      page.getByTestId(`dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`),
+      tableExampleSection.getByRole("heading", {
+        name: "Truth table as the starting point",
+      }),
+    ).toBeVisible();
+    await expect(
+      expressionExampleSection.getByTestId(
+        `dnf-example-${LECTURE_EXPRESSION_EXAMPLE_ID}-select`,
+      ),
+    ).toBeVisible();
+    await expect(
+      tableExampleSection.getByTestId(
+        `dnf-example-${DNF_INTRO_TABLE_EXAMPLE_ID}-select`,
+      ),
     ).toBeVisible();
     await expect(page.getByTestId("dnf-example-negation-select")).toHaveCount(
       0,
