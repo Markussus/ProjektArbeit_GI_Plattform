@@ -434,16 +434,26 @@
     "tutorialVideo": "Tutorial video",
     "tutorialQuestionLabel": "Question {{index}}",
     "tutorialQuestion1": "What is Disjunctive Normal Form?",
-    "tutorialAnswer1": "DNF writes a boolean function as an OR of AND terms. Each truth-table row with result 1 contributes exactly one AND term.",
-    "tutorialQuestion2": "How do I build the DNF from a truth table?",
-    "tutorialAnswer2": "For each 1-row you form an AND term: variables with value 1 stay positive, with value 0 negated. All terms are joined with OR.",
-    "tutorialQuestion3": "What does the simplification do?",
-    "tutorialAnswer3": "It reduces the canonical DNF with Quine-McCluskey to the minimal form – the equivalent DNF with the fewest literals.",
+    "tutorialAnswer1": "A DNF is an OR of AND terms. The terms consist of variables or their negations and do not always have to contain every variable.",
+    "tutorialQuestion2": "How is the canonical DNF derived from a truth table?",
+    "tutorialAnswer2": "An AND term is formed for each row with result 1. Variables with value 1 stay positive, while variables with value 0 are negated. Because every term contains all variables, it describes exactly one table row. The terms are then joined with OR.",
+    "tutorialQuestion3": "What is the difference between canonical and minimal DNF?",
+    "tutorialAnswer3": "The canonical DNF contains one complete minterm for every 1-row. The minimal DNF combines compatible minterms and describes the same function with as few literals as possible.",
     "concepts": "Key Concepts",
     "concept1": "Boolean polynomials",
     "concept2": "Truth Tables",
     "concept3": "Rows with result 1",
     "concept4": "Logic gates",
+    "taskGroups": {
+      "expression_to_truth_table": {
+        "title": "Expression as the starting point",
+        "description": "Evaluate an expression, create its truth table, derive the DNF, and simplify it."
+      },
+      "truth_table_to_dnf": {
+        "title": "Truth table as the starting point",
+        "description": "Derive and simplify the DNF from a given truth table."
+      }
+    },
     "algebra": {
       "title": "Boolean algebra rules",
       "intro": "These rules let you rewrite a DNF into shorter equivalent forms. They power the step-by-step solution path and the worked examples in the simulator.",

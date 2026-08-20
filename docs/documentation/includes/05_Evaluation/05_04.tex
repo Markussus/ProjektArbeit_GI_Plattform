@@ -1,3 +1,53 @@
-\subNsection{1}{Design-Iterationen}{Duy Tan Pham}
+\subNsection{1}{Design-Iterationen}{Duy Tan Pham} \label{5_4_DI}
 
-Welche Entscheidungen mussten im Prozess revidiert werden?
+Die Anforderungen entwickelten sich während des Projekts weiter. Den fachlichen und
+technischen Ausgangspunkt bildeten die im Lastenheft festgehaltenen Ziele. Rückmeldungen
+des Professors, neue fachliche Wünsche und Erfahrungen mit den ersten Prototypen führten
+im weiteren Verlauf zu Anpassungen. Die grundlegenden Ziele blieben erhalten. Dazu
+gehören das selbstständige Lernen, eine einheitliche Bedienung und der Betrieb ohne
+Backend. Der Umfang und die technische Umsetzung entwickelten sich dagegen schrittweise
+weiter.
+
+Der anfangs vorgesehene fachliche Umfang konzentrierte sich auf Themen aus Grundlagen
+Informatik. Später wuchs er auf zwei Ebenen. Zum einen kamen mit den regulären Sprachen
+und den Kodierungsverfahren zwei weitere Fachthemen hinzu. Zum anderen wurden vorhandene
+Themen erweitert, etwa der DNF-Bereich um das Vereinfachen als zusätzliche Aufgabenart.
+Mit Programmieren 1 und der Java-Umgebung kam später ein ergänzender Lernbereich außerhalb
+von Grundlagen Informatik hinzu. Die Erweiterungen wurden jeweils vorher abgestimmt. Für
+die Plattform bedeutete das, dass die gemeinsame Struktur mehrmals neue Themen aufnehmen
+musste, ohne die bestehenden Bereiche dafür umzubauen.
+
+Die grobe Seitenarchitektur wurde bereits zu Beginn des Projekts festgelegt. Schon das
+frühe Plattformgerüst registrierte Lernbereiche, Themenbereiche, Routen und
+Darstellungsinformationen zentral in \texttt{moduleCatalog.tsx}. Mit
+\texttt{ModuleTopicPage} stand außerdem ein gemeinsamer Aufbau für die Themenseiten bereit.
+Dadurch konnten die Fachmodule auf einer einheitlichen Grundlage entwickelt werden. Im
+weiteren Verlauf wurden diese Bausteine anhand der konkreten Anforderungen der Module
+erweitert und präzisiert.
+
+Trotz dieser gemeinsamen Grundlage unterschieden sich die parallel entwickelten Themen
+zunächst im konkreten Aufbau ihrer Übersichten, Beispiele und Übungen. Diese Bereiche
+wurden während der Integration schrittweise vereinheitlicht. Gemeinsame Tabs,
+Aufgabenkomponenten und Simulationsrahmen sorgen heute für einen wiedererkennbaren Ablauf.
+Gleichzeitig bleibt die Fachlogik in den jeweiligen Themenbereichen. Diese Aufteilung wurde
+der vollständigen Zentralisierung vorgezogen, weil sich die fachlichen Modelle und
+Prüfverfahren deutlich unterscheiden.
+
+Bei Endlichen Automaten und Regulären Sprachen war das besonders deutlich. Beide Themen
+wurden zunächst unabhängig umgesetzt. Bei der Integration wurden dann gemeinsame Grammatik-
+und Automatenmodelle sowie Bausteine für das Übertragungsformat wiederverwendet. Die
+themenspezifischen Prüfverfahren blieben dagegen in den jeweiligen Bereichen.
+
+Eine weitere Änderung betraf Import, Export und die Speicherung von Aufgabenständen.
+Import und Export waren anfangs nur als optionale Funktionen vorgesehen und wurden zuerst
+in einzelnen Simulatoren umgesetzt. Später wurden das Datenformat und der Einstieg über
+den globalen Kopfbereich zusammengeführt. Daraus entstand die gemeinsame
+Training-Center-Struktur. Zusätzlich werden geeignete Aufgabenstände und Einstellungen im
+lokalen Speicher des Browsers gesichert. Damit bleiben Ergebnisse zwischen Aufrufen
+erhalten, ohne die ursprüngliche Entscheidung gegen Benutzerkonten und ein Backend
+aufzugeben.
+
+Die gemeinsame Struktur entstand aus den wiederkehrenden Abläufen der Fachthemen und wurde
+angepasst, sobald mehrere unabhängige Lösungen dieselbe Aufgabe erfüllten. Dadurch konnten neue
+Anforderungen aufgenommen werden, ohne die Plattform in voneinander getrennte Werkzeuge
+aufzuteilen.

@@ -434,16 +434,26 @@
     "tutorialVideo": "Tutorial-Video",
     "tutorialQuestionLabel": "Frage {{index}}",
     "tutorialQuestion1": "Was ist die Disjunktive Normalform?",
-    "tutorialAnswer1": "Die DNF schreibt eine boolesche Funktion als ODER-Verknüpfung von UND-Termen. Jede Zeile der Wahrheitstabelle mit Ergebnis 1 liefert genau einen UND-Term.",
-    "tutorialQuestion2": "Wie baue ich aus einer Wahrheitstabelle die DNF?",
-    "tutorialAnswer2": "Für jede 1-Zeile bildest du einen UND-Term: Variablen mit Wert 1 stehen positiv, mit Wert 0 negiert. Alle Terme werden mit ODER verbunden.",
-    "tutorialQuestion3": "Was macht die Vereinfachung?",
-    "tutorialAnswer3": "Sie kürzt die kanonische DNF mit Quine-McCluskey zur minimalen Form – der äquivalenten DNF mit den wenigsten Literalen.",
+    "tutorialAnswer1": "Eine DNF ist eine ODER-Verknüpfung aus UND-Termen. Die Terme bestehen aus Variablen oder ihren Negationen und müssen nicht immer alle Variablen enthalten.",
+    "tutorialQuestion2": "Wie entsteht die kanonische DNF aus einer Wahrheitstabelle?",
+    "tutorialAnswer2": "Für jede Zeile mit Ergebnis 1 wird ein UND-Term gebildet. Variablen mit Wert 1 stehen positiv, Variablen mit Wert 0 negiert. Da jeder Term alle Variablen enthält, beschreibt er genau eine Tabellenzeile. Anschließend werden die Terme mit ODER verbunden.",
+    "tutorialQuestion3": "Was unterscheidet die kanonische von der minimalen DNF?",
+    "tutorialAnswer3": "Die kanonische DNF enthält für jede 1-Zeile einen vollständigen Minterm. Die minimale DNF fasst passende Minterme zusammen und beschreibt dieselbe Funktion mit möglichst wenigen Literalen.",
     "concepts": "Schlüsselkonzepte",
     "concept1": "Boolesche Polynome",
     "concept2": "Wahrheitstabellen",
     "concept3": "Zeilen mit Ergebnis 1",
     "concept4": "Logikgatter",
+    "taskGroups": {
+      "expression_to_truth_table": {
+        "title": "Ausdruck als Ausgangspunkt",
+        "description": "Ausdruck auswerten, Wahrheitstabelle erstellen, DNF ableiten und vereinfachen."
+      },
+      "truth_table_to_dnf": {
+        "title": "Wahrheitstabelle als Ausgangspunkt",
+        "description": "DNF aus einer vorgegebenen Wahrheitstabelle ableiten und vereinfachen."
+      }
+    },
     "algebra": {
       "title": "Regeln der booleschen Algebra",
       "intro": "Mit diesen Regeln lässt sich eine DNF in kürzere äquivalente Formen umformen. Sie sind die Grundlage für den schrittweisen Lösungsweg und für die Beispiele im Simulator.",
