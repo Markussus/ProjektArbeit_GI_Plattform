@@ -1,27 +1,35 @@
 \subNsection{1}{Lessons Learned}{Alle}
 
-Kristian Popov: Für mich war die Zusammenarbeit im Team eine wichtige praktische
-Erfahrung. Ich habe gelernt, wie wichtig eine übersichtliche Repository-Struktur mit
-klaren Unterordnern und gemeinsamen Komponenten ist. Dadurch bleiben die einzelnen
-Fachmodule voneinander getrennt, während wiederkehrende Funktionen zentral
-weiterentwickelt werden können.
+Kristian Popov: Am deutlichsten wurde mir der Wert einer einzigen Quelle an einer
+Stelle, an der dieselbe Logik dreimal existierte. Die Namensvergabe für Nichtterminale
+lag in drei leicht unterschiedlichen Kopien vor. In einer davon verbrauchte ein
+weggelassener Endzustand einen Buchstaben, sodass in der Ausgabe eine Lücke entstand
+und etwa \verb|E| übersprungen wurde. Für sich genommen war das harmlos, führte aber
+dazu, dass eine exportierte Grammatik nach dem Import andere Namen trug. Seitdem prüfe
+ich bei gleichartigem Verhalten an mehreren Stellen zuerst, ob es dieselbe Funktion
+sein müsste, statt die Kopien nur aneinander anzugleichen.
 
-Die Organisation in GitLab hat mir außerdem gezeigt, wie sich ein Projekt besser planen
-lässt. Ich habe gelernt, Entwicklungszyklen vorzubereiten, Issues eindeutig zu
-beschreiben und sie passenden Milestones zuzuordnen. Die wöchentlichen Meetings halfen
-dabei, den Fortschritt und offene Aufgaben im Blick zu behalten.
+Eine zweite Lektion betraf zu früh getroffene Annahmen. Für die Grammatikeingabe wollte
+ich Terminale und Nichtterminale zeichenweise trennen. Das funktioniert nicht, denn
+beide dürfen denselben Namen tragen, und eine Regel wie \verb|A -> AA| lässt sich aus
+den Zeichen allein nicht auflösen. Erst ein zweiter Durchlauf, der zunächst alle
+definierten Nichtterminale sammelt, machte die Zerlegung eindeutig. Ähnlich verlief es
+beim Thema selbst: Geplant war zunächst nur der deterministische Fall, der
+nichtdeterministische kam später hinzu und veränderte den Kern der Ausführung
+nachträglich.
 
-Eine Herausforderung war, dass einzelne Themen zunächst unterschiedlich umgesetzt
-wurden. Bei der späteren Integration mussten daher Aufbau, Schnittstellen und Bedienung
-teilweise vereinheitlicht werden. Durch regelmäßige Abstimmungen und gemeinsame
-Komponenten konnten wir diese Unterschiede jedoch schrittweise angleichen. Dadurch wurde
-mir besonders deutlich, wie wichtig es ist, bereits während der Entwicklung gemeinsame
-Standards und Schnittstellen festzulegen.
+Außerdem habe ich gelernt, dass fachlich Vollständiges nicht automatisch verständlich
+ist. Die Übergangstabelle definiert einen Automaten vollständig, doch beim
+Ausprobieren zeigte sich, dass sich der Weg eines Wortes daraus kaum verfolgen lässt.
+Das Zustandsdiagramm kam deshalb erst während der Entwicklung hinzu. Eine didaktische
+Annahme sollte ich künftig früher an der laufenden Anwendung prüfen.
 
-Insgesamt nehme ich mit, dass eine klare Architektur, eine strukturierte Planung und
-frühe Kommunikation eng zusammengehören. Der Git-Workflow mit Feature-Branches und
-Merge Requests hat zusätzlich dabei geholfen, Änderungen nachvollziehbar und
-kontrolliert zusammenzuführen.
+Im Team wurde mir vor allem deutlich, wie viel von gemeinsam festgelegten
+Schnittstellen abhängt. Die Themen entstanden zunächst getrennt und mussten bei der
+Integration in Aufbau und Bedienung angeglichen werden. Regelmäßige Abstimmungen,
+gemeinsame Komponenten und der Git-Workflow mit Feature-Branches und Merge Requests
+haben das möglich gemacht. Nachträglich war diese Angleichung aber deutlich
+aufwendiger, als eine frühe Absprache gewesen wäre.
 
 Duy Tan Pham: Im Projekt habe ich gelernt, größere Funktionen schrittweise zu entwickeln
 und dabei ihre Einbindung in die gesamte Plattform mitzudenken. Durch einzelne

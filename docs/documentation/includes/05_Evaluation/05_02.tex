@@ -1,40 +1,52 @@
 \subNsection{1}{Abgleich mit dem Lastenheft}{Kristian Popov}
 
 Der im Lastenheft festgelegte fachliche Umfang wurde umgesetzt und im Verlauf des
-Projekts erweitert. Zu den ursprünglich vorgesehenen Themen kamen die regulären
-Sprachen und die Kodierungsverfahren hinzu. Mit Programmieren~1 entstand außerdem
-ein zweiter Lernbereich, der im Lastenheft noch nicht vorgesehen war. Die Erweiterungen
-wurden mit dem Auftraggeber abgestimmt und in die bestehende Plattform integriert
-(siehe Abschnitt~\ref{5_4_DI}).
+Projekts erweitert.
+Zu den ursprünglich vorgesehenen Themen kamen die regulären Sprachen und die
+Kodierungsverfahren hinzu.
+Mit Programmieren~1 entstand außerdem ein zweiter Lernbereich, der im Lastenheft
+noch nicht vorgesehen war.
+Die Erweiterungen wurden mit dem Auftraggeber abgestimmt und in die bestehende
+Plattform integriert (siehe Abschnitt~\ref{5_4_DI}).
 
 Die didaktische Kernanforderung, nicht nur Ergebnisse, sondern auch Zwischenschritte
-sichtbar zu machen, wurde in allen Themenbereichen berücksichtigt. Simulationen können
-schrittweise ausgeführt, angehalten und zurückgesetzt werden. Die Übungen geben
-begründete Rückmeldungen, statt sich auf eine reine Ja-Nein-Aussage zu beschränken.
-Auch der Betrieb ohne Backend ist umgesetzt: Aufgabenstände werden im lokalen Speicher
-des Browsers abgelegt, während Aufgaben über Import und Export ausgetauscht werden können.
+sichtbar zu machen, wurde in allen Themen berücksichtigt.
+Simulationen können schrittweise ausgeführt, angehalten und zurückgesetzt werden.
+Die Übungen geben begründete Rückmeldungen, statt sich auf eine reine
+Ja-Nein-Aussage zu beschränken.
+Auch der Betrieb ohne Backend ist umgesetzt: Aufgabenstände werden im lokalen
+Speicher des Browsers abgelegt, während Aufgaben über Import und Export
+ausgetauscht werden können.
 
 Die Erweiterbarkeit der Plattform hat sich während der Entwicklung praktisch bewährt.
-Neue Themenbereiche wurden über den zentralen Modulkatalog registriert, ohne Navigation
-oder Routing der bestehenden Bereiche umbauen zu müssen. Das Unified UI-Konzept sorgt
-dabei dafür, dass Aufbau, Tabs und Rückmeldungen über die Themen hinweg wiedererkennbar
-bleiben. Eine systematische Usability-Erhebung, etwa durch Nutzertests mit Studierenden,
+Neue Themen wurden über den zentralen Modulkatalog registriert, ohne Navigation
+oder Routing der bestehenden Bereiche umbauen zu müssen.
+Das Unified UI-Konzept sorgt dabei dafür, dass Aufbau, Tabs und Rückmeldungen über
+die Themen hinweg wiedererkennbar bleiben.
+Eine systematische Usability-Erhebung, etwa durch Nutzertests mit Studierenden,
 fand jedoch nicht statt.
 
-Für das Qualitätsziel Performance liegt ein messbarer Nachweis vor. Die Pipeline prüft
-alle Modul- und Themenseiten sowie die zentralen Einstiegsseiten mit Lighthouse und
-schlägt fehl, sobald der Median des \gls{lcp} aus drei Durchläufen mehr als 1,25
-Sekunden beträgt (siehe Abschnitt~\ref{5_1_QS}). Die Themenseiten werden einzeln
-nachgeladen, sodass beim Aufruf nur der jeweils benötigte Teil der Anwendung übertragen
-wird. Die Messung erfolgte jedoch unter Desktop-Bedingungen; Werte für langsame mobile
+Für das Qualitätsziel Performance liegt ein messbarer Nachweis vor.
+Die \gls{ci}-Pipeline misst bei jedem Durchlauf alle Themenseiten beider
+Lernbereiche sowie die zentralen Einstiegsseiten mit Lighthouse und schlägt fehl,
+sobald der Median des \gls{lcp} aus drei Messungen je Seite mehr als 1,25 Sekunden
+beträgt.
+Seitenliste und Schwellenwert sind dazu versioniert in der Datei
+\texttt{lighthouserc.json} hinterlegt; zur Einbettung in die Pipeline siehe
+Abschnitt~\ref{5_1_QS}.
+Die Themenseiten werden einzeln nachgeladen, sodass beim Aufruf nur der jeweils
+benötigte Teil der Anwendung übertragen wird.
+Die Messung erfolgte jedoch unter Desktop-Bedingungen; Werte für langsame mobile
 Verbindungen wurden nicht erhoben.
 
 Die Zweisprachigkeit und die Anpassung des Erscheinungsbilds sind ebenfalls umgesetzt.
-Die Oberfläche steht vollständig auf Deutsch und Englisch zur Verfügung; das Farbschema
-kann der Systemeinstellung folgen oder manuell gewählt werden. Diese Funktionen
-verbessern die Zugänglichkeit, ersetzen aber keine vollständige
-Barrierefreiheitsprüfung. Tests mit Screenreadern oder gegen einschlägige Richtlinien
-sowie automatisierte Prüfungen in der Pipeline wurden bisher nicht durchgeführt. Die
-Nutzung auf kleinen Bildschirmen wurde ebenfalls nicht systematisch geprüft. Der
-Abgleich fällt daher insgesamt positiv aus, lässt aber bei der Usability-Bewertung, der
-Barrierefreiheit und der mobilen Nutzung noch offene Punkte erkennen.
+Die Oberfläche steht vollständig auf Deutsch und Englisch zur Verfügung; das
+Farbschema kann der Systemeinstellung folgen oder manuell gewählt werden.
+Diese Funktionen verbessern die Zugänglichkeit, ersetzen aber keine vollständige
+Barrierefreiheitsprüfung.
+Tests mit Screenreadern oder gegen einschlägige Richtlinien sowie automatisierte
+Prüfungen in der Pipeline wurden bisher nicht durchgeführt.
+Die Nutzung auf kleinen Bildschirmen wurde ebenfalls nicht systematisch geprüft.
+Der Abgleich fällt daher insgesamt positiv aus, lässt aber bei der
+Usability-Bewertung, der Barrierefreiheit und der mobilen Nutzung noch offene
+Punkte erkennen.

@@ -1,6 +1,6 @@
 \subNsection{1}{KI Reflexion}{Kristian Popov}
 
-Mein Schwerpunkt lag während des Projekts auf den Modulen
+Mein Schwerpunkt lag während des Projekts auf den Themen
 \emph{Endliche Automaten} und \emph{Reguläre Sprachen}.
 Ich habe dabei mehrere Modelle ausprobiert: Gemini 3.1 Pro,
 die kostenlose Version von ChatGPT sowie Claude Opus 4.8 und später Opus 5.
@@ -59,7 +59,7 @@ Architekturentscheidungen und verhinderte, dass ich Vorschläge der KI ungeprüf
 
 Möglich wurde diese Arbeitsweise durch mehrere Erweiterungen aus dem offiziellen
 Plugin-Verzeichnis \texttt{claude-\allowbreak plugins-\allowbreak official}.
-Für meine Module waren vor allem zwei davon relevant:
+Für meine Themen waren vor allem zwei davon relevant:
 
 \begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
 	\item[\texttt{typescript-lsp}]
@@ -93,7 +93,7 @@ Kontext dadurch besser erhalten.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Kristian Popov}
 
-Für beide Module musste jede Übung mehr enthalten als nur die eigentliche
+Für beide Themen musste jede Übung mehr enthalten als nur die eigentliche
 Aufgabenstellung.
 Zusätzlich wurden eine Referenzlösung, ein Startprogramm sowie Beispielwörter
 benötigt, mit denen die Lösung automatisch überprüft werden konnte.
@@ -109,8 +109,9 @@ der Inhalt.
 Ob die Aufgaben tatsächlich korrekt waren, habe ich aber nicht der KI überlassen,
 sondern im Simulator geprüft.
 Diese Prüfung läuft deterministisch ab: Geprüft werden alle Wörter über dem
-gemeinsamen Alphabet bis zur Länge vier, und für jedes dieser Wörter muss der
-Automat der Studierenden dieselbe Entscheidung treffen wie die Referenzlösung.
+gemeinsamen Alphabet bis zu einer je Aufgabe festgelegten Länge -- standardmäßig
+vier --, und für jedes dieser Wörter muss der Automat der Studierenden dieselbe
+Entscheidung treffen wie die Referenzlösung.
 Bewertet wird damit das tatsächliche Verhalten des Automaten und nicht die
 Einschätzung eines Sprachmodells.
 Aus demselben Grund habe ich jede generierte Aufgabe an der Simulation
@@ -134,17 +135,17 @@ Durchspielen konkreter Eingaben.
 Ein weiteres Problem lag in der Struktur des Codes.
 Da sich \emph{Endliche Automaten} und \emph{Reguläre Sprachen} stark ähneln,
 duplizierte die KI bestehende Implementierungen, statt sie zu abstrahieren.
-So entstanden Simulator- und Übersichtsseiten, die sich zwischen den Modulen
+So entstanden Simulator- und Übersichtsseiten, die sich zwischen den Themen
 kaum unterschieden, und Funktionen, die nie in der Oberfläche eingebunden wurden
 und später wieder entfernt werden mussten.
-Betraf eine Änderung beide Module zugleich, etwa die einheitliche Gruppierung
+Betraf eine Änderung beide Themen zugleich, etwa die einheitliche Gruppierung
 von Beispielen und Übungen nach Kategorien, reichte das Kontextfenster des
 Modells zudem nicht aus, um alle betroffenen Stellen zu erfassen.
 Solche Aufgaben musste ich in kleinere Schritte zerlegen.
 
 Insgesamt hat mir die KI vor allem bei wiederkehrenden Aufgaben und beim Ausbau
 bereits vorhandener Funktionen viel Zeit gespart.
-Gerade bei theoretischen Konzepten und bei Änderungen an mehreren Modulen
+Gerade bei theoretischen Konzepten und bei Änderungen an mehreren Themen
 gleichzeitig war die erste Lösung aber selten schon die richtige.
 Den Wechsel zwischen den Modellen könnte künftig ein Orchestrator wie Sakana Fugu
 übernehmen, der je nach Aufgabe automatisch das passende Modell
