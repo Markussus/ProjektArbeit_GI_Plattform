@@ -50,7 +50,7 @@ export interface JavaSimulatorHandle {
   resetStoredState: () => void;
 }
 
-export interface JavaSimulatorProps {
+interface JavaSimulatorProps {
   selectedExercise: Exercise | null;
   selectedItem?: TopicItem | null;
   isFocused: boolean;
@@ -346,7 +346,7 @@ const JavaSimulatorSession = forwardRef<
       <ExecutionControls
         phase={snapshot.phase}
         onRun={handleRun}
-        onStop={stop}
+        onStop={() => stop()}
         canRun={canRun}
         canStop={canStop}
         runLabel={

@@ -895,7 +895,7 @@
         },
         "input": {
           "title": "Console input",
-          "description": "Scanner and System.in work with the input box below the editor. Input is provided before the program starts; interactive prompts during execution are not supported."
+          "description": "The input box supports simple declarations using Scanner.nextLine() and Scanner.nextInt(). Values are substituted into the source before compilation; a real interactive System.in stream and BufferedReader are not supported."
         },
         "cli": {
           "title": "Terminal commands",
@@ -941,7 +941,7 @@
         },
         "stdin": {
           "title": "Console input is not interactive",
-          "description": "Console output through System.out and System.err is supported. Scanner/System.in uses the fixed simulator input box."
+          "description": "Scanner.nextLine() and Scanner.nextInt() use the fixed simulator input box. Other Scanner methods, BufferedReader, and input during execution are not supported."
         },
         "environment": {
           "title": "Browser sandbox restrictions apply",
@@ -988,7 +988,21 @@
     "stdin": {
       "label": "Program input",
       "placeholder": "Input for Scanner/System.in, e.g. hello java",
-      "help": "This input is provided as System.in before the program starts. Interactive prompts during execution are not supported."
+      "help": "This input is substituted before the program starts for simple Scanner.nextLine() and Scanner.nextInt() declarations. An interactive System.in stream is not available."
+    },
+    "console": {
+      "title": "Console",
+      "stdout": "Standard output",
+      "stdoutEmpty": "Program output appears here.",
+      "stderr": "Error output",
+      "stderrEmpty": "Runtime errors appear here.",
+      "issues": "Diagnostics",
+      "noIssues": "No diagnostics reported.",
+      "issueLocation": "Line {{line}}, column {{column}}"
+    },
+    "execution": {
+      "stoppedMessage": "Execution stopped by user.",
+      "timeoutMessage": "Execution stopped after {{seconds}} seconds."
     },
     "timeout": {
       "warningTitle": "Execution stopped by timeout",

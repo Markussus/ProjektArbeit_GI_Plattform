@@ -26,7 +26,7 @@ export function JavaConsolePanel({
     >
       <div className="border-border flex items-center gap-2 border-b px-4 py-3">
         <TerminalSquare className="text-muted-foreground size-4" />
-        <h3 className="text-sm font-semibold">Console</h3>
+        <h3 className="text-sm font-semibold">{t("java.console.title")}</h3>
       </div>
 
       <div className="space-y-4 p-4">
@@ -41,26 +41,26 @@ export function JavaConsolePanel({
         )}
 
         <ConsoleSection
-          title="stdout"
+          title={t("java.console.stdout")}
           content={stdout}
-          emptyText="Program output appears here."
+          emptyText={t("java.console.stdoutEmpty")}
           testId="java-console-stdout"
         />
         <ConsoleSection
-          title="stderr"
+          title={t("java.console.stderr")}
           content={stderr}
-          emptyText="Runtime errors appear here."
+          emptyText={t("java.console.stderrEmpty")}
           tone="error"
           testId="java-console-stderr"
         />
 
         <div data-testid="java-console-issues" className="space-y-2">
           <h4 className="text-xs font-semibold tracking-wide uppercase">
-            Issues
+            {t("java.console.issues")}
           </h4>
           {snapshot.issues.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              No diagnostics reported.
+              {t("java.console.noIssues")}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -85,7 +85,10 @@ export function JavaConsolePanel({
                   )}
                   {(issue.line || issue.column) && (
                     <p className="text-muted-foreground text-xs">
-                      Line {issue.line ?? "?"}, Column {issue.column ?? "?"}
+                      {t("java.console.issueLocation", {
+                        line: issue.line ?? "?",
+                        column: issue.column ?? "?",
+                      })}
                     </p>
                   )}
                 </li>

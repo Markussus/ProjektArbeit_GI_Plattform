@@ -218,6 +218,15 @@ describe("JavaSimulator", () => {
       );
       expect(resetSpy).toHaveBeenCalledTimes(1);
     });
+
+    it("stops execution without forwarding the React click event", () => {
+      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+
+      fireEvent.click(screen.getByTestId("mock-java-stop-code"));
+
+      expect(stopSpy).toHaveBeenCalledOnce();
+      expect(stopSpy).toHaveBeenCalledWith();
+    });
   });
 
   describe("when the simulator initializes", () => {
