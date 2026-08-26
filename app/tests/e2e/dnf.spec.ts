@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { exportActiveSimulator, importFromHeader } from "./support/app-shell";
 
 const DNF_ROUTE = "/fundamentals-cs/dnf";
 const FIRST_DNF_EXERCISE_ID = "dnf.exercises.worksheet02bTruthTable1.title";
@@ -257,21 +258,13 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-evaluate-expression").click();
     await page.getByTestId("dnf-result-button-0-1").click();
     await page.getByTestId("dnf-exercise-answer").fill("a");
-    await page.getByTestId("dnf-expression-transfer-export").click();
-
-    const transferValue = await page
-      .getByTestId("dnf-expression-transfer-input")
-      .inputValue();
+    const transferValue = await exportActiveSimulator(page);
 
     expect(transferValue).toMatch(/^[A-Za-z0-9_-]{3}D[A-Za-z0-9_-]+$/u);
 
-    const transferInput = page.getByTestId("dnf-expression-transfer-input");
-
     await page.getByTestId("dnf-result-button-0-0").click();
     await page.getByTestId("dnf-exercise-answer").fill("b");
-    await transferInput.fill("");
-    await transferInput.fill(transferValue);
-    await page.getByTestId("dnf-expression-transfer-import").click();
+    await importFromHeader(page, transferValue);
 
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await expect(page.getByTestId("dnf-result-button-0-1")).toHaveAttribute(
@@ -291,8 +284,16 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-fill-table").click();
     await page.getByRole("button", { name: "Commit table" }).click();
     await page.getByTestId("dnf-exercise-answer").fill("a");
-    await page.getByTestId("dnf-table-transfer-export").click();
-    await page.reload();
+    await switchTab(page, "overview");
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            window.localStorage.getItem("TrainingCenterStorage"),
+          ),
+        { timeout: 12_000 },
+      )
+      .not.toBeNull();
     await switchTab(page, "simulation");
 
     await expect(page.getByTestId("dnf-simulator")).toHaveAttribute(
@@ -327,17 +328,14 @@ test.describe("DNF page", () => {
     ).toBeNull();
   });
 
-  test("rejects an exercise transfer string in a different DNF exercise", async ({
+  test("routes a global exercise import back to its matching DNF exercise", async ({
     page,
   }) => {
     await gotoDnfPage(page);
     await openFirstDnfExercise(page);
 
     await page.getByTestId("dnf-exercise-answer").fill("a");
-    await page.getByTestId("dnf-exercise-transfer-export").click();
-    const firstExerciseTransfer = await page
-      .getByTestId("dnf-exercise-transfer-input")
-      .inputValue();
+    const firstExerciseTransfer = await exportActiveSimulator(page);
 
     await switchTab(page, "exercises");
     await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
@@ -348,14 +346,9 @@ test.describe("DNF page", () => {
       .getByTestId(`dnf-exercise-card-${SIMPLE_EXPRESSION_EXERCISE_ID}-open`)
       .click();
 
-    await page
-      .getByTestId("dnf-exercise-transfer-input")
-      .fill(firstExerciseTransfer);
-    await page.getByTestId("dnf-exercise-transfer-import").click();
+    await importFromHeader(page, firstExerciseTransfer);
 
-    await expect(page.getByTestId("dnf-exercise-transfer-status")).toHaveText(
-      /could not be loaded/i,
-    );
+    await expect(page.getByTestId("dnf-exercise-answer")).toHaveValue("a");
   });
 
   test("restores a saved DNF exercise attempt", async ({ page }) => {
@@ -363,7 +356,15 @@ test.describe("DNF page", () => {
     await openFirstDnfExercise(page);
 
     await page.getByTestId("dnf-exercise-answer").fill("a");
-    await page.getByTestId("dnf-exercise-transfer-export").click();
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            window.localStorage.getItem("TrainingCenterStorage"),
+          ),
+        { timeout: 12_000 },
+      )
+      .not.toBeNull();
     await page.reload();
     await openFirstDnfExercise(page);
 
@@ -428,7 +429,15 @@ test.describe("DNF page", () => {
 
     await page.getByTestId("dnf-follow-up-simplification-toggle").click();
     await page.getByTestId("dnf-simplified-answer").fill("a");
-    await page.getByTestId("dnf-exercise-transfer-export").click();
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            window.localStorage.getItem("TrainingCenterStorage"),
+          ),
+        { timeout: 12_000 },
+      )
+      .not.toBeNull();
     await page.reload();
     await openFirstDnfExercise(page);
 

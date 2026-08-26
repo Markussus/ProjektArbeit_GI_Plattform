@@ -1,6 +1,10 @@
 import { deflateRawSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
-import { appTestIds } from "../../support/app-shell";
+import {
+  appTestIds,
+  exportActiveSimulator,
+  importFromHeader,
+} from "../../support/app-shell";
 
 function encodeRawJavaTransfer(sourceCode: string) {
   return `C${deflateRawSync(Buffer.from(sourceCode, "utf8")).toString("base64url")}`;
@@ -103,9 +107,18 @@ test.describe("Java page", () => {
     await expect(
       page.getByTestId(appTestIds.javaEditorContainer),
     ).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferExport)).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferImport)).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferInput),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferExport),
+    ).toBeEnabled();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferImport),
+    ).toBeDisabled();
+    await expect(page.locator('[data-testid^="java-transfer-"]')).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId(appTestIds.javaRunButton)).toBeVisible();
     await expect(page.getByTestId(appTestIds.javaStopButton)).toBeVisible();
     await expect(page.getByTestId(appTestIds.javaConsolePanel)).toBeVisible();
@@ -140,6 +153,7 @@ test.describe("Java page", () => {
   test("supports transfer import/export and executing both valid and invalid Java code", async ({
     page,
   }) => {
+    test.setTimeout(180_000);
     await page.getByTestId(appTestIds.tabSimulation).click();
     await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
       /ready|loading/,
@@ -150,8 +164,7 @@ test.describe("Java page", () => {
     );
 
     await test.step("Export should generate a Java transfer string", async () => {
-      await page.getByTestId(appTestIds.javaTransferExport).click();
-      await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+      await expect(exportActiveSimulator(page)).resolves.toMatch(
         /^AH_[ABC][A-Za-z0-9_-]*$/,
       );
     });
@@ -164,13 +177,7 @@ test.describe("Java page", () => {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(runnableCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
-      await expect(
-        page.getByTestId(appTestIds.javaTransferStatus),
-      ).toBeVisible();
+      await importFromHeader(page, encodeJavaTransfer(runnableCode));
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -179,18 +186,10 @@ test.describe("Java page", () => {
     });
 
     await test.step("An exported program can be imported again without changing its behavior", async () => {
-      await page.getByTestId(appTestIds.javaTransferExport).click();
-      await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-        /^AH_[ABC][A-Za-z0-9_-]*$/,
-      );
-      const exportedProgram = await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .inputValue();
+      const exportedProgram = await exportActiveSimulator(page);
+      expect(exportedProgram).toMatch(/^AH_[ABC][A-Za-z0-9_-]*$/);
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(`${exportedProgram} `);
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, `${exportedProgram} `);
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -210,10 +209,7 @@ public class Main {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(scannerCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, encodeJavaTransfer(scannerCode));
       await page.getByTestId(appTestIds.javaStdinInput).fill("e2e input\n");
       await page.getByTestId(appTestIds.javaRunButton).click();
 
@@ -234,10 +230,7 @@ public class Main {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(scannerCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, encodeJavaTransfer(scannerCode));
       await page.getByTestId(appTestIds.javaStdinInput).fill("21\n");
       await page.getByTestId(appTestIds.javaRunButton).click();
 
@@ -249,13 +242,7 @@ public class Main {
     await test.step("Importing invalid Java should surface a diagnostic after running", async () => {
       const invalidCode = "this is not valid java {{{";
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(invalidCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
-      await expect(
-        page.getByTestId(appTestIds.javaTransferStatus),
-      ).toBeVisible();
+      await importFromHeader(page, encodeJavaTransfer(invalidCode));
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -277,10 +264,7 @@ public class Main {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(runtimeErrorCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, encodeJavaTransfer(runtimeErrorCode));
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -295,6 +279,7 @@ public class Main {
   test("supports stop, timeout, and reset without leaving the Java page", async ({
     page,
   }) => {
+    test.setTimeout(180_000);
     const endlessLoop = `public class Main {
   public static void main(String[] args) {
     while (true) {}
@@ -307,10 +292,7 @@ public class Main {
       /ready|bereit/i,
       { timeout: 120000 },
     );
-    await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .fill(encodeJavaTransfer(endlessLoop));
-    await page.getByTestId(appTestIds.javaTransferImport).click();
+    await importFromHeader(page, encodeJavaTransfer(endlessLoop));
 
     await test.step("Timeout terminates an endless program", async () => {
       await page.getByTestId(appTestIds.javaTimeoutInput).fill("1");
@@ -371,10 +353,7 @@ public class Main {
       /ready|bereit/i,
       { timeout: 120000 },
     );
-    await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .fill(encodeJavaTransfer(persistedCode));
-    await page.getByTestId(appTestIds.javaTransferImport).click();
+    await importFromHeader(page, encodeJavaTransfer(persistedCode));
     await page.getByTestId(appTestIds.javaRunButton).click();
     await expect(page.getByTestId(appTestIds.javaConsoleStdout)).toContainText(
       "restored from storage",
@@ -398,36 +377,24 @@ public class Main {
     page,
   }) => {
     await page.getByTestId(appTestIds.tabSimulation).click();
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-      /^AH_[ABC][A-Za-z0-9_-]*$/,
-    );
-    const storedFreeSimulation = await page.evaluate(() =>
-      window.localStorage.getItem("TrainingCenterStorage"),
-    );
-
     await page.getByTestId(appTestIds.tabExamples).click();
     await page
       .getByTestId("java-example-card-java.example1Title-select")
       .click();
     await page.getByTestId("java-example-card-java.example1Title-open").click();
-
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-      /^[ABC][A-Za-z0-9_-]*$/,
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
     );
-    const builtInExampleTransfer = await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .inputValue();
 
-    await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .fill(
-        encodeRawJavaTransfer(
-          "public class Main { public static void main(String[] args) {} }",
-        ),
-      );
-    await page.getByTestId(appTestIds.javaTransferImport).click();
+    const builtInExampleTransfer = await exportActiveSimulator(page);
+    expect(builtInExampleTransfer).toMatch(/^AH[A-Za-z0-9_-]+$/);
+
+    await page.locator(".monaco-editor .view-lines").click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type(
+      "public class Main { public static void main(String[] args) {} }",
+    );
+    expect(await exportActiveSimulator(page)).not.toBe(builtInExampleTransfer);
 
     await page.getByTestId(appTestIds.tabOverview).click();
     await page.getByTestId(appTestIds.tabExamples).click();
@@ -435,9 +402,7 @@ public class Main {
       .getByTestId("java-example-card-java.example1Title-select")
       .click();
     await page.getByTestId("java-example-card-java.example1Title-open").click();
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+    await expect(exportActiveSimulator(page)).resolves.toBe(
       builtInExampleTransfer,
     );
     expect(

@@ -93,15 +93,6 @@ vi.mock("@/components/shared/ConfirmDialog/ConfirmDialog", () => ({
     ) : null,
 }));
 
-vi.mock(
-  "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox",
-  () => ({
-    SimulatorStringTransferBox: () => (
-      <div data-testid="mock-transfer-box"></div>
-    ),
-  }),
-);
-
 function createGeneratedExercise(
   mode: "base64" | "utf8",
   converterMode: "encode" | "decode",

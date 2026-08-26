@@ -125,7 +125,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.regularLanguages"
       >
-        <RLSimulator onExitExercise={props.onExitExercise} />
+        <RLSimulator
+          onExitExercise={props.onExitExercise}
+          importedTaskStorageId={props.importedTaskStorageId}
+        />
       </TopicSimulationTab>
 
       <SolutionCheckDialog

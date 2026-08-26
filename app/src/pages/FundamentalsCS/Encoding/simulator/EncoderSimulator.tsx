@@ -13,7 +13,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import type { GeneratedExercise } from "../utils/exerciseGenerator";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   createTrainingCenterIdentifier,
@@ -110,10 +110,21 @@ export const EncoderSimulator = forwardRef<
           ENCODING_SIMULATOR_TASK_STORAGE_ID,
           encTransferCodec,
         );
-        const stored = await loadTrainingCenterValue(
-          ENCODING_SIMULATOR_TASK_STORAGE_ID,
-          tcCodec,
-        );
+        let stored: EncoderState | null;
+        try {
+          stored = await loadTrainingCenterValue(
+            ENCODING_SIMULATOR_TASK_STORAGE_ID,
+            encTransferCodec,
+          );
+        } catch {
+          // Older builds accidentally stored one additional identifier layer.
+          // Keep those existing LocalStorage entries readable while all new
+          // saves use the regular single-layer Training Center format.
+          stored = await loadTrainingCenterValue(
+            ENCODING_SIMULATOR_TASK_STORAGE_ID,
+            tcCodec,
+          );
+        }
 
         if (active && stored) {
           setSimulatorState(stored);
@@ -142,17 +153,16 @@ export const EncoderSimulator = forwardRef<
     };
   }, [selectedExercise]);
 
-  const tcCodec = useMemo(() => {
-    return createTrainingCenterTransferCodec(
-      ENCODING_SIMULATOR_TASK_STORAGE_ID,
-      encTransferCodec,
-    );
-  }, []);
+  useActiveSimulatorTransfer({
+    identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
+    value: simulatorState,
+    codec: encTransferCodec,
+  });
 
   useTrainingCenterAutoSave({
     identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
     value: simulatorState,
-    codec: tcCodec,
+    codec: encTransferCodec,
     enabled: isStorageReady && !isExerciseMode,
     intervalMs: 500,
   });
@@ -257,27 +267,6 @@ export const EncoderSimulator = forwardRef<
       data-testid="encoding-simulator"
       className="flex h-full flex-col space-y-6"
     >
-      {isStorageReady && !isExerciseMode && (
-        <SimulatorStringTransferBox
-          testIdPrefix="encoding-transfer"
-          value={simulatorState}
-          codec={tcCodec}
-          onLoad={(newState) => {
-            setSimulatorState(newState);
-            setLoadVersion((v) => v + 1);
-            setActiveMode(newState.activeMode);
-
-            if (newState.activeMode === "base64" && newState.base64) {
-              setInitialValue(newState.base64.inputValue);
-              setInitialConverterMode(newState.base64.converterMode);
-            } else if (newState.activeMode === "utf8" && newState.utf8) {
-              setInitialValue(newState.utf8.inputValue);
-              setInitialConverterMode(newState.utf8.converterMode);
-            }
-          }}
-          className="shrink-0"
-        />
-      )}
       <div className="border-border flex gap-1 border-b">
         {(["base64", "utf8"] as EncoderMode[]).map((mode) => (
           <button

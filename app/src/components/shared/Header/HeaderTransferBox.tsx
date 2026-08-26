@@ -4,14 +4,19 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { resolveTrainingCenterImportTarget } from "@/lib/trainingCenter/trainingCenterImportNavigation";
+import { useActiveSimulatorTransferStore } from "@/hooks/useActiveSimulatorTransfer";
 
-type Feedback = "error" | "exportLater" | null;
+type Feedback = "importError" | "exportError" | "copied" | null;
 
 export function HeaderTransferBox() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const activeTransfer = useActiveSimulatorTransferStore(
+    (state) => state.activeTransfer,
+  );
 
   useEffect(() => {
     if (!feedback) {
@@ -25,12 +30,16 @@ export function HeaderTransferBox() {
   const trimmedValue = value.trim();
   const canImport = trimmedValue.length > 0;
   const feedbackText = useMemo(() => {
-    if (feedback === "error") {
+    if (feedback === "importError") {
       return t("simulation.transfer.importError");
     }
 
-    if (feedback === "exportLater") {
-      return t("simulation.transfer.export");
+    if (feedback === "exportError") {
+      return t("simulation.transfer.exportError");
+    }
+
+    if (feedback === "copied") {
+      return t("simulation.transfer.copied");
     }
 
     return "";
@@ -49,7 +58,25 @@ export function HeaderTransferBox() {
         },
       });
     } catch {
-      setFeedback("error");
+      setFeedback("importError");
+    }
+  };
+
+  const handleExport = async () => {
+    if (!activeTransfer || isExporting) {
+      return;
+    }
+
+    setIsExporting(true);
+    setFeedback(null);
+    try {
+      const exportedValue = await activeTransfer.exportValue();
+      await navigator.clipboard.writeText(exportedValue);
+      setFeedback("copied");
+    } catch {
+      setFeedback("exportError");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -74,7 +101,7 @@ export function HeaderTransferBox() {
         placeholder={t("simulation.transfer.placeholder")}
         className={cn(
           "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 min-w-4 flex-1 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 sm:h-9 sm:min-w-16 md:min-w-24",
-          feedback === "error" && "border-destructive",
+          feedback === "importError" && "border-destructive",
         )}
         spellCheck={false}
         autoComplete="off"
@@ -83,11 +110,12 @@ export function HeaderTransferBox() {
       <button
         type="button"
         data-testid="header-transfer-export"
-        onClick={() => setFeedback("exportLater")}
-        disabled
+        onClick={() => void handleExport()}
+        disabled={!activeTransfer || isExporting}
+        aria-busy={isExporting}
         aria-label={t("simulation.transfer.export")}
         title={t("simulation.transfer.export")}
-        className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium opacity-50 disabled:cursor-not-allowed sm:size-9 lg:w-auto lg:px-2.5"
+        className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Download className="size-3.5" />
         <span className="hidden lg:inline">
@@ -115,7 +143,9 @@ export function HeaderTransferBox() {
           data-testid="header-transfer-status"
           className={cn(
             "bg-background absolute top-full right-0 mt-1 rounded px-2 py-1 text-xs shadow-sm",
-            feedback === "error" ? "text-destructive" : "text-muted-foreground",
+            feedback === "importError" || feedback === "exportError"
+              ? "text-destructive"
+              : "text-muted-foreground",
           )}
         >
           {feedbackText}

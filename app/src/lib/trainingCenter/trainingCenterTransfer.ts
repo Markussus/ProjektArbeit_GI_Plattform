@@ -11,11 +11,23 @@ export async function exportAndStoreTrainingCenterValue<TValue>(
   value: TValue,
   codec: ISimulatorTransferCodec<TValue>,
 ): Promise<string> {
-  readTrainingCenterIdentifier(identifier);
-  const payload = await codec.exportValue(value);
-  const storageValue = createTrainingCenterStorageValue(identifier, payload);
+  const storageValue = await exportTrainingCenterValue(
+    identifier,
+    value,
+    codec,
+  );
   trainingCenterStorage.store(storageValue);
   return storageValue;
+}
+
+export async function exportTrainingCenterValue<TValue>(
+  identifier: string,
+  value: TValue,
+  codec: ISimulatorTransferCodec<TValue>,
+): Promise<string> {
+  readTrainingCenterIdentifier(identifier);
+  const payload = await codec.exportValue(value);
+  return createTrainingCenterStorageValue(identifier, payload);
 }
 
 export async function loadTrainingCenterValue<TValue>(

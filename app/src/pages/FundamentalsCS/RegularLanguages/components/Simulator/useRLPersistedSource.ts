@@ -3,7 +3,6 @@ import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
 } from "@/lib/trainingCenter";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
@@ -40,7 +39,8 @@ interface UseRLPersistedSourceOptions {
  * Persists a single RL simulator source to local storage using the same
  * Training Center mechanism as the Turing Machine module: restore on mount,
  * autosave while editing, and wrap the codec so the export/import box writes
- * through to storage. Returns the storage-aware transfer codec.
+ * through to storage. Returns the identifier used by the active global
+ * simulator transfer registration.
  */
 export function useRLPersistedSource({
   taskStorageId,
@@ -48,7 +48,7 @@ export function useRLPersistedSource({
   source,
   setSource,
   hasSeed,
-}: UseRLPersistedSourceOptions): ISimulatorTransferCodec<string> {
+}: UseRLPersistedSourceOptions): string {
   const identifier = useMemo(
     () =>
       createTrainingCenterIdentifier(
@@ -57,11 +57,6 @@ export function useRLPersistedSource({
       ),
     [taskStorageId],
   );
-  const storageCodec = useMemo(
-    () => createTrainingCenterTransferCodec(identifier, codec),
-    [identifier, codec],
-  );
-
   // A seed (from an example/exercise) takes priority over a saved source, so
   // storage is considered ready immediately in that case.
   const [isStorageReady, setIsStorageReady] = useState(hasSeed);
@@ -104,5 +99,5 @@ export function useRLPersistedSource({
     enabled: isStorageReady,
   });
 
-  return storageCodec;
+  return identifier;
 }

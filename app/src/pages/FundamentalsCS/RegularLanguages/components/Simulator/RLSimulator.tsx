@@ -10,13 +10,18 @@ import { RLGrammarEnumerationExercise } from "./presentation/RLGrammarEnumeratio
 import { RLLanguageGrammarExercise } from "./presentation/RLLanguageGrammarExercise";
 import { RLLanguageToGrammar } from "./presentation/RLLanguageToGrammar";
 import { RLWordRecognizer } from "./presentation/RLWordRecognizer";
+import { RL_STORAGE_TASK_IDS } from "./useRLPersistedSource";
 
 interface RLSimulatorProps {
   /** Clears the active exercise (set by ModuleTopicPage when one is open). */
   onExitExercise?: () => void;
+  importedTaskStorageId?: number;
 }
 
-export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
+export function RLSimulator({
+  onExitExercise,
+  importedTaskStorageId,
+}: RLSimulatorProps) {
   const { t } = useTranslation();
   const mode = useRLSimulatorStore((s) => s.mode);
   const setMode = useRLSimulatorStore((s) => s.setMode);
@@ -30,6 +35,16 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
   );
   const pendingTestWord = useRLSimulatorStore((s) => s.pendingTestWord);
   const consumePending = useRLSimulatorStore((s) => s.consumePending);
+
+  useEffect(() => {
+    const importedMode = Object.entries(RL_STORAGE_TASK_IDS).find(
+      ([, taskStorageId]) => taskStorageId === importedTaskStorageId,
+    )?.[0] as SimulationMode | undefined;
+
+    if (importedMode) {
+      setMode(importedMode);
+    }
+  }, [importedTaskStorageId, setMode]);
 
   // An active exercise replaces the free converter with a guided workspace:
   // Grammar → Language gives the grammar and asks for the language; Language →
@@ -99,6 +114,7 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
           <RLGrammarEnumerationExercise exercise={activeExercise} />
         ) : (
           <RLGrammarToLanguage
+            transferActive={mode === "grammarToLanguage"}
             initialGrammar={
               mode === "grammarToLanguage"
                 ? (pendingGrammarSource ?? undefined)
@@ -112,6 +128,7 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
           <RLLanguageGrammarExercise exercise={activeExercise} />
         ) : (
           <RLLanguageToGrammar
+            transferActive={mode === "languageToGrammar"}
             initialSource={
               mode === "languageToGrammar"
                 ? (pendingLanguageSource ?? undefined)
@@ -122,6 +139,7 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
       </div>
       <div hidden={mode !== "recognizeWord"}>
         <RLWordRecognizer
+          transferActive={mode === "recognizeWord"}
           initialGrammar={
             mode === "recognizeWord"
               ? (pendingGrammarSource ?? undefined)

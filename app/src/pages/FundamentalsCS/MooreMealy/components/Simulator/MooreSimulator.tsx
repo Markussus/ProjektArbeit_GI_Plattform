@@ -8,8 +8,8 @@ import {
 } from "react";
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   buildMooreConversion,
@@ -18,7 +18,6 @@ import {
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -57,13 +56,19 @@ interface MooreSimulatorProps {
   scenario: MooreExerciseScenario | null;
   initialProgram?: MooreProgram;
   isExample?: boolean;
+  transferActive?: boolean;
 }
 
 export const MooreSimulator = forwardRef<
   MooreSimulatorHandle,
   MooreSimulatorProps
 >(function MooreSimulator(
-  { scenario, initialProgram = emptyMooreProgram, isExample = false },
+  {
+    scenario,
+    initialProgram = emptyMooreProgram,
+    isExample = false,
+    transferActive = true,
+  },
   ref,
 ) {
   const { t } = useTranslation();
@@ -98,16 +103,12 @@ export const MooreSimulator = forwardRef<
       ),
     [scenario?.storageId],
   );
-  const transferCodec = useMemo(
-    () =>
-      isStorageEnabled
-        ? createTrainingCenterTransferCodec(
-            storageIdentifier,
-            mooreProgramTransferCodec,
-          )
-        : mooreProgramTransferCodec,
-    [isStorageEnabled, storageIdentifier],
-  );
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: program,
+    codec: mooreProgramTransferCodec,
+    enabled: transferActive,
+  });
 
   const loadProgram = useCallback(
     (nextProgram: MooreProgram) => {
@@ -467,13 +468,6 @@ export const MooreSimulator = forwardRef<
             onOutputSymbolChange={handleOutputSymbolChange}
             onOutputSymbolCreate={handleOutputSymbolCreate}
             onOutputCodeChange={handleOutputCodeChange}
-          />
-
-          <SimulatorStringTransferBox
-            value={program}
-            codec={transferCodec}
-            onLoad={loadProgram}
-            testIdPrefix="moore-transfer"
           />
 
           <MooreViewActions

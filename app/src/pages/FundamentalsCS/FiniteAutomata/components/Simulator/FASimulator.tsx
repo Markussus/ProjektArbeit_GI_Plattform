@@ -8,13 +8,12 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
 } from "@/lib/trainingCenter";
@@ -62,14 +61,6 @@ export function FASimulator() {
       ),
     [],
   );
-  const storageTransferCodec = useMemo(
-    () =>
-      createTrainingCenterTransferCodec(
-        storageIdentifier,
-        faProgramTransferCodec,
-      ),
-    [storageIdentifier],
-  );
 
   // Consume pending example from the store (loaded via ExamplesTab or by the
   // exercise panel revealing a solution).
@@ -91,6 +82,11 @@ export function FASimulator() {
   // simulating it is the committed program.
   const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
   const exposedStudentProgram = isEditMode ? editor.draft : program;
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: exposedStudentProgram,
+    codec: faProgramTransferCodec,
+  });
   useEffect(() => {
     setStudentProgram(exposedStudentProgram);
     return () => setStudentProgram(null);
@@ -284,13 +280,6 @@ export function FASimulator() {
                   )}
                 </p>
               </div>
-
-              <SimulatorStringTransferBox
-                value={editor.draft}
-                codec={storageTransferCodec}
-                onLoad={handleImportProgram}
-                testIdPrefix="fa-transfer"
-              />
 
               <button
                 onClick={handleApplyProgram}

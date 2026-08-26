@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import type { TranslationKey } from "@/types/i18n";
 import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
@@ -16,6 +16,7 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 interface RLWordRecognizerProps {
   initialGrammar?: string;
   initialWord?: string;
+  transferActive?: boolean;
 }
 
 const DEFAULT_SOURCE = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
@@ -31,6 +32,7 @@ interface PerWordResult {
 export function RLWordRecognizer({
   initialGrammar,
   initialWord,
+  transferActive = true,
 }: RLWordRecognizerProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
@@ -49,12 +51,18 @@ export function RLWordRecognizer({
     setWord(initialWord);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.recognizeWord,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlGrammarTransferCodec,
+    enabled: transferActive,
   });
 
   const evaluation = useMemo<
@@ -150,14 +158,6 @@ export function RLWordRecognizer({
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }
