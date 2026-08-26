@@ -33,6 +33,7 @@ import type { MooreExerciseScenario } from "../../exercises";
 import {
   createNextInputSymbol,
   createNextStateName,
+  getNextMooreOutputCode,
   normalizeMooreProgram,
   renameMooreInputSymbol,
   renameMooreState,
@@ -262,13 +263,7 @@ export const MooreSimulator = forwardRef<
           ...current.outputs,
           [stateName]: {
             symbol: `OUT_${current.states.length}`,
-            code:
-              Math.max(
-                -1,
-                ...current.states.map(
-                  (state) => current.outputs[state]?.code ?? -1,
-                ),
-              ) + 1,
+            code: getNextMooreOutputCode(current),
           },
         },
       };
@@ -378,6 +373,22 @@ export const MooreSimulator = forwardRef<
     });
   };
 
+  const handleOutputSymbolCreate = (state: string, symbol: string) => {
+    setProgram((current) => {
+      const code = getNextMooreOutputCode(current);
+      return {
+        ...current,
+        outputs: {
+          ...current.outputs,
+          [state]: {
+            symbol: symbol.trim() || `OUT_${code}`,
+            code,
+          },
+        },
+      };
+    });
+  };
+
   const startSimulation = () => {
     const normalized = normalizeMooreProgram(program);
     if (validateMooreProgram(normalized).length > 0) {
@@ -454,6 +465,7 @@ export const MooreSimulator = forwardRef<
             onAddInputSymbol={handleAddInputSymbol}
             onRemoveInputSymbol={handleRemoveInputSymbol}
             onOutputSymbolChange={handleOutputSymbolChange}
+            onOutputSymbolCreate={handleOutputSymbolCreate}
             onOutputCodeChange={handleOutputCodeChange}
           />
 

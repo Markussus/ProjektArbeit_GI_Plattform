@@ -9,6 +9,7 @@ import {
   parseInternalNumber,
 } from "../domain/mooreProgram";
 import type { MooreOutput, MooreProgram } from "../domain/mooreTypes";
+import { MooreOutputTable } from "./MooreOutputTable";
 
 type TransitionProgram = Pick<
   MooreProgram,
@@ -38,6 +39,13 @@ interface MooreTransitionTableProps {
     onCodeChange: (inputSymbol: string, state: string, code: number) => void;
     testIdPrefix: string;
   };
+  mooreOutputControls?: {
+    outputs: Record<string, MooreOutput>;
+    outputAlphabet: MooreOutput[];
+    onSymbolChange: (state: string, symbol: string) => void;
+    onSymbolCreate: (state: string, symbol: string) => void;
+    onCodeChange: (state: string, code: number) => void;
+  };
 }
 
 export function MooreTransitionTable({
@@ -50,6 +58,7 @@ export function MooreTransitionTable({
   onAddInputSymbol,
   onRemoveInputSymbol,
   outputControls,
+  mooreOutputControls,
 }: MooreTransitionTableProps) {
   const { t } = useTranslation();
   const { setElementRef, onMouseDown, isDragging, scrollToEnd } =
@@ -112,7 +121,7 @@ export function MooreTransitionTable({
           <thead>
             <tr className="bg-muted/50 border-b">
               <th className="border-r p-3 text-left font-semibold">
-                {t("moore.sim.event")}
+                {!mooreOutputControls && t("moore.sim.event")}
               </th>
               {program.states.map((state, stateIndex) => (
                 <th
@@ -176,6 +185,15 @@ export function MooreTransitionTable({
             </tr>
           </thead>
           <tbody>
+            {mooreOutputControls && (
+              <MooreOutputTable
+                program={{ ...program, outputs: mooreOutputControls.outputs }}
+                outputAlphabet={mooreOutputControls.outputAlphabet}
+                onOutputSymbolChange={mooreOutputControls.onSymbolChange}
+                onOutputSymbolCreate={mooreOutputControls.onSymbolCreate}
+                onOutputCodeChange={mooreOutputControls.onCodeChange}
+              />
+            )}
             {program.inputSymbols.map((inputSymbol, inputIndex) => (
               <tr key={inputSymbol} className="group border-b last:border-b-0">
                 <td className="min-w-[10rem] border-r p-2">
@@ -255,8 +273,12 @@ export function MooreTransitionTable({
                             );
                           }}
                           ariaLabel={`Transition ${state}, ${inputSymbol}`}
-                          createLabel={t("moore.sim.createState")}
+                          createLabel={(value) =>
+                            t("moore.sim.createNamedState", { value })
+                          }
+                          emptyCreateLabel={t("moore.sim.createState")}
                           notFoundLabel={t("moore.sim.stateNotFound")}
+                          searchPlaceholder={t("moore.sim.search")}
                           testId={`moore-transition-${inputIndex}-${stateIndex}`}
                           className="w-full min-w-0"
                           style={{ width: dropdownWidth }}

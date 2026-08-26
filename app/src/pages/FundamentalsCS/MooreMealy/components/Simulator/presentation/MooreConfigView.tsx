@@ -26,6 +26,7 @@ export interface MooreConfigViewProps {
   onAddInputSymbol: () => void;
   onRemoveInputSymbol: (symbol: string) => void;
   onOutputSymbolChange: (state: string, symbol: string) => void;
+  onOutputSymbolCreate: (state: string, symbol: string) => void;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -41,6 +42,7 @@ export function MooreConfigView({
   onAddInputSymbol,
   onRemoveInputSymbol,
   onOutputSymbolChange,
+  onOutputSymbolCreate,
   onOutputCodeChange,
 }: MooreConfigViewProps) {
   const { t } = useTranslation();
@@ -155,13 +157,12 @@ export function MooreConfigView({
           onRemoveState={onRemoveState}
           onAddInputSymbol={onAddInputSymbol}
           onRemoveInputSymbol={onRemoveInputSymbol}
-          outputControls={{
-            getOutput: (_inputSymbol, state) => program.outputs[state],
-            onSymbolChange: (_inputSymbol, state, symbol) =>
-              onOutputSymbolChange(state, symbol),
-            onCodeChange: (_inputSymbol, state, code) =>
-              onOutputCodeChange(state, code),
-            testIdPrefix: "moore-transition-output",
+          mooreOutputControls={{
+            outputs: program.outputs,
+            outputAlphabet,
+            onSymbolChange: onOutputSymbolChange,
+            onSymbolCreate: onOutputSymbolCreate,
+            onCodeChange: onOutputCodeChange,
           }}
         />
         <div className="space-y-4">

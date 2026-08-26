@@ -29,6 +29,63 @@ async function openMooreSimulator(page: Page) {
 }
 
 test.describe("Moore and Mealy simulation tab", () => {
+  test("edits Moore outputs in one state-based row and creates output symbols", async ({
+    page,
+  }) => {
+    await openMooreSimulator(page);
+
+    const table = page.getByTestId("moore-transition-table");
+    await expect(table.locator("thead th").first()).toHaveText("");
+    await expect(page.getByTestId("moore-output-row")).toContainText(
+      "Output λ",
+    );
+    await expect(
+      page.locator('[data-testid^="moore-transition-output-"]'),
+    ).toHaveCount(0);
+
+    const output = page.getByTestId("moore-output-symbol-0");
+    await output.click();
+    await expect(
+      page.getByTestId("moore-output-symbol-0-create"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("moore-output-symbol-0-create"),
+    ).toBeEnabled();
+    await page.getByTestId("moore-output-symbol-0-search").fill("TEST");
+    await page.keyboard.press("Enter");
+
+    await expect(output).toHaveAttribute("data-value", "TEST");
+    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("7");
+    await expect(page.getByTestId("moore-output-alphabet")).toContainText(
+      "TEST7",
+    );
+
+    await page.getByTestId("moore-representation-select").click();
+    await page.getByTestId("moore-representation-option-binary").click();
+    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("111");
+  });
+
+  test("keeps Mealy outputs attached to transition cells", async ({ page }) => {
+    await openMooreSimulator(page);
+    await page.getByTestId("moore-machine-tab-mealy").click();
+
+    await expect(
+      page.getByTestId("mealy-config-view").locator("thead th").first(),
+    ).toContainText("Event");
+    await expect(
+      page.getByTestId("mealy-config-view").getByTestId("moore-output-row"),
+    ).toHaveCount(0);
+    await page
+      .getByTestId("mealy-config-view")
+      .getByTestId("moore-add-input-symbol")
+      .click();
+    await expect(
+      page
+        .getByTestId("mealy-config-view")
+        .locator('[data-testid^="mealy-transition-output-symbol-"]'),
+    ).not.toHaveCount(0);
+  });
+
   test("creates states from transition cells and simulates tokenized input", async ({
     page,
   }) => {
