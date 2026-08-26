@@ -4,7 +4,7 @@ import { computeSmallestBooleanExpression } from "@/pages/FundamentalsCS/Dnf/com
 import { createTruthTableFromResults } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 import type { MooreProgram } from "./mooreTypes";
 
-export const MAX_MINIMIZATION_VARIABLES = 8;
+const MAX_MINIMIZATION_VARIABLES = 8;
 
 export interface MooreConversionRow {
   currentState: string;

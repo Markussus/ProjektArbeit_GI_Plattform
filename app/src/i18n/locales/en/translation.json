@@ -330,8 +330,6 @@
       "event": "Event",
       "state": "State",
       "output": "Output",
-      "outputFunction": "Output function λ and output symbols",
-      "outputFunctionHelp": "In a Moore machine, every state has exactly one assigned output.",
       "internalValue": "Internal representation",
       "representation": "Internal representation",
       "decimal": "Decimal",
@@ -352,6 +350,7 @@
       "addInput": "Add input symbol",
       "removeInput": "Remove input symbol {{symbol}}",
       "renameInput": "Rename input symbol {{symbol}}",
+      "transitionForStateInput": "Transition for state {{state}} and input {{input}}",
       "search": "Search...",
       "createState": "Create new state",
       "createNamedState": "+ Create \"{{value}}\"",
@@ -367,7 +366,6 @@
       "removeWordSymbol": "Remove symbol {{symbol}} at position {{index}}",
       "startSimulation": "Start simulation",
       "simulationTitle": "Moore simulation",
-      "mooreOutputHint": "The start state's output is the first symbol of the output sequence.",
       "editConfiguration": "Edit definition",
       "currentState": "Current state",
       "progress": "Processed symbols",
@@ -389,14 +387,17 @@
     },
     "mealy": {
       "configureTitle": "Define Mealy machine",
-      "outputFunction": "Output function λ",
-      "outputFunctionHelp": "Exactly one output symbol is assigned to every state and input combination.",
-      "outputDragHelp": "Input alphabet Σ: drag symbols onto a rule to assign them to that output.",
-      "addRule": "Rule",
-      "addOutputRule": "Add an output rule for state {{state}}",
-      "dropForNewRule": "Drop an input symbol here to create a new rule",
       "simulationTitle": "Mealy simulation",
       "diagram": "State transition graph of the Mealy machine"
+    },
+    "graph": {
+      "start": "Start",
+      "showAsList": "Show transition symbols as a vertical list",
+      "showWrapped": "Show transition symbols comma-separated",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "resetView": "Reset view",
+      "resetZoom": "Reset zoom to 100%"
     },
     "navigation": {
       "editDefinition": "Edit definition",
@@ -426,8 +427,8 @@
       "title": "Logic gates",
       "minimalFunctions": "Minimized functions",
       "formulaMode": "Formula representation",
+      "diagram": "Logic gate diagram for {{output}}",
       "binaryGates": "Use only two-input gates",
-      "completeCircuit": "Show complete circuit",
       "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",
       "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT. Falstad export: TODO."
     }

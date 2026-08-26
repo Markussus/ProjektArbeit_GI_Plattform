@@ -120,6 +120,7 @@ export function MooreLogicGateView({
             key={`${formula.name}-${formulaMode}-${binaryGates}`}
             expression={displayedExpression ?? null}
             outputName={formula.name}
+            ariaLabel={t("moore.logic.diagram", { output: formula.name })}
             variables={formula.variables}
             unavailableText={t("moore.logic.minimizationUnavailable")}
             binaryGates={binaryGates}

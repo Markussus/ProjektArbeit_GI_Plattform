@@ -272,7 +272,10 @@ export function MooreTransitionTable({
                               createdState,
                             );
                           }}
-                          ariaLabel={`Transition ${state}, ${inputSymbol}`}
+                          ariaLabel={t("moore.sim.transitionForStateInput", {
+                            state,
+                            input: inputSymbol,
+                          })}
                           createLabel={(value) =>
                             t("moore.sim.createNamedState", { value })
                           }

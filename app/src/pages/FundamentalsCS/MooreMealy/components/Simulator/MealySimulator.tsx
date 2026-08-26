@@ -39,7 +39,6 @@ import { MooreViewActions } from "./presentation/MooreViewActions";
 
 export interface MealySimulatorHandle {
   resetStoredState: () => void;
-  loadProgram: (program: MealyProgram) => void;
 }
 
 interface MealySimulatorProps {
@@ -116,9 +115,8 @@ export const MealySimulator = forwardRef<
         setCommitted(resetProgram);
         setMode("edit");
       },
-      loadProgram,
     }),
-    [identifier, initialProgram, loadProgram, simulation, storageEnabled],
+    [identifier, initialProgram, simulation, storageEnabled],
   );
 
   const updateOutput = (

@@ -330,8 +330,6 @@
       "event": "Ereignis",
       "state": "Zustand",
       "output": "Ausgabe",
-      "outputFunction": "Ausgabefunktion λ und Ausgabezeichen",
-      "outputFunctionHelp": "Beim Moore-Automaten ist jedem Zustand genau eine Ausgabe zugeordnet.",
       "internalValue": "Interne Repräsentation",
       "representation": "Interne Repräsentation",
       "decimal": "Dezimal",
@@ -352,6 +350,7 @@
       "addInput": "Neues Eingabesymbol hinzufügen",
       "removeInput": "Eingabesymbol {{symbol}} entfernen",
       "renameInput": "Eingabesymbol {{symbol}} umbenennen",
+      "transitionForStateInput": "Übergang für Zustand {{state}} und Eingabe {{input}}",
       "search": "Suche...",
       "createState": "Neuen Zustand erstellen",
       "createNamedState": "+ \"{{value}}\" erstellen",
@@ -367,7 +366,6 @@
       "removeWordSymbol": "Symbol {{symbol}} an Position {{index}} entfernen",
       "startSimulation": "Simulation starten",
       "simulationTitle": "Moore-Simulation",
-      "mooreOutputHint": "Die Ausgabe des Startzustands ist das erste Symbol der Ausgabefolge.",
       "editConfiguration": "Definition bearbeiten",
       "currentState": "Aktueller Zustand",
       "progress": "Verarbeitete Symbole",
@@ -389,14 +387,17 @@
     },
     "mealy": {
       "configureTitle": "Mealy-Automat definieren",
-      "outputFunction": "Ausgabefunktion λ",
-      "outputFunctionHelp": "Für jede Kombination aus Zustand und Eingabe wird genau ein Ausgabezeichen festgelegt.",
-      "outputDragHelp": "Eingabealphabet Σ: Symbole auf eine Regel ziehen, um sie dieser Ausgabe zuzuordnen.",
-      "addRule": "Regel",
-      "addOutputRule": "Neue Ausgaberegel für Zustand {{state}} anlegen",
-      "dropForNewRule": "Eingabesymbol hier ablegen, um eine neue Regel anzulegen",
       "simulationTitle": "Mealy-Simulation",
       "diagram": "Zustandsübergangsgraph des Mealy-Automaten"
+    },
+    "graph": {
+      "start": "Start",
+      "showAsList": "Übergangssymbole untereinander anzeigen",
+      "showWrapped": "Übergangssymbole kommasepariert anzeigen",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "resetView": "Ansicht zurücksetzen",
+      "resetZoom": "Zoom auf 100 % zurücksetzen"
     },
     "navigation": {
       "editDefinition": "Definition bearbeiten",
@@ -426,8 +427,8 @@
       "title": "Logikgatter",
       "minimalFunctions": "Minimierte Funktionen",
       "formulaMode": "Formeldarstellung",
+      "diagram": "Logikgatterdiagramm für {{output}}",
       "binaryGates": "Nur Gatter mit zwei Eingängen",
-      "completeCircuit": "Gesamte Schaltung anzeigen",
       "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",
       "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT. Falstad-Export: TODO."
     }
