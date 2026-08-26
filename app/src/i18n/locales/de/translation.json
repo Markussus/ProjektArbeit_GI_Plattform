@@ -1047,6 +1047,8 @@
       "export": "Export",
       "import": "Import",
       "copied": "String in die Zwischenablage kopiert.",
+      "clipboardError": "Zwischenablage nicht verfügbar. Der String kann manuell kopiert werden.",
+      "exportPreviewLabel": "Export-String (wird nach 5 Sekunden ausgeblendet)",
       "exportError": "String konnte nicht erzeugt werden.",
       "importSuccess": "String erfolgreich geladen.",
       "importError": "String konnte nicht geladen werden."

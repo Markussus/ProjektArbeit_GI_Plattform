@@ -15,6 +15,7 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 interface RLGrammarToLanguageProps {
   initialGrammar?: string;
   transferActive?: boolean;
+  resetVersion?: number;
 }
 
 const DEFAULT_SOURCE = ["S -> aS | bA", "A -> bA | ε"].join("\n");
@@ -32,6 +33,7 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
 export function RLGrammarToLanguage({
   initialGrammar,
   transferActive = true,
+  resetVersion = 0,
 }: RLGrammarToLanguageProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
@@ -45,6 +47,12 @@ export function RLGrammarToLanguage({
   if (initialGrammar !== undefined && initialGrammar !== seededGrammar) {
     setSeededGrammar(initialGrammar);
     setSource(initialGrammar);
+  }
+
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
   }
 
   const storageIdentifier = useRLPersistedSource({
@@ -74,6 +82,7 @@ export function RLGrammarToLanguage({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-grammar-to-language-source"
           value={source}
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"

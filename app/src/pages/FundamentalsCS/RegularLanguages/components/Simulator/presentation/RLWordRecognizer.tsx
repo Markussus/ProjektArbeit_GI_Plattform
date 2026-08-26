@@ -17,6 +17,7 @@ interface RLWordRecognizerProps {
   initialGrammar?: string;
   initialWord?: string;
   transferActive?: boolean;
+  resetVersion?: number;
 }
 
 const DEFAULT_SOURCE = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
@@ -33,6 +34,7 @@ export function RLWordRecognizer({
   initialGrammar,
   initialWord,
   transferActive = true,
+  resetVersion = 0,
 }: RLWordRecognizerProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
@@ -49,6 +51,13 @@ export function RLWordRecognizer({
   if (initialWord !== undefined && initialWord !== seededWord) {
     setSeededWord(initialWord);
     setWord(initialWord);
+  }
+
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
+    setWord(DEFAULT_WORD);
   }
 
   const storageIdentifier = useRLPersistedSource({
@@ -90,6 +99,7 @@ export function RLWordRecognizer({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-word-recognizer-source"
           value={source}
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"

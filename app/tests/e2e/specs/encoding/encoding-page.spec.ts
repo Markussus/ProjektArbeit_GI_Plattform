@@ -140,6 +140,36 @@ test.describe("Encoding page", () => {
     });
   });
 
+  test("resetting an example preserves the free simulator storage", async ({
+    page,
+  }) => {
+    await page.evaluate(() => localStorage.clear());
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await page.getByTestId("base64-input").fill("free simulator value");
+    await page.getByTestId(appTestIds.headerTransferExport).click();
+    const freeStorageValue = await page
+      .getByTestId(appTestIds.headerTransferInput)
+      .inputValue();
+    await page.evaluate((value) => {
+      localStorage.setItem("TrainingCenterStorage", JSON.stringify([value]));
+    }, freeStorageValue);
+
+    await page.getByTestId(appTestIds.tabExamples).click();
+    await page
+      .getByTestId("example-card-encoding.example_base64_2-select")
+      .click();
+    await page
+      .getByTestId("example-card-encoding.example_base64_2-open")
+      .click();
+    await page.getByTestId("base64-input").fill("changed example");
+    await page.getByTestId("simulation-reset").click();
+
+    await expect(page.getByTestId("base64-input")).toHaveValue("THWS");
+    expect(
+      await page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+    ).toContain(freeStorageValue);
+  });
+
   test("global transfer allows import and correctly updates UI", async ({
     page,
   }) => {

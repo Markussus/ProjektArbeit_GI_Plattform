@@ -17,7 +17,6 @@ import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -59,6 +58,60 @@ function getGeneratedExerciseData(item: TopicItem | null | undefined): {
     };
   }
   return { isGenerated: false };
+}
+
+function getSelectedEncoderScenario(item: TopicItem): {
+  mode: EncoderMode;
+  converterMode: "encode" | "decode";
+  initialValue: string;
+  answer: string;
+} | null {
+  const generated = getGeneratedExerciseData(item);
+  if (generated.isGenerated && generated.mode) {
+    return {
+      mode: generated.mode,
+      converterMode: generated.converterMode ?? "encode",
+      initialValue: generated.initialValue ?? "",
+      answer: generated.answer ?? "",
+    };
+  }
+
+  const examples: Record<
+    string,
+    {
+      mode: EncoderMode;
+      converterMode: "encode" | "decode";
+      initialValue: string;
+      answer: string;
+    }
+  > = {
+    "encoding.example_base64_2": {
+      mode: "base64",
+      converterMode: "encode",
+      initialValue: "THWS",
+      answer: "",
+    },
+    "encoding.example_base64_3": {
+      mode: "base64",
+      converterMode: "decode",
+      initialValue: "RklY",
+      answer: "",
+    },
+    "encoding.example_utf8_2": {
+      mode: "utf8",
+      converterMode: "encode",
+      initialValue: "႐",
+      answer: "",
+    },
+    "encoding.example_utf8_3": {
+      mode: "utf8",
+      converterMode: "decode",
+      initialValue: "E1 A0 A0",
+      answer: "",
+    },
+  };
+
+  return examples[item.id] ?? null;
 }
 
 export const EncoderSimulator = forwardRef<
@@ -106,25 +159,10 @@ export const EncoderSimulator = forwardRef<
       }
 
       try {
-        const tcCodec = createTrainingCenterTransferCodec(
+        const stored = await loadTrainingCenterValue(
           ENCODING_SIMULATOR_TASK_STORAGE_ID,
           encTransferCodec,
         );
-        let stored: EncoderState | null;
-        try {
-          stored = await loadTrainingCenterValue(
-            ENCODING_SIMULATOR_TASK_STORAGE_ID,
-            encTransferCodec,
-          );
-        } catch {
-          // Older builds accidentally stored one additional identifier layer.
-          // Keep those existing LocalStorage entries readable while all new
-          // saves use the regular single-layer Training Center format.
-          stored = await loadTrainingCenterValue(
-            ENCODING_SIMULATOR_TASK_STORAGE_ID,
-            tcCodec,
-          );
-        }
 
         if (active && stored) {
           setSimulatorState(stored);
@@ -170,36 +208,16 @@ export const EncoderSimulator = forwardRef<
   useEffect(() => {
     if (selectedExercise) {
       const isExample = selectedExercise.id.includes(".example");
-      const genData = getGeneratedExerciseData(selectedExercise);
+      const scenario = getSelectedEncoderScenario(selectedExercise);
 
       setIsExerciseMode(!isExample);
       setShowSolution(isExample);
 
-      if (genData.isGenerated && genData.mode) {
-        setActiveMode(genData.mode);
-        setInitialConverterMode(genData.converterMode || "encode");
-        setInitialValue(genData.initialValue || "");
-        setExpectedAnswer(genData.answer || "");
-      } else if (selectedExercise.id === "encoding.example_base64_2") {
-        setActiveMode("base64");
-        setInitialConverterMode("encode");
-        setInitialValue("THWS");
-        setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_base64_3") {
-        setActiveMode("base64");
-        setInitialConverterMode("decode");
-        setInitialValue("RklY");
-        setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_utf8_2") {
-        setActiveMode("utf8");
-        setInitialConverterMode("encode");
-        setInitialValue("႐");
-        setExpectedAnswer("");
-      } else if (selectedExercise.id === "encoding.example_utf8_3") {
-        setActiveMode("utf8");
-        setInitialConverterMode("decode");
-        setInitialValue("E1 A0 A0");
-        setExpectedAnswer("");
+      if (scenario) {
+        setActiveMode(scenario.mode);
+        setInitialConverterMode(scenario.converterMode);
+        setInitialValue(scenario.initialValue);
+        setExpectedAnswer(scenario.answer);
       }
     } else {
       setIsExerciseMode(false);
@@ -238,6 +256,18 @@ export const EncoderSimulator = forwardRef<
   };
 
   const resetStoredState = useCallback(() => {
+    if (selectedExercise) {
+      const scenario = getSelectedEncoderScenario(selectedExercise);
+      if (scenario) {
+        setSimulatorState({ activeMode: scenario.mode });
+        setInitialValue(scenario.initialValue);
+        setInitialConverterMode(scenario.converterMode);
+        setExpectedAnswer(scenario.answer);
+      }
+      setLoadVersion((version) => version + 1);
+      return;
+    }
+
     trainingCenterStorage.delete(ENCODING_SIMULATOR_TASK_STORAGE_ID);
 
     setSimulatorState({ activeMode: "base64" });
@@ -245,7 +275,7 @@ export const EncoderSimulator = forwardRef<
     setInitialConverterMode("encode");
     setExpectedAnswer("");
     setLoadVersion((v) => v + 1);
-  }, []);
+  }, [selectedExercise]);
 
   useImperativeHandle(
     ref,

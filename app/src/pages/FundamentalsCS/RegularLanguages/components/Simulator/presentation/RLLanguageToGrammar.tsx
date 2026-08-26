@@ -28,6 +28,7 @@ import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 interface RLLanguageToGrammarProps {
   initialSource?: string;
   transferActive?: boolean;
+  resetVersion?: number;
 }
 
 // Kept short enough to sit on one line in the textarea; three words are still
@@ -52,6 +53,7 @@ type ConversionResult =
 export function RLLanguageToGrammar({
   initialSource,
   transferActive = true,
+  resetVersion = 0,
 }: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
@@ -65,6 +67,12 @@ export function RLLanguageToGrammar({
   if (initialSource !== undefined && initialSource !== seededSource) {
     setSeededSource(initialSource);
     setSource(initialSource);
+  }
+
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
   }
 
   const storageIdentifier = useRLPersistedSource({
@@ -140,6 +148,7 @@ export function RLLanguageToGrammar({
           </h4>
 
           <textarea
+            data-testid="rl-language-to-grammar-source"
             value={source}
             onChange={(e) => setSource(e.target.value)}
             spellCheck={false}

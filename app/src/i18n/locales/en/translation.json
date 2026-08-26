@@ -1047,6 +1047,8 @@
       "export": "Export",
       "import": "Import",
       "copied": "String copied to clipboard.",
+      "clipboardError": "Clipboard unavailable. The string can be copied manually.",
+      "exportPreviewLabel": "Export string (hidden after 5 seconds)",
       "exportError": "String could not be generated.",
       "importSuccess": "String loaded successfully.",
       "importError": "String could not be loaded."

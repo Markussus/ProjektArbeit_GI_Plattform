@@ -44,6 +44,7 @@ describe("HeaderTransferBox", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     useActiveSimulatorTransferStore.setState({ activeTransfer: null });
   });
@@ -75,6 +76,89 @@ describe("HeaderTransferBox", () => {
     expect(screen.getByTestId("header-transfer-status")).toHaveTextContent(
       "simulation.transfer.copied",
     );
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_current-state",
+    );
+    expect(screen.getByTestId("header-transfer-input")).toHaveAttribute(
+      "readonly",
+    );
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    expect(screen.getByTestId("header-transfer-import")).toBeDisabled();
+  });
+
+  it("hides the export preview after five seconds", async () => {
+    vi.useFakeTimers();
+    useActiveSimulatorTransferStore
+      .getState()
+      .register(async () => "AH_preview");
+    render(<HeaderTransferBox />);
+
+    fireEvent.click(screen.getByTestId("header-transfer-export"));
+    await act(async () => Promise.resolve());
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_preview",
+    );
+
+    act(() => vi.advanceTimersByTime(4999));
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_preview",
+    );
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue("");
+    expect(screen.getByTestId("header-transfer-input")).not.toHaveAttribute(
+      "readonly",
+    );
+    fireEvent.change(screen.getByTestId("header-transfer-input"), {
+      target: { value: "AH_import-after-preview" },
+    });
+    expect(screen.getByTestId("header-transfer-import")).toBeEnabled();
+  });
+
+  it("keeps the preview visible when clipboard access fails", async () => {
+    writeText.mockRejectedValueOnce(new Error("permission denied"));
+    useActiveSimulatorTransferStore
+      .getState()
+      .register(async () => "AH_manual-copy");
+    render(<HeaderTransferBox />);
+
+    fireEvent.click(screen.getByTestId("header-transfer-export"));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("header-transfer-status")).toHaveTextContent(
+        "simulation.transfer.clipboardError",
+      ),
+    );
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_manual-copy",
+    );
+  });
+
+  it("restarts the five-second timer for a later export", async () => {
+    vi.useFakeTimers();
+    useActiveSimulatorTransferStore.getState().register(async () => "AH_first");
+    render(<HeaderTransferBox />);
+
+    fireEvent.click(screen.getByTestId("header-transfer-export"));
+    await act(async () => Promise.resolve());
+    act(() => vi.advanceTimersByTime(2000));
+
+    act(() => {
+      useActiveSimulatorTransferStore
+        .getState()
+        .register(async () => "AH_second");
+    });
+    fireEvent.click(screen.getByTestId("header-transfer-export"));
+    await act(async () => Promise.resolve());
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_second",
+    );
+
+    act(() => vi.advanceTimersByTime(3000));
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue(
+      "AH_second",
+    );
+    act(() => vi.advanceTimersByTime(2000));
+    expect(screen.getByTestId("header-transfer-input")).toHaveValue("");
   });
 
   it("keeps import disabled for blank input and clears it after successful routing", () => {

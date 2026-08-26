@@ -40,6 +40,25 @@ test.describe("global simulator import and export", () => {
     ).toBeDisabled();
   });
 
+  test("shows the exported string without enabling import", async ({
+    page,
+  }) => {
+    await page.goto("/fundamentals-cs/number-systems");
+    await page.getByTestId(appTestIds.tabSimulation).click();
+
+    await page.getByTestId(appTestIds.headerTransferExport).click();
+
+    const transferInput = page.getByTestId(appTestIds.headerTransferInput);
+    await expect(transferInput).not.toHaveValue("");
+    await expect(transferInput).toHaveAttribute("readonly");
+    await expect(
+      page.locator('[data-testid="header-transfer-input"]'),
+    ).toHaveCount(1);
+    await expect(
+      page.getByTestId(appTestIds.headerTransferImport),
+    ).toBeDisabled();
+  });
+
   for (const [simulatorName, route] of simulatorRoutes) {
     test(`${simulatorName} uses the global clipboard roundtrip`, async ({
       page,

@@ -127,6 +127,7 @@ export async function exportActiveSimulator(page: Page) {
 
 export async function importFromHeader(page: Page, transferValue: string) {
   const input = page.getByTestId(appTestIds.headerTransferInput);
+  await expect(input).toBeEditable({ timeout: 6_000 });
   await input.fill(transferValue);
   await page.getByTestId(appTestIds.headerTransferImport).click();
   await expect(input).toHaveValue("");

@@ -1,10 +1,12 @@
 import {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
   type ReactNode,
+  type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
@@ -16,6 +18,7 @@ import {
   createTrainingCenterIdentifier,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -32,7 +35,15 @@ import { useFASimulatorStore } from "../../store/faSimulatorStore";
 
 type EditorMode = "manual" | "grammar";
 
-export function FASimulator() {
+export interface FASimulatorHandle {
+  resetStoredState: () => void;
+}
+
+interface FASimulatorProps {
+  ref?: Ref<FASimulatorHandle>;
+}
+
+export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const [program, setProgram] = useState<FAProgram>(() =>
     cloneJson(defaultDFAProgram),
@@ -96,6 +107,7 @@ export function FASimulator() {
   // restores the learner's work instead of the blank starter.
   const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
   const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
+  const clearExerciseDraft = useFASimulatorStore((s) => s.clearExerciseDraft);
   useEffect(() => {
     if (activeExerciseId) {
       setExerciseDraft(activeExerciseId, exposedStudentProgram);
@@ -213,6 +225,38 @@ export function FASimulator() {
     editor.resetToProgram(program);
     setIsEditMode(true);
   };
+
+  const resetStoredState = useCallback(() => {
+    simulation.pause();
+
+    const exercise = activeExerciseId
+      ? findFAExercise(activeExerciseId)
+      : undefined;
+    const resetProgram = cloneJson(exercise?.starter ?? defaultDFAProgram);
+
+    if (activeExerciseId) {
+      clearExerciseDraft(activeExerciseId);
+    } else {
+      trainingCenterStorage.delete(storageIdentifier);
+    }
+
+    setProgram(resetProgram);
+    editor.resetToProgram(resetProgram);
+    setInputWord(
+      exercise?.exampleWords?.accept.find((word) => word.length > 0) ??
+        defaultInputWord,
+    );
+    setIsEditMode(true);
+    setEditorMode("manual");
+  }, [
+    activeExerciseId,
+    clearExerciseDraft,
+    editor,
+    simulation,
+    storageIdentifier,
+  ]);
+
+  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
 
   const handleGrammarConvert = (converted: FAProgram) => {
     setProgram(converted);

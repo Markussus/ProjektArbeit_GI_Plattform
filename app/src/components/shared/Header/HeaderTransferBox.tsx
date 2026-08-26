@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,14 @@ import { cn } from "@/lib/utils";
 import { resolveTrainingCenterImportTarget } from "@/lib/trainingCenter/trainingCenterImportNavigation";
 import { useActiveSimulatorTransferStore } from "@/hooks/useActiveSimulatorTransfer";
 
-type Feedback = "importError" | "exportError" | "copied" | null;
+type Feedback =
+  | "importError"
+  | "exportError"
+  | "clipboardError"
+  | "copied"
+  | null;
+
+const EXPORT_PREVIEW_DURATION_MS = 5000;
 
 export function HeaderTransferBox() {
   const { t } = useTranslation();
@@ -14,6 +21,8 @@ export function HeaderTransferBox() {
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportPreview, setExportPreview] = useState<string | null>(null);
+  const exportPreviewTimeoutRef = useRef<number | null>(null);
   const activeTransfer = useActiveSimulatorTransferStore(
     (state) => state.activeTransfer,
   );
@@ -27,8 +36,19 @@ export function HeaderTransferBox() {
     return () => window.clearTimeout(timeoutId);
   }, [feedback]);
 
+  useEffect(
+    () => () => {
+      if (exportPreviewTimeoutRef.current !== null) {
+        window.clearTimeout(exportPreviewTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
   const trimmedValue = value.trim();
-  const canImport = trimmedValue.length > 0;
+  const isExportPreviewActive = exportPreview !== null;
+  const displayedValue = exportPreview ?? value;
+  const canImport = !isExportPreviewActive && trimmedValue.length > 0;
   const feedbackText = useMemo(() => {
     if (feedback === "importError") {
       return t("simulation.transfer.importError");
@@ -36,6 +56,10 @@ export function HeaderTransferBox() {
 
     if (feedback === "exportError") {
       return t("simulation.transfer.exportError");
+    }
+
+    if (feedback === "clipboardError") {
+      return t("simulation.transfer.clipboardError");
     }
 
     if (feedback === "copied") {
@@ -71,8 +95,22 @@ export function HeaderTransferBox() {
     setFeedback(null);
     try {
       const exportedValue = await activeTransfer.exportValue();
-      await navigator.clipboard.writeText(exportedValue);
-      setFeedback("copied");
+      if (exportPreviewTimeoutRef.current !== null) {
+        window.clearTimeout(exportPreviewTimeoutRef.current);
+      }
+      setValue("");
+      setExportPreview(exportedValue);
+      exportPreviewTimeoutRef.current = window.setTimeout(() => {
+        setExportPreview(null);
+        exportPreviewTimeoutRef.current = null;
+      }, EXPORT_PREVIEW_DURATION_MS);
+
+      try {
+        await navigator.clipboard.writeText(exportedValue);
+        setFeedback("copied");
+      } catch {
+        setFeedback("clipboardError");
+      }
     } catch {
       setFeedback("exportError");
     } finally {
@@ -88,10 +126,19 @@ export function HeaderTransferBox() {
       <input
         type="text"
         data-testid="header-transfer-input"
-        value={value}
+        value={displayedValue}
+        readOnly={isExportPreviewActive}
         onChange={(event) => {
+          if (isExportPreviewActive) {
+            return;
+          }
           setValue(event.target.value);
           setFeedback(null);
+        }}
+        onFocus={(event) => {
+          if (isExportPreviewActive) {
+            event.currentTarget.select();
+          }
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter" && canImport) {
@@ -99,6 +146,11 @@ export function HeaderTransferBox() {
           }
         }}
         placeholder={t("simulation.transfer.placeholder")}
+        aria-label={
+          isExportPreviewActive
+            ? t("simulation.transfer.exportPreviewLabel")
+            : undefined
+        }
         className={cn(
           "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 min-w-4 flex-1 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 sm:h-9 sm:min-w-16 md:min-w-24",
           feedback === "importError" && "border-destructive",

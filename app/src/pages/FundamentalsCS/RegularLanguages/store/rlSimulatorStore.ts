@@ -42,6 +42,7 @@ interface RLSimulatorStore {
    */
   exerciseDrafts: Record<string, string>;
   setExerciseDraft: (exerciseId: string, value: string) => void;
+  clearExerciseDraft: (exerciseId: string) => void;
   clearExerciseDrafts: () => void;
 
   /**
@@ -94,6 +95,12 @@ export const useRLSimulatorStore = create<RLSimulatorStore>((set) => ({
     set((state) => ({
       exerciseDrafts: { ...state.exerciseDrafts, [exerciseId]: value },
     })),
+  clearExerciseDraft: (exerciseId) =>
+    set((state) => {
+      const exerciseDrafts = { ...state.exerciseDrafts };
+      delete exerciseDrafts[exerciseId];
+      return { exerciseDrafts };
+    }),
   clearExerciseDrafts: () => set({ exerciseDrafts: {} }),
 
   revealedEnumeration: null,
