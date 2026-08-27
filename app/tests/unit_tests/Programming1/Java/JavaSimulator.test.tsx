@@ -59,12 +59,10 @@ vi.mock(
       code,
       fileName,
       onCodeChange,
-      onImportCode,
     }: {
       code: string;
       fileName: string;
       onCodeChange: (nextCode: string) => void;
-      onImportCode: (nextCode: string) => void;
     }) => (
       <div data-testid="mock-java-editor-panel">
         <div data-testid="mock-java-editor-code">{code}</div>
@@ -74,12 +72,6 @@ vi.mock(
           onClick={() => onCodeChange("changed code")}
         >
           change code
-        </button>
-        <button
-          data-testid="mock-java-import-code"
-          onClick={() => onImportCode("imported code")}
-        >
-          import code
         </button>
       </div>
     ),
@@ -177,7 +169,7 @@ describe("JavaSimulator", () => {
     });
   });
 
-  describe("when the user changes or imports code before execution", () => {
+  describe("when the user changes code before execution", () => {
     it("runs the latest changed editor content", () => {
       render(<JavaSimulator selectedExercise={null} isFocused={false} />);
 
@@ -208,15 +200,13 @@ describe("JavaSimulator", () => {
       });
     });
 
-    it("replaces the editor content on import and resets execution state", () => {
+    it("stops execution without forwarding the React click event", () => {
       render(<JavaSimulator selectedExercise={null} isFocused={false} />);
 
-      fireEvent.click(screen.getByTestId("mock-java-import-code"));
+      fireEvent.click(screen.getByTestId("mock-java-stop-code"));
 
-      expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
-        "imported code",
-      );
-      expect(resetSpy).toHaveBeenCalledTimes(1);
+      expect(stopSpy).toHaveBeenCalledOnce();
+      expect(stopSpy).toHaveBeenCalledWith();
     });
   });
 

@@ -35,6 +35,7 @@ interface FASimulatorStore {
   consumePendingInputWord: () => void;
   setStudentProgram: (program: FAProgram | null) => void;
   setExerciseDraft: (exerciseId: string, program: FAProgram) => void;
+  clearExerciseDraft: (exerciseId: string) => void;
   clearExerciseDrafts: () => void;
 }
 
@@ -60,5 +61,11 @@ export const useFASimulatorStore = create<FASimulatorStore>((set) => ({
     set((state) => ({
       exerciseDrafts: { ...state.exerciseDrafts, [exerciseId]: program },
     })),
+  clearExerciseDraft: (exerciseId) =>
+    set((state) => {
+      const exerciseDrafts = { ...state.exerciseDrafts };
+      delete exerciseDrafts[exerciseId];
+      return { exerciseDrafts };
+    }),
   clearExerciseDrafts: () => set({ exerciseDrafts: {} }),
 }));

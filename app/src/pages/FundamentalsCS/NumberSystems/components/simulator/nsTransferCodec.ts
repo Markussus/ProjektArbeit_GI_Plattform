@@ -53,24 +53,11 @@ export interface NumberSystemState {
 }
 
 function parseNumberSystemState(serializedValue: string): NumberSystemState {
-  let cleaned = serializedValue.replace(/[^A-Za-z0-9+/=_-]/g, "");
-  const prefixIndex = cleaned.indexOf("djF8");
-  if (prefixIndex > 0) {
-    cleaned = cleaned.substring(prefixIndex);
-  }
-  let base64 = cleaned.replace(/-/g, "+").replace(/_/g, "/");
+  let base64 = serializedValue.trim().replace(/-/g, "+").replace(/_/g, "/");
   while (base64.length % 4) {
     base64 += "=";
   }
   const decodedStr = decodeURIComponent(escape(atob(base64)));
-
-  if (decodedStr.startsWith("{")) {
-    const parsed = JSON.parse(decodedStr) as Partial<NumberSystemState>;
-    if (!parsed || !parsed.activeMode) {
-      throw new Error("Invalid state");
-    }
-    return parsed as NumberSystemState;
-  }
 
   const parts = decodedStr.split("|");
   if (parts[0] !== "v1") {
@@ -98,7 +85,6 @@ function parseNumberSystemState(serializedValue: string): NumberSystemState {
     m: "multiplication",
     d: "division",
     h: "shifting",
-    e: "addition", // Fallback for old states
     c: "compare",
   };
 

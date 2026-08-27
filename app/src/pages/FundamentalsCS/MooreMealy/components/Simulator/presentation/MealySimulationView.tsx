@@ -75,10 +75,12 @@ export function MealySimulationView(props: Props) {
           <Sequence
             title={t("moore.sim.inputWord")}
             values={props.program.inputWord}
+            testId="mealy-runtime-input"
           />
           <Sequence
             title={t("moore.sim.outputWord")}
             values={props.runtime.outputSymbols}
+            testId="mealy-runtime-output"
           />
         </div>
       </div>
@@ -174,9 +176,17 @@ function MealyRuntimeTable({
   );
 }
 
-function Sequence({ title, values }: { title: string; values: string[] }) {
+function Sequence({
+  title,
+  values,
+  testId,
+}: {
+  title: string;
+  values: string[];
+  testId: string;
+}) {
   return (
-    <section>
+    <section data-testid={testId}>
       <h3 className="mb-1 text-sm font-semibold">{title}</h3>
       <div className="border-border bg-card flex min-h-12 gap-2 overflow-x-auto rounded-lg border p-2">
         {values.map((value, index) => (

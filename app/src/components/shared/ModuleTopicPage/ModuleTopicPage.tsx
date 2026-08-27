@@ -12,6 +12,7 @@ import {
   resolveTrainingCenterImportForPath,
   type TrainingCenterImportRouteState,
 } from "@/lib/trainingCenter/trainingCenterImportNavigation";
+import { trainingCenterStorage } from "@/lib/trainingCenter";
 import { useUiStore } from "@/store/uiStore";
 import type { Example, Exercise, TopicItem } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
@@ -35,6 +36,7 @@ export interface ModuleSimulationTabProps {
   onToggleFocus: () => void;
   onExitExercise?: () => void;
   onExitExample?: () => void;
+  importedTaskStorageId?: number;
 }
 
 interface ModuleTopicPageProps {
@@ -67,8 +69,12 @@ export function ModuleTopicPage({
   const navigate = useNavigate();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
+  const [simulationImport, setSimulationImport] = useState({
+    revision: 0,
+    taskStorageId: undefined as number | undefined,
+  });
   const consumedImportValueRef = useRef<string | null>(null);
-
+  const isMountedRef = useRef(true);
   const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
   const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
 
@@ -89,10 +95,22 @@ export function ModuleTopicPage({
   } = useExerciseTabs();
 
   useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const routeState = location.state as TrainingCenterImportRouteState | null;
     const storageValue = routeState?.trainingCenterImport?.storageValue;
 
-    if (!storageValue || consumedImportValueRef.current === storageValue) {
+    if (!storageValue) {
+      consumedImportValueRef.current = null;
+      return;
+    }
+
+    if (consumedImportValueRef.current === storageValue) {
       return;
     }
 
@@ -105,17 +123,38 @@ export function ModuleTopicPage({
       return;
     }
 
-    consumedImportValueRef.current = storageValue;
     const exercise = createTrainingCenterExerciseFromImport(parsed, t);
-
-    if (exercise) {
-      openInSimulation(exercise);
-    } else {
+    const importTimeoutId = window.setTimeout(() => {
+      consumedImportValueRef.current = storageValue;
+      // Unmount the previous simulator first. Its auto-save cleanup must finish
+      // before the imported value becomes authoritative on a same-route import.
       clearSimulationSelection();
-      setActiveTab("simulation");
-    }
+      setActiveTab("overview");
 
-    navigate(location.pathname, { replace: true, state: null });
+      window.setTimeout(() => {
+        if (!isMountedRef.current) {
+          return;
+        }
+
+        trainingCenterStorage.store(storageValue);
+        setSimulationImport((current) => ({
+          revision: current.revision + 1,
+          taskStorageId: parsed.taskStorageId,
+        }));
+
+        if (exercise) {
+          openInSimulation(exercise);
+        } else {
+          setActiveTab("simulation");
+        }
+
+        navigate(location.pathname, { replace: true, state: null });
+      }, 0);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(importTimeoutId);
+    };
   }, [
     clearSimulationSelection,
     location.pathname,
@@ -218,6 +257,7 @@ export function ModuleTopicPage({
     if (activeTab === "simulation") {
       return (
         <SimulationTab
+          key={`simulation-import-${simulationImport.revision}`}
           selectedExercise={simulationExercise}
           selectedItem={simulationItem}
           isFocused={isSimulationFocused}
@@ -228,6 +268,7 @@ export function ModuleTopicPage({
               ? clearSimulationItem
               : undefined
           }
+          importedTaskStorageId={simulationImport.taskStorageId}
         />
       );
     }

@@ -1,22 +1,24 @@
 import {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
   type ReactNode,
+  type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -33,7 +35,15 @@ import { useFASimulatorStore } from "../../store/faSimulatorStore";
 
 type EditorMode = "manual" | "grammar";
 
-export function FASimulator() {
+export interface FASimulatorHandle {
+  resetStoredState: () => void;
+}
+
+interface FASimulatorProps {
+  ref?: Ref<FASimulatorHandle>;
+}
+
+export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const [program, setProgram] = useState<FAProgram>(() =>
     cloneJson(defaultDFAProgram),
@@ -62,14 +72,6 @@ export function FASimulator() {
       ),
     [],
   );
-  const storageTransferCodec = useMemo(
-    () =>
-      createTrainingCenterTransferCodec(
-        storageIdentifier,
-        faProgramTransferCodec,
-      ),
-    [storageIdentifier],
-  );
 
   // Consume pending example from the store (loaded via ExamplesTab or by the
   // exercise panel revealing a solution).
@@ -91,6 +93,11 @@ export function FASimulator() {
   // simulating it is the committed program.
   const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
   const exposedStudentProgram = isEditMode ? editor.draft : program;
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: exposedStudentProgram,
+    codec: faProgramTransferCodec,
+  });
   useEffect(() => {
     setStudentProgram(exposedStudentProgram);
     return () => setStudentProgram(null);
@@ -100,6 +107,7 @@ export function FASimulator() {
   // restores the learner's work instead of the blank starter.
   const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
   const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
+  const clearExerciseDraft = useFASimulatorStore((s) => s.clearExerciseDraft);
   useEffect(() => {
     if (activeExerciseId) {
       setExerciseDraft(activeExerciseId, exposedStudentProgram);
@@ -218,6 +226,38 @@ export function FASimulator() {
     setIsEditMode(true);
   };
 
+  const resetStoredState = useCallback(() => {
+    simulation.pause();
+
+    const exercise = activeExerciseId
+      ? findFAExercise(activeExerciseId)
+      : undefined;
+    const resetProgram = cloneJson(exercise?.starter ?? defaultDFAProgram);
+
+    if (activeExerciseId) {
+      clearExerciseDraft(activeExerciseId);
+    } else {
+      trainingCenterStorage.delete(storageIdentifier);
+    }
+
+    setProgram(resetProgram);
+    editor.resetToProgram(resetProgram);
+    setInputWord(
+      exercise?.exampleWords?.accept.find((word) => word.length > 0) ??
+        defaultInputWord,
+    );
+    setIsEditMode(true);
+    setEditorMode("manual");
+  }, [
+    activeExerciseId,
+    clearExerciseDraft,
+    editor,
+    simulation,
+    storageIdentifier,
+  ]);
+
+  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
+
   const handleGrammarConvert = (converted: FAProgram) => {
     setProgram(converted);
     editor.resetToProgram(converted);
@@ -284,13 +324,6 @@ export function FASimulator() {
                   )}
                 </p>
               </div>
-
-              <SimulatorStringTransferBox
-                value={editor.draft}
-                codec={storageTransferCodec}
-                onLoad={handleImportProgram}
-                testIdPrefix="fa-transfer"
-              />
 
               <button
                 onClick={handleApplyProgram}

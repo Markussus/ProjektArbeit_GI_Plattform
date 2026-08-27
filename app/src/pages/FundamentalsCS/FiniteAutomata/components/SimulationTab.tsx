@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import { FASimulator } from "./Simulator/FASimulator";
+import { FASimulator, type FASimulatorHandle } from "./Simulator/FASimulator";
 import type { FAProgram } from "./Simulator/domain/faTypes";
 import {
   validateAgainstSolution,
@@ -19,6 +19,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
   const loadExample = useFASimulatorStore((s) => s.loadExample);
+  const simulatorRef = useRef<FASimulatorHandle>(null);
 
   // The opened exercise (if any) drives the action buttons. Examples still flow
   // through the shared "Selected example" card with no actions.
@@ -93,8 +94,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.automata"
+        onReset={() => simulatorRef.current?.resetStoredState()}
       >
-        <FASimulator />
+        <FASimulator ref={simulatorRef} />
       </TopicSimulationTab>
 
       <SolutionCheckDialog

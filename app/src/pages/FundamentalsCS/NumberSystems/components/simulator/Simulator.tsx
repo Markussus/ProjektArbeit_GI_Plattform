@@ -3,7 +3,6 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,12 +14,11 @@ import { ArithmeticMode } from "./arithmetic";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -395,16 +393,11 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
       taskStorageId,
     );
 
-    const storageTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              nsTransferCodec,
-            )
-          : nsTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
+    useActiveSimulatorTransfer({
+      identifier: storageIdentifier,
+      value: simulatorState,
+      codec: nsTransferCodec,
+    });
 
     useEffect(() => {
       let isCancelled = false;
@@ -500,18 +493,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
         data-testid="ns-simulator"
         className="flex h-full flex-col space-y-6"
       >
-        {isStorageEnabled && isStorageReady && (
-          <SimulatorStringTransferBox
-            value={simulatorState}
-            codec={storageTransferCodec}
-            onLoad={(val: NumberSystemState) => {
-              setSimulatorState(val);
-              setLoadVersion((v) => v + 1);
-            }}
-            className="shrink-0"
-            testIdPrefix="ns-transfer"
-          />
-        )}
         {/* Dashboard Navigation */}
         <div className="border-border flex gap-1 border-b">
           {(

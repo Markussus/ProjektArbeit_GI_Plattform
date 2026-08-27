@@ -1,4 +1,1 @@
-export {
-  SearchableCreatableSelect,
-  type SearchableCreatableSelectProps,
-} from "./SearchableCreatableSelect";
+export { SearchableCreatableSelect } from "./SearchableCreatableSelect";

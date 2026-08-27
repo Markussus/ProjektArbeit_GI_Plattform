@@ -330,8 +330,6 @@
       "event": "Ereignis",
       "state": "Zustand",
       "output": "Ausgabe",
-      "outputFunction": "Ausgabefunktion λ und Ausgabezeichen",
-      "outputFunctionHelp": "Beim Moore-Automaten ist jedem Zustand genau eine Ausgabe zugeordnet.",
       "internalValue": "Interne Repräsentation",
       "representation": "Interne Repräsentation",
       "decimal": "Dezimal",
@@ -352,8 +350,15 @@
       "addInput": "Neues Eingabesymbol hinzufügen",
       "removeInput": "Eingabesymbol {{symbol}} entfernen",
       "renameInput": "Eingabesymbol {{symbol}} umbenennen",
-      "createState": "Erstellen:",
+      "transitionForStateInput": "Übergang für Zustand {{state}} und Eingabe {{input}}",
+      "search": "Suche...",
+      "createState": "Neuen Zustand erstellen",
+      "createNamedState": "+ \"{{value}}\" erstellen",
       "stateNotFound": "Kein Zustand gefunden",
+      "outputLambda": "Ausgabe λ",
+      "createOutput": "Neues Ausgabesymbol erstellen",
+      "createNamedOutput": "+ \"{{symbol}}\" erstellen",
+      "outputNotFound": "Kein Ausgabesymbol gefunden",
       "outputForState": "Ausgabe für Zustand {{state}}",
       "outputCodeForState": "Interner Ausgabecode für Zustand {{state}}",
       "symbolOutput": "Ausgabe (Symbol)",
@@ -361,7 +366,6 @@
       "removeWordSymbol": "Symbol {{symbol}} an Position {{index}} entfernen",
       "startSimulation": "Simulation starten",
       "simulationTitle": "Moore-Simulation",
-      "mooreOutputHint": "Die Ausgabe des Startzustands ist das erste Symbol der Ausgabefolge.",
       "editConfiguration": "Definition bearbeiten",
       "currentState": "Aktueller Zustand",
       "progress": "Verarbeitete Symbole",
@@ -383,14 +387,17 @@
     },
     "mealy": {
       "configureTitle": "Mealy-Automat definieren",
-      "outputFunction": "Ausgabefunktion λ",
-      "outputFunctionHelp": "Für jede Kombination aus Zustand und Eingabe wird genau ein Ausgabezeichen festgelegt.",
-      "outputDragHelp": "Eingabealphabet Σ: Symbole auf eine Regel ziehen, um sie dieser Ausgabe zuzuordnen.",
-      "addRule": "Regel",
-      "addOutputRule": "Neue Ausgaberegel für Zustand {{state}} anlegen",
-      "dropForNewRule": "Eingabesymbol hier ablegen, um eine neue Regel anzulegen",
       "simulationTitle": "Mealy-Simulation",
       "diagram": "Zustandsübergangsgraph des Mealy-Automaten"
+    },
+    "graph": {
+      "start": "Start",
+      "showAsList": "Übergangssymbole untereinander anzeigen",
+      "showWrapped": "Übergangssymbole kommasepariert anzeigen",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "resetView": "Ansicht zurücksetzen",
+      "resetZoom": "Zoom auf 100 % zurücksetzen"
     },
     "navigation": {
       "editDefinition": "Definition bearbeiten",
@@ -420,8 +427,8 @@
       "title": "Logikgatter",
       "minimalFunctions": "Minimierte Funktionen",
       "formulaMode": "Formeldarstellung",
+      "diagram": "Logikgatterdiagramm für {{output}}",
       "binaryGates": "Nur Gatter mit zwei Eingängen",
-      "completeCircuit": "Gesamte Schaltung anzeigen",
       "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",
       "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT. Falstad-Export: TODO."
     }
@@ -888,7 +895,7 @@
         },
         "input": {
           "title": "Konsoleneingabe",
-          "description": "Scanner und System.in funktionieren mit dem Eingabefeld unter dem Editor. Die Eingabe wird vor dem Start bereitgestellt; interaktive Nachfragen während der Ausführung sind nicht möglich."
+          "description": "Das Eingabefeld unterstützt einfache Deklarationen mit Scanner.nextLine() und Scanner.nextInt(). Die Werte werden vor dem Kompilieren in den Quelltext eingesetzt; ein echter interaktiver System.in-Stream und BufferedReader werden nicht unterstützt."
         },
         "cli": {
           "title": "Terminalbefehle",
@@ -934,7 +941,7 @@
         },
         "stdin": {
           "title": "Konsoleneingabe ist nicht interaktiv",
-          "description": "Konsolenausgabe über System.out und System.err wird unterstützt. Scanner/System.in nutzt das feste Eingabefeld im Simulator."
+          "description": "Scanner.nextLine() und Scanner.nextInt() nutzen das feste Eingabefeld im Simulator. Andere Scanner-Methoden, BufferedReader und Eingaben während der Ausführung werden nicht unterstützt."
         },
         "environment": {
           "title": "Browser-Sandbox gilt",
@@ -981,7 +988,21 @@
     "stdin": {
       "label": "Programmeingabe",
       "placeholder": "Eingabe für Scanner/System.in, z. B. hello java",
-      "help": "Diese Eingabe wird vor dem Programmstart als System.in bereitgestellt. Interaktive Nachfragen während der Ausführung sind nicht möglich."
+      "help": "Diese Eingabe wird vor dem Programmstart für einfache Scanner.nextLine()- und Scanner.nextInt()-Deklarationen eingesetzt. Ein interaktiver System.in-Stream ist nicht verfügbar."
+    },
+    "console": {
+      "title": "Konsole",
+      "stdout": "Standardausgabe",
+      "stdoutEmpty": "Die Programmausgabe erscheint hier.",
+      "stderr": "Fehlerausgabe",
+      "stderrEmpty": "Laufzeitfehler erscheinen hier.",
+      "issues": "Diagnosen",
+      "noIssues": "Keine Diagnosen gemeldet.",
+      "issueLocation": "Zeile {{line}}, Spalte {{column}}"
+    },
+    "execution": {
+      "stoppedMessage": "Ausführung durch Benutzer gestoppt.",
+      "timeoutMessage": "Ausführung nach {{seconds}} Sekunden gestoppt."
     },
     "timeout": {
       "warningTitle": "Ausführung wegen Timeout gestoppt",
@@ -1026,6 +1047,8 @@
       "export": "Export",
       "import": "Import",
       "copied": "String in die Zwischenablage kopiert.",
+      "clipboardError": "Zwischenablage nicht verfügbar. Der String kann manuell kopiert werden.",
+      "exportPreviewLabel": "Export-String (wird nach 5 Sekunden ausgeblendet)",
       "exportError": "String konnte nicht erzeugt werden.",
       "importSuccess": "String erfolgreich geladen.",
       "importError": "String konnte nicht geladen werden."

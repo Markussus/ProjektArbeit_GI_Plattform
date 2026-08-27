@@ -31,6 +31,7 @@ export {
 } from "./trainingCenterStorage";
 export {
   createTrainingCenterTransferCodec,
+  exportTrainingCenterValue,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
 } from "./trainingCenterTransfer";
