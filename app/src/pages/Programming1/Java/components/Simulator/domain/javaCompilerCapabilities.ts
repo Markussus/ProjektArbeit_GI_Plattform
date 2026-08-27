@@ -134,7 +134,7 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     status: "limited",
     titleKey: "java.commandOverview.capabilities.input.title",
     descriptionKey: "java.commandOverview.capabilities.input.description",
-    examples: ["System.in", "Scanner", "BufferedReader(System.in)"],
+    examples: ["Scanner.nextLine()", "Scanner.nextInt()"],
     snippets: [
       "Scanner scanner = new Scanner(System.in);\nString line = scanner.nextLine();",
     ],

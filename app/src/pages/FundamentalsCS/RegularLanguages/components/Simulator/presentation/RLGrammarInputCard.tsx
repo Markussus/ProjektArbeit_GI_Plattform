@@ -9,6 +9,7 @@ interface RLGrammarInputCardProps {
   onChange: (value: string) => void;
   titleKey?: string;
   titleFallback?: string;
+  testId?: string;
   /** Optional extra content rendered inside the card, e.g. a formats panel. */
   children?: ReactNode;
 }
@@ -20,6 +21,7 @@ export function RLGrammarInputCard({
   onChange,
   titleKey,
   titleFallback,
+  testId,
   children,
 }: RLGrammarInputCardProps) {
   const { t } = useTranslation();
@@ -38,6 +40,7 @@ export function RLGrammarInputCard({
         {t(titleKey ?? "rl.simulator.grammarInput", titleFallback ?? "Grammar")}
       </h4>
       <textarea
+        data-testid={testId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         spellCheck={false}

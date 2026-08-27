@@ -8,8 +8,8 @@ import {
 } from "react";
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   buildMooreConversion,
@@ -18,7 +18,6 @@ import {
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -33,6 +32,7 @@ import type { MooreExerciseScenario } from "../../exercises";
 import {
   createNextInputSymbol,
   createNextStateName,
+  getNextMooreOutputCode,
   normalizeMooreProgram,
   renameMooreInputSymbol,
   renameMooreState,
@@ -56,13 +56,19 @@ interface MooreSimulatorProps {
   scenario: MooreExerciseScenario | null;
   initialProgram?: MooreProgram;
   isExample?: boolean;
+  transferActive?: boolean;
 }
 
 export const MooreSimulator = forwardRef<
   MooreSimulatorHandle,
   MooreSimulatorProps
 >(function MooreSimulator(
-  { scenario, initialProgram = emptyMooreProgram, isExample = false },
+  {
+    scenario,
+    initialProgram = emptyMooreProgram,
+    isExample = false,
+    transferActive = true,
+  },
   ref,
 ) {
   const { t } = useTranslation();
@@ -97,16 +103,12 @@ export const MooreSimulator = forwardRef<
       ),
     [scenario?.storageId],
   );
-  const transferCodec = useMemo(
-    () =>
-      isStorageEnabled
-        ? createTrainingCenterTransferCodec(
-            storageIdentifier,
-            mooreProgramTransferCodec,
-          )
-        : mooreProgramTransferCodec,
-    [isStorageEnabled, storageIdentifier],
-  );
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: program,
+    codec: mooreProgramTransferCodec,
+    enabled: transferActive,
+  });
 
   const loadProgram = useCallback(
     (nextProgram: MooreProgram) => {
@@ -262,13 +264,7 @@ export const MooreSimulator = forwardRef<
           ...current.outputs,
           [stateName]: {
             symbol: `OUT_${current.states.length}`,
-            code:
-              Math.max(
-                -1,
-                ...current.states.map(
-                  (state) => current.outputs[state]?.code ?? -1,
-                ),
-              ) + 1,
+            code: getNextMooreOutputCode(current),
           },
         },
       };
@@ -378,6 +374,22 @@ export const MooreSimulator = forwardRef<
     });
   };
 
+  const handleOutputSymbolCreate = (state: string, symbol: string) => {
+    setProgram((current) => {
+      const code = getNextMooreOutputCode(current);
+      return {
+        ...current,
+        outputs: {
+          ...current.outputs,
+          [state]: {
+            symbol: symbol.trim() || `OUT_${code}`,
+            code,
+          },
+        },
+      };
+    });
+  };
+
   const startSimulation = () => {
     const normalized = normalizeMooreProgram(program);
     if (validateMooreProgram(normalized).length > 0) {
@@ -454,14 +466,8 @@ export const MooreSimulator = forwardRef<
             onAddInputSymbol={handleAddInputSymbol}
             onRemoveInputSymbol={handleRemoveInputSymbol}
             onOutputSymbolChange={handleOutputSymbolChange}
+            onOutputSymbolCreate={handleOutputSymbolCreate}
             onOutputCodeChange={handleOutputCodeChange}
-          />
-
-          <SimulatorStringTransferBox
-            value={program}
-            codec={transferCodec}
-            onLoad={loadProgram}
-            testIdPrefix="moore-transfer"
           />
 
           <MooreViewActions

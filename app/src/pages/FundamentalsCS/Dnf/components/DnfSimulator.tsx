@@ -14,16 +14,12 @@ import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { DnfBuilder, type DnfBuilderHandle } from "./DnfBuilder/DnfBuilder";
 import {
-  dnfExerciseTransferCodec,
-  dnfExpressionTransferCodec,
   dnfTransferCodec,
-  dnfTruthTableTransferCodec,
   type DnfExpressionTransferDraft,
   type DnfTransferValue,
   type DnfTruthTableTransferDraft,
@@ -114,37 +110,6 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         walkthroughExample,
       });
     }, [selectedExercise, storedValue, visibleMode, walkthroughExample]);
-    const expressionTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              dnfExpressionTransferCodec,
-            )
-          : dnfExpressionTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
-    const truthTableTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              dnfTruthTableTransferCodec,
-            )
-          : dnfTruthTableTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
-    const exerciseTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              dnfExerciseTransferCodec,
-            )
-          : dnfExerciseTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
-
     useEffect(() => {
       onStorageReadyChange?.(isStorageReady);
     }, [isStorageReady, onStorageReadyChange]);
@@ -273,7 +238,6 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
             initialAttempt={
               storedValue?.mode === "exercise_attempt" ? storedValue : undefined
             }
-            transferCodec={exerciseTransferCodec}
             onUserChange={handleUserChange}
             {...commonStorageProps}
           />
@@ -292,7 +256,6 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           <ExpressionBuilder
             key={`${activeWalkthroughExample?.id ?? "free-expression"}-${contentKey}`}
             initialValue={initialValue}
-            transferCodec={expressionTransferCodec}
             onTransferValueChange={
               isStorageReady ? handleExpressionChange : undefined
             }
@@ -314,7 +277,6 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         <TableToDnfBuilder
           key={`${activeWalkthroughExample?.id ?? "free-table"}-${contentKey}`}
           initialValue={initialValue}
-          transferCodec={truthTableTransferCodec}
           onTransferValueChange={
             isStorageReady ? handleTruthTableChange : undefined
           }

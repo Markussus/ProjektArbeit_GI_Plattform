@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   createJavaExecutionSnapshot,
   type JavaExecutionController,
@@ -31,33 +32,6 @@ function createRequestId(): string {
   return `java-exec-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function formatStopMessage(
-  reason: "stopped" | "timeout",
-  timeoutMs?: number,
-): string {
-  if (reason === "timeout") {
-    const seconds = Math.max(1, Math.round((timeoutMs ?? 0) / 1000));
-    return `Execution stopped after ${seconds} seconds.\n`;
-  }
-
-  return "Execution stopped by user.\n";
-}
-
-function createTerminalIssue(
-  reason: "stopped" | "timeout",
-  timeoutMs?: number,
-): JavaExecutionIssue {
-  return {
-    code: reason === "timeout" ? "execution_timeout" : "execution_stopped",
-    stage: reason,
-    severity: "error",
-    message:
-      reason === "timeout"
-        ? formatStopMessage(reason, timeoutMs).trim()
-        : "Execution was stopped manually.",
-  };
-}
-
 function mapJavaPhaseToExecutablePhase(
   phase: JavaExecutionPhase,
 ): ExecutionPhase {
@@ -73,6 +47,7 @@ function mapJavaPhaseToExecutablePhase(
 }
 
 export function useJavaExecution(): JavaExecutionController {
+  const { t } = useTranslation();
   const [snapshot, setSnapshot] = useState<JavaExecutionSnapshot>(() =>
     createJavaExecutionSnapshot(),
   );
@@ -320,8 +295,19 @@ export function useJavaExecution(): JavaExecutionController {
 
   const stop = useCallback(
     (reason: "stopped" | "timeout" = "stopped", timeoutMs?: number) => {
-      const issue = createTerminalIssue(reason, timeoutMs);
-      const stopMessage = formatStopMessage(reason, timeoutMs);
+      const seconds = Math.max(1, Math.round((timeoutMs ?? 0) / 1000));
+      const stopMessage = `${t(
+        reason === "timeout"
+          ? "java.execution.timeoutMessage"
+          : "java.execution.stoppedMessage",
+        { seconds },
+      )}\n`;
+      const issue: JavaExecutionIssue = {
+        code: reason === "timeout" ? "execution_timeout" : "execution_stopped",
+        stage: reason,
+        severity: "error",
+        message: stopMessage.trim(),
+      };
 
       recreatePreloadedWorker();
       setSnapshot((currentSnapshot) =>
@@ -341,7 +327,7 @@ export function useJavaExecution(): JavaExecutionController {
         }),
       );
     },
-    [createTerminalSnapshot, recreatePreloadedWorker],
+    [createTerminalSnapshot, recreatePreloadedWorker, t],
   );
 
   const reset = useCallback(() => {

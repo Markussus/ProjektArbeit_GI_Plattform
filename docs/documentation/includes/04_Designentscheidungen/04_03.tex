@@ -1,6 +1,6 @@
 \subNsection{1}{Reguläre Sprachen}{Kristian Popov}
 
-Das Modul \emph{Reguläre Sprachen} unterstützt die Arbeit mit regulären Sprachen
+Das Thema \emph{Reguläre Sprachen} unterstützt die Arbeit mit regulären Sprachen
 und rechtslinearen Grammatiken.
 Es bietet drei miteinander verknüpfte Funktionen:
 Die Aufzählung der von einer Grammatik erzeugten Wörter, die Erzeugung einer
@@ -9,7 +9,7 @@ Sprachbeschreibungen können entweder als Aufzählung oder in Mengenschreibweise
 eingegeben werden.
 Bei der Aufzählung einer Sprache werden die Wörter nach ihrer Länge sortiert.
 Die Ausgabe ist dabei auf eine maximale Wortlänge und Wortanzahl begrenzt.
-Bei der Wortprüfung zeigt das Modul neben der Annahme oder Ablehnung auch den Grund
+Bei der Wortprüfung zeigt das Thema neben der Annahme oder Ablehnung auch den Grund
 für ein abweichendes Ergebnis an, beispielsweise einen nicht möglichen Übergang.
 Beide Umwandlungsrichtungen sind zusätzlich als Übungen mit automatischer Rückmeldung verfügbar.
 
@@ -32,20 +32,20 @@ Die fachlichen Bausteine sind wie folgt aufgeteilt:
 
 	\item[Sprachbeschreibung]
 		Ein eigener Parser verarbeitet Aufzählungen und Mengenschreibweisen.
-    Er liefert eine strukturierte Beschreibung aus Faktoren, Exponenten und
+		Er liefert eine strukturierte Beschreibung aus Faktoren, Exponenten und
 		Nebenbedingungen, die anschließend in eine Grammatik umgewandelt werden
 		kann.
 
 	\item[Umwandlung und Vereinfachung]
 		Die Umwandlung erzeugt aus einer Sprachbeschreibung eine strikt
 		rechtslineare Grammatik.
-    Ergänzende Funktionen fassen gleichwertige Nichtterminale zusammen und
-    formatieren das Ergebnis für die Ausgabe.
+		Ergänzende Funktionen fassen gleichwertige Nichtterminale zusammen und
+		formatieren das Ergebnis für die Ausgabe.
 
 	\item[Sprachauswertung]
 		Die Aufzählung erzeugt Wörter bis zu den festgelegten Grenzen; die
 		Worterkennung prüft ein einzelnes Wort gegen eine Grammatik.
-    Die Übungsprüfung baut auf denselben Funktionen auf und ergänzt sie um die
+		Die Übungsprüfung baut auf denselben Funktionen auf und ergänzt sie um die
 		Auswertung der vorgegebenen Testfälle.
 \end{description}
 
@@ -90,7 +90,7 @@ Regeln der Form \verb|A -> aB| und \verb|A -> a| sowie die Regel
 $A \rightarrow \varepsilon$.
 Eine frühere Fassung gab eine kompaktere Form wie \verb|S -> A c B| aus.
 Diese Schreibweise ist zwar kürzer, aber eine allgemeine kontextfreie Regel und
-verlässt damit die Typ-3-Grammatiken, um die es in diesem Modul gerade geht.
+verlässt damit die Typ-3-Grammatiken, um die es in diesem Thema gerade geht.
 
 Um trotzdem eine lesbare Ausgabe zu bieten, gibt es zwei Sichten auf dasselbe
 Ergebnis statt zweier Formalismen:
@@ -109,7 +109,7 @@ eine exportierte Grammatik nach dem Import dieselben Namen trägt.
 
 \subNsection{2}{Entscheidungen im UI}{Kristian Popov}
 
-Die drei Arbeitsweisen sind über eine Modulauswahl erreichbar.
+Die drei Arbeitsweisen sind über eine Modusauswahl erreichbar.
 Ihre Komponenten bleiben im Hintergrund erhalten und werden nur ein- oder ausgeblendet.
 Dadurch bleiben Eingaben beim Wechsel zwischen den Modi bestehen.
 Würden die Modi jeweils neu aufgebaut, ginge die begonnene Arbeit verloren

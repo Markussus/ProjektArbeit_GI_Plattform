@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { exportActiveSimulator } from "./support/app-shell";
 
 const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
 const ERASE_TAPE_EXERCISE_ID = "tm.exercises.exerciseEraseTape";
@@ -210,20 +211,19 @@ test.describe("Turing Machine page", () => {
     await openSimulationTab(page);
 
     await page.getByTestId("tm-initial-tape-input").fill("11111");
-    await page.getByTestId("tm-transfer-export").click();
-    const storedFreeSimulation = await page.evaluate(() =>
-      window.localStorage.getItem("TrainingCenterStorage"),
-    );
+    await exportActiveSimulator(page);
 
     await openExampleInSimulation(page, BIT_FLIP_EXAMPLE_ID);
     await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue(
       "101001",
     );
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
+    );
 
     await page.getByTestId("tm-initial-tape-input").fill("000");
-    await page.getByTestId("tm-transfer-export").click();
-    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
-      /^[A-Za-z0-9_-]+$/,
+    await expect(exportActiveSimulator(page)).resolves.toMatch(
+      /^AA[A-Za-z0-9_-]+$/,
     );
 
     await switchTab(page, "overview");
@@ -270,8 +270,7 @@ test.describe("Turing Machine page", () => {
     await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
 
     await page.getByTestId("tm-initial-tape-input").fill("101");
-    await page.getByTestId("tm-transfer-export").click();
-    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
+    await expect(exportActiveSimulator(page)).resolves.toMatch(
       /^AAG[A-Za-z0-9_-]+$/,
     );
 

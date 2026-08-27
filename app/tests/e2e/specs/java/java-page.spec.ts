@@ -1,6 +1,10 @@
 import { deflateRawSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
-import { appTestIds } from "../../support/app-shell";
+import {
+  appTestIds,
+  exportActiveSimulator,
+  importFromHeader,
+} from "../../support/app-shell";
 
 function encodeRawJavaTransfer(sourceCode: string) {
   return `C${deflateRawSync(Buffer.from(sourceCode, "utf8")).toString("base64url")}`;
@@ -103,9 +107,18 @@ test.describe("Java page", () => {
     await expect(
       page.getByTestId(appTestIds.javaEditorContainer),
     ).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferExport)).toBeVisible();
-    await expect(page.getByTestId(appTestIds.javaTransferImport)).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferInput),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferExport),
+    ).toBeEnabled();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferImport),
+    ).toBeDisabled();
+    await expect(page.locator('[data-testid^="java-transfer-"]')).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId(appTestIds.javaRunButton)).toBeVisible();
     await expect(page.getByTestId(appTestIds.javaStopButton)).toBeVisible();
     await expect(page.getByTestId(appTestIds.javaConsolePanel)).toBeVisible();
@@ -140,6 +153,7 @@ test.describe("Java page", () => {
   test("supports transfer import/export and executing both valid and invalid Java code", async ({
     page,
   }) => {
+    test.setTimeout(180_000);
     await page.getByTestId(appTestIds.tabSimulation).click();
     await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
       /ready|loading/,
@@ -150,8 +164,7 @@ test.describe("Java page", () => {
     );
 
     await test.step("Export should generate a Java transfer string", async () => {
-      await page.getByTestId(appTestIds.javaTransferExport).click();
-      await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+      await expect(exportActiveSimulator(page)).resolves.toMatch(
         /^AH_[ABC][A-Za-z0-9_-]*$/,
       );
     });
@@ -164,13 +177,19 @@ test.describe("Java page", () => {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(runnableCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, encodeJavaTransfer(runnableCode));
+      await page.getByTestId(appTestIds.javaRunButton).click();
+
       await expect(
-        page.getByTestId(appTestIds.javaTransferStatus),
-      ).toBeVisible();
+        page.getByTestId(appTestIds.javaConsoleStdout),
+      ).toContainText("E2E success", { timeout: 120000 });
+    });
+
+    await test.step("An exported program can be imported again without changing its behavior", async () => {
+      const exportedProgram = await exportActiveSimulator(page);
+      expect(exportedProgram).toMatch(/^AH_[ABC][A-Za-z0-9_-]*$/);
+
+      await importFromHeader(page, `${exportedProgram} `);
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -190,10 +209,7 @@ public class Main {
 }
 `;
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(scannerCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
+      await importFromHeader(page, encodeJavaTransfer(scannerCode));
       await page.getByTestId(appTestIds.javaStdinInput).fill("e2e input\n");
       await page.getByTestId(appTestIds.javaRunButton).click();
 
@@ -202,16 +218,31 @@ public class Main {
       ).toContainText("E2E INPUT", { timeout: 120000 });
     });
 
+    await test.step("Scanner.nextInt reads a numeric token from program input", async () => {
+      const scannerCode = `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    int number = scanner.nextInt();
+    System.out.println(number * 2);
+  }
+}
+`;
+
+      await importFromHeader(page, encodeJavaTransfer(scannerCode));
+      await page.getByTestId(appTestIds.javaStdinInput).fill("21\n");
+      await page.getByTestId(appTestIds.javaRunButton).click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleStdout),
+      ).toContainText("42", { timeout: 120000 });
+    });
+
     await test.step("Importing invalid Java should surface a diagnostic after running", async () => {
       const invalidCode = "this is not valid java {{{";
 
-      await page
-        .getByTestId(appTestIds.javaTransferInput)
-        .fill(encodeJavaTransfer(invalidCode));
-      await page.getByTestId(appTestIds.javaTransferImport).click();
-      await expect(
-        page.getByTestId(appTestIds.javaTransferStatus),
-      ).toBeVisible();
+      await importFromHeader(page, encodeJavaTransfer(invalidCode));
       await page.getByTestId(appTestIds.javaRunButton).click();
 
       await expect(
@@ -223,42 +254,147 @@ public class Main {
         page.getByTestId(appTestIds.javaConsoleStderr),
       ).toContainText("Java compilation failed", { timeout: 120000 });
     });
+
+    await test.step("A runtime failure is reported separately from compiler diagnostics", async () => {
+      const runtimeErrorCode = `public class Main {
+  public static void main(String[] args) {
+    int zero = 0;
+    System.out.println(1 / zero);
+  }
+}
+`;
+
+      await importFromHeader(page, encodeJavaTransfer(runtimeErrorCode));
+      await page.getByTestId(appTestIds.javaRunButton).click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleIssues),
+      ).toContainText("wasm_runtime_failed", { timeout: 120000 });
+      await expect(
+        page.getByTestId(appTestIds.javaExecutionPhase),
+      ).toContainText(/error/i);
+    });
+  });
+
+  test("supports stop, timeout, and reset without leaving the Java page", async ({
+    page,
+  }) => {
+    test.setTimeout(180_000);
+    const endlessLoop = `public class Main {
+  public static void main(String[] args) {
+    while (true) {}
+  }
+}
+`;
+
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
+      /ready|bereit/i,
+      { timeout: 120000 },
+    );
+    await importFromHeader(page, encodeJavaTransfer(endlessLoop));
+
+    await test.step("Timeout terminates an endless program", async () => {
+      await page.getByTestId(appTestIds.javaTimeoutInput).fill("1");
+      await page.getByTestId(appTestIds.javaRunButton).click();
+      await expect(page.getByTestId("java-timeout-warning")).toBeVisible({
+        timeout: 120000,
+      });
+      await expect(
+        page.getByTestId(appTestIds.javaExecutionPhase),
+      ).toContainText(/timeout/i);
+    });
+
+    await test.step("Stop terminates a running program without crashing React", async () => {
+      await expect(
+        page.getByTestId(appTestIds.javaCompilerStatus),
+      ).toContainText(/ready|bereit/i, { timeout: 120000 });
+      await page.getByTestId(appTestIds.javaTimeoutInput).fill("60");
+      await page.getByTestId(appTestIds.javaRunButton).click();
+      await expect(
+        page.getByTestId(appTestIds.javaExecutionPhase),
+      ).toContainText(/running/i, { timeout: 120000 });
+      await page.getByTestId(appTestIds.javaStopButton).click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaExecutionPhase),
+      ).toContainText(/stopped/i);
+      await expect(page.getByTestId(appTestIds.javaSimulator)).toBeVisible();
+    });
+
+    await test.step("Reset restores code settings and console state", async () => {
+      await page.getByTestId("simulation-reset").click();
+
+      await expect(
+        page.getByTestId(appTestIds.javaExecutionPhase),
+      ).toContainText(/idle/i);
+      await expect(page.getByTestId(appTestIds.javaStdinInput)).toHaveValue("");
+      await expect(page.getByTestId(appTestIds.javaTimeoutInput)).toHaveValue(
+        "60",
+      );
+      await expect(
+        page.getByTestId(appTestIds.javaConsoleIssues),
+      ).toContainText(/No diagnostics|Keine Diagnosen/);
+    });
+  });
+
+  test("restores free-simulator Java code from LocalStorage", async ({
+    page,
+  }) => {
+    const persistedCode = `public class Main {
+  public static void main(String[] args) {
+    System.out.println("restored from storage");
+  }
+}
+`;
+
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
+      /ready|bereit/i,
+      { timeout: 120000 },
+    );
+    await importFromHeader(page, encodeJavaTransfer(persistedCode));
+    await page.getByTestId(appTestIds.javaRunButton).click();
+    await expect(page.getByTestId(appTestIds.javaConsoleStdout)).toContainText(
+      "restored from storage",
+      { timeout: 120000 },
+    );
+    await page.reload();
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await expect(page.getByTestId(appTestIds.javaCompilerStatus)).toContainText(
+      /ready|bereit/i,
+      { timeout: 120000 },
+    );
+    await page.getByTestId(appTestIds.javaRunButton).click();
+
+    await expect(page.getByTestId(appTestIds.javaConsoleStdout)).toContainText(
+      "restored from storage",
+      { timeout: 120000 },
+    );
   });
 
   test("always reloads examples from their built-in code without storing changes", async ({
     page,
   }) => {
     await page.getByTestId(appTestIds.tabSimulation).click();
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-      /^AH_[ABC][A-Za-z0-9_-]*$/,
-    );
-    const storedFreeSimulation = await page.evaluate(() =>
-      window.localStorage.getItem("TrainingCenterStorage"),
-    );
-
     await page.getByTestId(appTestIds.tabExamples).click();
     await page
       .getByTestId("java-example-card-java.example1Title-select")
       .click();
     await page.getByTestId("java-example-card-java.example1Title-open").click();
-
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
-      /^[ABC][A-Za-z0-9_-]*$/,
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
     );
-    const builtInExampleTransfer = await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .inputValue();
 
-    await page
-      .getByTestId(appTestIds.javaTransferInput)
-      .fill(
-        encodeRawJavaTransfer(
-          "public class Main { public static void main(String[] args) {} }",
-        ),
-      );
-    await page.getByTestId(appTestIds.javaTransferImport).click();
+    const builtInExampleTransfer = await exportActiveSimulator(page);
+    expect(builtInExampleTransfer).toMatch(/^AH[A-Za-z0-9_-]+$/);
+
+    await page.locator(".monaco-editor .view-lines").click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type(
+      "public class Main { public static void main(String[] args) {} }",
+    );
+    expect(await exportActiveSimulator(page)).not.toBe(builtInExampleTransfer);
 
     await page.getByTestId(appTestIds.tabOverview).click();
     await page.getByTestId(appTestIds.tabExamples).click();
@@ -266,9 +402,7 @@ public class Main {
       .getByTestId("java-example-card-java.example1Title-select")
       .click();
     await page.getByTestId("java-example-card-java.example1Title-open").click();
-    await page.getByTestId(appTestIds.javaTransferExport).click();
-
-    await expect(page.getByTestId(appTestIds.javaTransferInput)).toHaveValue(
+    await expect(exportActiveSimulator(page)).resolves.toBe(
       builtInExampleTransfer,
     );
     expect(

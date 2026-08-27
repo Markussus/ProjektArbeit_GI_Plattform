@@ -186,12 +186,6 @@ test.describe("Regular Languages — Grammar → Language", () => {
     await expect(page.getByText(/Format 1 — simplified/i)).toBeVisible();
     await expect(page.getByText(/Format 2 — structured/i)).toBeVisible();
   });
-
-  test("offers an import/export transfer box", async ({ page }) => {
-    await expect(
-      page.getByTestId("rl-transfer-root").filter(visibleOnly),
-    ).toBeVisible();
-  });
 });
 
 test.describe("Regular Languages — Language → Grammar", () => {
@@ -275,12 +269,6 @@ test.describe("Regular Languages — Language → Grammar", () => {
   }) => {
     await languageTextarea(page).fill("");
     await expect(page.getByText(/Enter a language definition/i)).toHaveCount(0);
-  });
-
-  test("offers its own import/export transfer box", async ({ page }) => {
-    await expect(
-      page.getByTestId("rl-language-transfer-root").filter(visibleOnly),
-    ).toBeVisible();
   });
 });
 

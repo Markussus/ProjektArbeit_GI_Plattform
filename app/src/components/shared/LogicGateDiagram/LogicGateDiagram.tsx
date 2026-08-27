@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
 export interface LogicGateDiagramProps {
   expression: BooleanExpression | null;
   outputName: string;
+  ariaLabel: string;
   variables: string[];
   unavailableText: string;
   binaryGates?: boolean;
@@ -28,6 +29,7 @@ interface SelectedConnection {
 export function LogicGateDiagram({
   expression,
   outputName,
+  ariaLabel,
   variables,
   unavailableText,
   binaryGates = true,
@@ -37,6 +39,9 @@ export function LogicGateDiagram({
     () => (expression ? buildDiagram(expression, binaryGates) : null),
     [binaryGates, expression],
   );
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-logic-arrow`;
+  const selectedArrowMarkerId = `${markerPrefix}-logic-arrow-selected`;
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [selectedConnection, setSelectedConnection] =
     useState<SelectedConnection | null>(null);
@@ -79,14 +84,14 @@ export function LogicGateDiagram({
       <svg
         data-testid={`${testIdPrefix}-gate-diagram`}
         role="img"
-        aria-label={`${outputName} logic gate diagram`}
+        aria-label={ariaLabel}
         viewBox={`0 0 ${width} ${height}`}
         style={{ width, height }}
         className="block max-w-none"
       >
         <defs>
           <marker
-            id="logic-arrow"
+            id={arrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -96,7 +101,7 @@ export function LogicGateDiagram({
             <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
           </marker>
           <marker
-            id="logic-arrow-selected"
+            id={selectedArrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -158,8 +163,8 @@ export function LogicGateDiagram({
                   strokeWidth={selected ? 4 : 2}
                   markerEnd={
                     selected
-                      ? "url(#logic-arrow-selected)"
-                      : "url(#logic-arrow)"
+                      ? `url(#${selectedArrowMarkerId})`
+                      : `url(#${arrowMarkerId})`
                   }
                 />
               </g>
@@ -207,8 +212,8 @@ export function LogicGateDiagram({
               markerEnd={
                 selectedConnection?.sourceId === diagram.rootId &&
                 selectedConnection.targetId === "output"
-                  ? "url(#logic-arrow-selected)"
-                  : "url(#logic-arrow)"
+                  ? `url(#${selectedArrowMarkerId})`
+                  : `url(#${arrowMarkerId})`
               }
             />
             <circle

@@ -4,20 +4,45 @@ import { buildMealyConversion } from "@/pages/FundamentalsCS/MooreMealy/componen
 import { MealyMachineSimulator } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyMachine";
 
 describe("MealyMachineSimulator", () => {
-  it("produces one output for every processed transition", () => {
+  it("produces one source-state output for every processed transition", () => {
     const simulator = new MealyMachineSimulator();
     simulator.initialize(defaultMealyProgram);
     while (!simulator.isFinished()) simulator.step();
+
     expect(simulator.getCurrentState().outputSymbols.join("")).toBe("abcabb");
+    expect(simulator.getCurrentState().outputSymbols).toHaveLength(
+      defaultMealyProgram.inputWord.length,
+    );
   });
 
-  it("builds output rows from state and input bits", () => {
+  it("restores the complete previous runtime on step back", () => {
+    const simulator = new MealyMachineSimulator();
+    simulator.initialize(defaultMealyProgram);
+    simulator.step();
+    simulator.stepBack();
+
+    expect(simulator.getCurrentState()).toMatchObject({
+      currentState: defaultMealyProgram.initialState,
+      inputPosition: 0,
+      outputSymbols: [],
+      stepCount: 0,
+      halted: false,
+    });
+  });
+
+  it("builds transition and output rows from state and input bits", () => {
     const conversion = buildMealyConversion(defaultMealyProgram);
+
     expect(conversion.output.inputVariables).toEqual(["E0"]);
     expect(conversion.output.rows).toHaveLength(
       defaultMealyProgram.states.length *
         defaultMealyProgram.inputSymbols.length,
     );
+    expect(conversion.output.rows[0]).toMatchObject({
+      currentState: "S0",
+      inputSymbol: "0",
+      outputSymbol: "a",
+    });
     expect(
       conversion.output.formulas.every((formula) =>
         formula.variables.includes("E0"),

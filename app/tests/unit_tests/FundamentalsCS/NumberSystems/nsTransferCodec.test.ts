@@ -87,25 +87,6 @@ describe("nsTransferCodec", () => {
       });
     });
 
-    test("handles garbage prefixes cleanly (like ADAdjF8 or ADHdjF8)", async () => {
-      // Prefixing with garbage text
-      const result = await nsTransferCodec.importValue(
-        "ADAdjF8aXxkfGJ8MTIzNA==",
-      );
-      expect(result).toEqual({
-        activeMode: "integers",
-        integers: { sourceBase: "dec", targetBase: "bin", inputValue: "1234" },
-      });
-
-      const result2 = await nsTransferCodec.importValue(
-        "SomeRandomTextdjF8aXxkfGJ8MTIzNA==",
-      );
-      expect(result2).toEqual({
-        activeMode: "integers",
-        integers: { sourceBase: "dec", targetBase: "bin", inputValue: "1234" },
-      });
-    });
-
     test("handles URL-safe base64 conversion", async () => {
       // If base64 has - and _ instead of + and /, it should handle it
       // Let's create a string with + and /
@@ -121,18 +102,6 @@ describe("nsTransferCodec", () => {
       expect(result.fractional?.inputValue).toBe("0.5+0/5");
     });
 
-    test("falls back to parsing JSON correctly", async () => {
-      const stateObj: NumberSystemState = {
-        activeMode: "negative",
-        negative: { activeMode: "ones", inputValue: "10" },
-      };
-      const jsonStr = JSON.stringify(stateObj);
-      const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
-
-      const result = await nsTransferCodec.importValue(base64Str);
-      expect(result).toEqual(stateObj);
-    });
-
     test("throws an error for invalid version", async () => {
       const invalidVersion = btoa(
         unescape(encodeURIComponent("v2|i|d|b|1234")),
@@ -140,6 +109,16 @@ describe("nsTransferCodec", () => {
       await expect(nsTransferCodec.importValue(invalidVersion)).rejects.toThrow(
         "Failed to import number systems state",
       );
+    });
+
+    test("rejects obsolete JSON and prefixed payloads", async () => {
+      const jsonPayload = btoa(JSON.stringify({ activeMode: "integers" }));
+      await expect(nsTransferCodec.importValue(jsonPayload)).rejects.toThrow(
+        "Failed to import number systems state",
+      );
+      await expect(
+        nsTransferCodec.importValue("ADAdjF8aXxkfGJ8MTIzNA=="),
+      ).rejects.toThrow("Failed to import number systems state");
     });
 
     test("throws an error for completely invalid strings", async () => {

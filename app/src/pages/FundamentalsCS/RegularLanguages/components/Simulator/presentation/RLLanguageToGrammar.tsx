@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   formatLanguageIssue,
   parseLanguageSpec,
@@ -27,6 +27,8 @@ import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
 // Kept short enough to sit on one line in the textarea; three words are still
@@ -50,6 +52,8 @@ type ConversionResult =
 
 export function RLLanguageToGrammar({
   initialSource,
+  transferActive = true,
+  resetVersion = 0,
 }: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
@@ -65,12 +69,24 @@ export function RLLanguageToGrammar({
     setSource(initialSource);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.languageToGrammar,
     codec: rlLanguageTransferCodec,
     source,
     setSource,
     hasSeed: initialSource !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlLanguageTransferCodec,
+    enabled: transferActive,
   });
 
   // Publish the current language so the lifted exercise "Check solution" action
@@ -132,6 +148,7 @@ export function RLLanguageToGrammar({
           </h4>
 
           <textarea
+            data-testid="rl-language-to-grammar-source"
             value={source}
             onChange={(e) => setSource(e.target.value)}
             spellCheck={false}
@@ -261,14 +278,6 @@ export function RLLanguageToGrammar({
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-language-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

@@ -1,5 +1,13 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { List, Minus, Plus, RotateCcw, WrapText } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
 import { Tooltip } from "@/components/shared/Tooltip";
@@ -41,6 +49,10 @@ export function StateMachineGraph({
   compact = false,
   defaultLabelLayout = "wrapped",
 }: StateMachineGraphProps) {
+  const { t } = useTranslation();
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-state-machine-arrow`;
+  const activeArrowMarkerId = `${markerPrefix}-state-machine-arrow-active`;
   const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
   const [nodePositions, setNodePositions] = useState<Map<string, Point>>(
@@ -144,7 +156,7 @@ export function StateMachineGraph({
       >
         <defs>
           <marker
-            id="state-machine-arrow"
+            id={arrowMarkerId}
             markerWidth="10"
             markerHeight="8"
             refX="9"
@@ -155,7 +167,7 @@ export function StateMachineGraph({
             <path d="M 0 0 L 10 4 L 0 8 z" className="fill-muted-foreground" />
           </marker>
           <marker
-            id="state-machine-arrow-active"
+            id={activeArrowMarkerId}
             markerWidth="10"
             markerHeight="8"
             refX="9"
@@ -182,6 +194,8 @@ export function StateMachineGraph({
               label={edge.label}
               active={edge.isActive}
               labelLayout={labelLayout}
+              arrowMarkerId={arrowMarkerId}
+              activeArrowMarkerId={activeArrowMarkerId}
             />
           ) : (
             <DirectedEdge
@@ -191,6 +205,8 @@ export function StateMachineGraph({
               label={edge.label}
               active={edge.isActive}
               labelLayout={labelLayout}
+              arrowMarkerId={arrowMarkerId}
+              activeArrowMarkerId={activeArrowMarkerId}
               offset={
                 groupedEdges.some(
                   (candidate) =>
@@ -236,7 +252,7 @@ export function StateMachineGraph({
                     y2={position.y}
                     className="stroke-muted-foreground"
                     strokeWidth="2"
-                    markerEnd="url(#state-machine-arrow)"
+                    markerEnd={`url(#${arrowMarkerId})`}
                   />
                   <text
                     x={position.x - NODE_RADIUS - 52}
@@ -244,7 +260,7 @@ export function StateMachineGraph({
                     textAnchor="end"
                     className="fill-muted-foreground text-[11px]"
                   >
-                    start
+                    {t("moore.graph.start")}
                   </text>
                 </>
               )}
@@ -303,8 +319,8 @@ export function StateMachineGraph({
         <GraphButton
           label={
             labelLayout === "wrapped"
-              ? "Show transition symbols as a vertical list"
-              : "Show transition symbols comma-separated"
+              ? t("moore.graph.showAsList")
+              : t("moore.graph.showWrapped")
           }
           testId={testId ? `${testId}-label-layout-toggle` : undefined}
           onClick={() =>
@@ -320,21 +336,21 @@ export function StateMachineGraph({
           )}
         </GraphButton>
         <GraphButton
-          label="Zoom out"
+          label={t("moore.graph.zoomOut")}
           testId={testId ? `${testId}-zoom-out` : undefined}
           onClick={zoomOut}
         >
           <Minus className="size-4" />
         </GraphButton>
         <GraphButton
-          label="Reset view"
+          label={t("moore.graph.resetView")}
           testId={testId ? `${testId}-reset-view` : undefined}
           onClick={resetGraph}
         >
           <RotateCcw className="size-4" />
         </GraphButton>
         <GraphButton
-          label="Zoom in"
+          label={t("moore.graph.zoomIn")}
           testId={testId ? `${testId}-zoom-in` : undefined}
           onClick={zoomIn}
         >
@@ -344,7 +360,7 @@ export function StateMachineGraph({
       <button
         type="button"
         onClick={resetGraph}
-        aria-label="Reset zoom to 100%"
+        aria-label={t("moore.graph.resetZoom")}
         data-testid={testId ? `${testId}-zoom-percent-reset` : undefined}
         className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
       >
@@ -434,6 +450,8 @@ function DirectedEdge({
   active,
   offset = 0,
   labelLayout,
+  arrowMarkerId,
+  activeArrowMarkerId,
 }: {
   from: Point;
   to: Point;
@@ -441,6 +459,8 @@ function DirectedEdge({
   active?: boolean;
   offset?: number;
   labelLayout: "wrapped" | "list";
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
 }) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -467,11 +487,7 @@ function DirectedEdge({
         y2={end.y}
         className={active ? "stroke-brand" : "stroke-muted-foreground"}
         strokeWidth={active ? 4 : 2}
-        markerEnd={
-          active
-            ? "url(#state-machine-arrow-active)"
-            : "url(#state-machine-arrow)"
-        }
+        markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
       />
       <EdgeLabel
         x={labelX}
@@ -490,12 +506,16 @@ function SelfLoop({
   label,
   active,
   labelLayout,
+  arrowMarkerId,
+  activeArrowMarkerId,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
   labelLayout: "wrapped" | "list";
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
 }) {
   const path = `M ${x - 22} ${y - 36} C ${x - 58} ${y - 92}, ${x + 58} ${y - 92}, ${x + 22} ${y - 36}`;
 
@@ -506,11 +526,7 @@ function SelfLoop({
         fill="none"
         className={active ? "stroke-brand" : "stroke-muted-foreground"}
         strokeWidth={active ? 4 : 2}
-        markerEnd={
-          active
-            ? "url(#state-machine-arrow-active)"
-            : "url(#state-machine-arrow)"
-        }
+        markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
       />
       <EdgeLabel
         x={x}

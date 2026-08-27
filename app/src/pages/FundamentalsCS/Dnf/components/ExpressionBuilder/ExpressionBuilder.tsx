@@ -8,9 +8,8 @@ import {
 } from "react";
 import { Eraser, Lightbulb, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
@@ -44,7 +43,6 @@ interface ExpressionBuilderProps {
   storageIdentifier: string;
   storageEnabled: boolean;
   storageReady: boolean;
-  transferCodec: ISimulatorTransferCodec<DnfExpressionTransferDraft>;
   onTransferValueChange?: (value: DnfExpressionTransferDraft) => void;
   onUserChange?: () => void;
   seedInitialFeedback?: boolean;
@@ -55,7 +53,6 @@ export function ExpressionBuilder({
   storageIdentifier,
   storageEnabled,
   storageReady,
-  transferCodec,
   onTransferValueChange,
   onUserChange,
   seedInitialFeedback = false,
@@ -85,6 +82,11 @@ export function ExpressionBuilder({
     value: transferValue,
     codec: dnfExpressionTransferCodec,
     enabled: storageEnabled && storageReady,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfExpressionTransferCodec,
   });
 
   useEffect(() => {
@@ -116,20 +118,6 @@ export function ExpressionBuilder({
     onUserChange?.();
     setCommittedSource(null);
     setAttempt(createDnfAttemptDraft());
-    setWorkspaceVersion((current) => current + 1);
-  };
-
-  const handleImportExpression = (value: DnfExpressionTransferDraft) => {
-    const normalizedExpression = normalizeBooleanOperatorAliases(
-      value.expression,
-    );
-
-    onUserChange?.();
-    setInputValue(normalizedExpression);
-    setCommittedSource(
-      value.committed ? normalizedExpression.trim() || null : null,
-    );
-    setAttempt(createDnfAttemptDraft(value));
     setWorkspaceVersion((current) => current + 1);
   };
 
@@ -233,13 +221,6 @@ export function ExpressionBuilder({
           seedInitialFeedback={seedInitialFeedback}
         />
       )}
-
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportExpression}
-        testIdPrefix="dnf-expression-transfer"
-      />
     </div>
   );
 }

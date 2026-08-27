@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
@@ -14,13 +14,14 @@ import { enumerateLanguage } from "./Simulator/domain/rlLanguageOps";
 import { parseGrammar } from "./Simulator/domain/rlGrammarValidation";
 import { findRLExercise } from "../exercises/rlExerciseDefinitions";
 import { useRLSimulatorStore } from "../store/rlSimulatorStore";
-import { RLSimulator } from "./Simulator/RLSimulator";
+import { RLSimulator, type RLSimulatorHandle } from "./Simulator/RLSimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const setActiveExercise = useRLSimulatorStore((s) => s.setActiveExercise);
   const revealEnumeration = useRLSimulatorStore((s) => s.revealEnumeration);
   const revealGrammar = useRLSimulatorStore((s) => s.revealGrammar);
+  const simulatorRef = useRef<RLSimulatorHandle>(null);
 
   // The opened exercise (if any) drives the action buttons. Examples still flow
   // through the shared "Selected example" card with no actions.
@@ -124,8 +125,13 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.regularLanguages"
+        onReset={() => simulatorRef.current?.resetStoredState()}
       >
-        <RLSimulator onExitExercise={props.onExitExercise} />
+        <RLSimulator
+          ref={simulatorRef}
+          onExitExercise={props.onExitExercise}
+          importedTaskStorageId={props.importedTaskStorageId}
+        />
       </TopicSimulationTab>
 
       <SolutionCheckDialog

@@ -1,6 +1,17 @@
-import { useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+  type Ref,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import {
+  createTrainingCenterIdentifier,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
 import { useRLSimulatorStore } from "../../store/rlSimulatorStore";
 import { findRLExercise } from "../../exercises/rlExerciseDefinitions";
 import type { SimulationMode } from "./domain/rlTypes";
@@ -10,13 +21,30 @@ import { RLGrammarEnumerationExercise } from "./presentation/RLGrammarEnumeratio
 import { RLLanguageGrammarExercise } from "./presentation/RLLanguageGrammarExercise";
 import { RLLanguageToGrammar } from "./presentation/RLLanguageToGrammar";
 import { RLWordRecognizer } from "./presentation/RLWordRecognizer";
+import { RL_STORAGE_TASK_IDS } from "./useRLPersistedSource";
 
 interface RLSimulatorProps {
   /** Clears the active exercise (set by ModuleTopicPage when one is open). */
   onExitExercise?: () => void;
+  importedTaskStorageId?: number;
+  ref?: Ref<RLSimulatorHandle>;
 }
 
-export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
+export interface RLSimulatorHandle {
+  resetStoredState: () => void;
+}
+
+const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
+  grammarToLanguage: 0,
+  languageToGrammar: 0,
+  recognizeWord: 0,
+};
+
+export function RLSimulator({
+  onExitExercise,
+  importedTaskStorageId,
+  ref,
+}: RLSimulatorProps) {
   const { t } = useTranslation();
   const mode = useRLSimulatorStore((s) => s.mode);
   const setMode = useRLSimulatorStore((s) => s.setMode);
@@ -30,6 +58,18 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
   );
   const pendingTestWord = useRLSimulatorStore((s) => s.pendingTestWord);
   const consumePending = useRLSimulatorStore((s) => s.consumePending);
+  const clearExerciseDraft = useRLSimulatorStore((s) => s.clearExerciseDraft);
+  const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
+
+  useEffect(() => {
+    const importedMode = Object.entries(RL_STORAGE_TASK_IDS).find(
+      ([, taskStorageId]) => taskStorageId === importedTaskStorageId,
+    )?.[0] as SimulationMode | undefined;
+
+    if (importedMode) {
+      setMode(importedMode);
+    }
+  }, [importedTaskStorageId, setMode]);
 
   // An active exercise replaces the free converter with a guided workspace:
   // Grammar → Language gives the grammar and asks for the language; Language →
@@ -61,6 +101,26 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
       setMode(target);
     }
   };
+
+  const resetStoredState = useCallback(() => {
+    if (activeExerciseId) {
+      clearExerciseDraft(activeExerciseId);
+      return;
+    }
+
+    trainingCenterStorage.delete(
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.regularLanguages,
+        RL_STORAGE_TASK_IDS[mode],
+      ),
+    );
+    setResetVersions((versions) => ({
+      ...versions,
+      [mode]: versions[mode] + 1,
+    }));
+  }, [activeExerciseId, clearExerciseDraft, mode]);
+
+  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
 
   // When a pending scenario arrives the mode cards pick it up via a
   // render-time prop sync (see each card); we then clear the store so the
@@ -99,6 +159,8 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
           <RLGrammarEnumerationExercise exercise={activeExercise} />
         ) : (
           <RLGrammarToLanguage
+            transferActive={mode === "grammarToLanguage"}
+            resetVersion={resetVersions.grammarToLanguage}
             initialGrammar={
               mode === "grammarToLanguage"
                 ? (pendingGrammarSource ?? undefined)
@@ -112,6 +174,8 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
           <RLLanguageGrammarExercise exercise={activeExercise} />
         ) : (
           <RLLanguageToGrammar
+            transferActive={mode === "languageToGrammar"}
+            resetVersion={resetVersions.languageToGrammar}
             initialSource={
               mode === "languageToGrammar"
                 ? (pendingLanguageSource ?? undefined)
@@ -122,6 +186,8 @@ export function RLSimulator({ onExitExercise }: RLSimulatorProps) {
       </div>
       <div hidden={mode !== "recognizeWord"}>
         <RLWordRecognizer
+          transferActive={mode === "recognizeWord"}
+          resetVersion={resetVersions.recognizeWord}
           initialGrammar={
             mode === "recognizeWord"
               ? (pendingGrammarSource ?? undefined)
