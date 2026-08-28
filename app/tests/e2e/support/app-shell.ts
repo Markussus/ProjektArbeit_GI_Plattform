@@ -1,9 +1,10 @@
 import { expect, type Page } from "@playwright/test";
 
 export const appTestIds = {
-  documentationPage: "documentation-page",
-  helpPage: "help-page",
-  legalPage: "legal-page",
+  infoPage: "info-page",
+  documentationPage: "info-page",
+  helpPage: "info-page",
+  legalPage: "info-page",
   javaCompilerStatus: "java-compiler-status",
   javaCommandOverviewButton: "java-command-overview-button",
   javaCommandOverviewDialog: "java-command-overview-dialog",
@@ -54,9 +55,10 @@ export const appTestIds = {
   nsValidationVerifyButton: "ns-validation-verify-button",
   nsValidationShowSolutionButton: "ns-validation-show-solution-button",
   sidebar: "sidebar",
-  sidebarDocumentationLink: "sidebar-documentation-link",
-  sidebarHelpLink: "sidebar-help-link",
-  sidebarLegalLink: "sidebar-legal-link",
+  sidebarInfoLink: "sidebar-info-link",
+  sidebarDocumentationLink: "sidebar-info-link",
+  sidebarHelpLink: "sidebar-info-link",
+  sidebarLegalLink: "sidebar-info-link",
   sidebarToggle: "sidebar-toggle",
   simulationSelectedExercise: "simulation-selected-exercise",
   tabExamples: "tab-button-examples",
@@ -69,8 +71,9 @@ export const appTestIds = {
 export const localizedContent = {
   de: {
     appTitle: "THWS - Traingscenter",
-    documentationTitle: "Dokumentation",
-    helpTitle: "Hilfe",
+    infoTitle: "Informationen & Rechtliches",
+    documentationTitle: "Informationen & Rechtliches",
+    helpTitle: "Informationen & Rechtliches",
     homeHeroTitleParts: [
       "Komplexe Systeme meistern",
       "durch interaktives Lernen.",
@@ -79,8 +82,9 @@ export const localizedContent = {
   },
   en: {
     appTitle: "THWS - Traing Center",
-    documentationTitle: "Documentation",
-    helpTitle: "Help",
+    infoTitle: "Information & Legal",
+    documentationTitle: "Information & Legal",
+    helpTitle: "Information & Legal",
     homeHeroTitleParts: [
       "Master Complex Systems",
       "through Interactive Learning.",

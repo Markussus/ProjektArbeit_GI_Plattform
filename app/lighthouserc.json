@@ -3,8 +3,7 @@
     "collect": {
       "url": [
         "http://127.0.0.1:4173/",
-        "http://127.0.0.1:4173/documentation",
-        "http://127.0.0.1:4173/help",
+        "http://127.0.0.1:4173/info",
         "http://127.0.0.1:4173/__lhci-not-found__",
         "http://127.0.0.1:4173/fundamentals-cs",
         "http://127.0.0.1:4173/fundamentals-cs/turing-machine",

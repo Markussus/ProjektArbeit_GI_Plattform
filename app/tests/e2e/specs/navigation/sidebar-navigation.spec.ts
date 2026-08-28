@@ -31,45 +31,24 @@ test.describe("Sidebar navigation", () => {
     });
   });
 
-  test("opens the documentation page from the sidebar", async ({ page }) => {
-    await switchLanguage(page, "en");
-    await ensureSidebarExpanded(page);
-
-    await test.step("The documentation link should navigate to the documentation route", async () => {
-      await page.getByTestId(appTestIds.sidebarDocumentationLink).click();
-      await expect
-        .poll(() => new URL(page.url()).pathname)
-        .toBe("/documentation");
-    });
-
-    await test.step("The documentation route should render the documentation page content", async () => {
-      await expect(
-        page.getByTestId(appTestIds.documentationPage),
-      ).toBeVisible();
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        localizedContent.en.documentationTitle,
-      );
-    });
-  });
-
-  test("opens the help page from the sidebar", async ({ page }) => {
+  test("opens the info page from the sidebar", async ({ page }) => {
     await switchLanguage(page, "de");
     await ensureSidebarExpanded(page);
 
-    await test.step("The help link should navigate to the help route", async () => {
-      await page.getByTestId(appTestIds.sidebarHelpLink).click();
-      await expect.poll(() => new URL(page.url()).pathname).toBe("/help");
+    await test.step("The info link should navigate to the info route", async () => {
+      await page.getByTestId(appTestIds.sidebarInfoLink).click();
+      await expect.poll(() => new URL(page.url()).pathname).toBe("/info");
     });
 
-    await test.step("The help route should render the help page content", async () => {
-      await expect(page.getByTestId(appTestIds.helpPage)).toBeVisible();
+    await test.step("The info route should render the info page content", async () => {
+      await expect(page.getByTestId(appTestIds.infoPage)).toBeVisible();
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        localizedContent.de.helpTitle,
+        localizedContent.de.infoTitle,
       );
     });
   });
 
-  test("deletes all saved training-center progress from the help page", async ({
+  test("deletes all saved training-center progress from the info page", async ({
     page,
   }) => {
     await page.evaluate(() => {
@@ -79,7 +58,7 @@ test.describe("Sidebar navigation", () => {
       );
     });
     await ensureSidebarExpanded(page);
-    await page.getByTestId(appTestIds.sidebarHelpLink).click();
+    await page.getByTestId(appTestIds.sidebarInfoLink).click();
 
     await page.getByTestId("help-reset-all-progress").click();
     await expect(

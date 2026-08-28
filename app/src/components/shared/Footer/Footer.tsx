@@ -6,10 +6,17 @@ export function Footer() {
 
   return (
     <footer className="border-border bg-background flex h-10 items-center justify-between border-t px-5">
-      <p className="text-muted-foreground text-xs">{t("footer.copyright")}</p>
+      <a
+        href="https://fiw.thws.de"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+      >
+        {t("footer.copyright")}
+      </a>
       <Link
-        to="/legal"
-        className="text-muted-foreground hover:text-foreground text-xs font-medium"
+        to="/info#legal"
+        className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
       >
         {t("footer.legal")}
       </Link>
