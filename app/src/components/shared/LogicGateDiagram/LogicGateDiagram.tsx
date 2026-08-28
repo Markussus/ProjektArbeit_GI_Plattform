@@ -1,13 +1,15 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
-interface LogicGateDiagramProps {
+export interface LogicGateDiagramProps {
   expression: BooleanExpression | null;
   outputName: string;
+  ariaLabel: string;
   variables: string[];
   unavailableText: string;
   binaryGates?: boolean;
+  testIdPrefix?: string;
 }
 
 interface DiagramNode {
@@ -27,14 +29,19 @@ interface SelectedConnection {
 export function LogicGateDiagram({
   expression,
   outputName,
+  ariaLabel,
   variables,
   unavailableText,
   binaryGates = true,
+  testIdPrefix = "logic",
 }: LogicGateDiagramProps) {
   const diagram = useMemo(
     () => (expression ? buildDiagram(expression, binaryGates) : null),
     [binaryGates, expression],
   );
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-logic-arrow`;
+  const selectedArrowMarkerId = `${markerPrefix}-logic-arrow-selected`;
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [selectedConnection, setSelectedConnection] =
     useState<SelectedConnection | null>(null);
@@ -75,16 +82,16 @@ export function LogicGateDiagram({
   return (
     <div className="border-border bg-muted/10 overflow-auto rounded-xl border">
       <svg
-        data-testid="moore-logic-gate-diagram"
+        data-testid={`${testIdPrefix}-gate-diagram`}
         role="img"
-        aria-label={`${outputName} logic gate diagram`}
+        aria-label={ariaLabel}
         viewBox={`0 0 ${width} ${height}`}
         style={{ width, height }}
         className="block max-w-none"
       >
         <defs>
           <marker
-            id="logic-arrow"
+            id={arrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -94,7 +101,7 @@ export function LogicGateDiagram({
             <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
           </marker>
           <marker
-            id="logic-arrow-selected"
+            id={selectedArrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -145,7 +152,7 @@ export function LogicGateDiagram({
                   }}
                 />
                 <path
-                  data-testid={`moore-logic-wire-${childId}-${node.id}`}
+                  data-testid={`${testIdPrefix}-wire-${childId}-${node.id}`}
                   d={path}
                   fill="none"
                   pointerEvents="none"
@@ -156,8 +163,8 @@ export function LogicGateDiagram({
                   strokeWidth={selected ? 4 : 2}
                   markerEnd={
                     selected
-                      ? "url(#logic-arrow-selected)"
-                      : "url(#logic-arrow)"
+                      ? `url(#${selectedArrowMarkerId})`
+                      : `url(#${arrowMarkerId})`
                   }
                 />
               </g>
@@ -184,7 +191,7 @@ export function LogicGateDiagram({
               }}
             />
             <line
-              data-testid={`moore-logic-wire-${diagram.rootId}-output`}
+              data-testid={`${testIdPrefix}-wire-${diagram.rootId}-output`}
               x1={rootPosition.x + 50}
               y1={rootPosition.y}
               x2={outputX}
@@ -205,8 +212,8 @@ export function LogicGateDiagram({
               markerEnd={
                 selectedConnection?.sourceId === diagram.rootId &&
                 selectedConnection.targetId === "output"
-                  ? "url(#logic-arrow-selected)"
-                  : "url(#logic-arrow)"
+                  ? `url(#${selectedArrowMarkerId})`
+                  : `url(#${arrowMarkerId})`
               }
             />
             <circle
@@ -240,6 +247,7 @@ export function LogicGateDiagram({
             <GateNode
               key={node.id}
               node={node}
+              testIdPrefix={testIdPrefix}
               x={position.x}
               y={position.y}
               selected={
@@ -307,12 +315,14 @@ function createCompactPositions(
 
 function GateNode({
   node,
+  testIdPrefix,
   x,
   y,
   selected,
   onSelect,
 }: {
   node: DiagramNode;
+  testIdPrefix: string;
   x: number;
   y: number;
   selected: boolean;
@@ -321,7 +331,7 @@ function GateNode({
   if (node.kind === "input" || node.kind === "constant") {
     return (
       <g
-        data-testid={`moore-logic-node-${node.id}`}
+        data-testid={`${testIdPrefix}-node-${node.id}`}
         onClick={onSelect}
         className="cursor-pointer"
       >
@@ -350,7 +360,7 @@ function GateNode({
 
   return (
     <g
-      data-testid={`moore-logic-node-${node.id}`}
+      data-testid={`${testIdPrefix}-node-${node.id}`}
       onClick={onSelect}
       className="cursor-pointer"
     >

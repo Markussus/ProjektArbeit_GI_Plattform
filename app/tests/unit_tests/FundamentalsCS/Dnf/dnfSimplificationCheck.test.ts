@@ -76,6 +76,24 @@ describe("DNF simplification check", () => {
     expect(result.minimumLiteralCount).toBe(4);
   });
 
+  it("accepts an already-minimal DNF that cannot be simplified further", () => {
+    // f = 1 only for 000 and 111 (the "all equal" function). The two minterms
+    // share no literal, so the canonical DNF is already minimal — there is no
+    // shorter equivalent form. Submitting it must be accepted as minimal, not
+    // flagged as "equivalent but not shorter".
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
+
+    const result = checkDnfSimplification(
+      table,
+      "(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)",
+    );
+
+    expect(result.status).toBe("accepted_minimal");
+    expect(result.userLiteralCount).toBe(6);
+    expect(result.minimumLiteralCount).toBe(6);
+    expect(result.canonicalLiteralCount).toBe(6);
+  });
+
   it("accepts a shorter-but-not-minimal simplification", () => {
     // Function f(a,b,c) with minterms {0,1,2,3,5,7}. Canonical DNF = 18
     // literals; QMC minimum is ¬a ∨ (a∧c) = 3 literals. The submission below
@@ -103,6 +121,20 @@ describe("DNF simplification check", () => {
 
     expect(result.status).toBe("accepted_minimal");
     expect(result.userLiteralCount).toBe(4);
+  });
+
+  it("does not mark an intermediate non-DNF form as globally minimal", () => {
+    const table = generateTruthTable(parse("(a | b) & (c | d)"));
+
+    const result = checkDnfSimplification(
+      table,
+      "(a & (c | d)) | (b & (c | d))",
+    );
+
+    expect(result.minimumLiteralCount).toBe(8);
+    expect(result.acceptedMinimumLiteralCount).toBe(4);
+    expect(result.userLiteralCount).toBe(6);
+    expect(result.status).toBe("accepted_not_minimal");
   });
 
   it("handles constants: tautology", () => {
@@ -157,6 +189,8 @@ describe("DNF simplification check", () => {
     expect(result.factoredLiteralCount).toBeLessThan(
       result.minimumLiteralCount,
     );
+    expect(result.factoredIsExact).toBe(true);
+    expect(result.factoredSource).toBe("factored_dnf");
     expectExpressionEquivalentToTable(result.factoredExpression, table);
   });
 
@@ -169,6 +203,37 @@ describe("DNF simplification check", () => {
 
     expect(result.factoredIsShorter).toBe(false);
     expect(result.factoredLiteralCount).toBe(result.minimumLiteralCount);
+  });
+
+  it("exposes the globally shortest form when it beats literal factoring", () => {
+    const table = generateTruthTable(parse("(a | b) & (c | d)"));
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.minimumLiteralCount).toBe(8);
+    expect(result.factoredIsShorter).toBe(true);
+    expect(result.factoredLiteralCount).toBe(4);
+    expect(result.factoredIsExact).toBe(true);
+    expect(result.factoredSource).toBe("exact");
+    expectExpressionEquivalentToTable(result.factoredExpression, table);
+  });
+
+  it("marks the optional shorter form as non-exact above four variables", () => {
+    const table = generateTruthTable(parse("(a & c) | (b & c)"), [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+    ]);
+
+    const result = checkDnfSimplification(table, "");
+
+    expect(result.factoredIsShorter).toBe(true);
+    expect(result.factoredLiteralCount).toBe(3);
+    expect(result.factoredIsExact).toBe(false);
+    expect(result.factoredSource).toBe("factored_dnf");
+    expectExpressionEquivalentToTable(result.factoredExpression, table);
   });
 });
 

@@ -11,10 +11,10 @@ import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -50,7 +50,7 @@ export interface JavaSimulatorHandle {
   resetStoredState: () => void;
 }
 
-export interface JavaSimulatorProps {
+interface JavaSimulatorProps {
   selectedExercise: Exercise | null;
   selectedItem?: TopicItem | null;
   isFocused: boolean;
@@ -108,16 +108,11 @@ const JavaSimulatorSession = forwardRef<
       ),
     [exerciseScenario?.storageId],
   );
-  const storageTransferCodec = useMemo(
-    () =>
-      isStorageEnabled
-        ? createTrainingCenterTransferCodec(
-            storageIdentifier,
-            javaCodeTransferCodec,
-          )
-        : javaCodeTransferCodec,
-    [isStorageEnabled, storageIdentifier],
-  );
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: code,
+    codec: javaCodeTransferCodec,
+  });
 
   useEffect(() => {
     preload();
@@ -176,14 +171,6 @@ const JavaSimulatorSession = forwardRef<
     standardInput,
     timeoutSeconds,
   ]);
-
-  const handleImportCode = useCallback(
-    (nextCode: string) => {
-      setCode(nextCode);
-      reset();
-    },
-    [reset],
-  );
 
   useImperativeHandle(
     ref,
@@ -262,8 +249,6 @@ const JavaSimulatorSession = forwardRef<
         fileName={fileName}
         isFocused={isFocused}
         onCodeChange={setCode}
-        onImportCode={handleImportCode}
-        transferCodec={storageTransferCodec}
         issues={snapshot.issues}
       />
 
@@ -346,7 +331,7 @@ const JavaSimulatorSession = forwardRef<
       <ExecutionControls
         phase={snapshot.phase}
         onRun={handleRun}
-        onStop={stop}
+        onStop={() => stop()}
         canRun={canRun}
         canStop={canStop}
         runLabel={

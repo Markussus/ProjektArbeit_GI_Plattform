@@ -77,6 +77,14 @@
 
 	\subNsection*[toc]{1}{Abkürzungsverzeichnis}
 
+	% Nimmt alle in glossary.tex definierten Akronyme auf, auch wenn sie im Text
+	% nicht per \gls{...} ausgezeichnet sind.
+	\glsaddall
+
+	% Ohne diesen Schalter setzt der list-Stil zwischen den Anfangsbuchstaben
+	% jeweils einen Absatzabstand, wodurch die Liste auseinandergezogen wirkt.
+	\glsnogroupskiptrue
+
 	\printacronyms[heading=none]
 
 	\subNsection*[toc]{1}{Literatur}

@@ -8,7 +8,6 @@ import type {
   MooreProgram,
 } from "../domain/mooreTypes";
 import { MooreInputBuilder } from "./MooreInputBuilder";
-import { MooreOutputTable } from "./MooreOutputTable";
 import { MooreTransitionTable } from "./MooreTransitionTable";
 
 export interface MooreConfigViewProps {
@@ -27,6 +26,7 @@ export interface MooreConfigViewProps {
   onAddInputSymbol: () => void;
   onRemoveInputSymbol: (symbol: string) => void;
   onOutputSymbolChange: (state: string, symbol: string) => void;
+  onOutputSymbolCreate: (state: string, symbol: string) => void;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -42,6 +42,7 @@ export function MooreConfigView({
   onAddInputSymbol,
   onRemoveInputSymbol,
   onOutputSymbolChange,
+  onOutputSymbolCreate,
   onOutputCodeChange,
 }: MooreConfigViewProps) {
   const { t } = useTranslation();
@@ -123,6 +124,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-representation-select"
+              optionTestIdPrefix="moore-representation-option"
             />
           </div>
           <div className="space-y-2">
@@ -139,6 +141,7 @@ export function MooreConfigView({
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-start-state-select"
+              optionTestIdPrefix="moore-start-state-option"
             />
           </div>
         </div>
@@ -154,47 +157,48 @@ export function MooreConfigView({
           onRemoveState={onRemoveState}
           onAddInputSymbol={onAddInputSymbol}
           onRemoveInputSymbol={onRemoveInputSymbol}
+          mooreOutputControls={{
+            outputs: program.outputs,
+            outputAlphabet,
+            onSymbolChange: onOutputSymbolChange,
+            onSymbolCreate: onOutputSymbolCreate,
+            onCodeChange: onOutputCodeChange,
+          }}
         />
-        <SymbolSetPanel
-          title={t("moore.sim.states")}
-          emptyText={t("moore.sim.noSymbols")}
-          testId="moore-state-set"
-          items={program.states.map((state, index) => ({
-            key: state,
-            content: (
-              <>
-                {state}
-                <span className="text-muted-foreground ml-1 text-xs">
-                  {formatInternalNumber(index, program.representation)}
-                </span>
-              </>
-            ),
-          }))}
-        />
-      </div>
-
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_15rem] xl:items-start">
-        <MooreOutputTable
-          program={program}
-          onOutputSymbolChange={onOutputSymbolChange}
-          onOutputCodeChange={onOutputCodeChange}
-        />
-        <SymbolSetPanel
-          title={t("moore.sim.outputAlphabet")}
-          emptyText={t("moore.sim.noSymbols")}
-          testId="moore-output-alphabet"
-          items={outputAlphabet.map((output) => ({
-            key: output.symbol,
-            content: (
-              <>
-                {output.symbol}
-                <span className="text-muted-foreground ml-1 text-xs">
-                  {formatInternalNumber(output.code, program.representation)}
-                </span>
-              </>
-            ),
-          }))}
-        />
+        <div className="space-y-4">
+          <SymbolSetPanel
+            title={t("moore.sim.states")}
+            emptyText={t("moore.sim.noSymbols")}
+            testId="moore-state-set"
+            items={program.states.map((state, index) => ({
+              key: state,
+              content: (
+                <>
+                  {state}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(index, program.representation)}
+                  </span>
+                </>
+              ),
+            }))}
+          />
+          <SymbolSetPanel
+            title={t("moore.sim.outputAlphabet")}
+            emptyText={t("moore.sim.noSymbols")}
+            testId="moore-output-alphabet"
+            items={outputAlphabet.map((output) => ({
+              key: output.symbol,
+              content: (
+                <>
+                  {output.symbol}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(output.code, program.representation)}
+                  </span>
+                </>
+              ),
+            }))}
+          />
+        </div>
       </div>
     </div>
   );

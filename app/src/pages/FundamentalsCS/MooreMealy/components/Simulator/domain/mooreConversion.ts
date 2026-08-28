@@ -1,17 +1,10 @@
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 import { formatBooleanExpressionForDisplay } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
-import {
-  countExpressionLiterals,
-  factorMinimalDnf,
-} from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/factorMinimalDnf";
-import {
-  computeMinimalDnf,
-  minimalDnfToExpression,
-} from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/quineMcCluskey";
+import { computeSmallestBooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/minimalExpression";
 import { createTruthTableFromResults } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 import type { MooreProgram } from "./mooreTypes";
 
-export const MAX_MINIMIZATION_VARIABLES = 8;
+const MAX_MINIMIZATION_VARIABLES = 8;
 
 export interface MooreConversionRow {
   currentState: string;
@@ -156,16 +149,10 @@ export function buildFormulas(
     for (const assignment of trueAssignments) {
       resultValues[bitsToNumber(assignment)] = true;
     }
-    const minimalDnf = computeMinimalDnf(
-      createTruthTableFromResults(inputVariables, resultValues),
-    );
-    const expression = minimalDnfToExpression(minimalDnf, inputVariables);
-    const factoredExpression = factorMinimalDnf(minimalDnf, inputVariables);
-    const preferredExpression =
-      countExpressionLiterals(factoredExpression) <
-      countExpressionLiterals(expression)
-        ? factoredExpression
-        : expression;
+    const { expression: preferredExpression } =
+      computeSmallestBooleanExpression(
+        createTruthTableFromResults(inputVariables, resultValues),
+      );
 
     return {
       name,

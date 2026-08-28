@@ -57,6 +57,23 @@ describe("DNF transfer codec", () => {
     expect(importedValue).toEqual(session);
   });
 
+  it("round-trips a truth-table session at the four-variable limit", async () => {
+    const session = {
+      variableCount: 4,
+      resultValues: Array.from({ length: 16 }, (_value, index) => index === 0),
+      committed: false,
+      truthTableAnswers: [],
+      dnfAnswer: "",
+      simplificationAnswer: "",
+    };
+
+    const exportedValue = await dnfTruthTableTransferCodec.exportValue(session);
+    const importedValue =
+      await dnfTruthTableTransferCodec.importValue(exportedValue);
+
+    expect(importedValue).toEqual(session);
+  });
+
   it("round-trips an exercise attempt with unanswered rows", async () => {
     const exportedValue = await dnfExerciseTransferCodec.exportValue({
       truthTableAnswers: [true, null, false],
@@ -113,34 +130,6 @@ describe("DNF transfer codec", () => {
     ).resolves.toEqual(draft);
   });
 
-  it("imports legacy free-simulator transfer strings with empty attempts", async () => {
-    await expect(
-      dnfExpressionTransferCodec.importValue("DQCsJATEDE"),
-    ).resolves.toEqual({
-      expression: "a & b",
-      committed: false,
-      ...emptyAttempt,
-    });
-    await expect(
-      dnfTruthTableTransferCodec.importValue("DSBrI"),
-    ).resolves.toEqual({
-      variableCount: 3,
-      resultValues: [false, true, false, true, true, false, false, true],
-      committed: false,
-      ...emptyAttempt,
-    });
-  });
-
-  it("imports legacy exercise attempts", async () => {
-    await expect(
-      dnfExerciseTransferCodec.importValue("DUBwgrCQPhAxALC"),
-    ).resolves.toEqual({
-      truthTableAnswers: [true, null, false],
-      dnfAnswer: "a | b",
-      simplificationAnswer: "a",
-    });
-  });
-
   it("rejects truth tables with a mismatching result count", async () => {
     expect(() =>
       dnfTruthTableTransferCodec.exportValue({
@@ -157,6 +146,12 @@ describe("DNF transfer codec", () => {
       "dnf_transfer_payload_invalid",
     );
     expect(() => dnfTransferCodec.importValue("D*")).toThrow(
+      "dnf_transfer_payload_invalid",
+    );
+  });
+
+  it("rejects obsolete version-two payloads", async () => {
+    expect(() => dnfTransferCodec.importValue("DQCsJATEDE")).toThrow(
       "dnf_transfer_payload_invalid",
     );
   });

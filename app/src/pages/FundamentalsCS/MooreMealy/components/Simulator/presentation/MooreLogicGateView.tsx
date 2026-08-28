@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { LogicGateDiagram } from "@/components/shared/LogicGateDiagram";
 import { cn } from "@/lib/utils";
 import type { MooreConversion } from "../domain/mooreConversion";
-import { LogicGateDiagram } from "./LogicGateDiagram";
 import { ViewHeader } from "./MooreConversionView";
 import { MooreViewActions } from "./MooreViewActions";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
@@ -71,6 +71,7 @@ export function MooreLogicGateView({
             triggerClassName="h-10 min-w-56 px-3"
             menuClassName="right-0 min-w-56"
             triggerTestId="moore-logic-formula-mode"
+            optionTestIdPrefix="moore-logic-formula-mode-option"
           />
         </div>
         <div className="grid gap-2 md:grid-cols-2">
@@ -119,9 +120,11 @@ export function MooreLogicGateView({
             key={`${formula.name}-${formulaMode}-${binaryGates}`}
             expression={displayedExpression ?? null}
             outputName={formula.name}
+            ariaLabel={t("moore.logic.diagram", { output: formula.name })}
             variables={formula.variables}
             unavailableText={t("moore.logic.minimizationUnavailable")}
             binaryGates={binaryGates}
+            testIdPrefix="moore-logic"
           />
         </div>
       ) : null}

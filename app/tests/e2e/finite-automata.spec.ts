@@ -19,6 +19,21 @@ test.describe("Finite Automata page", () => {
       page.getByRole("button", { name: "Simulation" }),
     ).toBeVisible();
   });
+
+  test("shows overview text and demo-video tutorial section", async ({
+    page,
+  }) => {
+    await page.goto(FA_URL);
+    await expect(page.getByTestId("automata-tutorial-questions")).toBeVisible();
+    await expect(
+      page.getByTestId("automata-tutorial-question-1-select"),
+    ).toBeVisible();
+    await page.getByTestId("automata-tutorial-question-1-select").click();
+    await expect(
+      page.getByTestId("automata-tutorial-question-1-description"),
+    ).toBeVisible();
+    await expect(page.getByTestId("automata-tutorial-video")).toBeVisible();
+  });
 });
 
 test.describe("Finite Automata — Simulation tab", () => {
@@ -156,6 +171,42 @@ test.describe("Finite Automata — editor interactions", () => {
     await page.getByRole("button", { name: /From Grammar/i }).click();
     await page.getByRole("button", { name: /Manual Editor/i }).click();
     await expect(page.getByText("Transition Table")).toBeVisible();
+  });
+
+  test("reset deletes the saved draft and restores the default after remount", async ({
+    page,
+  }) => {
+    await page.evaluate(() => localStorage.clear());
+    await page.getByTestId("header-transfer-export").click();
+    const defaultExport = await page
+      .getByTestId("header-transfer-input")
+      .inputValue();
+    const transition = page.getByLabel("δ(S0, a)");
+    await transition.fill("S2");
+    await page.getByPlaceholder("aab").fill("ab");
+    await page.getByRole("button", { name: /Start Simulation/i }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+      )
+      .not.toBeNull();
+
+    await page.getByTestId("simulation-reset").click();
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
+    await expect(page.getByPlaceholder("aab")).toHaveValue("aab");
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+      )
+      .toBeNull();
+    await page.getByTestId("header-transfer-export").click();
+    await expect(page.getByTestId("header-transfer-input")).toHaveValue(
+      defaultExport,
+    );
+
+    await page.getByRole("button", { name: "Overview" }).click();
+    await page.getByRole("button", { name: "Simulation" }).click();
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
   });
 });
 

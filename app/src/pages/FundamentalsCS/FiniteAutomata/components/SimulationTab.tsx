@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import { FASimulator } from "./Simulator/FASimulator";
+import { FASimulator, type FASimulatorHandle } from "./Simulator/FASimulator";
 import type { FAProgram } from "./Simulator/domain/faTypes";
 import {
   validateAgainstSolution,
@@ -18,6 +19,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
   const loadExample = useFASimulatorStore((s) => s.loadExample);
+  const simulatorRef = useRef<FASimulatorHandle>(null);
 
   // The opened exercise (if any) drives the action buttons. Examples still flow
   // through the shared "Selected example" card with no actions.
@@ -26,6 +28,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     : undefined;
 
   const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
+  // Revealing the solution overwrites whatever the learner has built, so it
+  // asks first.
+  const [confirmLoadSolution, setConfirmLoadSolution] = useState(false);
 
   // Keep the store flag in sync so other consumers agree with what is shown.
   useEffect(() => {
@@ -33,6 +38,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   }, [activeExercise?.id, setActiveExercise]);
 
   const handleLoadSolution = () => {
+    setConfirmLoadSolution(false);
     if (!activeExercise) {
       return;
     }
@@ -64,7 +70,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     <>
       <button
         type="button"
-        onClick={handleLoadSolution}
+        onClick={() => setConfirmLoadSolution(true)}
         data-testid="fa-load-solution"
         className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
       >
@@ -88,8 +94,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="simulation.emptyStates.automata"
+        onReset={() => simulatorRef.current?.resetStoredState()}
       >
-        <FASimulator />
+        <FASimulator ref={simulatorRef} />
       </TopicSimulationTab>
 
       <SolutionCheckDialog
@@ -101,6 +108,18 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         tableTestIdPrefix="fa-solution-check-table"
         headers={[]}
         rows={[]}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmLoadSolution}
+        title={t("fa.exerciseWorkspace.confirmTitle")}
+        description={t("fa.exerciseWorkspace.confirmBody")}
+        confirmLabel={t("fa.exerciseWorkspace.confirmYes")}
+        cancelLabel={t("fa.exerciseWorkspace.confirmNo")}
+        onConfirm={handleLoadSolution}
+        onCancel={() => setConfirmLoadSolution(false)}
+        variant="warning"
+        testId="fa-load-solution-confirm"
       />
     </>
   );

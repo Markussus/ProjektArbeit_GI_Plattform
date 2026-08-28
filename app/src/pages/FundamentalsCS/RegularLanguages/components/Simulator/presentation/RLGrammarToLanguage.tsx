@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { enumerateLanguage } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
@@ -14,6 +14,8 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 
 interface RLGrammarToLanguageProps {
   initialGrammar?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
 const DEFAULT_SOURCE = ["S -> aS | bA", "A -> bA | ε"].join("\n");
@@ -30,6 +32,8 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
 
 export function RLGrammarToLanguage({
   initialGrammar,
+  transferActive = true,
+  resetVersion = 0,
 }: RLGrammarToLanguageProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
@@ -45,12 +49,24 @@ export function RLGrammarToLanguage({
     setSource(initialGrammar);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.grammarToLanguage,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlGrammarTransferCodec,
+    enabled: transferActive,
   });
 
   const result = useMemo(() => {
@@ -66,6 +82,7 @@ export function RLGrammarToLanguage({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-grammar-to-language-source"
           value={source}
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"
@@ -194,19 +211,11 @@ export function RLGrammarToLanguage({
           <p className="text-muted-foreground text-sm">
             {t(
               "rl.simulator.grammarInvalid",
-              "Enter a valid right-linear grammar to derive a regex.",
+              "Enter a valid right-linear grammar.",
             )}
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

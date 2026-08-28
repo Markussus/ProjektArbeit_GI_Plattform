@@ -2,8 +2,9 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
-import { recognizeWord } from "../domain/rlLanguageOps";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
+import type { TranslationKey } from "@/types/i18n";
+import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import {
@@ -15,6 +16,8 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 interface RLWordRecognizerProps {
   initialGrammar?: string;
   initialWord?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
 const DEFAULT_SOURCE = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
@@ -23,12 +26,15 @@ const DEFAULT_WORD = "001, 010, 1, 00";
 interface PerWordResult {
   word: string;
   accepted: boolean;
-  reason: string;
+  reasonCode: string;
+  states: string;
 }
 
 export function RLWordRecognizer({
   initialGrammar,
   initialWord,
+  transferActive = true,
+  resetVersion = 0,
 }: RLWordRecognizerProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
@@ -47,12 +53,25 @@ export function RLWordRecognizer({
     setWord(initialWord);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
+    setWord(DEFAULT_WORD);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.recognizeWord,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlGrammarTransferCodec,
+    enabled: transferActive,
   });
 
   const evaluation = useMemo<
@@ -65,10 +84,14 @@ export function RLWordRecognizer({
     // Treat the input as a comma-separated list of test words. A bare
     // empty piece represents ε (the empty word).
     const pieces = word.split(",").map((w) => w.trim());
-    const results = pieces.map((w): PerWordResult => {
-      const outcome = recognizeWord(grammar, w);
-      return { word: w, accepted: outcome.accepted, reason: outcome.reason };
-    });
+    const results = recognizeWords(grammar, pieces).map(
+      (outcome, index): PerWordResult => ({
+        word: pieces[index],
+        accepted: outcome.accepted,
+        reasonCode: outcome.reasonCode,
+        states: outcome.states,
+      }),
+    );
     return { ok: true, results };
   }, [source, word]);
 
@@ -76,6 +99,7 @@ export function RLWordRecognizer({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-word-recognizer-source"
           value={source}
           onChange={setSource}
           titleKey="rl.simulator.grammarInput"
@@ -125,7 +149,12 @@ export function RLWordRecognizer({
                   <span className="font-mono text-sm font-semibold">
                     {r.word === "" ? "ε" : r.word}
                   </span>
-                  <span className="text-foreground/70 text-xs">{r.reason}</span>
+                  <span className="text-foreground/70 text-xs">
+                    {t(
+                      `rl.simulator.reason.${r.reasonCode}` as TranslationKey,
+                      { states: r.states },
+                    )}
+                  </span>
                 </div>
               </li>
             ))}
@@ -134,19 +163,11 @@ export function RLWordRecognizer({
           <p className="text-muted-foreground text-sm">
             {t(
               "rl.simulator.grammarInvalid",
-              "Enter a valid right-linear grammar to derive a regex.",
+              "Enter a valid right-linear grammar.",
             )}
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

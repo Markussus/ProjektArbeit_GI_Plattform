@@ -5,6 +5,7 @@ import type { DnfParseIssue, DnfParseIssueCode } from "../domain/dnfParser";
 
 const parseIssueKeyByCode: Record<DnfParseIssueCode, string> = {
   empty_expression: "dnf.builder.errors.emptyExpression",
+  expression_too_complex: "dnf.builder.errors.expressionTooComplex",
   unexpected_character: "dnf.builder.errors.unexpectedCharacter",
   unexpected_token: "dnf.builder.errors.unexpectedToken",
   unexpected_end: "dnf.builder.errors.unexpectedEnd",

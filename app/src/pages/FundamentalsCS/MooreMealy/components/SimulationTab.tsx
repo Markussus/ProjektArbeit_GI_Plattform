@@ -10,6 +10,7 @@ import {
 } from "./Simulator/MooreSimulator";
 import {
   MealySimulator,
+  MEALY_SIMULATOR_TASK_STORAGE_ID,
   type MealySimulatorHandle,
 } from "./Simulator/MealySimulator";
 import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
@@ -23,7 +24,10 @@ export const MEALY_EXAMPLE_ID = "moore.examples.mealyDefault";
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const [machineType, setMachineType] = useState<"moore" | "mealy">(() =>
-    props.selectedItem?.id === MEALY_EXAMPLE_ID ? "mealy" : "moore",
+    props.selectedItem?.id === MEALY_EXAMPLE_ID ||
+    props.importedTaskStorageId === MEALY_SIMULATOR_TASK_STORAGE_ID
+      ? "mealy"
+      : "moore",
   );
   const [checkResult, setCheckResult] = useState<MooreValidationResult | null>(
     null,
@@ -158,6 +162,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
               scenario={exerciseScenario}
               initialProgram={mooreInitialProgram}
               isExample={isMooreExample}
+              transferActive={machineType === "moore"}
             />
           </div>
           <div hidden={machineType !== "mealy"}>
@@ -165,6 +170,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
               ref={mealySimulatorRef}
               initialProgram={isMealyExample ? defaultMealyProgram : undefined}
               storageEnabled={storageEnabled}
+              transferActive={machineType === "mealy"}
             />
           </div>
         </div>

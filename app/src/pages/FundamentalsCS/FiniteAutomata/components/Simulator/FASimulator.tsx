@@ -1,22 +1,24 @@
 import {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
   type ReactNode,
+  type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings, Sparkles, Play } from "lucide-react";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
+  trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -25,13 +27,23 @@ import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
 import { FAConfigView } from "./presentation/FAConfigView";
+import { FAExercisePrompt } from "./presentation/FAExercisePrompt";
 import { FASimulationView } from "./presentation/FASimulationView";
 import { FAGrammarInput } from "./presentation/FAGrammarInput";
+import { findFAExercise } from "../../exercises/faExerciseDefinitions";
 import { useFASimulatorStore } from "../../store/faSimulatorStore";
 
 type EditorMode = "manual" | "grammar";
 
-export function FASimulator() {
+export interface FASimulatorHandle {
+  resetStoredState: () => void;
+}
+
+interface FASimulatorProps {
+  ref?: Ref<FASimulatorHandle>;
+}
+
+export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const [program, setProgram] = useState<FAProgram>(() =>
     cloneJson(defaultDFAProgram),
@@ -60,14 +72,6 @@ export function FASimulator() {
       ),
     [],
   );
-  const storageTransferCodec = useMemo(
-    () =>
-      createTrainingCenterTransferCodec(
-        storageIdentifier,
-        faProgramTransferCodec,
-      ),
-    [storageIdentifier],
-  );
 
   // Consume pending example from the store (loaded via ExamplesTab or by the
   // exercise panel revealing a solution).
@@ -89,10 +93,26 @@ export function FASimulator() {
   // simulating it is the committed program.
   const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
   const exposedStudentProgram = isEditMode ? editor.draft : program;
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: exposedStudentProgram,
+    codec: faProgramTransferCodec,
+  });
   useEffect(() => {
     setStudentProgram(exposedStudentProgram);
     return () => setStudentProgram(null);
   }, [exposedStudentProgram, setStudentProgram]);
+
+  // Persist the in-progress automaton per exercise so re-opening the exercise
+  // restores the learner's work instead of the blank starter.
+  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
+  const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
+  const clearExerciseDraft = useFASimulatorStore((s) => s.clearExerciseDraft);
+  useEffect(() => {
+    if (activeExerciseId) {
+      setExerciseDraft(activeExerciseId, exposedStudentProgram);
+    }
+  }, [activeExerciseId, exposedStudentProgram, setExerciseDraft]);
 
   // Track which pending program has already been applied to avoid double-processing.
   const [prevPendingProgram, setPrevPendingProgram] =
@@ -179,11 +199,13 @@ export function FASimulator() {
     };
   }, [handleImportProgram, storageIdentifier]);
 
+  // While an exercise is active its work persists to the per-exercise draft
+  // above, so the shared free-mode slot is only autosaved outside exercises.
   useTrainingCenterAutoSave({
     identifier: storageIdentifier,
     value: editor.draft,
     codec: faProgramTransferCodec,
-    enabled: isStorageReady,
+    enabled: isStorageReady && activeExerciseId === null,
   });
 
   const handleApplyProgram = () => {
@@ -204,11 +226,49 @@ export function FASimulator() {
     setIsEditMode(true);
   };
 
+  const resetStoredState = useCallback(() => {
+    simulation.pause();
+
+    const exercise = activeExerciseId
+      ? findFAExercise(activeExerciseId)
+      : undefined;
+    const resetProgram = cloneJson(exercise?.starter ?? defaultDFAProgram);
+
+    if (activeExerciseId) {
+      clearExerciseDraft(activeExerciseId);
+    } else {
+      trainingCenterStorage.delete(storageIdentifier);
+    }
+
+    setProgram(resetProgram);
+    editor.resetToProgram(resetProgram);
+    setInputWord(
+      exercise?.exampleWords?.accept.find((word) => word.length > 0) ??
+        defaultInputWord,
+    );
+    setIsEditMode(true);
+    setEditorMode("manual");
+  }, [
+    activeExerciseId,
+    clearExerciseDraft,
+    editor,
+    simulation,
+    storageIdentifier,
+  ]);
+
+  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
+
   const handleGrammarConvert = (converted: FAProgram) => {
     setProgram(converted);
     editor.resetToProgram(converted);
     setEditorMode("manual");
   };
+
+  // The open exercise's problem statement stays visible while building and
+  // while simulating — the grammar family cannot be solved without it.
+  const activeExercise = activeExerciseId
+    ? findFAExercise(activeExerciseId)
+    : undefined;
 
   return (
     <div
@@ -217,6 +277,8 @@ export function FASimulator() {
         isEditMode ? "max-w-none" : "max-w-7xl",
       )}
     >
+      {activeExercise && <FAExercisePrompt exercise={activeExercise} />}
+
       {isEditMode ? (
         <div className="flex flex-col gap-6">
           {/* Mode Toggle */}
@@ -262,13 +324,6 @@ export function FASimulator() {
                   )}
                 </p>
               </div>
-
-              <SimulatorStringTransferBox
-                value={editor.draft}
-                codec={storageTransferCodec}
-                onLoad={handleImportProgram}
-                testIdPrefix="fa-transfer"
-              />
 
               <button
                 onClick={handleApplyProgram}

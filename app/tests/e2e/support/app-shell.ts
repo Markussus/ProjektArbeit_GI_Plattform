@@ -20,10 +20,10 @@ export const appTestIds = {
   javaStopButton: "java-stop-button",
   javaStdinInput: "java-stdin-input",
   javaTimeoutInput: "java-timeout-input",
-  javaTransferExport: "java-transfer-export",
-  javaTransferImport: "java-transfer-import",
-  javaTransferInput: "java-transfer-input",
-  javaTransferStatus: "java-transfer-status",
+  headerTransferExport: "header-transfer-export",
+  headerTransferImport: "header-transfer-import",
+  headerTransferInput: "header-transfer-input",
+  headerTransferStatus: "header-transfer-status",
   languageSelectMenu: "language-select-menu",
   languageSelectTrigger: "language-select-trigger",
   moduleSelectorMenu: "module-selector-menu",
@@ -106,14 +106,32 @@ export async function ensureSidebarExpanded(page: Page) {
 export async function switchLanguage(page: Page, language: "de" | "en") {
   await page.getByTestId(appTestIds.languageSelectTrigger).click();
   await expect(page.getByTestId(appTestIds.languageSelectMenu)).toBeVisible();
-  await page
-    .getByTestId(appTestIds.languageSelectMenu)
-    .getByRole("option", { name: language.toUpperCase() })
-    .click();
+  await page.getByTestId(`language-select-option-${language}`).click();
 }
 
 export async function readResolvedTheme(page: Page) {
   return page.evaluate(() =>
     document.documentElement.classList.contains("dark") ? "dark" : "light",
   );
+}
+
+export async function exportActiveSimulator(page: Page) {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate(() => navigator.clipboard.writeText(""));
+  await page.getByTestId(appTestIds.headerTransferExport).click();
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .not.toBe("");
+  return page.evaluate(() => navigator.clipboard.readText());
+}
+
+export async function importFromHeader(page: Page, transferValue: string) {
+  const input = page.getByTestId(appTestIds.headerTransferInput);
+  await expect(input).toBeEditable({ timeout: 6_000 });
+  await input.fill(transferValue);
+  await page.getByTestId(appTestIds.headerTransferImport).click();
+  await expect(input).toHaveValue("");
+  // Same-route imports remount the active simulator after the header click.
+  // Wait for that route-state effect before interacting with its new controls.
+  await page.waitForTimeout(100);
 }

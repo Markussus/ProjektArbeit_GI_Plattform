@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
@@ -15,10 +16,14 @@ export interface SearchableCreatableSelectProps {
   onChange: (value: string) => void;
   onCreate?: (value: string) => void;
   ariaLabel: string;
-  createLabel: string;
+  createLabel: (value: string) => string;
+  emptyCreateLabel: string;
   notFoundLabel: string;
+  searchPlaceholder: string;
   disabled?: boolean;
   testId?: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
 export function SearchableCreatableSelect({
@@ -28,13 +33,18 @@ export function SearchableCreatableSelect({
   onCreate,
   ariaLabel,
   createLabel,
+  emptyCreateLabel,
   notFoundLabel,
+  searchPlaceholder,
   disabled = false,
   testId,
+  className,
+  style,
 }: SearchableCreatableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -54,11 +64,11 @@ export function SearchableCreatableSelect({
   );
   const canCreate =
     Boolean(onCreate) &&
-    normalizedQuery.length > 0 &&
-    !options.some(
-      (option) =>
-        option.toLocaleLowerCase() === normalizedQuery.toLocaleLowerCase(),
-    );
+    (normalizedQuery.length === 0 ||
+      !options.some(
+        (option) =>
+          option.toLocaleLowerCase() === normalizedQuery.toLocaleLowerCase(),
+      ));
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -72,9 +82,10 @@ export function SearchableCreatableSelect({
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && isOpen) {
         setIsOpen(false);
         setQuery("");
+        window.setTimeout(() => triggerRef.current?.focus());
       }
     };
 
@@ -85,7 +96,7 @@ export function SearchableCreatableSelect({
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("keydown", handleEscape);
     };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -126,12 +137,8 @@ export function SearchableCreatableSelect({
       setIsOpen(false);
       setQuery("");
     };
-    window.addEventListener("wheel", close, { capture: true });
-    window.addEventListener("touchmove", close, { capture: true });
     window.addEventListener("resize", close);
     return () => {
-      window.removeEventListener("wheel", close, true);
-      window.removeEventListener("touchmove", close, true);
       window.removeEventListener("resize", close);
     };
   }, [isOpen]);
@@ -140,6 +147,7 @@ export function SearchableCreatableSelect({
     onChange(nextValue);
     setIsOpen(false);
     setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus());
   };
 
   const createValue = () => {
@@ -150,6 +158,7 @@ export function SearchableCreatableSelect({
     onCreate?.(normalizedQuery);
     setIsOpen(false);
     setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus());
   };
 
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -185,8 +194,13 @@ export function SearchableCreatableSelect({
   };
 
   return (
-    <div ref={containerRef} className="relative min-w-32">
+    <div
+      ref={containerRef}
+      style={style}
+      className={cn("relative min-w-32", className)}
+    >
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => !disabled && setIsOpen((current) => !current)}
         aria-label={ariaLabel}
@@ -228,6 +242,7 @@ export function SearchableCreatableSelect({
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={handleInputKeyDown}
                 aria-label={`${ariaLabel} search`}
+                placeholder={searchPlaceholder}
                 data-testid={testId ? `${testId}-search` : undefined}
                 className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
                 autoComplete="off"
@@ -235,7 +250,10 @@ export function SearchableCreatableSelect({
               />
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto py-1">
+            <div
+              data-testid={testId ? `${testId}-options` : undefined}
+              className="max-h-[180px] min-h-0 overflow-y-auto py-1"
+            >
               {matchingOptions.map((option, index) => (
                 <button
                   ref={(element) => {
@@ -265,18 +283,21 @@ export function SearchableCreatableSelect({
                 </button>
               ))}
 
-              {matchingOptions.length === 0 && !canCreate && (
+              {matchingOptions.length === 0 && (
                 <p className="text-muted-foreground px-3 py-2 text-sm">
                   {notFoundLabel}
                 </p>
               )}
+            </div>
 
-              {canCreate && (
+            {onCreate && (
+              <div className="border-border border-t pt-1">
                 <button
                   ref={(element) => {
                     optionRefs.current[matchingOptions.length] = element;
                   }}
                   type="button"
+                  disabled={!canCreate}
                   onPointerDown={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
@@ -284,18 +305,21 @@ export function SearchableCreatableSelect({
                   }}
                   data-testid={testId ? `${testId}-create` : undefined}
                   className={cn(
-                    "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
-                    activeIndex === matchingOptions.length && "bg-muted",
+                    "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
+                    canCreate &&
+                      activeIndex === matchingOptions.length &&
+                      "bg-muted",
                   )}
                 >
                   <Plus className="text-brand size-4 shrink-0" />
-                  <span className="text-muted-foreground">{createLabel}</span>
-                  <span className="truncate font-mono font-semibold">
-                    {normalizedQuery}
+                  <span className="truncate">
+                    {normalizedQuery
+                      ? createLabel(normalizedQuery)
+                      : emptyCreateLabel}
                   </span>
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>,
           document.body,
         )}

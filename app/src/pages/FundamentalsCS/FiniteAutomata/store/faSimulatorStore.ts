@@ -20,12 +20,23 @@ interface FASimulatorStore {
   pendingInputWordOverride: string | null;
   studentProgram: FAProgram | null;
 
+  /**
+   * The learner's in-progress automaton for each exercise, keyed by exercise
+   * id. Held in the store so it survives leaving and re-entering exercise mode
+   * (re-opening an exercise restores this instead of the blank starter);
+   * cleared explicitly by "Reset all exercises".
+   */
+  exerciseDrafts: Record<string, FAProgram>;
+
   setActiveExercise: (id: string | null) => void;
   loadExample: (program: FAProgram, inputWord: string) => void;
   consumePending: () => void;
   setPendingInputWord: (word: string) => void;
   consumePendingInputWord: () => void;
   setStudentProgram: (program: FAProgram | null) => void;
+  setExerciseDraft: (exerciseId: string, program: FAProgram) => void;
+  clearExerciseDraft: (exerciseId: string) => void;
+  clearExerciseDrafts: () => void;
 }
 
 export const useFASimulatorStore = create<FASimulatorStore>((set) => ({
@@ -34,6 +45,7 @@ export const useFASimulatorStore = create<FASimulatorStore>((set) => ({
   pendingInputWord: "",
   pendingInputWordOverride: null,
   studentProgram: null,
+  exerciseDrafts: {},
 
   setActiveExercise: (id) => set({ activeExerciseId: id }),
 
@@ -45,4 +57,15 @@ export const useFASimulatorStore = create<FASimulatorStore>((set) => ({
   consumePendingInputWord: () => set({ pendingInputWordOverride: null }),
 
   setStudentProgram: (program) => set({ studentProgram: program }),
+  setExerciseDraft: (exerciseId, program) =>
+    set((state) => ({
+      exerciseDrafts: { ...state.exerciseDrafts, [exerciseId]: program },
+    })),
+  clearExerciseDraft: (exerciseId) =>
+    set((state) => {
+      const exerciseDrafts = { ...state.exerciseDrafts };
+      delete exerciseDrafts[exerciseId];
+      return { exerciseDrafts };
+    }),
+  clearExerciseDrafts: () => set({ exerciseDrafts: {} }),
 }));

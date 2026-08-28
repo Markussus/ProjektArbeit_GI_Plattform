@@ -2,13 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
+  formatLanguageIssue,
   parseLanguageSpec,
+  type LanguageParseIssue,
   type LanguageSpec,
 } from "../domain/rlLanguageSpecParser";
-import { formatGrammar, setBuilderToGrammar } from "../domain/rlRegexToGrammar";
-import { languageToGrammar } from "../domain/rlLanguageOps";
+import {
+  formatGrammar,
+  minimizeRightLinearGrammar,
+  setBuilderToRightLinearGrammar,
+} from "../domain/rlRegexToGrammar";
+import {
+  languageToGrammar,
+  languageToGrammarMinimal,
+} from "../domain/rlLanguageOps";
 import { rlLanguageTransferCodec } from "../domain/rlLanguageTransfer";
 import {
   RL_STORAGE_TASK_IDS,
@@ -18,16 +27,20 @@ import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
-const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", "00010", "000100", ..}';
+// Kept short enough to sit on one line in the textarea; three words are still
+// enough for the parser to infer the pattern 0ⁿ 1 0ᵐ from the trailing "..".
+const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", ..}';
 
 // Documents the language definition syntax in the "Supported Formats" panel.
 const LANGUAGE_ENUMERATION_EXAMPLE = 'L = {"010", "0010", "00100", ..}';
 const LANGUAGE_SETBUILDER_EXAMPLE = "L = {a^n c b^m | n, m > 0}";
 
 type ConversionResult =
-  | { ok: false; error: string | null }
+  | { ok: false; error: string; issue: LanguageParseIssue }
   | {
       ok: true;
       spec: LanguageSpec;
@@ -39,10 +52,14 @@ type ConversionResult =
 
 export function RLLanguageToGrammar({
   initialSource,
+  transferActive = true,
+  resetVersion = 0,
 }: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
   const [showFormats, setShowFormats] = useState(false);
+  // Detailed = one non-terminal per prefix; Simplified = minimal merged grammar.
+  const [simplified, setSimplified] = useState(false);
 
   // Adopt a freshly seeded language (e.g. when an exercise reveals its
   // solution) without remounting, so it persists after the store clears it.
@@ -52,12 +69,24 @@ export function RLLanguageToGrammar({
     setSource(initialSource);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(DEFAULT_SOURCE);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.languageToGrammar,
     codec: rlLanguageTransferCodec,
     source,
     setSource,
     hasSeed: initialSource !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlLanguageTransferCodec,
+    enabled: transferActive,
   });
 
   // Publish the current language so the lifted exercise "Check solution" action
@@ -73,24 +102,33 @@ export function RLLanguageToGrammar({
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
     if (!parsed.ok) {
-      return { ok: false, error: parsed.error };
+      return { ok: false, error: parsed.error, issue: parsed.issue };
     }
     if (parsed.spec.kind === "setBuilder") {
-      const cfg = setBuilderToGrammar(parsed.spec);
+      // Both views stay right-linear. Simplified merges non-terminals that
+      // derive the same words; when there is nothing to merge it is the very
+      // same grammar as Detailed.
+      const detailed = setBuilderToRightLinearGrammar(parsed.spec);
+      const grammar = simplified
+        ? minimizeRightLinearGrammar(detailed)
+        : detailed;
       return {
         ok: true,
         spec: parsed.spec,
-        nonTerminals: cfg.nonTerminals,
-        terminals: cfg.terminals,
-        startSymbol: cfg.startSymbol,
-        grammarText: cfg.displayText,
+        nonTerminals: grammar.nonTerminals,
+        terminals: grammar.terminals,
+        startSymbol: grammar.startSymbol,
+        grammarText: formatGrammar(grammar),
       };
     }
     // Enumeration: build a prefix-tree grammar. If the user wrote a `..`
     // continuation marker, the parser will already have promoted the
     // enumeration to a set-builder above, so this only fires for finite
-    // languages.
-    const grammar = languageToGrammar(parsed.spec.words);
+    // languages. The Simplified mode merges equivalent suffixes into a minimal,
+    // human-readable grammar instead.
+    const grammar = simplified
+      ? languageToGrammarMinimal(parsed.spec.words)
+      : languageToGrammar(parsed.spec.words);
     return {
       ok: true,
       spec: parsed.spec,
@@ -99,7 +137,7 @@ export function RLLanguageToGrammar({
       startSymbol: grammar.startSymbol,
       grammarText: formatGrammar(grammar),
     };
-  }, [source]);
+  }, [source, simplified]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -110,6 +148,7 @@ export function RLLanguageToGrammar({
           </h4>
 
           <textarea
+            data-testid="rl-language-to-grammar-source"
             value={source}
             onChange={(e) => setSource(e.target.value)}
             spellCheck={false}
@@ -160,20 +199,56 @@ export function RLLanguageToGrammar({
             </div>
           </details>
 
-          {!result.ok && result.error && (
+          {!result.ok && source.trim().length > 0 && (
             <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              <span>{result.error}</span>
+              <span>{formatLanguageIssue(t, result.issue, result.error)}</span>
             </div>
           )}
         </div>
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
-        <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          <ArrowRight className="text-primary h-4 w-4" />
-          {t("rl.simulator.grammarOutput", "Resulting Grammar")}
-        </h4>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
+            <ArrowRight className="text-primary h-4 w-4" />
+            {t("rl.simulator.grammarOutput", "Resulting Grammar")}
+          </h4>
+          <div
+            className="bg-muted/60 inline-flex rounded-lg p-0.5"
+            role="group"
+            aria-label={t("rl.simulator.grammarMode.label", "Grammar style")}
+          >
+            <button
+              type="button"
+              onClick={() => setSimplified(false)}
+              aria-pressed={!simplified}
+              data-testid="rl-grammar-mode-detailed"
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                !simplified
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t("rl.simulator.grammarMode.detailed", "Detailed")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSimplified(true)}
+              aria-pressed={simplified}
+              data-testid="rl-grammar-mode-simplified"
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                simplified
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t("rl.simulator.grammarMode.simplified", "Simplified")}
+            </button>
+          </div>
+        </div>
         {result.ok ? (
           <>
             <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-sm leading-relaxed whitespace-pre">
@@ -203,14 +278,6 @@ export function RLLanguageToGrammar({
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-language-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

@@ -95,6 +95,11 @@ export class BitReader {
     return new BitReader(bits, errorMessage);
   }
 
+  /** Bits not yet consumed, including any trailing Base64 padding. */
+  get remainingBitCount(): number {
+    return this.bits.length - this.offset;
+  }
+
   readBit(): number {
     if (this.offset >= this.bits.length) {
       throw new Error(this.errorMessage);

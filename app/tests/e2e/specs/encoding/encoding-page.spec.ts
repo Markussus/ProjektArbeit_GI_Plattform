@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { appTestIds } from "../../support/app-shell";
+import {
+  appTestIds,
+  exportActiveSimulator,
+  importFromHeader,
+} from "../../support/app-shell";
 
 test.describe("Encoding page", () => {
   test.beforeEach(async ({ page }) => {
@@ -136,14 +140,48 @@ test.describe("Encoding page", () => {
     });
   });
 
-  test("transfer box allows import and correctly updates UI", async ({
+  test("resetting an example preserves the free simulator storage", async ({
+    page,
+  }) => {
+    await page.evaluate(() => localStorage.clear());
+    await page.getByTestId(appTestIds.tabSimulation).click();
+    await page.getByTestId("base64-input").fill("free simulator value");
+    await page.getByTestId(appTestIds.headerTransferExport).click();
+    const freeStorageValue = await page
+      .getByTestId(appTestIds.headerTransferInput)
+      .inputValue();
+    await page.evaluate((value) => {
+      localStorage.setItem("TrainingCenterStorage", JSON.stringify([value]));
+    }, freeStorageValue);
+
+    await page.getByTestId(appTestIds.tabExamples).click();
+    await page
+      .getByTestId("example-card-encoding.example_base64_2-select")
+      .click();
+    await page
+      .getByTestId("example-card-encoding.example_base64_2-open")
+      .click();
+    await page.getByTestId("base64-input").fill("changed example");
+    await page.getByTestId("simulation-reset").click();
+
+    await expect(page.getByTestId("base64-input")).toHaveValue("THWS");
+    expect(
+      await page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+    ).toContain(freeStorageValue);
+  });
+
+  test("global transfer allows import and correctly updates UI", async ({
     page,
   }) => {
     await page.getByTestId(appTestIds.tabSimulation).click();
     await expect(page.getByTestId("encoding-simulator")).toBeVisible();
 
-    // Verify transfer box exists
-    await expect(page.getByTestId("encoding-transfer-input")).toBeVisible();
+    await expect(
+      page.getByTestId(appTestIds.headerTransferExport),
+    ).toBeEnabled();
+    await expect(
+      page.locator('[data-testid^="encoding-transfer-"]'),
+    ).toHaveCount(0);
 
     // 1. Switch to UTF-8 tab and decode mode
     await page.getByTestId("encoding-tab-utf8").click();
@@ -151,22 +189,16 @@ test.describe("Encoding page", () => {
     await page.getByTestId("utf8-input").fill("41");
     await expect(page.getByTestId("utf8-result-ascii")).toContainText("A");
 
-    // 2. Click Export to generate string
-    await page.getByTestId("encoding-transfer-export").click();
-
-    // Wait for the input to contain the export string
-    const exportInput = page.getByTestId("encoding-transfer-input");
-    await expect(exportInput).not.toBeEmpty();
-    const exportedString = await exportInput.inputValue();
+    // 2. Export the current state through the header clipboard action
+    const exportedString = await exportActiveSimulator(page);
+    expect(exportedString).toMatch(/^[A-Za-z0-9_-]{3}[A-Za-z0-9_-]+$/);
 
     // 3. Switch back to Base64 to mess up the state
     await page.getByTestId("encoding-tab-base64").click();
     await expect(page.getByTestId("base64-input")).toBeVisible();
 
-    // 4. Fill the export string and click Import
-    await exportInput.fill("");
-    await exportInput.fill(exportedString);
-    await page.getByTestId("encoding-transfer-import").click();
+    // 4. Import the exported state through the global header
+    await importFromHeader(page, exportedString);
 
     // 5. Verify the UI switched to utf8 tab and decode mode
     await expect(page.getByTestId("encoding-tab-utf8")).toHaveClass(

@@ -8,12 +8,12 @@ import {
 } from "react";
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
+  SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -39,19 +39,25 @@ import { MooreViewActions } from "./presentation/MooreViewActions";
 
 export interface MealySimulatorHandle {
   resetStoredState: () => void;
-  loadProgram: (program: MealyProgram) => void;
 }
 
 interface MealySimulatorProps {
   initialProgram?: MealyProgram;
   storageEnabled?: boolean;
+  transferActive?: boolean;
 }
+
+export const MEALY_SIMULATOR_TASK_STORAGE_ID = SIMULATOR_TASK_STORAGE_ID - 1;
 
 export const MealySimulator = forwardRef<
   MealySimulatorHandle,
   MealySimulatorProps
 >(function MealySimulator(
-  { initialProgram = emptyMealyProgram, storageEnabled = true },
+  {
+    initialProgram = emptyMealyProgram,
+    storageEnabled = true,
+    transferActive = true,
+  },
   ref,
 ) {
   const { t } = useTranslation();
@@ -68,14 +74,19 @@ export const MealySimulator = forwardRef<
     [issues.length, program],
   );
   const identifier = useMemo(
-    () => createTrainingCenterIdentifier(TOPIC_STORAGE_IDS.mooreMealy, 0x3e),
+    () =>
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.mooreMealy,
+        MEALY_SIMULATOR_TASK_STORAGE_ID,
+      ),
     [],
   );
-  const transferCodec = useMemo(
-    () =>
-      createTrainingCenterTransferCodec(identifier, mealyProgramTransferCodec),
-    [identifier],
-  );
+  useActiveSimulatorTransfer({
+    identifier,
+    value: program,
+    codec: mealyProgramTransferCodec,
+    enabled: transferActive,
+  });
   const loadProgram = useCallback((value: MealyProgram) => {
     setProgram(normalizeMealyProgram(value));
     setMode("edit");
@@ -116,9 +127,8 @@ export const MealySimulator = forwardRef<
         setCommitted(resetProgram);
         setMode("edit");
       },
-      loadProgram,
     }),
-    [identifier, initialProgram, loadProgram, simulation, storageEnabled],
+    [identifier, initialProgram, simulation, storageEnabled],
   );
 
   const updateOutput = (
@@ -155,21 +165,31 @@ export const MealySimulator = forwardRef<
 
   if (mode === "conversion" && conversion)
     return (
-      <MooreConversionView
-        conversion={conversion}
-        onBackToEditor={() => setMode("edit")}
-        onShowSimulator={showSimulation}
-        onShowLogic={() => setMode("logic")}
-      />
+      <div
+        data-testid="mealy-simulator"
+        className="mx-auto w-full max-w-[100rem]"
+      >
+        <MooreConversionView
+          conversion={conversion}
+          onBackToEditor={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowLogic={() => setMode("logic")}
+        />
+      </div>
     );
   if (mode === "logic" && conversion)
     return (
-      <MooreLogicGateView
-        conversion={conversion}
-        onEditDefinition={() => setMode("edit")}
-        onShowSimulator={showSimulation}
-        onShowConversion={() => setMode("conversion")}
-      />
+      <div
+        data-testid="mealy-simulator"
+        className="mx-auto w-full max-w-[100rem]"
+      >
+        <MooreLogicGateView
+          conversion={conversion}
+          onEditDefinition={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowConversion={() => setMode("conversion")}
+        />
+      </div>
     );
 
   return (
@@ -334,12 +354,6 @@ export const MealySimulator = forwardRef<
             onOutputCodeChange={(input, state, code) =>
               updateOutput(input, state, { code })
             }
-          />
-          <SimulatorStringTransferBox
-            value={program}
-            codec={transferCodec}
-            onLoad={loadProgram}
-            testIdPrefix="mealy-transfer"
           />
           <MooreViewActions
             actions={[

@@ -1,3 +1,60 @@
-\subNsection{1}{Perspektiven}{Author}
+\subNsection{1}{Perspektiven}{Kristian Popov}
 
-Gamification (Badges/Punkte), LMS-Anbindung (Moodle/ILIAS) und Mobile Learning (responsive Optimierung)
+Ein naheliegender nächster Schritt ist die Erweiterung um weitere Lernbereiche.
+Bisher umfasst die Anwendung Grundlagen Informatik als Hauptbereich und
+Programmieren~1 als zusätzlichen Lernbereich.
+Dieses Prinzip lässt sich auch auf weitere Module und Lehrende übertragen.
+Ein neuer Lernbereich kann zentral im Modulkatalog registriert werden.
+Dadurch werden Navigation, Routing und Seitenaufbau automatisch
+in die bestehende Struktur integriert, ohne dass die bereits vorhandenen
+Themen angepasst werden müssen.
+Für ein neues Thema ist dagegen weiterhin eine Anpassung des Quellcodes erforderlich,
+da jedes Thema seine eigene fachliche Logik und gegebenenfalls einen eigenen Simulator mitbringt.
+
+Auch die Erstellung und Verwaltung von Aufgaben könnte künftig stärker über die
+Oberfläche erfolgen.
+Lehrende könnten Aufgaben und Beispiele direkt anlegen und anschließend weitergeben, anstatt
+sie manuell im Aufgabenkatalog zu hinterlegen.
+Das bestehende Übertragungsformat könnte dafür als Grundlage dienen, müsste
+jedoch um die für eine Aufgabe benötigten Angaben wie Beschreibung,
+Schwierigkeitsgrad und Prüfkriterium erweitert werden.
+
+Ein weiterer wichtiger Ausbau betrifft die Generierung von Aufgaben aus einem Startwert.
+Aus einer Vorlage könnten viele unterschiedliche Varianten derselben
+Aufgabe erzeugt und weiterhin automatisch überprüft werden.
+Dadurch wird stärker das eigentliche Verfahren geübt, anstatt eine bekannte Musterlösung
+auswendig zu lernen.
+Ergänzend könnten Quizfragen, Lernkarten und zufällig ausgewählte
+Theoriefragen die Simulationen begleiten, sodass neben der praktischen Anwendung
+auch das theoretische Verständnis überprüft wird.
+
+Für Lehrende wäre außerdem eine Auswertung der Bearbeitungsergebnisse interessant.
+Sie könnte beispielsweise zeigen, welche Aufgaben besonders häufig
+abgebrochen oder falsch gelöst werden und bei welchen Themen dadurch
+zusätzlicher Erklärungsbedarf besteht.
+Die erfassten Fortschritte könnten außerdem für Gamification genutzt werden,
+beispielsweise durch Streaks für regelmäßiges Üben oder Abzeichen
+für abgeschlossene Aufgabenreihen.
+Solche Funktionen könnten grundsätzlich auch lokal umgesetzt werden.
+Eine zentrale Auswertung für Lehrende oder eine Anbindung an ein \gls{lms} wie
+Moodle würde dagegen Benutzerkonten, serverseitige Speicherung und ein Backend
+voraussetzen.
+Die aktuelle Anwendung ist bewusst so aufgebaut, dass sie ohne diese Infrastruktur
+betrieben werden kann.
+
+Weitere mögliche Erweiterungen betreffen den Zugang zu den Aufgaben.
+Ein Export als Arbeitsblatt im PDF- oder Druckformat könnte Studierenden ermöglichen,
+Aufgaben auch auf Papier zu bearbeiten oder ihren Bearbeitungsstand
+aufzubewahren.
+Auch eine überarbeitete mobile Ansicht wäre sinnvoll, um das Üben
+unabhängig vom verfügbaren Endgerät zu ermöglichen.
+Insbesondere Übergangstabellen und Zustandsdiagramme sind auf kleinen Bildschirmen derzeit
+noch schwer zu bedienen.
+
+Insgesamt bieten sich damit sowohl fachliche als auch technische
+Erweiterungsmöglichkeiten.
+Während weitere Lernbereiche, Aufgabenvarianten oder ein PDF-Export
+die bestehende Struktur vergleichsweise gezielt erweitern könnten,
+würden Funktionen wie Benutzerkonten, serverseitige Auswertungen oder
+eine Moodle-Anbindung eine Weiterentwicklung der bisher bewusst backendfreien
+Architektur erfordern.

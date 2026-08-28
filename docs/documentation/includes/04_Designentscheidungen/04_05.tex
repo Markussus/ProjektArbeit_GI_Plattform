@@ -1,9 +1,52 @@
-\subNsection{1}{Moore \& Mealy Automaten}{Author}
+\subNsection{1}{Moore- und Mealy-Automaten}{Markus Nöth}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Author}
+Moore- und Mealy-Automaten wurden als gemeinsamer Themenbereich umgesetzt, da beide auf demselben Grundmodell eines endlichen Automaten aufbauen. Der Unterschied liegt hauptsächlich in der Ausgabe. Beim Moore-Automaten besitzt jeder Zustand eine Ausgabe, beim Mealy-Automaten gehört die Ausgabe zu einem Übergang und hängt damit vom aktuellen Zustand und der Eingabe ab.
 
-\subNsection{2}{Entscheidungen im UI}{Author}
+Trotzdem sollten sich beide Simulatoren möglichst ähnlich bedienen lassen. Zustände und Eingabesymbole werden nach demselben Prinzip angelegt, die Simulationssteuerung funktioniert gleich und auch der grundsätzliche Aufbau der Seite ist identisch. Unterschiede gibt es nur an den Stellen, an denen Moore und Mealy fachlich unterschiedlich funktionieren. Dadurch muss der Benutzer nicht zwei komplett verschiedene Bedienkonzepte verstehen, sieht aber trotzdem direkt den Unterschied zwischen den beiden Automatentypen.
 
-\subNsection{2}{Andere Entscheidungen}{Author}
 
-Die Punkte sind nur Vorschläge ...
+\subNsection{2}{Entscheidungen in der Architektur}{Markus Nöth}
+
+Für Moore und Mealy wurden getrennte Datenmodelle verwendet. Beim Moore-Automaten werden die Ausgaben direkt anhand des Zustands gespeichert. Beim Mealy-Automaten gehören sie zu einer Kombination aus Zustand und Eingabe. Das entspricht direkt der jeweiligen Definition der Ausgabefunktion und vermeidet ein gemeinsames Datenmodell, das für einen der beiden Automaten nur durch zusätzliche Sonderfälle funktionieren würde.
+
+Getrennt wurden deshalb hauptsächlich die Teile, in denen sich die beiden Automaten fachlich unterscheiden. Gemeinsame Funktionen und UI-Bausteine werden dagegen wiederverwendet. Dazu gehören Teile der Tabellen, die Simulationssteuerung, der Zustandsgraph sowie die Ansichten für Konvertierung und Logikgatter. Damit wird nicht dieselbe Funktion zweimal implementiert, nur weil sie einmal von Moore und einmal von Mealy verwendet wird.
+
+Für die Simulation wird außerdem die bereits vorhandene Simulationsarchitektur der Plattform genutzt. Funktionen wie Start, Pause, Einzelschritt, Schritt zurück und Reset verhalten sich dadurch ähnlich wie bei den anderen Simulatoren. Die jeweilige Moore- oder Mealy-Implementierung übernimmt nur die Berechnung eines einzelnen Schrittes. Beim Moore-Automaten wird zuerst der Folgezustand bestimmt und anschließend dessen Ausgabe übernommen. Beim Mealy-Automaten werden Folgezustand und Ausgabe direkt aus Zustand und Eingabe bestimmt.
+
+Ein weiterer Punkt war die Trennung zwischen dem eigentlichen Automaten und den späteren Darstellungen. Für Wahrheitstabellen, boolesche Funktionen und Logikgatter wird der Automat zuerst in eine gemeinsame Konvertierungsstruktur überführt. Die folgenden Ansichten greifen auf dieses Ergebnis zurück. Dadurch wird die Logik für Codierung und Formelerzeugung nur einmal ausgeführt und die verschiedenen Darstellungen können nicht voneinander abweichende Ergebnisse berechnen.
+
+
+\subNsection{2}{Entscheidungen in der Benutzeroberfläche}{Markus Nöth}
+
+Beim Aufbau des UI wurde versucht, sich an den bereits vorhandenen Simulatoren der Plattform zu orientieren. Besonders die Aufteilung zwischen Konfiguration, Simulation und den weiteren Ansichten wurde gleich gehalten. Die Bedienung sollte damit auch dann verständlich bleiben, wenn ein Benutzer vorher beispielsweise mit der Turingmaschine gearbeitet hat.
+
+Der größte sichtbare Unterschied zwischen Moore und Mealy befindet sich in der Tabelle. Beim Moore-Automaten besitzt jeder Zustand genau eine Ausgabe. Deshalb gibt es oberhalb der Übergänge eine eigene Ausgabezeile für die Zustände. Die einzelnen Übergangszellen enthalten nur den jeweiligen Folgezustand. Beim Mealy-Automaten gehört die Ausgabe dagegen zum Übergang. Dort werden Folgezustand und Ausgabe deshalb gemeinsam innerhalb der jeweiligen Tabellenzelle eingegeben. Die Darstellung folgt damit direkt dem fachlichen Unterschied der beiden Automaten.
+
+Für die Eingabe werden soweit möglich dieselben Komponenten verwendet. Zustände und Ausgabesymbole können beispielsweise über gemeinsame Auswahlkomponenten angelegt und ausgewählt werden. Dadurch bleibt das Verhalten an verschiedenen Stellen gleich und Änderungen an diesen Komponenten wirken sich nicht nur auf einen einzelnen Simulator aus.
+
+Nach der Definition des Automaten kann direkt zwischen Simulation, Konvertierung und Logikgatterdarstellung gewechselt werden. Diese Ansichten wurden bewusst nicht als komplett getrennte Funktionen aufgebaut. Der Benutzer soll mit demselben Automaten weiterarbeiten und nacheinander sehen können, wie er sich verhält, wie Zustände und Übergänge codiert werden und welche booleschen Funktionen daraus entstehen.
+
+
+\subNsection{2}{Zustandsgraph}{Markus Nöth}
+
+Der Zustandsgraph wird für beide Automatentypen über die gemeinsame \texttt{StateMachineGraph}-Komponente dargestellt. Moore und Mealy übersetzen dafür ihre Daten jeweils in eine allgemeine Struktur aus Knoten und Kanten. Bei Moore wird die Ausgabe am Zustand angezeigt und auf einer Kante steht nur die Eingabe. Bei Mealy wird die Ausgabe zusammen mit der Eingabe auf der Kante dargestellt. Die Graphkomponente muss dadurch nicht wissen, ob sie gerade einen Moore- oder einen Mealy-Automaten darstellt.
+
+Für den Graphen wurde SVG verwendet. Zustände erhalten zuerst automatisch eine Position, können anschließend aber vom Benutzer verschoben werden. Die Ansicht selbst lässt sich ebenfalls verschieben und zoomen. Diese Kombination war sinnvoll, weil eine automatische Anordnung für kleine Automaten direkt funktioniert, bei größeren oder ungewöhnlich aufgebauten Automaten aber nicht immer die beste Darstellung liefert.
+
+Während der Simulation werden der aktuelle Zustand und die verwendeten Übergänge im Graphen hervorgehoben. Die graphische Darstellung ist damit nicht nur eine zusätzliche statische Ansicht, sondern zeigt direkt den aktuellen Zustand der Simulation. Da dieselbe Funktion auch für andere zustandsbasierte Darstellungen sinnvoll ist, wurde der Graph als Shared Component umgesetzt.
+
+
+\subNsection{2}{Konvertierung und Logikgatter}{Markus Nöth}
+
+Aus einem gültigen Automaten werden codierte Übergangs- und Ausgabefunktionen erzeugt. Für die Übergänge werden die Bits des aktuellen Zustands und der Eingabe verwendet. Bei Moore wird die Ausgabe nur aus den Zustandsbits bestimmt, während bei Mealy auch die Eingabe berücksichtigt werden muss. Auch hier bleibt der Unterschied zwischen beiden Automatentypen damit bis in die spätere technische Darstellung erhalten.
+
+Aus den Wertetabellen werden anschließend boolesche Funktionen erzeugt. Dabei können sowohl die kanonische DNF als auch eine minimierte Variante betrachtet werden. Für die Minimierung wird die bereits vorhandene Logik des DNF-Themas verwendet. Eine eigene zweite Implementierung für Moore und Mealy hätte an dieser Stelle dieselbe Aufgabe noch einmal gelöst und wäre deshalb redundant gewesen.
+
+Die Logikgatterdarstellung verwendet direkt den erzeugten booleschen Ausdrucksbaum. Variablen werden zu Eingängen und die Operationen zu UND-, ODER- oder NICHT-Gattern. Für die Darstellung werden IEC-Symbole verwendet. Der Benutzer kann zusätzlich zwischen einer binären Darstellung und zusammengefassten Gattern mit mehreren Eingängen wechseln. Die binäre Darstellung folgt näher dem eigentlichen Ausdrucksbaum, während die zusammengefasste Darstellung bei größeren Funktionen weniger Platz benötigt und dadurch übersichtlicher sein kann.
+
+Wie beim Zustandsgraphen wird auch das Gatternetz als SVG erzeugt. Die Positionen werden aus der Struktur des Ausdrucksbaums berechnet. Einzelne Gatter und Verbindungen können ausgewählt und hervorgehoben werden, damit auch größere Schaltungen leichter nachvollzogen werden können.
+
+
+\subNsection{2}{Zusammenfassung der Designentscheidungen}{Markus Nöth}
+
+Bei der Umsetzung wurde vor allem darauf geachtet, Moore und Mealy dort gemeinsam zu behandeln, wo sie technisch dasselbe benötigen, und sie dort zu trennen, wo sich die fachliche Bedeutung unterscheidet. Dadurch verwenden beide Simulatoren dieselben grundlegenden UI- und Simulationskonzepte, ohne dass beispielsweise die unterschiedliche Ausgabefunktion durch ein gemeinsames Datenmodell versteckt wird.

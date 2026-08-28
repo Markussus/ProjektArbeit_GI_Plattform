@@ -1,8 +1,26 @@
 import { useTranslation } from "react-i18next";
-import { Network, Sparkles, PlayCircle, ListChecks } from "lucide-react";
+import { TopicTutorialVideoSection } from "@/components/shared/TopicTutorialVideoSection/TopicTutorialVideoSection";
 
-const conceptIcons = [Network, Sparkles, PlayCircle, ListChecks];
+const tutorialQuestions = [
+  {
+    titleKey: "automata.tutorialQuestion1",
+    answerKey: "automata.tutorialAnswer1",
+  },
+  {
+    titleKey: "automata.tutorialQuestion2",
+    answerKey: "automata.tutorialAnswer2",
+  },
+  {
+    titleKey: "automata.tutorialQuestion3",
+    answerKey: "automata.tutorialAnswer3",
+  },
+] as const;
 
+/**
+ * Finite Automata overview. The "Core Concepts" card grid was removed — a
+ * tutorial video takes that spot (see the `develop/video_player` branch, which
+ * adds the shared `TopicTutorialVideoSection`).
+ */
 export function OverviewTab() {
   const { t } = useTranslation();
 
@@ -17,32 +35,13 @@ export function OverviewTab() {
         </p>
       </div>
 
-      <div>
-        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("automata.concepts")}
-        </h3>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {([1, 2, 3, 4] as const).map((num, i) => {
-            const Icon = conceptIcons[i];
-
-            return (
-              <div
-                key={num}
-                className="bg-card ring-foreground/10 flex items-center gap-3 rounded-lg p-4 ring-1"
-              >
-                <div className="bg-module-blue-bg text-module-blue-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-                  <Icon className="size-4" />
-                </div>
-
-                <span className="text-foreground text-sm font-medium">
-                  {t(`automata.concept${num}`)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <TopicTutorialVideoSection
+        topicId="finite-automata"
+        videoTitleKey="automata.tutorialVideo"
+        questionLabelKey="automata.tutorialQuestionLabel"
+        questions={tutorialQuestions}
+        testIdPrefix="automata-tutorial"
+      />
     </div>
   );
 }

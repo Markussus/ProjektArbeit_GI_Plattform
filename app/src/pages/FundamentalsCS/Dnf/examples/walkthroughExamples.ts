@@ -1,21 +1,10 @@
-import {
-  ArrowRight,
-  Ban,
-  BookOpen,
-  Hash,
-  Layers,
-  Plus,
-  Table2,
-} from "lucide-react";
+import { BookOpen, Hash, Layers, Table2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { TranslationKey } from "@/types/i18n";
 
 type DnfWalkthroughExampleId =
   | "lecture-expression"
   | "parentheses"
-  | "negation"
-  | "xor"
-  | "carry"
   | "dnf-intro"
   | "exercise-two";
 
@@ -77,39 +66,6 @@ export const dnfWalkthroughExamples: DnfWalkthroughExample[] = [
     oneRows: ["a=0, b=1, c=1", "a=1, b=0, c=1", "a=1, b=1, c=1"],
     terms: ["¬a ∧ b ∧ c", "a ∧ ¬b ∧ c", "a ∧ b ∧ c"],
     canonicalDnf: "(¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ c)",
-  },
-  {
-    id: "negation",
-    mode: "expression_to_truth_table",
-    titleKey: "dnf.examples.walkthroughs.negation.title",
-    explanationKey: "dnf.examples.walkthroughs.negation.explanation",
-    icon: Ban,
-    expression: "¬a ∧ (b ∨ c)",
-    oneRows: ["a=0, b=0, c=1", "a=0, b=1, c=0", "a=0, b=1, c=1"],
-    terms: ["¬a ∧ ¬b ∧ c", "¬a ∧ b ∧ ¬c", "¬a ∧ b ∧ c"],
-    canonicalDnf: "(¬a ∧ ¬b ∧ c) ∨ (¬a ∧ b ∧ ¬c) ∨ (¬a ∧ b ∧ c)",
-  },
-  {
-    id: "xor",
-    mode: "expression_to_truth_table",
-    titleKey: "dnf.examples.walkthroughs.xor.title",
-    explanationKey: "dnf.examples.walkthroughs.xor.explanation",
-    icon: ArrowRight,
-    expression: "(¬x ∧ y) ∨ (x ∧ ¬y)",
-    oneRows: ["x=0, y=1", "x=1, y=0"],
-    terms: ["¬x ∧ y", "x ∧ ¬y"],
-    canonicalDnf: "(¬x ∧ y) ∨ (x ∧ ¬y)",
-  },
-  {
-    id: "carry",
-    mode: "expression_to_truth_table",
-    titleKey: "dnf.examples.walkthroughs.carry.title",
-    explanationKey: "dnf.examples.walkthroughs.carry.explanation",
-    icon: Plus,
-    expression: "x ∧ y",
-    oneRows: ["x=1, y=1"],
-    terms: ["x ∧ y"],
-    canonicalDnf: "x ∧ y",
   },
   {
     id: "dnf-intro",

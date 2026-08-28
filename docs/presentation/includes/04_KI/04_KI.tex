@@ -1,0 +1,27 @@
+\addsectionframe{4. KI-Einsatz im Projekt}
+
+\begin{itemframe}{KI als Entwicklungswerkzeug}
+  \item Genutzt wurden ChatGPT, Codex, lokal ausgeführte Modelle über Ollama, Gemini und Claude (Opus).
+  \item Einsatzfelder: Strukturierung von Arbeitspaketen, Entwürfe, Refactorings, Tests und Varianten von Übungsaufgaben.
+  \item KI-Ausgaben waren Vorschläge. Fachliche Verantwortung und Freigabe blieben im Team.
+\end{itemframe}
+
+\begin{itemframe}{Tooling: LSP, MCP \& Graphen}
+  \item \textbf{LSP-Integration} (\texttt{typescript-lsp}): konsistente Typen und sichere Refactorings über Dateigrenzen.
+  \item \textbf{Browser-MCP} (\texttt{chrome-\allowbreak devtools-\allowbreak mcp}): Debugging von Simulator-Zuständen direkt im Browser.
+  \item \textbf{Graphify-Wissensgraph}: Semantischer Projektkontext verhindert Kontextverlust bei großen Änderungen.
+  \item \textbf{Aufgabengenerierung}: KI erzeugt Varianten aus Vorlagen; Verifikation erfolgt deterministisch im Simulator.
+\end{itemframe}
+
+\begin{itemframe}{Arbeitsweise mit KI}
+  \item Aufgabe und bestehende Architektur zuerst präzise beschreiben.
+  \item Vorschlag gegen Fachmodell, Codebasis und Projektkonventionen prüfen.
+  \item Kleine, testbare Änderungen übernehmen; anschließend Review und automatisierte Prüfungen ausführen.
+  \item Bei Aufgabenmaterial Lösungen unabhängig nachvollziehen.
+\end{itemframe}
+
+\begin{itemframe}{Grenzen und Erkenntnisse}
+  \item Große Gesamtaufgaben verlieren Details oder erzeugen unnötige Abstraktionen und Codeduplikate.
+  \item Bei Automaten und formaler Logik waren Format und fachliche Korrektheit nicht verlässlich genug für eine ungeprüfte Übernahme.
+  \item Der Nutzen entstand durch klare Teilaufgaben, Tool-Unterstützung und Kontrolle -- nicht durch automatisches Generieren.
+\end{itemframe}

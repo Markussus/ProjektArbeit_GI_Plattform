@@ -4,13 +4,15 @@ import type { TruthTableAnswer } from "./dnfExerciseCheck";
 
 const TRANSFER_PREFIX = "D";
 const FORMAT_VERSION = 3;
-const LEGACY_FORMAT_VERSION = 2;
 const FORMAT_VERSION_BITS = 3;
 const TRANSFER_MODE_BITS = 2;
 const MAX_TEXT_BYTES = 100_000;
 const MAX_TRUTH_TABLE_ANSWERS = 256;
 const MIN_VARIABLE_COUNT = 1;
-const MAX_VARIABLE_COUNT = 8;
+// Matches MAX_DNF_VARIABLE_COUNT — see dnfAnalysis.ts for the rationale.
+// Only a validation bound (the count is varuint-encoded), so changing it keeps
+// the transfer format intact and just accepts or rejects different payloads.
+const MAX_VARIABLE_COUNT = 4;
 
 const TransferMode = {
   ExpressionToTruthTable: 0,
@@ -119,23 +121,13 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
       "dnf_transfer_payload_invalid",
     );
     const version = reader.readBits(FORMAT_VERSION_BITS);
-    if (version !== FORMAT_VERSION && version !== LEGACY_FORMAT_VERSION) {
+    if (version !== FORMAT_VERSION) {
       throw new Error("dnf_transfer_payload_invalid");
     }
 
     const mode = reader.readBits(TRANSFER_MODE_BITS) as TransferMode;
     if (mode === TransferMode.ExpressionToTruthTable) {
       const expression = readUtf8String(reader);
-      if (version === LEGACY_FORMAT_VERSION) {
-        reader.assertOnlyPaddingRemains();
-        return {
-          mode: "expression_to_truth_table",
-          expression: expression.trim(),
-          committed: false,
-          ...createDnfAttemptDraft(),
-        };
-      }
-
       const committed = reader.readBit() === 1;
       const attempt = readAttempt(reader);
       reader.assertOnlyPaddingRemains();
@@ -154,18 +146,6 @@ export const dnfTransferCodec: ISimulatorTransferCodec<DnfTransferValue> = {
         { length: getExpectedResultCount(variableCount) },
         () => reader.readBit() === 1,
       );
-
-      if (version === LEGACY_FORMAT_VERSION) {
-        reader.assertOnlyPaddingRemains();
-        validateTruthTable(variableCount, resultValues);
-        return {
-          mode: "truth_table_to_dnf",
-          variableCount,
-          resultValues,
-          committed: false,
-          ...createDnfAttemptDraft(),
-        };
-      }
 
       const committed = reader.readBit() === 1;
       const attempt = readAttempt(reader);

@@ -1,8 +1,26 @@
 import { useTranslation } from "react-i18next";
-import { Sigma, Wand2, Sparkles, CheckCircle2 } from "lucide-react";
+import { TopicTutorialVideoSection } from "@/components/shared/TopicTutorialVideoSection/TopicTutorialVideoSection";
 
-const conceptIcons = [Sigma, Wand2, Sparkles, CheckCircle2];
+const tutorialQuestions = [
+  {
+    titleKey: "rl.tutorialQuestion1",
+    answerKey: "rl.tutorialAnswer1",
+  },
+  {
+    titleKey: "rl.tutorialQuestion2",
+    answerKey: "rl.tutorialAnswer2",
+  },
+  {
+    titleKey: "rl.tutorialQuestion3",
+    answerKey: "rl.tutorialAnswer3",
+  },
+] as const;
 
+/**
+ * Regular Languages overview. The "Core Concepts" card grid was removed — a
+ * tutorial video takes that spot (see the `develop/video_player` branch, which
+ * adds the shared `TopicTutorialVideoSection`).
+ */
 export function OverviewTab() {
   const { t } = useTranslation();
 
@@ -17,32 +35,13 @@ export function OverviewTab() {
         </p>
       </div>
 
-      <div>
-        <h3 className="text-muted-foreground mb-3 text-sm font-bold tracking-wider uppercase">
-          {t("rl.concepts")}
-        </h3>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {([1, 2, 3, 4] as const).map((num, i) => {
-            const Icon = conceptIcons[i];
-
-            return (
-              <div
-                key={num}
-                className="bg-card ring-foreground/10 flex items-center gap-3 rounded-lg p-4 ring-1"
-              >
-                <div className="bg-module-purple-bg text-module-purple-fg flex size-9 shrink-0 items-center justify-center rounded-md">
-                  <Icon className="size-4" />
-                </div>
-
-                <span className="text-foreground text-sm font-medium">
-                  {t(`rl.concept${num}`)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <TopicTutorialVideoSection
+        topicId="regular-languages"
+        videoTitleKey="rl.tutorialVideo"
+        questionLabelKey="rl.tutorialQuestionLabel"
+        questions={tutorialQuestions}
+        testIdPrefix="rl-tutorial"
+      />
     </div>
   );
 }

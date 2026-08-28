@@ -33,6 +33,33 @@ interface RLSimulatorStore {
    */
   studentLanguageSource: string | null;
   setStudentLanguageSource: (source: string | null) => void;
+
+  /**
+   * The learner's in-progress answer for each exercise, keyed by exercise id
+   * (an enumerated word list for Grammar → Language, a grammar for Language →
+   * Grammar). Held in the store so it survives leaving and re-entering exercise
+   * mode; cleared explicitly by "Reset all exercises".
+   */
+  exerciseDrafts: Record<string, string>;
+  setExerciseDraft: (exerciseId: string, value: string) => void;
+  clearExerciseDraft: (exerciseId: string) => void;
+  clearExerciseDrafts: () => void;
+
+  /**
+   * One-shot payload used by "Load solution" in a Grammar → Language exercise:
+   * the revealed enumeration (comma-separated) to drop into the student input.
+   */
+  revealedEnumeration: string | null;
+  revealEnumeration: (words: string) => void;
+  consumeRevealedEnumeration: () => void;
+
+  /**
+   * One-shot payload used by "Load solution" in a Language → Grammar exercise:
+   * the revealed reference grammar to drop into the student grammar input.
+   */
+  revealedGrammar: string | null;
+  revealGrammar: (grammar: string) => void;
+  consumeRevealedGrammar: () => void;
 }
 
 export const useRLSimulatorStore = create<RLSimulatorStore>((set) => ({
@@ -62,4 +89,25 @@ export const useRLSimulatorStore = create<RLSimulatorStore>((set) => ({
 
   studentLanguageSource: null,
   setStudentLanguageSource: (source) => set({ studentLanguageSource: source }),
+
+  exerciseDrafts: {},
+  setExerciseDraft: (exerciseId, value) =>
+    set((state) => ({
+      exerciseDrafts: { ...state.exerciseDrafts, [exerciseId]: value },
+    })),
+  clearExerciseDraft: (exerciseId) =>
+    set((state) => {
+      const exerciseDrafts = { ...state.exerciseDrafts };
+      delete exerciseDrafts[exerciseId];
+      return { exerciseDrafts };
+    }),
+  clearExerciseDrafts: () => set({ exerciseDrafts: {} }),
+
+  revealedEnumeration: null,
+  revealEnumeration: (words) => set({ revealedEnumeration: words }),
+  consumeRevealedEnumeration: () => set({ revealedEnumeration: null }),
+
+  revealedGrammar: null,
+  revealGrammar: (grammar) => set({ revealedGrammar: grammar }),
+  consumeRevealedGrammar: () => set({ revealedGrammar: null }),
 }));

@@ -1,13 +1,55 @@
-import { useEffect } from "react";
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+  type Ref,
+} from "react";
+import { useTranslation } from "react-i18next";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
+import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import {
+  createTrainingCenterIdentifier,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
 import { useRLSimulatorStore } from "../../store/rlSimulatorStore";
+import { findRLExercise } from "../../exercises/rlExerciseDefinitions";
+import type { SimulationMode } from "./domain/rlTypes";
 import { RLModeSelector } from "./presentation/RLModeSelector";
 import { RLGrammarToLanguage } from "./presentation/RLGrammarToLanguage";
+import { RLGrammarEnumerationExercise } from "./presentation/RLGrammarEnumerationExercise";
+import { RLLanguageGrammarExercise } from "./presentation/RLLanguageGrammarExercise";
 import { RLLanguageToGrammar } from "./presentation/RLLanguageToGrammar";
 import { RLWordRecognizer } from "./presentation/RLWordRecognizer";
+import { RL_STORAGE_TASK_IDS } from "./useRLPersistedSource";
 
-export function RLSimulator() {
+interface RLSimulatorProps {
+  /** Clears the active exercise (set by ModuleTopicPage when one is open). */
+  onExitExercise?: () => void;
+  importedTaskStorageId?: number;
+  ref?: Ref<RLSimulatorHandle>;
+}
+
+export interface RLSimulatorHandle {
+  resetStoredState: () => void;
+}
+
+const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
+  grammarToLanguage: 0,
+  languageToGrammar: 0,
+  recognizeWord: 0,
+};
+
+export function RLSimulator({
+  onExitExercise,
+  importedTaskStorageId,
+  ref,
+}: RLSimulatorProps) {
+  const { t } = useTranslation();
   const mode = useRLSimulatorStore((s) => s.mode);
   const setMode = useRLSimulatorStore((s) => s.setMode);
+  const activeExerciseId = useRLSimulatorStore((s) => s.activeExerciseId);
+  const [pendingMode, setPendingMode] = useState<SimulationMode | null>(null);
   const pendingGrammarSource = useRLSimulatorStore(
     (s) => s.pendingGrammarSource,
   );
@@ -16,6 +58,69 @@ export function RLSimulator() {
   );
   const pendingTestWord = useRLSimulatorStore((s) => s.pendingTestWord);
   const consumePending = useRLSimulatorStore((s) => s.consumePending);
+  const clearExerciseDraft = useRLSimulatorStore((s) => s.clearExerciseDraft);
+  const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
+
+  useEffect(() => {
+    const importedMode = Object.entries(RL_STORAGE_TASK_IDS).find(
+      ([, taskStorageId]) => taskStorageId === importedTaskStorageId,
+    )?.[0] as SimulationMode | undefined;
+
+    if (importedMode) {
+      setMode(importedMode);
+    }
+  }, [importedTaskStorageId, setMode]);
+
+  // An active exercise replaces the free converter with a guided workspace:
+  // Grammar → Language gives the grammar and asks for the language; Language →
+  // Grammar gives the language and asks for a grammar.
+  const activeExercise = activeExerciseId
+    ? findRLExercise(activeExerciseId)
+    : undefined;
+  const isGrammarExercise = activeExercise?.mode === "grammarToLanguage";
+  const isLanguageExercise = activeExercise?.mode === "languageToGrammar";
+
+  // Switching modes while an exercise is active abandons it, so prompt with the
+  // same "Switch Tab?" confirmation the top-level module tabs use.
+  const handleModeChange = (target: SimulationMode) => {
+    if (target === mode) {
+      return;
+    }
+    if (activeExerciseId) {
+      setPendingMode(target);
+      return;
+    }
+    setMode(target);
+  };
+
+  const confirmModeChange = () => {
+    const target = pendingMode;
+    setPendingMode(null);
+    onExitExercise?.();
+    if (target) {
+      setMode(target);
+    }
+  };
+
+  const resetStoredState = useCallback(() => {
+    if (activeExerciseId) {
+      clearExerciseDraft(activeExerciseId);
+      return;
+    }
+
+    trainingCenterStorage.delete(
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.regularLanguages,
+        RL_STORAGE_TASK_IDS[mode],
+      ),
+    );
+    setResetVersions((versions) => ({
+      ...versions,
+      [mode]: versions[mode] + 1,
+    }));
+  }, [activeExerciseId, clearExerciseDraft, mode]);
+
+  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
 
   // When a pending scenario arrives the mode cards pick it up via a
   // render-time prop sync (see each card); we then clear the store so the
@@ -26,8 +131,9 @@ export function RLSimulator() {
       pendingLanguageSource !== null ||
       pendingTestWord !== null
     ) {
-      const t = setTimeout(() => consumePending(), 0);
-      return () => clearTimeout(t);
+      // Named so it does not shadow the `t` from useTranslation above.
+      const clearPending = setTimeout(() => consumePending(), 0);
+      return () => clearTimeout(clearPending);
     }
   }, [
     pendingGrammarSource,
@@ -38,24 +144,73 @@ export function RLSimulator() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
-      <RLModeSelector mode={mode} onChange={setMode} />
+      <RLModeSelector mode={mode} onChange={handleModeChange} />
 
-      {mode === "grammarToLanguage" && (
-        <RLGrammarToLanguage
-          initialGrammar={pendingGrammarSource ?? undefined}
-        />
-      )}
-      {mode === "languageToGrammar" && (
-        <RLLanguageToGrammar
-          initialSource={pendingLanguageSource ?? undefined}
-        />
-      )}
-      {mode === "recognizeWord" && (
+      {/*
+        All three modes stay mounted and are toggled with `hidden`, mirroring
+        the Moore/Mealy simulator's tab handling. This preserves each mode's
+        in-progress edits when the learner switches between them, so returning
+        to a mode behaves like the initial navigation instead of resetting to
+        its default example. A pending seed is only handed to the mode it
+        targets (the grammar field is shared by two modes).
+      */}
+      <div hidden={mode !== "grammarToLanguage"}>
+        {isGrammarExercise && activeExercise ? (
+          <RLGrammarEnumerationExercise exercise={activeExercise} />
+        ) : (
+          <RLGrammarToLanguage
+            transferActive={mode === "grammarToLanguage"}
+            resetVersion={resetVersions.grammarToLanguage}
+            initialGrammar={
+              mode === "grammarToLanguage"
+                ? (pendingGrammarSource ?? undefined)
+                : undefined
+            }
+          />
+        )}
+      </div>
+      <div hidden={mode !== "languageToGrammar"}>
+        {isLanguageExercise && activeExercise ? (
+          <RLLanguageGrammarExercise exercise={activeExercise} />
+        ) : (
+          <RLLanguageToGrammar
+            transferActive={mode === "languageToGrammar"}
+            resetVersion={resetVersions.languageToGrammar}
+            initialSource={
+              mode === "languageToGrammar"
+                ? (pendingLanguageSource ?? undefined)
+                : undefined
+            }
+          />
+        )}
+      </div>
+      <div hidden={mode !== "recognizeWord"}>
         <RLWordRecognizer
-          initialGrammar={pendingGrammarSource ?? undefined}
-          initialWord={pendingTestWord ?? undefined}
+          transferActive={mode === "recognizeWord"}
+          resetVersion={resetVersions.recognizeWord}
+          initialGrammar={
+            mode === "recognizeWord"
+              ? (pendingGrammarSource ?? undefined)
+              : undefined
+          }
+          initialWord={
+            mode === "recognizeWord"
+              ? (pendingTestWord ?? undefined)
+              : undefined
+          }
         />
-      )}
+      </div>
+
+      <ConfirmDialog
+        isOpen={pendingMode !== null}
+        title={t("simulator.validation.exitTabTitle")}
+        description={t("simulator.validation.exitTabDesc")}
+        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        onConfirm={confirmModeChange}
+        onCancel={() => setPendingMode(null)}
+        variant="warning"
+        testId="rl-mode-switch-confirm"
+      />
     </div>
   );
 }

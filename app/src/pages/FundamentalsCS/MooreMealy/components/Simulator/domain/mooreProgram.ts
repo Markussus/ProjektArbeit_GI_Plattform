@@ -129,6 +129,15 @@ export function createNextInputSymbol(inputSymbols: string[]): string {
   return candidate;
 }
 
+export function getNextMooreOutputCode(program: MooreProgram): number {
+  return (
+    Math.max(
+      -1,
+      ...program.states.map((state) => program.outputs[state]?.code ?? -1),
+    ) + 1
+  );
+}
+
 export function renameMooreState(
   program: MooreProgram,
   previousName: string,

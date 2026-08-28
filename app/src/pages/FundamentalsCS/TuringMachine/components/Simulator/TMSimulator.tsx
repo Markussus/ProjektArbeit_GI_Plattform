@@ -8,13 +8,12 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
   trainingCenterStorage,
@@ -73,16 +72,11 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
         ),
       [scenario],
     );
-    const storageTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              tmProgramTransferCodec,
-            )
-          : tmProgramTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
+    useActiveSimulatorTransfer({
+      identifier: storageIdentifier,
+      value: editor.draft,
+      codec: tmProgramTransferCodec,
+    });
 
     const handleImportProgram = useCallback(
       (nextProgram: TMProgram) => {
@@ -231,12 +225,6 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
         {isEditMode ? (
           <div className="flex flex-col gap-4">
             <TMConfigView editor={editor} />
-            <SimulatorStringTransferBox
-              value={editor.draft}
-              codec={storageTransferCodec}
-              onLoad={handleImportProgram}
-              testIdPrefix="tm-transfer"
-            />
             <button
               onClick={handleApplyProgram}
               disabled={editor.hasBlockingCellIssue}

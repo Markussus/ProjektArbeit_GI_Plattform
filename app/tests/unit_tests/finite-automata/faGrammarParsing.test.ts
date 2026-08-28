@@ -55,14 +55,82 @@ describe("parseGrammarSource — simple format", () => {
   });
 
   it("expands alternatives separated by '|'", () => {
-    const result = parseGrammarSource("S -> 0S | 1A | 1");
+    const result = parseGrammarSource("S -> 0S | 1A | 1\nA -> 0");
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.grammar.productions).toEqual([
       { lhs: "S", terminal: "0", nextNonTerminal: "S" },
       { lhs: "S", terminal: "1", nextNonTerminal: "A" },
       { lhs: "S", terminal: "1", nextNonTerminal: null },
+      { lhs: "A", terminal: "0", nextNonTerminal: null },
     ]);
+  });
+
+  it("resolves non-terminals that are defined further down", () => {
+    const result = parseGrammarSource("S -> 0A\nA -> 1");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.grammar.productions[0]).toEqual({
+      lhs: "S",
+      terminal: "0",
+      nextNonTerminal: "A",
+    });
+  });
+
+  it("reads a shared terminal/non-terminal name correctly", () => {
+    // `A -> AA` is "terminal A followed by non-terminal A".
+    const result = parseGrammarSource("S -> aA\nA -> AA | ε");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.grammar.terminals.sort()).toEqual(["A", "a"]);
+    expect(result.grammar.nonTerminals.sort()).toEqual(["A", "S"]);
+    expect(result.grammar.productions).toContainEqual({
+      lhs: "A",
+      terminal: "A",
+      nextNonTerminal: "A",
+    });
+  });
+});
+
+describe("parseGrammarSource — right-linearity", () => {
+  it("rejects two terminals in one alternative", () => {
+    const result = parseGrammarSource("S -> ab");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issue.code).toBe("undefinedNonTerminal");
+    expect(result.issue.params?.rest).toBe("b");
+  });
+
+  it("rejects a unit production", () => {
+    const result = parseGrammarSource("S -> A\nA -> 1");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issue.code).toBe("unitProduction");
+  });
+
+  it("rejects a rule that is not right-linear", () => {
+    const result = parseGrammarSource("S -> aSb | ε");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issue.code).toBe("undefinedNonTerminal");
+  });
+
+  it("rejects a reference to a non-terminal that has no rule", () => {
+    const result = parseGrammarSource("S -> 0B");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.issue.code).toBe("undefinedNonTerminal");
+    expect(result.issue.params?.rest).toBe("B");
+  });
+
+  it("reports a translatable issue code for every failure", () => {
+    for (const src of ["S -> ab", "no-arrow", "S -> εS", "S -> 0S |"]) {
+      const result = parseGrammarSource(src);
+      expect(result.ok).toBe(false);
+      if (result.ok) continue;
+      expect(result.issue.code).toBeTruthy();
+      expect(result.error.length).toBeGreaterThan(0);
+    }
   });
 
   it("accepts the unicode arrow →", () => {

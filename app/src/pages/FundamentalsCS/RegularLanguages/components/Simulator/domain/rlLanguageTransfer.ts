@@ -1,8 +1,9 @@
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
+import { BitReader, BitWriter } from "@/lib/trainingCenter";
 import { parseLanguageSpec } from "./rlLanguageSpecParser";
 
-const BASE64_URL_ALPHABET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const SOURCE_INVALID = "rl_language_transfer_invalid";
+const PAYLOAD_INVALID = "rl_language_transfer_payload_invalid";
 const MAX_SOURCE_BYTES = 1_000_000;
 
 /**
@@ -17,22 +18,25 @@ const MAX_SOURCE_BYTES = 1_000_000;
 export const rlLanguageTransferCodec: ISimulatorTransferCodec<string> = {
   async exportValue(source) {
     const trimmedSource = source.trim();
-    const parsed = parseLanguageSpec(trimmedSource);
-    if (!parsed.ok) {
-      throw new Error("rl_language_transfer_invalid");
+    if (!parseLanguageSpec(trimmedSource).ok) {
+      throw new Error(SOURCE_INVALID);
     }
 
     const bytes = new TextEncoder().encode(trimmedSource);
     if (bytes.length > MAX_SOURCE_BYTES) {
-      throw new Error("rl_language_transfer_invalid");
+      throw new Error(SOURCE_INVALID);
     }
 
-    return bytesToBase64Url(bytes);
+    const writer = new BitWriter(SOURCE_INVALID);
+    for (const byte of bytes) {
+      writer.writeBits(byte, 8);
+    }
+    return writer.toBase64Url();
   },
   async importValue(serializedValue) {
     const source = decodeSource(serializedValue.trim());
     if (!parseLanguageSpec(source).ok) {
-      throw new Error("rl_language_transfer_payload_invalid");
+      throw new Error(PAYLOAD_INVALID);
     }
 
     return source;
@@ -40,65 +44,23 @@ export const rlLanguageTransferCodec: ISimulatorTransferCodec<string> = {
 };
 
 function decodeSource(serializedValue: string): string {
-  if (!serializedValue || !/^[A-Za-z0-9_-]+$/u.test(serializedValue)) {
-    throw new Error("rl_language_transfer_payload_invalid");
+  const reader = BitReader.fromBase64Url(serializedValue, PAYLOAD_INVALID);
+
+  // Whole bytes only; the trailing Base64 character contributes pad bits,
+  // which `assertOnlyPaddingRemains` then requires to be zero.
+  const byteCount = Math.floor(reader.remainingBitCount / 8);
+  if (byteCount > MAX_SOURCE_BYTES) {
+    throw new Error(PAYLOAD_INVALID);
   }
 
-  const bytes = base64UrlToBytes(serializedValue);
-  if (bytes.length > MAX_SOURCE_BYTES) {
-    throw new Error("rl_language_transfer_payload_invalid");
-  }
+  const bytes = Uint8Array.from({ length: byteCount }, () =>
+    reader.readBits(8),
+  );
+  reader.assertOnlyPaddingRemains();
 
   try {
     return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {
-    throw new Error("rl_language_transfer_payload_invalid");
+    throw new Error(PAYLOAD_INVALID);
   }
-}
-
-function bytesToBase64Url(bytes: Uint8Array): string {
-  const bits: number[] = [];
-  for (const byte of bytes) {
-    for (let bitIndex = 7; bitIndex >= 0; bitIndex--) {
-      bits.push((byte >> bitIndex) & 1);
-    }
-  }
-
-  let result = "";
-  for (let offset = 0; offset < bits.length; offset += 6) {
-    let value = 0;
-    for (let bitIndex = 0; bitIndex < 6; bitIndex++) {
-      value = value * 2 + (bits[offset + bitIndex] ?? 0);
-    }
-    result += BASE64_URL_ALPHABET[value];
-  }
-
-  return result;
-}
-
-function base64UrlToBytes(value: string): Uint8Array {
-  const bits: number[] = [];
-  for (const character of value) {
-    const valueIndex = BASE64_URL_ALPHABET.indexOf(character);
-    for (let bitIndex = 5; bitIndex >= 0; bitIndex--) {
-      bits.push((valueIndex >> bitIndex) & 1);
-    }
-  }
-
-  // Whole bytes only; the final Base64 char contributes up to 5 zero pad bits.
-  const byteCount = Math.floor(bits.length / 8);
-  if (bits.slice(byteCount * 8).some((bit) => bit !== 0)) {
-    throw new Error("rl_language_transfer_payload_invalid");
-  }
-
-  const bytes = new Uint8Array(byteCount);
-  for (let byteIndex = 0; byteIndex < byteCount; byteIndex++) {
-    let value = 0;
-    for (let bitIndex = 0; bitIndex < 8; bitIndex++) {
-      value = value * 2 + bits[byteIndex * 8 + bitIndex];
-    }
-    bytes[byteIndex] = value;
-  }
-
-  return bytes;
 }

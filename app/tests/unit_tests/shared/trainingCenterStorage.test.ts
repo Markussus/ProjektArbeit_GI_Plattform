@@ -8,6 +8,7 @@ import {
   createTrainingCenterIdentifier,
   createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
+  exportTrainingCenterValue,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
@@ -92,6 +93,19 @@ describe("training center storage", () => {
     await expect(loadTrainingCenterValue(identifier, codec)).resolves.toBe(
       "decoded-encoded-source",
     );
+  });
+
+  it("exports a current simulator snapshot without changing LocalStorage", async () => {
+    const identifier = createTrainingCenterIdentifier(7);
+    const codec: ISimulatorTransferCodec<string> = {
+      exportValue: vi.fn(async (value) => `encoded-${value}`),
+      importValue: vi.fn(),
+    };
+
+    await expect(
+      exportTrainingCenterValue(identifier, "live-state", codec),
+    ).resolves.toBe(`${identifier}encoded-live-state`);
+    expect(trainingCenterStorage.load(identifier)).toBe("");
   });
 
   it("returns null without importing when no saved value exists", async () => {

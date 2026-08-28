@@ -8,9 +8,7 @@ import {
 } from "react";
 import type { OnMount } from "@monaco-editor/react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
-import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import type { JavaExecutionIssue } from "./domain/javaExecution";
 import {
   getJavaEditorLimitReason,
@@ -27,8 +25,6 @@ export interface JavaEditorPanelProps {
   fileName: string;
   isFocused: boolean;
   onCodeChange: (nextCode: string) => void;
-  onImportCode: (nextCode: string) => void;
-  transferCodec: ISimulatorTransferCodec<string>;
   issues: JavaExecutionIssue[];
 }
 
@@ -37,8 +33,6 @@ export function JavaEditorPanel({
   fileName,
   isFocused,
   onCodeChange,
-  onImportCode,
-  transferCodec,
   issues,
 }: JavaEditorPanelProps) {
   const { t } = useTranslation();
@@ -193,22 +187,6 @@ export function JavaEditorPanel({
           )}
         </p>
       )}
-
-      <SimulatorStringTransferBox
-        value={code}
-        codec={transferCodec}
-        onLoad={(nextCode) => {
-          const reason = getJavaEditorLimitReason(nextCode);
-          if (reason) {
-            setLimitReason(reason);
-            throw new Error("java_editor_limit_exceeded");
-          }
-
-          setLimitReason(null);
-          onImportCode(nextCode);
-        }}
-        testIdPrefix="java-transfer"
-      />
     </div>
   );
 }
