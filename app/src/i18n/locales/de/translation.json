@@ -893,6 +893,29 @@
       "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
       "regularLanguages": "Der Simulator für reguläre Sprachen wird hier verfügbar sein.",
       "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
+    },
+    "controls": {
+      "reset": "Zurücksetzen",
+      "stepBack": "Schritt zurück",
+      "pause": "Pause",
+      "play": "Abspielen",
+      "step": "Schritt vorwärts",
+      "speed": "Geschwindigkeit",
+      "stop": "Stopp"
+    },
+    "table": {
+      "label": "Tabellenansicht",
+      "empty": "Tabelle ist leer",
+      "addRow": "Neue Zeile hinzufügen",
+      "addColumn": "Spalte hinzufügen",
+      "removeColumn": "Spalte entfernen",
+      "removeRow": "Zeile entfernen",
+      "columnActions": "Spaltenaktionen",
+      "rowActions": "Zeilenaktionen",
+      "columnHeader": "Spalte {{index}}",
+      "editColumnHeader": "Kopfzeile von Spalte {{index}} bearbeiten",
+      "editCell": "Zelle in Zeile {{row}}, Spalte {{column}} bearbeiten",
+      "removeRowWithIndex": "Zeile {{index}} entfernen"
     }
   },
   "simulator": {
@@ -1282,19 +1305,19 @@
       "exerciseBinaryIncrementDesc": "Bauen Sie eine Maschine, die zu einer Binärzahl auf dem Band 1 addiert und mit dem inkrementierten Ergebnis anhält."
     },
     "examples": {
-      "example1": "Beispiel: Bit-Invertierung",
+      "example1": "Bit-Invertierung",
       "example1Desc": "Eine vollständige Maschine, die beim Durchlauf von links nach rechts jedes Bit eines Binärworts invertiert.",
-      "example2": "Beispiel: Unäres Inkrement",
+      "example2": "Unäres Inkrement",
       "example2Desc": "Eine kompakte Maschine, die bis ans Ende eines unären Wortes läuft und eine weitere 1 schreibt.",
-      "example3": "Beispiel: Binäres Inkrement",
+      "example3": "Binäres Inkrement",
       "example3Desc": "Eine Maschine mit Carry-Zustand, die ein Binärwort um eins erhöht.",
-      "example4": "Beispiel: Binärzahlen addieren",
+      "example4": "Binärzahlen addieren",
       "example4Desc": "Eine vollständige Binäraddierer-Maschine für Eingaben wie 101+11. Die Bandzustände und Übergänge zeigen, wie der zweite Summand verarbeitet und das Ergebnis aufgebaut wird.",
-      "example5": "Beispiel: Zwei Nullen suchen",
+      "example5": "Zwei Nullen suchen",
       "example5Desc": "Suche zwei aufeinanderfolgende Nullen und schreibe danach E. Beispiel: Aus der Eingabe ⋄1001⋄ wird die Ausgabe ⋄100E⋄.",
-      "example6": "Beispiel: Drei Nullen suchen",
+      "example6": "Drei Nullen suchen",
       "example6Desc": "Das Band enthält eine endliche Folge von 0 und 1, die links und rechts durch ⋄ begrenzt ist. Suche drei aufeinanderfolgende Nullen, schreibe danach E und halte an. Der Kopf steht anschließend auf dem Symbol links vom E. Wird das Muster nicht gefunden, bleibt die Maschine beim ⋄ stehen. Beispiel: Aus ⋄10000⋄ wird ⋄1000E⋄.",
-      "example7": "Beispiel: Muster 010 suchen",
+      "example7": "Muster 010 suchen",
       "example7Desc": "Suche unter denselben Bedingungen das Muster 010, schreibe danach E und halte mit dem Kopf auf dem Symbol links vom E. Beispiel: Aus ⋄10100⋄ wird ⋄1010E⋄. Auch 0010 und 00010 enthalten das gesuchte Muster."
     },
     "actions": {

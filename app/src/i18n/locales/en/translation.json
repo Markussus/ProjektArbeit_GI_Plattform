@@ -893,6 +893,29 @@
       "encoding": "The Encoding simulator will be available here.",
       "regularLanguages": "The Regular Languages simulator will be available here.",
       "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
+    },
+    "controls": {
+      "reset": "Reset",
+      "stepBack": "Step backward",
+      "pause": "Pause",
+      "play": "Play",
+      "step": "Step forward",
+      "speed": "Speed",
+      "stop": "Stop"
+    },
+    "table": {
+      "label": "Table view",
+      "empty": "Table is empty",
+      "addRow": "Add new row",
+      "addColumn": "Add column",
+      "removeColumn": "Remove column",
+      "removeRow": "Remove row",
+      "columnActions": "Column actions",
+      "rowActions": "Row actions",
+      "columnHeader": "Column {{index}}",
+      "editColumnHeader": "Edit column {{index}} header",
+      "editCell": "Edit cell in row {{row}}, column {{column}}",
+      "removeRowWithIndex": "Remove row {{index}}"
     }
   },
   "simulator": {
@@ -1282,19 +1305,19 @@
       "exerciseBinaryIncrementDesc": "Build a machine that adds 1 to a binary number on the tape and halts with the incremented result."
     },
     "examples": {
-      "example1": "Example: Bit Flip",
+      "example1": "Bit Flip",
       "example1Desc": "A complete machine that inverts every bit in a binary word while scanning from left to right.",
-      "example2": "Example: Unary Increment",
+      "example2": "Unary Increment",
       "example2Desc": "A compact machine that scans to the end of a unary word and writes one extra 1.",
-      "example3": "Example: Binary Increment",
+      "example3": "Binary Increment",
       "example3Desc": "A carry-based machine that increments a binary word by one.",
-      "example4": "Example: Add Binary Numbers",
+      "example4": "Add Binary Numbers",
       "example4Desc": "A complete binary-adder machine for inputs such as 101+11. Follow the tape states and transitions to see how the second addend is consumed and the result is built.",
-      "example5": "Example: Search for Two Zeros",
+      "example5": "Search for Two Zeros",
       "example5Desc": "Search for two consecutive zeros and then write E. Example: The input ⋄1001⋄ produces the output ⋄100E⋄.",
-      "example6": "Example: Search for Three Zeros",
+      "example6": "Search for Three Zeros",
       "example6Desc": "The tape contains a finite sequence of 0s and 1s bounded by ⋄ on both sides. Search for three consecutive zeros, write E after them, and halt. The head then rests on the symbol to the left of E. If the pattern is not found, the machine stops on ⋄. Example: ⋄10000⋄ becomes ⋄1000E⋄.",
-      "example7": "Example: Search for Pattern 010",
+      "example7": "Search for Pattern 010",
       "example7Desc": "Under the same conditions, search for the pattern 010, write E after it, and halt with the head on the symbol to the left of E. Example: ⋄10100⋄ becomes ⋄1010E⋄. The inputs 0010 and 00010 also contain the pattern."
     },
     "actions": {
