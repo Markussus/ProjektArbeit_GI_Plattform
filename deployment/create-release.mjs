@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { access, chmod, copyFile, mkdir, rm, stat, writeFile } from "node:fs/promises";
+import { access, chmod, copyFile, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
