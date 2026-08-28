@@ -1,9 +1,23 @@
 \subNsection{1}{Encoding}{Enrico Ebert}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Enrico Ebert}
+Ziel des Encoding-Moduls ist es, die Transformation zwischen unstrukturiertem Text, Codepoints und binären Byte-Sequenzen transparent zu machen. Wir haben die praxisrelevanten Standards UTF-8 und Base64 vollständig implementiert. Der Fokus liegt darauf, die mathematischen und bitweisen Zwischenschritte – wie Bitmasken bei UTF-8 oder das Padding bei Base64 – für Studierende visuell nachvollziehbar darzustellen.
 
-\subNsection{2}{Entscheidungen im UI}{Enrico Ebert}
+\subNsection{2}{Architektur}{Enrico Ebert}
+
+Die Architektur trennt Datenmodell, Transformationslogik und UI strikt. Der Zustand wird zentral verwaltet. Child-Komponenten besitzen keinen eigenen Zustand für verarbeitete Daten, sondern geben Änderungen über State Lifting an die Simulator-Komponente weiter. Um beim Wechsel von Übungen einen sauberen Zustand ohne Artefakte zu garantieren, erzwingen wir über dynamische \texttt{key}-Attribute gezielte React-Remounts.
+
+Die UTF-8-Logik nutzt konsequent \texttt{Array.from()} zur sicheren Iteration über Unicode-Codepoints, um Fehler durch Surrogate-Pairs (UTF-16) zu vermeiden. Der Decoder validiert Byteströme streng und weist Sicherheitsrisiken wie \textit{Overlong Encodings} konsequent ab. Die Base64-Pipeline arbeitet iterativ in vier Stufen: ASCII-Konvertierung, 8-Bit-Verkettung, 6-Bit-Aufteilung und abschließendes Padding (\texttt{======}).
+
+Übungen werden programmgesteuert dynamisch generiert; eine statische Liste existiert nicht. Der Generator erzeugt pro Schwierigkeitsgrad (z.\,B. reines ASCII für \textit{easy}, 3-Byte-Unicode für \textit{hard}) Aufgaben inklusive der kanonischen Lösung. Da diese Aufgaben ephemere IDs erhalten, wird der Fortschritt hier im Gegensatz zum freien Modus nicht dauerhaft gespeichert.
+
+\subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
+
+Das UI visualisiert abstrakte Bitoperationen detailliert auf Byte-Ebene. Jeder Zwischenschritt lässt sich aufklappen. Bei UTF-8 werden Steuerbits zur besseren Unterscheidung rot und Nutzbits blau hervorgehoben. Bei Base64 weisen wir die 6-Bit-Gruppen und das Padding explizit aus. Nicht-druckbare Zeichen werden als Escape-Sequenzen (z.\,B. \texttt{\textbackslash x0A}) dargestellt, um das Layout nicht zu brechen.
+
+Wir verzichten bewusst auf zeitgesteuerte Animationen. Der statische \textit{Step-by-Step}-Ansatz gibt den Studierenden die nötige Zeit, die Transformationen in ihrem eigenen Tempo zu analysieren.
+
+Im Übungsmodus gibt ein Validierungspanel die Lösung erst bei korrekter Eingabe frei. Ein Warn-Dialog verhindert versehentlichen Fortschrittsverlust beim Tab-Wechsel. Das automatische Speichern ist im Übungsmodus deaktiviert und greift nur im freien Simulator-Modus.
 
 \subNsection{2}{Andere Entscheidungen}{Enrico Ebert}
 
-Die Punkte sind nur Vorschläge ...
+Der Modul-übergreifende Zustandstransfer (\textit{Import/Export}) erfolgt Unicode-sicher via Base64URL-Kodierung inklusive Fallback auf Standard-JSON.

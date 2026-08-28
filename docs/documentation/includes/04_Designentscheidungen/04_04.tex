@@ -1,9 +1,30 @@
 \subNsection{1}{Zahlensysteme}{Enrico Ebert}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Enrico Ebert}
+Ziel des Moduls ist es, abstrakte Abläufe wie Bit-Transformationen, Komplementbildungen und Arithmetik interaktiv und schrittweise begreifbar zu machen. Im Folgenden werden die wichtigsten architektonischen, visuellen und organisatorischen Entscheidungen der Umsetzung dokumentiert.
 
-\subNsection{2}{Entscheidungen im UI}{Enrico Ebert}
+\subNsection{2}{Architektur}{Enrico Ebert}
 
-\subNsection{2}{Andere Entscheidungen}{Enrico Ebert}
+Die Architektur des Simulators unterteilt sich in fünf Modi: \textit{integers}, \textit{negative}, \textit{fractional}, \textit{ieee754} und \textit{arithmetic}. Ein zentrales Zustandsobjekt dient dabei als \textit{Single Source of Truth}. Beim Start ordnet eine Hilfsfunktion die ausgewählte Übung oder das Beispiel automatisch dem passenden Modus zu.
 
-Die Punkte sind nur Vorschläge ...
+Für alle mathematischen Berechnungen verwenden wir JavaScripts \texttt{BigInt} statt \texttt{Number}. So verhindern wir zuverlässig Präzisionsverluste und ungewollte Überläufe bei großen Zahlen. Eingaben werden je nach Basis mit strengen Regex-Filtern validiert und in der maximalen Bitlänge begrenzt. Bei negativen Zahlen arbeiten wir mit einer festen Breite von 8 Bit (Wertebereich -128 bis 127).
+
+Ein technischer Kniff kommt bei der IEEE-754-Darstellung zum Einsatz: Um die exakte Bit-Repräsentation einer Gleitkommazahl zu erhalten, schreiben wir sie in ein \texttt{Float32Array} und lesen sie über ein \texttt{Uint32Array} wieder aus. Spezielle Zustände wie \textit{NaN} oder $\pm\text{Infinity}$ fangen wir ab und erklären sie gesondert.
+
+Die arithmetischen Basisoperationen sind modular in eigenen Pipelines gekapselt (z.\,B. Volladdierer für Addition, Shift-and-Add für Multiplikation). Jeder Durchlauf generiert strukturierte Schritt-Objekte, die direkt mit den i18n-Schlüsseln für die Lokalisierung verknüpft sind.
+
+\subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
+
+Das Interface ist stark auf die Didaktik ausgerichtet. Zentrales Element ist der Step-by-Step-Ansatz, bei dem die ersten Rechenschritte standardmäßig aufgeklappt sind, um den Einstieg zu erleichtern. Die Darstellung passt sich dem jeweiligen Modus an:
+
+\begin{itemize}
+  \item \textbf{Wandler (Ganz-/Kommazahlen):} Nutzung klassischer, statischer Mathematik-Blöcke (Divisionstabellen, Summenformeln).
+  \item \textbf{Arithmetik:} Nachbildung eines schriftlichen Rechengitters. Die Bits für Operanden, Carry und Summe sind farbcodiert. Bei einem Overflow warnt ein dediziertes Banner.
+  \item \textbf{Negative Zahlen:} Um den Vorlesungsstoff abzubilden, werden Vorzeichen-Betrag, Einer- und Zweierkomplement direkt nebeneinander visualisiert. Interaktive Zeilen steuern die jeweilige Erklärung.
+  \item \textbf{IEEE 754:} Die 32 Bits sind visuell in Sign, Exponent und Mantisse unterteilt. Informationskarten erklären die Normalisierung und den Bias.
+\end{itemize}
+
+\subNsection{2}{Organisation \& State Management}{Enrico Ebert}
+
+Die Lerninhalte bestehen aus 10 nach Schwierigkeit sortierten Übungen und 36 vorlesungsbegleitenden Beispielen. Als ID fungiert der \texttt{titleKey}, wodurch der Lernfortschritt auch bei einem Sprachwechsel im i18n-System erhalten bleibt. Beispiele zeigen sofort die Lösung und fließen nicht in den Fortschritt ein.
+
+Der Anwendungszustand wird alle 10 Sekunden sowie beim Verlassen der Komponente automatisch lokal gesichert. Übungen und der freie Simulator nutzen dabei getrennte Speicherslots. Für den Austausch von Zuständen haben wir einen \texttt{Base64URL}-kodierten Im- und Export implementiert (inklusive JSON-Fallback).

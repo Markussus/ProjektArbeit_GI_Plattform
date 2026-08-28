@@ -1,15 +1,30 @@
 \subNsection{1}{KI Reflexion}{Enrico Ebert}
 
-Nutzung von Gemini 3.1 Pro, ChatGPT und Codex als Entwicklungswerkzeuge – Effizienzsteigerung bei der Implementierung mathematischer Logik und UI-Komponenten
+Für die Entwicklung der Lernplattform wurden KI-Tools aktiv in den Softwareentwicklungsprozess integriert. Sie dienten als Unterstützung bei der Codegenerierung sowie der Konzeption der Module. Dieses Kapitel fasst die praktischen Erfahrungen zusammen und bewertet die Stärken und Schwächen generativer Modelle im Programmieralltag.
 
 \subNsection{2}{KI als Co-Developer}{Enrico Ebert}
 
-Reflektieren und so...
+Als „Co-Developer“ kamen drei Werkzeuge zum Einsatz, die unterschiedliche Stärken zeigten:
 
-\subNsection{2}{Automatisierte Aufgabengenerierung}{Enrico Ebert}
+\begin{itemize}
+  \item \textbf{\texttt{google/Gemma agentMode} (WebStorm):} Effektiv für lokales Refactoring und isolierte Features. Das modulübergreifende i18n-System wurde aufgrund fehlenden globalen Projektkontexts jedoch oft ignoriert.
+  \item \textbf{\texttt{google/Antigravity Gemini 3.1 Pro}:} Hilfreich beim Prototyping und bei Entwicklungsplänen. Das Modell übersah jedoch oft technische Edge Cases. Die Einhaltung der Projektstruktur und i18n-Vorgaben musste iterativ erzwungen werden.
+  \item \textbf{\texttt{OpenCode} (BigPickle):} Effizient für punktuelle Code-Anpassungen in Kombination mit dem integrierten Planungsmodus.
+\end{itemize}
 
-Reflektieren und so...
+Gesamteindruck: Planung und Prototyping funktionierten gut, Kontextverständnis und Vollständigkeit fehlten oft. Daraus ergab sich folgender Workflow:
+\begin{enumerate}
+  \item KI-Planungsmodus für den Umsetzungsplan nutzen.
+  \item Grundlegendes Code-Gerüst generieren lassen.
+  \item Code manuell anpassen (Typisierung, i18n und Architekturvorgaben sicherstellen).
+\end{enumerate}
 
 \subNsection{2}{Kritische Reflexion}{Enrico Ebert}
 
-Reflektieren und so...
+Die Grenzen der KI zeigten sich vor allem bei exakter, deterministischer Logik. Bei komplexen mathematischen und bitweisen Operationen -- wie Umrechnungen mit \texttt{BigInt}, IEEE-754 Bitmanipulationen oder dem Parsen von UTF-8-Sequenzen -- lieferten die Modelle oft fehlerhaften Code, der manuell refaktorisiert werden musste.
+
+Ein Hauptproblem war das Ignorieren von Edge Cases. Kritische Zustände wie \textit{NaN}, $\pm\text{Infinity}$, Overlong Encodings bei UTF-8 oder genaue Überlauferkennung wurden meist übersehen und mussten durch eigene Unit- und E2E-Tests (Vitest, Playwright) abgesichert werden.
+
+Bei größeren Komponenten stießen die Modelle zudem an die Grenzen ihres Kontextfensters. In komplexeren Dateien vergaß die KI regelmäßig existierende i18n-Keys, Shared Components und allgemeine Projektkonventionen, was ständige manuelle Korrekturen erforderte.
+
+Fazit: KI-Tools beschleunigen Prototyping, Konzeption und das Schreiben von Boilerplate-Code enorm. Sie ersetzen aber weder architektonisches Verständnis noch die manuelle Qualitätssicherung. Der größte Nutzen lag in der strukturierten Planung und dem Refactoring kleiner, isolierter Code-Einheiten.
