@@ -17,6 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
 const SRC_DIR = path.resolve(ROOT_DIR, "src");
+const TESTS_DIR = path.resolve(ROOT_DIR, "tests");
 const I18N_DIR = path.resolve(SRC_DIR, "i18n");
 const LOCALES_DIR = path.resolve(I18N_DIR, "locales");
 const TYPES_DIR = path.resolve(SRC_DIR, "types");
@@ -325,9 +326,10 @@ function validateMapping(mapping, enFlat, deFlat) {
 }
 
 // -----------------------------------------------------------------------------
-// Source Code Scanner & Replacer
+// Source & Test Code Scanner & Replacer
 // -----------------------------------------------------------------------------
-function getAllSourceFiles(dir, fileList = []) {
+function getAllCodeFiles(dir, fileList = []) {
+  if (!fs.existsSync(dir)) return fileList;
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
@@ -335,9 +337,10 @@ function getAllSourceFiles(dir, fileList = []) {
       if (
         entry.name !== "node_modules" &&
         entry.name !== ".git" &&
-        entry.name !== "dist"
+        entry.name !== "dist" &&
+        entry.name !== "build"
       ) {
-        getAllSourceFiles(fullPath, fileList);
+        getAllCodeFiles(fullPath, fileList);
       }
     } else if (entry.isFile() && /\.(ts|tsx|js|jsx)$/.test(entry.name)) {
       fileList.push(fullPath);
@@ -347,7 +350,8 @@ function getAllSourceFiles(dir, fileList = []) {
 }
 
 function processSourceFiles(mapping, isDryRun) {
-  const files = getAllSourceFiles(SRC_DIR);
+  // Collect both src and tests files
+  const files = [...getAllCodeFiles(SRC_DIR), ...getAllCodeFiles(TESTS_DIR)];
   let totalReplacements = 0;
   const modifiedFiles = [];
 
@@ -629,13 +633,23 @@ function main() {
   const dePath = path.join(LOCALES_DIR, "de", "translation.json");
 
   console.log("Loading translation files...");
-  const enRaw = loadJson(enPath);
-  const deRaw = loadJson(dePath);
-  const enFlat = flattenObject(enRaw);
-  const deFlat = flattenObject(deRaw);
+  // Fallback: If translation.json doesn't exist (because --split already converted it), we can assemble from split files or load mapping directly
+  let enRaw, deRaw;
+  if (fs.existsSync(enPath) && fs.existsSync(dePath)) {
+    enRaw = loadJson(enPath);
+    deRaw = loadJson(dePath);
+  }
 
   // 1. Generate Mapping Mode
   if (MODE_GENERATE) {
+    if (!enRaw || !deRaw) {
+      console.error(
+        "❌ translation.json not found in locales/en or locales/de.",
+      );
+      process.exit(1);
+    }
+    const enFlat = flattenObject(enRaw);
+    const deFlat = flattenObject(deRaw);
     console.log(`Generating default mapping rules to ${MAPPING_FILE}...`);
     const mapping = {};
     // Collect all unique keys from both languages
@@ -668,6 +682,14 @@ function main() {
 
   // 2. Validate Mode
   if (MODE_VALIDATE) {
+    if (!enRaw || !deRaw) {
+      console.log(
+        "✅ Using existing mapping without source translation.json (already split).",
+      );
+      return;
+    }
+    const enFlat = flattenObject(enRaw);
+    const deFlat = flattenObject(deRaw);
     const isValid = validateMapping(mapping, enFlat, deFlat);
     if (!isValid) process.exit(1);
     return;
@@ -676,10 +698,14 @@ function main() {
   // 3. Dry Run Mode
   if (MODE_DRY_RUN) {
     console.log("=== DRY RUN MODE (No files will be changed) ===");
-    const isValid = validateMapping(mapping, enFlat, deFlat);
-    if (!isValid) {
-      console.error("\n❌ Aborting dry run due to validation errors.");
-      process.exit(1);
+    if (enRaw && deRaw) {
+      const enFlat = flattenObject(enRaw);
+      const deFlat = flattenObject(deRaw);
+      const isValid = validateMapping(mapping, enFlat, deFlat);
+      if (!isValid) {
+        console.error("\n❌ Aborting dry run due to validation errors.");
+        process.exit(1);
+      }
     }
     processSourceFiles(mapping, true);
     console.log(
@@ -691,23 +717,27 @@ function main() {
   // 4. Apply Mode
   if (MODE_APPLY) {
     console.log("=== APPLY MODE (Modifying JSON files and source code) ===");
-    const isValid = validateMapping(mapping, enFlat, deFlat);
-    if (!isValid) {
-      console.error("\n❌ Aborting migration due to validation errors.");
-      process.exit(1);
+    if (enRaw && deRaw) {
+      const enFlat = flattenObject(enRaw);
+      const deFlat = flattenObject(deRaw);
+      const isValid = validateMapping(mapping, enFlat, deFlat);
+      if (!isValid) {
+        console.error("\n❌ Aborting migration due to validation errors.");
+        process.exit(1);
+      }
+
+      console.log("\n1. Transforming JSON translations...");
+      const transformedEn = transformJson(enRaw, mapping);
+      const transformedDe = transformJson(deRaw, mapping);
+      writeJsonFiles(transformedEn, transformedDe, FLAG_SPLIT);
     }
 
-    console.log("\n1. Transforming JSON translations...");
-    const transformedEn = transformJson(enRaw, mapping);
-    const transformedDe = transformJson(deRaw, mapping);
-    writeJsonFiles(transformedEn, transformedDe, FLAG_SPLIT);
-
-    console.log("\n2. Updating source code files...");
+    console.log("\n2. Updating source code and test files...");
     processSourceFiles(mapping, false);
 
     console.log("\n🎉 Migration completed successfully!");
     console.log(
-      "👉 Next step: Run `npm run build` or `npx tsc --noEmit` to verify type safety.",
+      "👉 Next step: Run `npm test` or `npx tsc --noEmit` to verify type safety.",
     );
     return;
   }
