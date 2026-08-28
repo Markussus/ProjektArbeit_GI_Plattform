@@ -14,6 +14,16 @@ const NotFoundPage = lazy(async () => ({
   default: (await import("@/pages/NotFound/NotFoundPage")).NotFoundPage,
 }));
 
+function getRouterBasename() {
+  const baseUrl = import.meta.env.BASE_URL;
+
+  // Vite also allows a full URL as `base`; React Router only wants its pathname.
+  const pathname = new URL(baseUrl || "/", window.location.origin).pathname;
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
+const routerBasename = getRouterBasename();
+
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -30,4 +40,6 @@ export const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
     ],
   },
-]);
+], {
+  basename: routerBasename,
+});
