@@ -1,68 +1,23 @@
 \subNsection{1}{Encoding}{Enrico Ebert}
 
-Das Modul „Encoding“ behandelt die grundlegenden Verfahren zur Zeichenkodierung und Datenrepräsentation in modernen Rechnersystemen. Im Kontext der Vorlesung „Grundlagen Informatik“ steht hierbei das Verständnis der Transformation zwischen unstrukturiertem Text, Codepoints und binären Byte-Sequenzen im Vordergrund. Für die interaktive Lernplattform wurden im Rahmen dieses Programmierprojekts die beiden praxisselevanten Kodierungsstandards UTF-8 und Base64 vollständig implementiert und visuell aufbereitet.
+Ziel des Encoding-Moduls ist es, die Transformation zwischen unstrukturiertem Text, Codepoints und binären Byte-Sequenzen transparent zu machen. Wir haben die praxisrelevanten Standards UTF-8 und Base64 vollständig implementiert. Der Fokus liegt darauf, die mathematischen und bitweisen Zwischenschritte – wie Bitmasken bei UTF-8 oder das Padding bei Base64 – für Studierende visuell nachvollziehbar darzustellen.
 
-Das Ziel des Moduls besteht darin, Studierenden nicht nur das Endergebnis einer Transformation zu präsentieren, sondern die mathematischen und bitweisen Zwischenschritte transparent darzulegen. Dies umfasst die Analyse von Bitmasken, Steuer- und Nutzbits bei variablen Bitlängen (UTF-8) sowie das Gruppieren und Auffüllen (\textit{Padding}) von Bitströmen bei der Sechser-Block-Transformation (Base64).
+\subNsection{2}{Architektur}{Enrico Ebert}
 
-\subNsection{2}{Entscheidungen in der Architektur}{Enrico Ebert}
+Die Architektur trennt Datenmodell, Transformationslogik und UI strikt. Der Zustand wird zentral verwaltet. Child-Komponenten besitzen keinen eigenen Zustand für verarbeitete Daten, sondern geben Änderungen über State Lifting an die Simulator-Komponente weiter. Um beim Wechsel von Übungen einen sauberen Zustand ohne Artefakte zu garantieren, erzwingen wir über dynamische \texttt{key}-Attribute gezielte React-Remounts.
 
-Die Softwarearchitektur des Encoding-Moduls wurde auf eine strikte Trennung von Datenmodell, Transformationslogik und UI-Komponenten ausgelegt. Der gesamte Moduszustand wird über ein zentrales Schnittstellenobjekt namens \texttt{EncoderState} in \texttt{encTransferCodec.ts} verwaltet. Das Objekt besitzt folgende Struktur:
-\begin{verbatim}
-type EncoderState = {
-  activeMode: "base64" | "utf8";
-  base64?: Base64State;
-  utf8?: Utf8State;
-};
-\end{verbatim}
-Untergeordnete Eingabe- und Visualisierungskomponenten besitzen keinen isolierten Eigenzustand für verarbeitete Daten, sondern heben ihren Zustand über ein einheitliches \texttt{onChangeState}-Event in die übergeordnete Simulator-Komponente an (\textit{State Lifting}). Um bei einem Wechsel der ausgewählten Übung oder beim Laden externer Daten einen definierten Ausgangszustand zu garantieren, wurde ein expliziter Remount-Mechanismus über das \texttt{key}-Attribut implementiert:
-\begin{verbatim}
-key = `${selectedExercise?.id}-${initialValue}-${loadVersion}`
-\end{verbatim}
-Ändert sich eine dieser Variablen, erwingt React das Verwerfen des alten Komponentenbaums und stellt einen sauberen Zustand ohne verbliebene Artefakte sicher.
+Die UTF-8-Logik nutzt konsequent \texttt{Array.from()} zur sicheren Iteration über Unicode-Codepoints, um Fehler durch Surrogate-Pairs (UTF-16) zu vermeiden. Der Decoder validiert Byteströme streng und weist Sicherheitsrisiken wie \textit{Overlong Encodings} konsequent ab. Die Base64-Pipeline arbeitet iterativ in vier Stufen: ASCII-Konvertierung, 8-Bit-Verkettung, 6-Bit-Aufteilung und abschließendes Padding (\texttt{======}).
 
-Die UTF-8-Logik ist in der Komponente \texttt{UTF8Encoder.tsx} gekapselt. Für die Enkodierung ermittelt die Funktion \texttt{getUtf8Bytes} Byte-Sequenzen mit einer Länge von 1 bis 4 Bytes. Die Dekodierung übernimmt der validierende Decoder \texttt{decodeUtf8}. Dieser prüft anhand von Lead-Byte-Masken und der Einhaltung von Continuation-Byte-Mustern (\texttt{10xxxxxx}) die Gültigkeit des Bytestroms. Überlange Kodierungen (\textit{Overlong Encodings}), die ein Sicherheitsrisiko darstellen, werden vom Decoder strikt zurückgewiesen. Zur fehlerfreien Iteration über Zeichenketten wird konsequent \texttt{Array.from()} genutzt. Dadurch erfolgt die Verfeinerung nach Unicode-Codepoints und verhindert Fehler, die durch die Zerlegung von Surrogate-Pairs in UTF-16-Code-Units entstehen würden.
+Übungen werden programmgesteuert dynamisch generiert; eine statische Liste existiert nicht. Der Generator erzeugt pro Schwierigkeitsgrad (z.\,B. reines ASCII für \textit{easy}, 3-Byte-Unicode für \textit{hard}) Aufgaben inklusive der kanonischen Lösung. Da diese Aufgaben ephemere IDs erhalten, wird der Fortschritt hier im Gegensatz zum freien Modus nicht dauerhaft gespeichert.
 
-Die Base64-Transformation ist in \texttt{Base64Encoder.tsx} lokalisiert und basiert auf dem Standard-Base64-Alphabet. Die Enkodierungs-Pipeline ist modular aufgebaut:
-\begin{enumerate}
-  \item Konvertierung der Eingabezeichen in ASCII- bzw. Bytewerte.
-  \item Zerlegung in 8-Bit-Binärblöcke und Zusammenführung zu einem zusammenhängenden Bitstrom.
-  \item Aufteilung des Bitstroms in 6-Bit-Gruppen inklusive Auffüllung der letzten Gruppe mittels \texttt{padEnd} auf ein Vielfaches von 6 Bits.
-  \item Generierung expliziter \texttt{"======"}-Padding-Zeilen zur Visualisierung des Auffüllprozesses auf Byteseite.
-\end{enumerate}
-Die Dekodierung verläuft spiegelbildlich. Zur Verhinderung ungültiger Berechnungen wird die Eingabe vor der Verarbeitung über den regulären Ausdruck \texttt{[A-Za-z0-9+/=]} bereinigt.
+\subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
 
-Für die Erstellung von Lernaufgaben wird eine programmatische Aufgabengenerierung in \texttt{utils/exerciseGenerator.ts} verwendet. Auf eine statische Übungsliste wird bewusst verzichtet; die Datei \texttt{exercises/index.ts} ist daher leer. Der Generator deckt 12 Aufgabentypen ab (2 Kodierer \(\times\) 2 Richtungen \(\times\) 3 Schwierigkeitsgrade). Die Schwierigkeit wird über direkte Parameter gesteuert:
-\begin{itemize}
-  \item \textbf{Base64:} Variation der Zeichenlänge (1 Zeichen bei \textit{easy}, 3 Zeichen bei \textit{medium}, 5–8 Zeichen inkl. Sonderzeichen bei \textit{hard}).
-  \item \textbf{UTF-8:} Variation des Codepoint-Bereichs (1-Byte-ASCII bei \textit{easy}, 2-Byte-Sequenzen bei \textit{medium}, 3-Byte-Unicode-Zeichen bei \textit{hard}).
-\end{itemize}
-Die Funktion \texttt{generateEncodingExercises(9)} erzeugt pro Tab-Mount jeweils 3 leichte, 3 mittlere und 3 schwere Aufgaben. Jede Aufgabe führt die kanonische Lösung \texttt{answer} direkt mit sich, die vom Generator selbst über interne Referenzfunktionen (wie \texttt{toBase64} oder \texttt{bytesToBinary}) berechnet wird. Zusammen mit den Parametern \texttt{mode}, \texttt{converterMode} und \texttt{initialValue} startet der Simulator direkt vorkonfiguriert. Die Auswertung der Benutzereingaben erfolgt dadurch exakt und ohne Approximation. Da Aufgabennummern ephemer erzeugt werden (Vergabe von IDs via \texttt{Date.now()}), wird der Übungsfortschritt im Gegensatz zum freien Modus nicht dauerhaft gespeichert.
+Das UI visualisiert abstrakte Bitoperationen detailliert auf Byte-Ebene. Jeder Zwischenschritt lässt sich aufklappen. Bei UTF-8 werden Steuerbits zur besseren Unterscheidung rot und Nutzbits blau hervorgehoben. Bei Base64 weisen wir die 6-Bit-Gruppen und das Padding explizit aus. Nicht-druckbare Zeichen werden als Escape-Sequenzen (z.\,B. \texttt{\textbackslash x0A}) dargestellt, um das Layout nicht zu brechen.
 
-\subNsection{2}{Entscheidungen im UI}{Enrico Ebert}
+Wir verzichten bewusst auf zeitgesteuerte Animationen. Der statische \textit{Step-by-Step}-Ansatz gibt den Studierenden die nötige Zeit, die Transformationen in ihrem eigenen Tempo zu analysieren.
 
-Das User Interface konzentriert sich darauf, abstrakte Bitoperationen visuell nachvollziehbar darzustellen. Hierzu dient eine Byte-für-Byte-Visualisierung. Für jedes einzelne Zeichen wird eine \texttt{CollapsibleStep}-Komponente gerendert, welche die Transformationskette lückenlos aufschlüsselt:
-\begin{itemize}
-  \item \textbf{UTF-8:} Darstellung der Kette \(\text{Zeichen} \rightarrow \text{Codepoint} \rightarrow \text{Bytes}\). Über die Spezialkomponente \texttt{Utf8BitDisplay} werden Steuerbits rot und fett hervorgehoben, während Nutzbits blau dargestellt werden. Ergänzend wird das generische Bitmuster (z.\,B. \texttt{110xxxxx}) eingeblendet.
-  \item \textbf{Base64:} Zerlegung in 6-Bit-Gruppen mit Angabe des Dezimalindex und expliziter Ausweisung von Padding-Zeilen.
-\end{itemize}
-Nicht-druckbare Steuerzeichen werden über Escape-Sequenzen (z.\,B. \texttt{\textbackslash x0A} für Newline) aufbereitet, um Layout-Brüche im UI zu vermeiden. Das Endergebnis wird in einer hervorgehobenen Monospace-Karte ausgegeben.
-
-Der Transformationsprozess ist pro Richtung in drei logische Abschnitte unterteilt:
-\begin{enumerate}
-  \item \textbf{Step 1:} Zeichen- bzw. Codepoint-Analyse und Wandlung in Bits.
-  \item \textbf{Step 2:} Verkettung der Bitströme und Ausrichtung an Byte- bzw. 6-Bit-Grenzen.
-  \item \textbf{Step 3:} Zusammenfassung und Ausgabe des Endergebnisses.
-\end{enumerate}
-Jeder Schritt wird durch die Kombination aus \texttt{StepByStepToggle}, \texttt{CollapsibleStep} und dem Hook \texttt{useToggleSet} gesteuert. Auf zeitgesteuerte Animationen wurde bewusst verzichtet. Stattdessen setzt das UI auf statische, aufklappbare Erklärabschnitte (\textit{Show your work}). Dies folgt dem didaktischen Ansatz, Lernenden das Verharren und Analysieren in den einzelnen Zwischenschritten ohne künstlichen Zeitdruck zu ermöglichen.
-
-Im Übungsmodus ersetzt das \texttt{ExerciseValidationPanel} die reguläre Eingabemaske. Das Panel unterstützt verschiedene Eingabemodi (\texttt{base64}, \texttt{text}, \texttt{hex-bytes}). Eingabefelder bleiben so lange gesperrt, bis eine korrekte Eingabe getätigt wurde. Bei erfolgreicher Validierung wird die Lösung nach einer Verzögerung von 1500\,ms freigegeben. Ein Wechsel des Tabs während einer aktiven Übung wird durch einen \texttt{ConfirmDialog} abgesichert, um unbeabsichtigten Fortschrittsverlust zu verhindern.
-
-Beispielaufgaben (gekennzeichnet durch eine ID mit dem Suffix \texttt{".example"}) stellen eine Sonderform dar: Sie zeigen die Lösung sofort an und unterbinden jegliche Zustandspersistenz.
-
-Die Persistenzlogik unterscheidet strikt zwischen den Betriebsmodi: Im freien Simulator-Modus ist das automatische Speichern (\textit{Autosave}) mit einem Intervall von 500\,ms aktiv und die \texttt{SimulatorStringTransferBox} wird eingeblendet. Im Übungsmodus ist das Autosave hingegen vollständig deaktiviert.
+Im Übungsmodus gibt ein Validierungspanel die Lösung erst bei korrekter Eingabe frei. Ein Warn-Dialog verhindert versehentlichen Fortschrittsverlust beim Tab-Wechsel. Das automatische Speichern ist im Übungsmodus deaktiviert und greift nur im freien Simulator-Modus.
 
 \subNsection{2}{Andere Entscheidungen}{Enrico Ebert}
 
-Für den Modul-übergreifenden Zustandstransfer nutzt das Modul den \texttt{encTransferCodec}. Das Exportformat verwendet eine Base64URL-Kodierung mit dem Präfix \texttt{"v1|b|u|"}. Der Parser ist tolerant implementiert: Er erkennt Legacy-Strings über das Präfix \texttt{"djF8"} und verfügt über einen Fallback auf Standard-JSON. Die Implementierung ist unicode-sicher ausgelegt, sodass auch Sonderzeichen und Emojis fehlerfrei exportiert werden können.
-
-Im Verlauf der Entwicklung wurde eine wesentliche Refactoring-Entscheidung getroffen: Die ursprünglich separat entworfene Overview-Seite für das Encoding-Modul wurde zurückgebaut und durch die projektweit einheitliche \texttt{TopicTutorialVideoSection} ersetzt. In diesem Zuge wurde auch die lokale Speicherlogik an das zentrale Training-Center der Anwendung angepasst. Sämtliche Daten des Moduls werden nun unter einem einheitlichen \texttt{localStorage}-Schlüssel mit spezifischem Identifier-Schema abgelegt.
+Der Modul-übergreifende Zustandstransfer (\textit{Import/Export}) erfolgt Unicode-sicher via Base64URL-Kodierung inklusive Fallback auf Standard-JSON.

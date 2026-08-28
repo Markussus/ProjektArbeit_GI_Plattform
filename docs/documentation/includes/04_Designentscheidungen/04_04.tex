@@ -1,47 +1,30 @@
 \subNsection{1}{Zahlensysteme}{Enrico Ebert}
 
-Ziel der Entwicklung dieses Moduls war es, abstrakte Abläufe wie Bit-Transformationen, Komplementbildungen und Arithmetik für Studierende interaktiv und schrittweise nachvollziehbar zu machen. Im Folgenden werden die architektonischen, visuellen und organisatorischen Entscheidungen dokumentiert, die bei der technischen Umsetzung des Projekts getroffen wurden.
+Ziel des Moduls ist es, abstrakte Abläufe wie Bit-Transformationen, Komplementbildungen und Arithmetik interaktiv und schrittweise begreifbar zu machen. Im Folgenden werden die wichtigsten architektonischen, visuellen und organisatorischen Entscheidungen der Umsetzung dokumentiert.
 
-\subNsection{2}{Entscheidungen in der Architektur}{Enrico Ebert}
+\subNsection{2}{Architektur}{Enrico Ebert}
 
-Die Softwarearchitektur des Simulators basiert auf fünf klar getrennten Modi: \textit{integers} (Ganzzahlen), \textit{negative} (Negative Zahlen), \textit{fractional} (Kommazahlen), \textit{ieee754} (Gleitkommazahlen) und \textit{arithmetic} (Arithmetik). In der Komponente \texttt{Simulator.tsx} (Zeilen 32–37) sind diese Modi über den Typ \texttt{SimulatorMode} rein deklarativ definiert und an den Tabs über das Attribut \texttt{data-testid} registriert.
+Die Architektur des Simulators unterteilt sich in fünf Modi: \textit{integers}, \textit{negative}, \textit{fractional}, \textit{ieee754} und \textit{arithmetic}. Ein zentrales Zustandsobjekt dient dabei als \textit{Single Source of Truth}. Beim Start ordnet eine Hilfsfunktion die ausgewählte Übung oder das Beispiel automatisch dem passenden Modus zu.
 
-Um den Zustand über alle Modi hinweg konsistent zu verwalten, kommt ein zentrales Zustandsobjekt \texttt{NumberSystemState} (\texttt{nsTransferCodec.ts}) als \textit{Single Source of Truth} zum Einsatz. Die Funktion \texttt{getInitialActiveMode} (\texttt{Simulator.tsx}, Zeilen 52–78) ordnet Übungs- und Beispiel-IDs beim Start per Substring-Matching dem passenden Modus zu (z.\,B. verweist „ieee“ auf \textit{ieee754} und „floatToBin“ auf \textit{fractional}).
+Für alle mathematischen Berechnungen verwenden wir JavaScripts \texttt{BigInt} statt \texttt{Number}. So verhindern wir zuverlässig Präzisionsverluste und ungewollte Überläufe bei großen Zahlen. Eingaben werden je nach Basis mit strengen Regex-Filtern validiert und in der maximalen Bitlänge begrenzt. Bei negativen Zahlen arbeiten wir mit einer festen Breite von 8 Bit (Wertebereich -128 bis 127).
 
-Für die mathematischen Berechnungen wurde gezielt JavaScripts \texttt{BigInt} statt des Standard-Typs \texttt{Number} gewählt, um Präzisionsverluste und Überläufe bei großen Zahlen zu vermeiden. Die Klasse \texttt{IntegerConverter} nutzt zur Konvertierung nativ Konstrukte wie \texttt{BigInt("0b...")}, \texttt{"0o"} und \texttt{"0x"}. Falscheingaben werden pro Basis über strikte Regex-Filter abgefangen und auf maximale Längen begrenzt (Binär: 16 Bit, Oktal: 6, Dezimal: 5, Hexadezimal: 4). Für negative Zahlen ist eine fixe Bitbreite von 8 Bit mit einem Wertebereich von -128 bis 127 vorgegeben; die Umrechnung zwischen Vorzeichen-Betrag, Einer- und Zweierkomplement inklusive Carry-Propagation erfolgt inline.
+Ein technischer Kniff kommt bei der IEEE-754-Darstellung zum Einsatz: Um die exakte Bit-Repräsentation einer Gleitkommazahl zu erhalten, schreiben wir sie in ein \texttt{Float32Array} und lesen sie über ein \texttt{Uint32Array} wieder aus. Spezielle Zustände wie \textit{NaN} oder $\pm\text{Infinity}$ fangen wir ab und erklären sie gesondert.
 
-Bei der Darstellung von IEEE-754-Gleitkommazahlen kommt ein Typed-Array-Trick zum Einsatz: Die Zahl wird in ein \texttt{Float32Array} geschrieben und über ein \texttt{Uint32Array} als 32-Bit-String ausgelesen, um die exakte Bit-Repräsentation zu gewinnen. Sonderfälle (0, \(\pm\text{Infinity}\), \textit{NaN}) werden abgefangen und dediziert erklärt.
+Die arithmetischen Basisoperationen sind modular in eigenen Pipelines gekapselt (z.\,B. Volladdierer für Addition, Shift-and-Add für Multiplikation). Jeder Durchlauf generiert strukturierte Schritt-Objekte, die direkt mit den i18n-Schlüsseln für die Lokalisierung verknüpft sind.
 
-Die arithmetischen Operationen sind modular im Unterordner \texttt{arithmetic/} gekapselt:
+\subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
+
+Das Interface ist stark auf die Didaktik ausgerichtet. Zentrales Element ist der Step-by-Step-Ansatz, bei dem die ersten Rechenschritte standardmäßig aufgeklappt sind, um den Einstieg zu erleichtern. Die Darstellung passt sich dem jeweiligen Modus an:
+
 \begin{itemize}
-	\item \textbf{Addition:} Volladdierer mit Carry-Kette; Überlauf wird über \texttt{carryInto} \(\neq\) \texttt{carryOut} erkannt.
-	\item \textbf{Subtraktion:} 3-Phasen-Pipeline aus Einerkomplement-Bildung, Inkrementierung (\texttt{+1}) und Addition.
-	\item \textbf{Multiplikation \& Division:} \textit{Shift-and-Add}-Verfahren bzw. restaurierende Langdivision.
-	\item \textbf{Shifting \& Compare:} Bit-Schiebeoperationen und Vergleichslogiken.
-\end{itemize}
-Jede Pipeline erzeugt beim Durchlauf Schritt-Objekte, die direkt mit i18n-Erklärschlüsseln für die Lokalisierung versehen sind.
-
-Die Aufgabengenerierung erfolgt direkt im \texttt{useEffect}-Hook in \texttt{Simulator.tsx} (Zeilen 133–373). Je nach Übungs-ID erzeugen Hilfsfunktionen Zufallswerte in definierten Bereichen (z.\,B. bei \texttt{ex\_u06\_mult} Operanden im Bereich \(8\dots15 \times 16\dots31\)).
-
-\subNsection{2}{Entscheidungen im UI}{Enrico Ebert}
-
-Das User Interface konzentriert sich auf eine didaktische Aufbereitung der Lerninhalte. Ein zentrales Bedienelement ist der Step-by-Step-Ansatz mittels \texttt{StepByStepToggle} und \texttt{CollapsibleStep}. Über den Hook \texttt{useToggleSet(["0","1","2"])} sind die ersten drei Rechenschritte standardmäßig aufgeklappt.
-
-Die Darstellung der Rechenwege unterscheidet sich je nach Modus:
-\begin{itemize}
-	\item \textbf{Ganzzahl- und Kommawandler:} Nutzung statischer Mathematik-Blöcke wie Divisionstabellen und Summenformeln der Form \((d \times \text{base}^{\text{power}})\).
-	\item \textbf{Arithmetik-Modus:} Nachbildung eines Papier-Mathematikgitters mit farbcodierten Chips (Operand A: blau, Operand B: grün, Carry: gelb, Summe: Primärfarbe, CarryOut: rot). Ein neuntes Carry-Bit steht links; ein \texttt{WarningBanner} weist auf Carry-Out oder Overflow hin.
-	\item \textbf{Negativzahlen-Tab:} Um den Vorlesungsbezug direkt im UI aufzugreifen, werden alle drei Darstellungen (Vorzeichen/Betrag, Einer- und Zweierkomplement) nebeneinander dargestellt. Klickbare Zeilen steuern die jeweilige Erläuterung. Schritt 3 zeigt die Bildung des Zweierkomplements (Einerkomplement + 1) getrennt durch eine Linie.
-	\item \textbf{IEEE 754:} Aufteilung der 32 Bits in drei farbige Blöcke (SIGN: blau/1 Bit, EXPONENT: grün/8 Bit, MANTISSA: orange/23 Bit). Vier Schritt-Karten erklären Vorzeichen, Normalisierung mit Hidden Bit, Exponent mit Bias 127 und Mantisse. Sonderwerte lösen ein Amber-Banner aus.
+  \item \textbf{Wandler (Ganz-/Kommazahlen):} Nutzung klassischer, statischer Mathematik-Blöcke (Divisionstabellen, Summenformeln).
+  \item \textbf{Arithmetik:} Nachbildung eines schriftlichen Rechengitters. Die Bits für Operanden, Carry und Summe sind farbcodiert. Bei einem Overflow warnt ein dediziertes Banner.
+  \item \textbf{Negative Zahlen:} Um den Vorlesungsstoff abzubilden, werden Vorzeichen-Betrag, Einer- und Zweierkomplement direkt nebeneinander visualisiert. Interaktive Zeilen steuern die jeweilige Erklärung.
+  \item \textbf{IEEE 754:} Die 32 Bits sind visuell in Sign, Exponent und Mantisse unterteilt. Informationskarten erklären die Normalisierung und den Bias.
 \end{itemize}
 
+\subNsection{2}{Organisation \& State Management}{Enrico Ebert}
 
-\subNsection{2}{Andere Entscheidungen}{Enrico Ebert}
+Die Lerninhalte bestehen aus 10 nach Schwierigkeit sortierten Übungen und 36 vorlesungsbegleitenden Beispielen. Als ID fungiert der \texttt{titleKey}, wodurch der Lernfortschritt auch bei einem Sprachwechsel im i18n-System erhalten bleibt. Beispiele zeigen sofort die Lösung und fließen nicht in den Fortschritt ein.
 
-Die Lerninhalte gliedern sich in 10 Übungen (\texttt{exercises/index.ts}) und 36 Beispiele (\texttt{examples/index.ts}). Die Übungen sind nach Schwierigkeit sortiert (\textit{easy}: 0, \textit{medium}: 1, \textit{hard}: 2). Als stabiler Bezeichner dient der \texttt{titleKey}, wodurch der Übungsfortschritt auch bei einem Sprachwechsel erhalten bleibt. Die 36 Beispiele dienen der Vorlesungsbegleitung und werden per Regex auf dem \texttt{titleKey} in die Gruppen „lecture“ (Einheiten 03–06) und „07“ unterteilt. Beispiele zeigen die Lösung sofort an und werden nicht gespeichert.
-
-Im Training-Center besitzt jede der 10 Übungen einen festen Speicherslot (Index 0–9), während der freie Simulator den Slot \texttt{0x3f} belegt. Der Speicherzustand wird alle 10 Sekunden sowie beim Entladen der Komponente (\textit{Unmount}) automatisch gesichert. Die Funktion „Reset all exercises“ löscht gezielt die Slots 0–9.
-
-Für den Datenaustausch steht eine Import-/Export-Funktion über den \texttt{nsTransferCodec} bereit. Dieser nutzt ein \textit{Base64URL}-kodiertes Format mit dem Präfix \texttt{"v1|"} und bietet ein JSON-Fallback. Die Bedienung erfolgt über die \texttt{SimulatorStringTransferBox}.
-
-Eine bewusste funktionale Einschränkung betrifft die IEEE-754-Addition: Obwohl die Komponente \texttt{IEEEAddition.tsx} im Quellcode existiert, wurde sie nicht in die Modusauswahl eingebunden, um den Umfang der Benutzeroberfläche übersichtlich zu halten und den Fokus auf die Kerninhalte der Vorlesung zu richten.
+Der Anwendungszustand wird alle 10 Sekunden sowie beim Verlassen der Komponente automatisch lokal gesichert. Übungen und der freie Simulator nutzen dabei getrennte Speicherslots. Für den Austausch von Zuständen haben wir einen \texttt{Base64URL}-kodierten Im- und Export implementiert (inklusive JSON-Fallback).
