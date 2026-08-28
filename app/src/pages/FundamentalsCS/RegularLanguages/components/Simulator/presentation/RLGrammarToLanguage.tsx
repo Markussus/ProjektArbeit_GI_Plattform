@@ -85,7 +85,7 @@ export function RLGrammarToLanguage({
           testId="rl-grammar-to-language-source"
           value={source}
           onChange={setSource}
-          titleKey="rl.simulator.grammarInput"
+          titleKey="regular-languages.simulator.grammarInput"
           titleFallback="Grammar"
         >
           {/* Supported grammar formats (mirrors the Language → Grammar panel) */}
@@ -103,12 +103,12 @@ export function RLGrammarToLanguage({
                   !showFormats && "-rotate-90",
                 )}
               />
-              {t("fa.grammar.supportedFormats", "Supported Formats")}
+              {t("finite-automata.grammar.supportedFormats", "Supported Formats")}
             </summary>
             <div className="flex flex-col gap-3 px-3 pb-3">
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                  {t("fa.grammar.format1Label", "Format 1 — simplified")}
+                  {t("finite-automata.grammar.format1Label", "Format 1 — simplified")}
                 </div>
                 <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
                   {GRAMMAR_SIMPLE_EXAMPLE}
@@ -116,7 +116,7 @@ export function RLGrammarToLanguage({
               </div>
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                  {t("fa.grammar.format2Label", "Format 2 — structured")}
+                  {t("finite-automata.grammar.format2Label", "Format 2 — structured")}
                 </div>
                 <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
                   {GRAMMAR_STRUCTURED_EXAMPLE}
@@ -124,7 +124,7 @@ export function RLGrammarToLanguage({
               </div>
               <p className="text-muted-foreground text-xs">
                 {t(
-                  "fa.grammar.epsilonHint",
+                  "finite-automata.grammar.epsilonHint",
                   "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
                 )}
               </p>
@@ -136,12 +136,12 @@ export function RLGrammarToLanguage({
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           <ArrowRight className="text-primary h-4 w-4" />
-          {t("rl.simulator.languageOutput", "Enumerated Language")}
+          {t("regular-languages.simulator.languageOutput", "Enumerated Language")}
         </h4>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="text-muted-foreground flex flex-col gap-1 text-xs">
-            {t("rl.simulator.maxLen", "Max word length")}
+            {t("regular-languages.simulator.maxLen", "Max word length")}
             <input
               type="number"
               min={0}
@@ -156,7 +156,7 @@ export function RLGrammarToLanguage({
             />
           </label>
           <label className="text-muted-foreground flex flex-col gap-1 text-xs">
-            {t("rl.simulator.maxWords", "Max number of words")}
+            {t("regular-languages.simulator.maxWords", "Max number of words")}
             <input
               type="number"
               min={1}
@@ -178,7 +178,7 @@ export function RLGrammarToLanguage({
               {result.words.length === 0 ? (
                 <span className="text-muted-foreground">
                   {t(
-                    "rl.simulator.noWords",
+                    "regular-languages.simulator.noWords",
                     "No words derivable within the limits.",
                   )}
                 </span>
@@ -198,11 +198,11 @@ export function RLGrammarToLanguage({
             <p className="text-muted-foreground text-xs">
               {result.truncated
                 ? t(
-                    "rl.simulator.truncatedNote",
+                    "regular-languages.simulator.truncatedNote",
                     "Output truncated by the word count cap. Increase the limit to see more.",
                   )
                 : t(
-                    "rl.simulator.completeNote",
+                    "regular-languages.simulator.completeNote",
                     "All derivable words within the chosen length cap are shown.",
                   )}
             </p>
@@ -210,7 +210,7 @@ export function RLGrammarToLanguage({
         ) : (
           <p className="text-muted-foreground text-sm">
             {t(
-              "rl.simulator.grammarInvalid",
+              "regular-languages.simulator.grammarInvalid",
               "Enter a valid right-linear grammar.",
             )}
           </p>

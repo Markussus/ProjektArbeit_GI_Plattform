@@ -43,7 +43,7 @@ export function RLLanguageGrammarExercise({
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           <FileText className="text-primary h-4 w-4" />
-          {t("rl.exerciseWorkspace.l2gTargetLanguage", "Target Language")}
+          {t("regular-languages.exerciseWorkspace.l2gTargetLanguage", "Target Language")}
         </h4>
         <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-sm leading-relaxed whitespace-pre-wrap">
           {exercise.prompt}
@@ -58,12 +58,12 @@ export function RLLanguageGrammarExercise({
         <RLGrammarInputCard
           value={grammar}
           onChange={(value) => setExerciseDraft(exercise.id, value)}
-          titleKey="rl.exerciseWorkspace.l2gYourGrammar"
+          titleKey="regular-languages.exerciseWorkspace.l2gYourGrammar"
           titleFallback="Your Grammar"
         >
           <p className="text-muted-foreground text-xs leading-relaxed">
             {t(
-              "rl.exerciseWorkspace.l2gHelp",
+              "regular-languages.exerciseWorkspace.l2gHelp",
               "Write a right-linear grammar that generates the target language, then press Check Solution.",
             )}
           </p>

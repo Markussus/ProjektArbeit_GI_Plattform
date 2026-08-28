@@ -298,9 +298,9 @@ export function ModuleTopicPage({
 
       <ConfirmDialog
         isOpen={showTabExitConfirm}
-        title={t("simulator.validation.exitTabTitle")}
-        description={t("simulator.validation.exitTabDesc")}
-        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        title={t("common.exerciseValidation.exitTabTitle")}
+        description={t("common.exerciseValidation.exitTabDesc")}
+        confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
         onConfirm={handleTabExitConfirm}
         onCancel={() => {
           setShowTabExitConfirm(false);

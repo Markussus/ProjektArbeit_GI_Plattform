@@ -41,8 +41,8 @@ export function SimulationWorkspace({
     : activeItem?.description;
   const itemLabel =
     activeItem?.kind === "example"
-      ? t("simulation.selectedExample")
-      : t("simulation.selectedExercise");
+      ? t("common.simulation.selectedExample")
+      : t("common.simulation.selectedExercise");
 
   return (
     <div className="space-y-4">
@@ -57,8 +57,8 @@ export function SimulationWorkspace({
             <button
               onClick={onCloseItem}
               className="text-primary hover:text-primary/80 absolute top-4 right-4 p-1 transition-colors"
-              aria-label={t("simulation.close")}
-              title={t("simulation.close")}
+              aria-label={t("common.simulation.close")}
+              title={t("common.simulation.close")}
             >
               <X className="size-6" />
             </button>
@@ -107,8 +107,8 @@ export function SimulationWorkspace({
               onClick={onReset}
               data-testid="simulation-reset"
               disabled={resetDisabled}
-              aria-label={t("trainingCenter.resetCurrent")}
-              title={t("trainingCenter.resetCurrent")}
+              aria-label={t("common.trainingCenter.resetCurrent")}
+              title={t("common.trainingCenter.resetCurrent")}
               className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RotateCcw className="size-4" />
@@ -120,9 +120,9 @@ export function SimulationWorkspace({
             data-testid="simulation-focus-toggle"
             aria-pressed={isFocused}
             aria-label={
-              isFocused ? t("simulation.exitFocus") : t("simulation.expand")
+              isFocused ? t("common.simulation.exitFocus") : t("common.simulation.expand")
             }
-            title={isFocused ? t("simulation.close") : t("simulation.expand")}
+            title={isFocused ? t("common.simulation.close") : t("common.simulation.expand")}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
           >
             {isFocused ? (

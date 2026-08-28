@@ -23,7 +23,7 @@ export function StepByStepToggle({
       className={`text-primary hover:text-primary/80 mb-4 flex items-center gap-2 text-sm font-medium ${className}`}
     >
       <List className="h-4 w-4" />
-      {t("simulator.arithmetic.common.showStepByStep")}
+      {t("number-systems.simulator.arithmetic.common.showStepByStep")}
       {open ? (
         <ChevronDown className="h-4 w-4" />
       ) : (

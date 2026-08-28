@@ -72,7 +72,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           data-testid="java-load-solution"
           className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {t("java.actions.loadSolution")}
+          {t("java-programming.actions.loadSolution")}
         </button>
         <button
           type="button"
@@ -82,18 +82,18 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isChecking
-            ? t("java.actions.checkingSolution")
-            : t("java.actions.checkSolution")}
+            ? t("java-programming.actions.checkingSolution")
+            : t("java-programming.actions.checkSolution")}
         </button>
       </>
     ) : null;
 
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
-        row.passed ? t("java.validation.pass") : t("java.validation.fail"),
+        row.passed ? t("java-programming.validation.pass") : t("java-programming.validation.fail"),
         row.id,
-        formatOutput(row.output, t("java.validation.emptyOutput")),
-        formatOutput(row.expectedOutput, t("java.validation.emptyOutput")),
+        formatOutput(row.output, t("java-programming.validation.emptyOutput")),
+        formatOutput(row.expectedOutput, t("java-programming.validation.emptyOutput")),
         row.phase,
       ])
     : [];
@@ -104,7 +104,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.java"
+        emptyStateTextKey="common.simulation.emptyStates.java"
         onReset={handleReset}
         resetDisabled={!isSimulatorReady}
         overlayControls
@@ -120,18 +120,18 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("java.validation.popupTitle")}
+        title={t("java-programming.validation.popupTitle")}
         onClose={() => setCheckResult(null)}
         testId="java-solution-check-dialog"
         error={checkResult?.error}
         errorTestId="java-solution-check-error"
         tableTestIdPrefix="java-solution-check-table"
         headers={[
-          t("java.validation.table.passed"),
-          t("java.validation.table.case"),
-          t("java.validation.table.output"),
-          t("java.validation.table.expectedOutput"),
-          t("java.validation.table.phase"),
+          t("java-programming.validation.table.passed"),
+          t("java-programming.validation.table.case"),
+          t("java-programming.validation.table.output"),
+          t("java-programming.validation.table.expectedOutput"),
+          t("java-programming.validation.table.phase"),
         ]}
         rows={resultRows}
         getRowTestAttributes={(rowIndex) => ({

@@ -2,16 +2,16 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { exportActiveSimulator } from "./support/app-shell";
 
 const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
-const ERASE_TAPE_EXERCISE_ID = "tm.exercises.exerciseEraseTape";
-const INVERT_BINARY_WORD_EXERCISE_ID = "tm.exercises.exerciseInvertBinaryWord";
-const UNARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseUnaryIncrement";
-const BINARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseBinaryIncrement";
-const ADD_BINARY_EXERCISE_ID = "tm.exercises.exerciseAddBinary";
-const CHECK_REGEX_EXERCISE_ID = "tm.exercises.exerciseCheckRegex";
-const BIT_FLIP_EXAMPLE_ID = "tm.examples.example1";
-const UNARY_INCREMENT_EXAMPLE_ID = "tm.examples.example2";
-const BINARY_INCREMENT_EXAMPLE_ID = "tm.examples.example3";
-const ADD_BINARY_EXAMPLE_ID = "tm.examples.example4";
+const ERASE_TAPE_EXERCISE_ID = "turing-machine.exercises.exerciseEraseTape";
+const INVERT_BINARY_WORD_EXERCISE_ID = "turing-machine.exercises.exerciseInvertBinaryWord";
+const UNARY_INCREMENT_EXERCISE_ID = "turing-machine.exercises.exerciseUnaryIncrement";
+const BINARY_INCREMENT_EXERCISE_ID = "turing-machine.exercises.exerciseBinaryIncrement";
+const ADD_BINARY_EXERCISE_ID = "turing-machine.exercises.exerciseAddBinary";
+const CHECK_REGEX_EXERCISE_ID = "turing-machine.exercises.exerciseCheckRegex";
+const BIT_FLIP_EXAMPLE_ID = "turing-machine.examples.example1";
+const UNARY_INCREMENT_EXAMPLE_ID = "turing-machine.examples.example2";
+const BINARY_INCREMENT_EXAMPLE_ID = "turing-machine.examples.example3";
+const ADD_BINARY_EXAMPLE_ID = "turing-machine.examples.example4";
 const BLANK_SYMBOL = "\u25ca";
 const Q1_SUBSCRIPT = "q\u2081";
 

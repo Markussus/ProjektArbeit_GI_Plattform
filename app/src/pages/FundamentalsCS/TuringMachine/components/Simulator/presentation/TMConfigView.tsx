@@ -42,7 +42,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
     }
 
     if (symbol === editor.draft.blankSymbol) {
-      alert(t("tm.config.editing.cannotRemoveBlank"));
+      alert(t("turing-machine.config.editing.cannotRemoveBlank"));
       return;
     }
 
@@ -51,12 +51,12 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
 
   const handleRemoveColumn = (colIndex: number) => {
     if (colIndex === 0) {
-      alert(t("tm.config.editing.cannotRemoveSymbolColumn"));
+      alert(t("turing-machine.config.editing.cannotRemoveSymbolColumn"));
       return;
     }
 
     if (editor.draft.states.length <= 1) {
-      alert(t("tm.config.editing.cannotRemoveLastState"));
+      alert(t("turing-machine.config.editing.cannotRemoveLastState"));
       return;
     }
 
@@ -67,7 +67,7 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
     <div data-testid="tm-config-view" className="flex w-full flex-col gap-6">
       <div className="space-y-4 lg:mx-auto lg:w-max lg:max-w-full">
         <h2 data-testid="tm-config-title" className="text-lg font-bold">
-          {t("tm.config.general.title")}
+          {t("turing-machine.config.general.title")}
         </h2>
 
         {combinedError && (
@@ -114,13 +114,13 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
             />
 
             <TMAlphabetPanel
-              title={t("tm.config.alphabets.inputAlphabet")}
+              title={t("turing-machine.config.alphabets.inputAlphabet")}
               symbols={editor.draft.inputAlphabet}
               testId="tm-input-alphabet"
             />
 
             <TMAlphabetPanel
-              title={t("tm.config.alphabets.tapeAlphabet")}
+              title={t("turing-machine.config.alphabets.tapeAlphabet")}
               symbols={displayedTapeAlphabet}
               testId="tm-tape-alphabet"
             />
@@ -133,38 +133,38 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
 
 function translateCellIssue(t: TFunction, code: TMEditorCellIssueCode): string {
   if (code === "symbol_single_char") {
-    return t("tm.config.editing.symbolSingleChar");
+    return t("turing-machine.config.editing.symbolSingleChar");
   }
 
   if (code === "symbol_duplicate") {
-    return t("tm.config.editing.symbolDuplicate");
+    return t("turing-machine.config.editing.symbolDuplicate");
   }
 
-  return t("tm.config.editing.transitionCellInvalid");
+  return t("turing-machine.config.editing.transitionCellInvalid");
 }
 
 function translateProgramIssue(t: TFunction, issue: TMProgramIssue): string {
   const keyByCode: Record<TMProgramIssueCode, string> = {
-    states_empty: "tm.validation.program.statesEmpty",
-    initial_state_missing: "tm.validation.program.initialStateMissing",
-    halt_states_empty: "tm.validation.program.haltStatesEmpty",
-    halt_state_missing: "tm.validation.program.haltStateMissing",
-    blank_symbol_missing: "tm.validation.program.blankSymbolMissing",
-    blank_symbol_invalid: "tm.validation.program.blankSymbolInvalid",
-    tape_symbol_invalid: "tm.validation.program.tapeSymbolInvalid",
+    states_empty: "turing-machine.validation.program.statesEmpty",
+    initial_state_missing: "turing-machine.validation.program.initialStateMissing",
+    halt_states_empty: "turing-machine.validation.program.haltStatesEmpty",
+    halt_state_missing: "turing-machine.validation.program.haltStateMissing",
+    blank_symbol_missing: "turing-machine.validation.program.blankSymbolMissing",
+    blank_symbol_invalid: "turing-machine.validation.program.blankSymbolInvalid",
+    tape_symbol_invalid: "turing-machine.validation.program.tapeSymbolInvalid",
     initial_tape_invalid_symbol:
-      "tm.validation.program.initialTapeInvalidSymbol",
+      "turing-machine.validation.program.initialTapeInvalidSymbol",
     transition_read_symbol_missing:
-      "tm.validation.program.transitionReadSymbolMissing",
+      "turing-machine.validation.program.transitionReadSymbolMissing",
     transition_read_symbol_invalid:
-      "tm.validation.program.transitionReadSymbolInvalid",
-    transition_state_missing: "tm.validation.program.transitionStateMissing",
+      "turing-machine.validation.program.transitionReadSymbolInvalid",
+    transition_state_missing: "turing-machine.validation.program.transitionStateMissing",
     transition_next_state_missing:
-      "tm.validation.program.transitionNextStateMissing",
+      "turing-machine.validation.program.transitionNextStateMissing",
     transition_write_symbol_missing:
-      "tm.validation.program.transitionWriteSymbolMissing",
+      "turing-machine.validation.program.transitionWriteSymbolMissing",
     transition_write_symbol_invalid:
-      "tm.validation.program.transitionWriteSymbolInvalid",
+      "turing-machine.validation.program.transitionWriteSymbolInvalid",
   };
 
   return t(

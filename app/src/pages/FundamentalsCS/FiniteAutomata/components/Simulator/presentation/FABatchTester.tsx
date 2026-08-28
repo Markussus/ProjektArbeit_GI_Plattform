@@ -48,7 +48,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
       {/* Header */}
       <div className="flex flex-shrink-0 items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
-          {t("fa.batch.title", "Batch Testing")}
+          {t("finite-automata.batch.title", "Batch Testing")}
         </span>
       </div>
 
@@ -61,7 +61,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
           value={rawInput}
           onChange={(e) => setRawInput(e.target.value)}
           placeholder={t(
-            "fa.batch.placeholder",
+            "finite-automata.batch.placeholder",
             "Enter words (one per line)\ne.g.\n101\n100\n11100",
           )}
         />
@@ -84,7 +84,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                 ❌ {summary.rejected}
               </span>
               <span style={{ color: "var(--fa-text-dim)" }}>
-                / {summary.total} {t("fa.batch.total", "total")}
+                / {summary.total} {t("finite-automata.batch.total", "total")}
               </span>
             </div>
           )}
@@ -121,7 +121,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                   style={{ fontSize: "0.75rem" }}
                 >
                   <span style={{ color: "var(--fa-text-dim)" }}>
-                    {r.steps} {t("fa.batch.steps", "steps")}
+                    {r.steps} {t("finite-automata.batch.steps", "steps")}
                   </span>
                   <span
                     className="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-bold"
@@ -157,7 +157,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
             paddingInline: "0.4rem",
             overflow: "hidden",
           }}
-          title={t("fa.batch.runAll", "Run All")}
+          title={t("finite-automata.batch.runAll", "Run All")}
         >
           <Play
             style={{
@@ -168,7 +168,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
             }}
           />
           <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-            {t("fa.batch.runAll", "Run All")}
+            {t("finite-automata.batch.runAll", "Run All")}
           </span>
         </button>
         {results && (
@@ -186,11 +186,11 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
               paddingInline: "0.4rem",
               overflow: "hidden",
             }}
-            title={t("fa.batch.clear", "Clear")}
+            title={t("finite-automata.batch.clear", "Clear")}
           >
             <RotateCcw style={{ width: 14, height: 14, flexShrink: 0 }} />
             <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-              {t("fa.batch.clear", "Clear")}
+              {t("finite-automata.batch.clear", "Clear")}
             </span>
           </button>
         )}

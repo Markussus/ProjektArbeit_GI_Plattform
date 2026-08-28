@@ -20,10 +20,10 @@ async function openMooreSimulator(page: Page) {
   await preparePage(page);
   await page.getByTestId("tab-button-examples").click();
   await page
-    .getByTestId("moore-mealy-example-moore.examples.mooreDefault-select")
+    .getByTestId("moore-mealy-example-moore-mealy.examples.mooreDefault-select")
     .click();
   await page
-    .getByTestId("moore-mealy-example-moore.examples.mooreDefault-open")
+    .getByTestId("moore-mealy-example-moore-mealy.examples.mooreDefault-open")
     .click();
   await expect(page.getByTestId("moore-config-view")).toBeVisible();
 }
@@ -32,10 +32,10 @@ async function openMealySimulator(page: Page) {
   await preparePage(page);
   await page.getByTestId("tab-button-examples").click();
   await page
-    .getByTestId("moore-mealy-example-moore.examples.mealyDefault-select")
+    .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-select")
     .click();
   await page
-    .getByTestId("moore-mealy-example-moore.examples.mealyDefault-open")
+    .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-open")
     .click();
   await expect(page.getByTestId("mealy-config-view")).toBeVisible();
 }
@@ -248,10 +248,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await page.getByTestId("tab-button-examples").click();
 
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mooreDefault-select")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mooreDefault-select")
       .click();
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mooreDefault-open")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mooreDefault-open")
       .click();
     await expect(
       page
@@ -261,10 +261,10 @@ test.describe("Moore and Mealy simulation tab", () => {
 
     await page.getByTestId("tab-button-examples").click();
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mealyDefault-select")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-select")
       .click();
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mealyDefault-open")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-open")
       .click();
     await expect(page.getByTestId("mealy-config-view")).toBeVisible();
   });
@@ -283,10 +283,10 @@ test.describe("Moore and Mealy simulation tab", () => {
 
     await page.getByTestId("tab-button-examples").click();
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mealyDefault-select")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-select")
       .click();
     await page
-      .getByTestId("moore-mealy-example-moore.examples.mealyDefault-open")
+      .getByTestId("moore-mealy-example-moore-mealy.examples.mealyDefault-open")
       .click();
 
     const mealyState = page
@@ -303,13 +303,13 @@ test.describe("Moore and Mealy simulation tab", () => {
   }) => {
     await preparePage(page);
     const exerciseIds = [
-      "moore.exercises.turnstile.title",
-      "moore.exercises.elevator.title",
-      "moore.exercises.barrier.title",
-      "moore.exercises.vending.title",
-      "moore.exercises.wiper.title",
-      "moore.exercises.alarm.title",
-      "moore.exercises.cruise.title",
+      "moore-mealy.exercises.turnstile.title",
+      "moore-mealy.exercises.elevator.title",
+      "moore-mealy.exercises.barrier.title",
+      "moore-mealy.exercises.vending.title",
+      "moore-mealy.exercises.wiper.title",
+      "moore-mealy.exercises.alarm.title",
+      "moore-mealy.exercises.cruise.title",
     ];
 
     for (const exerciseId of exerciseIds) {
@@ -328,10 +328,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await preparePage(page);
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-open")
       .click();
     await expect(
       page
@@ -386,10 +386,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await preparePage(page);
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-open")
       .click();
     await page.getByTestId("moore-load-solution").click();
     await expect(
@@ -422,10 +422,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await preparePage(page);
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-open")
       .click();
 
     const stateName = page
@@ -437,10 +437,10 @@ test.describe("Moore and Mealy simulation tab", () => {
 
     await page.getByTestId("tab-button-exercises").click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-open")
       .click();
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
@@ -450,10 +450,10 @@ test.describe("Moore and Mealy simulation tab", () => {
     await page.getByTestId("moore-reset-all-exercises").click();
     await page.getByTestId("moore-reset-all-exercises-confirm").click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-select")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-select")
       .click();
     await page
-      .getByTestId("moore-exercise-card-moore.exercises.turnstile.title-open")
+      .getByTestId("moore-exercise-card-moore-mealy.exercises.turnstile.title-open")
       .click();
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),

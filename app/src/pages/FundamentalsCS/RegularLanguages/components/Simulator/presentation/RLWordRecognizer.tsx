@@ -102,28 +102,28 @@ export function RLWordRecognizer({
           testId="rl-word-recognizer-source"
           value={source}
           onChange={setSource}
-          titleKey="rl.simulator.grammarInput"
+          titleKey="regular-languages.simulator.grammarInput"
           titleFallback="Grammar"
         />
       </div>
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          {t("rl.simulator.testWord", "Words to Test")}
+          {t("regular-languages.simulator.testWord", "Words to Test")}
         </h4>
         <input
           type="text"
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder={t(
-            "rl.simulator.testWordPlaceholder",
+            "regular-languages.simulator.testWordPlaceholder",
             "Comma-separated words; empty = ε",
           )}
           className="border-input bg-background focus:ring-primary w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
         />
         <p className="text-muted-foreground text-xs">
           {t(
-            "rl.simulator.testWordHelp",
+            "regular-languages.simulator.testWordHelp",
             "Separate multiple words with commas. Each character is treated as one terminal symbol; whitespace around commas is ignored.",
           )}
         </p>
@@ -162,7 +162,7 @@ export function RLWordRecognizer({
         ) : (
           <p className="text-muted-foreground text-sm">
             {t(
-              "rl.simulator.grammarInvalid",
+              "regular-languages.simulator.grammarInvalid",
               "Enter a valid right-linear grammar.",
             )}
           </p>

@@ -20,20 +20,20 @@ test.describe("Number Systems page", () => {
     await test.step("The exercises tab exposes the Number Systems exercise list", async () => {
       await page.getByTestId(appTestIds.tabExercises).click();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u03_decToBin-select"),
+        page.getByTestId("exercise-card-number-systems.ex_u03_decToBin-select"),
       ).toBeVisible();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u06_mult-select"),
+        page.getByTestId("exercise-card-number-systems.ex_u06_mult-select"),
       ).toBeVisible();
     });
 
     await test.step("The examples tab shows grouped examples", async () => {
       await page.getByTestId(appTestIds.tabExamples).click();
       await expect(
-        page.getByTestId("example-card-number.example_u03_1-select"),
+        page.getByTestId("example-card-number-systems.example_u03_1-select"),
       ).toBeVisible();
       await expect(
-        page.getByTestId("example-card-number.example_u06_2-select"),
+        page.getByTestId("example-card-number-systems.example_u06_2-select"),
       ).toBeVisible();
     });
 
@@ -53,16 +53,16 @@ test.describe("Number Systems page", () => {
 
     await test.step("Selecting an exercise should expand its details", async () => {
       await page
-        .getByTestId("exercise-card-number.ex_u04_binToHexOct-select")
+        .getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-select")
         .click();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u04_binToHexOct-open"),
+        page.getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-open"),
       ).toBeVisible();
     });
 
     await test.step("Opening an exercise in simulation should preserve the exercise context", async () => {
       await page
-        .getByTestId("exercise-card-number.ex_u04_binToHexOct-open")
+        .getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-open")
         .click();
       await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
       await expect(
@@ -213,12 +213,12 @@ test.describe("Number Systems page", () => {
 
     await test.step("Select and open example u03_1", async () => {
       await page
-        .getByTestId("example-card-number.example_u03_1-select")
+        .getByTestId("example-card-number-systems.example_u03_1-select")
         .click();
       await expect(
-        page.getByTestId("example-card-number.example_u03_1-open"),
+        page.getByTestId("example-card-number-systems.example_u03_1-open"),
       ).toBeVisible();
-      await page.getByTestId("example-card-number.example_u03_1-open").click();
+      await page.getByTestId("example-card-number-systems.example_u03_1-open").click();
     });
 
     await test.step("Simulator shows pre-filled decimal value 26", async () => {

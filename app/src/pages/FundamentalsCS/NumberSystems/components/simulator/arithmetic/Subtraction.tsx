@@ -103,7 +103,7 @@ export function Subtraction({
         position: 7 - i,
         originalBit: bit,
         flippedBit: bit === "1" ? "0" : "1",
-        explanation: t("simulator.arithmetic.subtraction.flipBitDesc", {
+        explanation: t("number-systems.simulator.arithmetic.subtraction.flipBitDesc", {
           pos: 7 - i,
           orig: bit,
           flipped: bit === "1" ? "0" : "1",
@@ -134,7 +134,7 @@ export function Subtraction({
         currentBit: bit,
         resultBit,
         carryOut: c,
-        explanation: t("simulator.arithmetic.subtraction.addOneDesc", {
+        explanation: t("number-systems.simulator.arithmetic.subtraction.addOneDesc", {
           pos: 7 - i,
           bit: bit,
           carry: c === 0 ? 1 : 0,
@@ -160,26 +160,26 @@ export function Subtraction({
 
       let explanation = "";
       if (bitA === 0 && bitB === 0 && cIn === 0) {
-        explanation = t("simulator.arithmetic.subtraction.add0", {
+        explanation = t("number-systems.simulator.arithmetic.subtraction.add0", {
           pos: 7 - i,
         });
       } else if (
         (bitA === 1 && bitB === 0 && cIn === 1) ||
         (bitA === 0 && bitB === 1 && cIn === 1)
       ) {
-        explanation = t("simulator.arithmetic.subtraction.add1", {
+        explanation = t("number-systems.simulator.arithmetic.subtraction.add1", {
           pos: 7 - i,
         });
       } else if (bitA === 1 && bitB === 1 && cIn === 0) {
-        explanation = t("simulator.arithmetic.subtraction.add2", {
+        explanation = t("number-systems.simulator.arithmetic.subtraction.add2", {
           pos: 7 - i,
         });
       } else if (bitA === 1 && bitB === 1 && cIn === 1) {
-        explanation = t("simulator.arithmetic.subtraction.add3", {
+        explanation = t("number-systems.simulator.arithmetic.subtraction.add3", {
           pos: 7 - i,
         });
       } else {
-        explanation = t("simulator.arithmetic.subtraction.add4", {
+        explanation = t("number-systems.simulator.arithmetic.subtraction.add4", {
           pos: 7 - i,
           a: bitA,
           b: bitB,
@@ -225,22 +225,22 @@ export function Subtraction({
         <>
           <div>
             <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("simulator.arithmetic.common.operands8bit")}
+              {t("number-systems.simulator.arithmetic.common.operands8bit")}
             </h3>
             <p className="text-muted-foreground mb-4 text-sm">
-              {t("simulator.arithmetic.subtraction.desc")}
+              {t("number-systems.simulator.arithmetic.subtraction.desc")}
             </p>
           </div>
           <div className="space-y-4">
             {renderModeSelector}
             <BinaryInput
-              label={t("simulator.arithmetic.subtraction.minuend")}
+              label={t("number-systems.simulator.arithmetic.subtraction.minuend")}
               value={valA}
               onChange={handleInputA}
               locked={locked}
             />
             <BinaryInput
-              label={t("simulator.arithmetic.subtraction.subtrahend")}
+              label={t("number-systems.simulator.arithmetic.subtraction.subtrahend")}
               value={valB}
               onChange={handleInputB}
               locked={locked}
@@ -261,7 +261,7 @@ export function Subtraction({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.arithmetic.common.stepsResult")}
+              title={t("number-systems.simulator.arithmetic.common.stepsResult")}
             />
 
             <StepByStepToggle
@@ -274,7 +274,7 @@ export function Subtraction({
                 {/* Step 1: Ones Complement */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">
-                    {t("simulator.arithmetic.subtraction.step1")}
+                    {t("number-systems.simulator.arithmetic.subtraction.step1")}
                   </p>
                   <div className="space-y-2">
                     {onesSteps.map((step, idx) => (
@@ -283,7 +283,7 @@ export function Subtraction({
                         className="flex items-center gap-4 font-mono text-sm"
                       >
                         <span className="text-muted-foreground w-16 text-xs">
-                          {t("simulator.arithmetic.subtraction.bitN", {
+                          {t("number-systems.simulator.arithmetic.subtraction.bitN", {
                             n: step.position,
                           })}
                         </span>
@@ -299,7 +299,7 @@ export function Subtraction({
                   </div>
                   <div className="border-border/40 mt-3 flex items-center justify-between border-t pt-3">
                     <span className="text-muted-foreground text-sm">
-                      {t("simulator.arithmetic.subtraction.onesResult")}
+                      {t("number-systems.simulator.arithmetic.subtraction.onesResult")}
                     </span>
                     <span className="text-destructive font-mono font-bold">
                       {onesComp}
@@ -310,7 +310,7 @@ export function Subtraction({
                 {/* Step 2: Add 1 */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">
-                    {t("simulator.arithmetic.subtraction.step2")}
+                    {t("number-systems.simulator.arithmetic.subtraction.step2")}
                   </p>
                   <div className="space-y-2">
                     {twosSteps.map((step, idx) => (
@@ -321,7 +321,7 @@ export function Subtraction({
                         header={
                           <div className="flex items-center gap-4 font-mono text-sm">
                             <span className="text-muted-foreground w-16 text-xs">
-                              {t("simulator.arithmetic.subtraction.bitN", {
+                              {t("number-systems.simulator.arithmetic.subtraction.bitN", {
                                 n: step.position,
                               })}
                             </span>
@@ -357,7 +357,7 @@ export function Subtraction({
                   </div>
                   <div className="border-border/40 mt-3 flex items-center justify-between border-t pt-3">
                     <span className="text-muted-foreground text-sm">
-                      {t("simulator.arithmetic.subtraction.twosResult")}
+                      {t("number-systems.simulator.arithmetic.subtraction.twosResult")}
                     </span>
                     <span className="text-primary font-mono font-bold">
                       {twosComp}
@@ -368,7 +368,7 @@ export function Subtraction({
                 {/* Step 3: Add */}
                 <div className="bg-background border-border/40 rounded-lg border p-4 shadow-inner">
                   <p className="text-muted-foreground mb-3 font-sans text-xs font-bold tracking-normal uppercase">
-                    {t("simulator.arithmetic.subtraction.step3")}
+                    {t("number-systems.simulator.arithmetic.subtraction.step3")}
                   </p>
                   <div className="space-y-2">
                     {addSteps.map((step, idx) => (
@@ -379,7 +379,7 @@ export function Subtraction({
                         header={
                           <div className="flex items-center gap-2 font-mono text-sm">
                             <span className="text-muted-foreground w-16 text-xs">
-                              {t("simulator.arithmetic.subtraction.bitN", {
+                              {t("number-systems.simulator.arithmetic.subtraction.bitN", {
                                 n: step.position,
                               })}
                             </span>
@@ -425,7 +425,7 @@ export function Subtraction({
             <div className="bg-background border-border/40 space-y-4 rounded-lg border p-4 font-mono text-sm tracking-widest shadow-inner">
               <div className="space-y-1">
                 <p className="text-muted-foreground font-sans text-xs font-bold tracking-normal uppercase">
-                  {t("simulator.arithmetic.subtraction.step1")}
+                  {t("number-systems.simulator.arithmetic.subtraction.step1")}
                 </p>
                 <div className="flex gap-4">
                   <span className="opacity-50">{padB}</span>
@@ -437,7 +437,7 @@ export function Subtraction({
               </div>
               <div className="space-y-1">
                 <p className="text-muted-foreground mt-2 font-sans text-xs font-bold tracking-normal uppercase">
-                  {t("simulator.arithmetic.subtraction.step2")}
+                  {t("number-systems.simulator.arithmetic.subtraction.step2")}
                 </p>
                 <div className="flex gap-4">
                   <span className="text-destructive opacity-50">
@@ -452,7 +452,7 @@ export function Subtraction({
 
             {/* Addition Grid */}
             <p className="text-muted-foreground border-border/50 mt-6 border-b pb-2 font-sans text-xs font-bold tracking-normal uppercase">
-              {t("simulator.arithmetic.subtraction.step3")}
+              {t("number-systems.simulator.arithmetic.subtraction.step3")}
             </p>
             <div className="flex justify-center p-4">
               <div className="bg-background border-border/40 rounded-lg border p-6 font-mono text-lg leading-loose font-medium tracking-widest shadow-inner select-none md:text-xl">
@@ -510,17 +510,17 @@ export function Subtraction({
               {carryOut && (
                 <WarningBanner
                   variant="info"
-                  title={t("simulator.arithmetic.subtraction.carryOutTitle")}
+                  title={t("number-systems.simulator.arithmetic.subtraction.carryOutTitle")}
                 >
-                  {t("simulator.arithmetic.subtraction.carryOutInfo")}
+                  {t("number-systems.simulator.arithmetic.subtraction.carryOutInfo")}
                 </WarningBanner>
               )}
               {overflow && (
                 <WarningBanner
                   variant="warning"
-                  title={t("simulator.arithmetic.addition.overflowTitle")}
+                  title={t("number-systems.simulator.arithmetic.addition.overflowTitle")}
                 >
-                  {t("simulator.arithmetic.addition.overflowWarning")}
+                  {t("number-systems.simulator.arithmetic.addition.overflowWarning")}
                 </WarningBanner>
               )}
             </div>

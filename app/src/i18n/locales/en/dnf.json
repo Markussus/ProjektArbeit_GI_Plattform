@@ -1,0 +1,316 @@
+{
+  "title": "Disjunctive Normal Form",
+  "description": "Learn how boolean expressions are evaluated with truth tables and how the Disjunctive Normal Form is derived from the rows with result 1.",
+  "tutorialVideo": "Tutorial video",
+  "taskGroups": {
+    "expression_to_truth_table": {
+      "title": "Expression as the starting point",
+      "description": "Evaluate an expression, create its truth table, derive the DNF, and simplify it."
+    },
+    "truth_table_to_dnf": {
+      "title": "Truth table as the starting point",
+      "description": "Derive and simplify the DNF from a given truth table."
+    }
+  },
+  "algebra": {
+    "title": "Boolean algebra rules",
+    "intro": "These rules let you rewrite a DNF into shorter equivalent forms. They power the step-by-step solution path and the worked examples in the simulator.",
+    "rules": {
+      "identity": {
+        "name": "Identity",
+        "example": "1 acts as the neutral element of ∧ and 0 as the neutral element of ∨."
+      },
+      "domination": {
+        "name": "Domination",
+        "example": "Whatever is OR-ed with 1 is forced to 1; whatever is AND-ed with 0 is forced to 0."
+      },
+      "idempotence": {
+        "name": "Idempotence",
+        "example": "Repeating the same operand neither tightens nor relaxes the term."
+      },
+      "double_negation": {
+        "name": "Double negation",
+        "example": "Two negations cancel each other out."
+      },
+      "complement": {
+        "name": "Complement",
+        "example": "A variable is always either true or false — so a ∨ ¬a is always 1, and a ∧ ¬a is always 0."
+      },
+      "commutativity": {
+        "name": "Commutativity",
+        "example": "Operand order does not affect the result for ∧ and ∨."
+      },
+      "associativity": {
+        "name": "Associativity",
+        "example": "With multiple ∧ or ∨ operations, the grouping does not matter — (a ∧ b) ∧ c equals a ∧ (b ∧ c)."
+      },
+      "distributivity": {
+        "name": "Distributivity",
+        "example": "A shared operand can be factored out — like factoring in regular maths, but with ∧ and ∨ instead of · and +."
+      },
+      "absorption": {
+        "name": "Absorption",
+        "example": "If a is already true, then a ∨ (a ∧ b) is also true — the AND part adds nothing."
+      },
+      "de_morgan": {
+        "name": "De Morgan",
+        "example": "Negation flips the operator: ∧ becomes ∨ and each operand is negated."
+      }
+    }
+  },
+  "examples": {
+    "walkthroughs": {
+      "lectureExpression": {
+        "title": "Lecture example: a ∨ (b ∧ c)",
+        "explanation": "The lecture truth table shows where a is 1 or b and c are both 1."
+      },
+      "parentheses": {
+        "title": "Exercise 1: (a ∨ b) ∧ c",
+        "explanation": "The lecture exercise changes only the parentheses and compares the result with the previous table."
+      },
+      "dnfIntro": {
+        "title": "DNF introduction from the lecture",
+        "explanation": "Only rows 000 and 111 evaluate to 1, producing two AND terms."
+      },
+      "exerciseTwo": {
+        "title": "Exercise 2: polynomial from truth table",
+        "explanation": "Three 1-rows (010, 100, 101) lead to the DNF of lecture exercise 2."
+      }
+    }
+  },
+  "exercises": {
+    "worksheet02bTruthTable1": {
+      "title": "Derive DNF from a Truth Table",
+      "description": "Derive the canonical DNF from the given truth table with a, b, and c, then simplify it. Based on worksheet 02b, exercise 1."
+    },
+    "simpleExpression": {
+      "title": "Build a Truth Table from an Expression",
+      "description": "Create the truth table for the given expression and derive its canonical DNF."
+    },
+    "overlappingGroups": {
+      "title": "Simplify DNF with Overlapping Groups",
+      "description": "Derive the canonical DNF from the truth table and determine a minimal DNF. Remember that a 1-row may be covered by multiple groups."
+    },
+    "negatedExpression": {
+      "title": "Evaluate an Expression with Negations",
+      "description": "Create the truth table for an expression with multiple negations and determine its canonical DNF."
+    },
+    "worksheet02bTruthTable2": {
+      "title": "Derive DNF with Four Variables",
+      "description": "Derive the canonical DNF from the given truth table with a, b, c, and d, then simplify it. Based on worksheet 02b, exercise 2."
+    },
+    "complexExpression": {
+      "title": "Convert a Complex Expression to DNF",
+      "description": "Create the truth table for the four-variable expression, determine its canonical DNF, and simplify it."
+    }
+  },
+  "exprBuilder": {
+    "evaluate": "Evaluate"
+  },
+  "simulator": {
+    "tabs": {
+      "expression_to_truth_table": "Expression → table",
+      "truth_table_to_dnf": "Table → DNF"
+    },
+    "tableModeTitle": "DNF from truth table",
+    "tableModeHint": "Build your own truth table, set the result column, and write the DNF from it.",
+    "variableCount": "Variables",
+    "variableCountLabel": "Count",
+    "variableCountHelp": "{{min}} to {{max}} variables allowed",
+    "clearTable": "Set table to 0",
+    "fillTable": "Set table to 1",
+    "randomTable": "Randomize",
+    "invertTable": "Invert results",
+    "setupPreviewTitle": "Set up the truth table",
+    "setupPreviewHint": "Set the f column for each row. Once the table is ready, click \"Commit table\" to start the DNF exercise.",
+    "commitTable": "Commit table",
+    "loadSolution": "Load solution",
+    "editConfig": "Edit config"
+  },
+  "builder": {
+    "inputTitle": "Boolean expression",
+    "inputHint": "Use variables, 0/1, parentheses, and the operators ¬, ∧, ∨.",
+    "keyboardAliases": "Keyboard aliases: ! or ~ = ¬, & or && = ∧, | or || = ∨.",
+    "operatorHelp": "Operators:",
+    "insertNot": "Insert negation",
+    "insertAnd": "Insert AND",
+    "insertOr": "Insert OR",
+    "insertOpenParen": "Insert opening parenthesis",
+    "insertCloseParen": "Insert closing parenthesis",
+    "clear": "Clear",
+    "exercise": {
+      "taskTitle": "Exercise task",
+      "given": "Given the boolean expression:",
+      "givenTruthTable": "Given the truth table:",
+      "buildTruthTable": "Build the truth table:",
+      "chooseResultColumn": "Set the result values f yourself. Then build the DNF from all 1-rows.",
+      "findExpressionFromTable": "Find the boolean polynomial in disjunctive normal form.",
+      "stepsTitle": "Workflow",
+      "instructionStepTable": "Fill in the truth table.",
+      "instructionStepDnf": "Build one AND term from each 1-row and join the terms with ∨.",
+      "instructionStepEditableTable": "Set the result column f in the truth table.",
+      "instructionStepOneRows": "Consider only the rows with result 1.",
+      "instructionStepDnfFromTable": "Build one AND term for each 1-row and join them with ∨.",
+      "tableTitle": "Workspace",
+      "tableHint": "Choose the result value 0 or 1 for each row. With keyboard focus, use 0/1 and the arrow keys.",
+      "tableHintEditable": "Set the result value f for each row. Your DNF must describe exactly this truth table.",
+      "tableHintGiven": "The result column is given. Derive the DNF from it.",
+      "rowHeader": "Row",
+      "resultGroupLabel": "Result for row {{row}}",
+      "resultButtonLabel": "Row {{row}}: choose result {{value}}",
+      "dnfLabel": "DNF",
+      "dnfHint": "Rule: each 1-row contributes exactly one AND term containing all variables.",
+      "dnfPlaceholder": "e.g. (¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ c)",
+      "check": "Check",
+      "feedbackTitle": "Feedback",
+      "notChecked": "Not checked yet. Fill in the table, enter the DNF, and click Check.",
+      "notCheckedDnfOnly": "Not checked yet. Enter the DNF for the given truth table and click Check.",
+      "notCheckedEditable": "Not checked yet. Set the result values, enter the matching DNF, and click Check.",
+      "progressTable": "Truth table",
+      "progressTableValue": "{{answered}} / {{total}} rows answered",
+      "progressTableProvided": "given",
+      "progressTableEditable": "self-defined",
+      "progressDnf": "DNF input",
+      "progressDnfReady": "present",
+      "progressDnfMissing": "still empty",
+      "tableCorrectValue": "{{correct}} / {{total}} rows correct",
+      "dnfStatus": {
+        "deferred": "waiting for table",
+        "empty": "missing",
+        "syntax_error": "check syntax",
+        "correct": "correct",
+        "equivalent_not_canonical": "equivalent, wrong form",
+        "not_equivalent": "does not match"
+      },
+      "oneRowsLabel": "1-rows for the DNF",
+      "noOneRows": "none",
+      "correctTitle": "All correct",
+      "correctDesc": "Truth table and DNF match the task.",
+      "tableIncomplete": "{{count}} table row(s) are still empty.",
+      "tableWrongRows_one": "{{count}} of {{total}} table rows is still wrong — find it yourself.",
+      "tableWrongRows_other": "{{count}} of {{total}} table rows are still wrong — find them yourself.",
+      "dnfEmpty": "The DNF input is still missing.",
+      "dnfSyntax": "The DNF input cannot be parsed.",
+      "dnfEquivalentNotCanonical": "The input describes the same function, but is not built as a DNF from the rows with result 1 — each 1-row requires exactly one AND term.",
+      "dnfMissingTerms": "The DNF is missing {{count}} term(s) for row(s): {{rows}}.",
+      "dnfExpectedTerms": "Expected missing terms: {{terms}}.",
+      "dnfExtraTerms": "The DNF contains term(s) that do not belong to a 1-row: {{rows}}.",
+      "dnfExtraTermDetails": "These term(s) would turn on 0-rows: {{terms}}.",
+      "dnfWrongRows": "The DNF does not match these table row(s): {{rows}}.",
+      "dnfDeferredUntilTable": "The DNF is checked in detail only after the truth table is complete and correct.",
+      "tipTitle": "Tip",
+      "tipCompleteTable": "The DNF can only be checked meaningfully after every table row has an answer.",
+      "tipTableRows": "Go through the table row by row and verify each value yourself. The DNF can only be derived once every row is correct.",
+      "tipStartDnf": "For each row with result 1, write one AND term containing all variables.",
+      "tipSyntax": "Use parentheses and the operators ¬, ∧, ∨ or the aliases !, &, |.",
+      "tipCanonical": "Each AND term must contain every variable exactly once — either as-is or negated.",
+      "tipMissingTerms": "Compare the table's 1-rows with the AND terms in your DNF.",
+      "tipCompareRows": "Evaluate your DNF on the listed rows and compare the result with the table.",
+      "solutionHint": "The full solution can now be shown as the final hint.",
+      "showSolutionHelp": "Show solution",
+      "solutionAfterCheck": "Solution after check",
+      "hideSolution": "Hide solution",
+      "simplificationTitle": "Simplify DNF",
+      "simplificationHint": "Use the Boolean algebra rules (absorption, distributivity, complement, …) to bring the DNF into a shorter equivalent form.",
+      "canonicalDnfLabel": "Original DNF",
+      "simplifiedDnfLabel": "Simplified form",
+      "simplifiedDnfPlaceholder": "e.g. a ∨ (b ∧ ¬c)",
+      "checkSimplification": "Check simplification",
+      "revealAlgebraReferenceTitle": "Rule cheat-sheet",
+      "minimalDnfLabel": "One possible minimal DNF",
+      "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF form (OR of AND-terms), e.g. result of Quine-McCluskey.",
+      "factoredLabel": "Mathematically shortest form",
+      "factoredNote": "{{literalsLabel}} — shorter than the minimal DNF and mathematically equivalent, but no longer in DNF form.",
+      "factoredFallbackLabel": "Best found form",
+      "factoredFallbackNote": "{{literalsLabel}} — equivalent and shorter than the minimal DNF. For more than 4 variables, this form is not guaranteed to be globally minimal.",
+      "literalCount_one": "{{count}} literal",
+      "literalCount_other": "{{count}} literals",
+      "termCount_one": "{{count}} term",
+      "termCount_other": "{{count}} terms",
+      "walkthroughTitle": "One possible solution path",
+      "walkthroughNote": "This path is not unique. It shows one possible grouping of the 1-rows into a minimal form.",
+      "showFullWalkthrough": "Show full solution path",
+      "showCompactWalkthrough": "Show compact solution path",
+      "walkthroughRowsTitle": "Start with the 1-rows",
+      "walkthroughRowsText": "Rows {{rows}} provide the terms of the correct DNF.",
+      "walkthroughNoRows": "There is no 1-row; the function is 0 for every assignment.",
+      "walkthroughConstantTitle": "Recognize the constant case",
+      "walkthroughAllRows": "All rows have result 1, so the whole DNF can be collapsed to 1.",
+      "walkthroughAlwaysFalse": "Without a 1-row, no AND group remains. The minimal form is therefore 0.",
+      "walkthroughGroupsTitle": "Combine matching rows",
+      "walkthroughGroupsIntro": "Each group below shows how its 1-rows reduce step by step to a shorter term — distributivity factors out the shared literals, the complement rule collapses (x ∨ ¬x) to 1, and the identity rule drops the trailing ∧ 1.",
+      "walkthroughGroupHeading": "Group {{index}}",
+      "walkthroughGroupCoverage": "covers rows {{rows}}",
+      "walkthroughGroupEliminated": "eliminated: {{variables}}",
+      "walkthroughGroupNoEliminated": "Already a single term — no reduction needed.",
+      "walkthroughCoverTitle": "Cover all 1-rows",
+      "walkthroughCoverText": "The selected groups cover all 1-rows — no 1-row is left over.",
+      "walkthroughResultTitle": "Possible minimal form",
+      "walkthroughFactoredTitle": "Optional: shortest form outside DNF",
+      "walkthroughFactoredText": "The minimal DNF has {{minimalLiterals}} literals. The shorter equivalent form needs only {{factoredLiterals}} literals — but the DNF form is lost.",
+      "walkthroughFactoredNote": "This form is mathematically equivalent but no longer a DNF. When it comes from factoring, the distributivity steps are shown as well.",
+      "walkthroughFactoredFallbackTitle": "Optional: best found form outside DNF",
+      "walkthroughFactoredFallbackText": "The minimal DNF has {{minimalLiterals}} literals. The found equivalent form needs only {{factoredLiterals}} literals — but the DNF form is lost.",
+      "walkthroughFactoredFallbackNote": "For more than 4 variables, the safe fallback is used here. The form is correct and simplified, but it is not guaranteed to be the globally shortest boolean formula.",
+      "walkthroughRowListMore": "{{visible}}, ... (+{{count}} more)",
+      "derivationNotes": {
+        "factorOut": "Factor out {{variable}} — the other literals stay.",
+        "complementToOne": "{{variable}} ∨ ¬{{variable}} evaluates to 1.",
+        "andOneEqualsTerm": "Any term ∧ 1 stays the same — the trailing 1 drops out.",
+        "factorOutCommon": "Factor out {{variables}} (distributivity) — shared by these terms."
+      },
+      "simplificationStatus": {
+        "empty": "Nothing entered yet",
+        "syntax_error": "Could not parse the input",
+        "unknown_variable": "Unknown variable",
+        "not_equivalent": "Not equivalent",
+        "equivalent_not_shorter": "Equivalent but not shorter",
+        "accepted_not_minimal": "Correctly simplified — but can be even shorter",
+        "accepted_minimal": "Minimal form — perfect"
+      },
+      "simplificationDetail": {
+        "empty": "Write a simplified equivalent form of the correct DNF.",
+        "syntax_error": "Check parentheses and the operators ¬, ∧, ∨ (or the aliases !, &, |).",
+        "unknown_variable": "The following variable(s) are not part of the truth table: {{variables}}.",
+        "not_equivalent": "Your form does not match the original truth table.",
+        "equivalent_not_shorter": "Equivalent, but with {{userLiterals}} literals it is not shorter than the original DNF ({{canonicalLiterals}} literals).",
+        "accepted_not_minimal": "Equivalent and shorter than the original DNF. You have {{userLiterals}} literals — minimum is {{minimumLiterals}}.",
+        "accepted_minimal": "{{userLiterals}} literals — matches the minimum ({{minimumLiterals}})."
+      }
+    },
+    "followUpTitle": "Continue",
+    "solutionTitle": "Solution",
+    "resultTitle": "DNF",
+    "resultHint": "Each highlighted row contributes one AND term.",
+    "resultRuleHint": "Rule of thumb: 0 → negate the variable, 1 → keep it as is. Only rows with result 1 become terms and are joined with ∨.",
+    "variableLimitTitle": "Too many variables",
+    "variableLimitDesc": "The expression contains {{variables}} variables. Use at most {{max}} variables so the truth table and DNF can be calculated reliably in the browser.",
+    "resultCompact": "Large DNF: all {{total}} terms are scrollable in the compact view.",
+    "resultFull": "Full DNF with {{total}} terms.",
+    "showFullResult": "Show full DNF",
+    "showCompactResult": "Show compact DNF",
+    "variables": "Variables",
+    "rows": "Table rows",
+    "oneRows": "Rows with result 1",
+    "truthTableTitle": "Truth table",
+    "truthTableRow": "Row",
+    "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
+    "truthTableFull": "Full table with {{total}} rows. This area stays scrollable.",
+    "showFullTable": "Show full table",
+    "showCompactTable": "Show compact table",
+    "truthTableNoVariables": "Expression",
+    "truthTableResult": "Result",
+    "truthTableTerm": "DNF term",
+    "truthTableConstant": "constant",
+    "truthTableIgnored": "-",
+    "errors": {
+      "title": "Expression cannot be parsed",
+      "emptyExpression": "Enter a boolean expression first.",
+      "expressionTooComplex": "The expression is too long or nested too deeply.",
+      "unexpectedCharacter": "Unexpected character '{{value}}' at position {{index}}.",
+      "unexpectedToken": "Unexpected token '{{value}}' at position {{index}}.",
+      "unexpectedEnd": "The expression ends too early at position {{index}}.",
+      "missingClosingParenthesis": "A closing parenthesis is missing near position {{index}}."
+    }
+  }
+}

@@ -100,8 +100,8 @@ export interface LearningModuleDefinition {
 export const learningModules: LearningModuleDefinition[] = [
   {
     id: "fundamentals-cs",
-    titleKey: "modules.fundamentalsCs.title",
-    descriptionKey: "modules.fundamentalsCs.description",
+    titleKey: "common.modules.fundamentalsCs.title",
+    descriptionKey: "common.modules.fundamentalsCs.description",
     path: "/fundamentals-cs",
     icon: Layers3,
     element: <FundamentalsCSPage />,
@@ -109,8 +109,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "turing-machine",
         storageId: TOPIC_STORAGE_IDS.turingMachine,
-        titleKey: "tm.topic.title",
-        descriptionKey: "tm.topic.description",
+        titleKey: "turing-machine.topic.title",
+        descriptionKey: "turing-machine.topic.description",
         path: "/fundamentals-cs/turing-machine",
         icon: Cpu,
         accent: "orange",
@@ -120,8 +120,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "finite-automata",
         storageId: TOPIC_STORAGE_IDS.finiteAutomata,
-        titleKey: "automata.title",
-        descriptionKey: "automata.description",
+        titleKey: "finite-automata.topic.title",
+        descriptionKey: "finite-automata.topic.description",
         path: "/fundamentals-cs/finite-automata",
         icon: GitBranch,
         accent: "blue",
@@ -131,8 +131,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "regular-languages",
         storageId: TOPIC_STORAGE_IDS.regularLanguages,
-        titleKey: "rl.title",
-        descriptionKey: "rl.description",
+        titleKey: "regular-languages.title",
+        descriptionKey: "regular-languages.description",
         path: "/fundamentals-cs/regular-languages",
         icon: Languages,
         accent: "purple",
@@ -142,8 +142,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "number-systems",
         storageId: TOPIC_STORAGE_IDS.numberSystems,
-        titleKey: "number.title",
-        descriptionKey: "number.description",
+        titleKey: "number-systems.title",
+        descriptionKey: "number-systems.description",
         path: "/fundamentals-cs/number-systems",
         icon: Hash,
         accent: "purple",
@@ -153,8 +153,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "moore-mealy",
         storageId: TOPIC_STORAGE_IDS.mooreMealy,
-        titleKey: "moore.title",
-        descriptionKey: "moore.description",
+        titleKey: "moore-mealy.title",
+        descriptionKey: "moore-mealy.description",
         path: "/fundamentals-cs/moore-mealy",
         icon: ToggleLeft,
         accent: "green",
@@ -187,8 +187,8 @@ export const learningModules: LearningModuleDefinition[] = [
   },
   {
     id: "programming-1",
-    titleKey: "modules.programming1.title",
-    descriptionKey: "modules.programming1.description",
+    titleKey: "common.modules.programming1.title",
+    descriptionKey: "common.modules.programming1.description",
     path: "/programming-1",
     icon: Code2,
     element: <Programming1Page />,
@@ -196,8 +196,8 @@ export const learningModules: LearningModuleDefinition[] = [
       {
         id: "java-programming",
         storageId: TOPIC_STORAGE_IDS.javaProgramming,
-        titleKey: "java.title",
-        descriptionKey: "java.description",
+        titleKey: "java-programming.title",
+        descriptionKey: "java-programming.description",
         path: "/programming-1/java-programming",
         icon: Coffee,
         accent: "orange",

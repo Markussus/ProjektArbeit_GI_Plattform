@@ -33,7 +33,7 @@ export function MooreInputBuilder({
   return (
     <section className="space-y-2">
       <label className="text-sm font-semibold">
-        {t("moore.sim.inputWord")}
+        {t("moore-mealy.sim.inputWord")}
       </label>
       <div
         onDragOver={(event) => {
@@ -63,7 +63,7 @@ export function MooreInputBuilder({
                   inputWord.filter((_, itemIndex) => itemIndex !== index),
                 )
               }
-              aria-label={t("moore.sim.removeWordSymbol", {
+              aria-label={t("moore-mealy.sim.removeWordSymbol", {
                 symbol,
                 index: index + 1,
               })}
@@ -75,14 +75,14 @@ export function MooreInputBuilder({
         ))}
         {inputWord.length === 0 && (
           <span className="text-muted-foreground px-1 text-sm italic">
-            {t("moore.sim.inputDropPlaceholder")}
+            {t("moore-mealy.sim.inputDropPlaceholder")}
           </span>
         )}
       </div>
 
       <div>
         <p className="text-muted-foreground mb-2 text-xs">
-          {t("moore.sim.inputAlphabetHelp")}
+          {t("moore-mealy.sim.inputAlphabetHelp")}
         </p>
         <div
           data-testid="moore-input-alphabet"
@@ -107,7 +107,7 @@ export function MooreInputBuilder({
           ))}
           {inputSymbols.length === 0 && (
             <span className="text-muted-foreground p-1 text-sm italic">
-              {t("moore.sim.noSymbols")}
+              {t("moore-mealy.sim.noSymbols")}
             </span>
           )}
         </div>

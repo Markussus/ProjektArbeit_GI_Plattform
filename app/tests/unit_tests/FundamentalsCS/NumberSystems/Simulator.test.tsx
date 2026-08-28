@@ -192,7 +192,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -212,7 +212,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_binAdd",
+            "number-systems.ex_u03_binAdd",
             "Binär Addition",
             "Binary addition",
           )}
@@ -229,7 +229,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u04_binToHexOct",
+            "number-systems.ex_u04_binToHexOct",
             "Binär zu Hex/Oktal",
             "Binary to hex/octal",
           )}
@@ -246,7 +246,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u05_ieeeEncode",
+            "number-systems.ex_u05_ieeeEncode",
             "IEEE754 Encodieren",
             "IEEE754 encode",
           )}
@@ -263,7 +263,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u05_ieeeDecode",
+            "number-systems.ex_u05_ieeeDecode",
             "IEEE754 Decodieren",
             "IEEE754 decode",
           )}
@@ -280,7 +280,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u06_mult",
+            "number-systems.ex_u06_mult",
             "Binär Multiplikation",
             "Binary multiplication",
           )}
@@ -299,7 +299,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.example_u03_1",
+            "number-systems.example_u03_1",
             "Beispiel Umrechnung",
             "Example conversion",
           )}
@@ -315,7 +315,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.example_u03_1",
+            "number-systems.example_u03_1",
             "Beispiel Umrechnung",
             "Example conversion",
           )}
@@ -340,7 +340,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -365,7 +365,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -385,7 +385,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -407,7 +407,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}

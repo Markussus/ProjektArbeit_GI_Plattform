@@ -14,15 +14,15 @@ export function ExamplesTab({
   const examples: Example[] = [
     {
       id: MOORE_EXAMPLE_ID,
-      title: t("moore.examples.mooreTitle"),
-      description: t("moore.examples.mooreDescription"),
+      title: t("moore-mealy.examples.mooreTitle"),
+      description: t("moore-mealy.examples.mooreDescription"),
       icon: Cpu,
       kind: "example",
     },
     {
       id: MEALY_EXAMPLE_ID,
-      title: t("moore.examples.mealyTitle"),
-      description: t("moore.examples.mealyDescription"),
+      title: t("moore-mealy.examples.mealyTitle"),
+      description: t("moore-mealy.examples.mealyDescription"),
       icon: GitBranch,
       kind: "example",
     },

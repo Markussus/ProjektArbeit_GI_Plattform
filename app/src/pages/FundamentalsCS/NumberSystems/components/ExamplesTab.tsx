@@ -65,8 +65,8 @@ export function ExamplesTab({
             <h3 className="text-foreground border-border/50 flex items-center gap-2 border-b pb-2 font-semibold">
               <Icon className="text-primary h-5 w-5" />
               {group === "lecture"
-                ? t("simulator.numbers.lectureScripts")
-                : t(`simulator.numbers.unit${group}`)}
+                ? t("number-systems.simulator.numbers.lectureScripts")
+                : t(`number-systems.simulator.numbers.unit${group}`)}
             </h3>
             <div>
               {groupExamples.map((def, index) => {

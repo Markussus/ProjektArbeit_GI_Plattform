@@ -32,8 +32,8 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       testIdPrefix="tm-exercise-card"
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="tm-reset-all-exercises"
         />

@@ -46,10 +46,10 @@ export function TMHaltStatesPanel({
     <div data-testid="tm-halt-states-panel" className="flex flex-col gap-2">
       <div data-testid="tm-halt-states-header" className="mb-2 min-h-[3.5rem]">
         <h3 className="text-md font-semibold">
-          {t("tm.config.haltStates.haltStates")}
+          {t("turing-machine.config.haltStates.haltStates")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.haltStates.haltStatesDesc")}
+          {t("turing-machine.config.haltStates.haltStatesDesc")}
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export function TMHaltStatesPanel({
 
         {selectableStates.length === 0 && (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.haltStates.noStates")}
+            {t("turing-machine.config.haltStates.noStates")}
           </span>
         )}
 
@@ -111,8 +111,8 @@ export function TMHaltStatesPanel({
             }}
             disabled={disabled}
             data-testid="tm-add-halt-state-input"
-            placeholder={t("tm.config.haltStates.addHaltStatePlaceholder")}
-            aria-label={t("tm.config.haltStates.addHaltState")}
+            placeholder={t("turing-machine.config.haltStates.addHaltStatePlaceholder")}
+            aria-label={t("turing-machine.config.haltStates.addHaltState")}
             className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"
             autoComplete="off"
             spellCheck="false"

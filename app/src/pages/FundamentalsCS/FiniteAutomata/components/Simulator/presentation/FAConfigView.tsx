@@ -52,37 +52,37 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
 
   function translateIssue(code: FAProgramIssueCode): string {
     const map: Record<FAProgramIssueCode, string> = {
-      states_empty: t("fa.validation.statesEmpty", "States must not be empty."),
+      states_empty: t("finite-automata.validation.statesEmpty", "States must not be empty."),
       start_state_missing: t(
-        "fa.validation.startStateMissing",
+        "finite-automata.validation.startStateMissing",
         "Start state is not in the state set.",
       ),
       accept_states_reference_invalid: t(
-        "fa.validation.acceptStatesInvalid",
+        "finite-automata.validation.acceptStatesInvalid",
         "An accept state is not in the state set.",
       ),
       alphabet_empty: t(
-        "fa.validation.alphabetEmpty",
+        "finite-automata.validation.alphabetEmpty",
         "Alphabet must not be empty.",
       ),
       transition_source_invalid: t(
-        "fa.validation.transitionSourceInvalid",
+        "finite-automata.validation.transitionSourceInvalid",
         "A transition source state is invalid.",
       ),
       transition_target_invalid: t(
-        "fa.validation.transitionTargetInvalid",
+        "finite-automata.validation.transitionTargetInvalid",
         "A transition target state is invalid.",
       ),
       transition_symbol_invalid: t(
-        "fa.validation.transitionSymbolInvalid",
+        "finite-automata.validation.transitionSymbolInvalid",
         "A transition symbol is not in the alphabet.",
       ),
       dfa_nondeterministic: t(
-        "fa.validation.dfaNondeterministic",
+        "finite-automata.validation.dfaNondeterministic",
         "DFA has nondeterministic transitions.",
       ),
       dfa_epsilon_transition: t(
-        "fa.validation.dfaEpsilon",
+        "finite-automata.validation.dfaEpsilon",
         "DFA must not have ε-transitions.",
       ),
     };
@@ -96,7 +96,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
   return (
     <div className="flex flex-col gap-6">
       <h2 className="text-lg font-bold">
-        {t("fa.config.title", "Automaton Configuration")}
+        {t("finite-automata.config.title", "Automaton Configuration")}
       </h2>
 
       {issueMessages && (
@@ -108,7 +108,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Automaton Type */}
         <div className="flex flex-col gap-1">
-          <label className={labelClass}>{t("fa.config.type", "Type")}</label>
+          <label className={labelClass}>{t("finite-automata.config.type", "Type")}</label>
           <select
             value={editor.draft.type}
             onChange={(e) =>
@@ -124,7 +124,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
         {/* Alphabet */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.alphabet", "Alphabet (comma-separated)")}
+            {t("finite-automata.config.alphabet", "Alphabet (comma-separated)")}
           </label>
           <ArrayInput
             value={editor.draft.alphabet}
@@ -137,7 +137,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
         {/* Start State */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.startState", "Start State")}
+            {t("finite-automata.config.startState", "Start State")}
           </label>
           <select
             value={editor.draft.startState}
@@ -156,7 +156,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
             empty cell. */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.acceptStates", "Accept States (comma-separated)")}
+            {t("finite-automata.config.acceptStates", "Accept States (comma-separated)")}
           </label>
           <ArrayInput
             value={editor.draft.acceptStates}

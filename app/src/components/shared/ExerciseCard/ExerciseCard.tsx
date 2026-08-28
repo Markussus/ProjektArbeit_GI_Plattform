@@ -51,12 +51,12 @@ export function ExerciseCard({
   const itemLabel =
     label ??
     (item.kind === "example"
-      ? t("example.label", { index: index + 1 })
-      : t("exercise.label", { index: index + 1 }));
+      ? t("common.example.label", { index: index + 1 })
+      : t("common.exercise.label", { index: index + 1 }));
   const openLabel =
     item.kind === "example"
-      ? t("example.openInSimulation")
-      : t("exercise.openInSimulation");
+      ? t("common.example.openInSimulation")
+      : t("common.exercise.openInSimulation");
 
   return (
     <div
@@ -99,7 +99,7 @@ export function ExerciseCard({
                 difficultyTextColors[item.difficulty],
               )}
             >
-              {t("exercise.difficulty")}: {t(`difficulty.${item.difficulty}`)}
+              {t("common.exercise.difficulty")}: {t(`common.difficulty.${item.difficulty}`)}
             </p>
           )}
         </div>

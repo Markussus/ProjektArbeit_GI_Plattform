@@ -6,7 +6,7 @@ import { turingMachineExercises } from "@/pages/FundamentalsCS/TuringMachine/sce
 
 describe("tmSolutionChecker", () => {
   const invertBinaryWordExercise = turingMachineExercises.find(
-    (exercise) => exercise.id === "tm.exercises.exerciseInvertBinaryWord",
+    (exercise) => exercise.id === "turing-machine.exercises.exerciseInvertBinaryWord",
   );
 
   it("assigns a unique six-bit storage id to every exercise", () => {

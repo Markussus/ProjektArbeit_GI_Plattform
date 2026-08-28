@@ -53,8 +53,8 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       testIdPrefix="dnf-exercise-card"
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="dnf-reset-all-exercises"
         />

@@ -9,7 +9,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u03_1 for decimal-to-binary conversion", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u03_1",
+        (ex) => ex.titleKey === "number-systems.example_u03_1",
       );
 
       expect(example).toBeDefined();
@@ -18,7 +18,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u03_2 for binary addition", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u03_2",
+        (ex) => ex.titleKey === "number-systems.example_u03_2",
       );
 
       expect(example).toBeDefined();
@@ -51,7 +51,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u05_4 for IEEE754 decode", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u05_4",
+        (ex) => ex.titleKey === "number-systems.example_u05_4",
       );
 
       expect(example).toBeDefined();
@@ -60,7 +60,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u06_1_add for binary addition", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u06_1_add",
+        (ex) => ex.titleKey === "number-systems.example_u06_1_add",
       );
 
       expect(example).toBeDefined();
@@ -69,7 +69,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u06_1_sub for binary subtraction", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u06_1_sub",
+        (ex) => ex.titleKey === "number-systems.example_u06_1_sub",
       );
 
       expect(example).toBeDefined();
@@ -78,7 +78,7 @@ describe("Number Systems examples", () => {
 
     it("defines example_u06_2 for binary multiplication", () => {
       const example = numberSystemsExamples.find(
-        (ex) => ex.titleKey === "number.example_u06_2",
+        (ex) => ex.titleKey === "number-systems.example_u06_2",
       );
 
       expect(example).toBeDefined();

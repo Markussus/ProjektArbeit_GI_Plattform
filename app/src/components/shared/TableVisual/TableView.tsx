@@ -105,30 +105,30 @@ export function TableView({
   const hasTrailingActionColumn = showRemoveRowControl || showAddColumnControl;
   const contentColSpan = maxCols + (hasTrailingActionColumn ? 1 : 0);
   const labels = {
-    table: t("simulation.table.label", "Table view"),
-    empty: t("simulation.table.empty", "Table is empty"),
-    addRow: t("simulation.table.addRow", "Add new row"),
-    addColumn: t("simulation.table.addColumn", "Add column"),
-    removeColumn: t("simulation.table.removeColumn", "Remove column"),
-    removeRow: t("simulation.table.removeRow", "Remove row"),
-    columnActions: t("simulation.table.columnActions", "Column actions"),
-    rowActions: t("simulation.table.rowActions", "Row actions"),
+    table: t("common.simulation.table.label", "Table view"),
+    empty: t("common.simulation.table.empty", "Table is empty"),
+    addRow: t("common.simulation.table.addRow", "Add new row"),
+    addColumn: t("common.simulation.table.addColumn", "Add column"),
+    removeColumn: t("common.simulation.table.removeColumn", "Remove column"),
+    removeRow: t("common.simulation.table.removeRow", "Remove row"),
+    columnActions: t("common.simulation.table.columnActions", "Column actions"),
+    rowActions: t("common.simulation.table.rowActions", "Row actions"),
   };
 
   const getColumnLabel = (header: string, colIndex: number) =>
     header ||
-    t("simulation.table.columnHeader", "Column {{index}}", {
+    t("common.simulation.table.columnHeader", "Column {{index}}", {
       index: colIndex + 1,
     });
 
   const getHeaderInputAriaLabel = (colIndex: number) =>
-    t("simulation.table.editColumnHeader", "Edit column {{index}} header", {
+    t("common.simulation.table.editColumnHeader", "Edit column {{index}} header", {
       index: colIndex + 1,
     });
 
   const getCellInputAriaLabel = (rowIndex: number, colIndex: number) =>
     t(
-      "simulation.table.editCell",
+      "common.simulation.table.editCell",
       "Edit cell in row {{row}}, column {{column}}",
       {
         row: rowIndex + 1,
@@ -263,7 +263,7 @@ export function TableView({
             onClick={() => onRemoveRow?.(rowIndex)}
             disabled={disableRemoveRow}
             aria-label={t(
-              "simulation.table.removeRowWithIndex",
+              "common.simulation.table.removeRowWithIndex",
               "Remove row {{index}}",
               { index: rowIndex + 1 },
             )}

@@ -127,7 +127,7 @@ export function IEEE754Converter({
           <div className="bg-card border-border/50 rounded-xl border p-6 shadow-sm">
             <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <h3 className="text-foreground text-lg font-semibold">
-                {t("simulator.numbers.ieeeTitle")}
+                {t("number-systems.simulator.numbers.ieeeTitle")}
               </h3>
 
               <div className="bg-muted mb-2 flex shrink-0 rounded-md p-1 sm:mb-0">
@@ -139,7 +139,7 @@ export function IEEE754Converter({
                   }}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "decToIeee" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {t("simulator.numbers.modeDecToIeee")}
+                  {t("number-systems.simulator.numbers.modeDecToIeee")}
                 </button>
                 <button
                   data-testid="ns-ieee-ieee-to-dec-button"
@@ -149,7 +149,7 @@ export function IEEE754Converter({
                   }}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "ieeeToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {t("simulator.numbers.modeIeeeToDec")}
+                  {t("number-systems.simulator.numbers.modeIeeeToDec")}
                 </button>
               </div>
             </div>
@@ -158,8 +158,8 @@ export function IEEE754Converter({
               <div className={locked ? "opacity-60" : ""}>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
                   {converterMode === "decToIeee"
-                    ? t("simulator.numbers.decInputFloat")
-                    : t("simulator.numbers.ieeeInputFormat")}
+                    ? t("number-systems.simulator.numbers.decInputFloat")
+                    : t("number-systems.simulator.numbers.ieeeInputFormat")}
                 </label>
                 <div
                   className={`bg-background relative flex items-center border ${locked ? "border-input bg-muted pointer-events-none" : "border-input focus-within:border-primary focus-within:ring-primary/20 focus-within:ring-1"} overflow-hidden rounded-md`}
@@ -183,8 +183,8 @@ export function IEEE754Converter({
               <div className="space-y-2">
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wider uppercase">
                   {converterMode === "decToIeee"
-                    ? t("simulator.numbers.resultUpper")
-                    : t("simulator.numbers.decResultUpper")}
+                    ? t("number-systems.simulator.numbers.resultUpper")
+                    : t("number-systems.simulator.numbers.decResultUpper")}
                 </div>
 
                 {converterMode === "decToIeee" ? (
@@ -225,7 +225,7 @@ export function IEEE754Converter({
                     <div className="text-muted-foreground py-4 text-sm">
                       {locked
                         ? "--------"
-                        : t("simulator.numbers.enterValidNumber")}
+                        : t("number-systems.simulator.numbers.enterValidNumber")}
                     </div>
                   )
                 ) : // IEEE TO DEC RESULT DISPLAY
@@ -244,7 +244,7 @@ export function IEEE754Converter({
                   <div className="text-muted-foreground py-4 text-sm">
                     {locked
                       ? "--------"
-                      : t("simulator.numbers.enterValid32Bit")}
+                      : t("number-systems.simulator.numbers.enterValid32Bit")}
                   </div>
                 )}
               </div>
@@ -255,25 +255,25 @@ export function IEEE754Converter({
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 shadow-sm">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
                 <AlertTriangle className="h-5 w-5" />
-                {t("simulator.numbers.specialCase")}
+                {t("number-systems.simulator.numbers.specialCase")}
               </h3>
               <div className="text-sm text-amber-800 dark:text-amber-300/80">
                 {isZero && (
                   <p>
-                    <strong>{t("simulator.numbers.zero")}</strong>{" "}
-                    {t("simulator.numbers.zeroDesc")}
+                    <strong>{t("number-systems.simulator.numbers.zero")}</strong>{" "}
+                    {t("number-systems.simulator.numbers.zeroDesc")}
                   </p>
                 )}
                 {isInf && (
                   <p>
-                    <strong>{t("simulator.numbers.infinity")}</strong>{" "}
-                    {t("simulator.numbers.infDesc")}
+                    <strong>{t("number-systems.simulator.numbers.infinity")}</strong>{" "}
+                    {t("number-systems.simulator.numbers.infDesc")}
                   </p>
                 )}
                 {isNaNVal && (
                   <p>
-                    <strong>{t("simulator.numbers.nan")}</strong>{" "}
-                    {t("simulator.numbers.nanDesc")}
+                    <strong>{t("number-systems.simulator.numbers.nan")}</strong>{" "}
+                    {t("number-systems.simulator.numbers.nanDesc")}
                   </p>
                 )}
               </div>
@@ -313,30 +313,30 @@ export function IEEE754Converter({
             <>
               <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
                 <Info className="text-primary h-5 w-5" />
-                {t("simulator.numbers.conceptPath")}
+                {t("number-systems.simulator.numbers.conceptPath")}
               </h3>
 
               {!isValid && !isNaNVal ? (
                 <p className="text-muted-foreground text-sm">
-                  {t("simulator.numbers.enterValueForExp")}
+                  {t("number-systems.simulator.numbers.enterValueForExp")}
                 </p>
               ) : isSpecial || isNaNVal ? (
                 <p className="text-muted-foreground text-sm">
-                  {t("simulator.numbers.specialCaseNoMath")}
+                  {t("number-systems.simulator.numbers.specialCaseNoMath")}
                 </p>
               ) : converterMode === "decToIeee" ? (
                 // EXISTING DEC TO IEEE EXPLANATION
                 <div className="space-y-6">
                   <div className="space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                      {t("simulator.numbers.step1Sign")}
+                      {t("number-systems.simulator.numbers.step1Sign")}
                     </div>
                     <div className="bg-background flex items-center justify-between rounded-lg border border-blue-500/20 p-4 shadow-inner">
                       <span className="text-muted-foreground text-sm">
-                        {t("simulator.numbers.isNegative")}{" "}
+                        {t("number-systems.simulator.numbers.isNegative")}{" "}
                         {floatVal < 0
-                          ? t("simulator.numbers.yes")
-                          : t("simulator.numbers.no")}
+                          ? t("number-systems.simulator.numbers.yes")
+                          : t("number-systems.simulator.numbers.no")}
                       </span>
                       <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400">
                         {sign}
@@ -346,10 +346,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="text-foreground mt-4 mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("simulator.numbers.step2Norm")}
+                      {t("number-systems.simulator.numbers.step2Norm")}
                     </div>
                     <div className="bg-background border-border/40 text-muted-foreground space-y-2 rounded-lg border p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.normDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.normDesc")}</p>
                       <div className="bg-muted/50 border-border/40 text-foreground mt-2 rounded border p-2 text-center font-mono">
                         X.X &rarr;{" "}
                         <span className="text-primary font-bold">1</span>.XXX
@@ -359,7 +359,7 @@ export function IEEE754Converter({
                         </sup>
                       </div>
                       <p className="text-primary border-primary mt-2 border-l-2 pl-2 text-xs font-medium">
-                        {t("simulator.numbers.normSubDesc", {
+                        {t("number-systems.simulator.numbers.normSubDesc", {
                           val: expVal - 127,
                         })}
                       </p>
@@ -368,10 +368,10 @@ export function IEEE754Converter({
 
                   <div className="mt-4 space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-green-600 uppercase dark:text-green-400">
-                      {t("simulator.numbers.step3Exp")}
+                      {t("number-systems.simulator.numbers.step3Exp")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-green-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.biasDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.biasDesc")}</p>
                       <div className="bg-muted/50 flex items-center justify-center gap-4 rounded p-2 font-mono">
                         <span>{expVal - 127}</span>
                         <span>+</span>
@@ -382,7 +382,7 @@ export function IEEE754Converter({
                         </span>
                       </div>
                       <p className="text-center">
-                        {t("simulator.numbers.binaryMode")}{" "}
+                        {t("number-systems.simulator.numbers.binaryMode")}{" "}
                         <strong className="tracking-widest text-green-600 dark:text-green-400">
                           {exponent}
                         </strong>
@@ -392,13 +392,13 @@ export function IEEE754Converter({
 
                   <div className="mt-4 space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-orange-600 uppercase dark:text-orange-400">
-                      {t("simulator.numbers.step4Mantissa")}
+                      {t("number-systems.simulator.numbers.step4Mantissa")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.mantissaDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.mantissaDesc")}</p>
                       <p className="border-l-2 border-orange-500/50 pl-2 text-xs">
-                        <strong>{t("simulator.numbers.hiddenBitTitle")}</strong>{" "}
-                        {t("simulator.numbers.hiddenBitDesc")}
+                        <strong>{t("number-systems.simulator.numbers.hiddenBitTitle")}</strong>{" "}
+                        {t("number-systems.simulator.numbers.hiddenBitDesc")}
                       </p>
                       <p className="bg-muted/50 mt-2 rounded p-2 text-center font-mono tracking-widest break-all text-orange-600 dark:text-orange-400">
                         {mantissa}
@@ -411,14 +411,14 @@ export function IEEE754Converter({
                 <div className="space-y-6">
                   <div className="space-y-1">
                     <div className="mb-2 text-xs font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                      {t("simulator.numbers.step1Sign")}
+                      {t("number-systems.simulator.numbers.step1Sign")}
                     </div>
                     <div className="bg-background flex items-center justify-between rounded-lg border border-blue-500/20 p-4 shadow-inner">
                       <span className="text-muted-foreground text-sm">
-                        {t("simulator.numbers.isNegative")}{" "}
+                        {t("number-systems.simulator.numbers.isNegative")}{" "}
                         {sign === "1"
-                          ? t("simulator.numbers.yes")
-                          : t("simulator.numbers.no")}
+                          ? t("number-systems.simulator.numbers.yes")
+                          : t("number-systems.simulator.numbers.no")}
                       </span>
                       <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400">
                         {sign}
@@ -428,10 +428,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="mt-4 mb-2 text-xs font-semibold tracking-wider text-green-600 uppercase dark:text-green-400">
-                      {t("simulator.numbers.step2ExpExtract")}
+                      {t("number-systems.simulator.numbers.step2ExpExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground rounded-lg border border-green-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.expBinToDecDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.expBinToDecDesc")}</p>
                       <div className="bg-muted/50 mt-2 flex flex-col justify-center gap-2 rounded p-2 text-center font-mono">
                         <span className="font-bold tracking-widest text-green-600 dark:text-green-400">
                           {exponent}₂
@@ -452,10 +452,10 @@ export function IEEE754Converter({
 
                   <div className="space-y-1">
                     <div className="mt-4 mb-2 text-xs font-semibold tracking-wider text-orange-600 uppercase dark:text-orange-400">
-                      {t("simulator.numbers.step3MantExtract")}
+                      {t("number-systems.simulator.numbers.step3MantExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.mantissaBinToDecDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.mantissaBinToDecDesc")}</p>
                       <div className="bg-muted/50 mt-2 w-full truncate rounded p-2 text-center font-mono tracking-widest text-orange-600 dark:text-orange-400">
                         1.{mantissa}
                       </div>
@@ -477,7 +477,7 @@ export function IEEE754Converter({
 
                       <div className="border-border/40 mt-2 flex flex-col items-center justify-center gap-1 border-t pt-2">
                         <span className="text-xs">
-                          {t("simulator.numbers.fractionSum")}: {sumOfFractions}
+                          {t("number-systems.simulator.numbers.fractionSum")}: {sumOfFractions}
                         </span>
                         <span className="text-foreground font-bold">
                           = 1.0 + {sumOfFractions} = {1 + sumOfFractions}
@@ -488,10 +488,10 @@ export function IEEE754Converter({
 
                   <div className="mt-4 space-y-1">
                     <div className="text-primary mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("simulator.numbers.step4FinalCalc")}
+                      {t("number-systems.simulator.numbers.step4FinalCalc")}
                     </div>
                     <div className="bg-background border-primary/20 text-muted-foreground space-y-2 rounded-lg border p-4 text-sm shadow-inner">
-                      <p>{t("simulator.numbers.finalFormulaDesc")}</p>
+                      <p>{t("number-systems.simulator.numbers.finalFormulaDesc")}</p>
                       <div className="bg-muted/50 mt-2 flex flex-wrap items-center justify-center gap-4 rounded p-3 font-mono">
                         <span>
                           (-1)

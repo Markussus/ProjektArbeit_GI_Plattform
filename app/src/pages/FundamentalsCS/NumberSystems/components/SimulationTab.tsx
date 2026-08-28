@@ -19,7 +19,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   return (
     <TopicSimulationTab
       {...props}
-      emptyStateTextKey="simulation.emptyStates.number"
+      emptyStateTextKey="common.simulation.emptyStates.number"
       onReset={handleReset}
       resetDisabled={!isSimulatorReady}
     >

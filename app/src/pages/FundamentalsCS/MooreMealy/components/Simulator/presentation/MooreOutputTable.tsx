@@ -35,7 +35,7 @@ export function MooreOutputTable({
   return (
     <tr data-testid="moore-output-row" className="bg-muted/20 border-b">
       <th scope="row" className="min-w-[10rem] border-r p-3 text-left">
-        {t("moore.sim.outputLambda")}
+        {t("moore-mealy.sim.outputLambda")}
       </th>
       {program.states.map((state, stateIndex) => {
         const output = program.outputs[state];
@@ -53,13 +53,13 @@ export function MooreOutputTable({
                 options={outputOptions}
                 onChange={(symbol) => onOutputSymbolChange(state, symbol)}
                 onCreate={(symbol) => onOutputSymbolCreate(state, symbol)}
-                ariaLabel={t("moore.sim.outputForState", { state })}
+                ariaLabel={t("moore-mealy.sim.outputForState", { state })}
                 createLabel={(symbol) =>
-                  t("moore.sim.createNamedOutput", { symbol })
+                  t("moore-mealy.sim.createNamedOutput", { symbol })
                 }
-                emptyCreateLabel={t("moore.sim.createOutput")}
-                notFoundLabel={t("moore.sim.outputNotFound")}
-                searchPlaceholder={t("moore.sim.search")}
+                emptyCreateLabel={t("moore-mealy.sim.createOutput")}
+                notFoundLabel={t("moore-mealy.sim.outputNotFound")}
+                searchPlaceholder={t("moore-mealy.sim.search")}
                 testId={`moore-output-symbol-${stateIndex}`}
                 className="min-w-0"
                 style={{ width: symbolWidth }}
@@ -87,7 +87,7 @@ export function MooreOutputTable({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") event.currentTarget.blur();
                 }}
-                aria-label={t("moore.sim.outputCodeForState", { state })}
+                aria-label={t("moore-mealy.sim.outputCodeForState", { state })}
                 data-testid={`moore-output-code-${stateIndex}`}
                 className="border-input bg-background focus:ring-ring h-9 w-[7ch] rounded-md border px-2 font-mono outline-none focus:ring-1"
               />

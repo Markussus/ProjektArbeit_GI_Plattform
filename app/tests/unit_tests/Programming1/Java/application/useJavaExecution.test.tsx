@@ -70,7 +70,7 @@ describe("useJavaExecution", () => {
       act(() => {
         result.current.run({
           source: 'System.out.println("Hello");',
-          exerciseId: "java.exercise1",
+          exerciseId: "java-programming.exercise1",
           timeoutMs: 60_000,
         });
       });

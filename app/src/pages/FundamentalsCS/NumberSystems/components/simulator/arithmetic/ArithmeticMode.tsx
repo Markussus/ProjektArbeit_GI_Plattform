@@ -65,35 +65,35 @@ export function ArithmeticMode({
   const modeSelector = (
     <div>
       <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-        {t("simulator.arithmetic.selectMode")}
+        {t("number-systems.simulator.arithmetic.selectMode")}
       </label>
       <DropdownSelect
         value={activeSubMode}
         options={[
           {
             value: "addition",
-            label: t("simulator.arithmetic.modes.addition"),
+            label: t("number-systems.simulator.arithmetic.modes.addition"),
           },
           {
             value: "subtraction",
-            label: t("simulator.arithmetic.modes.subtraction"),
+            label: t("number-systems.simulator.arithmetic.modes.subtraction"),
           },
           {
             value: "multiplication",
-            label: t("simulator.arithmetic.modes.multiplication"),
+            label: t("number-systems.simulator.arithmetic.modes.multiplication"),
           },
           {
             value: "division",
-            label: t("simulator.arithmetic.modes.division"),
+            label: t("number-systems.simulator.arithmetic.modes.division"),
           },
           {
             value: "shifting",
-            label: t("simulator.arithmetic.modes.shifting"),
+            label: t("number-systems.simulator.arithmetic.modes.shifting"),
           },
-          { value: "compare", label: t("simulator.arithmetic.modes.compare") },
+          { value: "compare", label: t("number-systems.simulator.arithmetic.modes.compare") },
         ]}
         onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
-        ariaLabel={t("simulator.arithmetic.selectMode")}
+        ariaLabel={t("number-systems.simulator.arithmetic.selectMode")}
         disabled={!!isExerciseMode && !showSolution}
         triggerClassName="w-full px-3 py-2 text-sm font-normal"
         menuClassName="w-full"

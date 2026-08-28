@@ -103,7 +103,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         data-testid="rl-load-solution"
         className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
       >
-        {t("rl.exerciseWorkspace.showSolution", "Load solution")}
+        {t("regular-languages.exerciseWorkspace.showSolution", "Load solution")}
       </button>
       {canCheck && (
         <button
@@ -112,7 +112,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           data-testid="rl-check-solution"
           className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90"
         >
-          {t("rl.exerciseWorkspace.check", "Check Solution")}
+          {t("regular-languages.exerciseWorkspace.check", "Check Solution")}
         </button>
       )}
     </>
@@ -124,7 +124,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.regularLanguages"
+        emptyStateTextKey="common.simulation.emptyStates.regularLanguages"
         onReset={() => simulatorRef.current?.resetStoredState()}
       >
         <RLSimulator
@@ -136,7 +136,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("rl.exerciseWorkspace.check", "Check Solution")}
+        title={t("regular-languages.exerciseWorkspace.check", "Check Solution")}
         onClose={() => setCheckResult(null)}
         testId="rl-solution-check-dialog"
         summary={
@@ -154,10 +154,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <ConfirmDialog
         isOpen={confirmLoadSolution}
-        title={t("rl.exerciseWorkspace.confirmTitle")}
-        description={t("rl.exerciseWorkspace.confirmBody")}
-        confirmLabel={t("rl.exerciseWorkspace.confirmYes")}
-        cancelLabel={t("rl.exerciseWorkspace.confirmNo")}
+        title={t("regular-languages.exerciseWorkspace.confirmTitle")}
+        description={t("regular-languages.exerciseWorkspace.confirmBody")}
+        confirmLabel={t("regular-languages.exerciseWorkspace.confirmYes")}
+        cancelLabel={t("regular-languages.exerciseWorkspace.confirmNo")}
         onConfirm={handleLoadSolution}
         onCancel={() => setConfirmLoadSolution(false)}
         variant="warning"
@@ -183,10 +183,10 @@ function CheckSummary({
   if (result.status === "invalid") {
     const messageKey =
       result.reason === "studentParse"
-        ? "rl.exerciseWorkspace.checkInvalidGrammar"
+        ? "regular-languages.exerciseWorkspace.checkInvalidGrammar"
         : result.reason === "reference"
-          ? "rl.exerciseWorkspace.checkUnavailable"
-          : "rl.exerciseWorkspace.checkEmpty";
+          ? "regular-languages.exerciseWorkspace.checkUnavailable"
+          : "regular-languages.exerciseWorkspace.checkEmpty";
     return <p className="text-muted-foreground text-sm">{t(messageKey)}</p>;
   }
 
@@ -194,13 +194,13 @@ function CheckSummary({
     return (
       <div>
         <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-          {t("rl.exerciseWorkspace.checkMatch")}
+          {t("regular-languages.exerciseWorkspace.checkMatch")}
         </p>
         <p className="text-muted-foreground mt-1 text-sm">
           {t(
             isGrammarExercise
-              ? "rl.exerciseWorkspace.checkMatchDetailG2L"
-              : "rl.exerciseWorkspace.checkMatchDetailL2G",
+              ? "regular-languages.exerciseWorkspace.checkMatchDetailG2L"
+              : "regular-languages.exerciseWorkspace.checkMatchDetailL2G",
           )}
         </p>
       </div>
@@ -210,14 +210,14 @@ function CheckSummary({
   return (
     <div>
       <p className="text-destructive text-sm font-semibold">
-        {t("rl.exerciseWorkspace.checkMismatch")}
+        {t("regular-languages.exerciseWorkspace.checkMismatch")}
       </p>
       {result.wrong.length > 0 && (
         <p className="text-muted-foreground mt-1 text-sm">
           {t(
             isGrammarExercise
-              ? "rl.exerciseWorkspace.checkWrongG2L"
-              : "rl.exerciseWorkspace.checkWrongL2G",
+              ? "regular-languages.exerciseWorkspace.checkWrongG2L"
+              : "regular-languages.exerciseWorkspace.checkWrongL2G",
             { words: formatWords(result.wrong) },
           )}
         </p>
@@ -226,8 +226,8 @@ function CheckSummary({
         <p className="text-muted-foreground mt-1 text-sm">
           {t(
             isGrammarExercise
-              ? "rl.exerciseWorkspace.checkMissingG2L"
-              : "rl.exerciseWorkspace.checkMissingL2G",
+              ? "regular-languages.exerciseWorkspace.checkMissingG2L"
+              : "regular-languages.exerciseWorkspace.checkMissingL2G",
             { words: formatWords(result.missing) },
           )}
         </p>

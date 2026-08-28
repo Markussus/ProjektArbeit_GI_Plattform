@@ -10,8 +10,8 @@ export function JavaProgrammingPage() {
     <JavaExecutionProvider>
       <ModuleTopicPage
         testId="java-topic-page"
-        titleKey="java.title"
-        descriptionKey="java.description"
+        titleKey="java-programming.title"
+        descriptionKey="java-programming.description"
         overviewTab={OverviewTab}
         exercisesTab={ExercisesTab}
         examplesTab={ExamplesTab}

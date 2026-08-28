@@ -30,21 +30,21 @@ export function MooreConversionView({
 
   return (
     <div data-testid="moore-conversion-view" className="space-y-5">
-      <ViewHeader title={t("moore.conversion.title")} />
+      <ViewHeader title={t("moore-mealy.conversion.title")} />
 
       <InlineTabNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        ariaLabel={t("moore.conversion.title")}
+        ariaLabel={t("moore-mealy.conversion.title")}
         tabs={[
           {
             id: "transition",
-            label: t("moore.conversion.transitionTab"),
+            label: t("moore-mealy.conversion.transitionTab"),
             testId: "moore-conversion-tab-transition",
           },
           {
             id: "output",
-            label: t("moore.conversion.outputTab"),
+            label: t("moore-mealy.conversion.outputTab"),
             testId: "moore-conversion-tab-output",
           },
         ]}
@@ -64,19 +64,19 @@ export function MooreConversionView({
       <MooreViewActions
         actions={[
           {
-            label: t("moore.navigation.editDefinition"),
+            label: t("moore-mealy.navigation.editDefinition"),
             onClick: onBackToEditor,
             icon: Pencil,
             testId: "moore-conversion-edit-definition",
           },
           {
-            label: t("moore.navigation.showSimulator"),
+            label: t("moore-mealy.navigation.showSimulator"),
             onClick: onShowSimulator,
             icon: Play,
             testId: "moore-conversion-show-simulator",
           },
           {
-            label: t("moore.navigation.showLogic"),
+            label: t("moore-mealy.navigation.showLogic"),
             onClick: onShowLogic,
             icon: CircuitBoard,
             testId: "moore-conversion-show-logic",
@@ -119,19 +119,19 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
               colSpan={stateVariables.length}
               className="border-foreground/70 border-r-2 bg-blue-500/10 p-3"
             >
-              {t("moore.conversion.currentState")}
+              {t("moore-mealy.conversion.currentState")}
             </th>
             <th
               colSpan={inputVariables.length}
               className="border-foreground/70 border-r-2 bg-amber-500/10 p-3"
             >
-              {t("moore.conversion.event")}
+              {t("moore-mealy.conversion.event")}
             </th>
             <th
               colSpan={targetVariables.length}
               className="bg-emerald-500/10 p-3"
             >
-              {t("moore.conversion.nextState")}
+              {t("moore-mealy.conversion.nextState")}
             </th>
           </tr>
           <tr className="border-foreground/70 bg-muted/40 border-b-2">
@@ -226,21 +226,21 @@ function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
       testId="moore-output-value-table"
       groups={[
         {
-          title: t("moore.conversion.state"),
+          title: t("moore-mealy.conversion.state"),
           variables: stateVariables,
           tone: "bg-blue-500/10",
         },
         ...(inputVariables.length
           ? [
               {
-                title: t("moore.conversion.event"),
+                title: t("moore-mealy.conversion.event"),
                 variables: inputVariables,
                 tone: "bg-amber-500/10",
               },
             ]
           : []),
         {
-          title: t("moore.conversion.output"),
+          title: t("moore-mealy.conversion.output"),
           variables: outputVariables,
           tone: "bg-purple-500/10",
         },

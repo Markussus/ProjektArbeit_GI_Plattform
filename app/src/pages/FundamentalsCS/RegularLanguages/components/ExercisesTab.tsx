@@ -80,8 +80,8 @@ export function ExercisesTab({
     <div data-testid="rl-exercises-tab">
       <div className="mb-4 flex items-center gap-2">
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="rl-reset-all-exercises"
         />
@@ -96,8 +96,8 @@ export function ExercisesTab({
             <TopicCategorySection
               key={category}
               testId={`rl-exercises-section-${category}`}
-              title={t(`rl.exercises.categories.${category}.title`)}
-              description={t(`rl.exercises.categories.${category}.description`)}
+              title={t(`regular-languages.exercises.categories.${category}.title`)}
+              description={t(`regular-languages.exercises.categories.${category}.description`)}
             >
               {defs.map((def) => {
                 const exercise = toExercise(def);

@@ -42,32 +42,32 @@ export function MooreLogicGateView({
 
   return (
     <div data-testid="moore-logic-gate-view" className="space-y-5">
-      <ViewHeader title={t("moore.logic.title")} />
+      <ViewHeader title={t("moore-mealy.logic.title")} />
 
       <div className="border-border bg-card space-y-3 rounded-xl border p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 className="font-semibold">
             {formulaMode === "canonical"
-              ? t("moore.conversion.canonicalDnf")
-              : t("moore.logic.minimalFunctions")}
+              ? t("moore-mealy.conversion.canonicalDnf")
+              : t("moore-mealy.logic.minimalFunctions")}
           </h3>
           <DropdownSelect
             value={formulaMode}
             options={[
               {
                 value: "minimal",
-                label: t("moore.logic.minimalFunctions"),
+                label: t("moore-mealy.logic.minimalFunctions"),
               },
               {
                 value: "canonical",
-                label: t("moore.conversion.canonicalDnf"),
+                label: t("moore-mealy.conversion.canonicalDnf"),
               },
             ]}
             onChange={(mode) => {
               setFormulaMode(mode);
               setSelectedFormula(conversion.allFormulas[0]?.name ?? "");
             }}
-            ariaLabel={t("moore.logic.formulaMode")}
+            ariaLabel={t("moore-mealy.logic.formulaMode")}
             triggerClassName="h-10 min-w-56 px-3"
             menuClassName="right-0 min-w-56"
             triggerTestId="moore-logic-formula-mode"
@@ -113,16 +113,16 @@ export function MooreLogicGateView({
                 data-testid="moore-binary-gates-toggle"
                 className="accent-brand size-4"
               />
-              <span>{t("moore.logic.binaryGates")}</span>
+              <span>{t("moore-mealy.logic.binaryGates")}</span>
             </label>
           </div>
           <LogicGateDiagram
             key={`${formula.name}-${formulaMode}-${binaryGates}`}
             expression={displayedExpression ?? null}
             outputName={formula.name}
-            ariaLabel={t("moore.logic.diagram", { output: formula.name })}
+            ariaLabel={t("moore-mealy.logic.diagram", { output: formula.name })}
             variables={formula.variables}
-            unavailableText={t("moore.logic.minimizationUnavailable")}
+            unavailableText={t("moore-mealy.logic.minimizationUnavailable")}
             binaryGates={binaryGates}
             testIdPrefix="moore-logic"
           />
@@ -132,19 +132,19 @@ export function MooreLogicGateView({
       <MooreViewActions
         actions={[
           {
-            label: t("moore.navigation.editDefinition"),
+            label: t("moore-mealy.navigation.editDefinition"),
             onClick: onEditDefinition,
             icon: Pencil,
             testId: "moore-logic-edit-definition",
           },
           {
-            label: t("moore.navigation.showSimulator"),
+            label: t("moore-mealy.navigation.showSimulator"),
             onClick: onShowSimulator,
             icon: Play,
             testId: "moore-logic-show-simulator",
           },
           {
-            label: t("moore.navigation.showConversion"),
+            label: t("moore-mealy.navigation.showConversion"),
             onClick: onShowConversion,
             icon: TableProperties,
             testId: "moore-logic-show-conversion",
@@ -153,7 +153,7 @@ export function MooreLogicGateView({
       />
 
       <p className="text-muted-foreground text-xs">
-        {t("moore.logic.iecHint")}
+        {t("moore-mealy.logic.iecHint")}
       </p>
     </div>
   );

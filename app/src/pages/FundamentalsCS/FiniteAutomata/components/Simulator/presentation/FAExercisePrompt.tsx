@@ -28,7 +28,7 @@ export function FAExercisePrompt({ exercise }: FAExercisePromptProps) {
       {exercise.grammar && (
         <>
           <h4 className="text-foreground text-sm font-bold">
-            {t("fa.exerciseWorkspace.grammarLabel", "Grammar")}
+            {t("finite-automata.exerciseWorkspace.grammarLabel", "Grammar")}
           </h4>
           <pre
             data-testid="fa-exercise-grammar"
@@ -38,7 +38,7 @@ export function FAExercisePrompt({ exercise }: FAExercisePromptProps) {
           </pre>
           <p className="text-muted-foreground text-xs">
             {t(
-              "fa.exerciseWorkspace.grammarEpsilonNote",
+              "finite-automata.exerciseWorkspace.grammarEpsilonNote",
               "ε represents the empty word and marks an accepting (final) state.",
             )}
           </p>

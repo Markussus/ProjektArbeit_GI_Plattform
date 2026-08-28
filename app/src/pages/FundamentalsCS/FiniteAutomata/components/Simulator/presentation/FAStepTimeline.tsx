@@ -28,7 +28,7 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
       isCurrent: i === currentStep,
       stateCount: isReached ? runtime.stateHistory[i].length : 0,
       // Step 0 is the initial state, step N means N symbols consumed
-      label: i === 0 ? t("fa.sim.stepStart", "Start") : `${i}`,
+      label: i === 0 ? t("finite-automata.sim.stepStart", "Start") : `${i}`,
     };
   });
 
@@ -36,13 +36,13 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
     <div className="flex h-full min-w-0 flex-col rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
-          {t("fa.sim.stepHistory", "Step History")}
+          {t("finite-automata.sim.stepHistory", "Step History")}
         </span>
         <span
           className="shrink-0"
           style={{ color: "var(--fa-text-dim)", fontSize: "0.75rem" }}
         >
-          {t("fa.sim.stepOf", "Step {{current}} of {{total}}", {
+          {t("finite-automata.sim.stepOf", "Step {{current}} of {{total}}", {
             current: currentStep,
             total: runtime.inputWord.length,
           })}
@@ -80,11 +80,11 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
               onClick={() => step.isReached && onJumpToStep(step.index)}
               title={
                 step.isReached
-                  ? t("fa.sim.stepTooltip", {
+                  ? t("finite-automata.sim.stepTooltip", {
                       step: step.index,
                       count: step.stateCount,
                     })
-                  : t("fa.sim.stepTooltipUnreached", { step: step.index })
+                  : t("finite-automata.sim.stepTooltipUnreached", { step: step.index })
               }
               style={{
                 width: step.isCurrent ? 36 : 28,

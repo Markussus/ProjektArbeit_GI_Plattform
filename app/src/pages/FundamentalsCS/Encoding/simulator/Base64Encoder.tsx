@@ -224,13 +224,13 @@ export function Base64Encoder({
 
   const inputLabel =
     converterMode === "encode"
-      ? t("simulator.encoding.inputText")
-      : t("simulator.encoding.inputBase64");
+      ? t("encoding.simulator.inputText")
+      : t("encoding.simulator.inputBase64");
 
   const resultLabel =
     converterMode === "encode"
-      ? t("simulator.encoding.base64Result")
-      : t("simulator.encoding.decodedResult");
+      ? t("encoding.simulator.base64Result")
+      : t("encoding.simulator.decodedResult");
 
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;
@@ -255,10 +255,10 @@ export function Base64Encoder({
             <div>
               <h3 className="text-foreground flex items-center gap-2 text-lg font-semibold">
                 <FileText className="text-primary h-5 w-5" />
-                {t("simulator.encoding.base64Title")}
+                {t("encoding.simulator.base64Title")}
               </h3>
               <p className="text-muted-foreground mt-1 text-sm">
-                {t("simulator.encoding.base64Desc")}
+                {t("encoding.simulator.base64Desc")}
               </p>
             </div>
 
@@ -268,11 +268,11 @@ export function Base64Encoder({
               options={[
                 {
                   value: "encode",
-                  label: t("simulator.encoding.encode"),
+                  label: t("encoding.simulator.encode"),
                 },
                 {
                   value: "decode",
-                  label: t("simulator.encoding.decode"),
+                  label: t("encoding.simulator.decode"),
                 },
               ]}
               disabled={isExerciseMode}
@@ -315,12 +315,12 @@ export function Base64Encoder({
           <div className="space-y-4">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.encoding.explanation")}
+              title={t("encoding.simulator.explanation")}
             />
 
             {!inputValue && (
               <p className="text-muted-foreground text-sm">
-                {t("simulator.encoding.enterValue")}
+                {t("encoding.simulator.enterValue")}
               </p>
             )}
 
@@ -334,7 +334,7 @@ export function Base64Encoder({
                 {expanded.has("0") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step1CharToAscii")}
+                      {t("encoding.simulator.step1CharToAscii")}
                     </h4>
                     {encodingSteps.map((step) => (
                       <CollapsibleStep
@@ -350,11 +350,11 @@ export function Base64Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.charLabel")}:{" "}
+                            {t("encoding.simulator.charLabel")}:{" "}
                             <code className="font-mono">{step.char}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.asciiLabel")}:{" "}
+                            {t("encoding.simulator.asciiLabel")}:{" "}
                             <code className="font-mono">{step.ascii}</code>
                             <span className="text-muted-foreground ml-2">
                               (Hex:{" "}
@@ -362,7 +362,7 @@ export function Base64Encoder({
                             </span>
                           </p>
                           <p>
-                            {t("simulator.encoding.binaryLabel")}:{" "}
+                            {t("encoding.simulator.binaryLabel")}:{" "}
                             <code className="font-mono">{step.binary}</code>
                           </p>
                         </div>
@@ -379,12 +379,12 @@ export function Base64Encoder({
                 {expanded.has("1") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step2GroupBits")}
+                      {t("encoding.simulator.step2GroupBits")}
                     </h4>
                     <div className="space-y-2">
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          {t("simulator.encoding.asciiHexLabel")}:
+                          {t("encoding.simulator.asciiHexLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.hex).join(" ")}
@@ -392,7 +392,7 @@ export function Base64Encoder({
                       </div>
                       <div>
                         <p className="text-muted-foreground mb-1 text-xs">
-                          {t("simulator.encoding.binaryConcatLabel")}:
+                          {t("encoding.simulator.binaryConcatLabel")}:
                         </p>
                         <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                           {encodingSteps.map((s) => s.binary).join("")}
@@ -410,7 +410,7 @@ export function Base64Encoder({
                 {expanded.has("2") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step3Base64Lookup")}
+                      {t("encoding.simulator.step3Base64Lookup")}
                     </h4>
                     {groupSteps.map((step) => (
                       <CollapsibleStep
@@ -425,17 +425,17 @@ export function Base64Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.bitsLabel")}:{" "}
+                            {t("encoding.simulator.bitsLabel")}:{" "}
                             <code className="font-mono">{step.bits}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.decimalLabel")}:{" "}
+                            {t("encoding.simulator.decimalLabel")}:{" "}
                             <code className="font-mono">
                               {step.decimal >= 0 ? step.decimal : "padding"}
                             </code>
                           </p>
                           <p>
-                            {t("simulator.encoding.base64CharLabel")}:{" "}
+                            {t("encoding.simulator.base64CharLabel")}:{" "}
                             <code className="font-mono">{step.base64Char}</code>
                           </p>
                         </div>
@@ -447,7 +447,7 @@ export function Base64Encoder({
                 {result && (
                   <div className="bg-primary/10 mt-4 rounded-lg p-4">
                     <p className="text-sm font-medium">
-                      {t("simulator.encoding.finalResult")}
+                      {t("encoding.simulator.finalResult")}
                     </p>
                     <code className="text-primary mt-1 block font-mono text-lg break-all">
                       {result}
@@ -467,7 +467,7 @@ export function Base64Encoder({
                 {expanded.has("0") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep1Lookup")}
+                      {t("encoding.simulator.decodeStep1Lookup")}
                     </h4>
                     {decodeSteps.map((step) => (
                       <CollapsibleStep
@@ -482,15 +482,15 @@ export function Base64Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.base64CharLabel")}:{" "}
+                            {t("encoding.simulator.base64CharLabel")}:{" "}
                             <code className="font-mono">{step.base64Char}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.decimalLabel")}:{" "}
+                            {t("encoding.simulator.decimalLabel")}:{" "}
                             <code className="font-mono">{step.decimal}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.bitsLabel")}:{" "}
+                            {t("encoding.simulator.bitsLabel")}:{" "}
                             <code className="font-mono">{step.bits}</code>
                           </p>
                         </div>
@@ -507,7 +507,7 @@ export function Base64Encoder({
                 {expanded.has("1") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep2ConcatBits")}
+                      {t("encoding.simulator.decodeStep2ConcatBits")}
                     </h4>
                     <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
                       {decodeSteps.map((s) => s.bits).join("")}
@@ -523,7 +523,7 @@ export function Base64Encoder({
                 {expanded.has("2") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep3ToChars")}
+                      {t("encoding.simulator.decodeStep3ToChars")}
                     </h4>
                     {decodeByteSteps.map((step) => (
                       <CollapsibleStep
@@ -538,15 +538,15 @@ export function Base64Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.bitsLabel")}:{" "}
+                            {t("encoding.simulator.bitsLabel")}:{" "}
                             <code className="font-mono">{step.bits}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.decimalLabel")}:{" "}
+                            {t("encoding.simulator.decimalLabel")}:{" "}
                             <code className="font-mono">{step.decimal}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.charLabel")}:{" "}
+                            {t("encoding.simulator.charLabel")}:{" "}
                             <code className="font-mono">{step.char}</code>
                           </p>
                         </div>
@@ -559,12 +559,12 @@ export function Base64Encoder({
                   <WarningBanner
                     variant="warning"
                     title={t(
-                      "simulator.encoding.invalidBase64Title",
+                      "encoding.simulator.invalidBase64Title",
                       "Invalid Base64 Input",
                     )}
                   >
                     {t(
-                      "simulator.encoding.invalidBase64Desc",
+                      "encoding.simulator.invalidBase64Desc",
                       "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
                     )}
                   </WarningBanner>
@@ -573,7 +573,7 @@ export function Base64Encoder({
                 {result && (
                   <div className="bg-primary/10 mt-4 rounded-lg p-4">
                     <p className="text-sm font-medium">
-                      {t("simulator.encoding.finalResult")}
+                      {t("encoding.simulator.finalResult")}
                     </p>
                     <code className="text-primary mt-1 block font-mono text-lg break-all">
                       {result}

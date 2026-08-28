@@ -30,15 +30,15 @@ export function NotFoundPage() {
                 data-testid="not-found-title"
                 className="text-foreground mt-8 text-3xl font-bold tracking-tight md:text-5xl"
               >
-                {t("notFound.title")}
+                {t("common.notFound.title")}
               </h1>
 
               <p className="text-muted-foreground mt-4 max-w-2xl text-base leading-relaxed md:text-lg">
-                {t("notFound.description")}
+                {t("common.notFound.description")}
               </p>
 
               <p className="text-muted-foreground mt-3 text-sm">
-                {t("notFound.requestedUrl")}:{" "}
+                {t("common.notFound.requestedUrl")}:{" "}
                 <span
                   data-testid="not-found-requested-path"
                   className="text-foreground font-medium"
@@ -53,7 +53,7 @@ export function NotFoundPage() {
                   className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold hover:opacity-90"
                 >
                   <Home className="size-4" />
-                  {t("notFound.goHome")}
+                  {t("common.notFound.goHome")}
                 </Link>
 
                 <button
@@ -62,20 +62,20 @@ export function NotFoundPage() {
                   className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
                 >
                   <ArrowLeft className="size-4" />
-                  {t("notFound.goBack")}
+                  {t("common.notFound.goBack")}
                 </button>
               </div>
             </div>
 
             <div className="bg-muted ring-foreground/10 rounded-xl p-6 ring-1">
               <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-                {t("notFound.hintLabel")}
+                {t("common.notFound.hintLabel")}
               </p>
 
               <ul className="text-muted-foreground mt-4 space-y-3 text-sm leading-relaxed">
-                <li>{t("notFound.reason1")}</li>
-                <li>{t("notFound.reason2")}</li>
-                <li>{t("notFound.reason3")}</li>
+                <li>{t("common.notFound.reason1")}</li>
+                <li>{t("common.notFound.reason2")}</li>
+                <li>{t("common.notFound.reason3")}</li>
               </ul>
             </div>
           </div>

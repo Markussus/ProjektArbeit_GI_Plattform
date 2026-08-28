@@ -31,7 +31,7 @@ export function JavaCommandOverview({
   return (
     <Popup
       open={open}
-      title={t("java.commandOverview.title")}
+      title={t("java-programming.commandOverview.title")}
       onClose={onClose}
       testId="java-command-overview-dialog"
     >
@@ -41,12 +41,12 @@ export function JavaCommandOverview({
             <Info className="text-muted-foreground mt-0.5 size-5 shrink-0" />
             <div>
               <p className="text-sm font-semibold">
-                {t("java.commandOverview.summary", {
+                {t("java-programming.commandOverview.summary", {
                   version: JAVA_COMPILER_VERSION_INFO.javaVersion,
                 })}
               </p>
               <p className="text-muted-foreground mt-1 text-sm">
-                {t("java.commandOverview.limitationsText")}
+                {t("java-programming.commandOverview.limitationsText")}
               </p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export function JavaCommandOverview({
           <div className="flex items-center gap-2">
             <ListChecks className="text-muted-foreground size-4" />
             <h3 className="text-sm font-semibold">
-              {t("java.commandOverview.commandListTitle")}
+              {t("java-programming.commandOverview.commandListTitle")}
             </h3>
           </div>
 
@@ -81,7 +81,7 @@ export function JavaCommandOverview({
                       statusClassNames[capability.status],
                     )}
                   >
-                    {t(`java.commandOverview.status.${capability.status}`)}
+                    {t(`java-programming.commandOverview.status.${capability.status}`)}
                   </span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">

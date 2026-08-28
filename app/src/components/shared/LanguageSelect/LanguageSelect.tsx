@@ -14,8 +14,8 @@ const languageLabels: Record<SupportedLanguage, string> = {
 };
 
 const languageTranslationKeys: Record<SupportedLanguage, TranslationKey> = {
-  de: "language.de",
-  en: "language.en",
+  de: "common.language.de",
+  en: "common.language.en",
 };
 
 export function LanguageSelect() {
@@ -46,7 +46,7 @@ export function LanguageSelect() {
       onChange={(language) => {
         void i18n.changeLanguage(language);
       }}
-      ariaLabel={t("language.select")}
+      ariaLabel={t("common.language.select")}
       triggerIcon={<Globe className="text-muted-foreground size-4 shrink-0" />}
       triggerClassName="size-8 justify-center gap-0 px-0 min-[760px]:w-auto min-[760px]:gap-2 min-[760px]:px-2.5"
       menuClassName="right-0 min-w-32"

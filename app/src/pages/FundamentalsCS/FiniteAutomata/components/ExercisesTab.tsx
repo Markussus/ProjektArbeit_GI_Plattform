@@ -58,16 +58,16 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
   const groups: TopicExerciseGroup[] = [
     {
       id: "languageToAutomaton",
-      titleKey: "fa.exercisesTab.categories.languageToAutomaton.title",
+      titleKey: "finite-automata.exercisesTab.categories.languageToAutomaton.title",
       descriptionKey:
-        "fa.exercisesTab.categories.languageToAutomaton.description",
+        "finite-automata.exercisesTab.categories.languageToAutomaton.description",
       exercises: faExercises,
     },
     {
       id: "grammarToAutomaton",
-      titleKey: "fa.exercisesTab.categories.grammarToAutomaton.title",
+      titleKey: "finite-automata.exercisesTab.categories.grammarToAutomaton.title",
       descriptionKey:
-        "fa.exercisesTab.categories.grammarToAutomaton.description",
+        "finite-automata.exercisesTab.categories.grammarToAutomaton.description",
       exercises: faGrammarToAutomatonExercises,
     },
   ];
@@ -80,8 +80,8 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       onOpenExerciseInSimulation={handleOpen}
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="fa-reset-all-exercises"
         />
