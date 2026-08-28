@@ -41,3 +41,8 @@ app/public/java/compiler/**
 
 # Locally generated release packages
 deployment/releases/*.zip
+
+.agents
+graphify-out
+infos_MMA
+docs/*.md
