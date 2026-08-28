@@ -17,16 +17,9 @@
     "title": "THWS - Traing Center"
   },
   "nav": {
-    "title": "FUNDAMENTALS OF COMPUTER SCIENCE",
     "home": "TRAINING CENTER"
   },
   "sidebar": {
-    "moduleOverview": "MODULE OVERVIEW",
-    "turingMachines": "TURING MACHINES",
-    "finiteAutomata": "FINITE AUTOMATA",
-    "numberSystems": "NUMBER SYSTEMS",
-    "mooreMealy": "MOORE & MEALY",
-    "dnf": "DNF",
     "documentation": "DOCUMENTATION",
     "legal": "LEGAL",
     "support": "SUPPORT",
@@ -51,56 +44,24 @@
     "overview": "Overview",
     "exercises": "Exercises",
     "examples": "Examples",
-    "simulation": "Simulation",
-    "integers": "Integers",
-    "negative": "Negative Numbers",
-    "ieee754": "IEEE 754 (32-bit)",
-    "arithmetic": "Arithmetic"
+    "simulation": "Simulation"
   },
   "home": {
     "heroTitle1": "Master Complex Systems",
     "heroTitle2": "through Interactive Learning.",
     "heroDescription": "Access the university's official training modules for Fundamentals of Computer Science.",
     "selectModule": "SELECT A MODULE",
-    "exploreModules": "Explore Available Modules",
-    "turingDesc": "Formal models of computation & complexity",
-    "automataDesc": "Deterministic and non-deterministic machines",
-    "numberDesc": "Binary, Octal, Hexadecimal & Float logic",
-    "mooreDesc": "Sequential circuit design & state machines",
-    "dnfDesc": "Disjunctive Normal Form & boolean algebra"
+    "exploreModules": "Explore Available Modules"
   },
   "automata": {
     "title": "Finite Automata",
     "description": "Study deterministic and non-deterministic finite automata. Build DFAs and NFAs, convert regular grammars, and step through input words.",
-    "tutorialVideo": "Finite Automata demo video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "What is the difference between deterministic and non-deterministic finite automata (DFA vs. NFA)?",
-    "tutorialAnswer1": "A DFA has exactly one next state for each state and input symbol. An NFA allows zero, one, or multiple next states as well as ε-transitions.",
-    "tutorialQuestion2": "When does a finite automaton accept an input word?",
-    "tutorialAnswer2": "An input word is accepted if the automaton ends in at least one accepting state after completely reading all symbols.",
-    "tutorialQuestion3": "How are the transition table and state diagram connected?",
-    "tutorialAnswer3": "The transition table provides the formal definition of state transitions, while the state diagram graphically visualizes the active execution path.",
-    "overviewTitle": "What are Finite Automata?",
-    "overviewText": "Finite Automata are the simplest computational models used to recognize patterns. They consist of states, transitions, and accept/reject decisions. DFAs and NFAs form the foundation for lexical analysis, pattern matching, and regular expression engines."
+    "tutorialVideo": "Finite Automata demo video"
   },
   "number": {
     "title": "Number Systems",
     "description": "Master conversions between Binary, Octal, Decimal, and Hexadecimal. Understand IEEE 754 floating-point representation.",
-    "overviewTitle": "Why Number Systems Matter",
-    "overviewText": "Number systems are fundamental to how computers store and process data. Understanding binary, octal, and hexadecimal representations is essential for low-level programming, networking, and digital design.",
     "tutorialVideo": "Tutorial Video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "What are the most important number systems in computer science?",
-    "tutorialAnswer1": "The most important number systems are binary (base 2), octal (base 8), decimal (base 10), and hexadecimal (base 16).",
-    "tutorialQuestion2": "Why is the binary system so important for computers?",
-    "tutorialAnswer2": "Computers are based on electronic circuits that primarily know two states: on (1) and off (0).",
-    "tutorialQuestion3": "How are decimal numbers converted to binary numbers?",
-    "tutorialAnswer3": "You repeatedly divide the decimal number by 2 and note the remainder (0 or 1), which, read from bottom to top, gives the binary number.",
-    "concepts": "Key Concepts",
-    "concept1": "Binary (Base-2)",
-    "concept2": "Octal (Base-8)",
-    "concept3": "Hexadecimal (Base-16)",
-    "concept4": "IEEE 754 Floating Point",
     "ex_u03_decToBin": "Decimal to Binary",
     "ex_u03_decToBinDesc": "Convert decimal numbers to binary.",
     "ex_u03_binAdd": "Binary Addition",
@@ -121,7 +82,6 @@
     "ex_u06_addSubDesc": "Perform addition and 2's complement subtraction.",
     "ex_u06_mult": "Multiplication",
     "ex_u06_multDesc": "Multiply two binary numbers.",
-    "examplesFallback": "Interactive examples for Number Systems will be available here.",
     "example_u03_1": "Decimal → Binary",
     "example_u03_1_desc": "Convert the decimal number 26 to binary.",
     "example_u03_2": "Binary Addition (50 + 13)",
@@ -196,21 +156,7 @@
   "encoding": {
     "title": "Encoding",
     "description": "Learn Base64 and UTF-8 encoding. Understand how text is converted to Base64 strings and how characters are represented as UTF-8 byte sequences.",
-    "overviewTitle": "Why Encoding Matters",
-    "overviewText": "Encoding schemes like Base64 and UTF-8 are fundamental to how data is transmitted and stored. Base64 converts binary data to ASCII-safe text, while UTF-8 provides a universal character encoding that supports all writing systems.",
-    "concepts": "Key Concepts",
-    "concept1": "Base64 Encoding",
-    "concept2": "Base64 Decoding",
-    "concept3": "UTF-8 Character Encoding",
-    "concept4": "ASCII vs UTF-8",
     "tutorialVideo": "Encoding Tutorial Video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "What is Base64 encoding and why is it used?",
-    "tutorialAnswer1": "Base64 encodes binary data into ASCII characters (A-Z, a-z, 0-9, +, /). It is used to safely transmit binary data over text-based protocols like email (MIME) or JSON, where only printable ASCII characters are allowed.",
-    "tutorialQuestion2": "How does UTF-8 encode Unicode characters?",
-    "tutorialAnswer2": "UTF-8 encodes each Unicode code point in 1 to 4 bytes. ASCII characters (U+0000-U+007F) use 1 byte, preserving compatibility with ASCII. Non-ASCII characters use 2-4 bytes with a specific bit pattern: 110xxxxx for 2-byte, 1110xxxx for 3-byte, and 11110xxx for 4-byte sequences.",
-    "tutorialQuestion3": "What is the difference between encoding and encryption?",
-    "tutorialAnswer3": "Encoding transforms data into a different format for compatibility (e.g., Base64, UTF-8) and is reversible without a key. Encryption transforms data to keep it secret and requires a secret key to reverse (e.g., AES, RSA). Encoding provides no security, while encryption does.",
     "example_base64_2": "Base64 Encode 'THWS'",
     "example_base64_2_desc": "Encode the text 'THWS' to Base64.",
     "example_base64_3": "Base64 Decode 'RklY'",
@@ -264,10 +210,7 @@
         "expectedOutput": "Expected output",
         "pass": "Pass",
         "fail": "Fail",
-        "emptyInput": "Empty input (ε)",
-        "errors": {
-          "input_symbol_missing": "Input symbol is missing"
-        }
+        "emptyInput": "Empty input (ε)"
       },
       "turnstile": {
         "title": "Turnstile control",
@@ -308,29 +251,11 @@
     },
     "title": "Moore & Mealy Machines",
     "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",
-    "overviewTitle": "Moore vs. Mealy",
-    "overviewText": "Moore and Mealy machines are finite state machines with output. In Moore machines, output depends only on the current state. In Mealy machines, output depends on both the current state and the current input. Both are fundamental to digital circuit design.",
     "tutorialVideo": "Tutorial video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "When is a machine a Moore machine?",
-    "tutorialAnswer1": "In a Moore machine, the output depends only on the current state. The output is attached to the state and changes only after a state transition.",
-    "tutorialQuestion2": "What makes a Mealy machine different?",
-    "tutorialAnswer2": "In a Mealy machine, the output depends on the current state and the input symbol being read. The output is attached directly to the transition.",
-    "tutorialQuestion3": "What matters during conversion?",
-    "tutorialAnswer3": "First check where the output is defined. When converting Mealy to Moore, states often need to be split so each output belongs unambiguously to one state.",
-    "exercise1": "Design a Moore Machine",
-    "exercise1Desc": "Create a sequence detector as Moore machine",
-    "exercise2": "Design a Mealy Machine",
-    "exercise2Desc": "Create a sequence detector as Mealy machine",
-    "exercise3": "Moore to Mealy",
-    "exercise3Desc": "Convert a Moore machine to equivalent Mealy",
-    "exercise4": "Mealy to Moore",
-    "exercise4Desc": "Convert a Mealy machine to equivalent Moore",
     "sim": {
       "machineType": "Machine type",
       "mooreTab": "Moore machine",
       "mealyTab": "Mealy machine",
-      "mealyLater": "The Mealy simulator will be added in the next implementation step.",
       "configureTitle": "Define Moore machine",
       "configureHelp": "States and input symbols are internally numbered by their order from left to right and top to bottom.",
       "transitionTable": "Transition function δ",
@@ -347,7 +272,6 @@
       "outputAlphabet": "Output alphabet Ω",
       "inputWord": "Input",
       "outputWord": "Output",
-      "inputWordPlaceholder": "Enter a symbol and press Enter",
       "inputDropPlaceholder": "Drop symbols from the input alphabet here",
       "inputAlphabetHelp": "Input alphabet Σ: click symbols or drag and drop them into the input.",
       "noSymbols": "No symbols",
@@ -374,7 +298,6 @@
       "removeWordSymbol": "Remove symbol {{symbol}} at position {{index}}",
       "startSimulation": "Start simulation",
       "simulationTitle": "Moore simulation",
-      "editConfiguration": "Edit definition",
       "currentState": "Current state",
       "progress": "Processed symbols",
       "status": "Status",
@@ -416,7 +339,6 @@
     "conversion": {
       "open": "Convert to transition functions",
       "title": "Transition functions",
-      "back": "Back to simulator",
       "transitionTab": "Transition table",
       "outputTab": "Output table",
       "currentState": "Current state",
@@ -426,8 +348,6 @@
       "output": "Output",
       "canonicalDnf": "Canonical DNF",
       "minimalDnf": "Minimized Boolean function",
-      "showSimulator": "Show simulator UI",
-      "showLogic": "Show logic gates",
       "minimizationLimit": "The canonical DNF is shown. Automatic minimization is limited to 8 state and input bits in total."
     },
     "logic": {
@@ -444,21 +364,7 @@
   "dnf": {
     "title": "Disjunctive Normal Form",
     "description": "Learn how boolean expressions are evaluated with truth tables and how the Disjunctive Normal Form is derived from the rows with result 1.",
-    "overviewTitle": "What is DNF?",
-    "overviewText": "Disjunctive Normal Form (DNF) writes a boolean expression as OR-linked AND terms. In the lecture style, each truth-table row with result 1 contributes exactly one term.",
     "tutorialVideo": "Tutorial video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "What is Disjunctive Normal Form?",
-    "tutorialAnswer1": "A DNF is an OR of AND terms. The terms consist of variables or their negations and do not always have to contain every variable.",
-    "tutorialQuestion2": "How is the canonical DNF derived from a truth table?",
-    "tutorialAnswer2": "An AND term is formed for each row with result 1. Variables with value 1 stay positive, while variables with value 0 are negated. Because every term contains all variables, it describes exactly one table row. The terms are then joined with OR.",
-    "tutorialQuestion3": "What is the difference between canonical and minimal DNF?",
-    "tutorialAnswer3": "The canonical DNF contains one complete minterm for every 1-row. The minimal DNF combines compatible minterms and describes the same function with as few literals as possible.",
-    "concepts": "Key Concepts",
-    "concept1": "Boolean polynomials",
-    "concept2": "Truth Tables",
-    "concept3": "Rows with result 1",
-    "concept4": "Logic gates",
     "taskGroups": {
       "expression_to_truth_table": {
         "title": "Expression as the starting point",
@@ -535,16 +441,6 @@
         }
       }
     },
-    "exampleExpressionTitle": "Start expression",
-    "exampleExpressionText": "The expression is true as soon as a is true or b and c are true together.",
-    "exampleTableTitle": "Truth table with DNF selection",
-    "exampleAssignment": "Assignment",
-    "exampleResult": "Result",
-    "exampleTerm": "DNF term",
-    "exampleIgnored": "ignored",
-    "exampleResultTitle": "DNF",
-    "exampleRuleTitle": "Rule of thumb",
-    "exampleRuleText": "If the value is 1, keep the variable as-is; if the value is 0, negate it. This makes each AND term describe exactly one matching table row.",
     "exercises": {
       "worksheet02bTruthTable1": {
         "title": "Derive DNF from a Truth Table",
@@ -605,7 +501,6 @@
       "insertOpenParen": "Insert opening parenthesis",
       "insertCloseParen": "Insert closing parenthesis",
       "clear": "Clear",
-      "reset": "Reset",
       "exercise": {
         "taskTitle": "Exercise task",
         "given": "Given the boolean expression:",
@@ -678,18 +573,13 @@
         "showSolutionHelp": "Show solution",
         "solutionAfterCheck": "Solution after check",
         "hideSolution": "Hide solution",
-        "startSimplification": "Start simplification",
-        "hideSimplification": "Hide simplification",
         "simplificationTitle": "Simplify DNF",
         "simplificationHint": "Use the Boolean algebra rules (absorption, distributivity, complement, …) to bring the DNF into a shorter equivalent form.",
         "canonicalDnfLabel": "Original DNF",
         "simplifiedDnfLabel": "Simplified form",
         "simplifiedDnfPlaceholder": "e.g. a ∨ (b ∧ ¬c)",
         "checkSimplification": "Check simplification",
-        "revealSolutionTitle": "One possible minimal solution",
-        "revealWalkthroughTitle": "Solution path",
         "revealAlgebraReferenceTitle": "Rule cheat-sheet",
-        "revealRequiresCheck": "available after check",
         "minimalDnfLabel": "One possible minimal DNF",
         "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF form (OR of AND-terms), e.g. result of Quine-McCluskey.",
         "factoredLabel": "Mathematically shortest form",
@@ -752,7 +642,6 @@
         }
       },
       "followUpTitle": "Continue",
-      "solutionBadge": "Solution",
       "solutionTitle": "Solution",
       "resultTitle": "DNF",
       "resultHint": "Each highlighted row contributes one AND term.",
@@ -766,15 +655,6 @@
       "variables": "Variables",
       "rows": "Table rows",
       "oneRows": "Rows with result 1",
-      "derivationTitle": "Derivation",
-      "derivationHint": "Only truth-table rows with result 1 are transformed into terms and then joined with OR.",
-      "derivationCompact": "Large derivation: all {{total}} steps are scrollable in the compact view.",
-      "derivationFull": "Full derivation with {{total}} steps.",
-      "showFullDerivation": "Show full derivation",
-      "showCompactDerivation": "Show compact derivation",
-      "derivationRowLabel": "Row {{row}}",
-      "derivationTautology": "Every row evaluates to 1 — the DNF is therefore constant 1.",
-      "derivationContradiction": "No row evaluates to 1 — the DNF is therefore constant 0.",
       "truthTableTitle": "Truth table",
       "truthTableRow": "Row",
       "truthTablePreview": "Large table: showing {{shown}} relevant rows first. Total: {{total}} rows, {{oneRows}} rows with result 1.",
@@ -800,21 +680,7 @@
   "java": {
     "title": "Java Programming",
     "description": "Work with core Java basics such as console output, loops, and arrays. The simulation tab provides a directly editable Java code editor.",
-    "overviewTitle": "Getting started with Java",
-    "overviewText": "This topic introduces simple Java programs step by step. The focus is on the Main class, the main method, console output, loops, and small array-based tasks.",
-    "concepts": "Key Concepts",
-    "concept1": "Main class and main method",
-    "concept2": "System.out.println for console output",
-    "concept3": "for loops for repeated output",
-    "concept4": "Reading, sorting, and evaluating arrays",
     "tutorialVideo": "Tutorial video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "Why do I need the main method?",
-    "tutorialAnswer1": "The main method is the entry point of a simple Java program. When you run the program, Java starts executing the first statement there.",
-    "tutorialQuestion2": "How do I print text to the console?",
-    "tutorialAnswer2": "System.out.println writes one line to the console. It is useful for showing intermediate results and testing small programs.",
-    "tutorialQuestion3": "When do I use loops and arrays?",
-    "tutorialAnswer3": "Loops repeat statements, while arrays store multiple values under one name. Together they help you process lists of data systematically.",
     "example1Title": "Simple Hello World",
     "example1Text": "The smallest Java program with a main method and a console print statement.",
     "example2Title": "Repeated output",
@@ -857,8 +723,6 @@
       "button": "Java commands",
       "title": "What works in the Java editor?",
       "summary": "Java {{version}} for small browser programs",
-      "versionTitle": "Supported Java version: {{version}}",
-      "versionText": "The browser compiler uses OpenJDK javac through teavm-javac. Language diagnostics come from javac; the generated program runs as WebAssembly in a browser worker.",
       "limitationsText": "Write one Main.java-style program. You can run Java source code, but you cannot type terminal commands into the editor.",
       "commandListTitle": "Compact overview",
       "status": {
@@ -921,41 +785,6 @@
           "title": "Strings, Math, and big numbers",
           "description": "StringBuilder, String methods, Math functions, BigInteger, and BigDecimal work for typical console tasks."
         }
-      },
-      "commands": {
-        "run": {
-          "title": "Compile and run the current editor content",
-          "description": "The Run button sends the Java source to the browser compiler, generates WebAssembly, and executes the Main.main method in the worker."
-        },
-        "compile": {
-          "title": "Compilation is available as part of Run",
-          "description": "The internal compiler command uses javac diagnostics and TeaVM code generation. The UI does not expose a separate standalone compile-only terminal command."
-        },
-        "javaCli": {
-          "title": "No java command-line launcher",
-          "description": "Typing or expecting a local java command is not supported because the browser environment does not start JVM processes."
-        },
-        "javacCli": {
-          "title": "No javac terminal command",
-          "description": "javac is embedded inside the browser compiler pipeline. Users cannot pass arbitrary javac flags or compile multiple project files from a local directory."
-        },
-        "jshell": {
-          "title": "No interactive JShell",
-          "description": "The simulator executes complete programs with a Main class. It does not provide a REPL or interactive command prompt."
-        },
-        "tools": {
-          "title": "No packaging or documentation tools",
-          "description": "Tools such as jar, javadoc, Maven, Gradle, and other local executables are outside the supported browser compiler workflow."
-        },
-        "stdin": {
-          "title": "Console input is not interactive",
-          "description": "Scanner.nextLine() and Scanner.nextInt() use the fixed simulator input box. Other Scanner methods, BufferedReader, and input during execution are not supported."
-        },
-        "environment": {
-          "title": "Browser sandbox restrictions apply",
-          "description": "Programs should avoid local files, sockets, native libraries, process execution, and environment-dependent APIs because WebAssembly runs inside a browser worker."
-        },
-        "title": "What can I type into the editor?"
       }
     },
     "actions": {
@@ -1040,25 +869,19 @@
     "hard": "HARD"
   },
   "simulation": {
-    "taskText": "Task text",
     "selectedExercise": "Selected exercise",
     "selectedExample": "Selected example",
-    "taskTextPlaceholder": "You can add the concrete task text here later.",
-    "workspace": "Simulation",
     "expand": "Expand simulation",
     "exitFocus": "Exit simulation focus",
     "close": "Close",
     "transfer": {
-      "title": "Import / Export",
       "placeholder": "Paste a transfer string here or generate one via export",
-      "copy": "Copy string",
       "export": "Export",
       "import": "Import",
       "copied": "String copied to clipboard.",
       "clipboardError": "Clipboard unavailable. The string can be copied manually.",
       "exportPreviewLabel": "Export string (hidden after 5 seconds)",
       "exportError": "String could not be generated.",
-      "importSuccess": "String loaded successfully.",
       "importError": "String could not be loaded."
     },
     "emptyStates": {
@@ -1088,26 +911,20 @@
         "multiplication": "Multiplication",
         "division": "Division",
         "shifting": "Bit-Shifting",
-        "ieee754": "IEEE 754 Addition",
         "compare": "Compare (Bit by Bit)"
       },
       "common": {
         "operandA": "Number A",
         "operandB": "Number B",
-        "calculate": "Calculate",
         "result": "Result",
-        "carry": "Carry:",
-        "invalidInput": "Please enter only 0 and 1.",
         "operands8bit": "Operands (max 8-bit)",
         "operands": "Operands",
         "stepsResult": "Calculation Steps & Result",
         "enterValidOperands": "Please enter valid operands.",
-        "inDecimal": "In Decimal:",
         "showStepByStep": "Show Step-by-Step"
       },
       "addition": {
         "desc": "Positional addition in binary. Adding two ones creates a carry to the next position.",
-        "bitwiseAddition": "Bitwise Addition",
         "carryOutWarning": "Warning: A carry has exceeded the 8th bit (Carry Out).",
         "overflowWarning": "Overflow error! The addition of logically positive numbers resulted in a negative two's complement result.",
         "overflowTitle": "Overflow Error (2s Complement):",
@@ -1130,7 +947,6 @@
       },
       "subtraction": {
         "desc": "Binary subtraction is usually performed as addition with the negative number (in two's complement).",
-        "stepByStepSubtraction": "Step-by-step Subtraction",
         "step1": "1. Form one's complement (flip bits)",
         "step2": "2. Add +1 (two's complement)",
         "step3": "3. Add the two's complement to Number A",
@@ -1151,7 +967,6 @@
       },
       "multiplication": {
         "desc": "Binary written multiplication (Shift and Add).",
-        "addingRow": "Add to sum",
         "multiplier": "Multiplier (Number A)",
         "multiplicand": "Multiplicand (Number B)",
         "stepByStepTitle": "Bitwise Multiplication",
@@ -1168,8 +983,6 @@
         "divisor": "Divisor (Number B)",
         "divByZero": "Division by 0 is undefined.",
         "remainder": "Remainder:",
-        "appendOne": "→ append 1 to the quotient",
-        "appendZero": "→ append 0 to the quotient",
         "stepByStepTitle": "Bitwise Division",
         "stepN": "Step {{n}}",
         "stepDesc": "Step {{n}}: {{current}} >= {{divisor}}, so 1 to quotient and subtract {{divisor}}",
@@ -1182,8 +995,6 @@
       "shifting": {
         "desc": "Here you can shift binary numbers to the left or right.",
         "amount": "Shift amount (n bits)",
-        "shiftLeft": "<< Left Shift (Multiply)",
-        "shiftRight": ">> Right Shift (Divide)",
         "shiftLeftExpl": "A left shift by n positions corresponds to a multiplication by 2^n.",
         "shiftRightExpl": "A right shift by n positions corresponds to a division by 2^n (without remainder).",
         "binaryNumber": "Binary number",
@@ -1215,8 +1026,6 @@
         "floatingPoint": "Floating-Point Numbers",
         "threeSteps": "Addition in 3 Steps",
         "zeroSkipped": "Zero-Addition skipped.",
-        "expDiff": "Exponent difference:",
-        "mantissaShifted": "The mantissa of the smaller number is shifted to the right by {{diff}} places.",
         "expAligned": "Now both operands have the exponent 2^{{exp}} and can be added (or subtracted).",
         "normBack": "The result is converted back into the format 1.M × 2^E.",
         "signExpMant": "Sign | Exponent | Mantissa",
@@ -1231,8 +1040,6 @@
       "compare": {
         "desc": "Compares two binary numbers bit by bit from left to right.",
         "pad": "The numbers are padded to the same length (with zeros on the left).",
-        "bitEqual": "Both bits are equal.",
-        "bitDiff": "Difference found! 1 is greater than 0.",
         "resultEq": "The numbers are equal in size.",
         "resultGreater": "Number A is greater than Number B.",
         "resultLess": "Number A is less than Number B.",
@@ -1262,9 +1069,6 @@
       "binary": "Binary (Base 2)",
       "octal": "Octal (Base 8)",
       "hex": "Hexadecimal (Base 16)",
-      "lockedTitle": "Solution locked",
-      "lockedDesc": "Click the button to show the result and calculation steps.",
-      "showSolution": "Show Solution",
       "explanation": "Explanation Mode",
       "enterValue": "Enter a number to see the calculation steps.",
       "decToBin": "Decimal to Binary (Division by 2)",
@@ -1344,32 +1148,15 @@
       "fractionSum": "Sum of fractional powers",
       "step4FinalCalc": "4. Final Calculation of all components",
       "finalFormulaDesc": "For the final decimal number, the sign, true mantissa, and exponent factor are multiplied:",
-      "examplesTitle": "Example Exercises",
-      "examplesDesc": "Here you can find additional example exercises for the different units:",
       "lectureScripts": "Lecture Scripts",
       "unit03": "Unit 03: How are numbers represented in computers?",
-      "unit03_ex1": "Exercise 1: Convert the following decimal numbers into binary numbers: 1, 5, 7, 26, 63.",
-      "unit03_ex2": "Exercise 2: Add the numbers 50 and 13 as binary numbers.",
       "unit04": "Unit 04: Further Number Systems (Octal and Hexadecimal)",
-      "unit04_ex1": "Exercise 1 (Binary to Hex): Represent the number 01111010 as a hex number.",
-      "unit04_ex2": "Exercise 2 (Binary to Octal): Represent the number 0011 1100 as an octal number.",
-      "unit04_ex3": "Exercise 3 (Octal to Hex): Represent the number 760 as a hex number. Use the binary format as an intermediate step.",
-      "unit04_ex4": "Exercise 4 (Hex to Binary): Represent the number 7F as a binary number.",
       "unit05": "Unit 05: Encoding of Real Numbers",
-      "unit05_ex1": "Exercise 1 (Conversion): Convert the number 10.5 into a binary floating point number.",
-      "unit05_ex2": "Exercise 2 (Conversion and Normalization): Represent the decimal number 3.375 as a normalized binary floating point number. Convert the whole number first, then the fractional part, and only then normalize the binary number.",
-      "unit05_ex3": "Exercise 3 (IEEE 754 Format): Represent the number -4.4375 in IEEE 754 Format (32 Bit).",
-      "unit05_ex4": "Exercise 4 (IEEE 754 to Decimal): Which number is encoded by the following bit sequence? 0 1000 0010 1 0101 000 ... 0.",
       "unit06": "Unit 06: Binary Arithmetic",
-      "unit06_ex1_title": "Exercise 1 (Addition and Subtraction): Perform the following calculations:",
-      "unit06_ex1_add": "Addition: 0110 1101 + 0010 0111.",
-      "unit06_ex1_sub": "Subtraction: 0110 1101 - 0010 0111.",
-      "unit06_ex2": "Exercise 2 (Multiplication and Division): Calculate 1011 × 11001.",
       "fracTitle": "Fractional to Binary (Unnormalized)",
       "fracDesc": "A decimal number with fractions (e.g. 10.5) is split. The integer part is repeatedly divided by 2, the fractional part is repeatedly multiplied by 2.",
       "fracIntPart": "Integer Part:",
       "fracFractPart": "Fractional Part:",
-      "fracMultBy2": "Multiply by 2:",
       "fracResult": "Combined Result:",
       "fracModeDecToBin": "Decimal to Binary",
       "fracModeBinToDec": "Binary to Decimal",
@@ -1406,7 +1193,6 @@
       "utf8Desc": "Convert characters to their UTF-8 byte sequence representation.",
       "encode": "Encode",
       "decode": "Decode",
-      "mode": "Mode",
       "inputText": "Input Text",
       "inputBase64": "Base64 String",
       "inputHexBytes": "Hex Bytes (space-separated)",
@@ -1449,8 +1235,6 @@
       "invalidUtf8Desc": "The hex bytes do not form a valid UTF-8 sequence. Check your input and try again.",
       "invalidBase64Title": "Invalid Base64 Input",
       "invalidBase64Desc": "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
-      "examplesTitle": "Example Exercises",
-      "examplesDesc": "Here you can find additional example exercises for encoding:",
       "groupbase64": "Base64 Encoding",
       "grouputf8": "UTF-8 Encoding",
       "asciiHexLabel": "ASCII-Hex",
@@ -1467,14 +1251,7 @@
       "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed."
     },
     "overview": {
-      "tutorialVideo": "Turing Machine tutorial video",
-      "overviewTitle": "What is a Turing Machine?",
-      "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
-      "concepts": "Key Concepts",
-      "concept1": "Tape & Head Movement",
-      "concept2": "States & Transitions",
-      "concept3": "Acceptance & Rejection",
-      "concept4": "Church-Turing Thesis"
+      "tutorialVideo": "Turing Machine tutorial video"
     },
     "exercises": {
       "exerciseWorksheetAlternatingSymbols": "Check Alternating Symbols",
@@ -1666,7 +1443,6 @@
     "config": {
       "title": "Automaton Configuration",
       "type": "Type",
-      "states": "States (comma-separated)",
       "alphabet": "Alphabet (comma-separated)",
       "startState": "Start State",
       "acceptStates": "Accept States (comma-separated)",
@@ -1678,28 +1454,7 @@
       "inputWordHelp": "Each character is treated as one input symbol.",
       "apply": "Start Simulation"
     },
-    "buildFromScratch": {
-      "title": "Build Your Own Automaton",
-      "description": "Start with a blank canvas and create your own DFA or NFA from scratch. Add states, define the alphabet, and build transitions step by step.",
-      "button": "Start Empty",
-      "hint": "You can switch between DFA and NFA mode at any time in the editor."
-    },
-    "examplesTab": {
-      "title": "Predefined Examples",
-      "subtitle": "Learn how finite automata work by studying these examples. Each one includes a step-by-step explanation of how and why it was built.",
-      "loadExample": "Load in Simulator",
-      "variant": "Variant",
-      "howItWorks": "How it works",
-      "stepLabel": "Step {{index}}",
-      "tryIt": "Try it with input:",
-      "buildOwn": "Or build your own"
-    },
     "exercisesTab": {
-      "title": "Practice Exercises",
-      "subtitle": "Build each automaton yourself. Use hints if you get stuck — full solutions only if you ask.",
-      "start": "Start",
-      "resume": "Resume",
-      "reset": "Reset progress",
       "status": {
         "notStarted": "Not started",
         "inProgress": "In progress",
@@ -1762,9 +1517,6 @@
       }
     },
     "exerciseWorkspace": {
-      "label": "Exercise",
-      "completed": "Completed",
-      "exit": "Exit exercise mode",
       "check": "Check Solution",
       "showSolution": "Load solution",
       "confirmTitle": "Reveal the full solution?",
@@ -1782,10 +1534,6 @@
       "got": "got",
       "accept": "accept",
       "reject": "reject",
-      "exampleWordsHeader": "Try these words",
-      "exampleWordsHint": "Select a word to load it as the input and run it through the automaton.",
-      "exampleAccept": "Accepted",
-      "exampleReject": "Rejected",
       "unbuiltTitle": "Build your automaton first",
       "unbuiltBody": "Add states, transitions and at least one accept state, then run Check Solution again.",
       "grammarLabel": "Grammar",
@@ -1825,7 +1573,6 @@
       "runAll": "Run All",
       "clear": "Clear",
       "total": "total",
-      "debugHint": "Click to debug step-by-step",
       "steps": "steps"
     },
     "grammar": {
@@ -1912,19 +1659,6 @@
     "title": "Regular Languages",
     "description": "Work with regular languages and their right-linear grammars — enumerate the words generated by a grammar, derive a grammar from a language definition, and test word membership.",
     "tutorialVideo": "Regular Languages demo video",
-    "tutorialQuestionLabel": "Question {{index}}",
-    "tutorialQuestion1": "What is a right-linear grammar (Type 3)?",
-    "tutorialAnswer1": "A right-linear grammar contains only productions of the form A -> aB, A -> a, or A -> ε. It generates regular languages.",
-    "tutorialQuestion2": "How are regular grammars connected to finite automata?",
-    "tutorialAnswer2": "Every right-linear grammar can be converted directly into an equivalent finite automaton (non-terminals become states) and vice versa.",
-    "tutorialQuestion3": "How is word membership in a regular language checked?",
-    "tutorialAnswer3": "Either by step-by-step derivation from the start symbol of the grammar, or by simulating the word through the corresponding finite automaton.",
-    "overviewTitle": "What are Regular Languages?",
-    "overviewText": "A regular language is a set of words that can be described by a regular grammar or a finite automaton. This module focuses on right-linear (Type 3) grammars.",
-    "whatYouCanDo": "What you can do here",
-    "feature1": "Enumerate the language generated by a grammar up to a maximum word length",
-    "feature2": "Generate a grammar from a word enumeration or set-builder notation",
-    "feature3": "Check whether a word belongs to the language generated by a grammar",
     "simulator": {
       "modes": {
         "grammarToLanguage": "Grammar → Language",
@@ -1946,20 +1680,8 @@
       "noWords": "No words can be derived within these limits.",
       "truncatedNote": "The output was truncated by the word limit. Increase the limit to see more.",
       "completeNote": "All derivable words up to the selected length are shown.",
-      "wordsInput": "Words in the Language",
-      "wordPlaceholder": "Enter a word and press Enter",
-      "addWord": "Add",
-      "removeWord": "Remove word",
-      "noWordsAdded": "Add at least one word — an empty input represents ε.",
-      "languageToGrammarHelp": "A right-linear grammar is built from a prefix tree over the words. It derives at least the listed words and does not generalize beyond them.",
       "languageDefinition": "Language Definition",
-      "languageDefinitionHelp": "Accepts both an enumeration such as L = {\"010\", \"0010\"} and set-builder notation such as L = {a^n c b^m | n, m > 0}. Use ^ for exponents, single letters as variables, and ∈ ℕ / >= / > for conditions.",
       "languageInvalid": "Enter a valid language definition to derive a grammar.",
-      "detectedEnumeration": "Detected: Enumeration",
-      "detectedSetBuilder": "Detected: Set-builder Notation",
-      "pattern": "Pattern:",
-      "variables": "Variables:",
-      "emptyLanguage": "Empty language (no words).",
       "preset": {
         "enumeration": "Enumeration",
         "aStarcBStar": "a^n c b^m",
@@ -1969,9 +1691,6 @@
       "testWord": "Words to Test",
       "testWordPlaceholder": "Comma-separated words; empty = ε",
       "testWordHelp": "Separate several words with commas. Each character counts as one terminal symbol, and whitespace around the commas is ignored. An empty entry stands for ε.",
-      "accepted": "ACCEPTED — the grammar derives this word.",
-      "rejected": "REJECTED — the grammar does not derive this word.",
-      "emptyOutput": "—",
       "supportedFormats": "Supported Formats",
       "supportedFormatsExtensional": "Extensional / set notation",
       "supportedFormatsIntensional": "Intensional / formal notation",
@@ -1980,11 +1699,6 @@
         "rejectedStates": "Run ended in: {{states}} (not accepting)",
         "rejectedDeadEnd": "No transition for the next symbol — rejected."
       }
-    },
-    "examplesTab": {
-      "title": "Predefined Examples",
-      "subtitle": "Work through examples that convert between grammars and languages.",
-      "loadExample": "Load in Simulator"
     },
     "examples": {
       "categories": {
@@ -2035,10 +1749,6 @@
       }
     },
     "exercises": {
-      "givenGrammar": "Given Grammar",
-      "targetLanguage": "Target Language",
-      "solution": "Solution",
-      "epsilonHint": "ε represents the empty word.",
       "categories": {
         "grammarToLanguage": {
           "title": "Grammar → Language",
@@ -2100,15 +1810,10 @@
       }
     },
     "exerciseWorkspace": {
-      "selectedExercise": "Selected Exercise",
-      "exit": "Exit Exercise Mode",
       "showSolution": "Load solution",
       "check": "Check Solution",
       "checkMatch": "Looks correct!",
-      "checkMatchDetail": "Every word you entered is in the target language, and all worked-example words are covered.",
       "checkMismatch": "Not matching the target language yet",
-      "checkWrong": "Not in the target language: {{words}}",
-      "checkMissing": "Missing example words: {{words}}",
       "checkMatchDetailG2L": "Every word you listed is generated by the grammar, and you found all the shortest words.",
       "checkWrongG2L": "These words are not generated by the grammar: {{words}}",
       "checkMissingG2L": "You still need to list these words: {{words}}",
@@ -2128,8 +1833,7 @@
       "confirmTitle": "Reveal the Full Solution?",
       "confirmBody": "The solution will be displayed here and loaded into the simulator. You can continue trying instead.",
       "confirmYes": "Yes, Show Solution",
-      "confirmNo": "Keep Trying",
-      "solutionLoadedNote": "The worked solution has been loaded into the simulator below — run it to inspect the derivation."
+      "confirmNo": "Keep Trying"
     },
     "languageErrors": {
       "empty": "Enter a language definition.",
