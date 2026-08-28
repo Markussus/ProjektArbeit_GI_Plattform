@@ -479,16 +479,15 @@ function updateI18nConfigFiles(sections) {
     )
     .join("\n");
 
+  // Uniformly put ALL keys in double quotes for consistent formatting
   const enResourceObj = sections
     .map(
-      (s) =>
-        `    ${s.includes("-") ? `"${s}"` : s}: en${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
+      (s) => `    "${s}": en${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
     )
     .join("\n");
   const deResourceObj = sections
     .map(
-      (s) =>
-        `    ${s.includes("-") ? `"${s}"` : s}: de${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
+      (s) => `    "${s}": de${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
     )
     .join("\n");
 
@@ -545,7 +544,7 @@ export default i18n;
   const dtsResourceObj = sections
     .map(
       (s) =>
-        `    ${s.includes("-") ? `"${s}"` : s}: typeof en${toCamelCase(s[0].toUpperCase() + s.slice(1))};`,
+        `        "${s}": typeof en${toCamelCase(s[0].toUpperCase() + s.slice(1))};`,
     )
     .join("\n");
 
