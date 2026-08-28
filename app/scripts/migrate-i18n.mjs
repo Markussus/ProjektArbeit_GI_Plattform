@@ -357,49 +357,48 @@ function processSourceFiles(mapping, isDryRun) {
   const modifiedFiles = [];
 
   // Build sorted list of search-and-replace tokens (longer keys first to prevent partial substring matches)
-  const replacementList = [];
+  const keyPairs = [];
+
+  // Match key when enclosed by quotes, backticks, dashes, underscores, slashes, or curly braces
+  const makeSearchRegex = (keyStr) =>
+    new RegExp(
+      `(?<=["'\`\\-_/{])` + escapeRegExp(keyStr) + `(?=["'\`\\-_/}])`,
+      "g",
+    );
 
   // 1. Leaf keys
   for (const [oldKey, newKey] of Object.entries(mapping)) {
     if (oldKey === newKey) continue;
-
-    // Normal key: "old.key"
-    replacementList.push({
-      searchRegex: new RegExp(`(["'\`])${escapeRegExp(oldKey)}\\1`, "g"),
-      replacement: `$1${newKey}$1`,
-      oldKey,
-      newKey,
-    });
+    keyPairs.push({ oldKey, newKey, searchRegex: makeSearchRegex(oldKey) });
 
     // Handle Plural Base Keys (e.g., if oldKey is "literalCount_one", replace base "literalCount" in code)
     if (oldKey.endsWith("_one")) {
       const oldBase = oldKey.slice(0, -4);
       const newBase = newKey.endsWith("_one") ? newKey.slice(0, -4) : newKey;
       if (oldBase !== newBase) {
-        replacementList.push({
-          searchRegex: new RegExp(`(["'\`])${escapeRegExp(oldBase)}\\1`, "g"),
-          replacement: `$1${newBase}$1`,
+        keyPairs.push({
           oldKey: oldBase,
           newKey: newBase,
+          searchRegex: makeSearchRegex(oldBase),
         });
       }
     }
   }
 
   // 2. Template literal prefixes
+  const templatePairs = [];
   for (const { oldPattern, newPattern } of TEMPLATE_LITERAL_REPLACEMENTS) {
     if (oldPattern !== newPattern) {
-      replacementList.push({
+      templatePairs.push({
         searchRegex: new RegExp(`\`${escapeRegExp(oldPattern)}\\$\{`, "g"),
         replacement: `\`${newPattern}\${`,
         oldKey: `\`${oldPattern}\${...}\``,
-        newKey: `\`${newPattern}\${...}\``,
       });
     }
   }
 
   // Sort by oldKey length descending to avoid prefix collision
-  replacementList.sort((a, b) => b.oldKey.length - a.oldKey.length);
+  keyPairs.sort((a, b) => b.oldKey.length - a.oldKey.length);
 
   for (const filePath of files) {
     // Skip i18n locales definition files
@@ -409,7 +408,8 @@ function processSourceFiles(mapping, isDryRun) {
     let updatedContent = originalContent;
     let fileReplacements = 0;
 
-    for (const item of replacementList) {
+    // 1. Replace template literal prefixes: `prefix.${foo}`
+    for (const item of templatePairs) {
       const matches = updatedContent.match(item.searchRegex);
       if (matches) {
         fileReplacements += matches.length;
@@ -417,6 +417,15 @@ function processSourceFiles(mapping, isDryRun) {
           item.searchRegex,
           item.replacement,
         );
+      }
+    }
+
+    // 2. Replace keys enclosed by string/delimiter boundaries
+    for (const pair of keyPairs) {
+      const matches = updatedContent.match(pair.searchRegex);
+      if (matches) {
+        fileReplacements += matches.length;
+        updatedContent = updatedContent.replace(pair.searchRegex, pair.newKey);
       }
     }
 
