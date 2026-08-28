@@ -1467,6 +1467,7 @@
       "description": "Learn about the fundamentals of computation through Turing Machines and their transition functions. Explore the limits of what can be computed."
     },
     "overview": {
+      "tutorialVideo": "Turing Machine tutorial video",
       "overviewTitle": "What is a Turing Machine?",
       "overviewText": "A Turing Machine is a mathematical model of computation that defines an abstract machine which manipulates symbols on a strip of tape according to a table of rules. It provides a simple yet powerful framework for understanding what problems can be solved algorithmically.",
       "concepts": "Key Concepts",

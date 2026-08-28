@@ -1467,6 +1467,7 @@
       "description": "Lernen Sie die Grundlagen der Berechenbarkeit durch Turingmaschinen und ihre Übergangsfunktionen. Erforschen Sie die Grenzen dessen, was berechenbar ist."
     },
     "overview": {
+      "tutorialVideo": "Tutorial-Video zur Turingmaschine",
       "overviewTitle": "Was ist eine Turingmaschine?",
       "overviewText": "Eine Turingmaschine ist ein mathematisches Modell der Berechenbarkeit, das eine abstrakte Maschine definiert, die Symbole auf einem Band nach einer Regeltabelle manipuliert. Sie bietet ein einfaches, aber mächtiges Rahmenwerk zum Verständnis algorithmisch lösbarer Probleme.",
       "concepts": "Schlüsselkonzepte",

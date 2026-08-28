@@ -145,13 +145,13 @@ function solutionRowsByValidHaltState(
 }
 
 test.describe("Turing Machine page", () => {
-  // Tests the tab navigation and the static overview/examples content that frames the topic page.
+  // Tests the tab navigation and the video overview that frames the topic page.
   test("shows the topic overview and switches between the top-level tabs", async ({
     page,
   }) => {
     await gotoTuringMachinePage(page);
 
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
 
     await page.getByTestId("tab-button-examples").click();
     await expect(page.getByTestId("tm-examples-tab")).toBeVisible();
@@ -160,7 +160,7 @@ test.describe("Turing Machine page", () => {
     ).toBeVisible();
 
     await page.getByTestId("tab-button-overview").click();
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
   });
 
   // Tests exercise selection, opening an exercise in the simulator, and the simulation focus toggle workflow.
@@ -201,7 +201,7 @@ test.describe("Turing Machine page", () => {
 
     await page.getByTestId("tab-button-overview").click();
     await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
   });
 
   test("always reloads examples from their built-in program without storing changes", async ({
