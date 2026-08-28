@@ -36,7 +36,17 @@ const appPackageJson = path.join(appDir, "package.json");
 
 const launcherFiles = ["start.cmd", "start.sh", "serve.py"];
 
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmExecPath = process.env.npm_execpath;
+
+function runNpm(args, options = {}) {
+  if (!npmExecPath) {
+    throw new Error(
+      "npm execution path is unavailable. Start the release builder with 'npm run release'.",
+    );
+  }
+
+  return run(process.execPath, [npmExecPath, ...args], options);
+}
 
 /* ============================================================
  * Load dependencies from App/node_modules
@@ -321,7 +331,7 @@ async function buildApplication() {
    * IMPORTANT:
    * npm runs from App/, because package.json lives there.
    */
-  run(npmCommand, ["run", "build"], {
+  runNpm(["run", "build"], {
     cwd: appDir,
   });
 
@@ -569,8 +579,8 @@ async function main() {
     throw new Error("Git was not found.");
   }
 
-  if (!commandExists(npmCommand)) {
-    throw new Error("npm was not found.");
+  if (!npmExecPath) {
+    throw new Error("npm execution path was not found. Start this script with 'npm run release'.",);
   }
 
   if (!commandExists("glab")) {
