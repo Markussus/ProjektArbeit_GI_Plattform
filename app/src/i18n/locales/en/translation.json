@@ -20,10 +20,8 @@
     "home": "TRAINING CENTER"
   },
   "sidebar": {
-    "documentation": "DOCUMENTATION",
-    "legal": "LEGAL",
-    "support": "SUPPORT",
-    "toggle": "Toggle sidebar"
+    "toggle": "Toggle sidebar",
+    "info": "Information"
   },
   "footer": {
     "copyright": "© 2026 THWS",
@@ -1436,28 +1434,6 @@
     "reason2": "The page may have been removed or renamed.",
     "reason3": "The link may be outdated or no longer valid."
   },
-  "documentation": {
-    "label": "Documentation",
-    "title": "Documentation",
-    "description": "Structured information about the platform, the modules, and the learning environment will be available here in the future.",
-    "section1Title": "Platform overview",
-    "section1Text": "This section can serve as an entry point for the structure, navigation, and main features of the application.",
-    "section2Title": "Module notes",
-    "section2Text": "Descriptions, learning goals, and additional notes for the individual modules can be added here later.",
-    "section3Title": "Technical notes",
-    "section3Text": "This section can later contain information about features, limitations, and planned extensions."
-  },
-  "help": {
-    "label": "Help",
-    "title": "Help",
-    "description": "Support content, frequently asked questions, and guidance for common issues will be available here in the future.",
-    "section1Title": "Getting started",
-    "section1Text": "This section can later include short guidance for navigation and the most important application features.",
-    "section2Title": "Support",
-    "section2Text": "This area can later explain where to turn for questions or technical issues.",
-    "section3Title": "Troubleshooting",
-    "section3Text": "This section is intended as a placeholder for common issues, known problems, and simple solutions."
-  },
   "fa": {
     "editor": {
       "manual": "Manual Editor",
@@ -1885,5 +1861,10 @@
       "structuredLine": "Line {{line}}: expected 'key: value' or a production rule.",
       "structuredMissingType": "The structured format requires a 'type: grammar' header."
     }
+  },
+  "info": {
+    "label": "Information",
+    "title": "Information & Legal",
+    "description": "Manage your local simulator progress and find legal notices and third-party licenses."
   }
 }
