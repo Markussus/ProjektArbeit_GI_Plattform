@@ -4,18 +4,8 @@ const RL_URL = "/fundamentals-cs/regular-languages";
 const DEFAULT_GRAMMAR = "S -> aS | bA\nA -> bA | ε";
 
 test.describe("Regular Languages — Overview tab", () => {
-  test("shows overview text and demo-video tutorial section", async ({
-    page,
-  }) => {
+  test("shows only the tutorial video", async ({ page }) => {
     await page.goto(RL_URL);
-    await expect(page.getByTestId("rl-tutorial-questions")).toBeVisible();
-    await expect(
-      page.getByTestId("rl-tutorial-question-1-select"),
-    ).toBeVisible();
-    await page.getByTestId("rl-tutorial-question-1-select").click();
-    await expect(
-      page.getByTestId("rl-tutorial-question-1-description"),
-    ).toBeVisible();
     await expect(page.getByTestId("rl-tutorial-video")).toBeVisible();
   });
 });

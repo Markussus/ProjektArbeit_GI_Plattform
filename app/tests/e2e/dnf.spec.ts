@@ -55,17 +55,7 @@ test.describe("DNF page", () => {
     await expect(page.getByTestId("tab-button-examples")).toBeVisible();
     await expect(page.getByTestId("tab-button-simulation")).toBeVisible();
 
-    await expect(page.getByTestId("dnf-tutorial-questions")).toBeVisible();
-    await expect(
-      page.getByTestId("dnf-tutorial-question-1-select"),
-    ).toContainText("What is Disjunctive Normal Form?");
-    await expect(
-      page.getByTestId("dnf-tutorial-question-2-select"),
-    ).toContainText("How is the canonical DNF derived from a truth table?");
-    await page.getByTestId("dnf-tutorial-question-3-select").click();
-    await expect(
-      page.getByTestId("dnf-tutorial-question-3-description"),
-    ).toContainText("The canonical DNF contains one complete minterm");
+    await expect(page.getByTestId("dnf-tutorial-video")).toBeVisible();
 
     await switchTab(page, "exercises");
     await expect(page.getByTestId("dnf-exercises-tab")).toBeVisible();
