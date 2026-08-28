@@ -96,6 +96,7 @@ function computeDefaultNewKey(oldKey) {
     oldKey.startsWith("legal.") ||
     oldKey.startsWith("documentation.") ||
     oldKey.startsWith("help.") ||
+    oldKey.startsWith("info.") ||
     oldKey.startsWith("notFound.") ||
     oldKey.startsWith("modules.") ||
     oldKey.startsWith("exercise.") ||
