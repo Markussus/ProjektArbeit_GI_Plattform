@@ -56,7 +56,8 @@ function runNpm(args, options = {}) {
  * ============================================================ */
 
 const requireFromApp = createRequire(appPackageJson);
-const archiver = requireFromApp("archiver");
+const archiverModule = requireFromApp("archiver");
+const archiver = archiverModule.default ?? archiverModule;
 
 /* ============================================================
  * Console utilities
