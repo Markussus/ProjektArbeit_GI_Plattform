@@ -1,4 +1,20 @@
 import { useTranslation } from "react-i18next";
+import { TopicTutorialVideoSection } from "@/components/shared/TopicTutorialVideoSection/TopicTutorialVideoSection";
+
+const tutorialQuestions = [
+  {
+    titleKey: "automata.tutorialQuestion1",
+    answerKey: "automata.tutorialAnswer1",
+  },
+  {
+    titleKey: "automata.tutorialQuestion2",
+    answerKey: "automata.tutorialAnswer2",
+  },
+  {
+    titleKey: "automata.tutorialQuestion3",
+    answerKey: "automata.tutorialAnswer3",
+  },
+] as const;
 
 /**
  * Finite Automata overview. The "Core Concepts" card grid was removed — a
@@ -18,6 +34,14 @@ export function OverviewTab() {
           {t("automata.overviewText")}
         </p>
       </div>
+
+      <TopicTutorialVideoSection
+        topicId="finite-automata"
+        videoTitleKey="automata.tutorialVideo"
+        questionLabelKey="automata.tutorialQuestionLabel"
+        questions={tutorialQuestions}
+        testIdPrefix="automata-tutorial"
+      />
     </div>
   );
 }

@@ -1,4 +1,20 @@
 import { useTranslation } from "react-i18next";
+import { TopicTutorialVideoSection } from "@/components/shared/TopicTutorialVideoSection/TopicTutorialVideoSection";
+
+const tutorialQuestions = [
+  {
+    titleKey: "rl.tutorialQuestion1",
+    answerKey: "rl.tutorialAnswer1",
+  },
+  {
+    titleKey: "rl.tutorialQuestion2",
+    answerKey: "rl.tutorialAnswer2",
+  },
+  {
+    titleKey: "rl.tutorialQuestion3",
+    answerKey: "rl.tutorialAnswer3",
+  },
+] as const;
 
 /**
  * Regular Languages overview. The "Core Concepts" card grid was removed — a
@@ -18,6 +34,14 @@ export function OverviewTab() {
           {t("rl.overviewText")}
         </p>
       </div>
+
+      <TopicTutorialVideoSection
+        topicId="regular-languages"
+        videoTitleKey="rl.tutorialVideo"
+        questionLabelKey="rl.tutorialQuestionLabel"
+        questions={tutorialQuestions}
+        testIdPrefix="rl-tutorial"
+      />
     </div>
   );
 }

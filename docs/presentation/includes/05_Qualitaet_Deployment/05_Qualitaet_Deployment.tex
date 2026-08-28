@@ -7,6 +7,13 @@
   \item Ein GitLab Runner auf einem Raspberry Pi führt die ARM-basierten Container-Jobs aus.
 \end{itemframe}
 
+\begin{itemframe}{Abgleich mit dem Lastenheft}
+  \item \textbf{Fachlicher Umfang}: Alle Lastenheft-Ziele erfüllt und erweitert (Reguläre Sprachen, Kodierungen, Programmieren 1).
+  \item \textbf{Didaktischer Kern}: Schrittweise Simulationen, sichtbare Zwischenschritte und begründete Rückmeldungen ohne Backend.
+  \item \textbf{Messbare Performance}: Automatisiertes Lighthouse CI-Gate in der Pipeline ($LCP \le 1{,}25$\,s) über alle Themen- und Einstiegsseiten.
+  \item \textbf{Offene Punkte}: Usability-Tests mit Studierenden, Screenreader-Barrierefreiheit und mobile Optimierung.
+\end{itemframe}
+
 \begin{itemframe}{Deployment-Strategie}
   \item Die Anwendung ist ein Vite-Frontend. Der Build erzeugt statische Dateien in \texttt{app/dist}.
   \item Nach erfolgreicher Pipeline ist dieses Artefakt der auslieferbare Stand.
