@@ -41,7 +41,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   return (
     <TopicSimulationTab
       {...props}
-      emptyStateTextKey="simulation.emptyStates.dnf"
+      emptyStateTextKey="common.simulation.emptyStates.dnf"
       selectedItemActions={headerActions}
       onReset={() => simulatorRef.current?.resetStoredState()}
       resetDisabled={!isSimulatorReady}

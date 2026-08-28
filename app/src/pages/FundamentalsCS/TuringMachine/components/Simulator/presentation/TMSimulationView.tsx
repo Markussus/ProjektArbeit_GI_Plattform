@@ -63,14 +63,14 @@ export function TMSimulationView({
     >
       <div className="flex w-full items-center justify-between">
         <h2 data-testid="tm-simulation-title" className="text-xl font-bold">
-          {t("tm.sim.screen.title")}
+          {t("turing-machine.sim.screen.title")}
         </h2>
         <button
           onClick={onEditConfig}
           data-testid="tm-edit-configuration"
           className="hover:bg-accent rounded-md border px-4 py-2"
         >
-          {t("tm.sim.screen.edit")}
+          {t("turing-machine.sim.screen.edit")}
         </button>
       </div>
 

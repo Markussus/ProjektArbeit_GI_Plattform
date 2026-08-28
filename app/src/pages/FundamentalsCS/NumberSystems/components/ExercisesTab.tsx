@@ -27,8 +27,8 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       testId="ns-exercises-tab"
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="ns-reset-all-exercises"
         />

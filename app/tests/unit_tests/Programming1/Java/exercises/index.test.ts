@@ -9,7 +9,7 @@ import {
 describe("Java exercise lookup helpers", () => {
   describe("when a known exercise id is provided", () => {
     it("returns the matching starter code for that exercise", () => {
-      const starterCode = getJavaStarterCode("java.exercise4");
+      const starterCode = getJavaStarterCode("java-programming.exercise4");
 
       expect(starterCode).toContain("import java.util.Arrays;");
       expect(starterCode).toContain(
@@ -18,7 +18,7 @@ describe("Java exercise lookup helpers", () => {
     });
 
     it("returns the matching file name for that exercise", () => {
-      expect(getJavaFileName("java.exercise4")).toBe("Main.java");
+      expect(getJavaFileName("java-programming.exercise4")).toBe("Main.java");
     });
   });
 
@@ -30,16 +30,19 @@ describe("Java exercise lookup helpers", () => {
           .map((exercise) => exercise.storageId)
           .sort((left, right) => left - right),
       ).toEqual(Array.from({ length: 13 }, (_, storageId) => storageId));
-      expect(getJavaScenario("java.exercise10")).toMatchObject({
+      expect(getJavaScenario("java-programming.exercise10")).toMatchObject({
         kind: "exercise",
         definition: { difficulty: "easy" },
       });
-      expect(getJavaScenario("java.exercise11")).toMatchObject({
+      expect(getJavaScenario("java-programming.exercise11")).toMatchObject({
         kind: "exercise",
         definition: { difficulty: "medium" },
       });
 
-      for (const id of ["java.exercise12", "java.exercise13"]) {
+      for (const id of [
+        "java-programming.exercise12",
+        "java-programming.exercise13",
+      ]) {
         const scenario = getJavaScenario(id);
         expect(scenario).toMatchObject({
           kind: "exercise",

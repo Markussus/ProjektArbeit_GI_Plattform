@@ -203,9 +203,9 @@ export function RLSimulator({
 
       <ConfirmDialog
         isOpen={pendingMode !== null}
-        title={t("simulator.validation.exitTabTitle")}
-        description={t("simulator.validation.exitTabDesc")}
-        confirmLabel={t("simulator.validation.exitTabConfirm")}
+        title={t("common.exerciseValidation.exitTabTitle")}
+        description={t("common.exerciseValidation.exitTabDesc")}
+        confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
         onConfirm={confirmModeChange}
         onCancel={() => setPendingMode(null)}
         variant="warning"

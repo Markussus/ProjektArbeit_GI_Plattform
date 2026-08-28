@@ -32,10 +32,14 @@ test.describe("Java page", () => {
     await test.step("The exercises tab exposes the Java exercise list", async () => {
       await page.getByTestId(appTestIds.tabExercises).click();
       await expect(
-        page.getByTestId("java-exercise-card-java.exercise1-select"),
+        page.getByTestId(
+          "java-exercise-card-java-programming.exercise1-select",
+        ),
       ).toBeVisible();
       await expect(
-        page.getByTestId("java-exercise-card-java.exercise5-select"),
+        page.getByTestId(
+          "java-exercise-card-java-programming.exercise5-select",
+        ),
       ).toBeVisible();
     });
 
@@ -55,15 +59,17 @@ test.describe("Java page", () => {
 
     await test.step("Selecting an exercise should expand its details", async () => {
       await page
-        .getByTestId("java-exercise-card-java.exercise4-select")
+        .getByTestId("java-exercise-card-java-programming.exercise4-select")
         .click();
       await expect(
-        page.getByTestId("java-exercise-card-java.exercise4-open"),
+        page.getByTestId("java-exercise-card-java-programming.exercise4-open"),
       ).toBeVisible();
     });
 
     await test.step("Opening an exercise in simulation should preserve the exercise context", async () => {
-      await page.getByTestId("java-exercise-card-java.exercise4-open").click();
+      await page
+        .getByTestId("java-exercise-card-java-programming.exercise4-open")
+        .click();
       await expect(page.getByTestId(appTestIds.javaSimulator)).toBeVisible();
       await expect(
         page.getByTestId(appTestIds.simulationSelectedExercise),
@@ -78,13 +84,15 @@ test.describe("Java page", () => {
     await page.getByTestId(appTestIds.tabExamples).click();
 
     await page
-      .getByTestId("java-example-card-java.example3Title-select")
+      .getByTestId("java-example-card-java-programming.example3Title-select")
       .click();
     await expect(
-      page.getByTestId("java-example-card-java.example3Title-open"),
+      page.getByTestId("java-example-card-java-programming.example3Title-open"),
     ).toBeVisible();
 
-    await page.getByTestId("java-example-card-java.example3Title-open").click();
+    await page
+      .getByTestId("java-example-card-java-programming.example3Title-open")
+      .click();
     await expect(page.getByTestId(appTestIds.javaSimulator)).toBeVisible();
     await expect(
       page.getByTestId(appTestIds.simulationSelectedExercise),
@@ -379,9 +387,11 @@ public class Main {
     await page.getByTestId(appTestIds.tabSimulation).click();
     await page.getByTestId(appTestIds.tabExamples).click();
     await page
-      .getByTestId("java-example-card-java.example1Title-select")
+      .getByTestId("java-example-card-java-programming.example1Title-select")
       .click();
-    await page.getByTestId("java-example-card-java.example1Title-open").click();
+    await page
+      .getByTestId("java-example-card-java-programming.example1Title-open")
+      .click();
     const storedFreeSimulation = await page.evaluate(() =>
       window.localStorage.getItem("TrainingCenterStorage"),
     );
@@ -399,9 +409,11 @@ public class Main {
     await page.getByTestId(appTestIds.tabOverview).click();
     await page.getByTestId(appTestIds.tabExamples).click();
     await page
-      .getByTestId("java-example-card-java.example1Title-select")
+      .getByTestId("java-example-card-java-programming.example1Title-select")
       .click();
-    await page.getByTestId("java-example-card-java.example1Title-open").click();
+    await page
+      .getByTestId("java-example-card-java-programming.example1Title-open")
+      .click();
     await expect(exportActiveSimulator(page)).resolves.toBe(
       builtInExampleTransfer,
     );

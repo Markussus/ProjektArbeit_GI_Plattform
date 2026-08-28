@@ -26,7 +26,9 @@ export function JavaConsolePanel({
     >
       <div className="border-border flex items-center gap-2 border-b px-4 py-3">
         <TerminalSquare className="text-muted-foreground size-4" />
-        <h3 className="text-sm font-semibold">{t("java.console.title")}</h3>
+        <h3 className="text-sm font-semibold">
+          {t("java-programming.console.title")}
+        </h3>
       </div>
 
       <div className="space-y-4 p-4">
@@ -35,32 +37,34 @@ export function JavaConsolePanel({
             data-testid="java-timeout-warning"
             className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
           >
-            <p className="font-semibold">{t("java.timeout.warningTitle")}</p>
-            <p>{t("java.timeout.warningText")}</p>
+            <p className="font-semibold">
+              {t("java-programming.timeout.warningTitle")}
+            </p>
+            <p>{t("java-programming.timeout.warningText")}</p>
           </div>
         )}
 
         <ConsoleSection
-          title={t("java.console.stdout")}
+          title={t("java-programming.console.stdout")}
           content={stdout}
-          emptyText={t("java.console.stdoutEmpty")}
+          emptyText={t("java-programming.console.stdoutEmpty")}
           testId="java-console-stdout"
         />
         <ConsoleSection
-          title={t("java.console.stderr")}
+          title={t("java-programming.console.stderr")}
           content={stderr}
-          emptyText={t("java.console.stderrEmpty")}
+          emptyText={t("java-programming.console.stderrEmpty")}
           tone="error"
           testId="java-console-stderr"
         />
 
         <div data-testid="java-console-issues" className="space-y-2">
           <h4 className="text-xs font-semibold tracking-wide uppercase">
-            {t("java.console.issues")}
+            {t("java-programming.console.issues")}
           </h4>
           {snapshot.issues.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              {t("java.console.noIssues")}
+              {t("java-programming.console.noIssues")}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -85,7 +89,7 @@ export function JavaConsolePanel({
                   )}
                   {(issue.line || issue.column) && (
                     <p className="text-muted-foreground text-xs">
-                      {t("java.console.issueLocation", {
+                      {t("java-programming.console.issueLocation", {
                         line: issue.line ?? "?",
                         column: issue.column ?? "?",
                       })}

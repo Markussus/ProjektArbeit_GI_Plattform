@@ -17,8 +17,8 @@ export function Header() {
     : location.pathname === "/info" ||
         location.pathname === "/help" ||
         location.pathname === "/legal"
-      ? t("info.title")
-      : t("nav.home");
+      ? t("common.info.title")
+      : t("common.nav.home");
 
   return (
     <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-3 sm:px-6">

@@ -7,8 +7,8 @@ import { SimulationTab } from "./components/SimulationTab";
 export function TuringMachinePage() {
   return (
     <ModuleTopicPage
-      titleKey="tm.topic.title"
-      descriptionKey="tm.topic.description"
+      titleKey="turing-machine.topic.title"
+      descriptionKey="turing-machine.topic.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}

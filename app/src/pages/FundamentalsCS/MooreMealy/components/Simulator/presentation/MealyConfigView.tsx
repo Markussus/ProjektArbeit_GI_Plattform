@@ -53,15 +53,17 @@ export function MealyConfigView(props: Props) {
   return (
     <div data-testid="mealy-config-view" className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">{t("moore.mealy.configureTitle")}</h2>
+        <h2 className="text-lg font-bold">
+          {t("moore-mealy.mealy.configureTitle")}
+        </h2>
         <p className="text-muted-foreground text-sm">
-          {t("moore.sim.configureHelp")}
+          {t("moore-mealy.sim.configureHelp")}
         </p>
       </div>
       {props.issues.length > 0 && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
           {props.issues
-            .map((issue) => t(`moore.sim.validation.${issue}` as never))
+            .map((issue) => t(`moore-mealy.sim.validation.${issue}` as never))
             .join(" ")}
         </div>
       )}
@@ -74,18 +76,18 @@ export function MealyConfigView(props: Props) {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.representation")}
+              {t("moore-mealy.sim.representation")}
             </label>
             <DropdownSelect<InternalRepresentation>
               value={program.representation}
               options={[
-                { value: "decimal", label: t("moore.sim.decimal") },
-                { value: "binary", label: t("moore.sim.binary") },
+                { value: "decimal", label: t("moore-mealy.sim.decimal") },
+                { value: "binary", label: t("moore-mealy.sim.binary") },
               ]}
               onChange={(representation) =>
                 props.onChange({ ...program, representation })
               }
-              ariaLabel={t("moore.sim.representation")}
+              ariaLabel={t("moore-mealy.sim.representation")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-representation-select"
@@ -94,7 +96,7 @@ export function MealyConfigView(props: Props) {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.startState")}
+              {t("moore-mealy.sim.startState")}
             </label>
             <DropdownSelect
               value={program.initialState}
@@ -102,7 +104,7 @@ export function MealyConfigView(props: Props) {
               onChange={(initialState) =>
                 props.onChange({ ...program, initialState })
               }
-              ariaLabel={t("moore.sim.startState")}
+              ariaLabel={t("moore-mealy.sim.startState")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="mealy-start-state-select"
@@ -130,16 +132,16 @@ export function MealyConfigView(props: Props) {
         />
         <div className="space-y-4">
           <SymbolSetPanel
-            title={t("moore.sim.states")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.states")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             items={program.states.map((state, index) => ({
               key: state,
               content: `${state} ${formatInternalNumber(index, program.representation)}`,
             }))}
           />
           <SymbolSetPanel
-            title={t("moore.sim.outputAlphabet")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.outputAlphabet")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             items={outputs.map(([code, symbol]) => ({
               key: String(code),
               content: `${symbol} ${formatInternalNumber(code, program.representation)}`,

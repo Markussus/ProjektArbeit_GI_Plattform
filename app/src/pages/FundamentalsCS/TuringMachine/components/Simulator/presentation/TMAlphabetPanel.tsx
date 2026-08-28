@@ -33,7 +33,7 @@ export function TMAlphabetPanel({
           ))
         ) : (
           <span className="text-muted-foreground text-sm italic">
-            {t("tm.config.alphabets.noSymbols")}
+            {t("turing-machine.config.alphabets.noSymbols")}
           </span>
         )}
       </div>

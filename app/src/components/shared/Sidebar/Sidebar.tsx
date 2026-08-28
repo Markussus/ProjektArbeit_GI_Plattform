@@ -47,7 +47,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           onClick={onToggle}
           data-testid="sidebar-toggle"
           className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
-          aria-label={t("sidebar.toggle")}
+          aria-label={t("common.sidebar.toggle")}
         >
           <div className="flex size-5 items-center justify-center">
             <Menu className="size-4" />
@@ -118,7 +118,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <HelpCircle className="size-4" />
           </div>
           {!collapsed && (
-            <span className="leading-none">{t("sidebar.info")}</span>
+            <span className="leading-none">{t("common.sidebar.info")}</span>
           )}
         </Link>
       </div>

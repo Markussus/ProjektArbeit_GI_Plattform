@@ -46,7 +46,7 @@ export function FATransitionTableEditor({
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-semibold">
-        {t("fa.config.transitionTable", "Transition Table")}
+        {t("finite-automata.config.transitionTable", "Transition Table")}
       </h3>
       <div className="overflow-x-auto rounded-lg border shadow-sm">
         <table className="w-full border-collapse text-sm">
@@ -68,11 +68,11 @@ export function FATransitionTableEditor({
                       <button
                         type="button"
                         onClick={() => onRemoveState(state)}
-                        aria-label={t("fa.config.removeState", {
+                        aria-label={t("finite-automata.config.removeState", {
                           state,
                           defaultValue: "Remove state {{state}}",
                         })}
-                        title={t("fa.config.removeState", {
+                        title={t("finite-automata.config.removeState", {
                           state,
                           defaultValue: "Remove state {{state}}",
                         })}
@@ -89,8 +89,11 @@ export function FATransitionTableEditor({
                   <button
                     type="button"
                     onClick={onAddState}
-                    aria-label={t("fa.config.addState", "Add state")}
-                    title={t("fa.config.addState", "Add state")}
+                    aria-label={t(
+                      "finite-automata.config.addState",
+                      "Add state",
+                    )}
+                    title={t("finite-automata.config.addState", "Add state")}
                     className="text-primary hover:bg-primary/10 inline-flex h-7 w-7 items-center justify-center rounded-md font-bold"
                   >
                     <Plus className="h-4 w-4" />
@@ -140,7 +143,11 @@ export function FATransitionTableEditor({
                     onClick={() => setShowEpsilon(true)}
                     className="text-primary hover:text-primary/80 text-xs font-semibold tracking-wide"
                   >
-                    + {t("fa.config.addEpsilon", "Add ε-Transitions")}
+                    +{" "}
+                    {t(
+                      "finite-automata.config.addEpsilon",
+                      "Add ε-Transitions",
+                    )}
                   </button>
                 </td>
               </tr>

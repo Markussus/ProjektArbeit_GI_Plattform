@@ -99,9 +99,11 @@ export function MooreTransitionTable({
   return (
     <section className="min-w-0 space-y-2">
       <div>
-        <h3 className="font-semibold">{t("moore.sim.transitionTable")}</h3>
+        <h3 className="font-semibold">
+          {t("moore-mealy.sim.transitionTable")}
+        </h3>
         <p className="text-muted-foreground text-sm">
-          {t("moore.sim.transitionTableHelp")}
+          {t("moore-mealy.sim.transitionTableHelp")}
         </p>
       </div>
 
@@ -121,7 +123,7 @@ export function MooreTransitionTable({
           <thead>
             <tr className="bg-muted/50 border-b">
               <th className="border-r p-3 text-left font-semibold">
-                {!mooreOutputControls && t("moore.sim.event")}
+                {!mooreOutputControls && t("moore-mealy.sim.event")}
               </th>
               {program.states.map((state, stateIndex) => (
                 <th
@@ -146,14 +148,14 @@ export function MooreTransitionTable({
                           event.currentTarget.blur();
                         }
                       }}
-                      aria-label={t("moore.sim.renameState", { state })}
+                      aria-label={t("moore-mealy.sim.renameState", { state })}
                       data-testid={`moore-state-name-${stateIndex}`}
                       style={{ width: getTextInputWidth(state) }}
                       className="focus:ring-ring min-w-0 flex-1 rounded bg-transparent px-1 py-1 font-mono font-semibold outline-none focus:ring-1"
                     />
                     <span
                       className="text-muted-foreground font-mono text-xs"
-                      title={t("moore.sim.internalValue")}
+                      title={t("moore-mealy.sim.internalValue")}
                     >
                       {formatInternalNumber(stateIndex, program.representation)}
                     </span>
@@ -161,7 +163,7 @@ export function MooreTransitionTable({
                       <button
                         type="button"
                         onClick={() => onRemoveState(state)}
-                        aria-label={t("moore.sim.removeState", { state })}
+                        aria-label={t("moore-mealy.sim.removeState", { state })}
                         data-testid={`moore-remove-state-${stateIndex}`}
                         className="text-muted-foreground hover:text-destructive rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                       >
@@ -175,7 +177,7 @@ export function MooreTransitionTable({
                 <button
                   type="button"
                   onClick={() => onAddState()}
-                  aria-label={t("moore.sim.addState")}
+                  aria-label={t("moore-mealy.sim.addState")}
                   data-testid="moore-add-state"
                   className="text-brand hover:bg-brand/10 inline-flex size-8 items-center justify-center rounded-md"
                 >
@@ -217,7 +219,7 @@ export function MooreTransitionTable({
                           event.currentTarget.blur();
                         }
                       }}
-                      aria-label={t("moore.sim.renameInput", {
+                      aria-label={t("moore-mealy.sim.renameInput", {
                         symbol: inputSymbol,
                       })}
                       data-testid={`moore-input-symbol-${inputIndex}`}
@@ -226,14 +228,14 @@ export function MooreTransitionTable({
                     />
                     <span
                       className="text-muted-foreground font-mono text-xs"
-                      title={t("moore.sim.internalValue")}
+                      title={t("moore-mealy.sim.internalValue")}
                     >
                       {formatInternalNumber(inputIndex, program.representation)}
                     </span>
                     <button
                       type="button"
                       onClick={() => onRemoveInputSymbol(inputSymbol)}
-                      aria-label={t("moore.sim.removeInput", {
+                      aria-label={t("moore-mealy.sim.removeInput", {
                         symbol: inputSymbol,
                       })}
                       data-testid={`moore-remove-input-symbol-${inputIndex}`}
@@ -272,16 +274,19 @@ export function MooreTransitionTable({
                               createdState,
                             );
                           }}
-                          ariaLabel={t("moore.sim.transitionForStateInput", {
-                            state,
-                            input: inputSymbol,
-                          })}
+                          ariaLabel={t(
+                            "moore-mealy.sim.transitionForStateInput",
+                            {
+                              state,
+                              input: inputSymbol,
+                            },
+                          )}
                           createLabel={(value) =>
-                            t("moore.sim.createNamedState", { value })
+                            t("moore-mealy.sim.createNamedState", { value })
                           }
-                          emptyCreateLabel={t("moore.sim.createState")}
-                          notFoundLabel={t("moore.sim.stateNotFound")}
-                          searchPlaceholder={t("moore.sim.search")}
+                          emptyCreateLabel={t("moore-mealy.sim.createState")}
+                          notFoundLabel={t("moore-mealy.sim.stateNotFound")}
+                          searchPlaceholder={t("moore-mealy.sim.search")}
                           testId={`moore-transition-${inputIndex}-${stateIndex}`}
                           className="w-full min-w-0"
                           style={{ width: dropdownWidth }}
@@ -303,7 +308,7 @@ export function MooreTransitionTable({
                                   symbolColumnKey,
                                 )
                               }
-                              aria-label={`${t("moore.sim.symbolOutput")} ${state} ${inputSymbol}`}
+                              aria-label={`${t("moore-mealy.sim.symbolOutput")} ${state} ${inputSymbol}`}
                               data-testid={`${outputControls.testIdPrefix}-symbol-${inputIndex}-${stateIndex}`}
                               data-output-column={symbolColumnKey}
                               style={{
@@ -347,7 +352,7 @@ export function MooreTransitionTable({
                                   event.currentTarget.blur();
                                 }
                               }}
-                              aria-label={`${t("moore.sim.internalOutputCode")} ${state} ${inputSymbol}`}
+                              aria-label={`${t("moore-mealy.sim.internalOutputCode")} ${state} ${inputSymbol}`}
                               data-testid={`${outputControls.testIdPrefix}-code-${inputIndex}-${stateIndex}`}
                               data-output-column={codeColumnKey}
                               style={{
@@ -373,7 +378,7 @@ export function MooreTransitionTable({
                   className="border-border text-muted-foreground hover:border-brand hover:text-brand flex w-full items-center justify-center gap-2 rounded-md border border-dashed px-3 py-2 text-sm font-medium"
                 >
                   <Plus className="size-4" />
-                  {t("moore.sim.addInput")}
+                  {t("moore-mealy.sim.addInput")}
                 </button>
               </td>
             </tr>

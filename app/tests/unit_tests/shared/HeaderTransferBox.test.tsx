@@ -74,7 +74,7 @@ describe("HeaderTransferBox", () => {
       expect(writeText).toHaveBeenCalledWith("AH_current-state"),
     );
     expect(screen.getByTestId("header-transfer-status")).toHaveTextContent(
-      "simulation.transfer.copied",
+      "common.simulation.transfer.copied",
     );
     expect(screen.getByTestId("header-transfer-input")).toHaveValue(
       "AH_current-state",
@@ -125,7 +125,7 @@ describe("HeaderTransferBox", () => {
 
     await waitFor(() =>
       expect(screen.getByTestId("header-transfer-status")).toHaveTextContent(
-        "simulation.transfer.clipboardError",
+        "common.simulation.transfer.clipboardError",
       ),
     );
     expect(screen.getByTestId("header-transfer-input")).toHaveValue(

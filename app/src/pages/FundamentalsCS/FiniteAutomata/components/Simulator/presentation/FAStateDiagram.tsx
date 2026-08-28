@@ -149,7 +149,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           className="text-sm font-semibold"
           style={{ color: "var(--fa-text)" }}
         >
-          {t("fa.diagram.title", "State Diagram")}
+          {t("finite-automata.diagram.title", "State Diagram")}
         </h3>
         <div className="flex items-center gap-2">
           {violations.length > 0 && (
@@ -161,7 +161,10 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 border: "1px solid rgba(255, 82, 82, 0.3)",
               }}
             >
-              ⚠ {t("fa.diagram.violations", { count: violations.length })}
+              ⚠{" "}
+              {t("finite-automata.diagram.violations", {
+                count: violations.length,
+              })}
             </span>
           )}
           <ZoomControls
@@ -357,7 +360,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                   fontSize="10"
                   fontWeight="500"
                 >
-                  {t("fa.diagram.start", "start")}
+                  {t("finite-automata.diagram.start", "start")}
                 </text>
               </g>
             );
@@ -481,7 +484,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
         {/* Hint overlay for first-time discovery */}
         <div className="text-foreground bg-background/80 border-border pointer-events-none absolute right-2 bottom-2 rounded border px-2 py-0.5 text-[10px]">
           {t(
-            "fa.diagram.usageHint",
+            "finite-automata.diagram.usageHint",
             "drag node to move · drag canvas to pan · scroll to zoom",
           )}{" "}
           · {Math.round(scale * 100)}%
@@ -531,9 +534,9 @@ function ZoomControls({
     alignItems: "center",
     justifyContent: "center",
   };
-  const zoomOutLabel = t("fa.diagram.zoomOut", "Zoom out");
-  const resetLabel = t("fa.diagram.resetView", "Reset view");
-  const zoomInLabel = t("fa.diagram.zoomIn", "Zoom in");
+  const zoomOutLabel = t("finite-automata.diagram.zoomOut", "Zoom out");
+  const resetLabel = t("finite-automata.diagram.resetView", "Reset view");
+  const zoomInLabel = t("finite-automata.diagram.zoomIn", "Zoom in");
 
   return (
     <div className="flex items-center gap-1" data-no-pan>
@@ -585,8 +588,10 @@ function ViolationTooltip({ violation }: { violation: DFAViolation }) {
       <span style={{ flexShrink: 0, marginTop: 1 }}>⚠</span>
       <span>
         {violation.type === "epsilon"
-          ? t("fa.diagram.violationEpsilon", { state: violation.state })
-          : t("fa.diagram.violationNondeterministic", {
+          ? t("finite-automata.diagram.violationEpsilon", {
+              state: violation.state,
+            })
+          : t("finite-automata.diagram.violationNondeterministic", {
               state: violation.state,
               symbol: violation.symbol,
               targets: violation.targets.join(", "),

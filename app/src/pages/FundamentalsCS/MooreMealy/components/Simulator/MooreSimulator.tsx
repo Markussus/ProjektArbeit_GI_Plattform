@@ -177,7 +177,9 @@ export const MooreSimulator = forwardRef<
           return {
             rows: [],
             passed: false,
-            error: t("moore.exercises.validation.exampleCheckUnavailable"),
+            error: t(
+              "moore-mealy.exercises.validation.exampleCheckUnavailable",
+            ),
           };
         }
         return runMooreValidation(program, scenario.validationCases);
@@ -473,21 +475,21 @@ export const MooreSimulator = forwardRef<
           <MooreViewActions
             actions={[
               {
-                label: t("moore.conversion.open"),
+                label: t("moore-mealy.conversion.open"),
                 onClick: () => setActiveView("conversion"),
                 icon: TableProperties,
                 testId: "moore-open-conversion",
                 disabled: !conversion,
               },
               {
-                label: t("moore.sim.startSimulation"),
+                label: t("moore-mealy.sim.startSimulation"),
                 onClick: startSimulation,
                 icon: Play,
                 testId: "moore-start-simulation",
                 disabled: issues.length > 0,
               },
               {
-                label: t("moore.logic.open"),
+                label: t("moore-mealy.logic.open"),
                 onClick: () => setActiveView("logic"),
                 icon: CircuitBoard,
                 testId: "moore-open-logic",
@@ -519,7 +521,7 @@ export const MooreSimulator = forwardRef<
           <MooreViewActions
             actions={[
               {
-                label: t("moore.navigation.editDefinition"),
+                label: t("moore-mealy.navigation.editDefinition"),
                 onClick: () => {
                   simulation.pause();
                   setProgram(cloneJson(committedProgram));
@@ -529,7 +531,7 @@ export const MooreSimulator = forwardRef<
                 testId: "moore-bottom-edit-configuration",
               },
               {
-                label: t("moore.navigation.showConversion"),
+                label: t("moore-mealy.navigation.showConversion"),
                 onClick: () => {
                   simulation.pause();
                   setActiveView("conversion");
@@ -539,7 +541,7 @@ export const MooreSimulator = forwardRef<
                 disabled: !conversion,
               },
               {
-                label: t("moore.navigation.showLogic"),
+                label: t("moore-mealy.navigation.showLogic"),
                 onClick: () => {
                   simulation.pause();
                   setActiveView("logic");

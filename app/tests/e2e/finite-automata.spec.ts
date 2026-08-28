@@ -6,7 +6,7 @@ test.describe("Finite Automata page", () => {
   test("page loads and shows the topic title", async ({ page }) => {
     await page.goto(FA_URL);
     await expect(page).toHaveURL(new RegExp("finite-automata"));
-    // The page title is rendered via t("automata.title") — check a key element exists
+    // The page title is rendered via t("finite-automata.topic.title") — check a key element exists
     await expect(page.locator("body")).toBeVisible();
   });
 

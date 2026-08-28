@@ -70,7 +70,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           data-testid="tm-load-solution"
           className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {t("tm.actions.loadSolution")}
+          {t("turing-machine.actions.loadSolution")}
         </button>
         <button
           type="button"
@@ -80,8 +80,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isChecking
-            ? t("tm.actions.checkingSolution")
-            : t("tm.actions.checkSolution")}
+            ? t("turing-machine.actions.checkingSolution")
+            : t("turing-machine.actions.checkSolution")}
         </button>
       </>
     ) : null;
@@ -89,16 +89,20 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
         row.passed
-          ? t("tm.validation.summary.pass")
-          : t("tm.validation.summary.fail"),
-        row.input === "" ? t("tm.validation.summary.emptyWord") : row.input,
-        row.output === "" ? t("tm.validation.summary.emptyWord") : row.output,
+          ? t("turing-machine.validation.summary.pass")
+          : t("turing-machine.validation.summary.fail"),
+        row.input === ""
+          ? t("turing-machine.validation.summary.emptyWord")
+          : row.input,
+        row.output === ""
+          ? t("turing-machine.validation.summary.emptyWord")
+          : row.output,
         row.expectedOutput === ""
-          ? t("tm.validation.summary.emptyWord")
+          ? t("turing-machine.validation.summary.emptyWord")
           : row.expectedOutput,
         row.endedInValidHaltState
-          ? t("tm.sim.status.yes")
-          : t("tm.sim.status.no"),
+          ? t("turing-machine.sim.status.yes")
+          : t("turing-machine.sim.status.no"),
       ])
     : [];
 
@@ -108,7 +112,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.turing"
+        emptyStateTextKey="common.simulation.emptyStates.turing"
         onReset={handleReset}
         resetDisabled={!isSimulatorReady}
       >
@@ -121,18 +125,18 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("tm.validation.summary.popupTitle")}
+        title={t("turing-machine.validation.summary.popupTitle")}
         onClose={() => setCheckResult(null)}
         testId="tm-solution-check-dialog"
         error={checkResult?.error}
         errorTestId="tm-solution-check-error"
         tableTestIdPrefix="tm-solution-check-table"
         headers={[
-          t("tm.validation.table.passed"),
-          t("tm.validation.table.input"),
-          t("tm.validation.table.output"),
-          t("tm.validation.table.expectedOutput"),
-          t("tm.validation.table.validHaltState"),
+          t("turing-machine.validation.table.passed"),
+          t("turing-machine.validation.table.input"),
+          t("turing-machine.validation.table.output"),
+          t("turing-machine.validation.table.expectedOutput"),
+          t("turing-machine.validation.table.validHaltState"),
         ]}
         rows={resultRows}
         getRowTestAttributes={(rowIndex) => ({

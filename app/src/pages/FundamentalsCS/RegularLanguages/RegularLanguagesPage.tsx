@@ -7,8 +7,8 @@ import { SimulationTab } from "./components/SimulationTab";
 export function RegularLanguagesPage() {
   return (
     <ModuleTopicPage
-      titleKey="rl.title"
-      descriptionKey="rl.description"
+      titleKey="regular-languages.title"
+      descriptionKey="regular-languages.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}

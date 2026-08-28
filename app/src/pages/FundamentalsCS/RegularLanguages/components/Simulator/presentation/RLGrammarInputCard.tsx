@@ -31,13 +31,16 @@ export function RLGrammarInputCard({
   const errorText = parsed.issue
     ? formatGrammarIssue(t, parsed.issue, parsed.error ?? "")
     : parsed.validationCodes
-        .map((code) => t(`fa.grammar.${code}`, code))
+        .map((code) => t(`finite-automata.grammar.${code}`, code))
         .join(", ");
 
   return (
     <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
       <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-        {t(titleKey ?? "rl.simulator.grammarInput", titleFallback ?? "Grammar")}
+        {t(
+          titleKey ?? "regular-languages.simulator.grammarInput",
+          titleFallback ?? "Grammar",
+        )}
       </h4>
       <textarea
         data-testid={testId}
@@ -49,7 +52,7 @@ export function RLGrammarInputCard({
       />
       <p className="text-muted-foreground text-xs leading-relaxed">
         {t(
-          "rl.simulator.grammarHelp",
+          "regular-languages.simulator.grammarHelp",
           "One production per line. Format: 'S -> 0S | 1A'. Use ε (or the word 'epsilon') for the empty word.",
         )}
       </p>

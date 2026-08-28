@@ -12,13 +12,13 @@ export function Footer() {
         rel="noopener noreferrer"
         className="text-muted-foreground hover:text-foreground text-xs transition-colors"
       >
-        {t("footer.copyright")}
+        {t("common.footer.copyright")}
       </a>
       <Link
         to="/info#legal"
         className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
       >
-        {t("footer.legal")}
+        {t("common.footer.legal")}
       </Link>
     </footer>
   );

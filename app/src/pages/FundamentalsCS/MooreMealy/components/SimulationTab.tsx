@@ -18,8 +18,8 @@ import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
 import { getMooreExerciseScenario } from "../exercises";
 import type { MooreValidationResult } from "./Simulator/application/mooreSolutionChecker";
 
-export const MOORE_EXAMPLE_ID = "moore.examples.mooreDefault";
-export const MEALY_EXAMPLE_ID = "moore.examples.mealyDefault";
+export const MOORE_EXAMPLE_ID = "moore-mealy.examples.mooreDefault";
+export const MEALY_EXAMPLE_ID = "moore-mealy.examples.mealyDefault";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
@@ -75,13 +75,13 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
         row.passed
-          ? t("moore.exercises.validation.pass")
-          : t("moore.exercises.validation.fail"),
+          ? t("moore-mealy.exercises.validation.pass")
+          : t("moore-mealy.exercises.validation.fail"),
         row.input.length
           ? row.input.join(" ")
-          : t("moore.exercises.validation.emptyInput"),
+          : t("moore-mealy.exercises.validation.emptyInput"),
         row.error
-          ? t(`moore.exercises.validation.errors.${row.error}` as never, {
+          ? t(`moore-mealy.exercises.validation.errors.${row.error}` as never, {
               defaultValue: row.error,
             })
           : formatOutputCodes(row.outputCodes),
@@ -104,7 +104,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
                 data-testid="moore-load-solution"
                 className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {t("moore.exercises.loadSolution")}
+                {t("moore-mealy.exercises.loadSolution")}
               </button>
               <button
                 type="button"
@@ -114,13 +114,13 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
                 className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isChecking
-                  ? t("moore.exercises.checkingSolution")
-                  : t("moore.exercises.checkSolution")}
+                  ? t("moore-mealy.exercises.checkingSolution")
+                  : t("moore-mealy.exercises.checkSolution")}
               </button>
             </>
           ) : undefined
         }
-        emptyStateTextKey="simulation.emptyStates.moore"
+        emptyStateTextKey="common.simulation.emptyStates.moore"
         onReset={() => {
           setCheckResult(null);
           if (machineType === "moore") {
@@ -135,17 +135,17 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
             <InlineTabNavigation
               activeTab={machineType}
               onTabChange={setMachineType}
-              ariaLabel={t("moore.sim.machineType")}
+              ariaLabel={t("moore-mealy.sim.machineType")}
               className="w-full"
               tabs={[
                 {
                   id: "moore",
-                  label: t("moore.sim.mooreTab"),
+                  label: t("moore-mealy.sim.mooreTab"),
                   testId: "moore-machine-tab-moore",
                 },
                 {
                   id: "mealy",
-                  label: t("moore.sim.mealyTab"),
+                  label: t("moore-mealy.sim.mealyTab"),
                   testId: "moore-machine-tab-mealy",
                 },
               ]}
@@ -177,7 +177,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       </TopicSimulationTab>
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("moore.exercises.checkResultTitle")}
+        title={t("moore-mealy.exercises.checkResultTitle")}
         onClose={() => setCheckResult(null)}
         testId="moore-solution-check-dialog"
         summary={
@@ -191,8 +191,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
             }
           >
             {checkResult?.passed
-              ? t("moore.exercises.checkCorrect")
-              : t("moore.exercises.checkIncorrect", {
+              ? t("moore-mealy.exercises.checkCorrect")
+              : t("moore-mealy.exercises.checkIncorrect", {
                   passed:
                     checkResult?.rows.filter((row) => row.passed).length ?? 0,
                   total: checkResult?.rows.length ?? 0,
@@ -202,10 +202,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         error={checkResult?.error}
         tableTestIdPrefix="moore-solution-check-table"
         headers={[
-          t("moore.exercises.validation.passed"),
-          t("moore.exercises.validation.input"),
-          t("moore.exercises.validation.output"),
-          t("moore.exercises.validation.expectedOutput"),
+          t("moore-mealy.exercises.validation.passed"),
+          t("moore-mealy.exercises.validation.input"),
+          t("moore-mealy.exercises.validation.output"),
+          t("moore-mealy.exercises.validation.expectedOutput"),
         ]}
         rows={resultRows}
         getRowTestAttributes={(rowIndex) => ({

@@ -11,7 +11,9 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
   return (
     <div className="space-y-5">
       <section className="space-y-3">
-        <h3 className="font-semibold">{t("moore.conversion.canonicalDnf")}</h3>
+        <h3 className="font-semibold">
+          {t("moore-mealy.conversion.canonicalDnf")}
+        </h3>
         {formulas.map((formula) => (
           <FormulaRow
             key={`canonical-${formula.name}`}
@@ -23,7 +25,9 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
       </section>
 
       <section className="space-y-3">
-        <h3 className="font-semibold">{t("moore.conversion.minimalDnf")}</h3>
+        <h3 className="font-semibold">
+          {t("moore-mealy.conversion.minimalDnf")}
+        </h3>
         {formulas.map((formula) => (
           <div key={`minimal-${formula.name}`}>
             <FormulaRow
@@ -33,7 +37,7 @@ export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
             />
             {!formula.minimizationAvailable && (
               <p className="text-muted-foreground mt-1 text-xs">
-                {t("moore.conversion.minimizationLimit")}
+                {t("moore-mealy.conversion.minimizationLimit")}
               </p>
             )}
           </div>

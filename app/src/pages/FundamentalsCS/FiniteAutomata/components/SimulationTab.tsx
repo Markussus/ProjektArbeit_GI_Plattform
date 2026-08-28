@@ -74,7 +74,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         data-testid="fa-load-solution"
         className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
       >
-        {t("fa.exerciseWorkspace.showSolution")}
+        {t("finite-automata.exerciseWorkspace.showSolution")}
       </button>
       <button
         type="button"
@@ -82,7 +82,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         data-testid="fa-check-solution"
         className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90"
       >
-        {t("fa.exerciseWorkspace.check")}
+        {t("finite-automata.exerciseWorkspace.check")}
       </button>
     </>
   ) : null;
@@ -93,7 +93,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.automata"
+        emptyStateTextKey="common.simulation.emptyStates.automata"
         onReset={() => simulatorRef.current?.resetStoredState()}
       >
         <FASimulator ref={simulatorRef} />
@@ -101,7 +101,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("fa.exerciseWorkspace.check")}
+        title={t("finite-automata.exerciseWorkspace.check")}
         onClose={() => setCheckResult(null)}
         testId="fa-solution-check-dialog"
         summary={checkResult && <CheckSummary result={checkResult} />}
@@ -112,10 +112,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
       <ConfirmDialog
         isOpen={confirmLoadSolution}
-        title={t("fa.exerciseWorkspace.confirmTitle")}
-        description={t("fa.exerciseWorkspace.confirmBody")}
-        confirmLabel={t("fa.exerciseWorkspace.confirmYes")}
-        cancelLabel={t("fa.exerciseWorkspace.confirmNo")}
+        title={t("finite-automata.exerciseWorkspace.confirmTitle")}
+        description={t("finite-automata.exerciseWorkspace.confirmBody")}
+        confirmLabel={t("finite-automata.exerciseWorkspace.confirmYes")}
+        cancelLabel={t("finite-automata.exerciseWorkspace.confirmNo")}
         onConfirm={handleLoadSolution}
         onCancel={() => setConfirmLoadSolution(false)}
         variant="warning"
@@ -141,10 +141,10 @@ function CheckSummary({ result }: { result: CheckResult }) {
     return (
       <div>
         <p className="text-foreground text-sm font-semibold">
-          {t("fa.exerciseWorkspace.unbuiltTitle")}
+          {t("finite-automata.exerciseWorkspace.unbuiltTitle")}
         </p>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t("fa.exerciseWorkspace.unbuiltBody")}
+          {t("finite-automata.exerciseWorkspace.unbuiltBody")}
         </p>
       </div>
     );
@@ -154,10 +154,10 @@ function CheckSummary({ result }: { result: CheckResult }) {
     return (
       <div>
         <p className="text-destructive text-sm font-semibold">
-          {t("fa.exerciseWorkspace.structuralFail")}
+          {t("finite-automata.exerciseWorkspace.structuralFail")}
         </p>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t("fa.exerciseWorkspace.structuralHint")}
+          {t("finite-automata.exerciseWorkspace.structuralHint")}
         </p>
       </div>
     );
@@ -167,10 +167,10 @@ function CheckSummary({ result }: { result: CheckResult }) {
     return (
       <div>
         <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-          {t("fa.exerciseWorkspace.passed")}
+          {t("finite-automata.exerciseWorkspace.passed")}
         </p>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t("fa.exerciseWorkspace.passedDetail", {
+          {t("finite-automata.exerciseWorkspace.passedDetail", {
             n: result.passedCount,
             total: result.total,
           })}
@@ -182,10 +182,10 @@ function CheckSummary({ result }: { result: CheckResult }) {
   return (
     <div>
       <p className="text-destructive text-sm font-semibold">
-        {t("fa.exerciseWorkspace.failed")}
+        {t("finite-automata.exerciseWorkspace.failed")}
       </p>
       <p className="text-muted-foreground mt-1 text-sm">
-        {t("fa.exerciseWorkspace.failedDetail", {
+        {t("finite-automata.exerciseWorkspace.failedDetail", {
           passed: result.passedCount,
           total: result.total,
           failed: result.failedCount,
@@ -193,18 +193,18 @@ function CheckSummary({ result }: { result: CheckResult }) {
       </p>
       {result.firstFailure && (
         <p className="text-muted-foreground mt-2 text-sm">
-          {t("fa.exerciseWorkspace.counterexample")}{" "}
+          {t("finite-automata.exerciseWorkspace.counterexample")}{" "}
           <span className="text-foreground font-mono">
             {result.firstFailure.word === "" ? "ε" : result.firstFailure.word}
           </span>{" "}
-          ({t("fa.exerciseWorkspace.expected")}{" "}
+          ({t("finite-automata.exerciseWorkspace.expected")}{" "}
           {result.firstFailure.expected
-            ? t("fa.exerciseWorkspace.accept")
-            : t("fa.exerciseWorkspace.reject")}
-          , {t("fa.exerciseWorkspace.got")}{" "}
+            ? t("finite-automata.exerciseWorkspace.accept")
+            : t("finite-automata.exerciseWorkspace.reject")}
+          , {t("finite-automata.exerciseWorkspace.got")}{" "}
           {result.firstFailure.got
-            ? t("fa.exerciseWorkspace.accept")
-            : t("fa.exerciseWorkspace.reject")}
+            ? t("finite-automata.exerciseWorkspace.accept")
+            : t("finite-automata.exerciseWorkspace.reject")}
           )
         </p>
       )}

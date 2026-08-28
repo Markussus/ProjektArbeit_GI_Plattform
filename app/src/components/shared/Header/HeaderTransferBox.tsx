@@ -51,19 +51,19 @@ export function HeaderTransferBox() {
   const canImport = !isExportPreviewActive && trimmedValue.length > 0;
   const feedbackText = useMemo(() => {
     if (feedback === "importError") {
-      return t("simulation.transfer.importError");
+      return t("common.simulation.transfer.importError");
     }
 
     if (feedback === "exportError") {
-      return t("simulation.transfer.exportError");
+      return t("common.simulation.transfer.exportError");
     }
 
     if (feedback === "clipboardError") {
-      return t("simulation.transfer.clipboardError");
+      return t("common.simulation.transfer.clipboardError");
     }
 
     if (feedback === "copied") {
-      return t("simulation.transfer.copied");
+      return t("common.simulation.transfer.copied");
     }
 
     return "";
@@ -145,10 +145,10 @@ export function HeaderTransferBox() {
             handleImport();
           }
         }}
-        placeholder={t("simulation.transfer.placeholder")}
+        placeholder={t("common.simulation.transfer.placeholder")}
         aria-label={
           isExportPreviewActive
-            ? t("simulation.transfer.exportPreviewLabel")
+            ? t("common.simulation.transfer.exportPreviewLabel")
             : undefined
         }
         className={cn(
@@ -165,13 +165,13 @@ export function HeaderTransferBox() {
         onClick={() => void handleExport()}
         disabled={!activeTransfer || isExporting}
         aria-busy={isExporting}
-        aria-label={t("simulation.transfer.export")}
-        title={t("simulation.transfer.export")}
+        aria-label={t("common.simulation.transfer.export")}
+        title={t("common.simulation.transfer.export")}
         className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Download className="size-3.5" />
         <span className="hidden lg:inline">
-          {t("simulation.transfer.export")}
+          {t("common.simulation.transfer.export")}
         </span>
       </button>
 
@@ -180,13 +180,13 @@ export function HeaderTransferBox() {
         data-testid="header-transfer-import"
         onClick={handleImport}
         disabled={!canImport}
-        aria-label={t("simulation.transfer.import")}
-        title={t("simulation.transfer.import")}
+        aria-label={t("common.simulation.transfer.import")}
+        title={t("common.simulation.transfer.import")}
         className="bg-secondary text-secondary-foreground hover:bg-secondary/90 inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
         <Upload className="size-3.5" />
         <span className="hidden lg:inline">
-          {t("simulation.transfer.import")}
+          {t("common.simulation.transfer.import")}
         </span>
       </button>
 

@@ -57,7 +57,9 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
 
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
-      <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
+      <h2 className="text-lg font-bold">
+        {t("moore-mealy.sim.simulationTitle")}
+      </h2>
 
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">
@@ -75,34 +77,34 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
           />
           <div className="border-border bg-card space-y-2 rounded-xl border p-3">
             <StatusRow
-              label={t("moore.sim.currentState")}
+              label={t("moore-mealy.sim.currentState")}
               value={runtime.currentState}
             />
             <StatusRow
-              label={t("moore.sim.progress")}
+              label={t("moore-mealy.sim.progress")}
               value={`${runtime.inputPosition} / ${program.inputWord.length}`}
             />
             <StatusRow
-              label={t("moore.sim.status")}
+              label={t("moore-mealy.sim.status")}
               value={
                 props.error
-                  ? t("moore.sim.error")
+                  ? t("moore-mealy.sim.error")
                   : runtime.halted
-                    ? t("moore.sim.finished")
-                    : t("moore.sim.ready")
+                    ? t("moore-mealy.sim.finished")
+                    : t("moore-mealy.sim.ready")
               }
             />
           </div>
         </div>
         <div className="grid grid-rows-2 gap-3">
           <SymbolSequence
-            title={t("moore.sim.inputWord")}
+            title={t("moore-mealy.sim.inputWord")}
             symbols={program.inputWord}
             activeIndex={runtime.inputPosition}
             testId="moore-runtime-input"
           />
           <SymbolSequence
-            title={t("moore.sim.outputWord")}
+            title={t("moore-mealy.sim.outputWord")}
             symbols={runtime.outputSymbols}
             activeIndex={runtime.outputSymbols.length - 1}
             testId="moore-runtime-output"
@@ -114,7 +116,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
       <StateMachineGraph
         nodes={graphNodes}
         edges={graphEdges}
-        ariaLabel={t("moore.sim.diagram")}
+        ariaLabel={t("moore-mealy.sim.diagram")}
         testId="moore-state-diagram"
         className="w-full"
         compact
@@ -174,7 +176,7 @@ function MooreRuntimeTable({
       >
         <thead>
           <tr className="bg-muted/50 border-b">
-            <th className="border-r p-2">{t("moore.sim.event")}</th>
+            <th className="border-r p-2">{t("moore-mealy.sim.event")}</th>
             {program.states.map((state, index) => (
               <th
                 key={state}
@@ -274,7 +276,7 @@ function SymbolSequence({
           ))
         ) : showEmptyWord ? (
           <span className="text-muted-foreground text-sm italic">
-            {t("moore.sim.emptyWord")}
+            {t("moore-mealy.sim.emptyWord")}
           </span>
         ) : null}
       </div>

@@ -213,13 +213,13 @@ export function FractionalConverter({
               <div>
                 <h3 className="text-foreground font-semibold">
                   {converterMode === "decToBin"
-                    ? t("simulator.numbers.fracTitle")
-                    : t("simulator.numbers.fracBinToDecTitle")}
+                    ? t("number-systems.simulator.numbers.fracTitle")
+                    : t("number-systems.simulator.numbers.fracBinToDecTitle")}
                 </h3>
                 <p className="text-muted-foreground mt-1 text-sm">
                   {converterMode === "decToBin"
-                    ? t("simulator.numbers.fracDesc")
-                    : t("simulator.numbers.fracBinToDecDesc")}
+                    ? t("number-systems.simulator.numbers.fracDesc")
+                    : t("number-systems.simulator.numbers.fracBinToDecDesc")}
                 </p>
               </div>
 
@@ -235,7 +235,7 @@ export function FractionalConverter({
                   disabled={isExerciseMode}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "decToBin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"} ${isExerciseMode && "cursor-not-allowed opacity-50"}`}
                 >
-                  {t("simulator.numbers.fracModeDecToBin")}
+                  {t("number-systems.simulator.numbers.fracModeDecToBin")}
                 </button>
                 <button
                   data-testid="ns-frac-bin-to-dec-button"
@@ -248,14 +248,14 @@ export function FractionalConverter({
                   disabled={isExerciseMode}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "binToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"} ${isExerciseMode && "cursor-not-allowed opacity-50"}`}
                 >
-                  {t("simulator.numbers.fracModeBinToDec")}
+                  {t("number-systems.simulator.numbers.fracModeBinToDec")}
                 </button>
               </div>
             </div>
 
             <div>
               <label className="text-muted-foreground mb-2 block text-sm font-medium">
-                {t("simulator.numbers.valueLabel")}
+                {t("number-systems.simulator.numbers.valueLabel")}
               </label>
               <input
                 type="text"
@@ -276,7 +276,7 @@ export function FractionalConverter({
               <div className="bg-card border-border/50 overflow-hidden rounded-xl border shadow-sm">
                 <div className="bg-muted/30 border-border/50 border-b p-4">
                   <h4 className="text-foreground font-semibold">
-                    {t("simulator.numbers.fracResult")}
+                    {t("number-systems.simulator.numbers.fracResult")}
                   </h4>
                 </div>
                 <div className="p-6">
@@ -314,23 +314,23 @@ export function FractionalConverter({
               <>
                 <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
                   <Info className="text-primary h-5 w-5" />
-                  {t("simulator.numbers.conceptPath")}
+                  {t("number-systems.simulator.numbers.conceptPath")}
                 </h3>
 
                 {!isValidInput ? (
                   <div className="text-muted-foreground flex items-center justify-center p-8 text-sm">
-                    {t("simulator.numbers.enterValue")}
+                    {t("number-systems.simulator.numbers.enterValue")}
                   </div>
                 ) : conversionData.mode === "decToBin" ? (
                   <div className="divide-border/50 flex flex-col divide-y">
                     {/* Integer Part Conversion */}
                     <div className="p-6">
                       <h4 className="text-foreground mb-4 font-semibold">
-                        1. {t("simulator.numbers.fracIntPart")}{" "}
+                        1. {t("number-systems.simulator.numbers.fracIntPart")}{" "}
                         {conversionData.intVal}
                       </h4>
                       <p className="text-muted-foreground mb-4 text-sm">
-                        {t("simulator.numbers.decToBinDesc")}
+                        {t("number-systems.simulator.numbers.decToBinDesc")}
                       </p>
 
                       <div className="overflow-x-auto">
@@ -346,7 +346,9 @@ export function FractionalConverter({
                                   {Math.floor(step.dividend / 2)}
                                 </div>
                                 <div className="text-muted-foreground">
-                                  {t("simulator.numbers.remainder")}
+                                  {t(
+                                    "number-systems.simulator.numbers.remainder",
+                                  )}
                                 </div>
                                 <div className="bg-brand/10 text-brand flex h-6 w-6 items-center justify-center rounded font-bold">
                                   {step.remainder}
@@ -360,7 +362,7 @@ export function FractionalConverter({
 
                         <div className="mt-6 flex items-center gap-3">
                           <span className="text-muted-foreground text-sm">
-                            {t("simulator.numbers.resultLabel")}
+                            {t("number-systems.simulator.numbers.resultLabel")}
                           </span>
                           <span className="bg-muted text-foreground rounded px-3 py-1.5 font-mono font-medium tracking-wider">
                             {conversionData.binIntPart}
@@ -372,7 +374,7 @@ export function FractionalConverter({
                     {/* Fractional Part Conversion */}
                     <div className="p-6">
                       <h4 className="text-foreground mb-4 font-semibold">
-                        2. {t("simulator.numbers.fracFractPart")}{" "}
+                        2. {t("number-systems.simulator.numbers.fracFractPart")}{" "}
                         {conversionData.fracVal}
                       </h4>
 
@@ -392,7 +394,9 @@ export function FractionalConverter({
                                 </div>
                                 <ArrowRight className="text-muted-foreground h-4 w-4" />
                                 <div className="text-muted-foreground">
-                                  {t("simulator.numbers.fracIntPart")}
+                                  {t(
+                                    "number-systems.simulator.numbers.fracIntPart",
+                                  )}
                                 </div>
                                 <div className="bg-brand/10 text-brand flex h-6 w-6 items-center justify-center rounded font-bold">
                                   {step.bit}
@@ -406,7 +410,7 @@ export function FractionalConverter({
 
                         <div className="mt-6 flex items-center gap-3">
                           <span className="text-muted-foreground text-sm">
-                            {t("simulator.numbers.resultLabel")}
+                            {t("number-systems.simulator.numbers.resultLabel")}
                           </span>
                           <span className="bg-muted text-foreground rounded px-3 py-1.5 font-mono font-medium tracking-wider">
                             0.{conversionData.binFracDisplay}
@@ -420,10 +424,10 @@ export function FractionalConverter({
                     {/* Integer Part Conversion (bin to dec) */}
                     <div className="p-6">
                       <h4 className="text-foreground mb-4 font-semibold">
-                        {t("simulator.numbers.fracSumInt")}
+                        {t("number-systems.simulator.numbers.fracSumInt")}
                       </h4>
                       <p className="text-muted-foreground mb-4 text-sm">
-                        {t("simulator.numbers.fracSumPowers")}
+                        {t("number-systems.simulator.numbers.fracSumPowers")}
                       </p>
 
                       <div className="overflow-x-auto">
@@ -450,7 +454,7 @@ export function FractionalConverter({
 
                         <div className="mt-6 flex items-center gap-3">
                           <span className="text-muted-foreground text-sm">
-                            {t("simulator.numbers.resultLabel")}
+                            {t("number-systems.simulator.numbers.resultLabel")}
                           </span>
                           <span className="bg-muted text-foreground rounded px-3 py-1.5 font-mono font-medium tracking-wider">
                             {conversionData.intDecVal}
@@ -462,7 +466,7 @@ export function FractionalConverter({
                     {/* Fractional Part Conversion (bin to dec) */}
                     <div className="p-6">
                       <h4 className="text-foreground mb-4 font-semibold">
-                        {t("simulator.numbers.fracSumFrac")}
+                        {t("number-systems.simulator.numbers.fracSumFrac")}
                       </h4>
 
                       <div className="overflow-x-auto">
@@ -489,7 +493,7 @@ export function FractionalConverter({
 
                         <div className="mt-6 flex items-center gap-3">
                           <span className="text-muted-foreground text-sm">
-                            {t("simulator.numbers.resultLabel")}
+                            {t("number-systems.simulator.numbers.resultLabel")}
                           </span>
                           <span className="bg-muted text-foreground rounded px-3 py-1.5 font-mono font-medium tracking-wider">
                             {conversionData.fracDecVal}

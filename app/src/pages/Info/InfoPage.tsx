@@ -60,9 +60,9 @@ export function InfoPage() {
       className="space-y-8 p-8"
     >
       <PageIntro
-        eyebrow={t("info.label")}
-        title={t("info.title")}
-        description={t("info.description")}
+        eyebrow={t("common.info.label")}
+        title={t("common.info.title")}
+        description={t("common.info.description")}
       />
 
       {/* Progress Reset Section */}
@@ -71,15 +71,17 @@ export function InfoPage() {
         className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
       >
         <h2 className="text-foreground text-lg font-semibold">
-          {t("trainingCenter.resetAllProgressTitle")}
+          {t("common.trainingCenter.resetAllProgressTitle")}
         </h2>
         <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-          {t("trainingCenter.resetAllProgressDescription")}
+          {t("common.trainingCenter.resetAllProgressDescription")}
         </p>
         <div className="mt-4">
           <InlineResetControl
-            label={t("trainingCenter.resetAllProgress")}
-            confirmationText={t("trainingCenter.confirmResetAllProgress")}
+            label={t("common.trainingCenter.resetAllProgress")}
+            confirmationText={t(
+              "common.trainingCenter.confirmResetAllProgress",
+            )}
             onConfirm={() => trainingCenterStorage.deleteAll()}
             testId="help-reset-all-progress"
           />
@@ -90,10 +92,10 @@ export function InfoPage() {
       <section id="legal" className="space-y-6">
         <div>
           <h2 className="text-foreground text-xl font-bold">
-            {t("legal.title")}
+            {t("common.legal.title")}
           </h2>
           <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-            {t("legal.summary")}
+            {t("common.legal.summary")}
           </p>
         </div>
 

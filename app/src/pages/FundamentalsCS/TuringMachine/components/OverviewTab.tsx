@@ -5,7 +5,7 @@ export function OverviewTab() {
     <div className="space-y-6">
       <TopicTutorialVideoSection
         topicId="turing-machine"
-        videoTitleKey="tm.overview.tutorialVideo"
+        videoTitleKey="turing-machine.overview.tutorialVideo"
         testIdPrefix="tm-tutorial"
       />
     </div>

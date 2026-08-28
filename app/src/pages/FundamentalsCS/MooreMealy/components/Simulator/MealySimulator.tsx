@@ -358,21 +358,21 @@ export const MealySimulator = forwardRef<
           <MooreViewActions
             actions={[
               {
-                label: t("moore.conversion.open"),
+                label: t("moore-mealy.conversion.open"),
                 onClick: () => setMode("conversion"),
                 icon: TableProperties,
                 testId: "mealy-open-conversion",
                 disabled: !conversion,
               },
               {
-                label: t("moore.sim.startSimulation"),
+                label: t("moore-mealy.sim.startSimulation"),
                 onClick: start,
                 icon: Play,
                 testId: "mealy-start-simulation",
                 disabled: !!issues.length,
               },
               {
-                label: t("moore.logic.open"),
+                label: t("moore-mealy.logic.open"),
                 onClick: () => setMode("logic"),
                 icon: CircuitBoard,
                 testId: "mealy-open-logic",
@@ -399,19 +399,19 @@ export const MealySimulator = forwardRef<
           <MooreViewActions
             actions={[
               {
-                label: t("moore.navigation.editDefinition"),
+                label: t("moore-mealy.navigation.editDefinition"),
                 onClick: edit,
                 icon: Pencil,
                 testId: "mealy-edit-definition",
               },
               {
-                label: t("moore.navigation.showConversion"),
+                label: t("moore-mealy.navigation.showConversion"),
                 onClick: () => setMode("conversion"),
                 icon: TableProperties,
                 testId: "mealy-open-conversion",
               },
               {
-                label: t("moore.navigation.showLogic"),
+                label: t("moore-mealy.navigation.showLogic"),
                 onClick: () => setMode("logic"),
                 icon: CircuitBoard,
                 testId: "mealy-open-logic",
