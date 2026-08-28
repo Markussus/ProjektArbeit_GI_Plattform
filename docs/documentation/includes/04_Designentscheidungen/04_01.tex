@@ -1,4 +1,4 @@
-\subNsection{1}{Turing Maschine}{Richard Schröder}
+\subNsection{1}{Turingmaschine}{Richard Schröder}
 
 Die Turing-Maschine ist als eigenständiger Themenbereich innerhalb des Moduls \glqq Grundlagen der Informatik\grqq{} umgesetzt. Sie umfasst Übersicht, Übungen, Beispiele und eine freie Simulation. Die Turingmaschine wurde schrittweise entwickelt vom Datenmodell, der Simulator-Schnittstelle und dem Debugger über die editierbare Konfiguration und die responsive Banddarstellung bis zu Internationalisierung, Import und Export, automatischer Speicherung, Tests und gemeinsam genutzten Komponenten.
 
@@ -30,7 +30,7 @@ Die Laufzeitansicht besteht aus Band, Steuerleiste, Statuskarte und Übergangsta
 
 Für die Steuerung verwendet die Turing-Maschine die gemeinsamen Simulator-Controls der Plattform: Play, Pause, Schritt, Schritt zurück, Reset und Geschwindigkeitsregler. Die Statuskarte zeigt den aktuellen Zustand, das aktuelle Symbol, die Schrittzahl und den Haltestatus. Fehlt ein Übergang, erläutert sie diesen fachlich, indem sie darauf hinweist, dass für den aktuellen Zustand und das aktuelle Symbol kein Übergang definiert ist.
 
-Übungen ergänzen die Simulation um die Aktionen \glqq Lösung laden\grqq{} und \glqq Lösung prüfen\grqq{}. Das Prüfergebnis erscheint in einem Dialog als Tabelle mit Eingabe, Ausgabe, erwarteter Ausgabe, Bestehen und gültigem Haltezustand. Die Oberfläche ist in deutsch und englisch lokalisiert.
+Übungen ergänzen die Simulation um die Aktionen \glqq Lösung laden\grqq{} und \glqq Lösung prüfen\grqq{}. Das Prüfergebnis erscheint in einem Dialog als Tabelle mit Eingabe, Ausgabe, erwarteter Ausgabe, Bestehen und gültigem Haltezustand. Die Oberfläche ist in Deutsch und Englisch lokalisiert.
 
 \subNsection{2}{Andere Entscheidungen}{Richard Schröder}
 
@@ -38,7 +38,7 @@ Beispiele und Übungen sind als Szenarien modelliert. Ein Beispiel enthält ein 
 
 Es gibt eine umfangreiche Testsuite für die Turingmaschine, um alle Funktionen auf Korrektheit zu prüfen. Unit-Tests prüfen Domain-Logik, Formatierung, Programmvalidierung, Transfer-Codec, Editor-Reducer, Tabellenadapter, Bandlogik, Lösungskontrolle und Simulator-Hook. Ergänzende E2E-Tests decken die sichtbare Bedienung, die Navigation zwischen Beispielen und Übungen, das Local-Storage-Verhalten, Import und Export, Fehlervalidierung sowie das schrittweise Erstellen einer Bit-Inverter-Maschine ab. Stabile \verb|data-testid|-Attribute an den UI-Elementen erleichtern diese Tests und die Live-Inspektion.
 
-Die Architektur wurde nach einem ersten Datenmodell und Simulator bzw. Proof of Concenpt gezielt stabilisiert. Größere Refactorings nach einer Architekturplanung wurden von responsiven Verbesserungen, Internationalisierung, Test-IDs, Übungsintegration und persistenter Speicherung ergänzt.
+Die Architektur wurde nach einem ersten Datenmodell und Simulator bzw. Proof of Concept gezielt stabilisiert. Größere Refactorings nach einer Architekturplanung wurden von responsiven Verbesserungen, Internationalisierung, Test-IDs, Übungsintegration und persistenter Speicherung ergänzt.
 
 Die Behandlung fehlender Übergänge als reguläres Halten ist für den Lernkontext in meinen Augen sinnvoll. Eine unvollständige Turing-Maschine ist beim Konstruieren ein normaler Zwischenstand. Die Übungsprüfung kann dennoch streng bleiben, weil sie nicht nur die korrekte Ausgabe, sondern auch das Halten in einem vorgesehenen Haltezustand verlangt.
 
