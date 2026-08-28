@@ -1,12 +1,12 @@
 /**
  * Migration & Validation Script for i18n Restructuring
- * 
+ *
  * Usage:
  *   node scripts/migrate-i18n.mjs --generate-mapping   # Generate/Refresh mapping.json based on rules
  *   node scripts/migrate-i18n.mjs --validate           # Validate mapping consistency without touching code
  *   node scripts/migrate-i18n.mjs --dry-run            # Preview code replacements and verify all keys
  *   node scripts/migrate-i18n.mjs --apply              # Execute migration on JSONs and source code
- *   node scripts/migrate-i18n.mjs --apply --split      # Execute migration and split into topic files
+ *   node scripts/migrate-i18n.mjs --apply --split      # Execute migration, split files & update i18n config
  */
 
 import fs from "node:fs";
@@ -17,7 +17,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
 const SRC_DIR = path.resolve(ROOT_DIR, "src");
-const LOCALES_DIR = path.resolve(SRC_DIR, "i18n", "locales");
+const I18N_DIR = path.resolve(SRC_DIR, "i18n");
+const LOCALES_DIR = path.resolve(I18N_DIR, "locales");
+const TYPES_DIR = path.resolve(SRC_DIR, "types");
 const MAPPING_FILE = path.resolve(__dirname, "i18n-mapping.json");
 
 // CLI arguments
@@ -105,7 +107,10 @@ function computeDefaultNewKey(oldKey) {
 
   // 2. Shared Simulator validation panel
   if (oldKey.startsWith("simulator.validation.")) {
-    return oldKey.replace("simulator.validation.", "common.exerciseValidation.");
+    return oldKey.replace(
+      "simulator.validation.",
+      "common.exerciseValidation.",
+    );
   }
 
   // 3. Turing Machine (tm.* -> turing-machine.*)
@@ -134,10 +139,16 @@ function computeDefaultNewKey(oldKey) {
     return oldKey.replace("number.", "number-systems.");
   }
   if (oldKey.startsWith("simulator.arithmetic.")) {
-    return oldKey.replace("simulator.arithmetic.", "number-systems.simulator.arithmetic.");
+    return oldKey.replace(
+      "simulator.arithmetic.",
+      "number-systems.simulator.arithmetic.",
+    );
   }
   if (oldKey.startsWith("simulator.numbers.")) {
-    return oldKey.replace("simulator.numbers.", "number-systems.simulator.numbers.");
+    return oldKey.replace(
+      "simulator.numbers.",
+      "number-systems.simulator.numbers.",
+    );
   }
   if (oldKey.startsWith("simulator.tabs.")) {
     return oldKey.replace("simulator.tabs.", "number-systems.simulator.tabs.");
@@ -175,22 +186,67 @@ function computeDefaultNewKey(oldKey) {
 const TEMPLATE_LITERAL_REPLACEMENTS = [
   { oldPattern: "difficulty.", newPattern: "common.difficulty." },
   { oldPattern: "tabs.", newPattern: "common.tabs." },
-  { oldPattern: "simulator.encoding.group", newPattern: "encoding.simulator.group" },
-  { oldPattern: "simulator.encoding.tabs.", newPattern: "encoding.simulator.tabs." },
-  { oldPattern: "simulator.numbers.unit", newPattern: "number-systems.simulator.numbers.unit" },
-  { oldPattern: "simulator.tabs.", newPattern: "number-systems.simulator.tabs." },
-  { oldPattern: "fa.examples.categories.", newPattern: "finite-automata.examples.categories." },
-  { oldPattern: "fa.grammar.format.", newPattern: "finite-automata.grammar.format." },
+  {
+    oldPattern: "simulator.encoding.group",
+    newPattern: "encoding.simulator.group",
+  },
+  {
+    oldPattern: "simulator.encoding.tabs.",
+    newPattern: "encoding.simulator.tabs.",
+  },
+  {
+    oldPattern: "simulator.numbers.unit",
+    newPattern: "number-systems.simulator.numbers.unit",
+  },
+  {
+    oldPattern: "simulator.tabs.",
+    newPattern: "number-systems.simulator.tabs.",
+  },
+  {
+    oldPattern: "fa.examples.categories.",
+    newPattern: "finite-automata.examples.categories.",
+  },
+  {
+    oldPattern: "fa.grammar.format.",
+    newPattern: "finite-automata.grammar.format.",
+  },
   { oldPattern: "fa.grammar.", newPattern: "finite-automata.grammar." },
-  { oldPattern: "moore.exercises.validation.errors.", newPattern: "moore-mealy.exercises.validation.errors." },
-  { oldPattern: "moore.sim.validation.", newPattern: "moore-mealy.sim.validation." },
-  { oldPattern: "rl.examples.categories.", newPattern: "regular-languages.examples.categories." },
-  { oldPattern: "rl.exercises.categories.", newPattern: "regular-languages.exercises.categories." },
-  { oldPattern: "java.compilerStatus.", newPattern: "java-programming.compilerStatus." },
-  { oldPattern: "java.compilerStatusText.", newPattern: "java-programming.compilerStatusText." },
-  { oldPattern: "java.commandOverview.status.", newPattern: "java-programming.commandOverview.status." },
-  { oldPattern: "dnf.builder.exercise.simplificationStatus.", newPattern: "dnf.builder.exercise.simplificationStatus." },
-  { oldPattern: "dnf.builder.exercise.dnfStatus.", newPattern: "dnf.builder.exercise.dnfStatus." },
+  {
+    oldPattern: "moore.exercises.validation.errors.",
+    newPattern: "moore-mealy.exercises.validation.errors.",
+  },
+  {
+    oldPattern: "moore.sim.validation.",
+    newPattern: "moore-mealy.sim.validation.",
+  },
+  {
+    oldPattern: "rl.examples.categories.",
+    newPattern: "regular-languages.examples.categories.",
+  },
+  {
+    oldPattern: "rl.exercises.categories.",
+    newPattern: "regular-languages.exercises.categories.",
+  },
+  {
+    oldPattern: "java.compilerStatus.",
+    newPattern: "java-programming.compilerStatus.",
+  },
+  {
+    oldPattern: "java.compilerStatusText.",
+    newPattern: "java-programming.compilerStatusText.",
+  },
+  {
+    oldPattern: "java.commandOverview.status.",
+    newPattern: "java-programming.commandOverview.status.",
+  },
+  {
+    oldPattern: "dnf.builder.exercise.simplificationStatus.",
+    newPattern: "dnf.builder.exercise.simplificationStatus.",
+  },
+  {
+    oldPattern: "dnf.builder.exercise.dnfStatus.",
+    newPattern: "dnf.builder.exercise.dnfStatus.",
+  },
   { oldPattern: "dnf.simulator.tabs.", newPattern: "dnf.simulator.tabs." },
   { oldPattern: "dnf.taskGroups.", newPattern: "dnf.taskGroups." },
 ];
@@ -215,10 +271,12 @@ function validateMapping(mapping, enFlat, deFlat) {
   const enSet = new Set(enKeys);
   const deSet = new Set(deKeys);
   for (const k of enKeys) {
-    if (!deSet.has(k)) warnings.push(`Key exists in EN but missing in DE: "${k}"`);
+    if (!deSet.has(k))
+      warnings.push(`Key exists in EN but missing in DE: "${k}"`);
   }
   for (const k of deKeys) {
-    if (!enSet.has(k)) warnings.push(`Key exists in DE but missing in EN: "${k}"`);
+    if (!enSet.has(k))
+      warnings.push(`Key exists in DE but missing in EN: "${k}"`);
   }
 
   // 2. Check if all keys exist in mapping
@@ -236,7 +294,9 @@ function validateMapping(mapping, enFlat, deFlat) {
       errors.push(`Key marked as unmapped: "${oldK}" -> "${newK}"`);
     }
     if (targetMap.has(newK)) {
-      errors.push(`Collision! Both "${targetMap.get(newK)}" and "${oldK}" map to "${newK}"`);
+      errors.push(
+        `Collision! Both "${targetMap.get(newK)}" and "${oldK}" map to "${newK}"`,
+      );
     } else {
       targetMap.set(newK, oldK);
     }
@@ -246,17 +306,21 @@ function validateMapping(mapping, enFlat, deFlat) {
   if (warnings.length > 0) {
     console.log(`\n⚠️  Warnings (${warnings.length}):`);
     warnings.slice(0, 10).forEach((w) => console.log(`   ${w}`));
-    if (warnings.length > 10) console.log(`   ... and ${warnings.length - 10} more`);
+    if (warnings.length > 10)
+      console.log(`   ... and ${warnings.length - 10} more`);
   }
 
   if (errors.length > 0) {
     console.error(`\n❌ Validation Failed with ${errors.length} errors:`);
     errors.slice(0, 20).forEach((e) => console.error(`   ${e}`));
-    if (errors.length > 20) console.error(`   ... and ${errors.length - 20} more`);
+    if (errors.length > 20)
+      console.error(`   ... and ${errors.length - 20} more`);
     return false;
   }
 
-  console.log("\n✅ Validation passed cleanly! All keys mapped without collisions.");
+  console.log(
+    "\n✅ Validation passed cleanly! All keys mapped without collisions.",
+  );
   return true;
 }
 
@@ -268,7 +332,11 @@ function getAllSourceFiles(dir, fileList = []) {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name !== "node_modules" && entry.name !== ".git" && entry.name !== "dist") {
+      if (
+        entry.name !== "node_modules" &&
+        entry.name !== ".git" &&
+        entry.name !== "dist"
+      ) {
         getAllSourceFiles(fullPath, fileList);
       }
     } else if (entry.isFile() && /\.(ts|tsx|js|jsx)$/.test(entry.name)) {
@@ -340,7 +408,10 @@ function processSourceFiles(mapping, isDryRun) {
       const matches = updatedContent.match(item.searchRegex);
       if (matches) {
         fileReplacements += matches.length;
-        updatedContent = updatedContent.replace(item.searchRegex, item.replacement);
+        updatedContent = updatedContent.replace(
+          item.searchRegex,
+          item.replacement,
+        );
       }
     }
 
@@ -360,8 +431,11 @@ function processSourceFiles(mapping, isDryRun) {
   console.log(`Total replacements: ${totalReplacements}`);
   if (modifiedFiles.length > 0) {
     console.log("\nSample modified files:");
-    modifiedFiles.slice(0, 15).forEach((f) => console.log(`  - ${f.path} (${f.count} replacements)`));
-    if (modifiedFiles.length > 15) console.log(`  ... and ${modifiedFiles.length - 15} more files`);
+    modifiedFiles
+      .slice(0, 15)
+      .forEach((f) => console.log(`  - ${f.path} (${f.count} replacements)`));
+    if (modifiedFiles.length > 15)
+      console.log(`  ... and ${modifiedFiles.length - 15} more files`);
   }
 }
 
@@ -384,6 +458,123 @@ function transformJson(sourceJson, mapping) {
   return unflattenObject(newFlat);
 }
 
+// Helper to convert hyphenated names to camelCase for variable imports
+function toCamelCase(str) {
+  return str.replace(/-([a-z0-9])/g, (_, g1) => g1.toUpperCase());
+}
+
+// Generates the updated i18n configuration files when splitting
+function updateI18nConfigFiles(sections) {
+  // 1. Generate src/i18n/index.ts
+  const enImports = sections
+    .map(
+      (s) =>
+        `import en${toCamelCase(s[0].toUpperCase() + s.slice(1))} from "./locales/en/${s}.json";`,
+    )
+    .join("\n");
+  const deImports = sections
+    .map(
+      (s) =>
+        `import de${toCamelCase(s[0].toUpperCase() + s.slice(1))} from "./locales/de/${s}.json";`,
+    )
+    .join("\n");
+
+  const enResourceObj = sections
+    .map(
+      (s) =>
+        `    ${s.includes("-") ? `"${s}"` : s}: en${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
+    )
+    .join("\n");
+  const deResourceObj = sections
+    .map(
+      (s) =>
+        `    ${s.includes("-") ? `"${s}"` : s}: de${toCamelCase(s[0].toUpperCase() + s.slice(1))},`,
+    )
+    .join("\n");
+
+  const i18nIndexContent = `import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+// English split translation modules
+${enImports}
+
+// German split translation modules
+${deImports}
+
+const en = {
+${enResourceObj}
+};
+
+const de = {
+${deResourceObj}
+};
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: { translation: en },
+      de: { translation: de },
+    },
+    fallbackLng: "en",
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
+      lookupLocalStorage: "i18nextLng",
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+
+export default i18n;
+`;
+
+  fs.writeFileSync(path.join(I18N_DIR, "index.ts"), i18nIndexContent, "utf-8");
+  console.log("✅ Updated src/i18n/index.ts with merged split resources.");
+
+  // 2. Generate src/types/i18next.d.ts
+  const dtsImports = sections
+    .map(
+      (s) =>
+        `import en${toCamelCase(s[0].toUpperCase() + s.slice(1))} from "@/i18n/locales/en/${s}.json";`,
+    )
+    .join("\n");
+  const dtsResourceObj = sections
+    .map(
+      (s) =>
+        `    ${s.includes("-") ? `"${s}"` : s}: typeof en${toCamelCase(s[0].toUpperCase() + s.slice(1))};`,
+    )
+    .join("\n");
+
+  const i18nTypesContent = `import "i18next";
+
+${dtsImports}
+
+declare module "i18next" {
+  interface CustomTypeOptions {
+    defaultNS: "translation";
+    resources: {
+      translation: {
+${dtsResourceObj}
+      };
+    };
+  }
+}
+`;
+
+  fs.writeFileSync(
+    path.join(TYPES_DIR, "i18next.d.ts"),
+    i18nTypesContent,
+    "utf-8",
+  );
+  console.log(
+    "✅ Updated src/types/i18next.d.ts with merged split resource types.",
+  );
+}
+
 function writeJsonFiles(transformedEn, transformedDe, splitFiles) {
   const enDir = path.join(LOCALES_DIR, "en");
   const deDir = path.join(LOCALES_DIR, "de");
@@ -392,22 +583,26 @@ function writeJsonFiles(transformedEn, transformedDe, splitFiles) {
     fs.writeFileSync(
       path.join(enDir, "translation.json"),
       JSON.stringify(transformedEn, null, 2) + "\n",
-      "utf-8"
+      "utf-8",
     );
     fs.writeFileSync(
       path.join(deDir, "translation.json"),
       JSON.stringify(transformedDe, null, 2) + "\n",
-      "utf-8"
+      "utf-8",
     );
-    console.log("\n✅ Successfully updated en/translation.json and de/translation.json");
+    console.log(
+      "\n✅ Successfully updated en/translation.json and de/translation.json",
+    );
   } else {
+    const sections = Object.keys(transformedEn);
+
     // Split mode: save each top-level key as its own file (e.g. common.json, dnf.json, ...)
     for (const [section, content] of Object.entries(transformedEn)) {
       const fileName = `${section}.json`;
       fs.writeFileSync(
         path.join(enDir, fileName),
         JSON.stringify(content, null, 2) + "\n",
-        "utf-8"
+        "utf-8",
       );
     }
     for (const [section, content] of Object.entries(transformedDe)) {
@@ -415,10 +610,15 @@ function writeJsonFiles(transformedEn, transformedDe, splitFiles) {
       fs.writeFileSync(
         path.join(deDir, fileName),
         JSON.stringify(content, null, 2) + "\n",
-        "utf-8"
+        "utf-8",
       );
     }
-    console.log(`\n✅ Successfully split locales into separate JSON files in locales/en/ and locales/de/`);
+    console.log(
+      `\n✅ Successfully split locales into separate JSON files in locales/en/ and locales/de/`,
+    );
+
+    // Automatically update i18n configuration and TypeScript declarations to merge split files
+    updateI18nConfigFiles(sections);
   }
 }
 
@@ -440,11 +640,17 @@ function main() {
     console.log(`Generating default mapping rules to ${MAPPING_FILE}...`);
     const mapping = {};
     // Collect all unique keys from both languages
-    const allKeys = Array.from(new Set([...Object.keys(enFlat), ...Object.keys(deFlat)])).sort();
+    const allKeys = Array.from(
+      new Set([...Object.keys(enFlat), ...Object.keys(deFlat)]),
+    ).sort();
     for (const key of allKeys) {
       mapping[key] = computeDefaultNewKey(key);
     }
-    fs.writeFileSync(MAPPING_FILE, JSON.stringify(mapping, null, 2) + "\n", "utf-8");
+    fs.writeFileSync(
+      MAPPING_FILE,
+      JSON.stringify(mapping, null, 2) + "\n",
+      "utf-8",
+    );
     console.log(`✅ Mapping file created with ${allKeys.length} keys.`);
     validateMapping(mapping, enFlat, deFlat);
     return;
@@ -453,7 +659,9 @@ function main() {
   // Load existing mapping file
   if (!fs.existsSync(MAPPING_FILE)) {
     console.error(`❌ Mapping file not found: ${MAPPING_FILE}`);
-    console.error("Run `node scripts/migrate-i18n.mjs --generate-mapping` first.");
+    console.error(
+      "Run `node scripts/migrate-i18n.mjs --generate-mapping` first.",
+    );
     process.exit(1);
   }
 
@@ -475,7 +683,9 @@ function main() {
       process.exit(1);
     }
     processSourceFiles(mapping, true);
-    console.log("\n💡 Dry run completed. Everything looks ready for `--apply`.");
+    console.log(
+      "\n💡 Dry run completed. Everything looks ready for `--apply`.",
+    );
     return;
   }
 
@@ -497,7 +707,9 @@ function main() {
     processSourceFiles(mapping, false);
 
     console.log("\n🎉 Migration completed successfully!");
-    console.log("👉 Next step: Run `npm run build` or `npx tsc --noEmit` to verify type safety.");
+    console.log(
+      "👉 Next step: Run `npm run build` or `npx tsc --noEmit` to verify type safety.",
+    );
     return;
   }
 
@@ -510,7 +722,7 @@ Available options:
   --validate           Validates current mapping against en/de files
   --dry-run            Simulates code replacements and prints statistics
   --apply              Executes migration on translations and source code
-  --apply --split      Executes migration and splits into separate JSON files
+  --apply --split      Executes migration, splits JSON files & updates i18n config
 `);
 }
 
