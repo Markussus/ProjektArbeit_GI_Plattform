@@ -4,7 +4,7 @@ import { createWriteStream } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createInterface } from "node:readline/promises";
 
 /* ============================================================
@@ -56,8 +56,8 @@ function runNpm(args, options = {}) {
  * ============================================================ */
 
 const requireFromApp = createRequire(appPackageJson);
-const archiverModule = requireFromApp("archiver");
-const archiver = archiverModule.default ?? archiverModule;
+const archiverPath = requireFromApp.resolve("archiver");
+const { ZipArchive } = await import(pathToFileURL(archiverPath).href);
 
 /* ============================================================
  * Console utilities
@@ -480,7 +480,7 @@ async function createZip(zipPath) {
   return new Promise((resolve, reject) => {
     const output = createWriteStream(zipPath);
 
-    const archive = archiver("zip", {
+    const archive = new ZipArchive({
       zlib: {
         level: 9,
       },
