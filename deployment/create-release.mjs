@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { access, chmod, copyFile, mkdir, rm, stat } from "node:fs/promises";
+import { access, chmod, copyFile, mkdir, rm, stat, writeFile } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -362,14 +362,22 @@ async function copyDeploymentFiles() {
 
   for (const file of launcherFiles) {
     const source = path.join(deploymentDir, file);
-
     const target = path.join(distDir, file);
 
-    await copyFile(source, target);
+    if (file === "start.sh") {
+      const content = await readFile(source, "utf8");
+
+      await writeFile(
+        target,
+        content.replace(/\r\n/g, "\n"),
+        "utf8",
+      );
+    } else {
+      await copyFile(source, target);
+    }
 
     console.log(`✓ ${file}`);
   }
-
   /*
    * Make start.sh executable on systems that support chmod.
    */
