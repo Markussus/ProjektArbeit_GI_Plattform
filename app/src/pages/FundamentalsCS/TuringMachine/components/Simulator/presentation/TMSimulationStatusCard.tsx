@@ -34,10 +34,14 @@ export function TMSimulationStatusCard({
       data-halted={runtime.halted}
       className="bg-card w-full max-w-md rounded-lg border p-4"
     >
-      <h3 className="mb-2 font-semibold">{t("turing-machine.sim.status.status")}</h3>
+      <h3 className="mb-2 font-semibold">
+        {t("turing-machine.sim.status.status")}
+      </h3>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="text-muted-foreground">{t("turing-machine.sim.status.state")}:</div>
+        <div className="text-muted-foreground">
+          {t("turing-machine.sim.status.state")}:
+        </div>
         <div data-testid="tm-status-current-state" className="font-mono">
           {formatTMStateName(runtime.currentState)}
         </div>
@@ -49,12 +53,18 @@ export function TMSimulationStatusCard({
           {currentSymbol}
         </div>
 
-        <div className="text-muted-foreground">{t("turing-machine.sim.status.step")}:</div>
+        <div className="text-muted-foreground">
+          {t("turing-machine.sim.status.step")}:
+        </div>
         <div data-testid="tm-status-step-count">{runtime.stepCount}</div>
 
-        <div className="text-muted-foreground">{t("turing-machine.sim.status.halt")}:</div>
+        <div className="text-muted-foreground">
+          {t("turing-machine.sim.status.halt")}:
+        </div>
         <div data-testid="tm-status-halted">
-          {runtime.halted ? t("turing-machine.sim.status.yes") : t("turing-machine.sim.status.no")}
+          {runtime.halted
+            ? t("turing-machine.sim.status.yes")
+            : t("turing-machine.sim.status.no")}
         </div>
       </div>
 

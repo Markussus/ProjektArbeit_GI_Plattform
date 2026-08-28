@@ -96,8 +96,12 @@ export function ExercisesTab({
             <TopicCategorySection
               key={category}
               testId={`rl-exercises-section-${category}`}
-              title={t(`regular-languages.exercises.categories.${category}.title`)}
-              description={t(`regular-languages.exercises.categories.${category}.description`)}
+              title={t(
+                `regular-languages.exercises.categories.${category}.title`,
+              )}
+              description={t(
+                `regular-languages.exercises.categories.${category}.description`,
+              )}
             >
               {defs.map((def) => {
                 const exercise = toExercise(def);

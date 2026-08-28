@@ -77,9 +77,12 @@ export function Shifting({
         steps.push({
           step: 0,
           binary: valA,
-          description: t("number-systems.simulator.arithmetic.shifting.stepOriginal", {
-            val: valA,
-          }),
+          description: t(
+            "number-systems.simulator.arithmetic.shifting.stepOriginal",
+            {
+              val: valA,
+            },
+          ),
           highlightedBit: null,
           newBit: null,
         });
@@ -89,9 +92,12 @@ export function Shifting({
           steps.push({
             step: i + 1,
             binary: currentResult,
-            description: t("number-systems.simulator.arithmetic.shifting.stepLeftShift", {
-              count: i + 1,
-            }),
+            description: t(
+              "number-systems.simulator.arithmetic.shifting.stepLeftShift",
+              {
+                count: i + 1,
+              },
+            ),
             highlightedBit: valA.length + i,
             newBit: "0",
           });
@@ -101,9 +107,12 @@ export function Shifting({
           steps.push({
             step: 5,
             binary: valA + "0".repeat(shiftAmount),
-            description: t("number-systems.simulator.arithmetic.shifting.stepLeftComplete", {
-              count: shiftAmount,
-            }),
+            description: t(
+              "number-systems.simulator.arithmetic.shifting.stepLeftComplete",
+              {
+                count: shiftAmount,
+              },
+            ),
             highlightedBit: null,
             newBit: null,
           });
@@ -114,32 +123,43 @@ export function Shifting({
           steps.push({
             step: 0,
             binary: valA,
-            description: t("number-systems.simulator.arithmetic.shifting.stepOriginal", {
-              val: valA,
-            }),
+            description: t(
+              "number-systems.simulator.arithmetic.shifting.stepOriginal",
+              {
+                val: valA,
+              },
+            ),
             highlightedBit: null,
             newBit: null,
           });
           steps.push({
             step: 1,
             binary: "0",
-            description: t("number-systems.simulator.arithmetic.shifting.stepRightZero", {
-              count: shiftAmount,
-            }),
+            description: t(
+              "number-systems.simulator.arithmetic.shifting.stepRightZero",
+              {
+                count: shiftAmount,
+              },
+            ),
             highlightedBit: null,
             newBit: null,
           });
         } else {
           resStr = valA.slice(0, valA.length - shiftAmount);
           afterDec = Math.floor(beforeDec / Math.pow(2, shiftAmount));
-          expl = t("number-systems.simulator.arithmetic.shifting.shiftRightExpl");
+          expl = t(
+            "number-systems.simulator.arithmetic.shifting.shiftRightExpl",
+          );
 
           steps.push({
             step: 0,
             binary: valA,
-            description: t("number-systems.simulator.arithmetic.shifting.stepOriginal", {
-              val: valA,
-            }),
+            description: t(
+              "number-systems.simulator.arithmetic.shifting.stepOriginal",
+              {
+                val: valA,
+              },
+            ),
             highlightedBit: null,
             newBit: null,
           });
@@ -150,9 +170,12 @@ export function Shifting({
             steps.push({
               step: i + 1,
               binary: remaining + "X".repeat(i + 1),
-              description: t("number-systems.simulator.arithmetic.shifting.stepRightShift", {
-                bit,
-              }),
+              description: t(
+                "number-systems.simulator.arithmetic.shifting.stepRightShift",
+                {
+                  bit,
+                },
+              ),
               highlightedBit: valA.length - 1 - i,
               newBit: null,
             });
@@ -197,7 +220,9 @@ export function Shifting({
           <div className="space-y-4">
             {renderModeSelector}
             <BinaryInput
-              label={t("number-systems.simulator.arithmetic.shifting.binaryNumber")}
+              label={t(
+                "number-systems.simulator.arithmetic.shifting.binaryNumber",
+              )}
               value={valA}
               onChange={handleInputA}
               locked={locked}
@@ -268,8 +293,12 @@ export function Shifting({
                   <div className="mb-6 w-full space-y-3">
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
                       {direction === "left"
-                        ? t("number-systems.simulator.arithmetic.shifting.leftStepsTitle")
-                        : t("number-systems.simulator.arithmetic.shifting.rightStepsTitle")}
+                        ? t(
+                            "number-systems.simulator.arithmetic.shifting.leftStepsTitle",
+                          )
+                        : t(
+                            "number-systems.simulator.arithmetic.shifting.rightStepsTitle",
+                          )}
                     </div>
 
                     <div className="space-y-2">
@@ -281,9 +310,12 @@ export function Shifting({
                           header={
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
-                                {t("number-systems.simulator.arithmetic.shifting.stepN", {
-                                  n: step.step,
-                                })}
+                                {t(
+                                  "number-systems.simulator.arithmetic.shifting.stepN",
+                                  {
+                                    n: step.step,
+                                  },
+                                )}
                               </span>
                               <div className="font-mono text-lg tracking-widest">
                                 {step.binary.split("").map((char, charIdx) => (
@@ -325,12 +357,16 @@ export function Shifting({
                     {/* Shift Diagram */}
                     <div className="bg-background border-border/40 mt-4 rounded-lg border p-4">
                       <div className="text-muted-foreground mb-2 text-xs">
-                        {t("number-systems.simulator.arithmetic.shifting.visualization")}
+                        {t(
+                          "number-systems.simulator.arithmetic.shifting.visualization",
+                        )}
                       </div>
                       <div className="flex items-center justify-center gap-4 font-mono text-lg">
                         <div className="flex flex-col items-center">
                           <span className="text-muted-foreground mb-1 text-xs">
-                            {t("number-systems.simulator.arithmetic.shifting.before")}
+                            {t(
+                              "number-systems.simulator.arithmetic.shifting.before",
+                            )}
                           </span>
                           <div className="tracking-widest">
                             {valA.split("").map((b, i) => (
@@ -353,7 +389,9 @@ export function Shifting({
                         </div>
                         <div className="flex flex-col items-center">
                           <span className="text-muted-foreground mb-1 text-xs">
-                            {t("number-systems.simulator.arithmetic.shifting.after")}
+                            {t(
+                              "number-systems.simulator.arithmetic.shifting.after",
+                            )}
                           </span>
                           <div className="tracking-widest">
                             {resultStr.split("").map((b, i) => (
@@ -390,7 +428,9 @@ export function Shifting({
                 <div className="bg-primary/10 border-primary mt-6 w-full rounded-r-md border-l-4 p-4">
                   <p className="text-foreground mb-2 text-sm">
                     <strong className="mb-1 block">
-                      {t("number-systems.simulator.arithmetic.shifting.mathMeaning")}
+                      {t(
+                        "number-systems.simulator.arithmetic.shifting.mathMeaning",
+                      )}
                     </strong>
                     {explanation}
                   </p>
@@ -402,7 +442,9 @@ export function Shifting({
                     ) : (
                       <span>
                         {decimalBefore} : 2^{shiftAmount} = {decimalAfter}{" "}
-                        {t("number-systems.simulator.arithmetic.shifting.integer")}
+                        {t(
+                          "number-systems.simulator.arithmetic.shifting.integer",
+                        )}
                       </span>
                     )}
                   </div>

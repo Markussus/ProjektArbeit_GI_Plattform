@@ -176,7 +176,9 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
           if (!isExerciseScenario) {
             return {
               rows: [],
-              error: t("turing-machine.validation.summary.exampleCheckUnavailable"),
+              error: t(
+                "turing-machine.validation.summary.exampleCheckUnavailable",
+              ),
             };
           }
 

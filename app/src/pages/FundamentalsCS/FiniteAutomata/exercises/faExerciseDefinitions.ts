@@ -290,7 +290,8 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
     id: "g2a-two-ones-zeros",
     titleKey: "finite-automata.exercisesTab.grammarTwoOnesZeros.title",
     goalKey: "finite-automata.exercisesTab.grammarTwoOnesZeros.goal",
-    descriptionKey: "finite-automata.exercisesTab.grammarTwoOnesZeros.description",
+    descriptionKey:
+      "finite-automata.exercisesTab.grammarTwoOnesZeros.description",
     difficulty: "easy",
     icon: Workflow,
     alphabet: ["0", "1"],

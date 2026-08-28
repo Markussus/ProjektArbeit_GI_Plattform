@@ -84,7 +84,9 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
                       step: step.index,
                       count: step.stateCount,
                     })
-                  : t("finite-automata.sim.stepTooltipUnreached", { step: step.index })
+                  : t("finite-automata.sim.stepTooltipUnreached", {
+                      step: step.index,
+                    })
               }
               style={{
                 width: step.isCurrent ? 36 : 28,

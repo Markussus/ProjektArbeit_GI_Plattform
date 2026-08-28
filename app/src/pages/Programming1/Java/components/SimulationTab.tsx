@@ -90,10 +90,15 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const resultRows = checkResult
     ? checkResult.rows.map((row) => [
-        row.passed ? t("java-programming.validation.pass") : t("java-programming.validation.fail"),
+        row.passed
+          ? t("java-programming.validation.pass")
+          : t("java-programming.validation.fail"),
         row.id,
         formatOutput(row.output, t("java-programming.validation.emptyOutput")),
-        formatOutput(row.expectedOutput, t("java-programming.validation.emptyOutput")),
+        formatOutput(
+          row.expectedOutput,
+          t("java-programming.validation.emptyOutput"),
+        ),
         row.phase,
       ])
     : [];

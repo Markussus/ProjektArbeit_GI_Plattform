@@ -80,7 +80,9 @@ export function ArithmeticMode({
           },
           {
             value: "multiplication",
-            label: t("number-systems.simulator.arithmetic.modes.multiplication"),
+            label: t(
+              "number-systems.simulator.arithmetic.modes.multiplication",
+            ),
           },
           {
             value: "division",
@@ -90,7 +92,10 @@ export function ArithmeticMode({
             value: "shifting",
             label: t("number-systems.simulator.arithmetic.modes.shifting"),
           },
-          { value: "compare", label: t("number-systems.simulator.arithmetic.modes.compare") },
+          {
+            value: "compare",
+            label: t("number-systems.simulator.arithmetic.modes.compare"),
+          },
         ]}
         onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
         ariaLabel={t("number-systems.simulator.arithmetic.selectMode")}

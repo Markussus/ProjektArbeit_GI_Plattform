@@ -130,13 +130,17 @@ export function Multiplication({
           <div className="space-y-4">
             {renderModeSelector}
             <BinaryInput
-              label={t("number-systems.simulator.arithmetic.multiplication.multiplier")}
+              label={t(
+                "number-systems.simulator.arithmetic.multiplication.multiplier",
+              )}
               value={valA}
               onChange={handleInputA}
               locked={locked}
             />
             <BinaryInput
-              label={t("number-systems.simulator.arithmetic.multiplication.multiplicand")}
+              label={t(
+                "number-systems.simulator.arithmetic.multiplication.multiplicand",
+              )}
               value={valB}
               onChange={handleInputB}
               locked={locked}
@@ -157,7 +161,9 @@ export function Multiplication({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("number-systems.simulator.arithmetic.common.stepsResult")}
+              title={t(
+                "number-systems.simulator.arithmetic.common.stepsResult",
+              )}
             />
 
             {valA && valB ? (
@@ -170,7 +176,9 @@ export function Multiplication({
                 {showStepByStep && steps.length > 0 && (
                   <div className="mb-6 space-y-3">
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("number-systems.simulator.arithmetic.multiplication.stepByStepTitle")}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.stepByStepTitle",
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -270,15 +278,20 @@ export function Multiplication({
                       <span className="text-primary font-bold">{finalSum}</span>
                     </div>
                     <div className="text-muted-foreground mt-4 text-right font-sans text-xs tracking-normal">
-                      {t("number-systems.simulator.arithmetic.multiplication.inDecimal")}:{" "}
-                      {parseInt(valA, 2)} × {parseInt(valB, 2)} = {finalSumDec}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.inDecimal",
+                      )}
+                      : {parseInt(valA, 2)} × {parseInt(valB, 2)} ={" "}
+                      {finalSumDec}
                     </div>
                   </div>
                 </div>
               </>
             ) : (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                {t("number-systems.simulator.arithmetic.common.enterValidOperands")}
+                {t(
+                  "number-systems.simulator.arithmetic.common.enterValidOperands",
+                )}
               </p>
             )}
           </div>

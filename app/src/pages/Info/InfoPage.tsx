@@ -79,7 +79,9 @@ export function InfoPage() {
         <div className="mt-4">
           <InlineResetControl
             label={t("common.trainingCenter.resetAllProgress")}
-            confirmationText={t("common.trainingCenter.confirmResetAllProgress")}
+            confirmationText={t(
+              "common.trainingCenter.confirmResetAllProgress",
+            )}
             onConfirm={() => trainingCenterStorage.deleteAll()}
             testId="help-reset-all-progress"
           />

@@ -150,7 +150,9 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
           setInitialSubMode("addition");
           setInitialValueA(decToBin(randInt(10, 100)));
           setInitialValueB(decToBin(randInt(10, 100)));
-        } else if (selectedExercise.id === "number-systems.ex_u04_binToHexOct") {
+        } else if (
+          selectedExercise.id === "number-systems.ex_u04_binToHexOct"
+        ) {
           setActiveMode("integers");
           setInitialBase("bin");
           setInitialTargetBase(Math.random() > 0.5 ? "hex" : "oct");

@@ -218,7 +218,8 @@ export const rlExercises: RLExerciseDefinition[] = [
   {
     id: "applied-identifiers",
     titleKey: "regular-languages.exercises.appliedIdentifiers.title",
-    descriptionKey: "regular-languages.exercises.appliedIdentifiers.description",
+    descriptionKey:
+      "regular-languages.exercises.appliedIdentifiers.description",
     goalKey: "regular-languages.exercises.appliedIdentifiers.goal",
     difficulty: "hard",
     icon: Code,

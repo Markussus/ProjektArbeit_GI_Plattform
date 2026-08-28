@@ -120,9 +120,15 @@ export function SimulationWorkspace({
             data-testid="simulation-focus-toggle"
             aria-pressed={isFocused}
             aria-label={
-              isFocused ? t("common.simulation.exitFocus") : t("common.simulation.expand")
+              isFocused
+                ? t("common.simulation.exitFocus")
+                : t("common.simulation.expand")
             }
-            title={isFocused ? t("common.simulation.close") : t("common.simulation.expand")}
+            title={
+              isFocused
+                ? t("common.simulation.close")
+                : t("common.simulation.expand")
+            }
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
           >
             {isFocused ? (

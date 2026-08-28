@@ -88,21 +88,30 @@ export function Compare({
         dIndex = i;
         res = bitA === "1" ? "greater" : "less";
         if (bitA === "1") {
-          explanation = t("number-systems.simulator.arithmetic.compare.stepResultGreater", {
-            pos: i,
-          });
+          explanation = t(
+            "number-systems.simulator.arithmetic.compare.stepResultGreater",
+            {
+              pos: i,
+            },
+          );
           stepResult = "greater";
         } else {
-          explanation = t("number-systems.simulator.arithmetic.compare.stepResultLess", {
-            pos: i,
-          });
+          explanation = t(
+            "number-systems.simulator.arithmetic.compare.stepResultLess",
+            {
+              pos: i,
+            },
+          );
           stepResult = "less";
         }
       } else {
-        explanation = t("number-systems.simulator.arithmetic.compare.stepEqual", {
-          pos: i,
-          bit: bitA,
-        });
+        explanation = t(
+          "number-systems.simulator.arithmetic.compare.stepEqual",
+          {
+            pos: i,
+            bit: bitA,
+          },
+        );
       }
 
       steps.push({
@@ -171,7 +180,9 @@ export function Compare({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Search className="text-primary h-5 w-5" />}
-              title={t("number-systems.simulator.arithmetic.compare.visualCompare")}
+              title={t(
+                "number-systems.simulator.arithmetic.compare.visualCompare",
+              )}
             />
 
             {valA && valB ? (
@@ -187,10 +198,14 @@ export function Compare({
                     {/* Padding Step */}
                     <div className="bg-background border-border/40 rounded-lg border p-4">
                       <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                        {t("number-systems.simulator.arithmetic.compare.stepPadding")}
+                        {t(
+                          "number-systems.simulator.arithmetic.compare.stepPadding",
+                        )}
                       </div>
                       <p className="text-muted-foreground mb-3 text-sm">
-                        {t("number-systems.simulator.arithmetic.compare.padDesc")}
+                        {t(
+                          "number-systems.simulator.arithmetic.compare.padDesc",
+                        )}
                       </p>
                       <div className="flex gap-6 font-mono text-sm">
                         <div>
@@ -212,16 +227,21 @@ export function Compare({
                       </div>
                       {valA.length !== padA.length && (
                         <p className="text-muted-foreground mt-2 text-xs">
-                          {t("number-systems.simulator.arithmetic.compare.paddingNote", {
-                            count: padA.length - valA.length,
-                          })}
+                          {t(
+                            "number-systems.simulator.arithmetic.compare.paddingNote",
+                            {
+                              count: padA.length - valA.length,
+                            },
+                          )}
                         </p>
                       )}
                     </div>
 
                     {/* Bit Comparison Steps */}
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("number-systems.simulator.arithmetic.compare.bitComparisonTitle")}
+                      {t(
+                        "number-systems.simulator.arithmetic.compare.bitComparisonTitle",
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -233,9 +253,12 @@ export function Compare({
                           header={
                             <>
                               <span className="text-muted-foreground w-20 text-xs font-bold">
-                                {t("number-systems.simulator.arithmetic.compare.posN", {
-                                  n: step.position,
-                                })}
+                                {t(
+                                  "number-systems.simulator.arithmetic.compare.posN",
+                                  {
+                                    n: step.position,
+                                  },
+                                )}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
                                 <span className="flex h-8 w-8 items-center justify-center rounded bg-blue-500/10">
@@ -290,10 +313,16 @@ export function Compare({
                     <div className="bg-primary/10 border-primary rounded-r-md border-l-4 p-4">
                       <p className="text-foreground text-sm font-semibold">
                         {result === "eq"
-                          ? t("number-systems.simulator.arithmetic.compare.resultEq")
+                          ? t(
+                              "number-systems.simulator.arithmetic.compare.resultEq",
+                            )
                           : result === "greater"
-                            ? t("number-systems.simulator.arithmetic.compare.resultGreater")
-                            : t("number-systems.simulator.arithmetic.compare.resultLess")}
+                            ? t(
+                                "number-systems.simulator.arithmetic.compare.resultGreater",
+                              )
+                            : t(
+                                "number-systems.simulator.arithmetic.compare.resultLess",
+                              )}
                       </p>
                     </div>
                   </div>
@@ -360,10 +389,16 @@ export function Compare({
                     <div className="bg-primary/10 border-primary w-full rounded-r-md border-l-4 p-4">
                       <p className="text-foreground text-sm font-semibold">
                         {result === "eq"
-                          ? t("number-systems.simulator.arithmetic.compare.resultEq")
+                          ? t(
+                              "number-systems.simulator.arithmetic.compare.resultEq",
+                            )
                           : result === "greater"
-                            ? t("number-systems.simulator.arithmetic.compare.resultGreater")
-                            : t("number-systems.simulator.arithmetic.compare.resultLess")}
+                            ? t(
+                                "number-systems.simulator.arithmetic.compare.resultGreater",
+                              )
+                            : t(
+                                "number-systems.simulator.arithmetic.compare.resultLess",
+                              )}
                       </p>
                     </div>
                   </>
@@ -371,7 +406,9 @@ export function Compare({
               </div>
             ) : (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                {t("number-systems.simulator.arithmetic.common.enterValidOperands")}
+                {t(
+                  "number-systems.simulator.arithmetic.common.enterValidOperands",
+                )}
               </p>
             )}
           </div>

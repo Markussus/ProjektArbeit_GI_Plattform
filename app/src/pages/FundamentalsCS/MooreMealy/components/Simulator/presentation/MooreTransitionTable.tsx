@@ -99,7 +99,9 @@ export function MooreTransitionTable({
   return (
     <section className="min-w-0 space-y-2">
       <div>
-        <h3 className="font-semibold">{t("moore-mealy.sim.transitionTable")}</h3>
+        <h3 className="font-semibold">
+          {t("moore-mealy.sim.transitionTable")}
+        </h3>
         <p className="text-muted-foreground text-sm">
           {t("moore-mealy.sim.transitionTableHelp")}
         </p>
@@ -272,10 +274,13 @@ export function MooreTransitionTable({
                               createdState,
                             );
                           }}
-                          ariaLabel={t("moore-mealy.sim.transitionForStateInput", {
-                            state,
-                            input: inputSymbol,
-                          })}
+                          ariaLabel={t(
+                            "moore-mealy.sim.transitionForStateInput",
+                            {
+                              state,
+                              input: inputSymbol,
+                            },
+                          )}
                           createLabel={(value) =>
                             t("moore-mealy.sim.createNamedState", { value })
                           }

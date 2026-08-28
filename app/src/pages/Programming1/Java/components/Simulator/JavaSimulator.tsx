@@ -281,7 +281,9 @@ const JavaSimulatorSession = forwardRef<
               testId="java-compiler-status"
             />
             <p className="text-muted-foreground text-sm">
-              {t(`java-programming.compilerStatusText.${snapshot.compilerStatus}`)}
+              {t(
+                `java-programming.compilerStatusText.${snapshot.compilerStatus}`,
+              )}
             </p>
           </div>
         </div>

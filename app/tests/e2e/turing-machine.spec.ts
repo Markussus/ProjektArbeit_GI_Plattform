@@ -3,9 +3,12 @@ import { exportActiveSimulator } from "./support/app-shell";
 
 const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
 const ERASE_TAPE_EXERCISE_ID = "turing-machine.exercises.exerciseEraseTape";
-const INVERT_BINARY_WORD_EXERCISE_ID = "turing-machine.exercises.exerciseInvertBinaryWord";
-const UNARY_INCREMENT_EXERCISE_ID = "turing-machine.exercises.exerciseUnaryIncrement";
-const BINARY_INCREMENT_EXERCISE_ID = "turing-machine.exercises.exerciseBinaryIncrement";
+const INVERT_BINARY_WORD_EXERCISE_ID =
+  "turing-machine.exercises.exerciseInvertBinaryWord";
+const UNARY_INCREMENT_EXERCISE_ID =
+  "turing-machine.exercises.exerciseUnaryIncrement";
+const BINARY_INCREMENT_EXERCISE_ID =
+  "turing-machine.exercises.exerciseBinaryIncrement";
 const ADD_BINARY_EXERCISE_ID = "turing-machine.exercises.exerciseAddBinary";
 const CHECK_REGEX_EXERCISE_ID = "turing-machine.exercises.exerciseCheckRegex";
 const BIT_FLIP_EXAMPLE_ID = "turing-machine.examples.example1";

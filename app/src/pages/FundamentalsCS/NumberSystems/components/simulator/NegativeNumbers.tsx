@@ -175,10 +175,16 @@ export function NegativeNumbers({
                 <div className="space-y-6">
                   <p className="text-muted-foreground text-sm">
                     {activeMode === "twos"
-                      ? t("number-systems.simulator.numbers.howTwosBuilt", { val: parsed })
+                      ? t("number-systems.simulator.numbers.howTwosBuilt", {
+                          val: parsed,
+                        })
                       : activeMode === "ones"
-                        ? t("number-systems.simulator.numbers.howOnesBuilt", { val: parsed })
-                        : t("number-systems.simulator.numbers.howSignBuilt", { val: parsed })}
+                        ? t("number-systems.simulator.numbers.howOnesBuilt", {
+                            val: parsed,
+                          })
+                        : t("number-systems.simulator.numbers.howSignBuilt", {
+                            val: parsed,
+                          })}
                   </p>
 
                   <div className="space-y-4">

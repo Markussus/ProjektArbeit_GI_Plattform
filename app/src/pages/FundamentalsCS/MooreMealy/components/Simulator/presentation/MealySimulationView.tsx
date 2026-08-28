@@ -52,7 +52,9 @@ export function MealySimulationView(props: Props) {
   );
   return (
     <div data-testid="mealy-simulation-view" className="space-y-5">
-      <h2 className="text-lg font-bold">{t("moore-mealy.mealy.simulationTitle")}</h2>
+      <h2 className="text-lg font-bold">
+        {t("moore-mealy.mealy.simulationTitle")}
+      </h2>
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">
           <SimulatorControls
@@ -134,7 +136,9 @@ function MealyRuntimeTable({
           <tr className="bg-muted/50 border-b">
             <th className="border-r p-2">{t("moore-mealy.sim.state")}</th>
             <th className="border-r p-2">{t("moore-mealy.sim.event")}</th>
-            <th className="border-r p-2">{t("moore-mealy.conversion.nextState")}</th>
+            <th className="border-r p-2">
+              {t("moore-mealy.conversion.nextState")}
+            </th>
             <th className="p-2">{t("moore-mealy.sim.output")}</th>
           </tr>
         </thead>

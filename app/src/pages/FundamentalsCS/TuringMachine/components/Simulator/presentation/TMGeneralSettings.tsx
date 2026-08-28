@@ -51,7 +51,9 @@ export function TMGeneralSettings({
           value={program.initialTape.join("")}
           onChange={(event) => onInitialTapeChange(event.target.value)}
           disabled={disabled}
-          placeholder={t("turing-machine.config.general.initialTapePlaceholder")}
+          placeholder={t(
+            "turing-machine.config.general.initialTapePlaceholder",
+          )}
         />
       </div>
 

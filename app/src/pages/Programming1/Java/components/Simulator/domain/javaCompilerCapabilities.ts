@@ -17,7 +17,8 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
   {
     id: "program-shape",
     status: "supported",
-    titleKey: "java-programming.commandOverview.capabilities.programShape.title",
+    titleKey:
+      "java-programming.commandOverview.capabilities.programShape.title",
     descriptionKey:
       "java-programming.commandOverview.capabilities.programShape.description",
     examples: [
@@ -30,20 +31,23 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "basics",
     status: "supported",
     titleKey: "java-programming.commandOverview.capabilities.basics.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.basics.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.basics.description",
     examples: ["int/double/boolean", "String", "if/else", "switch", "methods"],
   },
   {
     id: "loops",
     status: "supported",
     titleKey: "java-programming.commandOverview.capabilities.loops.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.loops.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.loops.description",
     examples: ["for", "while", "do/while", "for-each", "break", "continue"],
   },
   {
     id: "arrays-collections",
     status: "supported",
-    titleKey: "java-programming.commandOverview.capabilities.arraysCollections.title",
+    titleKey:
+      "java-programming.commandOverview.capabilities.arraysCollections.title",
     descriptionKey:
       "java-programming.commandOverview.capabilities.arraysCollections.description",
     examples: [
@@ -65,7 +69,8 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "strings-math",
     status: "supported",
     titleKey: "java-programming.commandOverview.capabilities.stringsMath.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.stringsMath.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.stringsMath.description",
     examples: [
       "StringBuilder",
       "String.split",
@@ -83,7 +88,8 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "objects",
     status: "supported",
     titleKey: "java-programming.commandOverview.capabilities.objects.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.objects.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.objects.description",
     examples: [
       "classes",
       "constructors",
@@ -100,13 +106,15 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "output",
     status: "supported",
     titleKey: "java-programming.commandOverview.capabilities.output.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.output.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.output.description",
     examples: ["System.out.print", "System.out.println", "System.err.println"],
   },
   {
     id: "standard-library",
     status: "limited",
-    titleKey: "java-programming.commandOverview.capabilities.standardLibrary.title",
+    titleKey:
+      "java-programming.commandOverview.capabilities.standardLibrary.title",
     descriptionKey:
       "java-programming.commandOverview.capabilities.standardLibrary.description",
     examples: [
@@ -121,7 +129,8 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "single-file",
     status: "limited",
     titleKey: "java-programming.commandOverview.capabilities.singleFile.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.singleFile.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.singleFile.description",
     examples: [
       "one Main.java editor file",
       "inner classes",
@@ -133,7 +142,8 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "input",
     status: "limited",
     titleKey: "java-programming.commandOverview.capabilities.input.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.input.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.input.description",
     examples: ["Scanner.nextLine()", "Scanner.nextInt()"],
     snippets: [
       "Scanner scanner = new Scanner(System.in);\nString line = scanner.nextLine();",
@@ -143,20 +153,23 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     id: "cli",
     status: "blocked",
     titleKey: "java-programming.commandOverview.capabilities.cli.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.cli.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.cli.description",
     examples: ["java", "javac", "jshell", "jar", "javadoc", "mvn", "gradle"],
   },
   {
     id: "environment",
     status: "blocked",
     titleKey: "java-programming.commandOverview.capabilities.environment.title",
-    descriptionKey: "java-programming.commandOverview.capabilities.environment.description",
+    descriptionKey:
+      "java-programming.commandOverview.capabilities.environment.description",
     examples: ["files", "sockets", "processes", "native libraries"],
   },
   {
     id: "runtime-features",
     status: "blocked",
-    titleKey: "java-programming.commandOverview.capabilities.runtimeFeatures.title",
+    titleKey:
+      "java-programming.commandOverview.capabilities.runtimeFeatures.title",
     descriptionKey:
       "java-programming.commandOverview.capabilities.runtimeFeatures.description",
     examples: ["reflection-heavy code", "dynamic class loading", "threads"],

@@ -15,12 +15,12 @@ declare module "i18next" {
     defaultNS: "translation";
     resources: {
       translation: {
-        "common": typeof enCommon;
+        common: typeof enCommon;
         "finite-automata": typeof enFiniteAutomata;
         "number-systems": typeof enNumberSystems;
-        "encoding": typeof enEncoding;
+        encoding: typeof enEncoding;
         "moore-mealy": typeof enMooreMealy;
-        "dnf": typeof enDnf;
+        dnf: typeof enDnf;
         "java-programming": typeof enJavaProgramming;
         "turing-machine": typeof enTuringMachine;
         "regular-languages": typeof enRegularLanguages;

@@ -572,7 +572,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       id: "turing-machine.exercises.exerciseWorksheetAlternatingSymbols",
       storageId: 0,
       titleKey: "turing-machine.exercises.exerciseWorksheetAlternatingSymbols",
-      descriptionKey: "turing-machine.exercises.exerciseWorksheetAlternatingSymbolsDesc",
+      descriptionKey:
+        "turing-machine.exercises.exerciseWorksheetAlternatingSymbolsDesc",
       starterProgram: emptyTuringMachineProgram,
       solutionProgram: worksheetAlternatingSymbols,
       program: emptyTuringMachineProgram,
@@ -586,8 +587,10 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
         { input: "0110", expectedOutput: "0110" },
       ],
       definition: {
-        titleKey: "turing-machine.exercises.exerciseWorksheetAlternatingSymbols",
-        descriptionKey: "turing-machine.exercises.exerciseWorksheetAlternatingSymbolsDesc",
+        titleKey:
+          "turing-machine.exercises.exerciseWorksheetAlternatingSymbols",
+        descriptionKey:
+          "turing-machine.exercises.exerciseWorksheetAlternatingSymbolsDesc",
         difficulty: "easy",
         icon: ToggleLeft,
       },
@@ -597,7 +600,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       id: "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbols",
       storageId: 1,
       titleKey: "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbols",
-      descriptionKey: "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbolsDesc",
+      descriptionKey:
+        "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbolsDesc",
       starterProgram: emptyTuringMachineProgram,
       solutionProgram: worksheetSwapFirstTwoSymbols,
       program: emptyTuringMachineProgram,
@@ -613,8 +617,10 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
         { input: "0111", expectedOutput: "1011" },
       ],
       definition: {
-        titleKey: "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbols",
-        descriptionKey: "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbolsDesc",
+        titleKey:
+          "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbols",
+        descriptionKey:
+          "turing-machine.exercises.exerciseWorksheetSwapFirstTwoSymbolsDesc",
         difficulty: "medium",
         icon: ToggleLeft,
       },
@@ -623,8 +629,10 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       kind: "exercise",
       id: "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOne",
       storageId: 2,
-      titleKey: "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOne",
-      descriptionKey: "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOneDesc",
+      titleKey:
+        "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOne",
+      descriptionKey:
+        "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOneDesc",
       starterProgram: emptyTuringMachineProgram,
       solutionProgram: worksheetSetFirstAndLastToOne,
       program: emptyTuringMachineProgram,
@@ -639,7 +647,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
         { input: "1000", expectedOutput: "1001" },
       ],
       definition: {
-        titleKey: "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOne",
+        titleKey:
+          "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOne",
         descriptionKey:
           "turing-machine.exercises.exerciseWorksheetSetFirstAndLastToOneDesc",
         difficulty: "medium",
@@ -650,8 +659,10 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       kind: "exercise",
       id: "turing-machine.exercises.exerciseWorksheetAlternatingOverwrite",
       storageId: 3,
-      titleKey: "turing-machine.exercises.exerciseWorksheetAlternatingOverwrite",
-      descriptionKey: "turing-machine.exercises.exerciseWorksheetAlternatingOverwriteDesc",
+      titleKey:
+        "turing-machine.exercises.exerciseWorksheetAlternatingOverwrite",
+      descriptionKey:
+        "turing-machine.exercises.exerciseWorksheetAlternatingOverwriteDesc",
       starterProgram: emptyTuringMachineProgram,
       solutionProgram: worksheetAlternatingOverwrite,
       program: emptyTuringMachineProgram,
@@ -665,7 +676,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
         { input: "1010101", expectedOutput: "0101010" },
       ],
       definition: {
-        titleKey: "turing-machine.exercises.exerciseWorksheetAlternatingOverwrite",
+        titleKey:
+          "turing-machine.exercises.exerciseWorksheetAlternatingOverwrite",
         descriptionKey:
           "turing-machine.exercises.exerciseWorksheetAlternatingOverwriteDesc",
         difficulty: "easy",
@@ -676,7 +688,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       kind: "exercise",
       id: "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
       storageId: 4,
-      titleKey: "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
+      titleKey:
+        "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
       descriptionKey:
         "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZeroDesc",
       starterProgram: emptyTuringMachineProgram,
@@ -691,7 +704,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
         { input: "100", expectedOutput: "100" },
       ],
       definition: {
-        titleKey: "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
+        titleKey:
+          "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZero",
         descriptionKey:
           "turing-machine.exercises.exerciseWorksheetOverwriteLastTwoWithZeroDesc",
         difficulty: "medium",
@@ -703,7 +717,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       id: "turing-machine.exercises.exerciseWorksheetAsciiParityBit",
       storageId: 5,
       titleKey: "turing-machine.exercises.exerciseWorksheetAsciiParityBit",
-      descriptionKey: "turing-machine.exercises.exerciseWorksheetAsciiParityBitDesc",
+      descriptionKey:
+        "turing-machine.exercises.exerciseWorksheetAsciiParityBitDesc",
       starterProgram: emptyTuringMachineProgram,
       solutionProgram: worksheetAsciiParityBit,
       program: emptyTuringMachineProgram,
@@ -716,7 +731,8 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
       ],
       definition: {
         titleKey: "turing-machine.exercises.exerciseWorksheetAsciiParityBit",
-        descriptionKey: "turing-machine.exercises.exerciseWorksheetAsciiParityBitDesc",
+        descriptionKey:
+          "turing-machine.exercises.exerciseWorksheetAsciiParityBitDesc",
         difficulty: "hard",
         icon: Binary,
       },

@@ -161,7 +161,10 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                 border: "1px solid rgba(255, 82, 82, 0.3)",
               }}
             >
-              ⚠ {t("finite-automata.diagram.violations", { count: violations.length })}
+              ⚠{" "}
+              {t("finite-automata.diagram.violations", {
+                count: violations.length,
+              })}
             </span>
           )}
           <ZoomControls
@@ -585,7 +588,9 @@ function ViolationTooltip({ violation }: { violation: DFAViolation }) {
       <span style={{ flexShrink: 0, marginTop: 1 }}>⚠</span>
       <span>
         {violation.type === "epsilon"
-          ? t("finite-automata.diagram.violationEpsilon", { state: violation.state })
+          ? t("finite-automata.diagram.violationEpsilon", {
+              state: violation.state,
+            })
           : t("finite-automata.diagram.violationNondeterministic", {
               state: violation.state,
               symbol: violation.symbol,

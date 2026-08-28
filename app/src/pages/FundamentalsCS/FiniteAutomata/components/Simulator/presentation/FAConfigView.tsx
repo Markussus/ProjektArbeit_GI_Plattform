@@ -52,7 +52,10 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
 
   function translateIssue(code: FAProgramIssueCode): string {
     const map: Record<FAProgramIssueCode, string> = {
-      states_empty: t("finite-automata.validation.statesEmpty", "States must not be empty."),
+      states_empty: t(
+        "finite-automata.validation.statesEmpty",
+        "States must not be empty.",
+      ),
       start_state_missing: t(
         "finite-automata.validation.startStateMissing",
         "Start state is not in the state set.",
@@ -108,7 +111,9 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Automaton Type */}
         <div className="flex flex-col gap-1">
-          <label className={labelClass}>{t("finite-automata.config.type", "Type")}</label>
+          <label className={labelClass}>
+            {t("finite-automata.config.type", "Type")}
+          </label>
           <select
             value={editor.draft.type}
             onChange={(e) =>
@@ -156,7 +161,10 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
             empty cell. */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("finite-automata.config.acceptStates", "Accept States (comma-separated)")}
+            {t(
+              "finite-automata.config.acceptStates",
+              "Accept States (comma-separated)",
+            )}
           </label>
           <ArrayInput
             value={editor.draft.acceptStates}

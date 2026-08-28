@@ -26,7 +26,9 @@ export function JavaConsolePanel({
     >
       <div className="border-border flex items-center gap-2 border-b px-4 py-3">
         <TerminalSquare className="text-muted-foreground size-4" />
-        <h3 className="text-sm font-semibold">{t("java-programming.console.title")}</h3>
+        <h3 className="text-sm font-semibold">
+          {t("java-programming.console.title")}
+        </h3>
       </div>
 
       <div className="space-y-4 p-4">
@@ -35,7 +37,9 @@ export function JavaConsolePanel({
             data-testid="java-timeout-warning"
             className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
           >
-            <p className="font-semibold">{t("java-programming.timeout.warningTitle")}</p>
+            <p className="font-semibold">
+              {t("java-programming.timeout.warningTitle")}
+            </p>
             <p>{t("java-programming.timeout.warningText")}</p>
           </div>
         )}

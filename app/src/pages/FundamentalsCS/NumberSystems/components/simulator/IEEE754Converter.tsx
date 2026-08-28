@@ -225,7 +225,9 @@ export function IEEE754Converter({
                     <div className="text-muted-foreground py-4 text-sm">
                       {locked
                         ? "--------"
-                        : t("number-systems.simulator.numbers.enterValidNumber")}
+                        : t(
+                            "number-systems.simulator.numbers.enterValidNumber",
+                          )}
                     </div>
                   )
                 ) : // IEEE TO DEC RESULT DISPLAY
@@ -260,13 +262,17 @@ export function IEEE754Converter({
               <div className="text-sm text-amber-800 dark:text-amber-300/80">
                 {isZero && (
                   <p>
-                    <strong>{t("number-systems.simulator.numbers.zero")}</strong>{" "}
+                    <strong>
+                      {t("number-systems.simulator.numbers.zero")}
+                    </strong>{" "}
                     {t("number-systems.simulator.numbers.zeroDesc")}
                   </p>
                 )}
                 {isInf && (
                   <p>
-                    <strong>{t("number-systems.simulator.numbers.infinity")}</strong>{" "}
+                    <strong>
+                      {t("number-systems.simulator.numbers.infinity")}
+                    </strong>{" "}
                     {t("number-systems.simulator.numbers.infDesc")}
                   </p>
                 )}
@@ -395,9 +401,13 @@ export function IEEE754Converter({
                       {t("number-systems.simulator.numbers.step4Mantissa")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("number-systems.simulator.numbers.mantissaDesc")}</p>
+                      <p>
+                        {t("number-systems.simulator.numbers.mantissaDesc")}
+                      </p>
                       <p className="border-l-2 border-orange-500/50 pl-2 text-xs">
-                        <strong>{t("number-systems.simulator.numbers.hiddenBitTitle")}</strong>{" "}
+                        <strong>
+                          {t("number-systems.simulator.numbers.hiddenBitTitle")}
+                        </strong>{" "}
                         {t("number-systems.simulator.numbers.hiddenBitDesc")}
                       </p>
                       <p className="bg-muted/50 mt-2 rounded p-2 text-center font-mono tracking-widest break-all text-orange-600 dark:text-orange-400">
@@ -431,7 +441,9 @@ export function IEEE754Converter({
                       {t("number-systems.simulator.numbers.step2ExpExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground rounded-lg border border-green-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("number-systems.simulator.numbers.expBinToDecDesc")}</p>
+                      <p>
+                        {t("number-systems.simulator.numbers.expBinToDecDesc")}
+                      </p>
                       <div className="bg-muted/50 mt-2 flex flex-col justify-center gap-2 rounded p-2 text-center font-mono">
                         <span className="font-bold tracking-widest text-green-600 dark:text-green-400">
                           {exponent}₂
@@ -455,7 +467,11 @@ export function IEEE754Converter({
                       {t("number-systems.simulator.numbers.step3MantExtract")}
                     </div>
                     <div className="bg-background text-muted-foreground space-y-2 rounded-lg border border-orange-500/20 p-4 text-sm shadow-inner">
-                      <p>{t("number-systems.simulator.numbers.mantissaBinToDecDesc")}</p>
+                      <p>
+                        {t(
+                          "number-systems.simulator.numbers.mantissaBinToDecDesc",
+                        )}
+                      </p>
                       <div className="bg-muted/50 mt-2 w-full truncate rounded p-2 text-center font-mono tracking-widest text-orange-600 dark:text-orange-400">
                         1.{mantissa}
                       </div>
@@ -477,7 +493,8 @@ export function IEEE754Converter({
 
                       <div className="border-border/40 mt-2 flex flex-col items-center justify-center gap-1 border-t pt-2">
                         <span className="text-xs">
-                          {t("number-systems.simulator.numbers.fractionSum")}: {sumOfFractions}
+                          {t("number-systems.simulator.numbers.fractionSum")}:{" "}
+                          {sumOfFractions}
                         </span>
                         <span className="text-foreground font-bold">
                           = 1.0 + {sumOfFractions} = {1 + sumOfFractions}
@@ -491,7 +508,9 @@ export function IEEE754Converter({
                       {t("number-systems.simulator.numbers.step4FinalCalc")}
                     </div>
                     <div className="bg-background border-primary/20 text-muted-foreground space-y-2 rounded-lg border p-4 text-sm shadow-inner">
-                      <p>{t("number-systems.simulator.numbers.finalFormulaDesc")}</p>
+                      <p>
+                        {t("number-systems.simulator.numbers.finalFormulaDesc")}
+                      </p>
                       <div className="bg-muted/50 mt-2 flex flex-wrap items-center justify-center gap-4 rounded p-3 font-mono">
                         <span>
                           (-1)

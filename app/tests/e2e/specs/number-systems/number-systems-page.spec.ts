@@ -56,7 +56,9 @@ test.describe("Number Systems page", () => {
         .getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-select")
         .click();
       await expect(
-        page.getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-open"),
+        page.getByTestId(
+          "exercise-card-number-systems.ex_u04_binToHexOct-open",
+        ),
       ).toBeVisible();
     });
 
@@ -218,7 +220,9 @@ test.describe("Number Systems page", () => {
       await expect(
         page.getByTestId("example-card-number-systems.example_u03_1-open"),
       ).toBeVisible();
-      await page.getByTestId("example-card-number-systems.example_u03_1-open").click();
+      await page
+        .getByTestId("example-card-number-systems.example_u03_1-open")
+        .click();
     });
 
     await test.step("Simulator shows pre-filled decimal value 26", async () => {

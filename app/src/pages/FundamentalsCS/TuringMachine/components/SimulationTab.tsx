@@ -91,8 +91,12 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         row.passed
           ? t("turing-machine.validation.summary.pass")
           : t("turing-machine.validation.summary.fail"),
-        row.input === "" ? t("turing-machine.validation.summary.emptyWord") : row.input,
-        row.output === "" ? t("turing-machine.validation.summary.emptyWord") : row.output,
+        row.input === ""
+          ? t("turing-machine.validation.summary.emptyWord")
+          : row.input,
+        row.output === ""
+          ? t("turing-machine.validation.summary.emptyWord")
+          : row.output,
         row.expectedOutput === ""
           ? t("turing-machine.validation.summary.emptyWord")
           : row.expectedOutput,

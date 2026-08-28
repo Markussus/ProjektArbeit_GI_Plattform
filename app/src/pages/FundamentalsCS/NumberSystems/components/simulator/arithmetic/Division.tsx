@@ -87,11 +87,14 @@ export function Division({
           isOne: true,
           quotientBit: "1",
           remainderAfter,
-          explanation: t("number-systems.simulator.arithmetic.division.stepDesc", {
-            n: i + 1,
-            current: currentStr.replace(/^0+/, "") || "0",
-            divisor: valB,
-          }),
+          explanation: t(
+            "number-systems.simulator.arithmetic.division.stepDesc",
+            {
+              n: i + 1,
+              current: currentStr.replace(/^0+/, "") || "0",
+              divisor: valB,
+            },
+          ),
         });
         qStr += "1";
         currentStr = remainderAfter;
@@ -104,11 +107,14 @@ export function Division({
           isOne: false,
           quotientBit: "0",
           remainderAfter: currentStr,
-          explanation: t("number-systems.simulator.arithmetic.division.stepDescSmall", {
-            n: i + 1,
-            current: currentStr.replace(/^0+/, "") || "0",
-            divisor: valB,
-          }),
+          explanation: t(
+            "number-systems.simulator.arithmetic.division.stepDescSmall",
+            {
+              n: i + 1,
+              current: currentStr.replace(/^0+/, "") || "0",
+              divisor: valB,
+            },
+          ),
         });
         qStr += "0";
       }
@@ -171,7 +177,9 @@ export function Division({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("number-systems.simulator.arithmetic.common.stepsResult")}
+              title={t(
+                "number-systems.simulator.arithmetic.common.stepsResult",
+              )}
             />
 
             {isZeroDiv ? (
@@ -188,7 +196,9 @@ export function Division({
                 {showStepByStep && steps.length > 0 && (
                   <div className="mb-6 space-y-3">
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("number-systems.simulator.arithmetic.division.stepByStepTitle")}
+                      {t(
+                        "number-systems.simulator.arithmetic.division.stepByStepTitle",
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -200,9 +210,12 @@ export function Division({
                           header={
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
-                                {t("number-systems.simulator.arithmetic.division.stepN", {
-                                  n: step.step + 1,
-                                })}
+                                {t(
+                                  "number-systems.simulator.arithmetic.division.stepN",
+                                  {
+                                    n: step.step + 1,
+                                  },
+                                )}
                               </span>
                               <div className="flex items-center gap-2 font-mono text-sm">
                                 <span
@@ -253,13 +266,19 @@ export function Division({
                     <div className="bg-primary/10 border-primary mt-4 rounded-r-md border-l-4 p-4">
                       <p className="text-foreground text-sm">
                         <strong>
-                          {t("number-systems.simulator.arithmetic.division.quotient")}:
+                          {t(
+                            "number-systems.simulator.arithmetic.division.quotient",
+                          )}
+                          :
                         </strong>{" "}
                         {quotient}
                       </p>
                       <p className="text-foreground mt-1 text-sm">
                         <strong>
-                          {t("number-systems.simulator.arithmetic.division.remainder")}:
+                          {t(
+                            "number-systems.simulator.arithmetic.division.remainder",
+                          )}
+                          :
                         </strong>{" "}
                         {remainder}
                       </p>
@@ -304,13 +323,17 @@ export function Division({
                     </div>
                     <div className="border-foreground/30 mt-6 flex justify-start gap-2 border-t-2 pt-4">
                       <span className="text-muted-foreground">
-                        {t("number-systems.simulator.arithmetic.division.remainder")}
+                        {t(
+                          "number-systems.simulator.arithmetic.division.remainder",
+                        )}
                       </span>
                       <span className="font-bold">{remainder}</span>
                     </div>
                     <div className="text-muted-foreground mt-4 text-left font-sans text-xs tracking-normal">
-                      {t("number-systems.simulator.arithmetic.division.inDecimal")}:{" "}
-                      {parseInt(valA, 2)} : {parseInt(valB, 2)} ={" "}
+                      {t(
+                        "number-systems.simulator.arithmetic.division.inDecimal",
+                      )}
+                      : {parseInt(valA, 2)} : {parseInt(valB, 2)} ={" "}
                       {parseInt(quotient, 2)} Rest {parseInt(remainder, 2)}
                     </div>
                   </div>
@@ -318,7 +341,9 @@ export function Division({
               </>
             ) : (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                {t("number-systems.simulator.arithmetic.common.enterValidOperands")}
+                {t(
+                  "number-systems.simulator.arithmetic.common.enterValidOperands",
+                )}
               </p>
             )}
           </div>

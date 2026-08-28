@@ -111,7 +111,9 @@ export function TMHaltStatesPanel({
             }}
             disabled={disabled}
             data-testid="tm-add-halt-state-input"
-            placeholder={t("turing-machine.config.haltStates.addHaltStatePlaceholder")}
+            placeholder={t(
+              "turing-machine.config.haltStates.addHaltStatePlaceholder",
+            )}
             aria-label={t("turing-machine.config.haltStates.addHaltState")}
             className="border-input bg-background h-9 w-full rounded border px-3 py-2 font-mono text-sm"
             autoComplete="off"

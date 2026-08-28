@@ -57,7 +57,9 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
 
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
-      <h2 className="text-lg font-bold">{t("moore-mealy.sim.simulationTitle")}</h2>
+      <h2 className="text-lg font-bold">
+        {t("moore-mealy.sim.simulationTitle")}
+      </h2>
 
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">

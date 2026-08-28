@@ -101,7 +101,9 @@ export function IEEEAddition({
     if (parsedA.isZero || parsedB.isZero) {
       return {
         parsed: { A: parsedA, B: parsedB },
-        steps: { msg: t("number-systems.simulator.arithmetic.ieee754.zeroSkipped") },
+        steps: {
+          msg: t("number-systems.simulator.arithmetic.ieee754.zeroSkipped"),
+        },
         result: { sumDec: numA + numB, binStr: floatToBinary(numA + numB) },
         shiftSteps: [],
       };
@@ -134,9 +136,12 @@ export function IEEEAddition({
         position: i,
         originalMantissa: smallerMantissaFull.slice(i, i + 8) || "",
         shiftedMantissa: shiftedSmaller.slice(i, i + 8) || "",
-        explanation: t("number-systems.simulator.arithmetic.ieee754.shiftBitDesc", {
-          n: i + 1,
-        }),
+        explanation: t(
+          "number-systems.simulator.arithmetic.ieee754.shiftBitDesc",
+          {
+            n: i + 1,
+          },
+        ),
       });
     }
 
@@ -206,7 +211,9 @@ export function IEEEAddition({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("number-systems.simulator.arithmetic.ieee754.threeSteps")}
+              title={t(
+                "number-systems.simulator.arithmetic.ieee754.threeSteps",
+              )}
             />
 
             <StepByStepToggle
@@ -260,16 +267,22 @@ export function IEEEAddition({
                     </div>
                     <div className="border-border/40 border-t pt-3">
                       <p className="text-muted-foreground mb-2 text-xs">
-                        {t("number-systems.simulator.arithmetic.ieee754.expDiffDesc", {
-                          larger: steps.denorm?.largerExpDec,
-                          smaller: steps.denorm?.smallerExpDec,
-                          diff: steps.denorm?.diff,
-                        })}
+                        {t(
+                          "number-systems.simulator.arithmetic.ieee754.expDiffDesc",
+                          {
+                            larger: steps.denorm?.largerExpDec,
+                            smaller: steps.denorm?.smallerExpDec,
+                            diff: steps.denorm?.diff,
+                          },
+                        )}
                       </p>
                       <p className="text-muted-foreground mb-2 text-xs">
-                        {t("number-systems.simulator.arithmetic.ieee754.shiftDesc", {
-                          diff: steps.denorm?.diff,
-                        })}
+                        {t(
+                          "number-systems.simulator.arithmetic.ieee754.shiftDesc",
+                          {
+                            diff: steps.denorm?.diff,
+                          },
+                        )}
                       </p>
                       {shiftSteps.length > 0 && (
                         <div className="mt-3 space-y-2">
@@ -286,9 +299,12 @@ export function IEEEAddition({
                               header={
                                 <div className="flex items-center gap-2 font-mono text-xs">
                                   <span className="text-muted-foreground w-16">
-                                    {t("number-systems.simulator.arithmetic.ieee754.shiftN", {
-                                      n: idx + 1,
-                                    })}
+                                    {t(
+                                      "number-systems.simulator.arithmetic.ieee754.shiftN",
+                                      {
+                                        n: idx + 1,
+                                      },
+                                    )}
                                   </span>
                                   <span className="text-muted-foreground">
                                     1.
@@ -346,7 +362,9 @@ export function IEEEAddition({
                   </p>
                   <div className="bg-primary/5 border-primary/20 mt-3 flex flex-col gap-1 rounded border p-3">
                     <span className="text-muted-foreground text-xs">
-                      {t("number-systems.simulator.arithmetic.ieee754.signExpMant")}
+                      {t(
+                        "number-systems.simulator.arithmetic.ieee754.signExpMant",
+                      )}
                     </span>
                     <div className="font-mono">
                       <span className="text-lg font-bold">
@@ -377,16 +395,22 @@ export function IEEEAddition({
                     {t("number-systems.simulator.arithmetic.ieee754.step1")}
                   </p>
                   <p className="text-muted-foreground font-sans text-xs">
-                    {t("number-systems.simulator.arithmetic.ieee754.expDiffDesc", {
-                      larger: steps.denorm?.largerExpDec,
-                      smaller: steps.denorm?.smallerExpDec,
-                      diff: steps.denorm?.diff,
-                    })}
+                    {t(
+                      "number-systems.simulator.arithmetic.ieee754.expDiffDesc",
+                      {
+                        larger: steps.denorm?.largerExpDec,
+                        smaller: steps.denorm?.smallerExpDec,
+                        diff: steps.denorm?.diff,
+                      },
+                    )}
                   </p>
                   <p className="text-muted-foreground font-sans text-xs">
-                    {t("number-systems.simulator.arithmetic.ieee754.shiftDesc", {
-                      diff: steps.denorm?.diff,
-                    })}
+                    {t(
+                      "number-systems.simulator.arithmetic.ieee754.shiftDesc",
+                      {
+                        diff: steps.denorm?.diff,
+                      },
+                    )}
                   </p>
                   <div className="pt-2">
                     <span className="mr-2 line-through opacity-50">
@@ -405,9 +429,12 @@ export function IEEEAddition({
                     {t("number-systems.simulator.arithmetic.ieee754.step2")}
                   </p>
                   <p className="text-muted-foreground font-sans text-xs">
-                    {t("number-systems.simulator.arithmetic.ieee754.expAligned", {
-                      exp: steps.denorm?.largerExpDec,
-                    })}
+                    {t(
+                      "number-systems.simulator.arithmetic.ieee754.expAligned",
+                      {
+                        exp: steps.denorm?.largerExpDec,
+                      },
+                    )}
                   </p>
                 </div>
 
@@ -421,7 +448,9 @@ export function IEEEAddition({
                   </p>
                   <div className="bg-primary/5 border-primary/20 mt-2 flex flex-col gap-1 rounded border p-2">
                     <span className="text-muted-foreground text-xs">
-                      {t("number-systems.simulator.arithmetic.ieee754.signExpMant")}
+                      {t(
+                        "number-systems.simulator.arithmetic.ieee754.signExpMant",
+                      )}
                     </span>
                     <div>
                       <span className="font-bold">
@@ -441,8 +470,8 @@ export function IEEEAddition({
 
             <div className="border-border/50 flex justify-start border-t pt-4 text-sm font-semibold">
               <span className="bg-primary/10 text-primary flex items-center gap-2 rounded-md px-3 py-1">
-                {t("number-systems.simulator.arithmetic.ieee754.decimalResult")}:{" "}
-                {result.sumDec}
+                {t("number-systems.simulator.arithmetic.ieee754.decimalResult")}
+                : {result.sumDec}
               </span>
             </div>
           </div>

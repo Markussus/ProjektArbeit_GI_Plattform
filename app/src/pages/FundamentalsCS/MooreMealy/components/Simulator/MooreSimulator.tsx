@@ -177,7 +177,9 @@ export const MooreSimulator = forwardRef<
           return {
             rows: [],
             passed: false,
-            error: t("moore-mealy.exercises.validation.exampleCheckUnavailable"),
+            error: t(
+              "moore-mealy.exercises.validation.exampleCheckUnavailable",
+            ),
           };
         }
         return runMooreValidation(program, scenario.validationCases);

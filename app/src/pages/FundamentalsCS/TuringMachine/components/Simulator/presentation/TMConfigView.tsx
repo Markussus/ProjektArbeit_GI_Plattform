@@ -146,11 +146,14 @@ function translateCellIssue(t: TFunction, code: TMEditorCellIssueCode): string {
 function translateProgramIssue(t: TFunction, issue: TMProgramIssue): string {
   const keyByCode: Record<TMProgramIssueCode, string> = {
     states_empty: "turing-machine.validation.program.statesEmpty",
-    initial_state_missing: "turing-machine.validation.program.initialStateMissing",
+    initial_state_missing:
+      "turing-machine.validation.program.initialStateMissing",
     halt_states_empty: "turing-machine.validation.program.haltStatesEmpty",
     halt_state_missing: "turing-machine.validation.program.haltStateMissing",
-    blank_symbol_missing: "turing-machine.validation.program.blankSymbolMissing",
-    blank_symbol_invalid: "turing-machine.validation.program.blankSymbolInvalid",
+    blank_symbol_missing:
+      "turing-machine.validation.program.blankSymbolMissing",
+    blank_symbol_invalid:
+      "turing-machine.validation.program.blankSymbolInvalid",
     tape_symbol_invalid: "turing-machine.validation.program.tapeSymbolInvalid",
     initial_tape_invalid_symbol:
       "turing-machine.validation.program.initialTapeInvalidSymbol",
@@ -158,7 +161,8 @@ function translateProgramIssue(t: TFunction, issue: TMProgramIssue): string {
       "turing-machine.validation.program.transitionReadSymbolMissing",
     transition_read_symbol_invalid:
       "turing-machine.validation.program.transitionReadSymbolInvalid",
-    transition_state_missing: "turing-machine.validation.program.transitionStateMissing",
+    transition_state_missing:
+      "turing-machine.validation.program.transitionStateMissing",
     transition_next_state_missing:
       "turing-machine.validation.program.transitionNextStateMissing",
     transition_write_symbol_missing:

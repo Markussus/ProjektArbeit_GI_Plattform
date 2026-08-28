@@ -25,27 +25,27 @@ import deTuringMachine from "./locales/de/turing-machine.json";
 import deRegularLanguages from "./locales/de/regular-languages.json";
 
 const en = {
-    "common": enCommon,
-    "finite-automata": enFiniteAutomata,
-    "number-systems": enNumberSystems,
-    "encoding": enEncoding,
-    "moore-mealy": enMooreMealy,
-    "dnf": enDnf,
-    "java-programming": enJavaProgramming,
-    "turing-machine": enTuringMachine,
-    "regular-languages": enRegularLanguages,
+  common: enCommon,
+  "finite-automata": enFiniteAutomata,
+  "number-systems": enNumberSystems,
+  encoding: enEncoding,
+  "moore-mealy": enMooreMealy,
+  dnf: enDnf,
+  "java-programming": enJavaProgramming,
+  "turing-machine": enTuringMachine,
+  "regular-languages": enRegularLanguages,
 };
 
 const de = {
-    "common": deCommon,
-    "finite-automata": deFiniteAutomata,
-    "number-systems": deNumberSystems,
-    "encoding": deEncoding,
-    "moore-mealy": deMooreMealy,
-    "dnf": deDnf,
-    "java-programming": deJavaProgramming,
-    "turing-machine": deTuringMachine,
-    "regular-languages": deRegularLanguages,
+  common: deCommon,
+  "finite-automata": deFiniteAutomata,
+  "number-systems": deNumberSystems,
+  encoding: deEncoding,
+  "moore-mealy": deMooreMealy,
+  dnf: deDnf,
+  "java-programming": deJavaProgramming,
+  "turing-machine": deTuringMachine,
+  "regular-languages": deRegularLanguages,
 };
 
 i18n

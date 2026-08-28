@@ -58,14 +58,16 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
   const groups: TopicExerciseGroup[] = [
     {
       id: "languageToAutomaton",
-      titleKey: "finite-automata.exercisesTab.categories.languageToAutomaton.title",
+      titleKey:
+        "finite-automata.exercisesTab.categories.languageToAutomaton.title",
       descriptionKey:
         "finite-automata.exercisesTab.categories.languageToAutomaton.description",
       exercises: faExercises,
     },
     {
       id: "grammarToAutomaton",
-      titleKey: "finite-automata.exercisesTab.categories.grammarToAutomaton.title",
+      titleKey:
+        "finite-automata.exercisesTab.categories.grammarToAutomaton.title",
       descriptionKey:
         "finite-automata.exercisesTab.categories.grammarToAutomaton.description",
       exercises: faGrammarToAutomatonExercises,

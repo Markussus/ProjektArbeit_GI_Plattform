@@ -319,10 +319,22 @@ export function IntegerConverter({
                 <DropdownSelect
                   value={sourceBase}
                   options={[
-                    { value: "dec", label: t("number-systems.simulator.numbers.decimal") },
-                    { value: "bin", label: t("number-systems.simulator.numbers.binary") },
-                    { value: "oct", label: t("number-systems.simulator.numbers.octal") },
-                    { value: "hex", label: t("number-systems.simulator.numbers.hex") },
+                    {
+                      value: "dec",
+                      label: t("number-systems.simulator.numbers.decimal"),
+                    },
+                    {
+                      value: "bin",
+                      label: t("number-systems.simulator.numbers.binary"),
+                    },
+                    {
+                      value: "oct",
+                      label: t("number-systems.simulator.numbers.octal"),
+                    },
+                    {
+                      value: "hex",
+                      label: t("number-systems.simulator.numbers.hex"),
+                    },
                   ]}
                   onChange={handleSourceBaseChange}
                   ariaLabel={t("number-systems.simulator.numbers.fromBase")}
@@ -339,10 +351,22 @@ export function IntegerConverter({
                 <DropdownSelect
                   value={targetBase}
                   options={[
-                    { value: "dec", label: t("number-systems.simulator.numbers.decimal") },
-                    { value: "bin", label: t("number-systems.simulator.numbers.binary") },
-                    { value: "oct", label: t("number-systems.simulator.numbers.octal") },
-                    { value: "hex", label: t("number-systems.simulator.numbers.hex") },
+                    {
+                      value: "dec",
+                      label: t("number-systems.simulator.numbers.decimal"),
+                    },
+                    {
+                      value: "bin",
+                      label: t("number-systems.simulator.numbers.binary"),
+                    },
+                    {
+                      value: "oct",
+                      label: t("number-systems.simulator.numbers.octal"),
+                    },
+                    {
+                      value: "hex",
+                      label: t("number-systems.simulator.numbers.hex"),
+                    },
                   ]}
                   onChange={setTargetBase}
                   ariaLabel={t("number-systems.simulator.numbers.toBase")}
@@ -435,7 +459,9 @@ export function IntegerConverter({
               ) : sourceBase === targetBase ? (
                 <div className="text-muted-foreground flex flex-col items-center justify-center py-8">
                   <ArrowRight className="mb-2 h-8 w-8 opacity-20" />
-                  <p className="text-sm">{t("number-systems.simulator.numbers.sameBase")}</p>
+                  <p className="text-sm">
+                    {t("number-systems.simulator.numbers.sameBase")}
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -464,7 +490,9 @@ export function IntegerConverter({
                     <div>
                       {showToDecSteps && (
                         <h4 className="text-muted-foreground border-border/50 mb-3 border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                          {t("number-systems.simulator.numbers.step2TempTarget")}
+                          {t(
+                            "number-systems.simulator.numbers.step2TempTarget",
+                          )}
                         </h4>
                       )}
                       {renderFromDec()}

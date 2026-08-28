@@ -17,7 +17,8 @@ export function FASimulationStatusCard({
 
   const statusLabel = (() => {
     if (error) return t("finite-automata.sim.status.error", "Error");
-    if (!runtime.halted) return t("finite-automata.sim.status.running", "Running");
+    if (!runtime.halted)
+      return t("finite-automata.sim.status.running", "Running");
     if (runtime.haltReason?.type === "accepted")
       return t("finite-automata.sim.status.accepted", "Accepted ✓");
     if (runtime.haltReason?.type === "rejected")

@@ -39,7 +39,10 @@ describe("Java exercise lookup helpers", () => {
         definition: { difficulty: "medium" },
       });
 
-      for (const id of ["java-programming.exercise12", "java-programming.exercise13"]) {
+      for (const id of [
+        "java-programming.exercise12",
+        "java-programming.exercise13",
+      ]) {
         const scenario = getJavaScenario(id);
         expect(scenario).toMatchObject({
           kind: "exercise",

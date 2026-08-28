@@ -122,9 +122,13 @@ export function TableView({
     });
 
   const getHeaderInputAriaLabel = (colIndex: number) =>
-    t("common.simulation.table.editColumnHeader", "Edit column {{index}} header", {
-      index: colIndex + 1,
-    });
+    t(
+      "common.simulation.table.editColumnHeader",
+      "Edit column {{index}} header",
+      {
+        index: colIndex + 1,
+      },
+    );
 
   const getCellInputAriaLabel = (rowIndex: number, colIndex: number) =>
     t(

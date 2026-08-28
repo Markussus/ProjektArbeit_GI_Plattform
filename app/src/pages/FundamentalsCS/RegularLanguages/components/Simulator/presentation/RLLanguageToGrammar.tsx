@@ -144,7 +144,10 @@ export function RLLanguageToGrammar({
       <div className="flex flex-col gap-4">
         <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-            {t("regular-languages.simulator.languageDefinition", "Language Definition")}
+            {t(
+              "regular-languages.simulator.languageDefinition",
+              "Language Definition",
+            )}
           </h4>
 
           <textarea
@@ -171,7 +174,10 @@ export function RLLanguageToGrammar({
                   !showFormats && "-rotate-90",
                 )}
               />
-              {t("regular-languages.simulator.supportedFormats", "Supported formats")}
+              {t(
+                "regular-languages.simulator.supportedFormats",
+                "Supported formats",
+              )}
             </summary>
             <div className="flex flex-col gap-3 px-3 pb-3">
               <div>
@@ -212,12 +218,18 @@ export function RLLanguageToGrammar({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
             <ArrowRight className="text-primary h-4 w-4" />
-            {t("regular-languages.simulator.grammarOutput", "Resulting Grammar")}
+            {t(
+              "regular-languages.simulator.grammarOutput",
+              "Resulting Grammar",
+            )}
           </h4>
           <div
             className="bg-muted/60 inline-flex rounded-lg p-0.5"
             role="group"
-            aria-label={t("regular-languages.simulator.grammarMode.label", "Grammar style")}
+            aria-label={t(
+              "regular-languages.simulator.grammarMode.label",
+              "Grammar style",
+            )}
           >
             <button
               type="button"
@@ -231,7 +243,10 @@ export function RLLanguageToGrammar({
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {t("regular-languages.simulator.grammarMode.detailed", "Detailed")}
+              {t(
+                "regular-languages.simulator.grammarMode.detailed",
+                "Detailed",
+              )}
             </button>
             <button
               type="button"
@@ -245,7 +260,10 @@ export function RLLanguageToGrammar({
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {t("regular-languages.simulator.grammarMode.simplified", "Simplified")}
+              {t(
+                "regular-languages.simulator.grammarMode.simplified",
+                "Simplified",
+              )}
             </button>
           </div>
         </div>

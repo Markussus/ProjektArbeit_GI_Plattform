@@ -43,7 +43,9 @@ export function ExamplesTab({
     <div data-testid="fa-examples-tab" className="flex flex-col gap-6">
       <div className="text-muted-foreground flex items-center gap-2">
         <BookOpen className="size-4" />
-        <h3 className="text-sm font-bold">{t("common.example.currentExamples")}</h3>
+        <h3 className="text-sm font-bold">
+          {t("common.example.currentExamples")}
+        </h3>
       </div>
 
       {CATEGORY_ORDER.map((category) => {
@@ -55,7 +57,9 @@ export function ExamplesTab({
             key={category}
             testId={`fa-examples-section-${category}`}
             title={t(`finite-automata.examples.categories.${category}.title`)}
-            description={t(`finite-automata.examples.categories.${category}.description`)}
+            description={t(
+              `finite-automata.examples.categories.${category}.description`,
+            )}
           >
             {examples.map((example) => {
               const item = toTopicExample(example, t);

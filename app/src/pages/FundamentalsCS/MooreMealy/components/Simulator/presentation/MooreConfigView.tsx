@@ -86,7 +86,9 @@ export function MooreConfigView({
   return (
     <div data-testid="moore-config-view" className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">{t("moore-mealy.sim.configureTitle")}</h2>
+        <h2 className="text-lg font-bold">
+          {t("moore-mealy.sim.configureTitle")}
+        </h2>
         <p className="text-muted-foreground text-sm">
           {t("moore-mealy.sim.configureHelp")}
         </p>

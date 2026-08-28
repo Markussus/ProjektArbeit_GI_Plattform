@@ -81,7 +81,9 @@ export function JavaCommandOverview({
                       statusClassNames[capability.status],
                     )}
                   >
-                    {t(`java-programming.commandOverview.status.${capability.status}`)}
+                    {t(
+                      `java-programming.commandOverview.status.${capability.status}`,
+                    )}
                   </span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">

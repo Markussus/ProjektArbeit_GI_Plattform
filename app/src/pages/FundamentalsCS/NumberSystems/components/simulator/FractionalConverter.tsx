@@ -346,7 +346,9 @@ export function FractionalConverter({
                                   {Math.floor(step.dividend / 2)}
                                 </div>
                                 <div className="text-muted-foreground">
-                                  {t("number-systems.simulator.numbers.remainder")}
+                                  {t(
+                                    "number-systems.simulator.numbers.remainder",
+                                  )}
                                 </div>
                                 <div className="bg-brand/10 text-brand flex h-6 w-6 items-center justify-center rounded font-bold">
                                   {step.remainder}
@@ -392,7 +394,9 @@ export function FractionalConverter({
                                 </div>
                                 <ArrowRight className="text-muted-foreground h-4 w-4" />
                                 <div className="text-muted-foreground">
-                                  {t("number-systems.simulator.numbers.fracIntPart")}
+                                  {t(
+                                    "number-systems.simulator.numbers.fracIntPart",
+                                  )}
                                 </div>
                                 <div className="bg-brand/10 text-brand flex h-6 w-6 items-center justify-center rounded font-bold">
                                   {step.bit}

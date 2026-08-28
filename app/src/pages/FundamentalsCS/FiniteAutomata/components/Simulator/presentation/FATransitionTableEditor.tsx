@@ -89,7 +89,10 @@ export function FATransitionTableEditor({
                   <button
                     type="button"
                     onClick={onAddState}
-                    aria-label={t("finite-automata.config.addState", "Add state")}
+                    aria-label={t(
+                      "finite-automata.config.addState",
+                      "Add state",
+                    )}
                     title={t("finite-automata.config.addState", "Add state")}
                     className="text-primary hover:bg-primary/10 inline-flex h-7 w-7 items-center justify-center rounded-md font-bold"
                   >
@@ -140,7 +143,11 @@ export function FATransitionTableEditor({
                     onClick={() => setShowEpsilon(true)}
                     className="text-primary hover:text-primary/80 text-xs font-semibold tracking-wide"
                   >
-                    + {t("finite-automata.config.addEpsilon", "Add ε-Transitions")}
+                    +{" "}
+                    {t(
+                      "finite-automata.config.addEpsilon",
+                      "Add ε-Transitions",
+                    )}
                   </button>
                 </td>
               </tr>

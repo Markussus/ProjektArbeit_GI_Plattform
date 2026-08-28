@@ -48,7 +48,10 @@ export function RLGrammarEnumerationExercise({
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           <ListOrdered className="text-primary h-4 w-4" />
-          {t("regular-languages.exerciseWorkspace.g2lGivenGrammar", "Given Grammar")}
+          {t(
+            "regular-languages.exerciseWorkspace.g2lGivenGrammar",
+            "Given Grammar",
+          )}
         </h4>
         <pre className="bg-muted/40 text-foreground/90 overflow-x-auto rounded-md p-3 font-mono text-sm leading-relaxed whitespace-pre">
           {givenGrammar || "—"}
@@ -61,7 +64,10 @@ export function RLGrammarEnumerationExercise({
 
       <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          {t("regular-languages.exerciseWorkspace.g2lYourEnumeration", "Your Enumeration")}
+          {t(
+            "regular-languages.exerciseWorkspace.g2lYourEnumeration",
+            "Your Enumeration",
+          )}
         </h4>
         <textarea
           value={studentWords}

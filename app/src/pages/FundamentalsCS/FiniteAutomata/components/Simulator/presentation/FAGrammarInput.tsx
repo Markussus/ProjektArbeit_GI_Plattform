@@ -50,7 +50,9 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
     const validationErrors = validateRegularGrammar(parsed.grammar);
     if (validationErrors.length > 0) {
       setSubmitErrors(
-        validationErrors.map((code) => t(`finite-automata.grammar.${code}`, code)),
+        validationErrors.map((code) =>
+          t(`finite-automata.grammar.${code}`, code),
+        ),
       );
       return;
     }
@@ -132,7 +134,10 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <div>
             <div className="text-xs font-semibold tracking-wide uppercase">
-              {t("finite-automata.grammar.parseError", "Grammar not parseable yet")}
+              {t(
+                "finite-automata.grammar.parseError",
+                "Grammar not parseable yet",
+              )}
             </div>
             <div className="text-xs">{parseErrorText}</div>
           </div>
@@ -153,7 +158,10 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
         <div className="flex flex-col gap-3 px-3 pb-3">
           <div>
             <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-              {t("finite-automata.grammar.format1Label", "Format 1 — simplified")}
+              {t(
+                "finite-automata.grammar.format1Label",
+                "Format 1 — simplified",
+              )}
             </div>
             <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
               {SIMPLE_EXAMPLE}
@@ -161,7 +169,10 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           </div>
           <div>
             <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-              {t("finite-automata.grammar.format2Label", "Format 2 — structured")}
+              {t(
+                "finite-automata.grammar.format2Label",
+                "Format 2 — structured",
+              )}
             </div>
             <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
               {STRUCTURED_EXAMPLE}

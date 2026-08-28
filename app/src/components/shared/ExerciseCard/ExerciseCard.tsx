@@ -99,7 +99,8 @@ export function ExerciseCard({
                 difficultyTextColors[item.difficulty],
               )}
             >
-              {t("common.exercise.difficulty")}: {t(`common.difficulty.${item.difficulty}`)}
+              {t("common.exercise.difficulty")}:{" "}
+              {t(`common.difficulty.${item.difficulty}`)}
             </p>
           )}
         </div>
