@@ -1,6 +1,6 @@
 \subNsection{1}{Zusammenfassung der Projektergebnisse}{Alle}
 
-Kristian Popov: Mein Schwerpunkt im Projekt lag auf den Themen
+\textbf{Kristian Popov}: Mein Schwerpunkt im Projekt lag auf den Themen
 \emph{Endliche Automaten} und \emph{Reguläre Sprachen}. Für Endliche Automaten
 habe ich eine interaktive Umgebung umgesetzt, in der deterministische und
 nichtdeterministische Automaten erstellt und Eingabewörter schrittweise ausgeführt
@@ -22,7 +22,7 @@ die Fachlogik klar von der Benutzeroberfläche zu trennen. Dadurch konnten gemei
 Grammatik- und Automatenfunktionen wiederverwendet werden, während die einzelnen
 Funktionen testbar und übersichtlich blieben.
 
-Duy Tan Pham: Mein fachlicher Schwerpunkt lag auf dem Themenbereich
+\textbf{Duy Tan Pham}: Mein fachlicher Schwerpunkt lag auf dem Themenbereich
 \emph{Disjunktive Normalform}. Dort können Studierende boolesche Ausdrücke und
 Wahrheitstabellen untersuchen, die kanonische DNF schrittweise herleiten und Ausdrücke
 vereinfachen. Beispiele zeigen einen vollständigen Lösungsweg. In den Übungen bearbeiten
@@ -36,3 +36,7 @@ werden. Die Fachlogik ist von der Benutzeroberfläche getrennt und durch automat
 Tests abgesichert. Der DNF-Bereich nutzt außerdem den gemeinsamen Themenaufbau sowie die
 vorhandenen Funktionen für Import und Export. Dadurch fügt er sich in Bedienung und
 Darstellung in die gesamte Lernplattform ein.
+
+\textbf{Richard Schröder}: Mein fachlicher Schwerpunkt lag auf dem Themenbereich \emph{Turingmaschine}. Dafür habe ich eine interaktive Simulationsumgebung entwickelt, in der Maschinen über eine tabellenbasierte Oberfläche konfiguriert, Eingabebänder definiert und die Einzelschritte vorwärts sowie rückwärts ausgeführt werden können. Die Banddarstellung passt sich an die Bildschirmbreite an und visualisiert die Kopfposition samt Übergangsstatus. Neben einer freien Simulation umfasst das Modul vorgefertigte Beispiele sowie Übungsaufgaben, bei denen erstellte Maschinen gegen mehrere automatisierte Testfälle auf korrekte Bandinhalte und gültige Haltezustände geprüft werden.
+
+Auf Architekturebene habe ich das generische Interface \verb|ISimulator<TConfig, TState>| sowie den zugehörigen Steuerungs-Hook entwickelt, um die mathematische Logik von der UI zu trennen und eine einheitliche Basis für alle Simulatoren der Plattform bereitzustellen. Ein weiterer technischer Schwerpunkt war der Transfer-Codec für den Import, Export und die persistente Speicherung: Dafür habe ich ein eigenes, speziell auf Turingmaschinen optimiertes Kompressionsverfahren auf Bitstream-Basis entworfen, das Zustände, Alphabete und Übergangstabellen kompakt als Base64URL-Zeichenkette kodiert.
