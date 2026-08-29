@@ -1,5 +1,10 @@
 import type { FAProgram } from "../domain/faTypes";
 
+/**
+ * Reference DFA/NFA pair behind the editor's DFA <-> NFA type swap. The
+ * simulator opens on `emptyFAProgram` instead of one of these; the DFA is
+ * still reachable as the "ends with ab" example in the Examples tab.
+ */
 export const defaultDFAProgram: FAProgram = {
   type: "DFA",
   states: ["S0", "S1", "S2"],

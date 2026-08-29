@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   appTestIds,
   exportActiveSimulator,
@@ -15,6 +15,17 @@ const simulatorRoutes = [
   ["Encoding", "/fundamentals-cs/encoding"],
   ["Java", "/programming-1/java-programming"],
 ] as const;
+
+// Regular Languages opens on a blank grammar, and a blank workspace has nothing
+// to export, so it gets one typed in before the roundtrip.
+const seedBeforeExport: Partial<
+  Record<(typeof simulatorRoutes)[number][0], (page: Page) => Promise<void>>
+> = {
+  "Regular Languages": (page) =>
+    page
+      .getByTestId("rl-grammar-to-language-source")
+      .fill(["S -> aS | bA", "A -> bA | ε"].join("\n")),
+};
 
 test.describe("global simulator import and export", () => {
   test("keeps export disabled without an active simulation and unregisters on tab exit", async ({
@@ -65,6 +76,7 @@ test.describe("global simulator import and export", () => {
     }) => {
       await page.goto(route);
       await page.getByTestId(appTestIds.tabSimulation).click();
+      await seedBeforeExport[simulatorName]?.(page);
       await expect(
         page.getByTestId(appTestIds.headerTransferExport),
       ).toBeEnabled();

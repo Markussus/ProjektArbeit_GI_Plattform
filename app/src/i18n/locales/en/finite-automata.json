@@ -87,10 +87,6 @@
   "exerciseWorkspace": {
     "check": "Check Solution",
     "showSolution": "Load solution",
-    "confirmTitle": "Reveal the full solution?",
-    "confirmBody": "Your current automaton will be replaced with the reference solution. You can still reset the exercise from the Exercises tab.",
-    "confirmYes": "Yes, show solution",
-    "confirmNo": "Keep trying",
     "structuralFail": "Your automaton isn't valid yet",
     "structuralHint": "Fix the highlighted configuration issues before we can compare against the solution.",
     "passed": "All checks passed!",
@@ -115,6 +111,10 @@
     "lecture": {
       "title": "One or more 0s, then a single 1 (00*1)",
       "description": "A DFA from the lecture exercise that accepts one or more '0's followed by exactly one '1' (Regex: 00*1)."
+    },
+    "endsWithAb": {
+      "title": "Ends with \"ab\"",
+      "description": "A DFA over {a, b} that accepts exactly the words ending in \"ab\" — the automaton the simulator used to start with. \"aab\" is accepted, \"aba\" is rejected."
     },
     "grammar": {
       "title": "Grammar → Automat",

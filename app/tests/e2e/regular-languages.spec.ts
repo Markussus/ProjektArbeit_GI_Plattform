@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 const RL_URL = "/fundamentals-cs/regular-languages";
-const DEFAULT_GRAMMAR = "S -> aS | bA\nA -> bA | ε";
+// Free mode opens blank; the worked grammars live in the Examples tab.
+const BLANK_GRAMMAR = "";
 
 test.describe("Regular Languages — Overview tab", () => {
   test("shows only the tutorial video", async ({ page }) => {
@@ -11,7 +12,7 @@ test.describe("Regular Languages — Overview tab", () => {
 });
 
 test.describe("Regular Languages — reset", () => {
-  test("deletes only the active mode draft and restores its default", async ({
+  test("deletes only the active mode draft and restores its blank starter", async ({
     page,
   }) => {
     await page.goto(RL_URL);
@@ -36,7 +37,7 @@ test.describe("Regular Languages — reset", () => {
 
     await page.getByTestId("simulation-reset").click();
     await expect(page.getByTestId("rl-grammar-to-language-source")).toHaveValue(
-      DEFAULT_GRAMMAR,
+      BLANK_GRAMMAR,
     );
     await expect
       .poll(() =>
@@ -47,7 +48,7 @@ test.describe("Regular Languages — reset", () => {
     await page.getByTestId("tab-button-overview").click();
     await page.getByTestId("tab-button-simulation").click();
     await expect(page.getByTestId("rl-grammar-to-language-source")).toHaveValue(
-      DEFAULT_GRAMMAR,
+      BLANK_GRAMMAR,
     );
   });
 });

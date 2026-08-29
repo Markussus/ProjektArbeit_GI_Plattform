@@ -1,4 +1,5 @@
 import type { FAProgram } from "../domain/faTypes";
+import { defaultDFAProgram, defaultInputWord } from "./defaultFAProgram";
 
 /** Which on-page section an example belongs to. */
 export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
@@ -64,6 +65,19 @@ export const exampleLecture: FAExample = {
   inputWord: "001",
 };
 
+// ─── DFA: Ends with "ab" ───────────────────────────────────────────────────
+// The automaton the simulator used to open with. It lives here now that free
+// mode starts blank, so the worked version is still one click away.
+export const exampleEndsWithAb: FAExample = {
+  id: "ends-with-ab",
+  titleKey: "finite-automata.examples.endsWithAb.title",
+  descriptionKey: "finite-automata.examples.endsWithAb.description",
+  type: "DFA",
+  category: "dfa",
+  program: defaultDFAProgram,
+  inputWord: defaultInputWord,
+};
+
 // ─── Grammar → NFA | DFA ────────────────────────────────────────────────────
 export const exampleGrammar: FAExample = {
   id: "grammar-example",
@@ -89,6 +103,7 @@ export const exampleGrammar: FAExample = {
 /** All predefined examples */
 export const faExamples: FAExample[] = [
   exampleLecture,
+  exampleEndsWithAb,
   exampleGrammar,
   exampleContainsAba,
 ];

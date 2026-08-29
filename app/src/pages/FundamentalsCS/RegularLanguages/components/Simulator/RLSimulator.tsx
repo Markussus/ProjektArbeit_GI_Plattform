@@ -5,8 +5,6 @@ import {
   useState,
   type Ref,
 } from "react";
-import { useTranslation } from "react-i18next";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
@@ -45,11 +43,9 @@ export function RLSimulator({
   importedTaskStorageId,
   ref,
 }: RLSimulatorProps) {
-  const { t } = useTranslation();
   const mode = useRLSimulatorStore((s) => s.mode);
   const setMode = useRLSimulatorStore((s) => s.setMode);
   const activeExerciseId = useRLSimulatorStore((s) => s.activeExerciseId);
-  const [pendingMode, setPendingMode] = useState<SimulationMode | null>(null);
   const pendingGrammarSource = useRLSimulatorStore(
     (s) => s.pendingGrammarSource,
   );
@@ -80,26 +76,16 @@ export function RLSimulator({
   const isGrammarExercise = activeExercise?.mode === "grammarToLanguage";
   const isLanguageExercise = activeExercise?.mode === "languageToGrammar";
 
-  // Switching modes while an exercise is active abandons it, so prompt with the
-  // same "Switch Tab?" confirmation the top-level module tabs use.
+  // Switching modes while an exercise is active simply abandons it - the same
+  // uninterrupted switch the module tabs and the Moore/Mealy tabs use.
   const handleModeChange = (target: SimulationMode) => {
     if (target === mode) {
       return;
     }
     if (activeExerciseId) {
-      setPendingMode(target);
-      return;
+      onExitExercise?.();
     }
     setMode(target);
-  };
-
-  const confirmModeChange = () => {
-    const target = pendingMode;
-    setPendingMode(null);
-    onExitExercise?.();
-    if (target) {
-      setMode(target);
-    }
   };
 
   const resetStoredState = useCallback(() => {
@@ -131,7 +117,6 @@ export function RLSimulator({
       pendingLanguageSource !== null ||
       pendingTestWord !== null
     ) {
-      // Named so it does not shadow the `t` from useTranslation above.
       const clearPending = setTimeout(() => consumePending(), 0);
       return () => clearTimeout(clearPending);
     }
@@ -200,17 +185,6 @@ export function RLSimulator({
           }
         />
       </div>
-
-      <ConfirmDialog
-        isOpen={pendingMode !== null}
-        title={t("common.exerciseValidation.exitTabTitle")}
-        description={t("common.exerciseValidation.exitTabDesc")}
-        confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
-        onConfirm={confirmModeChange}
-        onCancel={() => setPendingMode(null)}
-        variant="warning"
-        testId="rl-mode-switch-confirm"
-      />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
@@ -30,8 +29,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     : undefined;
 
   const [checkResult, setCheckResult] = useState<RLCheckResult | null>(null);
-  // Revealing the solution overwrites the learner's draft, so it asks first.
-  const [confirmLoadSolution, setConfirmLoadSolution] = useState(false);
 
   // Keep the store flag in sync with what is actually displayed.
   useEffect(() => {
@@ -46,8 +43,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   // Reveal: Grammar → Language drops the enumerated words into the learner's
   // list; Language → Grammar drops the reference grammar into the editor.
+  // The reveal applies straight away, like the reveal on the other topics.
   const handleLoadSolution = () => {
-    setConfirmLoadSolution(false);
     if (!activeExercise) {
       return;
     }
@@ -99,7 +96,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     <>
       <button
         type="button"
-        onClick={() => setConfirmLoadSolution(true)}
+        onClick={handleLoadSolution}
         data-testid="rl-load-solution"
         className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
       >
@@ -150,18 +147,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         tableTestIdPrefix="rl-solution-check-table"
         headers={[]}
         rows={[]}
-      />
-
-      <ConfirmDialog
-        isOpen={confirmLoadSolution}
-        title={t("regular-languages.exerciseWorkspace.confirmTitle")}
-        description={t("regular-languages.exerciseWorkspace.confirmBody")}
-        confirmLabel={t("regular-languages.exerciseWorkspace.confirmYes")}
-        cancelLabel={t("regular-languages.exerciseWorkspace.confirmNo")}
-        onConfirm={handleLoadSolution}
-        onCancel={() => setConfirmLoadSolution(false)}
-        variant="warning"
-        testId="rl-load-solution-confirm"
       />
     </>
   );

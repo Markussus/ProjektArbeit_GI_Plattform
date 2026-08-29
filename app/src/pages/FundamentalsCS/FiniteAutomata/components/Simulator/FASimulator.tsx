@@ -23,7 +23,7 @@ import {
 import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
 import { useFASimulator } from "./application/useFASimulator";
-import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
+import { emptyFAProgram, emptyInputWord } from "./config/emptyFAProgram";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
 import { FAConfigView } from "./presentation/FAConfigView";
@@ -46,9 +46,9 @@ interface FASimulatorProps {
 export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const [program, setProgram] = useState<FAProgram>(() =>
-    cloneJson(defaultDFAProgram),
+    cloneJson(emptyFAProgram),
   );
-  const [inputWord, setInputWord] = useState(defaultInputWord);
+  const [inputWord, setInputWord] = useState(emptyInputWord);
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
@@ -232,7 +232,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
     const exercise = activeExerciseId
       ? findFAExercise(activeExerciseId)
       : undefined;
-    const resetProgram = cloneJson(exercise?.starter ?? defaultDFAProgram);
+    const resetProgram = cloneJson(exercise?.starter ?? emptyFAProgram);
 
     if (activeExerciseId) {
       clearExerciseDraft(activeExerciseId);
@@ -244,7 +244,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
     editor.resetToProgram(resetProgram);
     setInputWord(
       exercise?.exampleWords?.accept.find((word) => word.length > 0) ??
-        defaultInputWord,
+        emptyInputWord,
     );
     setIsEditMode(true);
     setEditorMode("manual");
