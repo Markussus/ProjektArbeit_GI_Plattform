@@ -21,7 +21,7 @@ export function FAExercisePrompt({ exercise }: FAExercisePromptProps) {
   return (
     <div
       data-testid="fa-exercise-prompt"
-      className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1"
+      className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1 md:mr-24"
     >
       <h4 className="text-foreground text-sm font-bold">
         {t("finite-automata.exerciseWorkspace.grammarLabel", "Grammar")}

@@ -45,6 +45,15 @@ interface FASimulatorProps {
 
 export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  /** Brings the whole workspace panel, controls included, back into view. */
+  const scrollWorkspaceIntoView = () => {
+    requestAnimationFrame(() => {
+      rootRef.current
+        ?.closest("[data-testid='simulation-workspace']")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
   const [program, setProgram] = useState<FAProgram>(() =>
     cloneJson(emptyFAProgram),
   );
@@ -218,6 +227,11 @@ export function FASimulator({ ref }: FASimulatorProps) {
     if (!result.ok) return;
     setProgram(result.program);
     setIsEditMode(false);
+    // Start Simulation sits at the bottom of a tall editor and swaps it for a
+    // much shorter simulation view, which would otherwise leave the page
+    // parked below the workspace header - reset, expand and Edit Configuration
+    // all scrolled out of sight above.
+    scrollWorkspaceIntoView();
     void exportAndStoreTrainingCenterValue(
       storageIdentifier,
       result.program,
@@ -277,6 +291,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
 
   return (
     <div
+      ref={rootRef}
       className={cn(
         "mx-auto flex w-full flex-col gap-6 p-2 sm:p-4",
         isEditMode ? "max-w-none" : "max-w-7xl",

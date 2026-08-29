@@ -97,14 +97,16 @@ export function SimulationWorkspace({
       <div
         data-testid="simulation-workspace"
         className={cn(
-          "bg-card ring-foreground/10 relative rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          "bg-card ring-foreground/10 relative flex flex-col rounded-xl p-4 ring-1 transition-[min-height] duration-300 ease-in-out sm:p-6",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
         <div
+          data-testid="simulation-workspace-controls"
           className={cn(
-            "absolute top-6 right-6 z-20 flex justify-end gap-2",
-            overlayControls && "bg-card/80 rounded-lg backdrop-blur-sm",
+            "mb-4 flex shrink-0 items-center justify-end gap-2 md:absolute md:top-6 md:right-6 md:z-20 md:mb-0",
+            overlayControls &&
+              "md:bg-card/80 md:rounded-lg md:backdrop-blur-sm",
           )}
         >
           {onReset && (
@@ -145,9 +147,11 @@ export function SimulationWorkspace({
           </button>
         </div>
 
-        {children ?? (
-          <p className="text-muted-foreground text-sm">{emptyStateText}</p>
-        )}
+        <div className="min-w-0 flex-1">
+          {children ?? (
+            <p className="text-muted-foreground text-sm">{emptyStateText}</p>
+          )}
+        </div>
       </div>
     </div>
   );

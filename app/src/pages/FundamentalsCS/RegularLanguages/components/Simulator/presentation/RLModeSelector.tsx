@@ -40,7 +40,7 @@ export function RLModeSelector({ mode, onChange }: RLModeSelectorProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-card ring-foreground/10 rounded-xl p-2 ring-1">
+    <div className="bg-card ring-foreground/10 rounded-xl p-2 ring-1 md:mr-24">
       <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
         {MODES.map(({ id, icon: Icon, labelKey, fallback }) => {
           const active = mode === id;
