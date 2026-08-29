@@ -32,8 +32,8 @@ export interface RLExample {
 
 export const exampleGrammarToLanguage: RLExample = {
   id: "grammar-to-language",
-  titleKey: "rl.examples.grammarToLanguage.title",
-  descriptionKey: "rl.examples.grammarToLanguage.description",
+  titleKey: "regular-languages.examples.grammarToLanguage.title",
+  descriptionKey: "regular-languages.examples.grammarToLanguage.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
@@ -42,8 +42,8 @@ export const exampleGrammarToLanguage: RLExample = {
 
 export const exampleLanguageToGrammar: RLExample = {
   id: "language-to-grammar",
-  titleKey: "rl.examples.languageToGrammar.title",
-  descriptionKey: "rl.examples.languageToGrammar.description",
+  titleKey: "regular-languages.examples.languageToGrammar.title",
+  descriptionKey: "regular-languages.examples.languageToGrammar.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
@@ -52,8 +52,8 @@ export const exampleLanguageToGrammar: RLExample = {
 
 export const exampleLanguageSetBuilder: RLExample = {
   id: "language-set-builder",
-  titleKey: "rl.examples.languageSetBuilder.title",
-  descriptionKey: "rl.examples.languageSetBuilder.description",
+  titleKey: "regular-languages.examples.languageSetBuilder.title",
+  descriptionKey: "regular-languages.examples.languageSetBuilder.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
@@ -62,8 +62,8 @@ export const exampleLanguageSetBuilder: RLExample = {
 
 export const exampleRecognizeWord: RLExample = {
   id: "recognize-word",
-  titleKey: "rl.examples.recognizeWord.title",
-  descriptionKey: "rl.examples.recognizeWord.description",
+  titleKey: "regular-languages.examples.recognizeWord.title",
+  descriptionKey: "regular-languages.examples.recognizeWord.description",
   mode: "recognizeWord",
   category: "recognizeWord",
   icon: SearchCheck,
@@ -78,8 +78,8 @@ export const exampleRecognizeWord: RLExample = {
  */
 export const exampleLectureGrammar1: RLExample = {
   id: "lecture-g2l-1",
-  titleKey: "rl.examples.lectureGrammar1.title",
-  descriptionKey: "rl.examples.lectureGrammar1.description",
+  titleKey: "regular-languages.examples.lectureGrammar1.title",
+  descriptionKey: "regular-languages.examples.lectureGrammar1.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
@@ -88,8 +88,8 @@ export const exampleLectureGrammar1: RLExample = {
 
 export const exampleLectureGrammar2: RLExample = {
   id: "lecture-g2l-2",
-  titleKey: "rl.examples.lectureGrammar2.title",
-  descriptionKey: "rl.examples.lectureGrammar2.description",
+  titleKey: "regular-languages.examples.lectureGrammar2.title",
+  descriptionKey: "regular-languages.examples.lectureGrammar2.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
@@ -102,8 +102,8 @@ export const exampleLectureGrammar2: RLExample = {
  */
 export const exampleLanguageDefault: RLExample = {
   id: "language-default",
-  titleKey: "rl.examples.languageDefault.title",
-  descriptionKey: "rl.examples.languageDefault.description",
+  titleKey: "regular-languages.examples.languageDefault.title",
+  descriptionKey: "regular-languages.examples.languageDefault.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
@@ -112,8 +112,8 @@ export const exampleLanguageDefault: RLExample = {
 
 export const exampleLectureLanguage1: RLExample = {
   id: "lecture-l2g-1",
-  titleKey: "rl.examples.lectureLanguage1.title",
-  descriptionKey: "rl.examples.lectureLanguage1.description",
+  titleKey: "regular-languages.examples.lectureLanguage1.title",
+  descriptionKey: "regular-languages.examples.lectureLanguage1.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,

@@ -93,14 +93,14 @@ export function Multiplication({
         decimalProduct: bit === "1" ? parseInt(valA, 2) * Math.pow(2, i) : 0,
         explanation:
           bit === "1"
-            ? t("simulator.arithmetic.multiplication.stepDesc", {
+            ? t("number-systems.simulator.arithmetic.multiplication.stepDesc", {
                 n: i,
                 bit: bit,
                 val: valA,
                 shift: i,
                 result: termStr,
               })
-            : t("simulator.arithmetic.multiplication.skipZero", {
+            : t("number-systems.simulator.arithmetic.multiplication.skipZero", {
                 n: i,
                 bit: bit,
               }),
@@ -121,22 +121,26 @@ export function Multiplication({
         <>
           <div>
             <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("simulator.arithmetic.common.operands")}
+              {t("number-systems.simulator.arithmetic.common.operands")}
             </h3>
             <p className="text-muted-foreground mb-4 text-sm">
-              {t("simulator.arithmetic.multiplication.desc")}
+              {t("number-systems.simulator.arithmetic.multiplication.desc")}
             </p>
           </div>
           <div className="space-y-4">
             {renderModeSelector}
             <BinaryInput
-              label={t("simulator.arithmetic.multiplication.multiplier")}
+              label={t(
+                "number-systems.simulator.arithmetic.multiplication.multiplier",
+              )}
               value={valA}
               onChange={handleInputA}
               locked={locked}
             />
             <BinaryInput
-              label={t("simulator.arithmetic.multiplication.multiplicand")}
+              label={t(
+                "number-systems.simulator.arithmetic.multiplication.multiplicand",
+              )}
               value={valB}
               onChange={handleInputB}
               locked={locked}
@@ -157,7 +161,9 @@ export function Multiplication({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.arithmetic.common.stepsResult")}
+              title={t(
+                "number-systems.simulator.arithmetic.common.stepsResult",
+              )}
             />
 
             {valA && valB ? (
@@ -170,7 +176,9 @@ export function Multiplication({
                 {showStepByStep && steps.length > 0 && (
                   <div className="mb-6 space-y-3">
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("simulator.arithmetic.multiplication.stepByStepTitle")}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.stepByStepTitle",
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -183,7 +191,7 @@ export function Multiplication({
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
                                 {t(
-                                  "simulator.arithmetic.multiplication.stepN",
+                                  "number-systems.simulator.arithmetic.multiplication.stepN",
                                   { n: step.bitIndex },
                                 )}
                               </span>
@@ -196,7 +204,7 @@ export function Multiplication({
                                 {step.isZero ? (
                                   <span className="text-muted-foreground">
                                     {t(
-                                      "simulator.arithmetic.multiplication.skipShort",
+                                      "number-systems.simulator.arithmetic.multiplication.skipShort",
                                     )}
                                   </span>
                                 ) : (
@@ -230,7 +238,7 @@ export function Multiplication({
                       <p className="text-foreground text-sm">
                         <strong>
                           {t(
-                            "simulator.arithmetic.multiplication.partialProducts",
+                            "number-systems.simulator.arithmetic.multiplication.partialProducts",
                           )}
                           :
                         </strong>
@@ -270,15 +278,20 @@ export function Multiplication({
                       <span className="text-primary font-bold">{finalSum}</span>
                     </div>
                     <div className="text-muted-foreground mt-4 text-right font-sans text-xs tracking-normal">
-                      {t("simulator.arithmetic.multiplication.inDecimal")}:{" "}
-                      {parseInt(valA, 2)} × {parseInt(valB, 2)} = {finalSumDec}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.inDecimal",
+                      )}
+                      : {parseInt(valA, 2)} × {parseInt(valB, 2)} ={" "}
+                      {finalSumDec}
                     </div>
                   </div>
                 </div>
               </>
             ) : (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                {t("simulator.arithmetic.common.enterValidOperands")}
+                {t(
+                  "number-systems.simulator.arithmetic.common.enterValidOperands",
+                )}
               </p>
             )}
           </div>

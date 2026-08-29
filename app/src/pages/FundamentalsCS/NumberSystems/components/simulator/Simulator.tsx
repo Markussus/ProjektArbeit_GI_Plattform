@@ -322,7 +322,7 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
               )}
               onClick={() => handleTabClick(mode)}
             >
-              {t(`simulator.tabs.${mode}`)}
+              {t(`number-systems.simulator.tabs.${mode}`)}
               {activeMode === mode && (
                 <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
               )}
@@ -450,9 +450,9 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
         {/* Tab switch confirmation dialog */}
         <ConfirmDialog
           isOpen={showTabConfirm}
-          title={t("simulator.validation.exitTabTitle")}
-          description={t("simulator.validation.exitTabDesc")}
-          confirmLabel={t("simulator.validation.exitTabConfirm")}
+          title={t("common.exerciseValidation.exitTabTitle")}
+          description={t("common.exerciseValidation.exitTabDesc")}
+          confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
           onConfirm={handleTabConfirm}
           onCancel={() => {
             setShowTabConfirm(false);

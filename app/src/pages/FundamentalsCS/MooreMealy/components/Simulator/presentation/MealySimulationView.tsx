@@ -52,7 +52,9 @@ export function MealySimulationView(props: Props) {
   );
   return (
     <div data-testid="mealy-simulation-view" className="space-y-5">
-      <h2 className="text-lg font-bold">{t("moore.mealy.simulationTitle")}</h2>
+      <h2 className="text-lg font-bold">
+        {t("moore-mealy.mealy.simulationTitle")}
+      </h2>
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">
           <SimulatorControls
@@ -67,18 +69,18 @@ export function MealySimulationView(props: Props) {
             testIdPrefix="mealy-controls"
           />
           <div className="border-border bg-card rounded-xl border p-3 text-sm">
-            <strong>{t("moore.sim.currentState")}:</strong>{" "}
+            <strong>{t("moore-mealy.sim.currentState")}:</strong>{" "}
             {props.runtime.currentState}
           </div>
         </div>
         <div className="space-y-3">
           <Sequence
-            title={t("moore.sim.inputWord")}
+            title={t("moore-mealy.sim.inputWord")}
             values={props.program.inputWord}
             testId="mealy-runtime-input"
           />
           <Sequence
-            title={t("moore.sim.outputWord")}
+            title={t("moore-mealy.sim.outputWord")}
             values={props.runtime.outputSymbols}
             testId="mealy-runtime-output"
           />
@@ -87,7 +89,7 @@ export function MealySimulationView(props: Props) {
       <StateMachineGraph
         nodes={nodes}
         edges={edges}
-        ariaLabel={t("moore.mealy.diagram")}
+        ariaLabel={t("moore-mealy.mealy.diagram")}
         testId="mealy-state-diagram"
         compact
         defaultLabelLayout="list"
@@ -132,10 +134,12 @@ function MealyRuntimeTable({
       >
         <thead>
           <tr className="bg-muted/50 border-b">
-            <th className="border-r p-2">{t("moore.sim.state")}</th>
-            <th className="border-r p-2">{t("moore.sim.event")}</th>
-            <th className="border-r p-2">{t("moore.conversion.nextState")}</th>
-            <th className="p-2">{t("moore.sim.output")}</th>
+            <th className="border-r p-2">{t("moore-mealy.sim.state")}</th>
+            <th className="border-r p-2">{t("moore-mealy.sim.event")}</th>
+            <th className="border-r p-2">
+              {t("moore-mealy.conversion.nextState")}
+            </th>
+            <th className="p-2">{t("moore-mealy.sim.output")}</th>
           </tr>
         </thead>
         <tbody>

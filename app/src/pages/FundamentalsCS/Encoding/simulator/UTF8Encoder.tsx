@@ -451,13 +451,13 @@ export function UTF8Encoder({
 
   const inputLabel =
     converterMode === "encode"
-      ? t("simulator.encoding.inputText")
-      : t("simulator.encoding.inputHexBytes");
+      ? t("encoding.simulator.inputText")
+      : t("encoding.simulator.inputHexBytes");
 
   const resultLabel =
     converterMode === "encode"
-      ? t("simulator.encoding.utf8Result")
-      : t("simulator.encoding.decodedResult");
+      ? t("encoding.simulator.utf8Result")
+      : t("encoding.simulator.decodedResult");
 
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;
@@ -488,10 +488,10 @@ export function UTF8Encoder({
             <div>
               <h3 className="text-foreground flex items-center gap-2 text-lg font-semibold">
                 <Globe className="text-primary h-5 w-5" />
-                {t("simulator.encoding.utf8Title")}
+                {t("encoding.simulator.utf8Title")}
               </h3>
               <p className="text-muted-foreground mt-1 text-sm">
-                {t("simulator.encoding.utf8Desc")}
+                {t("encoding.simulator.utf8Desc")}
               </p>
             </div>
 
@@ -501,11 +501,11 @@ export function UTF8Encoder({
               options={[
                 {
                   value: "encode",
-                  label: t("simulator.encoding.encode"),
+                  label: t("encoding.simulator.encode"),
                 },
                 {
                   value: "decode",
-                  label: t("simulator.encoding.decode"),
+                  label: t("encoding.simulator.decode"),
                 },
               ]}
               disabled={isExerciseMode}
@@ -554,12 +554,12 @@ export function UTF8Encoder({
           <div className="space-y-4">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.encoding.explanation")}
+              title={t("encoding.simulator.explanation")}
             />
 
             {!inputValue && (
               <p className="text-muted-foreground text-sm">
-                {t("simulator.encoding.enterValue")}
+                {t("encoding.simulator.enterValue")}
               </p>
             )}
 
@@ -573,7 +573,7 @@ export function UTF8Encoder({
                 {expanded.has("0") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step1CodePoint")}
+                      {t("encoding.simulator.step1CodePoint")}
                     </h4>
                     {charSteps.map((step) => (
                       <CollapsibleStep
@@ -584,7 +584,7 @@ export function UTF8Encoder({
                           <span className="font-mono text-sm">
                             '{step.char}' → {step.codePointHex} (
                             {step.byteCount}{" "}
-                            {t("simulator.encoding.byteLabel", {
+                            {t("encoding.simulator.byteLabel", {
                               count: step.byteCount,
                             })}
                             )
@@ -593,21 +593,21 @@ export function UTF8Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.charLabel")}:{" "}
+                            {t("encoding.simulator.charLabel")}:{" "}
                             <code className="font-mono">{step.char}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.codePointLabel")}:{" "}
+                            {t("encoding.simulator.codePointLabel")}:{" "}
                             <code className="font-mono">
                               {step.codePointHex}
                             </code>
                           </p>
                           <p>
-                            {t("simulator.encoding.decimalLabel")}:{" "}
+                            {t("encoding.simulator.decimalLabel")}:{" "}
                             <code className="font-mono">{step.codePoint}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.bytePattern")}:{" "}
+                            {t("encoding.simulator.bytePattern")}:{" "}
                             {getUtf8PatternDisplay(step.byteCount)}
                           </p>
                         </div>
@@ -624,7 +624,7 @@ export function UTF8Encoder({
                 {expanded.has("1") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step2ByteEncoding")}
+                      {t("encoding.simulator.step2ByteEncoding")}
                     </h4>
                     {charSteps.map((step) => (
                       <CollapsibleStep
@@ -653,31 +653,31 @@ export function UTF8Encoder({
                             return (
                               <div key={bi} className="space-y-1">
                                 <p className="font-medium">
-                                  {t("simulator.encoding.byteN", {
+                                  {t("encoding.simulator.byteN", {
                                     n: bi + 1,
                                   })}
                                   {step.byteCount > 1 && (
                                     <span className="text-muted-foreground ml-2 text-xs">
                                       (
                                       {byteType === "lead"
-                                        ? t("simulator.encoding.leadByte", {
+                                        ? t("encoding.simulator.leadByte", {
                                             count: step.byteCount,
                                           })
                                         : t(
-                                            "simulator.encoding.continuationByte",
+                                            "encoding.simulator.continuationByte",
                                           )}
                                       )
                                     </span>
                                   )}
                                 </p>
                                 <p>
-                                  {t("simulator.encoding.hexLabel")}:{" "}
+                                  {t("encoding.simulator.hexLabel")}:{" "}
                                   <code className="font-mono">
                                     {step.bytesHex[bi]}
                                   </code>
                                 </p>
                                 <p>
-                                  {t("simulator.encoding.binaryLabel")}:{" "}
+                                  {t("encoding.simulator.binaryLabel")}:{" "}
                                   <Utf8BitDisplay segments={segments} />
                                 </p>
                               </div>
@@ -697,15 +697,15 @@ export function UTF8Encoder({
                 {expanded.has("2") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.step3FullSequence")}
+                      {t("encoding.simulator.step3FullSequence")}
                     </h4>
                     <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs">
                       <p className="text-muted-foreground mb-1">
-                        {t("simulator.encoding.hexSequence")}:
+                        {t("encoding.simulator.hexSequence")}:
                       </p>
                       <p className="break-all">{result}</p>
                       <p className="text-muted-foreground mt-3 mb-1">
-                        {t("simulator.encoding.binarySequence")}:
+                        {t("encoding.simulator.binarySequence")}:
                       </p>
                       <div className="flex flex-wrap gap-1 break-all">
                         {charSteps.map((step) =>
@@ -741,7 +741,7 @@ export function UTF8Encoder({
                 {result && (
                   <div className="bg-primary/10 mt-4 rounded-lg p-4">
                     <p className="text-sm font-medium">
-                      {t("simulator.encoding.finalResult")}
+                      {t("encoding.simulator.finalResult")}
                     </p>
                     <code className="text-primary mt-1 block font-mono text-lg break-all">
                       {result}
@@ -761,7 +761,7 @@ export function UTF8Encoder({
                 {expanded.has("0") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep1Bytes")}
+                      {t("encoding.simulator.decodeStep1Bytes")}
                     </h4>
                     {utf8DecodeByteSteps.map((step) => (
                       <CollapsibleStep
@@ -772,20 +772,20 @@ export function UTF8Encoder({
                           <span className="font-mono text-sm">
                             {step.hexByte} ({step.binary}){" "}
                             {step.byteType === "lead"
-                              ? `→ ${t("simulator.encoding.leadByte", { count: step.byteCount })}`
+                              ? `→ ${t("encoding.simulator.leadByte", { count: step.byteCount })}`
                               : step.byteType === "cont"
-                                ? `→ ${t("simulator.encoding.continuationByte")}`
-                                : `→ ${t("simulator.encoding.singleByte")}`}
+                                ? `→ ${t("encoding.simulator.continuationByte")}`
+                                : `→ ${t("encoding.simulator.singleByte")}`}
                           </span>
                         }
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.hexLabel")}:{" "}
+                            {t("encoding.simulator.hexLabel")}:{" "}
                             <code className="font-mono">{step.hexByte}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.binaryLabel")}:{" "}
+                            {t("encoding.simulator.binaryLabel")}:{" "}
                             <Utf8BitDisplay
                               segments={getUtf8BitSegments(
                                 step.binary,
@@ -795,15 +795,15 @@ export function UTF8Encoder({
                             />
                           </p>
                           <p>
-                            {t("simulator.encoding.byteTypeLabel")}:{" "}
+                            {t("encoding.simulator.byteTypeLabel")}:{" "}
                             <code className="font-mono">
                               {step.byteType === "lead"
-                                ? t("simulator.encoding.leadByte", {
+                                ? t("encoding.simulator.leadByte", {
                                     count: step.byteCount,
                                   })
                                 : step.byteType === "cont"
-                                  ? t("simulator.encoding.continuationByte")
-                                  : t("simulator.encoding.singleByte")}
+                                  ? t("encoding.simulator.continuationByte")
+                                  : t("encoding.simulator.singleByte")}
                             </code>
                           </p>
                         </div>
@@ -820,7 +820,7 @@ export function UTF8Encoder({
                 {expanded.has("1") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep2CodePoints")}
+                      {t("encoding.simulator.decodeStep2CodePoints")}
                     </h4>
                     {utf8DecodeCharSteps.map((step) => (
                       <CollapsibleStep
@@ -836,23 +836,23 @@ export function UTF8Encoder({
                       >
                         <div className="space-y-1 text-sm">
                           <p>
-                            {t("simulator.encoding.bytesUsed")}:{" "}
+                            {t("encoding.simulator.bytesUsed")}:{" "}
                             <code className="font-mono">
                               {step.bytesUsed.join(" ")}
                             </code>
                           </p>
                           <p>
-                            {t("simulator.encoding.codePointLabel")}:{" "}
+                            {t("encoding.simulator.codePointLabel")}:{" "}
                             <code className="font-mono">
                               {step.codePointHex}
                             </code>
                           </p>
                           <p>
-                            {t("simulator.encoding.decimalLabel")}:{" "}
+                            {t("encoding.simulator.decimalLabel")}:{" "}
                             <code className="font-mono">{step.codePoint}</code>
                           </p>
                           <p>
-                            {t("simulator.encoding.charLabel")}:{" "}
+                            {t("encoding.simulator.charLabel")}:{" "}
                             <code className="font-mono">
                               {displayChar(step.char)}
                             </code>
@@ -871,11 +871,11 @@ export function UTF8Encoder({
                 {expanded.has("2") && (
                   <div className="space-y-2">
                     <h4 className="text-foreground text-sm font-medium">
-                      {t("simulator.encoding.decodeStep3FullText")}
+                      {t("encoding.simulator.decodeStep3FullText")}
                     </h4>
                     <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs">
                       <p className="text-muted-foreground mb-1">
-                        {t("simulator.encoding.decodedResult")}:
+                        {t("encoding.simulator.decodedResult")}:
                       </p>
                       <p className="text-base break-all">
                         {displayText(result)}
@@ -888,12 +888,12 @@ export function UTF8Encoder({
                   <WarningBanner
                     variant="warning"
                     title={t(
-                      "simulator.encoding.invalidUtf8Title",
+                      "encoding.simulator.invalidUtf8Title",
                       "Invalid UTF-8 Sequence",
                     )}
                   >
                     {t(
-                      "simulator.encoding.invalidUtf8Desc",
+                      "encoding.simulator.invalidUtf8Desc",
                       "The hex bytes do not form a valid UTF-8 sequence. Check your input and try again.",
                     )}
                   </WarningBanner>
@@ -902,7 +902,7 @@ export function UTF8Encoder({
                 {result && (
                   <div className="bg-primary/10 mt-4 rounded-lg p-4">
                     <p className="text-sm font-medium">
-                      {t("simulator.encoding.finalResult")}
+                      {t("encoding.simulator.finalResult")}
                     </p>
                     <code className="text-primary mt-1 block font-mono text-lg break-all">
                       {displayText(result)}

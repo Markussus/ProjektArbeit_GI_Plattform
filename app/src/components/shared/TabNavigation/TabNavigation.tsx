@@ -37,7 +37,7 @@ export function TabNavigation({
               : "text-muted-foreground hover:text-foreground",
           )}
         >
-          {t(`tabs.${tab}`)}
+          {t(`common.tabs.${tab}`)}
           {activeTab === tab && (
             <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
           )}

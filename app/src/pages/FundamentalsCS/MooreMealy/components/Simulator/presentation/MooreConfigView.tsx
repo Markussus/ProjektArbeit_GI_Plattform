@@ -64,11 +64,11 @@ export function MooreConfigView({
   const representationOptions = [
     {
       value: "decimal" as const,
-      label: t("moore.sim.decimal"),
+      label: t("moore-mealy.sim.decimal"),
     },
     {
       value: "binary" as const,
-      label: t("moore.sim.binary"),
+      label: t("moore-mealy.sim.binary"),
     },
   ];
   const outputAlphabet = useMemo(() => {
@@ -86,9 +86,11 @@ export function MooreConfigView({
   return (
     <div data-testid="moore-config-view" className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">{t("moore.sim.configureTitle")}</h2>
+        <h2 className="text-lg font-bold">
+          {t("moore-mealy.sim.configureTitle")}
+        </h2>
         <p className="text-muted-foreground text-sm">
-          {t("moore.sim.configureHelp")}
+          {t("moore-mealy.sim.configureHelp")}
         </p>
       </div>
 
@@ -98,7 +100,7 @@ export function MooreConfigView({
           className="bg-destructive/10 text-destructive rounded-lg border border-current/20 p-3 text-sm"
         >
           {issues
-            .map((issue) => t(`moore.sim.validation.${issue}` as never))
+            .map((issue) => t(`moore-mealy.sim.validation.${issue}` as never))
             .join(" ")}
         </div>
       )}
@@ -112,7 +114,7 @@ export function MooreConfigView({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.representation")}
+              {t("moore-mealy.sim.representation")}
             </label>
             <DropdownSelect<InternalRepresentation>
               value={program.representation}
@@ -120,7 +122,7 @@ export function MooreConfigView({
               onChange={(representation) =>
                 onChange({ ...program, representation })
               }
-              ariaLabel={t("moore.sim.representation")}
+              ariaLabel={t("moore-mealy.sim.representation")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-representation-select"
@@ -129,7 +131,7 @@ export function MooreConfigView({
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.startState")}
+              {t("moore-mealy.sim.startState")}
             </label>
             <DropdownSelect
               value={program.initialState}
@@ -137,7 +139,7 @@ export function MooreConfigView({
               onChange={(initialState) =>
                 onChange({ ...program, initialState })
               }
-              ariaLabel={t("moore.sim.startState")}
+              ariaLabel={t("moore-mealy.sim.startState")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-start-state-select"
@@ -167,8 +169,8 @@ export function MooreConfigView({
         />
         <div className="space-y-4">
           <SymbolSetPanel
-            title={t("moore.sim.states")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.states")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             testId="moore-state-set"
             items={program.states.map((state, index) => ({
               key: state,
@@ -183,8 +185,8 @@ export function MooreConfigView({
             }))}
           />
           <SymbolSetPanel
-            title={t("moore.sim.outputAlphabet")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.outputAlphabet")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             testId="moore-output-alphabet"
             items={outputAlphabet.map((output) => ({
               key: output.symbol,

@@ -14,13 +14,11 @@ export function Header() {
 
   const headerLabel: string = activeModule
     ? t(activeModule.titleKey)
-    : location.pathname === "/documentation"
-      ? t("documentation.title")
-      : location.pathname === "/help"
-        ? t("help.title")
-        : location.pathname === "/legal"
-          ? t("legal.title")
-          : t("nav.home");
+    : location.pathname === "/info" ||
+        location.pathname === "/help" ||
+        location.pathname === "/legal"
+      ? t("common.info.title")
+      : t("common.nav.home");
 
   return (
     <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-3 sm:px-6">

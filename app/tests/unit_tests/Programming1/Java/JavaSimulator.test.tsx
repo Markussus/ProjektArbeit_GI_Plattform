@@ -19,7 +19,10 @@ vi.mock("react-i18next", () => ({
         return options;
       }
 
-      if (key === "java.commandOverview.summary" && options?.version) {
+      if (
+        key === "java-programming.commandOverview.summary" &&
+        options?.version
+      ) {
         return `Java ${options.version}`;
       }
 
@@ -152,7 +155,7 @@ describe("JavaSimulator", () => {
       render(
         <JavaSimulator
           selectedExercise={createExercise(
-            "java.exercise4",
+            "java-programming.exercise4",
             "Array sortieren",
             "Sort an array",
           )}

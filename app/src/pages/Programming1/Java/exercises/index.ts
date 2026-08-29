@@ -61,9 +61,9 @@ const defaultStarterCode = `public class Main {
 export const javaProgrammingExamples: JavaExampleScenario[] = [
   {
     kind: "example",
-    id: "java.example1Title",
-    titleKey: "java.example1Title",
-    descriptionKey: "java.example1Text",
+    id: "java-programming.example1Title",
+    titleKey: "java-programming.example1Title",
+    descriptionKey: "java-programming.example1Text",
     fileName: "Main.java",
     code: `public class Main {
   public static void main(String[] args) {
@@ -72,16 +72,16 @@ export const javaProgrammingExamples: JavaExampleScenario[] = [
 }
 `,
     definition: {
-      titleKey: "java.example1Title",
-      descriptionKey: "java.example1Text",
+      titleKey: "java-programming.example1Title",
+      descriptionKey: "java-programming.example1Text",
       icon: BookOpen,
     },
   },
   {
     kind: "example",
-    id: "java.example2Title",
-    titleKey: "java.example2Title",
-    descriptionKey: "java.example2Text",
+    id: "java-programming.example2Title",
+    titleKey: "java-programming.example2Title",
+    descriptionKey: "java-programming.example2Text",
     fileName: "Main.java",
     code: `public class Main {
   public static void main(String[] args) {
@@ -92,16 +92,16 @@ export const javaProgrammingExamples: JavaExampleScenario[] = [
 }
 `,
     definition: {
-      titleKey: "java.example2Title",
-      descriptionKey: "java.example2Text",
+      titleKey: "java-programming.example2Title",
+      descriptionKey: "java-programming.example2Text",
       icon: Repeat,
     },
   },
   {
     kind: "example",
-    id: "java.example3Title",
-    titleKey: "java.example3Title",
-    descriptionKey: "java.example3Text",
+    id: "java-programming.example3Title",
+    titleKey: "java-programming.example3Title",
+    descriptionKey: "java-programming.example3Text",
     fileName: "Main.java",
     code: `import java.util.Arrays;
 
@@ -114,8 +114,8 @@ public class Main {
 }
 `,
     definition: {
-      titleKey: "java.example3Title",
-      descriptionKey: "java.example3Text",
+      titleKey: "java-programming.example3Title",
+      descriptionKey: "java-programming.example3Text",
       icon: Code2,
     },
   },
@@ -125,10 +125,10 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
   [
     {
       kind: "exercise",
-      id: "java.exercise1",
+      id: "java-programming.exercise1",
       storageId: 0,
-      titleKey: "java.exercise1",
-      descriptionKey: "java.exercise1Desc",
+      titleKey: "java-programming.exercise1",
+      descriptionKey: "java-programming.exercise1Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -155,18 +155,18 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
 }
 `,
       definition: {
-        titleKey: "java.exercise1",
-        descriptionKey: "java.exercise1Desc",
+        titleKey: "java-programming.exercise1",
+        descriptionKey: "java-programming.exercise1Desc",
         difficulty: "easy",
         icon: TerminalSquare,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise2",
+      id: "java-programming.exercise2",
       storageId: 1,
-      titleKey: "java.exercise2",
-      descriptionKey: "java.exercise2Desc",
+      titleKey: "java-programming.exercise2",
+      descriptionKey: "java-programming.exercise2Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -196,18 +196,18 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
 }
 `,
       definition: {
-        titleKey: "java.exercise2",
-        descriptionKey: "java.exercise2Desc",
+        titleKey: "java-programming.exercise2",
+        descriptionKey: "java-programming.exercise2Desc",
         difficulty: "easy",
         icon: Repeat,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise3",
+      id: "java-programming.exercise3",
       storageId: 2,
-      titleKey: "java.exercise3",
-      descriptionKey: "java.exercise3Desc",
+      titleKey: "java-programming.exercise3",
+      descriptionKey: "java-programming.exercise3Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -254,18 +254,18 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
 }
 `,
       definition: {
-        titleKey: "java.exercise3",
-        descriptionKey: "java.exercise3Desc",
+        titleKey: "java-programming.exercise3",
+        descriptionKey: "java-programming.exercise3Desc",
         difficulty: "easy",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise4",
+      id: "java-programming.exercise4",
       storageId: 3,
-      titleKey: "java.exercise4",
-      descriptionKey: "java.exercise4Desc",
+      titleKey: "java-programming.exercise4",
+      descriptionKey: "java-programming.exercise4Desc",
       fileName: "Main.java",
       starterCode: `import java.util.Arrays;
 
@@ -317,18 +317,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise4",
-        descriptionKey: "java.exercise4Desc",
+        titleKey: "java-programming.exercise4",
+        descriptionKey: "java-programming.exercise4Desc",
         difficulty: "medium",
         icon: ArrowDownWideNarrow,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise5",
+      id: "java-programming.exercise5",
       storageId: 4,
-      titleKey: "java.exercise5",
-      descriptionKey: "java.exercise5Desc",
+      titleKey: "java-programming.exercise5",
+      descriptionKey: "java-programming.exercise5Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -382,18 +382,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise5",
-        descriptionKey: "java.exercise5Desc",
+        titleKey: "java-programming.exercise5",
+        descriptionKey: "java-programming.exercise5Desc",
         difficulty: "medium",
         icon: ListOrdered,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise6",
+      id: "java-programming.exercise6",
       storageId: 5,
-      titleKey: "java.exercise6",
-      descriptionKey: "java.exercise6Desc",
+      titleKey: "java-programming.exercise6",
+      descriptionKey: "java-programming.exercise6Desc",
       fileName: "Main.java",
       starterCode: `import java.util.Scanner;
 
@@ -441,18 +441,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise6",
-        descriptionKey: "java.exercise6Desc",
+        titleKey: "java-programming.exercise6",
+        descriptionKey: "java-programming.exercise6Desc",
         difficulty: "medium",
         icon: TerminalSquare,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise7",
+      id: "java-programming.exercise7",
       storageId: 6,
-      titleKey: "java.exercise7",
-      descriptionKey: "java.exercise7Desc",
+      titleKey: "java-programming.exercise7",
+      descriptionKey: "java-programming.exercise7Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -502,18 +502,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise7",
-        descriptionKey: "java.exercise7Desc",
+        titleKey: "java-programming.exercise7",
+        descriptionKey: "java-programming.exercise7Desc",
         difficulty: "medium",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise8",
+      id: "java-programming.exercise8",
       storageId: 7,
-      titleKey: "java.exercise8",
-      descriptionKey: "java.exercise8Desc",
+      titleKey: "java-programming.exercise8",
+      descriptionKey: "java-programming.exercise8Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -594,18 +594,18 @@ class Student {
 }
 `,
       definition: {
-        titleKey: "java.exercise8",
-        descriptionKey: "java.exercise8Desc",
+        titleKey: "java-programming.exercise8",
+        descriptionKey: "java-programming.exercise8Desc",
         difficulty: "medium",
         icon: Code2,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise9",
+      id: "java-programming.exercise9",
       storageId: 8,
-      titleKey: "java.exercise9",
-      descriptionKey: "java.exercise9Desc",
+      titleKey: "java-programming.exercise9",
+      descriptionKey: "java-programming.exercise9Desc",
       fileName: "Main.java",
       starterCode: `import java.util.ArrayList;
 import java.util.Collections;
@@ -669,18 +669,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise9",
-        descriptionKey: "java.exercise9Desc",
+        titleKey: "java-programming.exercise9",
+        descriptionKey: "java-programming.exercise9Desc",
         difficulty: "medium",
         icon: ListOrdered,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise10",
+      id: "java-programming.exercise10",
       storageId: 9,
-      titleKey: "java.exercise10",
-      descriptionKey: "java.exercise10Desc",
+      titleKey: "java-programming.exercise10",
+      descriptionKey: "java-programming.exercise10Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -735,18 +735,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise10",
-        descriptionKey: "java.exercise10Desc",
+        titleKey: "java-programming.exercise10",
+        descriptionKey: "java-programming.exercise10Desc",
         difficulty: "easy",
         icon: Repeat,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise11",
+      id: "java-programming.exercise11",
       storageId: 10,
-      titleKey: "java.exercise11",
-      descriptionKey: "java.exercise11Desc",
+      titleKey: "java-programming.exercise11",
+      descriptionKey: "java-programming.exercise11Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -819,18 +819,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise11",
-        descriptionKey: "java.exercise11Desc",
+        titleKey: "java-programming.exercise11",
+        descriptionKey: "java-programming.exercise11Desc",
         difficulty: "medium",
         icon: Code2,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise12",
+      id: "java-programming.exercise12",
       storageId: 11,
-      titleKey: "java.exercise12",
-      descriptionKey: "java.exercise12Desc",
+      titleKey: "java-programming.exercise12",
+      descriptionKey: "java-programming.exercise12Desc",
       fileName: "Main.java",
       starterCode: `public class Main {
   public static void main(String[] args) {
@@ -900,18 +900,18 @@ public class Main {
 }
 `,
       definition: {
-        titleKey: "java.exercise12",
-        descriptionKey: "java.exercise12Desc",
+        titleKey: "java-programming.exercise12",
+        descriptionKey: "java-programming.exercise12Desc",
         difficulty: "hard",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise13",
+      id: "java-programming.exercise13",
       storageId: 12,
-      titleKey: "java.exercise13",
-      descriptionKey: "java.exercise13Desc",
+      titleKey: "java-programming.exercise13",
+      descriptionKey: "java-programming.exercise13Desc",
       fileName: "Main.java",
       starterCode: `import java.util.ArrayList;
 
@@ -1044,8 +1044,8 @@ class ShoppingCart {
 }
 `,
       definition: {
-        titleKey: "java.exercise13",
-        descriptionKey: "java.exercise13Desc",
+        titleKey: "java-programming.exercise13",
+        descriptionKey: "java-programming.exercise13Desc",
         difficulty: "hard",
         icon: ListOrdered,
       },

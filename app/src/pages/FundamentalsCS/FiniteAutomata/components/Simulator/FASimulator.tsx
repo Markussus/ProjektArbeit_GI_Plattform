@@ -287,13 +287,13 @@ export function FASimulator({ ref }: FASimulatorProps) {
               active={editorMode === "manual"}
               onClick={() => setEditorMode("manual")}
               icon={<Settings className="h-4 w-4" />}
-              label={t("fa.editor.manual", "Manual Editor")}
+              label={t("finite-automata.editor.manual", "Manual Editor")}
             />
             <ModeButton
               active={editorMode === "grammar"}
               onClick={() => setEditorMode("grammar")}
               icon={<Sparkles className="h-4 w-4" />}
-              label={t("fa.editor.grammar", "From Grammar")}
+              label={t("finite-automata.editor.grammar", "From Grammar")}
             />
           </div>
 
@@ -308,7 +308,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
 
               <div className="bg-card flex flex-col gap-3 rounded-xl border p-6 shadow-sm">
                 <label className="text-sm font-semibold">
-                  {t("fa.config.inputWord", "Input Word")}
+                  {t("finite-automata.config.inputWord", "Input Word")}
                 </label>
                 <input
                   type="text"
@@ -319,7 +319,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
                 />
                 <p className="text-muted-foreground text-xs">
                   {t(
-                    "fa.config.inputWordHelp",
+                    "finite-automata.config.inputWordHelp",
                     "Each character is treated as one input symbol.",
                   )}
                 </p>
@@ -331,7 +331,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
                 className="bg-brand text-brand-foreground inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Play className="h-4 w-4 fill-current" />
-                {t("fa.config.apply", "Start Simulation")}
+                {t("finite-automata.config.apply", "Start Simulation")}
               </button>
             </div>
           )}

@@ -38,3 +38,11 @@ third_party/teavm-javac-src/**
 app/public/java/compiler/
 app/public/java/compiler/**
 /.playwright-mcp
+
+# Locally generated release packages
+deployment/releases/*.zip
+
+.agents
+graphify-out
+infos_MMA
+docs/*.md

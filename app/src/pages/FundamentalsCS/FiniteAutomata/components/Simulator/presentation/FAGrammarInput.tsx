@@ -50,7 +50,9 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
     const validationErrors = validateRegularGrammar(parsed.grammar);
     if (validationErrors.length > 0) {
       setSubmitErrors(
-        validationErrors.map((code) => t(`fa.grammar.${code}`, code)),
+        validationErrors.map((code) =>
+          t(`finite-automata.grammar.${code}`, code),
+        ),
       );
       return;
     }
@@ -67,18 +69,18 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
     "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none";
 
   const detectedFormatLabel = parsed.format
-    ? t(`fa.grammar.format.${parsed.format}`, parsed.format)
+    ? t(`finite-automata.grammar.format.${parsed.format}`, parsed.format)
     : null;
 
   return (
     <div className="flex flex-col gap-4">
       <div>
         <h3 className="text-sm font-bold">
-          {t("fa.grammar.title", "Regular Grammar → Automaton")}
+          {t("finite-automata.grammar.title", "Regular Grammar → Automaton")}
         </h3>
         <p className="text-muted-foreground mt-1 text-xs">
           {t(
-            "fa.grammar.intro",
+            "finite-automata.grammar.intro",
             "Enter a right-linear grammar. The first non-terminal on the left becomes the start symbol; non-terminals and terminals are inferred from your productions.",
           )}
         </p>
@@ -97,11 +99,11 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
             className="text-sm font-medium"
             htmlFor="fa-grammar-productions"
           >
-            {t("fa.grammar.productions", "Grammar")}
+            {t("finite-automata.grammar.productions", "Grammar")}
           </label>
           {detectedFormatLabel && (
             <span className="text-muted-foreground text-xs">
-              {t("fa.grammar.detectedFormat", "Detected format")}:{" "}
+              {t("finite-automata.grammar.detectedFormat", "Detected format")}:{" "}
               <span className="text-foreground font-medium">
                 {detectedFormatLabel}
               </span>
@@ -121,7 +123,7 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
         />
         <p className="text-muted-foreground text-xs">
           {t(
-            "fa.grammar.productionsHint",
+            "finite-automata.grammar.productionsHint",
             "One production per line. Two formats are supported (auto-detected).",
           )}
         </p>
@@ -132,7 +134,10 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <div>
             <div className="text-xs font-semibold tracking-wide uppercase">
-              {t("fa.grammar.parseError", "Grammar not parseable yet")}
+              {t(
+                "finite-automata.grammar.parseError",
+                "Grammar not parseable yet",
+              )}
             </div>
             <div className="text-xs">{parseErrorText}</div>
           </div>
@@ -148,12 +153,15 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           <ChevronDown
             className={`h-4 w-4 transition-transform ${helpOpen ? "" : "-rotate-90"}`}
           />
-          {t("fa.grammar.supportedFormats", "Supported Formats")}
+          {t("finite-automata.grammar.supportedFormats", "Supported Formats")}
         </summary>
         <div className="flex flex-col gap-3 px-3 pb-3">
           <div>
             <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-              {t("fa.grammar.format1Label", "Format 1 — simplified")}
+              {t(
+                "finite-automata.grammar.format1Label",
+                "Format 1 — simplified",
+              )}
             </div>
             <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
               {SIMPLE_EXAMPLE}
@@ -161,7 +169,10 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           </div>
           <div>
             <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-              {t("fa.grammar.format2Label", "Format 2 — structured")}
+              {t(
+                "finite-automata.grammar.format2Label",
+                "Format 2 — structured",
+              )}
             </div>
             <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
               {STRUCTURED_EXAMPLE}
@@ -169,7 +180,7 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           </div>
           <p className="text-muted-foreground text-xs">
             {t(
-              "fa.grammar.epsilonHint",
+              "finite-automata.grammar.epsilonHint",
               "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
             )}
           </p>
@@ -183,14 +194,14 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
           disabled={!parsed.ok}
           className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {t("fa.grammar.convert", "Convert to Automaton")}
+          {t("finite-automata.grammar.convert", "Convert to Automaton")}
         </button>
         <button
           type="button"
           onClick={handleLoadExample}
           className="bg-muted hover:bg-muted/80 rounded-md px-3 py-2 text-sm font-medium"
         >
-          {t("fa.grammar.loadExample", "Load Example")}
+          {t("finite-automata.grammar.loadExample", "Load Example")}
         </button>
       </div>
     </div>

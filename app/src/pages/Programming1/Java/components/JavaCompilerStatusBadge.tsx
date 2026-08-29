@@ -29,7 +29,7 @@ export function JavaCompilerStatusBadge({
         className,
       )}
     >
-      {t(`java.compilerStatus.${status}`)}
+      {t(`java-programming.compilerStatus.${status}`)}
     </span>
   );
 }

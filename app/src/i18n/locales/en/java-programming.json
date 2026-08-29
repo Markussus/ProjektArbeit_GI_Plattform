@@ -1,0 +1,169 @@
+{
+  "title": "Java Programming",
+  "description": "Work with core Java basics such as console output, loops, and arrays. The simulation tab provides a directly editable Java code editor.",
+  "tutorialVideo": "Tutorial video",
+  "example1Title": "Simple Hello World",
+  "example1Text": "The smallest Java program with a main method and a console print statement.",
+  "example2Title": "Repeated output",
+  "example2Text": "A for loop is the standard way to repeat the same instruction several times.",
+  "example3Title": "Sorting an array",
+  "example3Text": "An integer array can be sorted in ascending order with Arrays.sort.",
+  "exercise1": "Print Hello World",
+  "exercise1Desc": "Write a Java program that prints Hello World to the console exactly once.",
+  "exercise2": "Print Hello World five times",
+  "exercise2Desc": "Use a loop to print Hello World to the console exactly five times.",
+  "exercise3": "Add two numbers",
+  "exercise3Desc": "Add two integer values and print the sum in the console.",
+  "exercise4": "Sort an array",
+  "exercise4Desc": "Sort an integer array in ascending order and print the result afterwards.",
+  "exercise5": "Find the maximum value",
+  "exercise5Desc": "Iterate over an array and determine the largest contained value.",
+  "editorLabel": "Java editor",
+  "editorLoading": "Loading Monaco editor...",
+  "editorLimit": {
+    "lines": "The Java editor is limited to {{maxLines}} lines. The pasted or imported text was not accepted.",
+    "characters": "The Java editor is limited to {{maxCharacters}} characters. The pasted or imported text was not accepted."
+  },
+  "compilerLabel": "Compiler",
+  "timeoutLabel": "Timeout",
+  "timeoutUnit": "seconds",
+  "runWhileLoading": "Compiler loading",
+  "compilerStatus": {
+    "not-loaded": "not loaded",
+    "loading": "loading",
+    "ready": "ready",
+    "failed": "failed"
+  },
+  "compilerStatusText": {
+    "not-loaded": "Compiler not loaded yet.",
+    "loading": "Java compiler is loading in the background...",
+    "ready": "Compiler is ready for Java compilation and execution.",
+    "failed": "Compiler could not be loaded. Check the console output below for details."
+  },
+  "commandOverview": {
+    "button": "Java commands",
+    "title": "What works in the Java editor?",
+    "summary": "Java {{version}} for small browser programs",
+    "limitationsText": "Write one Main.java-style program. You can run Java source code, but you cannot type terminal commands into the editor.",
+    "commandListTitle": "Compact overview",
+    "status": {
+      "supported": "Works",
+      "limited": "Limited",
+      "blocked": "Does not work",
+      "not-supported": "Not supported",
+      "explained": "Limited"
+    },
+    "capabilities": {
+      "programShape": {
+        "title": "Program entry point",
+        "description": "One Main.java program works. public class Main and additional non-public helper classes can be placed in the same editor file."
+      },
+      "basics": {
+        "title": "Basic Java syntax",
+        "description": "Basic Java syntax works: variables, operators, if/else, switch, and method calls."
+      },
+      "loops": {
+        "title": "Loops and control flow",
+        "description": "for, while, do/while, and for-each work for exercises and small algorithms."
+      },
+      "arraysCollections": {
+        "title": "Arrays, lists, maps, and sets",
+        "description": "Arrays and typical java.util collections work: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+      },
+      "objects": {
+        "title": "Own types",
+        "description": "Custom classes, constructors, enums, records, interfaces, and static methods can be placed in the same editor file."
+      },
+      "output": {
+        "title": "Console output",
+        "description": "Output is captured and shown in stdout or stderr below the editor."
+      },
+      "standardLibrary": {
+        "title": "Standard library subset",
+        "description": "Common library classes from java.lang, java.util, java.math, and simple java.time are available. OS-facing APIs are not reliable."
+      },
+      "singleFile": {
+        "title": "One editor file",
+        "description": "The UI currently sends one source file. Put helper classes into the same file instead of using a multi-file project."
+      },
+      "input": {
+        "title": "Console input",
+        "description": "The input box supports simple declarations using Scanner.nextLine() and Scanner.nextInt(). Values are substituted into the source before compilation; a real interactive System.in stream and BufferedReader are not supported."
+      },
+      "cli": {
+        "title": "Terminal commands",
+        "description": "The editor expects Java source code, not commands. java, javac, jshell, jar, mvn, and gradle are not executed as terminal commands."
+      },
+      "environment": {
+        "title": "OS access",
+        "description": "Local files, sockets, started processes, and native libraries are blocked by the browser runtime model."
+      },
+      "runtimeFeatures": {
+        "title": "Dynamic runtime features",
+        "description": "Reflection-heavy code, dynamic class loading, and real Java threads are not reliable in this WebAssembly target."
+      },
+      "stringsMath": {
+        "title": "Strings, Math, and big numbers",
+        "description": "StringBuilder, String methods, Math functions, BigInteger, and BigDecimal work for typical console tasks."
+      }
+    }
+  },
+  "actions": {
+    "loadSolution": "Load solution",
+    "checkSolution": "Check solution",
+    "checkingSolution": "Checking..."
+  },
+  "validation": {
+    "popupTitle": "Solution check",
+    "pass": "PASS",
+    "fail": "FAIL",
+    "emptyOutput": "<empty>",
+    "exampleCheckUnavailable": "Examples do not need solution checks.",
+    "table": {
+      "passed": "Passed",
+      "case": "Test case",
+      "output": "Output",
+      "expectedOutput": "Expected output",
+      "phase": "Status"
+    }
+  },
+  "exercise6": "Uppercase input text",
+  "exercise6Desc": "Read one line with Scanner and print the text in uppercase.",
+  "exercise7": "Write a method",
+  "exercise7Desc": "Implement a method that squares a number and returns the result.",
+  "exercise8": "Use a simple class",
+  "exercise8Desc": "Store constructor values in a class and return a description.",
+  "exercise9": "Sort an ArrayList",
+  "exercise9Desc": "Sort an ArrayList with Collections.sort and print the list.",
+  "exercise10": "Implement FizzBuzz",
+  "exercise10Desc": "Combine a loop, modulo, and conditions to produce the classic FizzBuzz output.",
+  "exercise11": "Check a palindrome",
+  "exercise11Desc": "Implement a method that compares text from both ends and detects palindromes.",
+  "exercise12": "Evaluate a matrix",
+  "exercise12Desc": "Use nested loops to calculate every row sum and the main diagonal sum.",
+  "exercise13": "Model a shopping cart",
+  "exercise13Desc": "Store prices in a class with an ArrayList and implement item count, total, and maximum.",
+  "stdin": {
+    "label": "Program input",
+    "placeholder": "Input for Scanner/System.in, e.g. hello java",
+    "help": "This input is substituted before the program starts for simple Scanner.nextLine() and Scanner.nextInt() declarations. An interactive System.in stream is not available."
+  },
+  "console": {
+    "title": "Console",
+    "stdout": "Standard output",
+    "stdoutEmpty": "Program output appears here.",
+    "stderr": "Error output",
+    "stderrEmpty": "Runtime errors appear here.",
+    "issues": "Diagnostics",
+    "noIssues": "No diagnostics reported.",
+    "issueLocation": "Line {{line}}, column {{column}}"
+  },
+  "execution": {
+    "stoppedMessage": "Execution stopped by user.",
+    "timeoutMessage": "Execution stopped after {{seconds}} seconds."
+  },
+  "timeout": {
+    "warningTitle": "Execution stopped by timeout",
+    "warningText": "The program ran too long or is waiting for input. Check loops, Scanner calls, and the timeout."
+  }
+}

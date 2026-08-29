@@ -3,6 +3,8 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
+deployment/start.sh text eol=lf
+
 *.png binary
 *.jpg binary
 *.jpeg binary

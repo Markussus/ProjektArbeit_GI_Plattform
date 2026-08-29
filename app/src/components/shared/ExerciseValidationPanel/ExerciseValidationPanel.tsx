@@ -139,7 +139,7 @@ export function ExerciseValidationPanel({
         <div className="bg-muted/30 border-border/50 border-b p-4">
           <h3 className="text-foreground flex items-center gap-2 font-semibold">
             <KeyRound className="text-primary h-5 w-5" />
-            {t("simulator.validation.title", "Check result")}
+            {t("common.exerciseValidation.title", "Check result")}
           </h3>
         </div>
 
@@ -147,7 +147,7 @@ export function ExerciseValidationPanel({
           <div>
             <label className="text-muted-foreground mb-2 block text-sm font-medium">
               {t(
-                "simulator.validation.enterSolution",
+                "common.exerciseValidation.enterSolution",
                 "Enter your final result here...",
               )}
             </label>
@@ -175,7 +175,7 @@ export function ExerciseValidationPanel({
               <XCircle className="h-5 w-5 shrink-0" />
               <p>
                 {t(
-                  "simulator.validation.incorrect",
+                  "common.exerciseValidation.incorrect",
                   "The result is not correct. Please try again!",
                 )}
               </p>
@@ -187,7 +187,7 @@ export function ExerciseValidationPanel({
               <CheckCircle2 className="h-5 w-5 shrink-0" />
               <p>
                 {t(
-                  "simulator.validation.correct",
+                  "common.exerciseValidation.correct",
                   "Correct! The solution has been unlocked.",
                 )}
               </p>
@@ -201,7 +201,7 @@ export function ExerciseValidationPanel({
               data-testid={testIdPrefix ? `${testIdPrefix}-verify` : undefined}
               className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium disabled:pointer-events-none disabled:opacity-50"
             >
-              {t("simulator.validation.verify", "Check solution")}
+              {t("common.exerciseValidation.verify", "Check solution")}
             </button>
 
             <button
@@ -212,7 +212,7 @@ export function ExerciseValidationPanel({
               className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium sm:flex-none"
             >
               <Eye className="h-4 w-4" />
-              {t("simulator.validation.showSolution", "Show solution")}
+              {t("common.exerciseValidation.showSolution", "Show solution")}
             </button>
           </div>
 
@@ -227,7 +227,7 @@ export function ExerciseValidationPanel({
                 className="text-muted-foreground hover:text-destructive hover:border-destructive/30 flex w-full items-center justify-center gap-2 rounded-md border border-transparent px-4 py-2 text-sm font-medium"
               >
                 <LogOut className="h-4 w-4" />
-                {t("simulator.validation.exitExerciseButton")}
+                {t("common.exerciseValidation.exitExerciseButton")}
               </button>
             </div>
           )}
@@ -238,9 +238,9 @@ export function ExerciseValidationPanel({
       {onExitExercise && (
         <ConfirmDialog
           isOpen={showExitConfirm}
-          title={t("simulator.validation.exitExerciseTitle")}
-          description={t("simulator.validation.exitExerciseDesc")}
-          confirmLabel={t("simulator.validation.exitExerciseConfirm")}
+          title={t("common.exerciseValidation.exitExerciseTitle")}
+          description={t("common.exerciseValidation.exitExerciseDesc")}
+          confirmLabel={t("common.exerciseValidation.exitExerciseConfirm")}
           onConfirm={() => {
             setShowExitConfirm(false);
             onExitExercise();

@@ -7,8 +7,8 @@ import { SimulationTab } from "./components/SimulationTab";
 export function NumberSystemsPage() {
   return (
     <ModuleTopicPage
-      titleKey="number.title"
-      descriptionKey="number.description"
+      titleKey="number-systems.title"
+      descriptionKey="number-systems.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}

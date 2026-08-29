@@ -1,0 +1,169 @@
+{
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "close": "Close",
+  "trainingCenter": {
+    "resetCurrent": "Reset",
+    "resetAllExercises": "Reset all exercises",
+    "confirmResetAllExercises": "Delete all saved exercise progress?",
+    "resetAllProgressTitle": "Reset saved progress",
+    "resetAllProgressDescription": "Delete all saved simulator and exercise progress from every topic on this device.",
+    "resetAllProgress": "Reset all saved progress",
+    "confirmResetAllProgress": "Delete all saved progress?"
+  },
+  "app": {
+    "title": "THWS - Traing Center"
+  },
+  "nav": {
+    "home": "TRAINING CENTER"
+  },
+  "sidebar": {
+    "toggle": "Toggle sidebar",
+    "info": "Information"
+  },
+  "footer": {
+    "copyright": "© 2026 THWS",
+    "legal": "Third-party notices"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "language": {
+    "select": "Select language",
+    "de": "German",
+    "en": "English"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "exercises": "Exercises",
+    "examples": "Examples",
+    "simulation": "Simulation"
+  },
+  "home": {
+    "heroTitle1": "Master Complex Systems",
+    "heroTitle2": "through Interactive Learning.",
+    "heroDescription": "Access the university's official training modules for Fundamentals of Computer Science.",
+    "selectModule": "SELECT A MODULE",
+    "exploreModules": "Explore Available Modules"
+  },
+  "legal": {
+    "label": "Legal",
+    "title": "Third-party notices",
+    "description": "Licensing and source information for bundled compiler components and related dependencies.",
+    "summary": "This application includes a browser-based Java compiler built from teavm-javac. The compiler module includes OpenJDK javac, licensed under GNU GPLv2 with the Classpath Exception, and TeaVM components licensed under Apache License 2.0. No OpenJDK source files were modified. Exact source and build information is available in the project’s third-party notices."
+  },
+  "exercise": {
+    "label": "Exercise {{index}}",
+    "difficulty": "Difficulty",
+    "currentExercises": "Current Exercises",
+    "openInSimulation": "Open in simulation"
+  },
+  "example": {
+    "label": "Example {{index}}",
+    "currentExamples": "Current Examples",
+    "openInSimulation": "Open in simulation"
+  },
+  "difficulty": {
+    "easy": "EASY",
+    "medium": "MEDIUM",
+    "hard": "HARD"
+  },
+  "simulation": {
+    "selectedExercise": "Selected exercise",
+    "selectedExample": "Selected example",
+    "expand": "Expand simulation",
+    "exitFocus": "Exit simulation focus",
+    "close": "Close",
+    "transfer": {
+      "placeholder": "Paste a transfer string here or generate one via export",
+      "export": "Export",
+      "import": "Import",
+      "copied": "String copied to clipboard.",
+      "clipboardError": "Clipboard unavailable. The string can be copied manually.",
+      "exportPreviewLabel": "Export string (hidden after 5 seconds)",
+      "exportError": "String could not be generated.",
+      "importError": "String could not be loaded."
+    },
+    "emptyStates": {
+      "turing": "The Turing Machine simulator will be available here.",
+      "automata": "The Finite Automata simulator will be available here.",
+      "number": "The Number Systems converter will be available here.",
+      "moore": "The Moore & Mealy simulator will be available here.",
+      "dnf": "The DNF builder / truth table generator will be available here.",
+      "encoding": "The Encoding simulator will be available here.",
+      "regularLanguages": "The Regular Languages simulator will be available here.",
+      "java": "Select a Java exercise or Java example, or start directly with your own code in the editor."
+    },
+    "controls": {
+      "reset": "Reset",
+      "stepBack": "Step backward",
+      "pause": "Pause",
+      "play": "Play",
+      "step": "Step forward",
+      "speed": "Speed",
+      "stop": "Stop"
+    },
+    "table": {
+      "label": "Table view",
+      "empty": "Table is empty",
+      "addRow": "Add new row",
+      "addColumn": "Add column",
+      "removeColumn": "Remove column",
+      "removeRow": "Remove row",
+      "columnActions": "Column actions",
+      "rowActions": "Row actions",
+      "columnHeader": "Column {{index}}",
+      "editColumnHeader": "Edit column {{index}} header",
+      "editCell": "Edit cell in row {{row}}, column {{column}}",
+      "removeRowWithIndex": "Remove row {{index}}"
+    }
+  },
+  "exerciseValidation": {
+    "title": "Verify Result",
+    "enterSolution": "Enter your final result here...",
+    "verify": "Verify Solution",
+    "showSolution": "Show Solution (Skip)",
+    "correct": "Correct! The solution has been unlocked.",
+    "incorrect": "The result is incorrect. Please try again!",
+    "exitExerciseButton": "Exit Exercise Mode",
+    "exitExerciseTitle": "Exit Exercise Mode?",
+    "exitExerciseDesc": "Your progress on this exercise will be lost. Are you sure you want to leave the exercise mode?",
+    "exitExerciseConfirm": "Exit",
+    "exitTabTitle": "Switch Tab?",
+    "exitTabDesc": "You are currently in exercise mode. Switching tabs leaves the current exercise — your progress stays saved and can be cleared with \"Reset all exercises\" on the Exercises tab.",
+    "exitTabConfirm": "Switch Tab"
+  },
+  "modules": {
+    "label": "Module",
+    "topicsTitle": "Topics",
+    "fundamentalsCs": {
+      "title": "Fundamentals of Computer Science",
+      "description": "This module bundles the core foundations of Fundamentals of Computer Science. Select a topic to start learning."
+    },
+    "programming1": {
+      "title": "Programming 1",
+      "description": "This module introduces first programming fundamentals. Start with simple Java exercises and a built-in editor."
+    },
+    "moreComingSoon": "More coming soon",
+    "moreComingSoonDescription": "Additional learning modules will be added in future versions."
+  },
+  "notFound": {
+    "title": "404 – This page does not exist",
+    "description": "The requested URL does not exist, was deleted, or was moved to another location.",
+    "requestedUrl": "Requested URL",
+    "goHome": "Go to homepage",
+    "goBack": "Go back",
+    "hintLabel": "Possible reasons",
+    "reason1": "The address may have been entered incorrectly.",
+    "reason2": "The page may have been removed or renamed.",
+    "reason3": "The link may be outdated or no longer valid."
+  },
+  "info": {
+    "label": "Information",
+    "title": "Information & Legal",
+    "description": "Manage your local simulator progress and find legal notices and third-party licenses."
+  }
+}

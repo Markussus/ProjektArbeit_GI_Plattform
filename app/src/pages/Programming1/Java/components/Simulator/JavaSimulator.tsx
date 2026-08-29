@@ -197,7 +197,7 @@ const JavaSimulatorSession = forwardRef<
         if (!exerciseScenario) {
           return {
             rows: [],
-            error: t("java.validation.exampleCheckUnavailable"),
+            error: t("java-programming.validation.exampleCheckUnavailable"),
           };
         }
 
@@ -255,25 +255,25 @@ const JavaSimulatorSession = forwardRef<
       <div className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm">
         <label className="block space-y-2">
           <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.stdin.label")}
+            {t("java-programming.stdin.label")}
           </span>
           <textarea
             value={standardInput}
             onChange={(event) => setStandardInput(event.target.value)}
             data-testid="java-stdin-input"
-            placeholder={t("java.stdin.placeholder")}
+            placeholder={t("java-programming.stdin.placeholder")}
             className="border-input bg-background min-h-24 w-full rounded-md border px-3 py-2 font-mono text-sm"
           />
         </label>
         <p className="text-muted-foreground mt-2 text-xs">
-          {t("java.stdin.help")}
+          {t("java-programming.stdin.help")}
         </p>
       </div>
 
       <div className="bg-card text-card-foreground flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm">
         <div className="space-y-2">
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.compilerLabel")}
+            {t("java-programming.compilerLabel")}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <JavaCompilerStatusBadge
@@ -281,7 +281,9 @@ const JavaSimulatorSession = forwardRef<
               testId="java-compiler-status"
             />
             <p className="text-muted-foreground text-sm">
-              {t(`java.compilerStatusText.${snapshot.compilerStatus}`)}
+              {t(
+                `java-programming.compilerStatusText.${snapshot.compilerStatus}`,
+              )}
             </p>
           </div>
         </div>
@@ -294,11 +296,11 @@ const JavaSimulatorSession = forwardRef<
             className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
           >
             <ListChecks className="size-4" />
-            {t("java.commandOverview.button")}
+            {t("java-programming.commandOverview.button")}
           </button>
 
           <label className="flex items-center gap-3 text-sm font-medium">
-            <span>{t("java.timeoutLabel")}</span>
+            <span>{t("java-programming.timeoutLabel")}</span>
             <input
               type="number"
               min={1}
@@ -317,7 +319,7 @@ const JavaSimulatorSession = forwardRef<
               className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
             />
             <span className="text-muted-foreground">
-              {t("java.timeoutUnit")}
+              {t("java-programming.timeoutUnit")}
             </span>
           </label>
         </div>
@@ -336,10 +338,10 @@ const JavaSimulatorSession = forwardRef<
         canStop={canStop}
         runLabel={
           snapshot.compilerStatus !== "ready"
-            ? t("java.runWhileLoading")
-            : t("simulation.controls.play", "Run")
+            ? t("java-programming.runWhileLoading")
+            : t("common.simulation.controls.play", "Run")
         }
-        stopLabel={t("simulation.controls.stop", "Stop")}
+        stopLabel={t("common.simulation.controls.stop", "Stop")}
         runTestId="java-run-button"
         stopTestId="java-stop-button"
         phaseTestId="java-execution-phase"

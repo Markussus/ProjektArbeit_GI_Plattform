@@ -67,14 +67,14 @@ export function FASimulationView({
       {/* Top bar: title + edit button */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-bold text-(--fa-text-bright)">
-          {t("fa.sim.title", "Simulation")}
+          {t("finite-automata.sim.title", "Simulation")}
         </h2>
         <button
           type="button"
           className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
           onClick={onEditConfig}
         >
-          {t("fa.sim.edit", "Edit Configuration")}
+          {t("finite-automata.sim.edit", "Edit Configuration")}
         </button>
       </div>
 

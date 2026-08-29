@@ -16,13 +16,14 @@ export function FASimulationStatusCard({
   const { t } = useTranslation();
 
   const statusLabel = (() => {
-    if (error) return t("fa.sim.status.error", "Error");
-    if (!runtime.halted) return t("fa.sim.status.running", "Running");
+    if (error) return t("finite-automata.sim.status.error", "Error");
+    if (!runtime.halted)
+      return t("finite-automata.sim.status.running", "Running");
     if (runtime.haltReason?.type === "accepted")
-      return t("fa.sim.status.accepted", "Accepted ✓");
+      return t("finite-automata.sim.status.accepted", "Accepted ✓");
     if (runtime.haltReason?.type === "rejected")
-      return t("fa.sim.status.rejected", "Rejected ✗");
-    return t("fa.sim.status.halted", "Halted");
+      return t("finite-automata.sim.status.rejected", "Rejected ✗");
+    return t("finite-automata.sim.status.halted", "Halted");
   })();
 
   const statusColor = (() => {
@@ -38,7 +39,7 @@ export function FASimulationStatusCard({
       if (runtime.inputPosition < runtime.inputWord.length) {
         const symbol = runtime.inputWord[runtime.inputPosition];
         return t(
-          "fa.sim.explanation.reading",
+          "finite-automata.sim.explanation.reading",
           "Reading symbol '{{symbol}}' at position {{pos}}. Active states: {{states}}",
           {
             symbol,
@@ -47,11 +48,11 @@ export function FASimulationStatusCard({
           },
         );
       }
-      return t("fa.sim.explanation.processing", "Processing...");
+      return t("finite-automata.sim.explanation.processing", "Processing...");
     }
     if (runtime.haltReason?.type === "accepted") {
       return t(
-        "fa.sim.explanation.accepted",
+        "finite-automata.sim.explanation.accepted",
         "The word is accepted. Final states {{states}} include an accept state.",
         {
           states: runtime.activeStates.join(", "),
@@ -61,12 +62,12 @@ export function FASimulationStatusCard({
     if (runtime.haltReason?.type === "rejected") {
       if (runtime.activeStates.length === 0) {
         return t(
-          "fa.sim.explanation.rejectedDead",
+          "finite-automata.sim.explanation.rejectedDead",
           "The word is rejected. No reachable states (dead end).",
         );
       }
       return t(
-        "fa.sim.explanation.rejected",
+        "finite-automata.sim.explanation.rejected",
         "The word is rejected. Final states {{states}} do not include an accept state.",
         {
           states: runtime.activeStates.join(", "),
@@ -82,7 +83,7 @@ export function FASimulationStatusCard({
         {/* Status header */}
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
-            {t("fa.sim.status.label", "Status")}
+            {t("finite-automata.sim.status.label", "Status")}
           </span>
           <span
             className="text-sm font-bold"
@@ -102,7 +103,7 @@ export function FASimulationStatusCard({
         >
           <div className="flex justify-between">
             <span style={{ color: "var(--fa-text-dim)" }}>
-              {t("fa.sim.status.type", "Type")}
+              {t("finite-automata.sim.status.type", "Type")}
             </span>
             <span style={{ color: "var(--fa-text)", fontWeight: 600 }}>
               {program.type}
@@ -110,7 +111,7 @@ export function FASimulationStatusCard({
           </div>
           <div className="flex justify-between">
             <span style={{ color: "var(--fa-text-dim)" }}>
-              {t("fa.sim.status.step", "Step")}
+              {t("finite-automata.sim.status.step", "Step")}
             </span>
             <span style={{ color: "var(--fa-cyan)", fontWeight: 600 }}>
               {runtime.stepCount}
@@ -118,7 +119,7 @@ export function FASimulationStatusCard({
           </div>
           <div className="flex justify-between">
             <span style={{ color: "var(--fa-text-dim)" }}>
-              {t("fa.sim.status.activeStates", "Active States")}
+              {t("finite-automata.sim.status.activeStates", "Active States")}
             </span>
             <span
               className="font-mono"
@@ -131,7 +132,7 @@ export function FASimulationStatusCard({
           </div>
           <div className="flex justify-between">
             <span style={{ color: "var(--fa-text-dim)" }}>
-              {t("fa.sim.status.position", "Position")}
+              {t("finite-automata.sim.status.position", "Position")}
             </span>
             <span style={{ color: "var(--fa-text)", fontWeight: 600 }}>
               {runtime.inputPosition} / {runtime.inputWord.length}

@@ -1,0 +1,167 @@
+{
+  "exercises": {
+    "loadSolution": "Load solution",
+    "checkSolution": "Check solution",
+    "checkingSolution": "Checking...",
+    "checkResultTitle": "Check result",
+    "checkCorrect": "All test runs produce the expected output sequences.",
+    "checkIncorrect": "{{passed}} of {{total}} test runs produce the expected output sequence.",
+    "validation": {
+      "exampleCheckUnavailable": "Solution checking is unavailable for this scenario.",
+      "passed": "Passed",
+      "input": "Input",
+      "output": "Output",
+      "expectedOutput": "Expected output",
+      "pass": "Pass",
+      "fail": "Fail",
+      "emptyInput": "Empty input (ε)"
+    },
+    "turnstile": {
+      "title": "Turnstile control",
+      "description": "Model a turnstile as a Moore machine with states LOCKED and UNLOCKED. COIN unlocks a locked turnstile and leaves an unlocked one unchanged. PASS locks an unlocked turnstile and has no effect while locked. Outputs are 0/LOCKED and 1/FREE. Complete the transition and output tables, binary encodings, encoded tables, and state diagram."
+    },
+    "elevator": {
+      "title": "Elevator control",
+      "description": "Model a two-floor elevator with states EG_CLOSED, EG_OPEN, OG_CLOSED, and OG_OPEN. OPEN and CLOSE control the door. GO_OG and GO_EG move the elevator only while the door is closed; movement commands have no effect while it is open. Complete the Moore transition table and state diagram."
+    },
+    "barrier": {
+      "title": "Parking garage barrier",
+      "description": "Model a parking garage barrier with an always-open guest mode and a card-controlled mode. In card mode, VALID_CARD opens the barrier and PASS closes it after the induction loop detects the vehicle. Rework the behavior as a Moore machine and define suitable state-dependent output actions."
+    },
+    "vending": {
+      "title": "Vending machine",
+      "description": "Model a vending machine accepting 50-cent and 1-euro coins for drinks costing 1.00 and 1.50 euros. START has no effect below 1 euro, extra coins at 1.50 euros are returned, and CANCEL returns the full credit. Determine events and actions, handle every event in every state, mark the initial state, and express the behavior as a Moore machine."
+    },
+    "wiper": {
+      "title": "Windshield wiper control",
+      "description": "Develop a Moore control system for windshield wipers with off, single-wipe, continuous, and rain-sensor modes. Driver controls and the rain signal are events. Define state-dependent motor outputs for stopping, wiping once, and continuous wiping, then complete the state diagram."
+    },
+    "alarm": {
+      "title": "Alarm system",
+      "description": "Model an alarm system with OFF, ARMED, and ALARM states. ON arms the system, the door sensor triggers a continuous alarm only while armed, and OFF switches the system off and stops an active alarm. Define the initial state, complete all transitions, and add suitable Moore outputs."
+    },
+    "cruise": {
+      "title": "Cruise control",
+      "description": "Model simplified cruise control with OFF, READY, and ACTIVE states. ON_OFF controls power, SET activates regulation, braking or accelerating deactivates it, RESET resumes the stored speed, CANCEL deactivates it, and PLUS/MINUS adjust the speed while active. Abstract from the concrete speed value and define suitable Moore outputs."
+    }
+  },
+  "examples": {
+    "mooreDefault": "moore.examples.mooreDefault",
+    "mealyDefault": "moore.examples.mealyDefault",
+    "mooreTitle": "Moore example machine",
+    "mooreDescription": "A Moore machine with four states and two input symbols.",
+    "mealyTitle": "Mealy example machine",
+    "mealyDescription": "A Mealy machine with two states and transition-dependent outputs."
+  },
+  "title": "Moore & Mealy Machines",
+  "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",
+  "tutorialVideo": "Tutorial video",
+  "sim": {
+    "machineType": "Machine type",
+    "mooreTab": "Moore machine",
+    "mealyTab": "Mealy machine",
+    "configureTitle": "Define Moore machine",
+    "configureHelp": "States and input symbols are internally numbered by their order from left to right and top to bottom.",
+    "transitionTable": "Transition function δ",
+    "transitionTableHelp": "Choose exactly one successor state for every event and state combination.",
+    "event": "Event",
+    "state": "State",
+    "output": "Output",
+    "internalValue": "Internal representation",
+    "representation": "Internal representation",
+    "decimal": "Decimal",
+    "binary": "Binary",
+    "startState": "Start state S₀",
+    "states": "Set of states S",
+    "outputAlphabet": "Output alphabet Ω",
+    "inputWord": "Input",
+    "outputWord": "Output",
+    "inputDropPlaceholder": "Drop symbols from the input alphabet here",
+    "inputAlphabetHelp": "Input alphabet Σ: click symbols or drag and drop them into the input.",
+    "noSymbols": "No symbols",
+    "emptyWord": "Empty word (ε)",
+    "addState": "Add state",
+    "removeState": "Remove state {{state}}",
+    "renameState": "Rename state {{state}}",
+    "addInput": "Add input symbol",
+    "removeInput": "Remove input symbol {{symbol}}",
+    "renameInput": "Rename input symbol {{symbol}}",
+    "transitionForStateInput": "Transition for state {{state}} and input {{input}}",
+    "search": "Search...",
+    "createState": "Create new state",
+    "createNamedState": "+ Create \"{{value}}\"",
+    "stateNotFound": "No state found",
+    "outputLambda": "Output λ",
+    "createOutput": "Create new output symbol",
+    "createNamedOutput": "+ Create \"{{symbol}}\"",
+    "outputNotFound": "No output symbol found",
+    "outputForState": "Output for state {{state}}",
+    "outputCodeForState": "Internal output code for state {{state}}",
+    "symbolOutput": "Output (symbol)",
+    "internalOutputCode": "Internal number representation",
+    "removeWordSymbol": "Remove symbol {{symbol}} at position {{index}}",
+    "startSimulation": "Start simulation",
+    "simulationTitle": "Moore simulation",
+    "currentState": "Current state",
+    "progress": "Processed symbols",
+    "status": "Status",
+    "ready": "Ready",
+    "finished": "Finished",
+    "error": "Error",
+    "diagram": "State transition graph of the Moore machine",
+    "validation": {
+      "states_invalid": "At least one state is required.",
+      "input_symbols_invalid": "There are too many input symbols.",
+      "state_names_invalid": "State names must be unique and non-empty.",
+      "input_symbol_names_invalid": "Input symbols must be unique and non-empty.",
+      "initial_state_invalid": "The start state is invalid.",
+      "outputs_invalid": "Every state needs an output symbol and one unique, non-negative code per output symbol.",
+      "transitions_invalid": "Every table cell needs a valid successor state.",
+      "input_word_invalid": "The input contains a symbol outside the input alphabet."
+    }
+  },
+  "mealy": {
+    "configureTitle": "Define Mealy machine",
+    "simulationTitle": "Mealy simulation",
+    "diagram": "State transition graph of the Mealy machine"
+  },
+  "graph": {
+    "start": "Start",
+    "showAsList": "Show transition symbols as a vertical list",
+    "showWrapped": "Show transition symbols comma-separated",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "resetView": "Reset view",
+    "resetZoom": "Reset zoom to 100%"
+  },
+  "navigation": {
+    "editDefinition": "Edit definition",
+    "showSimulator": "Show simulator",
+    "showConversion": "Show transfer functions",
+    "showLogic": "Show logic gates"
+  },
+  "conversion": {
+    "open": "Convert to transition functions",
+    "title": "Transition functions",
+    "transitionTab": "Transition table",
+    "outputTab": "Output table",
+    "currentState": "Current state",
+    "event": "Event",
+    "nextState": "Next state",
+    "state": "State",
+    "output": "Output",
+    "canonicalDnf": "Canonical DNF",
+    "minimalDnf": "Minimized Boolean function",
+    "minimizationLimit": "The canonical DNF is shown. Automatic minimization is limited to 8 state and input bits in total."
+  },
+  "logic": {
+    "open": "Convert to logic gates",
+    "title": "Logic gates",
+    "minimalFunctions": "Minimized functions",
+    "formulaMode": "Formula representation",
+    "diagram": "Logic gate diagram for {{output}}",
+    "binaryGates": "Use only two-input gates",
+    "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",
+    "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT. Falstad export: TODO."
+  }
+}

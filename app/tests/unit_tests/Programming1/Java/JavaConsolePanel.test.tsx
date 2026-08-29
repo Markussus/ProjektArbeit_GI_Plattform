@@ -6,13 +6,13 @@ import { JavaConsolePanel } from "../../../../src/pages/Programming1/Java/compon
 import { createJavaExecutionSnapshot } from "../../../../src/pages/Programming1/Java/components/Simulator/domain/javaExecution";
 
 const translations: Record<string, string> = {
-  "java.console.title": "Konsole",
-  "java.console.stdout": "Standardausgabe",
-  "java.console.stdoutEmpty": "Die Programmausgabe erscheint hier.",
-  "java.console.stderr": "Fehlerausgabe",
-  "java.console.stderrEmpty": "Laufzeitfehler erscheinen hier.",
-  "java.console.issues": "Diagnosen",
-  "java.console.noIssues": "Keine Diagnosen gemeldet.",
+  "java-programming.console.title": "Konsole",
+  "java-programming.console.stdout": "Standardausgabe",
+  "java-programming.console.stdoutEmpty": "Die Programmausgabe erscheint hier.",
+  "java-programming.console.stderr": "Fehlerausgabe",
+  "java-programming.console.stderrEmpty": "Laufzeitfehler erscheinen hier.",
+  "java-programming.console.issues": "Diagnosen",
+  "java-programming.console.noIssues": "Keine Diagnosen gemeldet.",
 };
 
 vi.mock("react-i18next", () => ({
@@ -21,7 +21,7 @@ vi.mock("react-i18next", () => ({
       key: string,
       options?: { line?: number | string; column?: number | string },
     ) => {
-      if (key === "java.console.issueLocation") {
+      if (key === "java-programming.console.issueLocation") {
         return `Zeile ${options?.line}, Spalte ${options?.column}`;
       }
 

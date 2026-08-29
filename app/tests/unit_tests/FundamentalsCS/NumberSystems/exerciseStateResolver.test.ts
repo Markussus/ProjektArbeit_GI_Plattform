@@ -20,7 +20,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("returns fixed example values without mutation", () => {
-    const config = exerciseStateConfig["number.example_u03_1"];
+    const config = exerciseStateConfig["number-systems.example_u03_1"];
     const init = resolveRandomInit(config);
 
     expect(init).toEqual({
@@ -32,7 +32,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates a decimal value for ex_u03_decToBin", () => {
-    const config = exerciseStateConfig["number.ex_u03_decToBin"];
+    const config = exerciseStateConfig["number-systems.ex_u03_decToBin"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("integers");
@@ -45,7 +45,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates binary operands for ex_u03_binAdd", () => {
-    const config = exerciseStateConfig["number.ex_u03_binAdd"];
+    const config = exerciseStateConfig["number-systems.ex_u03_binAdd"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("arithmetic");
@@ -55,7 +55,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates a random binary target base for ex_u04_binToHexOct", () => {
-    const config = exerciseStateConfig["number.ex_u04_binToHexOct"];
+    const config = exerciseStateConfig["number-systems.ex_u04_binToHexOct"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("integers");
@@ -65,7 +65,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates an octal value for ex_u04_octToHex", () => {
-    const config = exerciseStateConfig["number.ex_u04_octToHex"];
+    const config = exerciseStateConfig["number-systems.ex_u04_octToHex"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("integers");
@@ -75,7 +75,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates a hex value for ex_u04_hexToBin", () => {
-    const config = exerciseStateConfig["number.ex_u04_hexToBin"];
+    const config = exerciseStateConfig["number-systems.ex_u04_hexToBin"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("integers");
@@ -85,7 +85,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates a fractional value for ex_u05_floatToBin", () => {
-    const config = exerciseStateConfig["number.ex_u05_floatToBin"];
+    const config = exerciseStateConfig["number-systems.ex_u05_floatToBin"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("fractional");
@@ -94,7 +94,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates an IEEE encode value for ex_u05_ieeeEncode", () => {
-    const config = exerciseStateConfig["number.ex_u05_ieeeEncode"];
+    const config = exerciseStateConfig["number-systems.ex_u05_ieeeEncode"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("ieee754");
@@ -104,7 +104,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates a 32-bit IEEE binary value for ex_u05_ieeeDecode", () => {
-    const config = exerciseStateConfig["number.ex_u05_ieeeDecode"];
+    const config = exerciseStateConfig["number-systems.ex_u05_ieeeDecode"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("ieee754");
@@ -113,7 +113,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates arithmetic operands for ex_u06_addSub", () => {
-    const config = exerciseStateConfig["number.ex_u06_addSub"];
+    const config = exerciseStateConfig["number-systems.ex_u06_addSub"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("arithmetic");
@@ -123,7 +123,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("generates multiplication operands for ex_u06_mult", () => {
-    const config = exerciseStateConfig["number.ex_u06_mult"];
+    const config = exerciseStateConfig["number-systems.ex_u06_mult"];
     const init = resolveRandomInit(config);
 
     expect(init.mode).toBe("arithmetic");
@@ -133,7 +133,7 @@ describe("exerciseStateResolver", () => {
   });
 
   it("does not return random flags in resolved init", () => {
-    const config = exerciseStateConfig["number.ex_u03_decToBin"];
+    const config = exerciseStateConfig["number-systems.ex_u03_decToBin"];
     const init = resolveRandomInit(config);
 
     expect(init).not.toHaveProperty("randomDecToBin");

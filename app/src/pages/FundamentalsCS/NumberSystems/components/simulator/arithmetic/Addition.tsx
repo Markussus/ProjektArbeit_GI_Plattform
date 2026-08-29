@@ -80,21 +80,21 @@ export function Addition({
 
         let explanation = "";
         if (bitA === 0 && bitB === 0 && cIn === 0) {
-          explanation = t("simulator.arithmetic.addition.step0");
+          explanation = t("number-systems.simulator.arithmetic.addition.step0");
         } else if (bitA === 1 && bitB === 0 && cIn === 0) {
-          explanation = t("simulator.arithmetic.addition.step1");
+          explanation = t("number-systems.simulator.arithmetic.addition.step1");
         } else if (bitA === 0 && bitB === 1 && cIn === 0) {
-          explanation = t("simulator.arithmetic.addition.step2");
+          explanation = t("number-systems.simulator.arithmetic.addition.step2");
         } else if (bitA === 0 && bitB === 0 && cIn === 1) {
-          explanation = t("simulator.arithmetic.addition.step3");
+          explanation = t("number-systems.simulator.arithmetic.addition.step3");
         } else if (bitA === 1 && bitB === 1 && cIn === 0) {
-          explanation = t("simulator.arithmetic.addition.step4");
+          explanation = t("number-systems.simulator.arithmetic.addition.step4");
         } else if (bitA === 1 && bitB === 0 && cIn === 1) {
-          explanation = t("simulator.arithmetic.addition.step5");
+          explanation = t("number-systems.simulator.arithmetic.addition.step5");
         } else if (bitA === 0 && bitB === 1 && cIn === 1) {
-          explanation = t("simulator.arithmetic.addition.step6");
+          explanation = t("number-systems.simulator.arithmetic.addition.step6");
         } else if (bitA === 1 && bitB === 1 && cIn === 1) {
-          explanation = t("simulator.arithmetic.addition.step7");
+          explanation = t("number-systems.simulator.arithmetic.addition.step7");
         }
 
         steps.unshift({
@@ -129,22 +129,22 @@ export function Addition({
         <>
           <div>
             <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("simulator.arithmetic.common.operands8bit")}
+              {t("number-systems.simulator.arithmetic.common.operands8bit")}
             </h3>
             <p className="text-muted-foreground mb-4 text-sm">
-              {t("simulator.arithmetic.addition.desc")}
+              {t("number-systems.simulator.arithmetic.addition.desc")}
             </p>
           </div>
           <div className="space-y-4">
             {renderModeSelector}
             <BinaryInput
-              label={t("simulator.arithmetic.common.operandA")}
+              label={t("number-systems.simulator.arithmetic.common.operandA")}
               value={valA}
               onChange={handleInputA}
               locked={locked}
             />
             <BinaryInput
-              label={t("simulator.arithmetic.common.operandB")}
+              label={t("number-systems.simulator.arithmetic.common.operandB")}
               value={valB}
               onChange={handleInputB}
               locked={locked}
@@ -165,7 +165,9 @@ export function Addition({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.arithmetic.common.stepsResult")}
+              title={t(
+                "number-systems.simulator.arithmetic.common.stepsResult",
+              )}
             />
 
             <StepByStepToggle
@@ -176,7 +178,9 @@ export function Addition({
             {showStepByStep && (
               <div className="space-y-3">
                 <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                  {t("simulator.arithmetic.addition.stepByStepTitle")}
+                  {t(
+                    "number-systems.simulator.arithmetic.addition.stepByStepTitle",
+                  )}
                 </div>
 
                 {/* Bit Position Legend */}
@@ -186,32 +190,50 @@ export function Addition({
                       <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">
                         A
                       </span>
-                      <span>{t("simulator.arithmetic.addition.legendA")}</span>
+                      <span>
+                        {t(
+                          "number-systems.simulator.arithmetic.addition.legendA",
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10">
                         B
                       </span>
-                      <span>{t("simulator.arithmetic.addition.legendB")}</span>
+                      <span>
+                        {t(
+                          "number-systems.simulator.arithmetic.addition.legendB",
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="flex h-6 w-6 items-center justify-center rounded bg-yellow-500/10">
                         C
                       </span>
-                      <span>{t("simulator.arithmetic.addition.legendC")}</span>
+                      <span>
+                        {t(
+                          "number-systems.simulator.arithmetic.addition.legendC",
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded">
                         S
                       </span>
-                      <span>{t("simulator.arithmetic.addition.legendS")}</span>
+                      <span>
+                        {t(
+                          "number-systems.simulator.arithmetic.addition.legendS",
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="bg-destructive/10 text-destructive flex h-6 w-6 items-center justify-center rounded">
                         →
                       </span>
                       <span>
-                        {t("simulator.arithmetic.addition.legendOut")}
+                        {t(
+                          "number-systems.simulator.arithmetic.addition.legendOut",
+                        )}
                       </span>
                     </div>
                   </div>
@@ -227,9 +249,12 @@ export function Addition({
                       header={
                         <>
                           <span className="text-muted-foreground text-xs font-bold">
-                            {t("simulator.arithmetic.addition.bitPos", {
-                              pos: step.position,
-                            })}
+                            {t(
+                              "number-systems.simulator.arithmetic.addition.bitPos",
+                              {
+                                pos: step.position,
+                              },
+                            )}
                           </span>
                           <div className="flex items-center gap-1 font-mono text-sm">
                             <span className="flex h-6 w-6 items-center justify-center rounded bg-blue-500/10">
@@ -270,7 +295,9 @@ export function Addition({
 
                 <div className="border-border/50 mt-4 border-t pt-4">
                   <p className="text-muted-foreground text-sm">
-                    {t("simulator.arithmetic.addition.finalResult")}
+                    {t(
+                      "number-systems.simulator.arithmetic.addition.finalResult",
+                    )}
                   </p>
                 </div>
               </div>
@@ -337,17 +364,25 @@ export function Addition({
               {carryOut && (
                 <WarningBanner
                   variant="destructive"
-                  title={t("simulator.arithmetic.subtraction.carryOutTitle")}
+                  title={t(
+                    "number-systems.simulator.arithmetic.subtraction.carryOutTitle",
+                  )}
                 >
-                  {t("simulator.arithmetic.addition.carryOutWarning")}
+                  {t(
+                    "number-systems.simulator.arithmetic.addition.carryOutWarning",
+                  )}
                 </WarningBanner>
               )}
               {overflow && (
                 <WarningBanner
                   variant="warning"
-                  title={t("simulator.arithmetic.addition.overflowTitle")}
+                  title={t(
+                    "number-systems.simulator.arithmetic.addition.overflowTitle",
+                  )}
                 >
-                  {t("simulator.arithmetic.addition.overflowWarning")}
+                  {t(
+                    "number-systems.simulator.arithmetic.addition.overflowWarning",
+                  )}
                 </WarningBanner>
               )}
             </div>

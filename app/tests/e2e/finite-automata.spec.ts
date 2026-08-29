@@ -6,7 +6,7 @@ test.describe("Finite Automata page", () => {
   test("page loads and shows the topic title", async ({ page }) => {
     await page.goto(FA_URL);
     await expect(page).toHaveURL(new RegExp("finite-automata"));
-    // The page title is rendered via t("automata.title") — check a key element exists
+    // The page title is rendered via t("finite-automata.topic.title") — check a key element exists
     await expect(page.locator("body")).toBeVisible();
   });
 
@@ -20,18 +20,8 @@ test.describe("Finite Automata page", () => {
     ).toBeVisible();
   });
 
-  test("shows overview text and demo-video tutorial section", async ({
-    page,
-  }) => {
+  test("shows only the tutorial video", async ({ page }) => {
     await page.goto(FA_URL);
-    await expect(page.getByTestId("automata-tutorial-questions")).toBeVisible();
-    await expect(
-      page.getByTestId("automata-tutorial-question-1-select"),
-    ).toBeVisible();
-    await page.getByTestId("automata-tutorial-question-1-select").click();
-    await expect(
-      page.getByTestId("automata-tutorial-question-1-description"),
-    ).toBeVisible();
     await expect(page.getByTestId("automata-tutorial-video")).toBeVisible();
   });
 });

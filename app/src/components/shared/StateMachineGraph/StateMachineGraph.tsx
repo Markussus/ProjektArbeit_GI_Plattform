@@ -260,7 +260,7 @@ export function StateMachineGraph({
                     textAnchor="end"
                     className="fill-muted-foreground text-[11px]"
                   >
-                    {t("moore.graph.start")}
+                    {t("moore-mealy.graph.start")}
                   </text>
                 </>
               )}
@@ -319,8 +319,8 @@ export function StateMachineGraph({
         <GraphButton
           label={
             labelLayout === "wrapped"
-              ? t("moore.graph.showAsList")
-              : t("moore.graph.showWrapped")
+              ? t("moore-mealy.graph.showAsList")
+              : t("moore-mealy.graph.showWrapped")
           }
           testId={testId ? `${testId}-label-layout-toggle` : undefined}
           onClick={() =>
@@ -336,21 +336,21 @@ export function StateMachineGraph({
           )}
         </GraphButton>
         <GraphButton
-          label={t("moore.graph.zoomOut")}
+          label={t("moore-mealy.graph.zoomOut")}
           testId={testId ? `${testId}-zoom-out` : undefined}
           onClick={zoomOut}
         >
           <Minus className="size-4" />
         </GraphButton>
         <GraphButton
-          label={t("moore.graph.resetView")}
+          label={t("moore-mealy.graph.resetView")}
           testId={testId ? `${testId}-reset-view` : undefined}
           onClick={resetGraph}
         >
           <RotateCcw className="size-4" />
         </GraphButton>
         <GraphButton
-          label={t("moore.graph.zoomIn")}
+          label={t("moore-mealy.graph.zoomIn")}
           testId={testId ? `${testId}-zoom-in` : undefined}
           onClick={zoomIn}
         >
@@ -360,7 +360,7 @@ export function StateMachineGraph({
       <button
         type="button"
         onClick={resetGraph}
-        aria-label={t("moore.graph.resetZoom")}
+        aria-label={t("moore-mealy.graph.resetZoom")}
         data-testid={testId ? `${testId}-zoom-percent-reset` : undefined}
         className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
       >

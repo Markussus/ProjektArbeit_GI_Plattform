@@ -19,19 +19,19 @@ const MODES: ModeMeta[] = [
   {
     id: "grammarToLanguage",
     icon: ListOrdered,
-    labelKey: "rl.simulator.modes.grammarToLanguage",
+    labelKey: "regular-languages.simulator.modes.grammarToLanguage",
     fallback: "Grammar → Language",
   },
   {
     id: "languageToGrammar",
     icon: FileText,
-    labelKey: "rl.simulator.modes.languageToGrammar",
+    labelKey: "regular-languages.simulator.modes.languageToGrammar",
     fallback: "Language → Grammar",
   },
   {
     id: "recognizeWord",
     icon: Eye,
-    labelKey: "rl.simulator.modes.recognizeWord",
+    labelKey: "regular-languages.simulator.modes.recognizeWord",
     fallback: "Recognize Word",
   },
 ];

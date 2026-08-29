@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { FileText, Gavel, HelpCircle, Menu } from "lucide-react";
+import { HelpCircle, Menu } from "lucide-react";
 import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalog";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +47,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           onClick={onToggle}
           data-testid="sidebar-toggle"
           className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
-          aria-label={t("sidebar.toggle")}
+          aria-label={t("common.sidebar.toggle")}
         >
           <div className="flex size-5 items-center justify-center">
             <Menu className="size-4" />
@@ -107,24 +107,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       <div className="border-border space-y-1 border-t px-2 py-3">
         <Link
-          to="/documentation"
-          data-testid="sidebar-documentation-link"
-          className={cn(
-            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
-            collapsed ? "justify-center" : "gap-3",
-          )}
-        >
-          <div className="flex size-5 shrink-0 items-center justify-center">
-            <FileText className="size-4" />
-          </div>
-          {!collapsed && (
-            <span className="leading-none">{t("sidebar.documentation")}</span>
-          )}
-        </Link>
-
-        <Link
-          to="/help"
-          data-testid="sidebar-help-link"
+          to="/info"
+          data-testid="sidebar-info-link"
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
             collapsed ? "justify-center" : "gap-3",
@@ -134,23 +118,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <HelpCircle className="size-4" />
           </div>
           {!collapsed && (
-            <span className="leading-none">{t("sidebar.support")}</span>
-          )}
-        </Link>
-
-        <Link
-          to="/legal"
-          data-testid="sidebar-legal-link"
-          className={cn(
-            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
-            collapsed ? "justify-center" : "gap-3",
-          )}
-        >
-          <div className="flex size-5 shrink-0 items-center justify-center">
-            <Gavel className="size-4" />
-          </div>
-          {!collapsed && (
-            <span className="leading-none">{t("sidebar.legal")}</span>
+            <span className="leading-none">{t("common.sidebar.info")}</span>
           )}
         </Link>
       </div>

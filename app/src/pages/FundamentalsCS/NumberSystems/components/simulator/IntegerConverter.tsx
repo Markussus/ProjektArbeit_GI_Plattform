@@ -125,10 +125,10 @@ export function IntegerConverter({
   const baseToNumber = (base: BaseType) =>
     base === "dec" ? 10 : base === "bin" ? 2 : base === "oct" ? 8 : 16;
   const baseLabel = (base: BaseType) => {
-    if (base === "dec") return t("simulator.numbers.decimal");
-    if (base === "bin") return t("simulator.numbers.binary");
-    if (base === "oct") return t("simulator.numbers.octal");
-    if (base === "hex") return t("simulator.numbers.hex");
+    if (base === "dec") return t("number-systems.simulator.numbers.decimal");
+    if (base === "bin") return t("number-systems.simulator.numbers.binary");
+    if (base === "oct") return t("number-systems.simulator.numbers.octal");
+    if (base === "hex") return t("number-systems.simulator.numbers.hex");
     return "";
   };
 
@@ -191,13 +191,13 @@ export function IntegerConverter({
       <div className="space-y-3">
         <p className="text-foreground text-sm font-medium">
           {isBin
-            ? t("simulator.numbers.binToDec")
-            : `${baseLabel(sourceBase)} ${t("simulator.numbers.toDec")}`}
+            ? t("number-systems.simulator.numbers.binToDec")
+            : `${baseLabel(sourceBase)} ${t("number-systems.simulator.numbers.toDec")}`}
         </p>
         <p className="text-muted-foreground mb-2 text-xs">
           {isBin
-            ? t("simulator.numbers.binToDecDesc")
-            : t("simulator.numbers.otherToDecDesc", {
+            ? t("number-systems.simulator.numbers.binToDecDesc")
+            : t("number-systems.simulator.numbers.otherToDecDesc", {
                 base: baseToNumber(sourceBase),
               })}
         </p>
@@ -259,15 +259,15 @@ export function IntegerConverter({
       <div className="space-y-3">
         <p className="text-foreground text-sm font-medium">
           {targetBase === "bin"
-            ? t("simulator.numbers.decToBin")
-            : t("simulator.numbers.decToTarget", {
+            ? t("number-systems.simulator.numbers.decToBin")
+            : t("number-systems.simulator.numbers.decToTarget", {
                 target: String(baseLabel(targetBase)),
               })}
         </p>
         <p className="text-muted-foreground mb-2 text-xs">
           {targetBase === "bin"
-            ? t("simulator.numbers.decToBinDesc")
-            : t("simulator.numbers.divByBaseDesc", {
+            ? t("number-systems.simulator.numbers.decToBinDesc")
+            : t("number-systems.simulator.numbers.divByBaseDesc", {
                 base: Number(baseToNumber(targetBase)),
               })}
         </p>
@@ -282,7 +282,7 @@ export function IntegerConverter({
                 {step.value / BigInt(step.base)}
               </div>
               <div className="text-muted-foreground w-21.25 text-right whitespace-nowrap">
-                {t("simulator.numbers.remainder")}
+                {t("number-systems.simulator.numbers.remainder")}
               </div>
               <div className="text-primary w-5 text-right font-bold">
                 {targetBase === "hex" && step.remainder > 9n
@@ -294,7 +294,7 @@ export function IntegerConverter({
         </div>
         <div className="mt-4 flex justify-end text-sm font-semibold">
           <span className="bg-primary/10 text-primary flex items-center gap-2 rounded-md px-3 py-1">
-            {t("simulator.numbers.result")}{" "}
+            {t("number-systems.simulator.numbers.result")}{" "}
             <span className="tracking-widest">{targetValue}</span>
           </span>
         </div>
@@ -308,24 +308,36 @@ export function IntegerConverter({
         {/* Converter Inputs */}
         <div className="bg-card border-border/50 rounded-xl border p-6 shadow-sm">
           <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
-            {t("simulator.numbers.converter")}
+            {t("number-systems.simulator.numbers.converter")}
           </h3>
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                  {t("simulator.numbers.fromBase")}
+                  {t("number-systems.simulator.numbers.fromBase")}
                 </label>
                 <DropdownSelect
                   value={sourceBase}
                   options={[
-                    { value: "dec", label: t("simulator.numbers.decimal") },
-                    { value: "bin", label: t("simulator.numbers.binary") },
-                    { value: "oct", label: t("simulator.numbers.octal") },
-                    { value: "hex", label: t("simulator.numbers.hex") },
+                    {
+                      value: "dec",
+                      label: t("number-systems.simulator.numbers.decimal"),
+                    },
+                    {
+                      value: "bin",
+                      label: t("number-systems.simulator.numbers.binary"),
+                    },
+                    {
+                      value: "oct",
+                      label: t("number-systems.simulator.numbers.octal"),
+                    },
+                    {
+                      value: "hex",
+                      label: t("number-systems.simulator.numbers.hex"),
+                    },
                   ]}
                   onChange={handleSourceBaseChange}
-                  ariaLabel={t("simulator.numbers.fromBase")}
+                  ariaLabel={t("number-systems.simulator.numbers.fromBase")}
                   disabled={!!isExerciseMode && !showSolution}
                   triggerClassName="w-full px-3 py-2 text-sm font-normal"
                   menuClassName="w-full"
@@ -334,18 +346,30 @@ export function IntegerConverter({
               </div>
               <div>
                 <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                  {t("simulator.numbers.toBase")}
+                  {t("number-systems.simulator.numbers.toBase")}
                 </label>
                 <DropdownSelect
                   value={targetBase}
                   options={[
-                    { value: "dec", label: t("simulator.numbers.decimal") },
-                    { value: "bin", label: t("simulator.numbers.binary") },
-                    { value: "oct", label: t("simulator.numbers.octal") },
-                    { value: "hex", label: t("simulator.numbers.hex") },
+                    {
+                      value: "dec",
+                      label: t("number-systems.simulator.numbers.decimal"),
+                    },
+                    {
+                      value: "bin",
+                      label: t("number-systems.simulator.numbers.binary"),
+                    },
+                    {
+                      value: "oct",
+                      label: t("number-systems.simulator.numbers.octal"),
+                    },
+                    {
+                      value: "hex",
+                      label: t("number-systems.simulator.numbers.hex"),
+                    },
                   ]}
                   onChange={setTargetBase}
-                  ariaLabel={t("simulator.numbers.toBase")}
+                  ariaLabel={t("number-systems.simulator.numbers.toBase")}
                   disabled={!!isExerciseMode && !showSolution}
                   triggerClassName="w-full px-3 py-2 text-sm font-normal"
                   menuClassName="w-full"
@@ -356,7 +380,7 @@ export function IntegerConverter({
 
             <div className={locked ? "opacity-60" : ""}>
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                {t("simulator.numbers.valueLabel")}
+                {t("number-systems.simulator.numbers.valueLabel")}
               </label>
               <input
                 type="text"
@@ -378,7 +402,7 @@ export function IntegerConverter({
               />
               {inputValue !== "" && decValue === "" && (
                 <p className="text-destructive mt-1 text-xs">
-                  {t("simulator.numbers.invalidInputBase")}{" "}
+                  {t("number-systems.simulator.numbers.invalidInputBase")}{" "}
                   {baseToNumber(sourceBase)}.
                 </p>
               )}
@@ -386,7 +410,7 @@ export function IntegerConverter({
 
             <div className="border-border/40 border-t pt-4">
               <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-                {t("simulator.numbers.resultLabel")}
+                {t("number-systems.simulator.numbers.resultLabel")}
               </label>
               <div
                 data-testid="ns-converter-result"
@@ -425,23 +449,25 @@ export function IntegerConverter({
             <>
               <h3 className="text-foreground mb-4 flex items-center gap-2 text-lg font-semibold">
                 <Info className="text-primary h-5 w-5" />
-                {t("simulator.numbers.explanation")}
+                {t("number-systems.simulator.numbers.explanation")}
               </h3>
 
               {!decValue ? (
                 <p className="text-muted-foreground text-sm">
-                  {t("simulator.numbers.enterValue")}
+                  {t("number-systems.simulator.numbers.enterValue")}
                 </p>
               ) : sourceBase === targetBase ? (
                 <div className="text-muted-foreground flex flex-col items-center justify-center py-8">
                   <ArrowRight className="mb-2 h-8 w-8 opacity-20" />
-                  <p className="text-sm">{t("simulator.numbers.sameBase")}</p>
+                  <p className="text-sm">
+                    {t("number-systems.simulator.numbers.sameBase")}
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {showToDecSteps && showFromDecSteps && (
                     <div className="bg-popover/50 border-primary text-muted-foreground rounded-r-md border-l-4 p-3 text-sm">
-                      {t("simulator.numbers.nonDecConvHint")}
+                      {t("number-systems.simulator.numbers.nonDecConvHint")}
                     </div>
                   )}
 
@@ -449,7 +475,7 @@ export function IntegerConverter({
                     <div>
                       {showFromDecSteps && (
                         <h4 className="text-muted-foreground border-border/50 mb-3 border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                          {t("simulator.numbers.step1TempDec")}
+                          {t("number-systems.simulator.numbers.step1TempDec")}
                         </h4>
                       )}
                       {renderToDec()}
@@ -464,7 +490,9 @@ export function IntegerConverter({
                     <div>
                       {showToDecSteps && (
                         <h4 className="text-muted-foreground border-border/50 mb-3 border-b pb-2 text-xs font-bold tracking-wider uppercase">
-                          {t("simulator.numbers.step2TempTarget")}
+                          {t(
+                            "number-systems.simulator.numbers.step2TempTarget",
+                          )}
                         </h4>
                       )}
                       {renderFromDec()}

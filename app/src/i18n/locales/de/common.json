@@ -1,0 +1,169 @@
+{
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "close": "Schließen",
+  "trainingCenter": {
+    "resetCurrent": "Zurücksetzen",
+    "resetAllExercises": "Alle Übungen zurücksetzen",
+    "confirmResetAllExercises": "Alle gespeicherten Übungsstände löschen?",
+    "resetAllProgressTitle": "Gespeicherten Fortschritt zurücksetzen",
+    "resetAllProgressDescription": "Löscht alle gespeicherten Simulator- und Übungsstände aus allen Themen auf diesem Gerät.",
+    "resetAllProgress": "Alle Fortschritte zurücksetzen",
+    "confirmResetAllProgress": "Alle gespeicherten Fortschritte löschen?"
+  },
+  "app": {
+    "title": "THWS - Traingscenter"
+  },
+  "nav": {
+    "home": "TRAININGSCENTER"
+  },
+  "sidebar": {
+    "toggle": "Seitenleiste umschalten",
+    "info": "Informationen"
+  },
+  "footer": {
+    "copyright": "© 2026 THWS",
+    "legal": "Drittanbieter-Hinweise"
+  },
+  "theme": {
+    "light": "Heller Modus",
+    "dark": "Dunkler Modus",
+    "switchToLight": "Zu hellem Modus wechseln",
+    "switchToDark": "Zu dunklem Modus wechseln"
+  },
+  "language": {
+    "select": "Sprache auswählen",
+    "de": "Deutsch",
+    "en": "Englisch"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "exercises": "Übungen",
+    "examples": "Beispiele",
+    "simulation": "Simulation"
+  },
+  "home": {
+    "heroTitle1": "Komplexe Systeme meistern",
+    "heroTitle2": "durch interaktives Lernen.",
+    "heroDescription": "Zugang zu den Trainingsmodulen der Hochschule für Grundlagen der Informatik.",
+    "selectModule": "MODUL AUSWÄHLEN",
+    "exploreModules": "Verfügbare Module erkunden"
+  },
+  "legal": {
+    "label": "Rechtliches",
+    "title": "Drittanbieter-Hinweise",
+    "description": "Lizenz- und Quelleninformationen fuer eingebundene Compiler-Komponenten und zugehoerige Abhaengigkeiten.",
+    "summary": "Diese Anwendung enthaelt einen browserbasierten Java-Compiler, der aus teavm-javac gebaut wird. Das Compiler-Modul enthaelt OpenJDK javac unter GNU GPLv2 mit Classpath Exception sowie TeaVM-Komponenten unter Apache License 2.0. Es wurden keine OpenJDK-Quelldateien veraendert. Exakte Quellen- und Build-Informationen finden Sie in den Drittanbieter-Hinweisen des Projekts."
+  },
+  "exercise": {
+    "label": "Übung {{index}}",
+    "difficulty": "Schwierigkeit",
+    "currentExercises": "Aktuelle Übungen",
+    "openInSimulation": "In Simulation öffnen"
+  },
+  "example": {
+    "label": "Beispiel {{index}}",
+    "currentExamples": "Aktuelle Beispiele",
+    "openInSimulation": "In Simulation öffnen"
+  },
+  "difficulty": {
+    "easy": "LEICHT",
+    "medium": "MITTEL",
+    "hard": "SCHWER"
+  },
+  "simulation": {
+    "selectedExercise": "Ausgewählte Übung",
+    "selectedExample": "Ausgewähltes Beispiel",
+    "expand": "Simulation vergrößern",
+    "exitFocus": "Simulationsfokus verlassen",
+    "close": "Schließen",
+    "transfer": {
+      "placeholder": "Transfer-String hier einfügen oder per Export erzeugen",
+      "export": "Export",
+      "import": "Import",
+      "copied": "String in die Zwischenablage kopiert.",
+      "clipboardError": "Zwischenablage nicht verfügbar. Der String kann manuell kopiert werden.",
+      "exportPreviewLabel": "Export-String (wird nach 5 Sekunden ausgeblendet)",
+      "exportError": "String konnte nicht erzeugt werden.",
+      "importError": "String konnte nicht geladen werden."
+    },
+    "emptyStates": {
+      "turing": "Der Turingmaschinen-Simulator wird hier verfügbar sein.",
+      "automata": "Der Automatensimulator wird hier verfügbar sein.",
+      "number": "Der Zahlensystem-Konverter wird hier verfügbar sein.",
+      "moore": "Der Moore- und Mealy-Simulator wird hier verfügbar sein.",
+      "dnf": "Der DNF-Builder beziehungsweise Wahrheitstabellen-Generator wird hier verfügbar sein.",
+      "encoding": "Der Kodierungs-Simulator wird hier verfügbar sein.",
+      "regularLanguages": "Der Simulator für reguläre Sprachen wird hier verfügbar sein.",
+      "java": "Wählen Sie eine Java-Übung oder ein Java-Beispiel aus, oder starten Sie direkt mit eigenem Code im Editor."
+    },
+    "controls": {
+      "reset": "Zurücksetzen",
+      "stepBack": "Schritt zurück",
+      "pause": "Pause",
+      "play": "Abspielen",
+      "step": "Schritt vorwärts",
+      "speed": "Geschwindigkeit",
+      "stop": "Stopp"
+    },
+    "table": {
+      "label": "Tabellenansicht",
+      "empty": "Tabelle ist leer",
+      "addRow": "Neue Zeile hinzufügen",
+      "addColumn": "Spalte hinzufügen",
+      "removeColumn": "Spalte entfernen",
+      "removeRow": "Zeile entfernen",
+      "columnActions": "Spaltenaktionen",
+      "rowActions": "Zeilenaktionen",
+      "columnHeader": "Spalte {{index}}",
+      "editColumnHeader": "Kopfzeile von Spalte {{index}} bearbeiten",
+      "editCell": "Zelle in Zeile {{row}}, Spalte {{column}} bearbeiten",
+      "removeRowWithIndex": "Zeile {{index}} entfernen"
+    }
+  },
+  "exerciseValidation": {
+    "title": "Ergebnis überprüfen",
+    "enterSolution": "Geben Sie hier Ihr Endergebnis ein...",
+    "verify": "Lösung überprüfen",
+    "showSolution": "Lösung anzeigen (Überspringen)",
+    "correct": "Korrekt! Die Lösung wurde freigeschaltet.",
+    "incorrect": "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!",
+    "exitExerciseButton": "Übungsmodus verlassen",
+    "exitExerciseTitle": "Übungsmodus verlassen?",
+    "exitExerciseDesc": "Dein Fortschritt in dieser Übung geht verloren. Bist du sicher, dass du den Übungsmodus verlassen möchtest?",
+    "exitExerciseConfirm": "Verlassen",
+    "exitTabTitle": "Tab wechseln?",
+    "exitTabDesc": "Du bist gerade im Übungsmodus. Beim Wechseln des Tabs verlässt du die aktuelle Übung — dein Fortschritt bleibt gespeichert und kann über „Alle Übungen zurücksetzen“ im Übungen-Tab gelöscht werden.",
+    "exitTabConfirm": "Tab wechseln"
+  },
+  "modules": {
+    "label": "Modul",
+    "topicsTitle": "Themen",
+    "fundamentalsCs": {
+      "title": "Grundlagen der Informatik",
+      "description": "Dieses Modul bündelt die zentralen Grundlagen der Informatik. Wählen Sie ein Thema aus, um mit dem Training zu beginnen."
+    },
+    "programming1": {
+      "title": "Programmieren 1",
+      "description": "Dieses Modul fuehrt in die ersten Programmiergrundlagen ein. Starten Sie mit einfachen Java-Aufgaben und einem direkten Editor."
+    },
+    "moreComingSoon": "Mehr Module folgen bald",
+    "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."
+  },
+  "notFound": {
+    "title": "404 – Diese Seite gibt es nicht",
+    "description": "Die angeforderte URL existiert nicht, wurde gelöscht oder an eine andere Stelle verschoben.",
+    "requestedUrl": "Angeforderte URL",
+    "goHome": "Zur Startseite",
+    "goBack": "Zurück",
+    "hintLabel": "Mögliche Ursachen",
+    "reason1": "Die Adresse wurde falsch eingegeben.",
+    "reason2": "Die Seite wurde entfernt oder umbenannt.",
+    "reason3": "Der Link ist veraltet oder nicht mehr gültig."
+  },
+  "info": {
+    "label": "Informationen",
+    "title": "Informationen & Rechtliches",
+    "description": "Verwalte deine lokalen Simulator-Fortschritte und finde rechtliche Hinweise sowie Drittanbieter-Lizenzen."
+  }
+}

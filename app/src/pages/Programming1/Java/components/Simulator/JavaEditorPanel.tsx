@@ -133,7 +133,7 @@ export function JavaEditorPanel({
       <div className="pr-24">
         <div>
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.editorLabel")}
+            {t("java-programming.editorLabel")}
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">{fileName}</p>
         </div>
@@ -146,7 +146,7 @@ export function JavaEditorPanel({
         <Suspense
           fallback={
             <div className="bg-card text-muted-foreground flex h-[28rem] items-center justify-center p-4 text-sm">
-              {t("java.editorLoading")}
+              {t("java-programming.editorLoading")}
             </div>
           }
         >
@@ -178,8 +178,8 @@ export function JavaEditorPanel({
         >
           {t(
             limitReason === "lines"
-              ? "java.editorLimit.lines"
-              : "java.editorLimit.characters",
+              ? "java-programming.editorLimit.lines"
+              : "java-programming.editorLimit.characters",
             {
               maxLines: JAVA_EDITOR_MAX_LINES.toLocaleString(),
               maxCharacters: JAVA_EDITOR_MAX_CHARACTERS.toLocaleString(),

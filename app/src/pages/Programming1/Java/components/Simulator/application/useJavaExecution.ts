@@ -298,8 +298,8 @@ export function useJavaExecution(): JavaExecutionController {
       const seconds = Math.max(1, Math.round((timeoutMs ?? 0) / 1000));
       const stopMessage = `${t(
         reason === "timeout"
-          ? "java.execution.timeoutMessage"
-          : "java.execution.stoppedMessage",
+          ? "java-programming.execution.timeoutMessage"
+          : "java-programming.execution.stoppedMessage",
         { seconds },
       )}\n`;
       const issue: JavaExecutionIssue = {

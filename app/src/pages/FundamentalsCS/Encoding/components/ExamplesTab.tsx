@@ -61,7 +61,7 @@ export function ExamplesTab({
           >
             <h3 className="text-foreground border-border/50 flex items-center gap-2 border-b pb-2 font-semibold">
               <Icon className="text-primary h-5 w-5" />
-              {t(`simulator.encoding.group${group}`)}
+              {t(`encoding.simulator.group${group}`)}
             </h3>
             <div>
               {groupExamples.map((def, index) => {

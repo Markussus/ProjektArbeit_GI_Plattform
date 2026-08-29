@@ -76,7 +76,7 @@ export function TopicExercisesTab({
           <>
             <ClipboardList className="size-4" />
             <h3 className="text-sm font-bold">
-              {t("exercise.currentExercises")}
+              {t("common.exercise.currentExercises")}
             </h3>
           </>
         )}
