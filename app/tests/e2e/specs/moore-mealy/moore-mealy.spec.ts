@@ -40,6 +40,12 @@ async function openMealySimulator(page: Page) {
   await expect(page.getByTestId("mealy-config-view")).toBeVisible();
 }
 
+async function openExercise(page: Page, exerciseId: string) {
+  await page.getByTestId("tab-button-exercises").click();
+  await page.getByTestId(`moore-exercise-card-${exerciseId}-select`).click();
+  await page.getByTestId(`moore-exercise-card-${exerciseId}-open`).click();
+}
+
 test.describe("Moore and Mealy simulation tab", () => {
   test("edits Moore outputs in one state-based row and creates output symbols", async ({
     page,
@@ -319,11 +325,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     ];
 
     for (const exerciseId of exerciseIds) {
-      await page.getByTestId("tab-button-exercises").click();
-      await page
-        .getByTestId(`moore-exercise-card-${exerciseId}-select`)
-        .click();
-      await page.getByTestId(`moore-exercise-card-${exerciseId}-open`).click();
+      await openExercise(page, exerciseId);
       await expect(page.getByTestId("moore-config-view")).toBeVisible();
       await page.getByTestId("moore-load-solution").click();
       await expect(page.getByTestId("moore-config-error")).toHaveCount(0);
@@ -332,17 +334,7 @@ test.describe("Moore and Mealy simulation tab", () => {
 
   test("checks an exercise against its stored solution", async ({ page }) => {
     await preparePage(page);
-    await page.getByTestId("tab-button-exercises").click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
-      )
-      .click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-open",
-      )
-      .click();
+    await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await expect(
       page
         .getByTestId("moore-config-view")
@@ -394,17 +386,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     page,
   }) => {
     await preparePage(page);
-    await page.getByTestId("tab-button-exercises").click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
-      )
-      .click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-open",
-      )
-      .click();
+    await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await page.getByTestId("moore-load-solution").click();
     await expect(
       page
@@ -434,17 +416,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     page,
   }) => {
     await preparePage(page);
-    await page.getByTestId("tab-button-exercises").click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
-      )
-      .click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-open",
-      )
-      .click();
+    await openExercise(page, "moore-mealy.exercises.turnstile.title");
 
     const stateName = page
       .getByTestId("moore-config-view")
@@ -453,17 +425,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await stateName.press("Enter");
     await page.getByTestId("tab-button-overview").click();
 
-    await page.getByTestId("tab-button-exercises").click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
-      )
-      .click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-open",
-      )
-      .click();
+    await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
     ).toHaveValue("SAVED_STATE");
@@ -471,16 +433,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await page.getByTestId("tab-button-exercises").click();
     await page.getByTestId("moore-reset-all-exercises").click();
     await page.getByTestId("moore-reset-all-exercises-confirm").click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
-      )
-      .click();
-    await page
-      .getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-open",
-      )
-      .click();
+    await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
     ).toHaveValue("STATE_0");

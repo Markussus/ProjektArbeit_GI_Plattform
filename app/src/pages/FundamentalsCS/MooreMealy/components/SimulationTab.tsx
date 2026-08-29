@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
-import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import {
   MooreSimulator,
   type MooreSimulatorHandle,
@@ -16,7 +15,8 @@ import {
 import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
 import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
 import { getMooreExerciseScenario } from "../exercises";
-import type { MooreValidationResult } from "./Simulator/application/mooreSolutionChecker";
+import type { AutomataValidationResult } from "./Simulator/application/automataSolutionChecker";
+import { MooreSolutionCheckDialog } from "./MooreSolutionCheckDialog";
 
 export const MOORE_EXAMPLE_ID = "moore-mealy.examples.mooreDefault";
 export const MEALY_EXAMPLE_ID = "moore-mealy.examples.mealyDefault";
@@ -29,9 +29,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       ? "mealy"
       : "moore",
   );
-  const [checkResult, setCheckResult] = useState<MooreValidationResult | null>(
-    null,
-  );
+  const [checkResult, setCheckResult] =
+    useState<AutomataValidationResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [isMooreSimulatorReady, setIsMooreSimulatorReady] = useState(false);
   const mooreSimulatorRef = useRef<MooreSimulatorHandle | null>(null);
@@ -72,22 +71,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       setIsChecking(false);
     }
   };
-  const resultRows = checkResult
-    ? checkResult.rows.map((row) => [
-        row.passed
-          ? t("moore-mealy.exercises.validation.pass")
-          : t("moore-mealy.exercises.validation.fail"),
-        row.input.length
-          ? row.input.join(" ")
-          : t("moore-mealy.exercises.validation.emptyInput"),
-        row.error
-          ? t(`moore-mealy.exercises.validation.errors.${row.error}` as never, {
-              defaultValue: row.error,
-            })
-          : formatOutputCodes(row.outputCodes),
-        formatOutputCodes(row.expectedOutputCodes),
-      ])
-    : [];
 
   return (
     <>
@@ -175,48 +158,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           </div>
         </div>
       </TopicSimulationTab>
-      <SolutionCheckDialog
-        open={checkResult !== null}
-        title={t("moore-mealy.exercises.checkResultTitle")}
+      <MooreSolutionCheckDialog
+        checkResult={checkResult}
         onClose={() => setCheckResult(null)}
-        testId="moore-solution-check-dialog"
-        summary={
-          <p
-            data-testid="moore-solution-check-result"
-            data-passed={String(checkResult?.passed)}
-            className={
-              checkResult?.passed
-                ? "text-sm font-medium text-green-700 dark:text-green-400"
-                : "text-destructive text-sm font-medium"
-            }
-          >
-            {checkResult?.passed
-              ? t("moore-mealy.exercises.checkCorrect")
-              : t("moore-mealy.exercises.checkIncorrect", {
-                  passed:
-                    checkResult?.rows.filter((row) => row.passed).length ?? 0,
-                  total: checkResult?.rows.length ?? 0,
-                })}
-          </p>
-        }
-        error={checkResult?.error}
-        tableTestIdPrefix="moore-solution-check-table"
-        headers={[
-          t("moore-mealy.exercises.validation.passed"),
-          t("moore-mealy.exercises.validation.input"),
-          t("moore-mealy.exercises.validation.output"),
-          t("moore-mealy.exercises.validation.expectedOutput"),
-        ]}
-        rows={resultRows}
-        getRowTestAttributes={(rowIndex) => ({
-          "data-passed": String(checkResult?.rows[rowIndex]?.passed ?? false),
-        })}
-        dataColumnWidthClassName="w-[12rem] max-w-[18rem]"
       />
     </>
   );
-}
-
-function formatOutputCodes(codes: number[]): string {
-  return codes.length ? codes.join(" → ") : "—";
 }

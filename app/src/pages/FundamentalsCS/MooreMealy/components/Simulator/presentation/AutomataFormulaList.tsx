@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import type { MooreFormula } from "../domain/mooreConversion";
+import type { AutomataFormula } from "../domain/automataConversion";
 
-interface MooreFormulaListProps {
-  formulas: MooreFormula[];
+export interface AutomataFormulaListProps {
+  formulas: AutomataFormula[];
 }
 
-export function MooreFormulaList({ formulas }: MooreFormulaListProps) {
+export function AutomataFormulaList({ formulas }: AutomataFormulaListProps) {
   const { t } = useTranslation();
 
   return (

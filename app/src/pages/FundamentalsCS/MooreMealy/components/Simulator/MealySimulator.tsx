@@ -19,23 +19,20 @@ import {
 } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import { useMealySimulator } from "./application/useMealySimulator";
+import { useMealyProgramEditor } from "./application/useMealyProgramEditor";
 import { emptyMealyProgram } from "./config/emptyMealyProgram";
-import { buildMealyConversion } from "./domain/mealyConversion";
+import { buildMealyConversion } from "./domain/automataConversion";
 import {
-  createNextInputSymbol,
-  createNextStateName,
   normalizeMealyProgram,
-  renameMealyInput,
-  renameMealyState,
   validateMealyProgram,
 } from "./domain/mealyProgram";
 import { mealyProgramTransferCodec } from "./domain/mealyProgramTransfer";
 import type { MealyProgram } from "./domain/mealyTypes";
 import { MealyConfigView } from "./presentation/MealyConfigView";
 import { MealySimulationView } from "./presentation/MealySimulationView";
-import { MooreConversionView } from "./presentation/MooreConversionView";
-import { MooreLogicGateView } from "./presentation/MooreLogicGateView";
-import { MooreViewActions } from "./presentation/MooreViewActions";
+import { AutomataConversionView } from "./presentation/AutomataConversionView";
+import { AutomataLogicGateView } from "./presentation/AutomataLogicGateView";
+import { AutomataViewActions } from "./presentation/AutomataViewActions";
 
 export interface MealySimulatorHandle {
   resetStoredState: () => void;
@@ -44,6 +41,7 @@ export interface MealySimulatorHandle {
 interface MealySimulatorProps {
   initialProgram?: MealyProgram;
   storageEnabled?: boolean;
+  isExample?: boolean;
   transferActive?: boolean;
 }
 
@@ -56,19 +54,35 @@ export const MealySimulator = forwardRef<
   {
     initialProgram = emptyMealyProgram,
     storageEnabled = true,
+    isExample = false,
     transferActive = true,
   },
   ref,
 ) {
   const { t } = useTranslation();
-  const [program, setProgram] = useState(() => cloneJson(initialProgram));
+  const effectiveStorageEnabled = storageEnabled && !isExample;
+  const {
+    program,
+    setProgram,
+    issues,
+    handleTransitionChange,
+    handleStateRename,
+    handleInputSymbolRename,
+    handleAddState,
+    handleRemoveState,
+    handleAddInputSymbol,
+    handleRemoveInputSymbol,
+    handleOutputSymbolChange,
+    handleOutputCodeChange,
+  } = useMealyProgramEditor(cloneJson(initialProgram));
+
   const [committed, setCommitted] = useState(() => cloneJson(initialProgram));
   const [mode, setMode] = useState<
     "edit" | "simulation" | "conversion" | "logic"
   >("edit");
   const [storageReady, setStorageReady] = useState(false);
   const simulation = useMealySimulator(committed);
-  const issues = useMemo(() => validateMealyProgram(program), [program]);
+
   const conversion = useMemo(
     () => (issues.length ? null : buildMealyConversion(program)),
     [issues.length, program],
@@ -87,12 +101,17 @@ export const MealySimulator = forwardRef<
     codec: mealyProgramTransferCodec,
     enabled: transferActive,
   });
-  const loadProgram = useCallback((value: MealyProgram) => {
-    setProgram(normalizeMealyProgram(value));
-    setMode("edit");
-  }, []);
+
+  const loadProgram = useCallback(
+    (value: MealyProgram) => {
+      setProgram(normalizeMealyProgram(value));
+      setMode("edit");
+    },
+    [setProgram],
+  );
+
   useEffect(() => {
-    if (!storageEnabled) {
+    if (!effectiveStorageEnabled) {
       setStorageReady(true);
       return;
     }
@@ -107,18 +126,20 @@ export const MealySimulator = forwardRef<
     return () => {
       cancelled = true;
     };
-  }, [identifier, loadProgram, storageEnabled]);
+  }, [identifier, loadProgram, effectiveStorageEnabled]);
+
   useTrainingCenterAutoSave({
     identifier,
     value: program,
     codec: mealyProgramTransferCodec,
-    enabled: storageEnabled && storageReady,
+    enabled: effectiveStorageEnabled && storageReady,
   });
+
   useImperativeHandle(
     ref,
     () => ({
       resetStoredState() {
-        if (storageEnabled) {
+        if (effectiveStorageEnabled) {
           trainingCenterStorage.delete(identifier);
         }
         simulation.pause();
@@ -128,24 +149,15 @@ export const MealySimulator = forwardRef<
         setMode("edit");
       },
     }),
-    [identifier, initialProgram, simulation, storageEnabled],
+    [
+      identifier,
+      initialProgram,
+      setProgram,
+      simulation,
+      effectiveStorageEnabled,
+    ],
   );
 
-  const updateOutput = (
-    input: string,
-    state: string,
-    patch: Partial<{ symbol: string; code: number }>,
-  ) =>
-    setProgram((current) => ({
-      ...current,
-      outputs: {
-        ...current.outputs,
-        [input]: {
-          ...current.outputs[input],
-          [state]: { ...current.outputs[input][state], ...patch },
-        },
-      },
-    }));
   const start = () => {
     const normalized = normalizeMealyProgram(program);
     if (validateMealyProgram(normalized).length) return;
@@ -153,11 +165,13 @@ export const MealySimulator = forwardRef<
     setCommitted(normalized);
     setMode("simulation");
   };
+
   const edit = () => {
     simulation.pause();
     setProgram(cloneJson(committed));
     setMode("edit");
   };
+
   const showSimulation = () => {
     setCommitted(normalizeMealyProgram(program));
     setMode("simulation");
@@ -169,7 +183,7 @@ export const MealySimulator = forwardRef<
         data-testid="mealy-simulator"
         className="mx-auto w-full max-w-[100rem]"
       >
-        <MooreConversionView
+        <AutomataConversionView
           conversion={conversion}
           onBackToEditor={() => setMode("edit")}
           onShowSimulator={showSimulation}
@@ -183,7 +197,7 @@ export const MealySimulator = forwardRef<
         data-testid="mealy-simulator"
         className="mx-auto w-full max-w-[100rem]"
       >
-        <MooreLogicGateView
+        <AutomataLogicGateView
           conversion={conversion}
           onEditDefinition={() => setMode("edit")}
           onShowSimulator={showSimulation}
@@ -203,159 +217,17 @@ export const MealySimulator = forwardRef<
             program={program}
             issues={issues}
             onChange={setProgram}
-            onTransitionChange={(input, state, target) =>
-              setProgram((current) => ({
-                ...current,
-                transitions: {
-                  ...current.transitions,
-                  [input]: { ...current.transitions[input], [state]: target },
-                },
-              }))
-            }
-            onStateRename={(previous, next) => {
-              const renamed = renameMealyState(program, previous, next);
-              if (!renamed) return false;
-              setProgram(renamed);
-              return true;
-            }}
-            onInputRename={(previous, next) => {
-              const renamed = renameMealyInput(program, previous, next);
-              if (!renamed) return false;
-              setProgram(renamed);
-              return true;
-            }}
-            onAddState={(requested) => {
-              const state =
-                requested?.trim() || createNextStateName(program.states);
-              if (program.states.includes(state)) return state;
-              setProgram((current) => ({
-                ...current,
-                states: [...current.states, state],
-                transitions: Object.fromEntries(
-                  current.inputSymbols.map((input) => [
-                    input,
-                    {
-                      ...current.transitions[input],
-                      [state]: current.initialState,
-                    },
-                  ]),
-                ),
-                outputs: Object.fromEntries(
-                  current.inputSymbols.map((input) => [
-                    input,
-                    {
-                      ...current.outputs[input],
-                      [state]: {
-                        symbol: `OUT_${current.states.length}`,
-                        code: current.states.length,
-                      },
-                    },
-                  ]),
-                ),
-              }));
-              return state;
-            }}
-            onRemoveState={(removed) =>
-              setProgram((current) => {
-                if (current.states.length <= 1) return current;
-                const states = current.states.filter(
-                  (state) => state !== removed,
-                );
-                const fallback = states[0];
-                return {
-                  ...current,
-                  states,
-                  initialState:
-                    current.initialState === removed
-                      ? fallback
-                      : current.initialState,
-                  transitions: Object.fromEntries(
-                    current.inputSymbols.map((input) => [
-                      input,
-                      Object.fromEntries(
-                        states.map((state) => [
-                          state,
-                          current.transitions[input][state] === removed
-                            ? fallback
-                            : current.transitions[input][state],
-                        ]),
-                      ),
-                    ]),
-                  ),
-                  outputs: Object.fromEntries(
-                    current.inputSymbols.map((input) => [
-                      input,
-                      Object.fromEntries(
-                        states.map((state) => [
-                          state,
-                          current.outputs[input][state],
-                        ]),
-                      ),
-                    ]),
-                  ),
-                };
-              })
-            }
-            onAddInput={() =>
-              setProgram((current) => {
-                const input = createNextInputSymbol(current.inputSymbols);
-                return {
-                  ...current,
-                  inputSymbols: [...current.inputSymbols, input],
-                  transitions: {
-                    ...current.transitions,
-                    [input]: Object.fromEntries(
-                      current.states.map((state) => [
-                        state,
-                        current.initialState,
-                      ]),
-                    ),
-                  },
-                  outputs: {
-                    ...current.outputs,
-                    [input]: Object.fromEntries(
-                      current.states.map((state, index) => [
-                        state,
-                        current.outputs[current.inputSymbols[0]]?.[state] ?? {
-                          symbol: `OUT_${current.inputSymbols.length}_${index}`,
-                          code:
-                            current.inputSymbols.length *
-                              current.states.length +
-                            index,
-                        },
-                      ]),
-                    ),
-                  },
-                };
-              })
-            }
-            onRemoveInput={(removed) =>
-              setProgram((current) => {
-                const transitions = { ...current.transitions };
-                const outputs = { ...current.outputs };
-                delete transitions[removed];
-                delete outputs[removed];
-                return {
-                  ...current,
-                  inputSymbols: current.inputSymbols.filter(
-                    (input) => input !== removed,
-                  ),
-                  inputWord: current.inputWord.filter(
-                    (input) => input !== removed,
-                  ),
-                  transitions,
-                  outputs,
-                };
-              })
-            }
-            onOutputSymbolChange={(input, state, symbol) =>
-              updateOutput(input, state, { symbol })
-            }
-            onOutputCodeChange={(input, state, code) =>
-              updateOutput(input, state, { code })
-            }
+            onTransitionChange={handleTransitionChange}
+            onStateRename={handleStateRename}
+            onInputRename={handleInputSymbolRename}
+            onAddState={handleAddState}
+            onRemoveState={handleRemoveState}
+            onAddInput={handleAddInputSymbol}
+            onRemoveInput={handleRemoveInputSymbol}
+            onOutputSymbolChange={handleOutputSymbolChange}
+            onOutputCodeChange={handleOutputCodeChange}
           />
-          <MooreViewActions
+          <AutomataViewActions
             actions={[
               {
                 label: t("moore-mealy.conversion.open"),
@@ -369,7 +241,7 @@ export const MealySimulator = forwardRef<
                 onClick: start,
                 icon: Play,
                 testId: "mealy-start-simulation",
-                disabled: !!issues.length,
+                disabled: issues.length > 0,
               },
               {
                 label: t("moore-mealy.logic.open"),
@@ -396,7 +268,7 @@ export const MealySimulator = forwardRef<
             onReset={() => simulation.reset(committed)}
             onSpeedChange={simulation.setSpeed}
           />
-          <MooreViewActions
+          <AutomataViewActions
             actions={[
               {
                 label: t("moore-mealy.navigation.editDefinition"),

@@ -2,25 +2,27 @@ import { useState } from "react";
 import { Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LogicGateDiagram } from "@/components/shared/LogicGateDiagram";
-import { cn } from "@/lib/utils";
-import type { MooreConversion } from "../domain/mooreConversion";
-import { ViewHeader } from "./MooreConversionView";
-import { MooreViewActions } from "./MooreViewActions";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
+import type { AutomataConversion } from "../domain/automataConversion";
+import { FormulaSelectorGrid } from "./FormulaSelectorGrid";
+import { ViewHeader } from "./AutomataConversionView";
+import { AutomataViewActions } from "./AutomataViewActions";
 
-interface MooreLogicGateViewProps {
-  conversion: MooreConversion;
+export interface AutomataLogicGateViewProps {
+  conversion: AutomataConversion;
   onEditDefinition: () => void;
   onShowSimulator: () => void;
   onShowConversion: () => void;
+  testIdPrefix?: string;
 }
 
-export function MooreLogicGateView({
+export function AutomataLogicGateView({
   conversion,
   onEditDefinition,
   onShowSimulator,
   onShowConversion,
-}: MooreLogicGateViewProps) {
+  testIdPrefix = "moore-logic",
+}: AutomataLogicGateViewProps) {
   const { t } = useTranslation();
   const [selectedFormula, setSelectedFormula] = useState(
     conversion.allFormulas[0]?.name ?? "",
@@ -29,10 +31,12 @@ export function MooreLogicGateView({
   const [formulaMode, setFormulaMode] = useState<"minimal" | "canonical">(
     "minimal",
   );
+
   const formula =
     conversion.allFormulas.find(
       (candidate) => candidate.name === selectedFormula,
     ) ?? conversion.allFormulas[0];
+
   const displayedFormula =
     formulaMode === "canonical" ? formula?.canonical : formula?.minimal;
   const displayedExpression =
@@ -74,29 +78,14 @@ export function MooreLogicGateView({
             optionTestIdPrefix="moore-logic-formula-mode-option"
           />
         </div>
-        <div className="grid gap-2 md:grid-cols-2">
-          {conversion.allFormulas.map((candidate) => (
-            <button
-              key={candidate.name}
-              type="button"
-              onClick={() => {
-                setSelectedFormula(candidate.name);
-              }}
-              data-testid={`moore-logic-formula-${candidate.name}`}
-              className={cn(
-                "border-border rounded-lg border p-3 text-left font-mono text-sm",
-                formula?.name === candidate.name
-                  ? "border-brand bg-brand/10"
-                  : "hover:bg-muted",
-              )}
-            >
-              <strong>{candidate.name} = </strong>
-              {formulaMode === "canonical"
-                ? candidate.canonical
-                : candidate.minimal}
-            </button>
-          ))}
-        </div>
+
+        <FormulaSelectorGrid
+          formulas={conversion.allFormulas}
+          selectedFormulaName={formula?.name ?? ""}
+          formulaMode={formulaMode}
+          onSelectFormula={setSelectedFormula}
+          testIdPrefix={testIdPrefix}
+        />
       </div>
 
       {formula ? (
@@ -129,32 +118,28 @@ export function MooreLogicGateView({
         </div>
       ) : null}
 
-      <MooreViewActions
+      <AutomataViewActions
         actions={[
           {
             label: t("moore-mealy.navigation.editDefinition"),
             onClick: onEditDefinition,
             icon: Pencil,
-            testId: "moore-logic-edit-definition",
+            testId: `${testIdPrefix}-edit-definition`,
           },
           {
             label: t("moore-mealy.navigation.showSimulator"),
             onClick: onShowSimulator,
             icon: Play,
-            testId: "moore-logic-show-simulator",
+            testId: `${testIdPrefix}-show-simulator`,
           },
           {
             label: t("moore-mealy.navigation.showConversion"),
             onClick: onShowConversion,
             icon: TableProperties,
-            testId: "moore-logic-show-conversion",
+            testId: `${testIdPrefix}-show-conversion`,
           },
         ]}
       />
-
-      <p className="text-muted-foreground text-xs">
-        {t("moore-mealy.logic.iecHint")}
-      </p>
     </div>
   );
 }

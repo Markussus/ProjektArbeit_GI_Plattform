@@ -2,39 +2,69 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import { SymbolSetPanel } from "@/components/shared/SymbolSetPanel";
-import { formatInternalNumber } from "../domain/mooreProgram";
-import type { InternalRepresentation } from "../domain/mooreTypes";
-import type { MealyProgram } from "../domain/mealyTypes";
-import { MooreInputBuilder } from "./MooreInputBuilder";
+import { formatInternalNumber } from "../domain/programCommon";
+import type {
+  InternalRepresentation,
+  MealyProgram,
+} from "../domain/mealyTypes";
+import { AutomataInputBuilder } from "./AutomataInputBuilder";
 import { MooreTransitionTable } from "./MooreTransitionTable";
 
-interface Props {
+export interface MealyConfigViewProps {
   program: MealyProgram;
   issues: string[];
   onChange: (program: MealyProgram) => void;
-  onTransitionChange: (input: string, state: string, target: string) => void;
-  onStateRename: (previous: string, next: string) => boolean;
-  onInputRename: (previous: string, next: string) => boolean;
-  onAddState: (name?: string) => string;
+  onTransitionChange: (
+    inputSymbol: string,
+    state: string,
+    targetState: string,
+  ) => void;
+  onStateRename: (previousName: string, nextName: string) => boolean;
+  onInputRename: (previousSymbol: string, nextSymbol: string) => boolean;
+  onAddState: (requestedName?: string) => string;
   onRemoveState: (state: string) => void;
   onAddInput: () => void;
-  onRemoveInput: (input: string) => void;
-  onOutputSymbolChange: (input: string, state: string, symbol: string) => void;
-  onOutputCodeChange: (input: string, state: string, code: number) => void;
+  onRemoveInput: (symbol: string) => void;
+  onOutputSymbolChange: (
+    inputSymbol: string,
+    state: string,
+    symbol: string,
+  ) => void;
+  onOutputCodeChange: (
+    inputSymbol: string,
+    state: string,
+    code: number,
+  ) => void;
 }
 
-export function MealyConfigView(props: Props) {
+export function MealyConfigView({
+  program,
+  issues,
+  onChange,
+  onTransitionChange,
+  onStateRename,
+  onInputRename,
+  onAddState,
+  onRemoveState,
+  onAddInput,
+  onRemoveInput,
+  onOutputSymbolChange,
+  onOutputCodeChange,
+}: MealyConfigViewProps) {
   const { t } = useTranslation();
-  const { program } = props;
   const outputs = useMemo(() => {
     const unique = new Map<number, string>();
-    for (const input of program.inputSymbols)
+    for (const input of program.inputSymbols) {
       for (const state of program.states) {
-        const output = program.outputs[input][state];
-        if (!unique.has(output.code)) unique.set(output.code, output.symbol);
+        const output = program.outputs[input]?.[state];
+        if (output && !unique.has(output.code)) {
+          unique.set(output.code, output.symbol);
+        }
       }
+    }
     return [...unique];
   }, [program]);
+
   const stateOptions = useMemo(
     () =>
       program.states.map((state, index) => ({
@@ -50,6 +80,7 @@ export function MealyConfigView(props: Props) {
       })),
     [program.representation, program.states],
   );
+
   return (
     <div data-testid="mealy-config-view" className="space-y-6">
       <div>
@@ -60,18 +91,22 @@ export function MealyConfigView(props: Props) {
           {t("moore-mealy.sim.configureHelp")}
         </p>
       </div>
-      {props.issues.length > 0 && (
-        <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
-          {props.issues
+      {issues.length > 0 && (
+        <div
+          data-testid="mealy-config-error"
+          className="bg-destructive/10 text-destructive rounded-lg border border-current/20 p-3 text-sm"
+        >
+          {issues
             .map((issue) => t(`moore-mealy.sim.validation.${issue}` as never))
             .join(" ")}
         </div>
       )}
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <MooreInputBuilder
+        <AutomataInputBuilder
           inputSymbols={program.inputSymbols}
           inputWord={program.inputWord}
-          onChange={(inputWord) => props.onChange({ ...program, inputWord })}
+          onChange={(inputWord) => onChange({ ...program, inputWord })}
         />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="space-y-2">
@@ -81,11 +116,17 @@ export function MealyConfigView(props: Props) {
             <DropdownSelect<InternalRepresentation>
               value={program.representation}
               options={[
-                { value: "decimal", label: t("moore-mealy.sim.decimal") },
-                { value: "binary", label: t("moore-mealy.sim.binary") },
+                {
+                  value: "decimal" as const,
+                  label: t("moore-mealy.sim.decimal"),
+                },
+                {
+                  value: "binary" as const,
+                  label: t("moore-mealy.sim.binary"),
+                },
               ]}
               onChange={(representation) =>
-                props.onChange({ ...program, representation })
+                onChange({ ...program, representation })
               }
               ariaLabel={t("moore-mealy.sim.representation")}
               triggerClassName="h-11 w-full px-3"
@@ -102,7 +143,7 @@ export function MealyConfigView(props: Props) {
               value={program.initialState}
               options={stateOptions}
               onChange={(initialState) =>
-                props.onChange({ ...program, initialState })
+                onChange({ ...program, initialState })
               }
               ariaLabel={t("moore-mealy.sim.startState")}
               triggerClassName="h-11 w-full px-3"
@@ -113,20 +154,21 @@ export function MealyConfigView(props: Props) {
           </div>
         </div>
       </div>
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_15rem]">
+
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_15rem] xl:items-start">
         <MooreTransitionTable
           program={program}
-          onTransitionChange={props.onTransitionChange}
-          onStateRename={props.onStateRename}
-          onInputSymbolRename={props.onInputRename}
-          onAddState={props.onAddState}
-          onRemoveState={props.onRemoveState}
-          onAddInputSymbol={props.onAddInput}
-          onRemoveInputSymbol={props.onRemoveInput}
+          onTransitionChange={onTransitionChange}
+          onStateRename={onStateRename}
+          onInputSymbolRename={onInputRename}
+          onAddState={onAddState}
+          onRemoveState={onRemoveState}
+          onAddInputSymbol={onAddInput}
+          onRemoveInputSymbol={onRemoveInput}
           outputControls={{
             getOutput: (input, state) => program.outputs[input]?.[state],
-            onSymbolChange: props.onOutputSymbolChange,
-            onCodeChange: props.onOutputCodeChange,
+            onSymbolChange: onOutputSymbolChange,
+            onCodeChange: onOutputCodeChange,
             testIdPrefix: "mealy-transition-output",
           }}
         />
@@ -134,17 +176,33 @@ export function MealyConfigView(props: Props) {
           <SymbolSetPanel
             title={t("moore-mealy.sim.states")}
             emptyText={t("moore-mealy.sim.noSymbols")}
+            testId="mealy-state-set"
             items={program.states.map((state, index) => ({
               key: state,
-              content: `${state} ${formatInternalNumber(index, program.representation)}`,
+              content: (
+                <>
+                  {state}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(index, program.representation)}
+                  </span>
+                </>
+              ),
             }))}
           />
           <SymbolSetPanel
             title={t("moore-mealy.sim.outputAlphabet")}
             emptyText={t("moore-mealy.sim.noSymbols")}
+            testId="mealy-output-alphabet"
             items={outputs.map(([code, symbol]) => ({
               key: String(code),
-              content: `${symbol} ${formatInternalNumber(code, program.representation)}`,
+              content: (
+                <>
+                  {symbol}
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {formatInternalNumber(code, program.representation)}
+                  </span>
+                </>
+              ),
             }))}
           />
         </div>

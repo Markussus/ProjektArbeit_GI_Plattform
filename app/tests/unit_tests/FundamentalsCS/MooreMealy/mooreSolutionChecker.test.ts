@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runMooreValidation } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/mooreSolutionChecker";
+import { runMooreValidation } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/automataSolutionChecker";
 import type { MooreProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreTypes";
 import type { MooreValidationCase } from "@/pages/FundamentalsCS/MooreMealy/exercises";
 

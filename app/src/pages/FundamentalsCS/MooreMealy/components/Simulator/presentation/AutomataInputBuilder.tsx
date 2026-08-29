@@ -3,17 +3,19 @@ import { GripVertical, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-interface MooreInputBuilderProps {
+export interface AutomataInputBuilderProps {
   inputSymbols: string[];
   inputWord: string[];
   onChange: (inputWord: string[]) => void;
+  testIdPrefix?: string;
 }
 
-export function MooreInputBuilder({
+export function AutomataInputBuilder({
   inputSymbols,
   inputWord,
   onChange,
-}: MooreInputBuilderProps) {
+  testIdPrefix = "moore",
+}: AutomataInputBuilderProps) {
   const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -42,7 +44,7 @@ export function MooreInputBuilder({
         }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
-        data-testid="moore-input-word"
+        data-testid={`${testIdPrefix}-input-word`}
         className={cn(
           "border-input bg-background focus-within:ring-ring flex min-h-14 flex-wrap items-center gap-2 rounded-lg border p-2 focus-within:ring-2",
           isDragOver && "border-brand bg-brand/5",
@@ -51,13 +53,13 @@ export function MooreInputBuilder({
         {inputWord.map((symbol, index) => (
           <span
             key={`${symbol}-${index}`}
-            data-testid={`moore-input-word-token-${index}`}
+            data-testid={`${testIdPrefix}-input-word-token-${index}`}
             className="bg-muted inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono text-sm"
           >
             {symbol}
             <button
               type="button"
-              data-testid={`moore-input-word-token-${index}-remove`}
+              data-testid={`${testIdPrefix}-input-word-token-${index}-remove`}
               onClick={() =>
                 onChange(
                   inputWord.filter((_, itemIndex) => itemIndex !== index),
@@ -85,14 +87,14 @@ export function MooreInputBuilder({
           {t("moore-mealy.sim.inputAlphabetHelp")}
         </p>
         <div
-          data-testid="moore-input-alphabet"
+          data-testid={`${testIdPrefix}-input-alphabet`}
           className="border-border flex min-h-12 flex-wrap gap-2 rounded-lg border p-2"
         >
           {inputSymbols.map((symbol) => (
             <button
               key={symbol}
               type="button"
-              data-testid={`moore-input-token-${symbol}`}
+              data-testid={`${testIdPrefix}-input-token-${symbol}`}
               draggable
               onDragStart={(event) => {
                 event.dataTransfer.setData("text/plain", symbol);

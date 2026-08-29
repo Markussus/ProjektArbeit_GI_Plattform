@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface MooreViewAction {
+export interface AutomataViewAction {
   label: string;
   onClick: () => void;
   icon: LucideIcon;
@@ -9,10 +9,10 @@ export interface MooreViewAction {
   disabled?: boolean;
 }
 
-export function MooreViewActions({
+export function AutomataViewActions({
   actions,
 }: {
-  actions: [MooreViewAction, MooreViewAction, MooreViewAction];
+  actions: [AutomataViewAction, AutomataViewAction, AutomataViewAction];
 }) {
   const tones = [
     "border-border bg-background hover:bg-muted",

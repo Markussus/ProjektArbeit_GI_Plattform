@@ -4,25 +4,25 @@ import { useTranslation } from "react-i18next";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { cn } from "@/lib/utils";
 import type {
-  MooreConversion,
-  MooreConversionRow,
-} from "../domain/mooreConversion";
-import { MooreFormulaList } from "./MooreFormulaList";
-import { MooreViewActions } from "./MooreViewActions";
+  AutomataConversion,
+  AutomataConversionRow,
+} from "../domain/automataConversion";
+import { AutomataFormulaList } from "./AutomataFormulaList";
+import { AutomataViewActions } from "./AutomataViewActions";
 
-interface MooreConversionViewProps {
-  conversion: MooreConversion;
+export interface AutomataConversionViewProps {
+  conversion: AutomataConversion;
   onBackToEditor: () => void;
   onShowSimulator: () => void;
   onShowLogic: () => void;
 }
 
-export function MooreConversionView({
+export function AutomataConversionView({
   conversion,
   onBackToEditor,
   onShowSimulator,
   onShowLogic,
-}: MooreConversionViewProps) {
+}: AutomataConversionViewProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"transition" | "output">(
     "transition",
@@ -53,15 +53,15 @@ export function MooreConversionView({
       {activeTab === "transition" ? (
         <div className="space-y-6">
           <TransitionValueTable conversion={conversion} />
-          <MooreFormulaList formulas={conversion.transition.formulas} />
+          <AutomataFormulaList formulas={conversion.transition.formulas} />
         </div>
       ) : (
         <div className="space-y-6">
           <OutputValueTable conversion={conversion} />
-          <MooreFormulaList formulas={conversion.output.formulas} />
+          <AutomataFormulaList formulas={conversion.output.formulas} />
         </div>
       )}
-      <MooreViewActions
+      <AutomataViewActions
         actions={[
           {
             label: t("moore-mealy.navigation.editDefinition"),
@@ -91,13 +91,17 @@ export function ViewHeader({ title }: { title: string }) {
   return <h2 className="text-xl font-bold">{title}</h2>;
 }
 
-function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
+function TransitionValueTable({
+  conversion,
+}: {
+  conversion: AutomataConversion;
+}) {
   const { t } = useTranslation();
   const { stateVariables, inputVariables, targetVariables } =
     conversion.transition;
 
   const groupedRows = conversion.transition.rows.reduce<
-    Array<{ state: string; rows: MooreConversionRow[] }>
+    Array<{ state: string; rows: AutomataConversionRow[] }>
   >((groups, row) => {
     const group = groups.find(
       (candidate) => candidate.state === row.currentState,
@@ -212,7 +216,7 @@ function TransitionValueTable({ conversion }: { conversion: MooreConversion }) {
   );
 }
 
-function OutputValueTable({ conversion }: { conversion: MooreConversion }) {
+function OutputValueTable({ conversion }: { conversion: AutomataConversion }) {
   const { t } = useTranslation();
   const {
     stateVariables,
@@ -276,9 +280,9 @@ function ValueTable({
   testId,
 }: {
   groups: ValueTableGroup[];
-  rows: MooreConversionRow[];
-  getBits: (row: MooreConversionRow) => number[];
-  getTitles: (row: MooreConversionRow) => string[];
+  rows: AutomataConversionRow[];
+  getBits: (row: AutomataConversionRow) => number[];
+  getTitles: (row: AutomataConversionRow) => string[];
   testId: string;
 }) {
   return (

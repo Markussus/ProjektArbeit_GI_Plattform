@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultMealyProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/config/defaultMealyProgram";
-import { buildMealyConversion } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyConversion";
+import { buildMealyConversion } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/automataConversion";
 import { MealyMachineSimulator } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyMachine";
 
 describe("MealyMachineSimulator", () => {

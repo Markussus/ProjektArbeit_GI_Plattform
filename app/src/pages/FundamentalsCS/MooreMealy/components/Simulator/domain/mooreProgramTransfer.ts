@@ -1,9 +1,13 @@
 import { BitReader, BitWriter } from "@/lib/trainingCenter";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
+import {
+  bitsNeeded,
+  hasUniqueNonEmptyValues,
+  MAX_COLLECTION_SIZE,
+} from "./programCommon";
 import type { MooreProgram } from "./mooreTypes";
 
 const FORMAT_VERSION = 0;
-const MAX_COLLECTION_SIZE = 1024;
 const MAX_STRING_BYTES = 4096;
 
 export const mooreProgramTransferCodec: ISimulatorTransferCodec<MooreProgram> =
@@ -36,27 +40,10 @@ export const mooreProgramTransferCodec: ISimulatorTransferCodec<MooreProgram> =
       for (const symbol of program.inputSymbols) {
         writeString(writer, symbol);
       }
-      for (const state of program.states) {
-        const output = program.outputs[state] ?? { symbol: "", code: 0 };
-        writeString(writer, output.symbol);
-        writer.writeVarUint(output.code);
-      }
 
-      for (const inputSymbol of program.inputSymbols) {
-        for (const state of program.states) {
-          const target = program.transitions[inputSymbol]?.[state];
-          if (!target || !stateIds.has(target)) {
-            writer.writeBit(0);
-            continue;
-          }
-          writer.writeBit(1);
-          writer.writeBits(getRequiredValue(stateIds, target), stateBits);
-        }
-      }
-
-      for (const symbol of program.inputWord) {
-        writer.writeBits(getRequiredValue(inputIds, symbol), inputBits);
-      }
+      writeOutputs(writer, program);
+      writeTransitions(writer, program, stateIds, stateBits);
+      writeInputWord(writer, program.inputWord, inputIds, inputBits);
 
       return writer.toBase64Url();
     },
@@ -101,35 +88,21 @@ export const mooreProgramTransferCodec: ISimulatorTransferCodec<MooreProgram> =
           throw new Error("moore_transfer_payload_invalid");
         }
 
-        const outputs: MooreProgram["outputs"] = {};
-        for (const state of states) {
-          outputs[state] = {
-            symbol: readString(reader),
-            code: reader.readVarUint(),
-          };
-        }
-
-        const transitions: MooreProgram["transitions"] = {};
-        for (const inputSymbol of inputSymbols) {
-          transitions[inputSymbol] = {};
-          for (const state of states) {
-            if (reader.readBit() === 0) {
-              continue;
-            }
-            const targetId = reader.readBits(stateBits);
-            assertId(targetId, stateCount);
-            transitions[inputSymbol][state] = states[targetId];
-          }
-        }
-
-        if (inputCount === 0 && inputWordLength > 0) {
-          throw new Error("moore_transfer_payload_invalid");
-        }
-        const inputWord = Array.from({ length: inputWordLength }, () => {
-          const symbolId = reader.readBits(inputBits);
-          assertId(symbolId, inputCount);
-          return inputSymbols[symbolId];
-        });
+        const outputs = readOutputs(reader, states);
+        const transitions = readTransitions(
+          reader,
+          states,
+          inputSymbols,
+          stateBits,
+          stateCount,
+        );
+        const inputWord = readInputWord(
+          reader,
+          inputSymbols,
+          inputBits,
+          inputWordLength,
+          inputCount,
+        );
 
         reader.assertOnlyPaddingRemains();
         return {
@@ -146,6 +119,96 @@ export const mooreProgramTransferCodec: ISimulatorTransferCodec<MooreProgram> =
       }
     },
   };
+
+function writeOutputs(writer: BitWriter, program: MooreProgram): void {
+  for (const state of program.states) {
+    const output = program.outputs[state] ?? { symbol: "", code: 0 };
+    writeString(writer, output.symbol);
+    writer.writeVarUint(output.code);
+  }
+}
+
+function writeTransitions(
+  writer: BitWriter,
+  program: MooreProgram,
+  stateIds: Map<string, number>,
+  stateBits: number,
+): void {
+  for (const inputSymbol of program.inputSymbols) {
+    for (const state of program.states) {
+      const target = program.transitions[inputSymbol]?.[state];
+      if (!target || !stateIds.has(target)) {
+        writer.writeBit(0);
+      } else {
+        writer.writeBit(1);
+        writer.writeBits(getRequiredValue(stateIds, target), stateBits);
+      }
+    }
+  }
+}
+
+function writeInputWord(
+  writer: BitWriter,
+  inputWord: string[],
+  inputIds: Map<string, number>,
+  inputBits: number,
+): void {
+  for (const symbol of inputWord) {
+    writer.writeBits(getRequiredValue(inputIds, symbol), inputBits);
+  }
+}
+
+function readOutputs(
+  reader: BitReader,
+  states: string[],
+): MooreProgram["outputs"] {
+  const outputs: MooreProgram["outputs"] = {};
+  for (const state of states) {
+    outputs[state] = {
+      symbol: readString(reader),
+      code: reader.readVarUint(),
+    };
+  }
+  return outputs;
+}
+
+function readTransitions(
+  reader: BitReader,
+  states: string[],
+  inputSymbols: string[],
+  stateBits: number,
+  stateCount: number,
+): MooreProgram["transitions"] {
+  const transitions: MooreProgram["transitions"] = {};
+  for (const inputSymbol of inputSymbols) {
+    transitions[inputSymbol] = {};
+    for (const state of states) {
+      if (reader.readBit() === 1) {
+        const targetId = reader.readBits(stateBits);
+        assertId(targetId, stateCount);
+        transitions[inputSymbol][state] = states[targetId];
+      }
+    }
+  }
+  return transitions;
+}
+
+function readInputWord(
+  reader: BitReader,
+  inputSymbols: string[],
+  inputBits: number,
+  inputWordLength: number,
+  inputCount: number,
+): string[] {
+  if (inputCount === 0 && inputWordLength > 0) {
+    throw new Error("moore_transfer_payload_invalid");
+  }
+  return Array.from({ length: inputWordLength }, () => {
+    const symbolId = reader.readBits(inputBits);
+    assertId(symbolId, inputCount);
+    return inputSymbols[symbolId];
+  });
+}
 
 function assertTransferableProgram(program: MooreProgram): void {
   assertCollectionSize(program.states.length);
@@ -193,10 +256,6 @@ function readString(reader: BitReader): string {
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
-function bitsNeeded(count: number): number {
-  return count <= 1 ? 0 : Math.floor(Math.log2(count - 1)) + 1;
-}
-
 function assertCollectionSize(value: number): void {
   if (
     !Number.isSafeInteger(value) ||
@@ -211,13 +270,6 @@ function assertId(value: number, count: number): void {
   if (!Number.isSafeInteger(value) || value < 0 || value >= count) {
     throw new Error("moore_transfer_payload_invalid");
   }
-}
-
-function hasUniqueNonEmptyValues(values: string[]): boolean {
-  return (
-    values.every((value) => value.trim().length > 0) &&
-    new Set(values).size === values.length
-  );
 }
 
 function getRequiredValue<TKey, TValue>(
