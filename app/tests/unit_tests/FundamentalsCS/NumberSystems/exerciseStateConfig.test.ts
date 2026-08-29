@@ -68,25 +68,35 @@ describe("exerciseStateConfig", () => {
   });
 
   it("marks randomized exercises with flags", () => {
-    expect(exerciseStateConfig["number-systems.ex_u03_decToBin"].randomDecToBin).toBe(
-      true,
-    );
-    expect(exerciseStateConfig["number-systems.ex_u03_binAdd"].randomBinAdd).toBe(true);
+    expect(
+      exerciseStateConfig["number-systems.ex_u03_decToBin"].randomDecToBin,
+    ).toBe(true);
+    expect(
+      exerciseStateConfig["number-systems.ex_u03_binAdd"].randomBinAdd,
+    ).toBe(true);
     expect(
       exerciseStateConfig["number-systems.ex_u05_ieeeDecode"].randomIeeeDecode,
     ).toBe(true);
   });
 
   it("provides fixed initial values for examples", () => {
-    expect(exerciseStateConfig["number-systems.example_u03_1"].initialValue).toBe("26");
-    expect(exerciseStateConfig["number-systems.example_u05_4"].initialValue).toBe(
-      "01000001010101000000000000000000",
-    );
+    expect(
+      exerciseStateConfig["number-systems.example_u03_1"].initialValue,
+    ).toBe("26");
+    expect(
+      exerciseStateConfig["number-systems.example_u05_4"].initialValue,
+    ).toBe("01000001010101000000000000000000");
   });
 
   it("matches example mode with expected simulator mode", () => {
-    expect(exerciseStateConfig["number-systems.example_u05_3"].mode).toBe("ieee754");
-    expect(exerciseStateConfig["number-systems.example_u07_3_1"].mode).toBe("negative");
-    expect(exerciseStateConfig["number-systems.example_u06_2"].mode).toBe("arithmetic");
+    expect(exerciseStateConfig["number-systems.example_u05_3"].mode).toBe(
+      "ieee754",
+    );
+    expect(exerciseStateConfig["number-systems.example_u07_3_1"].mode).toBe(
+      "negative",
+    );
+    expect(exerciseStateConfig["number-systems.example_u06_2"].mode).toBe(
+      "arithmetic",
+    );
   });
 });
