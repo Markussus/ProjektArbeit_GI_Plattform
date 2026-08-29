@@ -14,9 +14,12 @@ import {
   getJavaEditorLimitReason,
   JAVA_EDITOR_MAX_CHARACTERS,
   JAVA_EDITOR_MAX_LINES,
-  wouldPasteExceedJavaEditorLimit,
   type JavaEditorLimitReason,
 } from "./domain/javaEditorLimits";
+import {
+  createPasteLimitListener,
+  syncMonacoMarkers,
+} from "./domain/javaEditorMarkers";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 
@@ -42,66 +45,19 @@ export function JavaEditorPanel({
   const [limitReason, setLimitReason] = useState<JavaEditorLimitReason | null>(
     null,
   );
-  const syncMarkers = useCallback(() => {
-    const editor = editorRef.current;
-    const monaco = monacoRef.current;
-    const model = editor?.getModel();
 
-    if (!model || !monaco) {
-      return;
-    }
-
-    monaco.editor.setModelMarkers(
-      model,
-      "java",
-      issues
-        .filter((issue) => issue.line)
-        .map((issue) => ({
-          startLineNumber: issue.line ?? 1,
-          startColumn: issue.column ?? 1,
-          endLineNumber: issue.line ?? 1,
-          endColumn: Math.max((issue.column ?? 1) + 1, 2),
-          message: issue.message,
-          severity:
-            issue.severity === "error"
-              ? monaco.MarkerSeverity.Error
-              : issue.severity === "warning"
-                ? monaco.MarkerSeverity.Warning
-                : monaco.MarkerSeverity.Info,
-        })),
-    );
+  const syncActiveMarkers = useCallback(() => {
+    syncMonacoMarkers(editorRef.current, monacoRef.current, issues);
   }, [issues]);
+
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    syncMarkers();
-    editor.onDidChangeModel(syncMarkers);
+    syncActiveMarkers();
+    editor.onDidChangeModel(syncActiveMarkers);
 
     const editorNode = editor.getDomNode();
-    const pasteListener = (event: ClipboardEvent) => {
-      const model = editor.getModel();
-      const selection = editor.getSelection();
-      const pastedText = event.clipboardData?.getData("text/plain");
-
-      if (!model || !selection || pastedText === undefined) {
-        return;
-      }
-
-      const reason = wouldPasteExceedJavaEditorLimit({
-        currentCharacterCount: model.getValueLength(),
-        currentLineCount: model.getLineCount(),
-        selectedCharacterCount: model.getValueLengthInRange(selection),
-        selectedLineBreakCount:
-          selection.endLineNumber - selection.startLineNumber,
-        pastedText,
-      });
-
-      if (reason) {
-        event.preventDefault();
-        event.stopPropagation();
-        setLimitReason(reason);
-      }
-    };
+    const pasteListener = createPasteLimitListener(editor, setLimitReason);
 
     editorNode?.addEventListener("paste", pasteListener, true);
     editor.onDidDispose(() => {
@@ -110,8 +66,8 @@ export function JavaEditorPanel({
   };
 
   useEffect(() => {
-    syncMarkers();
-  }, [syncMarkers]);
+    syncActiveMarkers();
+  }, [syncActiveMarkers]);
 
   const handleEditorCodeChange = useCallback(
     (nextCode: string) => {

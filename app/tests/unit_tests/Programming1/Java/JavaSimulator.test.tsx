@@ -1,9 +1,19 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import React, { createRef } from "react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { TerminalSquare } from "lucide-react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { JavaSimulator } from "../../../../src/pages/Programming1/Java/components/Simulator/JavaSimulator";
+import {
+  JavaSimulator,
+  type JavaSimulatorHandle,
+} from "../../../../src/pages/Programming1/Java/components/Simulator/JavaSimulator";
 import type { Exercise } from "../../../../src/types/exercise";
 
 const runSpy = vi.fn();
@@ -241,6 +251,92 @@ describe("JavaSimulator", () => {
       expect(
         screen.getByTestId("java-command-overview-dialog"),
       ).toHaveTextContent("javac");
+    });
+  });
+
+  describe("imperative handle methods", () => {
+    it("loads solution code when loadSolution is invoked", () => {
+      const ref = createRef<JavaSimulatorHandle>();
+      render(
+        <JavaSimulator
+          ref={ref}
+          selectedExercise={createExercise(
+            "java-programming.exercise1",
+            "Hello World",
+            "Desc",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      act(() => {
+        ref.current?.loadSolution();
+      });
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        'System.out.println("Hello World");',
+      );
+    });
+
+    it("resets state when resetStoredState is invoked", () => {
+      const ref = createRef<JavaSimulatorHandle>();
+      render(
+        <JavaSimulator
+          ref={ref}
+          selectedExercise={createExercise(
+            "java-programming.exercise1",
+            "Hello World",
+            "Desc",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      // change code
+      fireEvent.click(screen.getByTestId("mock-java-change-code"));
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
+        "changed code",
+      );
+
+      act(() => {
+        ref.current?.resetStoredState();
+      });
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
+        "// TODO: print Hello World once",
+      );
+    });
+
+    it("runs validation through checkSolution", async () => {
+      runAsyncSpy.mockResolvedValueOnce({
+        phase: "done",
+        stdout: ["Hello World\n"],
+        stderr: [],
+        compilerStatus: "ready",
+        issues: [],
+        artifacts: null,
+      });
+
+      const ref = createRef<JavaSimulatorHandle>();
+      render(
+        <JavaSimulator
+          ref={ref}
+          selectedExercise={createExercise(
+            "java-programming.exercise1",
+            "Hello World",
+            "Desc",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      let result: any;
+      await act(async () => {
+        result = await ref.current?.checkSolution();
+      });
+
+      expect(result.rows).toHaveLength(1);
+      expect(result.rows[0].passed).toBe(true);
     });
   });
 });
