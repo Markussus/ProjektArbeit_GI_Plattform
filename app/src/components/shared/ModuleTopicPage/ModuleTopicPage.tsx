@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import {
   createTrainingCenterExerciseFromImport,
@@ -48,7 +47,6 @@ interface ModuleTopicPageProps {
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
   testId?: string;
-  confirmExerciseTabExit?: boolean;
   clearSimulationSelectionOnTabExit?: boolean;
 }
 
@@ -61,7 +59,6 @@ export function ModuleTopicPage({
   simulationTab: SimulationTab,
   tabs,
   testId,
-  confirmExerciseTabExit = true,
   clearSimulationSelectionOnTabExit = false,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
@@ -75,9 +72,6 @@ export function ModuleTopicPage({
   });
   const consumedImportValueRef = useRef<string | null>(null);
   const isMountedRef = useRef(true);
-  const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
-  const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
-
   const {
     activeTab,
     setActiveTab,
@@ -182,26 +176,6 @@ export function ModuleTopicPage({
   };
 
   const handleTabChange = (tab: ModuleTabId) => {
-    const exerciseIsActive =
-      !!simulationExercise && !simulationExercise.id.includes(".example");
-
-    if (confirmExerciseTabExit && exerciseIsActive && tab !== activeTab) {
-      setPendingTab(tab);
-      setShowTabExitConfirm(true);
-      return;
-    }
-
-    if (
-      confirmExerciseTabExit &&
-      exerciseIsActive &&
-      tab === activeTab &&
-      tab === "simulation"
-    ) {
-      setPendingTab(null);
-      setShowTabExitConfirm(true);
-      return;
-    }
-
     applyTabChange(tab);
   };
 
@@ -219,14 +193,6 @@ export function ModuleTopicPage({
       // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
-  };
-
-  const handleTabExitConfirm = () => {
-    setShowTabExitConfirm(false);
-    clearSimulationExercise();
-    const target = pendingTab ?? activeTab;
-    setPendingTab(null);
-    applyTabChange(target);
   };
 
   const renderActiveTab = () => {
@@ -295,20 +261,6 @@ export function ModuleTopicPage({
       />
 
       {renderActiveTab()}
-
-      <ConfirmDialog
-        isOpen={showTabExitConfirm}
-        title={t("common.exerciseValidation.exitTabTitle")}
-        description={t("common.exerciseValidation.exitTabDesc")}
-        confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
-        onConfirm={handleTabExitConfirm}
-        onCancel={() => {
-          setShowTabExitConfirm(false);
-          setPendingTab(null);
-        }}
-        variant="warning"
-        testId="module-tab-exit-confirm"
-      />
     </div>
   );
 }

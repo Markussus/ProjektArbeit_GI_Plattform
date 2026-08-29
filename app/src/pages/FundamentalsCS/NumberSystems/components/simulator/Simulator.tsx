@@ -11,7 +11,6 @@ import { NegativeNumbers } from "./NegativeNumbers";
 import { IEEE754Converter } from "./IEEE754Converter";
 import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -26,8 +25,13 @@ import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { numberSystemsExercises } from "../../exercises";
 import { nsTransferCodec } from "./nsTransferCodec";
 import type { NumberSystemState } from "./nsTransferCodec";
+import { exerciseStateConfig } from "./exerciseStateConfig";
+import {
+  resolveRandomInit,
+  defaultExerciseState,
+} from "./exerciseStateResolver";
 
-type SimulatorMode =
+export type SimulatorMode =
   | "integers"
   | "negative"
   | "fractional"
@@ -40,7 +44,7 @@ export interface SimulatorHandle {
 
 interface SimulatorProps {
   selectedExercise?: TopicItem | null;
-  /** Callback zum Verlassen des Übungsmodus auf Seite des Elternelementes */
+  /** Callback to exit exercise mode from the parent component. */
   onExitExercise?: () => void;
 }
 
@@ -48,6 +52,10 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
   function Simulator({ selectedExercise, onExitExercise }, ref) {
     const { t } = useTranslation("translation");
     const getInitialActiveMode = (id: string): SimulatorMode => {
+      const config = exerciseStateConfig[id];
+      if (config) return config.mode;
+
+      // Fallback prefix logic for unknown IDs
       if (
         id.includes("floatToBin") ||
         id.includes("example_u05_1") ||
@@ -102,10 +110,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
       return selectedExercise ? selectedExercise.id.includes(".example") : true;
     });
 
-    // Tab-change confirm dialog state
-    const [pendingMode, setPendingMode] = useState<SimulatorMode | null>(null);
-    const [showTabConfirm, setShowTabConfirm] = useState(false);
-
     // Initial values for converters when launched via exercise
     const [initialValue, setInitialValue] = useState<string>("");
     const [initialBase, setInitialBase] = useState<
@@ -135,248 +139,44 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
         setIsExerciseMode(!isExample);
         setShowSolution(isExample);
 
-        const randInt = (min: number, max: number) =>
-          Math.floor(Math.random() * (max - min + 1)) + min;
-        const decToBin = (n: number) => n.toString(2);
-
-        // Match exercise id using prefix/contains or exact matching logic based on data.
-        if (selectedExercise.id === "number-systems.ex_u03_decToBin") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue(randInt(1, 63).toString());
-        } else if (selectedExercise.id === "number-systems.ex_u03_binAdd") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA(decToBin(randInt(10, 100)));
-          setInitialValueB(decToBin(randInt(10, 100)));
-        } else if (
-          selectedExercise.id === "number-systems.ex_u04_binToHexOct"
-        ) {
-          setActiveMode("integers");
-          setInitialBase("bin");
-          setInitialTargetBase(Math.random() > 0.5 ? "hex" : "oct");
-          setInitialValue(
-            Array.from({ length: 8 }, () =>
-              Math.random() < 0.5 ? "1" : "0",
-            ).join(""),
-          );
-        } else if (selectedExercise.id === "number-systems.ex_u04_octToHex") {
-          setActiveMode("integers");
-          setInitialBase("oct");
-          setInitialTargetBase("hex");
-          setInitialValue(randInt(64, 511).toString(8).padStart(3, "0"));
-        } else if (selectedExercise.id === "number-systems.ex_u04_hexToBin") {
-          setActiveMode("integers");
-          setInitialBase("hex");
-          setInitialTargetBase("bin");
-          setInitialValue(
-            randInt(16, 255).toString(16).toUpperCase().padStart(2, "0"),
-          );
-        } else if (selectedExercise.id === "number-systems.ex_u05_floatToBin") {
-          setActiveMode("fractional");
-          const wholes = randInt(-20, 20);
-          const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
-          setInitialValue(
-            (wholes + fracs[randInt(0, fracs.length - 1)]).toString(),
-          );
-        } else if (selectedExercise.id === "number-systems.ex_u05_ieeeEncode") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue((Math.random() * 200 - 100).toFixed(4));
-        } else if (selectedExercise.id === "number-systems.ex_u05_ieeeDecode") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("ieeeToDec");
-          const sign = Math.random() < 0.5 ? "1" : "0";
-          const exp = randInt(1, 254).toString(2).padStart(8, "0");
-          const mant = Array.from({ length: 23 }, () =>
-            Math.random() < 0.5 ? "1" : "0",
-          ).join("");
-          setInitialValue(sign + exp + mant);
-        } else if (selectedExercise.id === "number-systems.ex_u06_addSub") {
-          setActiveMode("arithmetic");
-          setInitialSubMode(Math.random() > 0.5 ? "addition" : "subtraction");
-          setInitialValueA(decToBin(randInt(10, 100)).padStart(8, "0"));
-          setInitialValueB(decToBin(randInt(10, 100)).padStart(8, "0"));
-        } else if (selectedExercise.id === "number-systems.ex_u06_mult") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("multiplication");
-          setInitialValueA(decToBin(randInt(8, 15)));
-          setInitialValueB(decToBin(randInt(16, 31)));
-        } else if (selectedExercise.id === "number-systems.example_u03_1") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("26"); // Picked 26 as an example
-        } else if (selectedExercise.id === "number-systems.example_u03_2") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA("110010"); // 50
-          setInitialValueB("1101"); // 13
-        } else if (selectedExercise.id === "number-systems.example_u04_1") {
-          setActiveMode("integers");
-          setInitialBase("bin");
-          setInitialTargetBase("hex");
-          setInitialValue("01111010");
-        } else if (selectedExercise.id === "number-systems.example_u04_2") {
-          setActiveMode("integers");
-          setInitialBase("bin");
-          setInitialTargetBase("oct");
-          setInitialValue("00111100");
-        } else if (selectedExercise.id === "number-systems.example_u04_3") {
-          setActiveMode("integers");
-          setInitialBase("oct");
-          setInitialTargetBase("hex");
-          setInitialValue("760");
-        } else if (selectedExercise.id === "number-systems.example_u04_4") {
-          setActiveMode("integers");
-          setInitialBase("hex");
-          setInitialTargetBase("bin");
-          setInitialValue("7F");
-        } else if (selectedExercise.id === "number-systems.example_u05_1") {
-          setActiveMode("fractional");
-          setInitialValue("10.5");
-        } else if (selectedExercise.id === "number-systems.example_u05_2") {
-          // Unnormalized is fractional converter, normalized is IEEE without bias? IEEE is normalized
-          setActiveMode("fractional");
-          setInitialValue("3.375");
-        } else if (selectedExercise.id === "number-systems.example_u05_3") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("-4.4375");
-        } else if (selectedExercise.id === "number-systems.example_u05_4") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("ieeeToDec");
-          setInitialValue("01000001010101000000000000000000"); // padded with zeros
-        } else if (selectedExercise.id === "number-systems.example_u06_1_add") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA("01101101");
-          setInitialValueB("00100111");
-        } else if (selectedExercise.id === "number-systems.example_u06_1_sub") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("subtraction");
-          setInitialValueA("01101101");
-          setInitialValueB("00100111");
-        } else if (selectedExercise.id === "number-systems.example_u06_2") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("multiplication");
-          setInitialValueA("1011");
-          setInitialValueB("11001");
-        } else if (selectedExercise.id === "number-systems.example_u07_1_1") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("127");
-        } else if (selectedExercise.id === "number-systems.example_u07_1_2") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("45");
-        } else if (selectedExercise.id === "number-systems.example_u07_1_3") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("456");
-        } else if (selectedExercise.id === "number-systems.example_u07_1_4") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("255");
-        } else if (selectedExercise.id === "number-systems.example_u07_1_5") {
-          setActiveMode("integers");
-          setInitialBase("dec");
-          setInitialTargetBase("bin");
-          setInitialValue("110");
-        } else if (selectedExercise.id === "number-systems.example_u07_2_1") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA("110101");
-          setInitialValueB("100110");
-        } else if (selectedExercise.id === "number-systems.example_u07_2_2") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA("10000000");
-          setInitialValueB("111111");
-        } else if (selectedExercise.id === "number-systems.example_u07_2_3") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("addition");
-          setInitialValueA("11111111");
-          setInitialValueB("11001000");
-        } else if (selectedExercise.id === "number-systems.example_u07_3_1") {
-          setActiveMode("negative");
-          setInitialValue("-5");
-        } else if (selectedExercise.id === "number-systems.example_u07_3_2") {
-          setActiveMode("negative");
-          setInitialValue("-125");
-        } else if (selectedExercise.id === "number-systems.example_u07_3_3") {
-          setActiveMode("negative");
-          setInitialValue("0");
-        } else if (selectedExercise.id === "number-systems.example_u07_3_4") {
-          setActiveMode("negative");
-          setInitialValue("-63");
-        } else if (selectedExercise.id === "number-systems.example_u07_3_5") {
-          setActiveMode("negative");
-          setInitialValue("-128");
-        } else if (selectedExercise.id === "number-systems.example_u07_4_1") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("subtraction");
-          setInitialValueA("110010");
-          setInitialValueB("100110");
-        } else if (selectedExercise.id === "number-systems.example_u07_4_2") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("subtraction");
-          setInitialValueA("1000011");
-          setInitialValueB("1000100");
-        } else if (selectedExercise.id === "number-systems.example_u07_4_3") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("subtraction");
-          setInitialValueA("101");
-          setInitialValueB("1000");
-        } else if (selectedExercise.id === "number-systems.example_u07_4_4") {
-          setActiveMode("arithmetic");
-          setInitialSubMode("subtraction");
-          setInitialValueA("1111");
-          setInitialValueB("1111");
-        } else if (selectedExercise.id === "number-systems.example_u07_5_1") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("5.75");
-        } else if (selectedExercise.id === "number-systems.example_u07_5_2") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("24.25");
-        } else if (selectedExercise.id === "number-systems.example_u07_5_3") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("18.375");
-        } else if (selectedExercise.id === "number-systems.example_u07_5_4") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("-2.8125");
-        } else if (selectedExercise.id === "number-systems.example_u07_5_5") {
-          setActiveMode("ieee754");
-          setInitialConverterMode("decToIeee");
-          setInitialValue("-10.9375");
+        const config = exerciseStateConfig[selectedExercise.id];
+        if (config) {
+          const init = resolveRandomInit(config);
+          setActiveMode(init.mode);
+          if (init.initialValue !== undefined)
+            setInitialValue(init.initialValue);
+          if (init.initialBase !== undefined) setInitialBase(init.initialBase);
+          if (init.initialTargetBase !== undefined)
+            setInitialTargetBase(init.initialTargetBase);
+          if (init.initialValueA !== undefined)
+            setInitialValueA(init.initialValueA);
+          if (init.initialValueB !== undefined)
+            setInitialValueB(init.initialValueB);
+          if (init.initialSubMode !== undefined)
+            setInitialSubMode(init.initialSubMode);
+          if (init.initialConverterMode !== undefined)
+            setInitialConverterMode(init.initialConverterMode);
         }
       } else {
         setIsExerciseMode(false);
         setShowSolution(true);
-        setInitialValue("");
-        setInitialBase("dec");
-        setInitialTargetBase("bin");
-        setInitialValueA("");
-        setInitialValueB("");
-        setInitialSubMode("addition");
-        setInitialConverterMode("decToIeee");
+        setInitialValue(defaultExerciseState.initialValue ?? "");
+        setInitialBase(defaultExerciseState.initialBase ?? "dec");
+        setInitialTargetBase(defaultExerciseState.initialTargetBase ?? "bin");
+        setInitialValueA(defaultExerciseState.initialValueA ?? "");
+        setInitialValueB(defaultExerciseState.initialValueB ?? "");
+        setInitialSubMode(defaultExerciseState.initialSubMode ?? "addition");
+        setInitialConverterMode(
+          defaultExerciseState.initialConverterMode ?? "decToIeee",
+        );
       }
     }, [selectedExercise]);
 
-    /** Verlässt den Übungsmodus vollständig: lokaler State + übergeordneter State */
+    /** Fully exits exercise mode: resets local state and notifies the parent. */
     const handleExitExercise = () => {
       setIsExerciseMode(false);
       setShowSolution(true);
-      // Elternelement (ModuleTopicPage) informieren → simulationExercise wird genullt
+      // Notify parent (ModuleTopicPage) so it clears the active simulation exercise
       onExitExercise?.();
     };
 
@@ -445,28 +245,10 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
       enabled: isStorageEnabled && isStorageReady,
     });
 
-    /**
-     * Tab-Click Handler: Wenn im Übungsmodus, Dialog anzeigen.
-     * Andernfalls direkt wechseln.
-     */
     const handleTabClick = (mode: SimulatorMode) => {
       if (mode === activeMode) return;
-      if (isExerciseMode && !showSolution) {
-        setPendingMode(mode);
-        setShowTabConfirm(true);
-      } else {
-        setActiveMode(mode);
-      }
-    };
-
-    /** Bestätigter Tab-Wechsel: Übungsmodus verlassen + Tab wechseln */
-    const handleTabConfirm = () => {
-      setShowTabConfirm(false);
       handleExitExercise();
-      if (pendingMode) {
-        setActiveMode(pendingMode);
-        setPendingMode(null);
-      }
+      setActiveMode(mode);
     };
 
     const resetStoredState = useCallback(() => {
@@ -641,20 +423,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
             />
           )}
         </div>
-
-        {/* Tab-Wechsel Bestätigungsdialog */}
-        <ConfirmDialog
-          isOpen={showTabConfirm}
-          title={t("common.exerciseValidation.exitTabTitle")}
-          description={t("common.exerciseValidation.exitTabDesc")}
-          confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
-          onConfirm={handleTabConfirm}
-          onCancel={() => {
-            setShowTabConfirm(false);
-            setPendingMode(null);
-          }}
-          variant="warning"
-        />
       </div>
     );
   },

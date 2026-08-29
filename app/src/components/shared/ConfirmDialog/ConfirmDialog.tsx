@@ -2,28 +2,28 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, X } from "lucide-react";
 
 export interface ConfirmDialogProps {
-  /** Ob der Dialog sichtbar ist */
+  /** Whether the dialog is visible */
   isOpen: boolean;
-  /** Titel des Dialogs */
+  /** Dialog title */
   title: string;
-  /** Beschreibungstext */
+  /** Description text */
   description: string;
-  /** Label des Bestätigungs-Buttons (destruktiv) */
+  /** Label of the confirmation button (destructive) */
   confirmLabel?: string;
-  /** Label des Abbrechen-Buttons */
+  /** Label of the cancel button */
   cancelLabel?: string;
-  /** Callback wenn bestätigt */
+  /** Callback when confirmed */
   onConfirm: () => void;
-  /** Callback wenn abgebrochen */
+  /** Callback when cancelled */
   onCancel: () => void;
-  /** Variante des Dialogs, default "warning" */
+  /** Dialog variant, default "warning" */
   variant?: "warning" | "destructive";
   testId?: string;
 }
 
 /**
- * Modaler Bestätigungsdialog für destruktive Aktionen.
- * Zeigt eine Warnung mit Bestätigen- und Abbrechen-Button.
+ * Modal confirmation dialog for destructive actions.
+ * Shows a warning with confirm and cancel buttons.
  */
 export function ConfirmDialog({
   isOpen,

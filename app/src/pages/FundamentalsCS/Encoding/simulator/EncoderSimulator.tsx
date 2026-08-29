@@ -9,7 +9,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { Base64Encoder } from "./Base64Encoder";
 import { UTF8Encoder } from "./UTF8Encoder";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import type { GeneratedExercise } from "../utils/exerciseGenerator";
@@ -140,9 +139,6 @@ export const EncoderSimulator = forwardRef<
     return selectedExercise ? selectedExercise.id.includes(".example") : true;
   });
 
-  const [pendingMode, setPendingMode] = useState<EncoderMode | null>(null);
-  const [showTabConfirm, setShowTabConfirm] = useState(false);
-
   const [initialValue, setInitialValue] = useState<string>("");
   const [initialConverterMode, setInitialConverterMode] = useState<
     "encode" | "decode"
@@ -238,21 +234,8 @@ export const EncoderSimulator = forwardRef<
 
   const handleTabClick = (mode: EncoderMode) => {
     if (mode === activeMode) return;
-    if (isExerciseMode && !showSolution) {
-      setPendingMode(mode);
-      setShowTabConfirm(true);
-    } else {
-      setActiveMode(mode);
-    }
-  };
-
-  const handleTabConfirm = () => {
-    setShowTabConfirm(false);
     handleExitExercise();
-    if (pendingMode) {
-      setActiveMode(pendingMode);
-      setPendingMode(null);
-    }
+    setActiveMode(mode);
   };
 
   const resetStoredState = useCallback(() => {
@@ -356,19 +339,6 @@ export const EncoderSimulator = forwardRef<
           />
         )}
       </div>
-
-      <ConfirmDialog
-        isOpen={showTabConfirm}
-        title={t("common.exerciseValidation.exitTabTitle")}
-        description={t("common.exerciseValidation.exitTabDesc")}
-        confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
-        onConfirm={handleTabConfirm}
-        onCancel={() => {
-          setShowTabConfirm(false);
-          setPendingMode(null);
-        }}
-        variant="warning"
-      />
     </div>
   );
 });

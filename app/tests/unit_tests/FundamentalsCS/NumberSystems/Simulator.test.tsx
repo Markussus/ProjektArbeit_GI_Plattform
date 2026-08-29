@@ -98,24 +98,6 @@ vi.mock(
   }),
 );
 
-vi.mock("@/components/shared/ConfirmDialog/ConfirmDialog", () => ({
-  ConfirmDialog: (props: {
-    isOpen: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }) =>
-    props.isOpen ? (
-      <div data-testid="mock-confirm-dialog">
-        <button data-testid="mock-confirm" onClick={props.onConfirm}>
-          confirm
-        </button>
-        <button data-testid="mock-cancel" onClick={props.onCancel}>
-          cancel
-        </button>
-      </div>
-    ) : null,
-}));
-
 function createExercise(
   id: string,
   title: string,
@@ -335,7 +317,7 @@ describe("Simulator", () => {
   });
 
   describe("when in exercise mode without solution shown", () => {
-    it("shows confirm dialog when switching tabs", () => {
+    it("exits exercise and switches tab immediately", () => {
       const onExitExercise = vi.fn();
       render(
         <Simulator
@@ -357,47 +339,8 @@ describe("Simulator", () => {
 
       fireEvent.click(screen.getByTestId("ns-tab-fractional"));
 
-      expect(screen.getByTestId("mock-confirm-dialog")).toBeTruthy();
-    });
-
-    it("exits exercise and switches tab on confirm", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <Simulator
-          selectedExercise={createExercise(
-            "number-systems.ex_u03_decToBin",
-            "Dezimal zu Binär",
-            "Convert decimal to binary",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("ns-tab-fractional"));
-      fireEvent.click(screen.getByTestId("mock-confirm"));
-
       expect(onExitExercise).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
-    });
-
-    it("stays on current tab when cancel is clicked", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <Simulator
-          selectedExercise={createExercise(
-            "number-systems.ex_u03_decToBin",
-            "Dezimal zu Binär",
-            "Convert decimal to binary",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("ns-tab-fractional"));
-      fireEvent.click(screen.getByTestId("mock-cancel"));
-
-      expect(onExitExercise).not.toHaveBeenCalled();
-      expect(screen.getByTestId("mock-integer-converter")).toBeTruthy();
     });
   });
 
