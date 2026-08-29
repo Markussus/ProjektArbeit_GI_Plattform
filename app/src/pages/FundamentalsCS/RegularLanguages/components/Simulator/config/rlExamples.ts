@@ -40,6 +40,20 @@ export const exampleGrammarToLanguage: RLExample = {
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
 };
 
+/**
+ * The grammar the Grammar → Language converter used to open with. Free mode
+ * starts blank now, so it is offered here instead.
+ */
+export const exampleGrammarDefault: RLExample = {
+  id: "grammar-default",
+  titleKey: "regular-languages.examples.grammarDefault.title",
+  descriptionKey: "regular-languages.examples.grammarDefault.description",
+  mode: "grammarToLanguage",
+  category: "grammarToLanguage",
+  icon: ListOrdered,
+  grammarSource: ["S -> aS | bA", "A -> bA | ε"].join("\n"),
+};
+
 export const exampleLanguageToGrammar: RLExample = {
   id: "language-to-grammar",
   titleKey: "regular-languages.examples.languageToGrammar.title",
@@ -68,7 +82,7 @@ export const exampleRecognizeWord: RLExample = {
   category: "recognizeWord",
   icon: SearchCheck,
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
-  testWord: "001",
+  testWord: "001, 010, 1, 00",
 };
 
 /**
@@ -97,8 +111,8 @@ export const exampleLectureGrammar2: RLExample = {
 };
 
 /**
- * The word list shown by default in the Language → Grammar simulator, exposed
- * here so learners can reopen it from the Examples tab.
+ * The introductory word list for the Language → Grammar converter. The
+ * simulator itself opens blank, so this is where learners pick it up.
  */
 export const exampleLanguageDefault: RLExample = {
   id: "language-default",
@@ -122,6 +136,7 @@ export const exampleLectureLanguage1: RLExample = {
 
 export const rlExamples: RLExample[] = [
   exampleGrammarToLanguage,
+  exampleGrammarDefault,
   exampleLectureGrammar1,
   exampleLectureGrammar2,
   exampleLanguageToGrammar,

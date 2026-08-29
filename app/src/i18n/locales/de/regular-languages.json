@@ -62,6 +62,10 @@
       "title": "Grammatik → Sprache (Breitensuche-Aufzählung)",
       "description": "Zählt die ersten Wörter auf, die eine Grammatik per BFS über ihren Ableitungen erzeugt."
     },
+    "grammarDefault": {
+      "title": "Grammatik → Sprache (a’s, dann mindestens ein b)",
+      "description": "Die Grammatik, mit der der Grammatik-→-Sprache-Konverter früher startete: beliebig viele a’s, gefolgt von mindestens einem b."
+    },
     "languageToGrammar": {
       "title": "Sprache → Grammatik (Wortliste)",
       "description": "Erzeugt aus einer expliziten Wortmenge wie L = {\"ab\", \"abb\", \"abbb\"} eine reguläre Grammatik, indem die Wörter zu einem Präfixbaum kombiniert werden."
@@ -72,7 +76,7 @@
     },
     "recognizeWord": {
       "title": "Wort erkennen (Zugehörigkeitstest)",
-      "description": "Prüft für eine Grammatik, ob ein konkretes Wort in der erzeugten Sprache liegt."
+      "description": "Prüft eine kommagetrennte Wortliste gegen die Sprache, die eine Grammatik erzeugt."
     },
     "lectureGrammar1": {
       "title": "Grammatik → Sprache (Nullen gefolgt von einer Eins)",
@@ -88,7 +92,7 @@
     },
     "languageDefault": {
       "title": "Sprache → Grammatik (Nullen, eine Eins, Nullen)",
-      "description": "Die voreingestellte Wortliste des Sprache-→-Grammatik-Simulators: Nullen, eine einzelne 1, dann Nullen (ein offenes Muster mit abschließendem „..“)."
+      "description": "Nullen, eine einzelne 1, dann Nullen — ein offenes Muster mit abschließendem „..“."
     }
   },
   "exercises": {
@@ -172,11 +176,7 @@
     "l2gYourGrammar": "Ihre Grammatik",
     "l2gHelp": "Schreiben Sie eine rechtslineare Grammatik, die die Zielsprache erzeugt, und klicken Sie dann auf „Lösung prüfen“.",
     "checkEmpty": "Geben Sie mindestens ein Wort ein und prüfen Sie erneut.",
-    "checkUnavailable": "Diese Übung kann nicht automatisch geprüft werden.",
-    "confirmTitle": "Vollständige Lösung anzeigen?",
-    "confirmBody": "Die Lösung wird hier angezeigt und in den Simulator geladen. Sie können stattdessen weiter probieren.",
-    "confirmYes": "Ja, Lösung anzeigen",
-    "confirmNo": "Weiter probieren"
+    "checkUnavailable": "Diese Übung kann nicht automatisch geprüft werden."
   },
   "languageErrors": {
     "empty": "Geben Sie eine Sprachdefinition ein.",

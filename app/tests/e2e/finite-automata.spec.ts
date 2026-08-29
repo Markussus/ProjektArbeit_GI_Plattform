@@ -62,11 +62,12 @@ test.describe("Finite Automata — Simulation tab", () => {
     await expect(page.getByText("Transition Table")).toBeVisible();
   });
 
-  test("renders the default DFA states as column headers", async ({ page }) => {
-    // defaultDFAProgram states: S0, S1, S2
+  test("opens on the blank starter with a single state column", async ({
+    page,
+  }) => {
+    // emptyFAProgram: one start state, no transitions, no accept states.
     await expect(page.getByRole("columnheader", { name: /S0/ })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /S1/ })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /S2/ })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /S1/ })).toHaveCount(0);
   });
 
   test("marks the start state with →", async ({ page }) => {
@@ -75,10 +76,8 @@ test.describe("Finite Automata — Simulation tab", () => {
     ).toBeVisible();
   });
 
-  test("marks the accept state with *", async ({ page }) => {
-    await expect(
-      page.getByRole("columnheader", { name: /S2.*\*/ }),
-    ).toBeVisible();
+  test("marks no accept state on the blank starter", async ({ page }) => {
+    await expect(page.getByRole("columnheader", { name: /\*/ })).toHaveCount(0);
   });
 
   test("shows the alphabet symbol rows (a and b)", async ({ page }) => {
@@ -89,24 +88,15 @@ test.describe("Finite Automata — Simulation tab", () => {
     await expect(cellsB.first()).toBeVisible();
   });
 
-  test("pre-fills transition inputs with the default DFA transitions", async ({
-    page,
-  }) => {
-    // δ(S0, a) = S1
-    const input = page.getByLabel("δ(S0, a)");
-    await expect(input).toHaveValue("S1");
+  test("starts with empty transition inputs", async ({ page }) => {
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("");
+    await expect(page.getByLabel("δ(S0, b)")).toHaveValue("");
   });
 
-  test("pre-fills δ(S1, b) = S2", async ({ page }) => {
-    const input = page.getByLabel("δ(S1, b)");
-    await expect(input).toHaveValue("S2");
-  });
-
-  test("shows the Input Word field with default value 'aab'", async ({
+  test("shows an empty Input Word field with its placeholder", async ({
     page,
   }) => {
-    const inputWord = page.getByPlaceholder("aab");
-    await expect(inputWord).toHaveValue("aab");
+    await expect(page.getByPlaceholder("aab")).toHaveValue("");
   });
 
   test("shows the Start Simulation button", async ({ page }) => {
@@ -125,8 +115,8 @@ test.describe("Finite Automata — editor interactions", () => {
   test("allows editing a transition input", async ({ page }) => {
     const input = page.getByLabel("δ(S0, a)");
     await input.clear();
-    await input.fill("S2");
-    await expect(input).toHaveValue("S2");
+    await input.fill("S0");
+    await expect(input).toHaveValue("S0");
   });
 
   test("allows clearing a transition", async ({ page }) => {
@@ -163,7 +153,7 @@ test.describe("Finite Automata — editor interactions", () => {
     await expect(page.getByText("Transition Table")).toBeVisible();
   });
 
-  test("reset deletes the saved draft and restores the default after remount", async ({
+  test("reset deletes the saved draft and restores the blank starter", async ({
     page,
   }) => {
     await page.evaluate(() => localStorage.clear());
@@ -172,7 +162,7 @@ test.describe("Finite Automata — editor interactions", () => {
       .getByTestId("header-transfer-input")
       .inputValue();
     const transition = page.getByLabel("δ(S0, a)");
-    await transition.fill("S2");
+    await transition.fill("S0");
     await page.getByPlaceholder("aab").fill("ab");
     await page.getByRole("button", { name: /Start Simulation/i }).click();
     await expect
@@ -182,8 +172,8 @@ test.describe("Finite Automata — editor interactions", () => {
       .not.toBeNull();
 
     await page.getByTestId("simulation-reset").click();
-    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
-    await expect(page.getByPlaceholder("aab")).toHaveValue("aab");
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("");
+    await expect(page.getByPlaceholder("aab")).toHaveValue("");
     await expect
       .poll(() =>
         page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
@@ -196,7 +186,7 @@ test.describe("Finite Automata — editor interactions", () => {
 
     await page.getByRole("button", { name: "Overview" }).click();
     await page.getByRole("button", { name: "Simulation" }).click();
-    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("");
   });
 });
 
@@ -266,6 +256,7 @@ test.describe("Finite Automata — running a simulation", () => {
   });
 
   test("simulation view shows the input word", async ({ page }) => {
+    await page.getByPlaceholder("aab").fill("aab");
     await page.getByRole("button", { name: /Start Simulation/i }).click();
     // The input word "aab" should be displayed in the simulation view
     await expect(page.getByText("aab")).toBeVisible({ timeout: 5000 });
@@ -277,6 +268,31 @@ test.describe("Finite Automata — running a simulation", () => {
     await expect(page.getByText("Transition Table")).toBeVisible({
       timeout: 5000,
     });
+  });
+});
+
+test.describe("Finite Automata — opening an example", () => {
+  test("loads the example's automaton over a previously saved draft", async ({
+    page,
+  }) => {
+    // The blank free-mode starter autosaves, so by the time an example is
+    // opened there is always a stored draft that must not win.
+    await page.goto(FA_URL);
+    await page.getByRole("button", { name: "Simulation" }).click();
+    await page.getByRole("button", { name: /Start Simulation/i }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+      )
+      .not.toBeNull();
+
+    await page.getByRole("button", { name: "Examples" }).click();
+    await page.getByTestId("fa-example-card-ends-with-ab-select").click();
+    await page.getByTestId("fa-example-card-ends-with-ab-open").click();
+
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
+    await expect(page.getByLabel("δ(S1, b)")).toHaveValue("S2");
+    await expect(page.getByPlaceholder("aab")).toHaveValue("aab");
   });
 });
 

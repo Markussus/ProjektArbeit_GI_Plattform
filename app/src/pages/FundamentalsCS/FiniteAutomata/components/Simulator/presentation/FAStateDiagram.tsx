@@ -91,30 +91,48 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
   // Drag a node by tracking the pointer at window level (so it keeps working
   // even if the cursor leaves the SVG mid-drag), mapping client coordinates
   // into the SVG's user space so it stays accurate at any zoom level.
+  //
+  // The screen -> user matrix is read once per drag and pointer moves are
+  // coalesced into a single update per animation frame. Calling getScreenCTM()
+  // on every mousemove forces a synchronous layout, and a high-rate mouse then
+  // renders far more often than the display refreshes, which made the node
+  // trail behind the cursor.
   useEffect(() => {
     if (!draggedNodeId) {
       return;
     }
+    const screenToUser = svgElementRef.current?.getScreenCTM()?.inverse();
+    let frameId: number | null = null;
+    let pending: Point | null = null;
+
+    const flush = () => {
+      frameId = null;
+      const position = pending;
+      pending = null;
+      if (position) {
+        setNodePositions((current) =>
+          new Map(current).set(draggedNodeId, position),
+        );
+      }
+    };
+
     const handleMove = (event: MouseEvent) => {
-      const svg = svgElementRef.current;
-      const matrix = svg?.getScreenCTM();
-      if (!svg || !matrix) {
+      if (!screenToUser) {
         return;
       }
-      const point = svg.createSVGPoint();
-      point.x = event.clientX;
-      point.y = event.clientY;
-      const transformed = point.matrixTransform(matrix.inverse());
-      setNodePositions((current) => {
-        const next = new Map(current);
-        next.set(draggedNodeId, { x: transformed.x, y: transformed.y });
-        return next;
-      });
+      const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+        screenToUser,
+      );
+      pending = { x: point.x, y: point.y };
+      frameId ??= requestAnimationFrame(flush);
     };
     const handleUp = () => setDraggedNodeId(null);
     window.addEventListener("mousemove", handleMove);
     window.addEventListener("mouseup", handleUp);
     return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("mouseup", handleUp);
     };
@@ -130,6 +148,9 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
 
   const showEdgeLabels = scale >= EDGE_LABEL_MIN_SCALE;
   const showNodeLabels = scale >= NODE_LABEL_MIN_SCALE;
+  // Gaussian-blur glows have to be re-rasterised on every frame a node moves,
+  // so they are dropped for the duration of a drag and restored on release.
+  const isDragging = draggedNodeId !== null;
   const isLargeGraph = layout.strategy === "force";
 
   // Adaptive SVG element height: large graphs get more screen real estate so
@@ -176,7 +197,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
         </div>
       </div>
       <div
-        className="relative"
+        className="relative flex flex-1 items-center justify-center overflow-hidden"
         style={{
           background: "var(--fa-bg, #0a0a0a)",
         }}
@@ -188,11 +209,10 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           }}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           preserveAspectRatio="xMidYMid meet"
-          className="block w-full select-none"
+          className="block h-full w-full select-none"
           style={{
             maxHeight: svgMaxHeight,
             minHeight: 320,
-            aspectRatio: `${layout.width} / ${layout.height}`,
             cursor: isPanning ? "grabbing" : "grab",
             touchAction: "none",
           }}
@@ -378,7 +398,9 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
             return (
               <g
                 key={node.id}
-                filter={isActive ? "url(#fa-glow-cyan)" : undefined}
+                filter={
+                  isActive && !isDragging ? "url(#fa-glow-cyan)" : undefined
+                }
                 onMouseDown={(event) => {
                   // Left-button only; stop the SVG pan handler from also firing.
                   if (event.button !== 0) return;
@@ -398,7 +420,9 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                     fill="none"
                     stroke={isActive ? "var(--fa-cyan)" : "var(--fa-green)"}
                     strokeWidth={1.5}
-                    filter={isActive ? undefined : "url(#fa-glow-green)"}
+                    filter={
+                      isActive || isDragging ? undefined : "url(#fa-glow-green)"
+                    }
                   />
                 )}
 
@@ -414,7 +438,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
                     stroke="var(--fa-red)"
                     strokeWidth={1.5}
                     strokeDasharray="4 3"
-                    filter="url(#fa-glow-red)"
+                    filter={isDragging ? undefined : "url(#fa-glow-red)"}
                   />
                 )}
 
@@ -653,7 +677,7 @@ function SelfLoop({
         strokeWidth={isActive ? 2.5 : 1.5}
         opacity={edgeOpacity}
         markerEnd={markerEnd}
-        style={{ transition: "all 0.3s" }}
+        style={{ transition: "stroke 0.3s, opacity 0.3s" }}
       />
       {showLabel && (
         <>
@@ -762,7 +786,7 @@ function CurvedEdge({
         strokeWidth={isActive ? 2.5 : 1.5}
         opacity={edgeOpacity}
         markerEnd={markerEnd}
-        style={{ transition: "all 0.3s" }}
+        style={{ transition: "stroke 0.3s, opacity 0.3s" }}
       />
       {showLabel && (
         <>

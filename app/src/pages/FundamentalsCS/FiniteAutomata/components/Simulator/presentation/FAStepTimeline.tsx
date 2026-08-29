@@ -108,9 +108,6 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
                 alignItems: "center",
                 justifyContent: "center",
                 transition: "all 0.2s",
-                boxShadow: step.isCurrent
-                  ? "0 0 10px rgba(0, 229, 255, 0.35)"
-                  : "none",
               }}
             >
               {step.label}

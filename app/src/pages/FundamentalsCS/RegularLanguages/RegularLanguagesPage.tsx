@@ -13,6 +13,8 @@ export function RegularLanguagesPage() {
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      confirmExerciseTabExit={false}
+      clearSimulationSelectionOnTabExit
     />
   );
 }

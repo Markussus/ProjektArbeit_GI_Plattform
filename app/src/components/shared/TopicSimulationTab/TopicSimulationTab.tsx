@@ -13,6 +13,7 @@ interface TopicSimulationTabProps {
   onReset?: () => void;
   resetDisabled?: boolean;
   overlayControls?: boolean;
+  hideWorkspaceControls?: boolean;
   selectedItemActions?: ReactNode;
   onExitExercise?: () => void;
   onExitExample?: () => void;
@@ -28,6 +29,7 @@ export function TopicSimulationTab({
   onReset,
   resetDisabled,
   overlayControls,
+  hideWorkspaceControls,
   selectedItemActions,
   onExitExercise,
   onExitExample,
@@ -56,6 +58,7 @@ export function TopicSimulationTab({
       onReset={onReset}
       resetDisabled={resetDisabled}
       overlayControls={overlayControls}
+      hideWorkspaceControls={hideWorkspaceControls}
       onCloseItem={activeItem ? handleCloseItem : undefined}
     >
       {children}

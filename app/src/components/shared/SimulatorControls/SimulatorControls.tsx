@@ -54,7 +54,7 @@ export function SimulatorControls({
   };
 
   const buttonClasses = cn(
-    "flex items-center justify-center p-2 rounded-md transition-colors",
+    "flex size-9 shrink-0 items-center justify-center rounded-md transition-colors",
     "bg-background border border-input hover:bg-accent hover:text-accent-foreground",
     "disabled:opacity-50 disabled:cursor-not-allowed",
   );
@@ -75,7 +75,7 @@ export function SimulatorControls({
           title={t("common.simulation.controls.reset", "Reset")}
           aria-label={t("common.simulation.controls.reset", "Reset")}
         >
-          <RotateCcw className="h-5 w-5" />
+          <RotateCcw className="size-4" />
         </button>
 
         <button
@@ -86,7 +86,7 @@ export function SimulatorControls({
           title={t("common.simulation.controls.stepBack", "Step backward")}
           aria-label={t("common.simulation.controls.stepBack", "Step backward")}
         >
-          <StepBack className="h-5 w-5" />
+          <StepBack className="size-4" />
         </button>
 
         {isPlaying ? (
@@ -100,7 +100,7 @@ export function SimulatorControls({
             title={t("common.simulation.controls.pause", "Pause")}
             aria-label={t("common.simulation.controls.pause", "Pause")}
           >
-            <Pause className="h-5 w-5 fill-current" />
+            <Pause className="size-4 fill-current" />
           </button>
         ) : (
           <button
@@ -114,7 +114,7 @@ export function SimulatorControls({
             title={t("common.simulation.controls.play", "Play")}
             aria-label={t("common.simulation.controls.play", "Play")}
           >
-            <Play className="h-5 w-5 fill-current" />
+            <Play className="size-4 fill-current" />
           </button>
         )}
 
@@ -126,7 +126,7 @@ export function SimulatorControls({
           title={t("common.simulation.controls.step", "Step forward")}
           aria-label={t("common.simulation.controls.step", "Step forward")}
         >
-          <StepForward className="h-5 w-5" />
+          <StepForward className="size-4" />
         </button>
       </div>
 

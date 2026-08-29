@@ -87,10 +87,6 @@
   "exerciseWorkspace": {
     "check": "Lösung prüfen",
     "showSolution": "Lösung laden",
-    "confirmTitle": "Vollständige Lösung anzeigen?",
-    "confirmBody": "Ihr aktueller Automat wird durch die Referenzlösung ersetzt. Sie können die Aufgabe jederzeit aus dem Tab „Übungen“ zurücksetzen.",
-    "confirmYes": "Ja, Lösung anzeigen",
-    "confirmNo": "Weiter versuchen",
     "structuralFail": "Ihr Automat ist noch nicht gültig",
     "structuralHint": "Beheben Sie die markierten Konfigurationsprobleme, bevor wir mit der Lösung vergleichen können.",
     "passed": "Alle Tests bestanden!",
@@ -115,6 +111,10 @@
     "lecture": {
       "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
       "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da für die letzte „0“ in S2 kein Übergang definiert ist. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
+    },
+    "endsWithAb": {
+      "title": "Endet auf „ab“",
+      "description": "Ein DFA über {a, b}, der genau die Wörter akzeptiert, die auf „ab“ enden — der Automat, mit dem der Simulator früher startete. „aab“ wird akzeptiert, „aba“ abgelehnt."
     },
     "grammar": {
       "title": "Grammatik → Automat",

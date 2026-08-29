@@ -9,7 +9,14 @@ import {
   type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Settings, Sparkles, Play } from "lucide-react";
+import {
+  Settings,
+  Sparkles,
+  Play,
+  RotateCcw,
+  Maximize2,
+  X,
+} from "lucide-react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -23,7 +30,7 @@ import {
 import { cloneJson, cn } from "@/lib/utils";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
 import { useFASimulator } from "./application/useFASimulator";
-import { defaultDFAProgram, defaultInputWord } from "./config/defaultFAProgram";
+import { emptyFAProgram, emptyInputWord } from "./config/emptyFAProgram";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
 import { FAConfigView } from "./presentation/FAConfigView";
@@ -41,14 +48,31 @@ export interface FASimulatorHandle {
 
 interface FASimulatorProps {
   ref?: Ref<FASimulatorHandle>;
+  isFocused?: boolean;
+  onToggleFocus?: () => void;
+  onReset?: () => void;
 }
 
-export function FASimulator({ ref }: FASimulatorProps) {
+export function FASimulator({
+  ref,
+  isFocused,
+  onToggleFocus,
+  onReset: onWorkspaceReset,
+}: FASimulatorProps) {
   const { t } = useTranslation();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  /** Brings the whole workspace panel, controls included, back into view. */
+  const scrollWorkspaceIntoView = () => {
+    requestAnimationFrame(() => {
+      rootRef.current
+        ?.closest("[data-testid='simulation-workspace']")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
   const [program, setProgram] = useState<FAProgram>(() =>
-    cloneJson(defaultDFAProgram),
+    cloneJson(emptyFAProgram),
   );
-  const [inputWord, setInputWord] = useState(defaultInputWord);
+  const [inputWord, setInputWord] = useState(emptyInputWord);
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
@@ -56,6 +80,11 @@ export function FASimulator({ ref }: FASimulatorProps) {
   // saved draft, so storage is considered ready immediately in that case.
   const [isStorageReady, setIsStorageReady] = useState(
     () => useFASimulatorStore.getState().pendingProgram !== null,
+  );
+  // Read at mount: the effect that clears the pending program runs before the
+  // restore effect below, so by then the store no longer shows one was queued.
+  const hadPendingProgramOnMount = useRef(
+    useFASimulatorStore.getState().pendingProgram !== null,
   );
 
   const editor = useFAConfigEditor(program);
@@ -175,8 +204,8 @@ export function FASimulator({ ref }: FASimulatorProps) {
     }
     hasInitializedStorage.current = true;
 
-    // A pending program will be applied this render; don't restore over it.
-    if (useFASimulatorStore.getState().pendingProgram !== null) {
+    // An example/exercise queued a program for this mount; don't restore over it.
+    if (hadPendingProgramOnMount.current) {
       return;
     }
 
@@ -213,6 +242,11 @@ export function FASimulator({ ref }: FASimulatorProps) {
     if (!result.ok) return;
     setProgram(result.program);
     setIsEditMode(false);
+    // Start Simulation sits at the bottom of a tall editor and swaps it for a
+    // much shorter simulation view, which would otherwise leave the page
+    // parked below the workspace header - reset, expand and Edit Configuration
+    // all scrolled out of sight above.
+    scrollWorkspaceIntoView();
     void exportAndStoreTrainingCenterValue(
       storageIdentifier,
       result.program,
@@ -232,7 +266,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
     const exercise = activeExerciseId
       ? findFAExercise(activeExerciseId)
       : undefined;
-    const resetProgram = cloneJson(exercise?.starter ?? defaultDFAProgram);
+    const resetProgram = cloneJson(exercise?.starter ?? emptyFAProgram);
 
     if (activeExerciseId) {
       clearExerciseDraft(activeExerciseId);
@@ -244,7 +278,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
     editor.resetToProgram(resetProgram);
     setInputWord(
       exercise?.exampleWords?.accept.find((word) => word.length > 0) ??
-        defaultInputWord,
+        emptyInputWord,
     );
     setIsEditMode(true);
     setEditorMode("manual");
@@ -272,6 +306,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
 
   return (
     <div
+      ref={rootRef}
       className={cn(
         "mx-auto flex w-full flex-col gap-6 p-2 sm:p-4",
         isEditMode ? "max-w-none" : "max-w-7xl",
@@ -281,20 +316,61 @@ export function FASimulator({ ref }: FASimulatorProps) {
 
       {isEditMode ? (
         <div className="flex flex-col gap-6">
-          {/* Mode Toggle */}
-          <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
-            <ModeButton
-              active={editorMode === "manual"}
-              onClick={() => setEditorMode("manual")}
-              icon={<Settings className="h-4 w-4" />}
-              label={t("finite-automata.editor.manual", "Manual Editor")}
-            />
-            <ModeButton
-              active={editorMode === "grammar"}
-              onClick={() => setEditorMode("grammar")}
-              icon={<Sparkles className="h-4 w-4" />}
-              label={t("finite-automata.editor.grammar", "From Grammar")}
-            />
+          {/* Mode Toggle & Workspace Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
+              <ModeButton
+                active={editorMode === "manual"}
+                onClick={() => setEditorMode("manual")}
+                icon={<Settings className="h-4 w-4" />}
+                label={t("finite-automata.editor.manual", "Manual Editor")}
+              />
+              <ModeButton
+                active={editorMode === "grammar"}
+                onClick={() => setEditorMode("grammar")}
+                icon={<Sparkles className="h-4 w-4" />}
+                label={t("finite-automata.editor.grammar", "From Grammar")}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              {onWorkspaceReset && (
+                <button
+                  type="button"
+                  onClick={onWorkspaceReset}
+                  data-testid="simulation-reset"
+                  aria-label={t("common.trainingCenter.resetCurrent")}
+                  title={t("common.trainingCenter.resetCurrent")}
+                  className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  <RotateCcw className="size-4" />
+                </button>
+              )}
+              {onToggleFocus && (
+                <button
+                  type="button"
+                  onClick={onToggleFocus}
+                  data-testid="simulation-focus-toggle"
+                  aria-pressed={isFocused}
+                  aria-label={
+                    isFocused
+                      ? t("common.simulation.exitFocus")
+                      : t("common.simulation.expand")
+                  }
+                  title={
+                    isFocused
+                      ? t("common.simulation.close")
+                      : t("common.simulation.expand")
+                  }
+                  className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {isFocused ? (
+                    <X className="size-4" />
+                  ) : (
+                    <Maximize2 className="size-4" />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
 
           {editorMode === "manual" && (
@@ -302,11 +378,11 @@ export function FASimulator({ ref }: FASimulatorProps) {
               key="manual"
               className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-6 duration-300"
             >
-              <div className="bg-card rounded-xl border p-6 shadow-sm">
+              <div className="bg-card rounded-xl border p-4 shadow-sm sm:p-6">
                 <FAConfigView editor={editor} />
               </div>
 
-              <div className="bg-card flex flex-col gap-3 rounded-xl border p-6 shadow-sm">
+              <div className="bg-card flex flex-col gap-3 rounded-xl border p-4 shadow-sm sm:p-6">
                 <label className="text-sm font-semibold">
                   {t("finite-automata.config.inputWord", "Input Word")}
                 </label>
@@ -339,7 +415,7 @@ export function FASimulator({ ref }: FASimulatorProps) {
           {editorMode === "grammar" && (
             <div
               key="grammar"
-              className="bg-card animate-in fade-in slide-in-from-bottom-2 rounded-xl border p-6 shadow-sm duration-300"
+              className="bg-card animate-in fade-in slide-in-from-bottom-2 rounded-xl border p-4 shadow-sm duration-300 sm:p-6"
             >
               <FAGrammarInput onConvert={handleGrammarConvert} />
             </div>
@@ -352,6 +428,9 @@ export function FASimulator({ ref }: FASimulatorProps) {
           status={simulation.status}
           speed={simulation.speed}
           error={simulation.error}
+          isFocused={isFocused}
+          onToggleFocus={onToggleFocus}
+          onResetWorkspace={onWorkspaceReset}
           onEditConfig={handleEditProgram}
           onPlay={simulation.play}
           onPause={simulation.pause}

@@ -18,7 +18,9 @@ interface RLGrammarToLanguageProps {
   resetVersion?: number;
 }
 
-const DEFAULT_SOURCE = ["S -> aS | bA", "A -> bA | ε"].join("\n");
+// Free mode opens blank - the worked grammars live in the Examples tab.
+// The input card keeps its placeholder so the notation stays visible.
+const EMPTY_SOURCE = "";
 
 // Documents the right-linear grammar notation, mirroring the "Supported
 // Formats" panel on the Finite Automata page.
@@ -36,7 +38,7 @@ export function RLGrammarToLanguage({
   resetVersion = 0,
 }: RLGrammarToLanguageProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
+  const [source, setSource] = useState(initialGrammar ?? EMPTY_SOURCE);
   const [maxLen, setMaxLen] = useState(6);
   const [maxWords, setMaxWords] = useState(20);
   const [showFormats, setShowFormats] = useState(false);
@@ -52,7 +54,7 @@ export function RLGrammarToLanguage({
   const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
   if (resetVersion !== appliedResetVersion) {
     setAppliedResetVersion(resetVersion);
-    setSource(DEFAULT_SOURCE);
+    setSource(EMPTY_SOURCE);
   }
 
   const storageIdentifier = useRLPersistedSource({

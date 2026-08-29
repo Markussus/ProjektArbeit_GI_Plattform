@@ -31,9 +31,11 @@ interface RLLanguageToGrammarProps {
   resetVersion?: number;
 }
 
-// Kept short enough to sit on one line in the textarea; three words are still
-// enough for the parser to infer the pattern 0ⁿ 1 0ᵐ from the trailing "..".
-const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", ..}';
+// Free mode opens blank - the worked languages live in the Examples tab,
+// where this word list stays available as its own example. It doubles as the
+// textarea placeholder so the expected notation is still visible.
+const EMPTY_SOURCE = "";
+const SOURCE_PLACEHOLDER = 'L = {"010", "0010", "00100", ..}';
 
 // Documents the language definition syntax in the "Supported Formats" panel.
 const LANGUAGE_ENUMERATION_EXAMPLE = 'L = {"010", "0010", "00100", ..}';
@@ -56,7 +58,7 @@ export function RLLanguageToGrammar({
   resetVersion = 0,
 }: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
+  const [source, setSource] = useState(initialSource ?? EMPTY_SOURCE);
   const [showFormats, setShowFormats] = useState(false);
   // Detailed = one non-terminal per prefix; Simplified = minimal merged grammar.
   const [simplified, setSimplified] = useState(false);
@@ -72,7 +74,7 @@ export function RLLanguageToGrammar({
   const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
   if (resetVersion !== appliedResetVersion) {
     setAppliedResetVersion(resetVersion);
-    setSource(DEFAULT_SOURCE);
+    setSource(EMPTY_SOURCE);
   }
 
   const storageIdentifier = useRLPersistedSource({
@@ -155,7 +157,7 @@ export function RLLanguageToGrammar({
             value={source}
             onChange={(e) => setSource(e.target.value)}
             spellCheck={false}
-            placeholder={DEFAULT_SOURCE}
+            placeholder={SOURCE_PLACEHOLDER}
             className="border-input bg-background focus:ring-primary min-h-[120px] w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
           />
 

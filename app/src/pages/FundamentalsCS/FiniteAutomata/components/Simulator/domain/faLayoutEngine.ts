@@ -41,6 +41,14 @@ const DEFAULT_OPTIONS: LayoutOptions = {
 /** From this many states on, a circle gets too crowded — use forces instead. */
 const FORCE_LAYOUT_MIN_STATES = 9;
 
+/**
+ * Smallest canvas the diagram is drawn on. Keeping a floor here stops a tiny
+ * automaton from being blown up to fill the panel; the graph is centred inside
+ * whatever space is left over.
+ */
+const MIN_CANVAS_WIDTH = 520;
+const MIN_CANVAS_HEIGHT = 360;
+
 export function computeLayout(
   program: FAProgram,
   options: Partial<LayoutOptions> = {},
@@ -56,8 +64,8 @@ export function computeLayout(
       nodes: [],
       nodeMap: new Map(),
       edges: [],
-      width: 320,
-      height: 200,
+      width: MIN_CANVAS_WIDTH,
+      height: MIN_CANVAS_HEIGHT,
       strategy: "single",
       nodeRadius: opts.nodeRadius,
     };
@@ -85,17 +93,30 @@ export function computeLayout(
   resolveOverlaps(nodes, opts.nodeRadius);
 
   const bounds = computeBounds(nodes);
-  const offsetX = opts.padding - bounds.minX + opts.nodeRadius;
-  const offsetY = opts.padding - bounds.minY + opts.nodeRadius;
+  const contentWidth =
+    bounds.maxX - bounds.minX + opts.padding * 2 + opts.nodeRadius * 2;
+  const contentHeight =
+    bounds.maxY - bounds.minY + opts.padding * 2 + opts.nodeRadius * 2;
+
+  const minCanvasWidth =
+    n <= 1 ? 260 : n <= 2 ? 340 : n <= 4 ? 420 : MIN_CANVAS_WIDTH;
+  const minCanvasHeight =
+    n <= 1 ? 200 : n <= 2 ? 260 : n <= 4 ? 300 : MIN_CANVAS_HEIGHT;
+
+  const width = Math.max(contentWidth, minCanvasWidth);
+  const height = Math.max(contentHeight, minCanvasHeight);
+
+  // A one- or two-state automaton is smaller than the minimum canvas. Split the
+  // leftover space evenly so it sits in the middle of the diagram panel instead
+  // of being parked in the top-left corner with a large void beside it.
+  const offsetX =
+    opts.padding - bounds.minX + opts.nodeRadius + (width - contentWidth) / 2;
+  const offsetY =
+    opts.padding - bounds.minY + opts.nodeRadius + (height - contentHeight) / 2;
   for (const node of nodes) {
     node.x += offsetX;
     node.y += offsetY;
   }
-
-  const width =
-    bounds.maxX - bounds.minX + opts.padding * 2 + opts.nodeRadius * 2;
-  const height =
-    bounds.maxY - bounds.minY + opts.padding * 2 + opts.nodeRadius * 2;
 
   const nodeMap = new Map(nodes.map((node) => [node.id, node]));
   const edges = buildEdges(program);
@@ -104,8 +125,8 @@ export function computeLayout(
     nodes,
     nodeMap,
     edges,
-    width: Math.max(width, 320),
-    height: Math.max(height, 220),
+    width,
+    height,
     strategy,
     nodeRadius: opts.nodeRadius,
   };

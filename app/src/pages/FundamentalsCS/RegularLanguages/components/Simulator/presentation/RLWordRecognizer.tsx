@@ -20,8 +20,10 @@ interface RLWordRecognizerProps {
   resetVersion?: number;
 }
 
-const DEFAULT_SOURCE = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
-const DEFAULT_WORD = "001, 010, 1, 00";
+// Free mode opens blank - the worked grammar and its test words live in the
+// Examples tab. Both fields keep their placeholders.
+const EMPTY_SOURCE = "";
+const EMPTY_WORD = "";
 
 interface PerWordResult {
   word: string;
@@ -37,8 +39,8 @@ export function RLWordRecognizer({
   resetVersion = 0,
 }: RLWordRecognizerProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
-  const [word, setWord] = useState(initialWord ?? DEFAULT_WORD);
+  const [source, setSource] = useState(initialGrammar ?? EMPTY_SOURCE);
+  const [word, setWord] = useState(initialWord ?? EMPTY_WORD);
 
   // Adopt freshly seeded inputs (from an example/exercise) without remounting,
   // so the values persist after the store clears the pending scenario.
@@ -56,8 +58,8 @@ export function RLWordRecognizer({
   const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
   if (resetVersion !== appliedResetVersion) {
     setAppliedResetVersion(resetVersion);
-    setSource(DEFAULT_SOURCE);
-    setWord(DEFAULT_WORD);
+    setSource(EMPTY_SOURCE);
+    setWord(EMPTY_WORD);
   }
 
   const storageIdentifier = useRLPersistedSource({
