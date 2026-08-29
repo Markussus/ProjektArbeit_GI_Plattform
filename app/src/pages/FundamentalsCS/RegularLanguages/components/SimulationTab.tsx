@@ -123,9 +123,13 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.regularLanguages"
         onReset={() => simulatorRef.current?.resetStoredState()}
+        hideWorkspaceControls
       >
         <RLSimulator
           ref={simulatorRef}
+          isFocused={props.isFocused}
+          onToggleFocus={props.onToggleFocus}
+          onReset={() => simulatorRef.current?.resetStoredState()}
           onExitExercise={props.onExitExercise}
           importedTaskStorageId={props.importedTaskStorageId}
         />

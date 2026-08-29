@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Maximize2, RotateCcw, X } from "lucide-react";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
@@ -22,6 +23,9 @@ export interface FASimulationViewProps {
   status: SimulationStatus;
   speed: number;
   error: Error | null;
+  isFocused?: boolean;
+  onToggleFocus?: () => void;
+  onResetWorkspace?: () => void;
   onEditConfig: () => void;
   onPlay: () => void;
   onPause: () => void;
@@ -40,6 +44,9 @@ export function FASimulationView({
   status,
   speed,
   error,
+  isFocused,
+  onToggleFocus,
+  onResetWorkspace,
   onEditConfig,
   onPlay,
   onPause,
@@ -63,20 +70,58 @@ export function FASimulationView({
   );
 
   return (
-    <div className="rounded-[1rem] bg-(--fa-bg) p-6 text-(--fa-text)">
-      {/* Top bar: title + edit button. Inset from `md` up so the edit button
-          clears the workspace's floating reset/expand controls. */}
-      <div className="mb-4 flex items-center justify-between md:pr-24">
+    <div className="rounded-[1rem] bg-(--fa-bg) p-3 text-(--fa-text) sm:p-6">
+      {/* Top bar: title + action buttons (Edit Configuration, Reset, Expand) */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-bold text-(--fa-text-bright)">
           {t("finite-automata.sim.title", "Simulation")}
         </h2>
-        <button
-          type="button"
-          className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
-          onClick={onEditConfig}
-        >
-          {t("finite-automata.sim.edit", "Edit Configuration")}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-3 py-1.5 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan) sm:px-4 sm:py-2"
+            onClick={onEditConfig}
+          >
+            {t("finite-automata.sim.edit", "Edit Configuration")}
+          </button>
+          {onResetWorkspace && (
+            <button
+              type="button"
+              onClick={onResetWorkspace}
+              data-testid="simulation-reset"
+              aria-label={t("common.trainingCenter.resetCurrent")}
+              title={t("common.trainingCenter.resetCurrent")}
+              className="inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-(--fa-border) bg-(--fa-surface-raised) text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan) focus-visible:ring-2 focus-visible:outline-none"
+            >
+              <RotateCcw className="size-4" />
+            </button>
+          )}
+          {onToggleFocus && (
+            <button
+              type="button"
+              onClick={onToggleFocus}
+              data-testid="simulation-focus-toggle"
+              aria-pressed={isFocused}
+              aria-label={
+                isFocused
+                  ? t("common.simulation.exitFocus")
+                  : t("common.simulation.expand")
+              }
+              title={
+                isFocused
+                  ? t("common.simulation.close")
+                  : t("common.simulation.expand")
+              }
+              className="inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-(--fa-border) bg-(--fa-surface-raised) text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan) focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {isFocused ? (
+                <X className="size-4" />
+              ) : (
+                <Maximize2 className="size-4" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Input word + step timeline row.
@@ -93,21 +138,20 @@ export function FASimulationView({
         </div>
       </div>
 
-      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
-        {/* Left: Controls + Status */}
-        <div className="flex w-full min-w-0 flex-col gap-4 lg:w-1/4">
-          <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
-            <SimulatorControls
-              status={status}
-              speed={speed}
-              onPlay={onPlay}
-              onPause={onPause}
-              onStep={onStep}
-              onStepBack={onStepBack}
-              onReset={onReset}
-              onSpeedChange={onSpeedChange}
-            />
-          </div>
+      <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-[280px_minmax(0,1fr)_260px]">
+        {/* Left on xl / 2-col on md-lg: Controls + Status */}
+        <div className="flex w-full min-w-0 flex-col gap-4 md:grid md:grid-cols-2 xl:flex xl:flex-col">
+          <SimulatorControls
+            status={status}
+            speed={speed}
+            onPlay={onPlay}
+            onPause={onPause}
+            onStep={onStep}
+            onStepBack={onStepBack}
+            onReset={onReset}
+            onSpeedChange={onSpeedChange}
+            className="max-w-none rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3 shadow-none"
+          />
 
           <FASimulationStatusCard
             program={program}
@@ -116,13 +160,13 @@ export function FASimulationView({
           />
         </div>
 
-        {/* Center: State Diagram (larger) */}
-        <div className="w-full min-w-0 lg:w-1/2">
+        {/* Center: State Diagram (prominent and spacious) */}
+        <div className="flex min-h-[360px] w-full min-w-0">
           <FAStateDiagram program={program} runtime={runtime} />
         </div>
 
-        {/* Right: Batch Tester — stretches to match the diagram height */}
-        <div className="flex min-h-0 w-full min-w-0 lg:w-1/4">
+        {/* Right on xl / below on md-lg: Batch Tester */}
+        <div className="flex min-h-0 w-full min-w-0">
           <FABatchTester program={program} onSelectWord={onSelectBatchWord} />
         </div>
       </div>

@@ -26,6 +26,9 @@ interface RLSimulatorProps {
   onExitExercise?: () => void;
   importedTaskStorageId?: number;
   ref?: Ref<RLSimulatorHandle>;
+  isFocused?: boolean;
+  onToggleFocus?: () => void;
+  onReset?: () => void;
 }
 
 export interface RLSimulatorHandle {
@@ -42,6 +45,9 @@ export function RLSimulator({
   onExitExercise,
   importedTaskStorageId,
   ref,
+  isFocused,
+  onToggleFocus,
+  onReset: onWorkspaceReset,
 }: RLSimulatorProps) {
   const mode = useRLSimulatorStore((s) => s.mode);
   const setMode = useRLSimulatorStore((s) => s.setMode);
@@ -129,7 +135,13 @@ export function RLSimulator({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
-      <RLModeSelector mode={mode} onChange={handleModeChange} />
+      <RLModeSelector
+        mode={mode}
+        onChange={handleModeChange}
+        isFocused={isFocused}
+        onToggleFocus={onToggleFocus}
+        onReset={onWorkspaceReset}
+      />
 
       {/*
         All three modes stay mounted and are toggled with `hidden`, mirroring

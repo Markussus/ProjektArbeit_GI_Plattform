@@ -76,7 +76,6 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
                       background: "var(--fa-cyan-dim)",
                       border: "2px solid var(--fa-cyan)",
                       color: "var(--fa-cyan)",
-                      boxShadow: "0 0 10px rgba(0, 229, 255, 0.3)",
                     }
                   : isRead
                     ? {

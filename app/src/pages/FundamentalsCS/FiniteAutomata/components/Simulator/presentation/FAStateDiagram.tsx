@@ -197,7 +197,7 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
         </div>
       </div>
       <div
-        className="relative"
+        className="relative flex flex-1 items-center justify-center overflow-hidden"
         style={{
           background: "var(--fa-bg, #0a0a0a)",
         }}
@@ -209,11 +209,10 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           }}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           preserveAspectRatio="xMidYMid meet"
-          className="block w-full select-none"
+          className="block h-full w-full select-none"
           style={{
             maxHeight: svgMaxHeight,
             minHeight: 320,
-            aspectRatio: `${layout.width} / ${layout.height}`,
             cursor: isPanning ? "grabbing" : "grab",
             touchAction: "none",
           }}

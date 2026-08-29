@@ -14,6 +14,7 @@ interface SimulationWorkspaceProps {
   onReset?: () => void;
   resetDisabled?: boolean;
   overlayControls?: boolean;
+  hideWorkspaceControls?: boolean;
   onCloseItem?: () => void;
   children?: ReactNode;
 }
@@ -28,6 +29,7 @@ export function SimulationWorkspace({
   onReset,
   resetDisabled = false,
   overlayControls = false,
+  hideWorkspaceControls = false,
   onCloseItem,
   children,
 }: SimulationWorkspaceProps) {
@@ -101,51 +103,53 @@ export function SimulationWorkspace({
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
-        <div
-          data-testid="simulation-workspace-controls"
-          className={cn(
-            "mb-4 flex shrink-0 items-center justify-end gap-2 md:absolute md:top-6 md:right-6 md:z-20 md:mb-0",
-            overlayControls &&
-              "md:bg-card/80 md:rounded-lg md:backdrop-blur-sm",
-          )}
-        >
-          {onReset && (
+        {!hideWorkspaceControls && (
+          <div
+            data-testid="simulation-workspace-controls"
+            className={cn(
+              "mb-4 flex shrink-0 items-center justify-end gap-2 md:absolute md:top-6 md:right-6 md:z-20 md:mb-0",
+              overlayControls &&
+                "md:bg-card/80 md:rounded-lg md:backdrop-blur-sm",
+            )}
+          >
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                data-testid="simulation-reset"
+                disabled={resetDisabled}
+                aria-label={t("common.trainingCenter.resetCurrent")}
+                title={t("common.trainingCenter.resetCurrent")}
+                className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <RotateCcw className="size-4" />
+              </button>
+            )}
             <button
               type="button"
-              onClick={onReset}
-              data-testid="simulation-reset"
-              disabled={resetDisabled}
-              aria-label={t("common.trainingCenter.resetCurrent")}
-              title={t("common.trainingCenter.resetCurrent")}
-              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={onToggleFocus}
+              data-testid="simulation-focus-toggle"
+              aria-pressed={isFocused}
+              aria-label={
+                isFocused
+                  ? t("common.simulation.exitFocus")
+                  : t("common.simulation.expand")
+              }
+              title={
+                isFocused
+                  ? t("common.simulation.close")
+                  : t("common.simulation.expand")
+              }
+              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
             >
-              <RotateCcw className="size-4" />
+              {isFocused ? (
+                <X className="size-4" />
+              ) : (
+                <Maximize2 className="size-4" />
+              )}
             </button>
-          )}
-          <button
-            type="button"
-            onClick={onToggleFocus}
-            data-testid="simulation-focus-toggle"
-            aria-pressed={isFocused}
-            aria-label={
-              isFocused
-                ? t("common.simulation.exitFocus")
-                : t("common.simulation.expand")
-            }
-            title={
-              isFocused
-                ? t("common.simulation.close")
-                : t("common.simulation.expand")
-            }
-            className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
-          >
-            {isFocused ? (
-              <X className="size-4" />
-            ) : (
-              <Maximize2 className="size-4" />
-            )}
-          </button>
-        </div>
+          </div>
+        )}
 
         <div className="min-w-0 flex-1">
           {children ?? (

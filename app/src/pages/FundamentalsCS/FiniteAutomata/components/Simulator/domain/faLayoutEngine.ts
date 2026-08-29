@@ -97,8 +97,14 @@ export function computeLayout(
     bounds.maxX - bounds.minX + opts.padding * 2 + opts.nodeRadius * 2;
   const contentHeight =
     bounds.maxY - bounds.minY + opts.padding * 2 + opts.nodeRadius * 2;
-  const width = Math.max(contentWidth, MIN_CANVAS_WIDTH);
-  const height = Math.max(contentHeight, MIN_CANVAS_HEIGHT);
+
+  const minCanvasWidth =
+    n <= 1 ? 260 : n <= 2 ? 340 : n <= 4 ? 420 : MIN_CANVAS_WIDTH;
+  const minCanvasHeight =
+    n <= 1 ? 200 : n <= 2 ? 260 : n <= 4 ? 300 : MIN_CANVAS_HEIGHT;
+
+  const width = Math.max(contentWidth, minCanvasWidth);
+  const height = Math.max(contentHeight, minCanvasHeight);
 
   // A one- or two-state automaton is smaller than the minimum canvas. Split the
   // leftover space evenly so it sits in the middle of the diagram panel instead
