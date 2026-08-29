@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, Layers3, Sparkles } from "lucide-react";
-import { learningModules } from "@/data/moduleCatalog";
+import { learningModules } from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 export function ModuleSelector() {

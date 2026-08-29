@@ -22,7 +22,7 @@ import {
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { numberSystemsExercises } from "../../exercises";
 import { nsTransferCodec } from "./nsTransferCodec";
 import type { NumberSystemState } from "./nsTransferCodec";

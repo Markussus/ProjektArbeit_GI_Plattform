@@ -3,7 +3,7 @@ import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicCategorySection } from "@/components/shared/TopicCategorySection/TopicCategorySection";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,

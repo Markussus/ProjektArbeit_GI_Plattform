@@ -9,7 +9,7 @@ import {
 import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {

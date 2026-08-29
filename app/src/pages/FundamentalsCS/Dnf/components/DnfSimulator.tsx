@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import type { Example, Exercise } from "@/types/exercise";
 import { cn } from "@/lib/utils";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
