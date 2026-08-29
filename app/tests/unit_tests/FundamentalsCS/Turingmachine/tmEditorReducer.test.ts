@@ -291,6 +291,41 @@ describe("tmEditorReducer", () => {
       ).toBe(program);
     });
 
+    it("renames non-blank tape symbols updating writeSymbols and readSymbol transition keys", () => {
+      const program = createProgram();
+
+      const result = tmEditorReducer(program, {
+        type: "rename_tape_symbol",
+        currentSymbol: "0",
+        nextSymbol: "A",
+      });
+
+      expect(result.tapeAlphabet).toEqual(["A", "1", "_"]);
+      expect(result.initialTape).toEqual(["1", "A", "_"]);
+      expect(result.transitions["0"]).toBeUndefined();
+      expect(result.transitions["A"]).toEqual({
+        q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
+        q1: { nextState: "q2", writeSymbol: "A", movement: "R" },
+      });
+      expect(result.transitions["1"]?.q1?.writeSymbol).toBe("A");
+    });
+
+    it("renames tape symbols that have no transitions defined", () => {
+      const program = createProgram({
+        tapeAlphabet: ["0", "_", "Z"],
+        transitions: {},
+      });
+
+      const result = tmEditorReducer(program, {
+        type: "rename_tape_symbol",
+        currentSymbol: "Z",
+        nextSymbol: "W",
+      });
+
+      expect(result.tapeAlphabet).toEqual(["0", "_", "W"]);
+      expect(result.transitions).toEqual({});
+    });
+
     // Tests that adding a state chooses the first missing q-index instead of always appending numerically.
     it("adds the next available state name", () => {
       expect(
@@ -349,6 +384,35 @@ describe("tmEditorReducer", () => {
       ).toBe(program);
     });
 
+    it("removes a non-initial state and rewires transitions targeting it to the initialState", () => {
+      const program = createProgram();
+      const result = tmEditorReducer(program, {
+        type: "remove_state",
+        state: "q1",
+      });
+
+      expect(result.states).toEqual(["q0", "q2", "halt"]);
+      expect(result.initialState).toBe("q0");
+      // Transition from q0 used to target q1, now rewired to fallback q0:
+      expect(result.transitions["0"]?.q0?.nextState).toBe("q0");
+      // Transition from q1 is removed:
+      expect(result.transitions["0"]?.q1).toBeUndefined();
+      expect(result.transitions["1"]?.q1).toBeUndefined();
+      expect(result.transitions._?.q1).toBeUndefined();
+    });
+
+    it("removes a halt state and clears it from both states and haltStates", () => {
+      const program = createProgram();
+      const result = tmEditorReducer(program, {
+        type: "remove_state",
+        state: "halt",
+      });
+
+      expect(result.states).toEqual(["q0", "q1", "q2"]);
+      expect(result.haltStates).toEqual([]);
+      expect(result.transitions["1"]?.q1?.nextState).toBe("q0");
+    });
+
     // Tests that renaming a state updates state lists, the initial state, transition keys, and transition targets, while invalid renames are ignored.
     it("renames a state across the full program graph", () => {
       const program = createProgram({
@@ -400,6 +464,38 @@ describe("tmEditorReducer", () => {
           nextState: "q0",
         }),
       ).toBe(program);
+    });
+
+    it("renames the initial state directly and updates initialState reference", () => {
+      const program = createProgram();
+      const result = tmEditorReducer(program, {
+        type: "rename_state",
+        currentState: "q0",
+        nextState: "start",
+      });
+
+      expect(result.initialState).toBe("start");
+      expect(result.states).toEqual(["start", "q1", "q2", "halt"]);
+      expect(result.transitions._?.q1?.nextState).toBe("start");
+      expect(result.transitions["0"]?.start).toEqual({
+        nextState: "q1",
+        writeSymbol: "1",
+        movement: "R",
+      });
+      expect(result.transitions["0"]?.q0).toBeUndefined();
+    });
+
+    it("renames a halt state and updates haltStates list and transitions pointing to it", () => {
+      const program = createProgram();
+      const result = tmEditorReducer(program, {
+        type: "rename_state",
+        currentState: "halt",
+        nextState: "qAccept",
+      });
+
+      expect(result.haltStates).toEqual(["qAccept"]);
+      expect(result.states).toEqual(["q0", "q1", "q2", "qAccept"]);
+      expect(result.transitions["1"]?.q1?.nextState).toBe("qAccept");
     });
 
     // Tests transition updates for both insertion and deletion, including creation of a missing read-symbol bucket.

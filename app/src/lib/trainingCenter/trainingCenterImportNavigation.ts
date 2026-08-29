@@ -5,7 +5,7 @@ import {
   findTopicByPath,
   findTopicByStorageId,
   TOPIC_STORAGE_IDS,
-} from "@/data/moduleCatalog";
+} from "@/data/moduleCatalogData";
 import { dnfExercises } from "@/pages/FundamentalsCS/Dnf/exercises";
 import { mooreExerciseScenarios } from "@/pages/FundamentalsCS/MooreMealy/exercises";
 import { numberSystemsExercises } from "@/pages/FundamentalsCS/NumberSystems/exercises";

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { VideoPlayer } from "@/components/shared/VideoPlayer/VideoPlayer";
-import { findTopicById } from "@/data/moduleCatalog";
+import { findTopicById } from "@/data/moduleCatalogData";
 import type { TranslationKey } from "@/types/i18n";
 
 interface TopicTutorialVideoSectionProps {

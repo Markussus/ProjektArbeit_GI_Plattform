@@ -4,7 +4,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 import { LanguageSelect } from "@/components/shared/LanguageSelect/LanguageSelect";
 import { HeaderTransferBox } from "@/components/shared/Header/HeaderTransferBox";
 import ThwsLogo from "@/assets/THWS.svg";
-import { findModuleByPath } from "@/data/moduleCatalog";
+import { findModuleByPath } from "@/data/moduleCatalogData";
 
 export function Header() {
   const { t } = useTranslation();
@@ -29,12 +29,18 @@ export function Header() {
 
         <div className="bg-border hidden h-7 w-px shrink-0 min-[760px]:block" />
 
-        <span className="text-foreground truncate text-[clamp(0.875rem,2.25vw,1.25rem)] font-bold tracking-tight max-[760px]:hidden">
-          {headerLabel}
-        </span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="text-muted-foreground hidden truncate text-xs font-semibold tracking-wider uppercase min-[1250px]:inline">
+            {t("common.app.title")}
+          </span>
+          <span className="text-border hidden min-[1250px]:inline">/</span>
+          <span className="text-foreground truncate text-sm font-semibold sm:text-base">
+            {headerLabel}
+          </span>
+        </div>
       </div>
 
-      <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 [&>*:not([data-testid='header-transfer-root'])]:shrink-0">
+      <div className="flex shrink-0 items-center gap-2">
         <HeaderTransferBox />
         <LanguageSelect />
         <ThemeToggle />

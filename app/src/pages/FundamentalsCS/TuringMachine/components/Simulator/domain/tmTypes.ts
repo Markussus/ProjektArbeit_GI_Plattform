@@ -10,7 +10,7 @@ export interface TMTransition {
 }
 
 export const DEFAULT_BLANK_SYMBOL: TapeSymbol = "\u25CA";
-export const BLANK_SYMBOL_INPUT_ALIAS = "<>";
+const BLANK_SYMBOL_INPUT_ALIAS = "<>";
 
 export function isSingleTapeSymbol(value: string): boolean {
   return Array.from(value).length === 1;

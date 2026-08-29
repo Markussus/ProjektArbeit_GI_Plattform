@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BitWriter } from "@/lib/trainingCenter/bitStream";
 import {
   withDerivedAlphabets,
   type TMProgram,
@@ -107,6 +108,30 @@ describe("Turing Machine program transfer codec", () => {
     expect(importedProgram.transitions["0"]).toEqual({
       q0: transition("q1", "1", "R"),
       q1: transition("qS", "0", "N"),
+    });
+  });
+
+  it("ignores transitions defined on halt states during normalization", async () => {
+    const program = createProgram({
+      states: ["start", "accept"],
+      haltStates: ["accept"],
+      initialTape: ["0"],
+      transitions: {
+        "0": {
+          start: transition("accept", "1", "R"),
+          accept: transition("accept", "0", "L"),
+        },
+      },
+    });
+
+    const exportedValue = await tmProgramTransferCodec.exportValue(program);
+    const importedProgram =
+      await tmProgramTransferCodec.importValue(exportedValue);
+
+    expect(importedProgram.states).toEqual(["q0", "qS"]);
+    expect(importedProgram.haltStates).toEqual(["qS"]);
+    expect(importedProgram.transitions["0"]).toEqual({
+      q0: transition("qS", "1", "R"),
     });
   });
 
@@ -224,6 +249,39 @@ describe("Turing Machine program transfer codec", () => {
     );
   });
 
+  it("rejects programs with duplicate states or duplicate halt states", async () => {
+    const duplicateStatesProgram: TMProgram = {
+      ...defaultTMProgram,
+      states: ["q0", "qS", "q0"],
+    };
+    const duplicateHaltProgram: TMProgram = {
+      ...defaultTMProgram,
+      haltStates: ["qS", "qS"],
+    };
+
+    await expect(
+      tmProgramTransferCodec.exportValue(duplicateStatesProgram),
+    ).rejects.toThrow("tm_transfer_program_invalid");
+    await expect(
+      tmProgramTransferCodec.exportValue(duplicateHaltProgram),
+    ).rejects.toThrow("tm_transfer_program_invalid");
+  });
+
+  it("rejects programs with invalid transitions referencing undeclared states", async () => {
+    const invalidTargetProgram: TMProgram = {
+      ...defaultTMProgram,
+      transitions: {
+        "0": {
+          q0: { nextState: "qMissing", writeSymbol: "1", movement: "R" },
+        },
+      },
+    };
+
+    await expect(
+      tmProgramTransferCodec.exportValue(invalidTargetProgram),
+    ).rejects.toThrow("tm_transfer_program_invalid");
+  });
+
   it("rejects programs that the compact format cannot represent", async () => {
     const customBlankProgram = {
       ...defaultTMProgram,
@@ -240,6 +298,153 @@ describe("Turing Machine program transfer codec", () => {
     await expect(
       tmProgramTransferCodec.exportValue(initialHaltProgram),
     ).rejects.toThrow("tm_transfer_program_invalid");
+  });
+
+  describe("restoreImportedProgram & readSymbolDictionary branch validation", () => {
+    it("rejects payload with zero non-halt states or zero symbols", async () => {
+      const writerZeroStates = new BitWriter();
+      writerZeroStates.writeVarUint(0);
+      writerZeroStates.writeVarUint(1);
+      writerZeroStates.writeVarUint(1);
+      writerZeroStates.writeVarUint(0);
+      await expect(
+        tmProgramTransferCodec.importValue(writerZeroStates.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+
+      const writerZeroSymbols = new BitWriter();
+      writerZeroSymbols.writeVarUint(1);
+      writerZeroSymbols.writeVarUint(1);
+      writerZeroSymbols.writeVarUint(0);
+      writerZeroSymbols.writeVarUint(0);
+      await expect(
+        tmProgramTransferCodec.importValue(writerZeroSymbols.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
+
+    it("rejects payload when registry bit count does not match symbolCount", async () => {
+      const writer = new BitWriter();
+      writer.writeVarUint(1); // nonHaltStateCount
+      writer.writeVarUint(0); // haltStateCount
+      writer.writeVarUint(5); // symbolCount = 5
+      writer.writeVarUint(0); // initialTapeLength = 0
+      writer.writeBits(0, 1); // symbolMode = Registry
+      writer.writeBits(0, 2); // transitionMode = DenseRaw
+      // Write 18 bits for SYMBOL_REGISTRY, only 1 bit set to 1 => total symbols would be 1+1=2 !== 5
+      for (let i = 0; i < 18; i++) {
+        writer.writeBit(i === 0 ? 1 : 0);
+      }
+      await expect(
+        tmProgramTransferCodec.importValue(writer.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
+
+    it("rejects payload with invalid symbolMode", async () => {
+      const writer = new BitWriter();
+      writer.writeVarUint(1);
+      writer.writeVarUint(0);
+      writer.writeVarUint(1);
+      writer.writeVarUint(0);
+      writer.writeBits(1, 1); // symbolMode = 1 (raw utf8)
+      writer.writeBits(0, 2);
+      // But now send 0 byte length in raw UTF8 symbol dictionary
+      // symbolCount is 2 so it will try to read 1 symbol
+      const writerInvalidMode = new BitWriter();
+      writerInvalidMode.writeVarUint(1);
+      writerInvalidMode.writeVarUint(0);
+      writerInvalidMode.writeVarUint(2);
+      writerInvalidMode.writeVarUint(0);
+      writerInvalidMode.writeBits(1, 1); // RawUtf8
+      writerInvalidMode.writeBits(0, 2);
+      writerInvalidMode.writeVarUint(0); // byteLength 0 => invalid!
+      await expect(
+        tmProgramTransferCodec.importValue(writerInvalidMode.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
+
+    it("rejects payload with multi-char symbol in raw UTF-8 dictionary", async () => {
+      const writer = new BitWriter();
+      writer.writeVarUint(1);
+      writer.writeVarUint(0);
+      writer.writeVarUint(2); // 1 blank + 1 extra symbol
+      writer.writeVarUint(0);
+      writer.writeBits(1, 1); // RawUtf8
+      writer.writeBits(0, 2);
+      // Write 2 bytes representing "ab"
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode("ab");
+      writer.writeVarUint(bytes.length);
+      for (const b of bytes) {
+        writer.writeBits(b, 8);
+      }
+      await expect(
+        tmProgramTransferCodec.importValue(writer.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
+
+    it("rejects payload with duplicate symbol in raw UTF-8 dictionary", async () => {
+      const writer = new BitWriter();
+      writer.writeVarUint(1);
+      writer.writeVarUint(0);
+      writer.writeVarUint(3); // 1 blank + 2 extra symbols
+      writer.writeVarUint(0);
+      writer.writeBits(1, 1); // RawUtf8
+      writer.writeBits(0, 2);
+      // Write "X" twice
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode("X");
+      writer.writeVarUint(bytes.length);
+      for (const b of bytes) {
+        writer.writeBits(b, 8);
+      }
+      writer.writeVarUint(bytes.length);
+      for (const b of bytes) {
+        writer.writeBits(b, 8);
+      }
+      await expect(
+        tmProgramTransferCodec.importValue(writer.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
+
+    it("rejects payload with initial tape symbol ID out of range", async () => {
+      const writer = new BitWriter();
+      writer.writeVarUint(1);
+      writer.writeVarUint(0);
+      writer.writeVarUint(2); // symbols: blank + "0"
+      writer.writeVarUint(1); // initialTape length 1
+      writer.writeBits(0, 1); // Registry
+      writer.writeBits(0, 2); // DenseRaw
+      // Registry bitmask for 1 symbol:
+      for (let i = 0; i < 18; i++) {
+        writer.writeBit(i === 0 ? 1 : 0);
+      }
+      // readableSymbolIds: 2 bits (for 2 symbols)
+      writer.writeBit(0);
+      writer.writeBit(0);
+      // initialTape symbol bits (bitsNeeded(2) = 1) -> symbolId 1 is valid, but let's write 2 (if bitsNeeded was > 1)
+      // With symbolCount = 2, symbolBits = 1 bit (values 0 or 1).
+      // Let's create symbolCount = 3 (bitsNeeded = 2), but only provide 3 symbols and request symbolId = 3 (out of range [0..2])
+      const writerOutOfRange = new BitWriter();
+      writerOutOfRange.writeVarUint(1);
+      writerOutOfRange.writeVarUint(0);
+      writerOutOfRange.writeVarUint(3); // symbolCount = 3 (0, 1, 2)
+      writerOutOfRange.writeVarUint(1); // initialTape length 1
+      writerOutOfRange.writeBits(0, 1); // Registry
+      writerOutOfRange.writeBits(0, 2); // DenseRaw
+      // 2 registry symbols active: "0", "1"
+      for (let i = 0; i < 18; i++) {
+        writerOutOfRange.writeBit(i < 2 ? 1 : 0);
+      }
+      // readableSymbolIds: 3 bits
+      writerOutOfRange.writeBit(0);
+      writerOutOfRange.writeBit(0);
+      writerOutOfRange.writeBit(0);
+      // initial tape symbol id: 2 bits -> write 3 (which is >= symbolCount 3)
+      writerOutOfRange.writeBits(3, 2);
+      // No transitions needed since readableSymbolIds is empty
+      await expect(
+        tmProgramTransferCodec.importValue(writerOutOfRange.toBase64Url()),
+      ).rejects.toThrow("tm_transfer_payload_invalid");
+    });
   });
 });
 

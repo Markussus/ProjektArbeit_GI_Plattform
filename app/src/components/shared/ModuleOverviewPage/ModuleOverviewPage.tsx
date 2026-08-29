@@ -2,7 +2,7 @@ import { ChevronRight, Layers3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
-import { learningModules, type TopicAccent } from "@/data/moduleCatalog";
+import { learningModules, type TopicAccent } from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 interface ModuleOverviewPageProps {
