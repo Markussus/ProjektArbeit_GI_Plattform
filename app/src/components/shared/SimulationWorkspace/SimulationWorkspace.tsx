@@ -27,7 +27,6 @@ export function SimulationWorkspace({
   onToggleFocus,
   onReset,
   resetDisabled = false,
-  overlayControls = false,
   onCloseItem,
   children,
 }: SimulationWorkspaceProps) {
@@ -97,15 +96,13 @@ export function SimulationWorkspace({
       <div
         data-testid="simulation-workspace"
         className={cn(
-          "bg-card ring-foreground/10 relative rounded-xl p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          "bg-card ring-foreground/10 relative flex flex-col rounded-xl p-4 sm:p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
         <div
-          className={cn(
-            "absolute top-6 right-6 z-20 flex justify-end gap-2",
-            overlayControls && "bg-card/80 rounded-lg backdrop-blur-sm",
-          )}
+          data-testid="simulation-workspace-controls"
+          className="mb-4 flex shrink-0 items-center justify-end gap-2"
         >
           {onReset && (
             <button
@@ -145,9 +142,11 @@ export function SimulationWorkspace({
           </button>
         </div>
 
-        {children ?? (
-          <p className="text-muted-foreground text-sm">{emptyStateText}</p>
-        )}
+        <div className="min-w-0 flex-1">
+          {children ?? (
+            <p className="text-muted-foreground text-sm">{emptyStateText}</p>
+          )}
+        </div>
       </div>
     </div>
   );
