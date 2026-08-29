@@ -11,7 +11,6 @@ import { NegativeNumbers } from "./NegativeNumbers";
 import { IEEE754Converter } from "./IEEE754Converter";
 import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -110,10 +109,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
     const [showSolution, setShowSolution] = useState(() => {
       return selectedExercise ? selectedExercise.id.includes(".example") : true;
     });
-
-    // Tab-change confirm dialog state
-    const [pendingMode, setPendingMode] = useState<SimulatorMode | null>(null);
-    const [showTabConfirm, setShowTabConfirm] = useState(false);
 
     // Initial values for converters when launched via exercise
     const [initialValue, setInitialValue] = useState<string>("");
@@ -250,28 +245,10 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
       enabled: isStorageEnabled && isStorageReady,
     });
 
-    /**
-     * Handles tab click: shows confirmation dialog during active exercise mode,
-     * otherwise switches immediately.
-     */
     const handleTabClick = (mode: SimulatorMode) => {
       if (mode === activeMode) return;
-      if (isExerciseMode && !showSolution) {
-        setPendingMode(mode);
-        setShowTabConfirm(true);
-      } else {
-        setActiveMode(mode);
-      }
-    };
-
-    /** Confirmed tab switch: exit exercise mode and switch tab. */
-    const handleTabConfirm = () => {
-      setShowTabConfirm(false);
       handleExitExercise();
-      if (pendingMode) {
-        setActiveMode(pendingMode);
-        setPendingMode(null);
-      }
+      setActiveMode(mode);
     };
 
     const resetStoredState = useCallback(() => {
@@ -446,20 +423,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
             />
           )}
         </div>
-
-        {/* Tab switch confirmation dialog */}
-        <ConfirmDialog
-          isOpen={showTabConfirm}
-          title={t("common.exerciseValidation.exitTabTitle")}
-          description={t("common.exerciseValidation.exitTabDesc")}
-          confirmLabel={t("common.exerciseValidation.exitTabConfirm")}
-          onConfirm={handleTabConfirm}
-          onCancel={() => {
-            setShowTabConfirm(false);
-            setPendingMode(null);
-          }}
-          variant="warning"
-        />
       </div>
     );
   },
