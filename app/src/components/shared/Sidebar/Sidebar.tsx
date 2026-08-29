@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HelpCircle, Menu } from "lucide-react";
-import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalog";
+import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {

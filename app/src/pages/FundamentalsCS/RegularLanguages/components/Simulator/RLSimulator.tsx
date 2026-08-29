@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,

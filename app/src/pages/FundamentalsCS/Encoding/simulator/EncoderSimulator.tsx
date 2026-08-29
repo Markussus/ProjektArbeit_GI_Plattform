@@ -20,7 +20,7 @@ import {
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { encTransferCodec } from "./encTransferCodec";
 import type { EncoderState } from "./encTransferCodec";
 
@@ -100,7 +100,7 @@ function getSelectedEncoderScenario(item: TopicItem): {
     "encoding.example_utf8_2": {
       mode: "utf8",
       converterMode: "encode",
-      initialValue: "႐",
+      initialValue: "\u1090",
       answer: "",
     },
     "encoding.example_utf8_3": {
