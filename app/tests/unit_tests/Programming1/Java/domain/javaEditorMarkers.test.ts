@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import type { Monaco } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 import {
   createMonacoMarkers,
   createPasteLimitListener,
@@ -16,7 +18,7 @@ describe("javaEditorMarkers", () => {
     editor: {
       setModelMarkers: vi.fn(),
     },
-  } as any;
+  } as unknown as Monaco;
 
   describe("createMonacoMarkers", () => {
     it("maps issues with line numbers to Monaco markers", () => {
@@ -71,10 +73,10 @@ describe("javaEditorMarkers", () => {
 
   describe("syncMonacoMarkers", () => {
     it("calls setModelMarkers when model and monaco exist", () => {
-      const mockModel = {};
+      const mockModel = {} as editor.ITextModel;
       const mockEditor = {
         getModel: () => mockModel,
-      } as any;
+      } as unknown as editor.IStandaloneCodeEditor;
 
       syncMonacoMarkers(mockEditor, mockMonaco, [
         {
@@ -97,7 +99,11 @@ describe("javaEditorMarkers", () => {
     it("does nothing when editor or monaco is null", () => {
       expect(() => syncMonacoMarkers(null, mockMonaco, [])).not.toThrow();
       expect(() =>
-        syncMonacoMarkers({ getModel: () => null } as any, null, []),
+        syncMonacoMarkers(
+          { getModel: () => null } as unknown as editor.IStandaloneCodeEditor,
+          null,
+          [],
+        ),
       ).not.toThrow();
     });
   });
@@ -113,7 +119,7 @@ describe("javaEditorMarkers", () => {
       const mockEditor = {
         getModel: () => mockModel,
         getSelection: () => ({ startLineNumber: 1, endLineNumber: 1 }),
-      } as any;
+      } as unknown as editor.IStandaloneCodeEditor;
 
       const listener = createPasteLimitListener(mockEditor, onLimitExceeded);
 
@@ -144,7 +150,7 @@ describe("javaEditorMarkers", () => {
       const mockEditor = {
         getModel: () => mockModel,
         getSelection: () => ({ startLineNumber: 1, endLineNumber: 1 }),
-      } as any;
+      } as unknown as editor.IStandaloneCodeEditor;
 
       const listener = createPasteLimitListener(mockEditor, onLimitExceeded);
 

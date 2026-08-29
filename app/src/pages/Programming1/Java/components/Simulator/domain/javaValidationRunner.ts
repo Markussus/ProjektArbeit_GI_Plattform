@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import type {
   JavaExerciseScenario,
   JavaValidationCase,
@@ -99,4 +100,29 @@ async function evaluateValidationCase({
 
 export function normalizeOutput(output: string): string {
   return output.replace(/\r\n/g, "\n").trimEnd();
+}
+
+export function buildValidationTableRows(
+  checkResult: JavaValidationRunResult | null,
+  t: TFunction,
+): string[][] {
+  if (!checkResult) {
+    return [];
+  }
+
+  const emptyText = t("java-programming.validation.emptyOutput");
+  return checkResult.rows.map((row) => [
+    row.passed
+      ? t("java-programming.validation.pass")
+      : t("java-programming.validation.fail"),
+    row.id,
+    formatOutput(row.output, emptyText),
+    formatOutput(row.expectedOutput, emptyText),
+    row.phase,
+  ]);
+}
+
+function formatOutput(output: string, emptyOutput: string): string {
+  const normalized = normalizeOutput(output);
+  return normalized === "" ? emptyOutput : normalized;
 }

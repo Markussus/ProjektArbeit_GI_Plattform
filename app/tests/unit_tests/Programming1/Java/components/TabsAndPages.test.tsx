@@ -28,9 +28,13 @@ vi.mock("@/components/shared/ModuleOverviewPage/ModuleOverviewPage", () => ({
 }));
 
 vi.mock("@/components/shared/ModuleTopicPage/ModuleTopicPage", () => ({
-  ModuleTopicPage: ({ testId, titleKey }: any) => (
-    <div data-testid={testId} data-title-key={titleKey} />
-  ),
+  ModuleTopicPage: ({
+    testId,
+    titleKey,
+  }: {
+    testId?: string;
+    titleKey?: string;
+  }) => <div data-testid={testId} data-title-key={titleKey} />,
 }));
 
 describe("Java Tabs and Pages", () => {

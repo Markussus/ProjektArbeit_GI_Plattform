@@ -1,10 +1,10 @@
 /** @vitest-environment jsdom */
+import type { ComponentProps } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import {
-  SimulationTab,
-  buildValidationTableRows,
-} from "@/pages/Programming1/Java/components/SimulationTab";
+import { SimulationTab } from "@/pages/Programming1/Java/components/SimulationTab";
+import { buildValidationTableRows } from "@/pages/Programming1/Java/components/Simulator/domain/javaValidationRunner";
+import type { JavaSimulator } from "@/pages/Programming1/Java/components/Simulator/JavaSimulator";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TerminalSquare } from "lucide-react";
 
@@ -20,7 +20,7 @@ const mockCheckSolution = vi.fn();
 
 vi.mock("@/pages/Programming1/Java/components/Simulator/JavaSimulator", () => {
   return {
-    JavaSimulator: ({ ref }: any) => {
+    JavaSimulator: ({ ref }: ComponentProps<typeof JavaSimulator>) => {
       // simulate exposing handle
       if (ref) {
         if (typeof ref === "function") {
@@ -30,7 +30,7 @@ vi.mock("@/pages/Programming1/Java/components/Simulator/JavaSimulator", () => {
             checkSolution: mockCheckSolution,
           });
         } else if ("current" in ref) {
-          ref.current = {
+          (ref as { current: unknown }).current = {
             loadSolution: mockLoadSolution,
             resetStoredState: mockResetStoredState,
             checkSolution: mockCheckSolution,

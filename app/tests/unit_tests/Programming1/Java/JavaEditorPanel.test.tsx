@@ -20,7 +20,15 @@ vi.mock("@/hooks/useTheme", () => ({
 vi.mock("@monaco-editor/react", () => {
   return {
     __esModule: true,
-    default: ({ value, onChange, onMount }: any) => {
+    default: ({
+      value,
+      onChange,
+      onMount,
+    }: {
+      value?: string;
+      onChange?: (value?: string) => void;
+      onMount?: (editor: unknown, monaco: unknown) => void;
+    }) => {
       return (
         <div data-testid="mock-monaco-editor">
           <textarea

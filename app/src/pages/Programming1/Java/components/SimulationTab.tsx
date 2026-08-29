@@ -1,14 +1,16 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { getJavaScenario } from "../exercises";
 import {
+  buildValidationTableRows,
+  type JavaValidationRunResult,
+} from "./Simulator/domain/javaValidationRunner";
+import {
   JavaSimulator,
   type JavaSimulatorHandle,
-  type JavaValidationRunResult,
 } from "./Simulator/JavaSimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
@@ -156,29 +158,4 @@ function JavaSimulationHeaderActions({
       </button>
     </>
   );
-}
-
-export function buildValidationTableRows(
-  checkResult: JavaValidationRunResult | null,
-  t: TFunction,
-): string[][] {
-  if (!checkResult) {
-    return [];
-  }
-
-  const emptyText = t("java-programming.validation.emptyOutput");
-  return checkResult.rows.map((row) => [
-    row.passed
-      ? t("java-programming.validation.pass")
-      : t("java-programming.validation.fail"),
-    row.id,
-    formatOutput(row.output, emptyText),
-    formatOutput(row.expectedOutput, emptyText),
-    row.phase,
-  ]);
-}
-
-function formatOutput(output: string, emptyOutput: string): string {
-  const normalized = output.replace(/\r\n/g, "\n").trimEnd();
-  return normalized === "" ? emptyOutput : normalized;
 }

@@ -14,6 +14,7 @@ import {
   JavaSimulator,
   type JavaSimulatorHandle,
 } from "../../../../src/pages/Programming1/Java/components/Simulator/JavaSimulator";
+import type { JavaValidationRunResult } from "../../../../src/pages/Programming1/Java/components/Simulator/domain/javaValidationRunner";
 import type { Exercise } from "../../../../src/types/exercise";
 
 const runSpy = vi.fn();
@@ -330,13 +331,13 @@ describe("JavaSimulator", () => {
         />,
       );
 
-      let result: any;
+      let result: JavaValidationRunResult | undefined;
       await act(async () => {
         result = await ref.current?.checkSolution();
       });
 
-      expect(result.rows).toHaveLength(1);
-      expect(result.rows[0].passed).toBe(true);
+      expect(result?.rows).toHaveLength(1);
+      expect(result?.rows[0]?.passed).toBe(true);
     });
   });
 });

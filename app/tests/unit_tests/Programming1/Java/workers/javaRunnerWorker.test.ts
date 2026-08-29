@@ -1,40 +1,69 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+interface DiagnosticMessage {
+  message: string;
+}
+
+interface WorkerMessagePayload {
+  type?: string;
+  requestId?: string;
+  errorCategory?: string;
+  diagnostics?: DiagnosticMessage[];
+  [key: string]: unknown;
+}
+
+interface UpstreamWorkerMessage {
+  command?: string;
+  id?: string;
+  severity?: string;
+  message?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
 describe("javaRunner.worker", () => {
-  let postedMessages: any[] = [];
-  let workerInstance: any = null;
+  let postedMessages: WorkerMessagePayload[] = [];
+  const terminateSpy = vi.fn();
 
   beforeEach(() => {
     vi.resetModules();
     postedMessages = [];
+    terminateSpy.mockReset();
 
     // Mock Worker environment
-    (globalThis as any).self = globalThis;
-    (globalThis as any).location = { origin: "http://localhost:3000" };
-    (globalThis as any).postMessage = vi.fn((msg: any) => {
+    (globalThis as unknown as { self: unknown }).self = globalThis;
+    (globalThis as unknown as { location: { origin: string } }).location = {
+      origin: "http://localhost:3000",
+    };
+    (
+      globalThis as unknown as {
+        postMessage: (msg: WorkerMessagePayload) => void;
+      }
+    ).postMessage = vi.fn((msg: WorkerMessagePayload) => {
       postedMessages.push(msg);
     });
 
     class MockWorker {
-      onmessage: ((event: any) => void) | null = null;
-      onerror: ((event: any) => void) | null = null;
-      postMessage = vi.fn((data: any) => {
+      onmessage: ((event: { data: UpstreamWorkerMessage }) => void) | null =
+        null;
+      onerror: ((event: unknown) => void) | null = null;
+      postMessage = vi.fn((data: UpstreamWorkerMessage) => {
         if (data.command === "load-classlib") {
           setTimeout(() => {
             this.onmessage?.({ data: { command: "ok", id: data.id } });
           }, 10);
         }
       });
-      terminate = vi.fn();
+      terminate = terminateSpy;
       constructor() {
-        workerInstance = this;
         setTimeout(() => {
           this.onmessage?.({ data: { command: "initialized" } });
         }, 5);
       }
     }
 
-    (globalThis as any).Worker = MockWorker;
+    (globalThis as unknown as { Worker: typeof MockWorker }).Worker =
+      MockWorker;
   });
 
   afterEach(() => {
@@ -44,10 +73,14 @@ describe("javaRunner.worker", () => {
   it("handles preload-compiler request successfully", async () => {
     await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
 
-    const onMessage = (globalThis as any).onmessage;
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
     expect(onMessage).toBeDefined();
 
-    await onMessage({
+    await onMessage?.({
       data: {
         type: "preload-compiler",
         requestId: "req-1",
@@ -67,32 +100,35 @@ describe("javaRunner.worker", () => {
   it("handles stop request and terminates upstream worker", async () => {
     await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
 
-    const onMessage = (globalThis as any).onmessage;
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
 
-    await onMessage({
+    await onMessage?.({
       data: {
         type: "preload-compiler",
         requestId: "req-2",
       },
     });
 
-    expect(workerInstance).toBeDefined();
-
-    await onMessage({
+    await onMessage?.({
       data: {
         type: "stop",
       },
     });
 
-    expect(workerInstance.terminate).toHaveBeenCalled();
+    expect(terminateSpy).toHaveBeenCalled();
   });
 
   it("handles compiler diagnostic and compilation errors gracefully", async () => {
     // Custom error worker for compile step
     class ErrorWorker {
-      onmessage: ((event: any) => void) | null = null;
-      onerror: ((event: any) => void) | null = null;
-      postMessage = vi.fn((data: any) => {
+      onmessage: ((event: { data: UpstreamWorkerMessage }) => void) | null =
+        null;
+      onerror: ((event: unknown) => void) | null = null;
+      postMessage = vi.fn((data: UpstreamWorkerMessage) => {
         if (data.command === "load-classlib") {
           setTimeout(() => {
             this.onmessage?.({ data: { command: "ok", id: data.id } });
@@ -125,13 +161,18 @@ describe("javaRunner.worker", () => {
         }, 5);
       }
     }
-    (globalThis as any).Worker = ErrorWorker;
+    (globalThis as unknown as { Worker: typeof ErrorWorker }).Worker =
+      ErrorWorker;
 
     await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
 
-    const onMessage = (globalThis as any).onmessage;
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
 
-    await onMessage({
+    await onMessage?.({
       data: {
         type: "compile-and-run",
         requestId: "req-3",
@@ -143,8 +184,10 @@ describe("javaRunner.worker", () => {
       (msg) => msg.type === "error" && msg.requestId === "req-3",
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg.errorCategory).toBe("javac");
-    expect(errorMsg.diagnostics).toHaveLength(1);
-    expect(errorMsg.diagnostics[0].message).toBe("Syntax error: ';' expected");
+    expect(errorMsg?.errorCategory).toBe("javac");
+    expect(errorMsg?.diagnostics).toHaveLength(1);
+    expect(errorMsg?.diagnostics?.[0]?.message).toBe(
+      "Syntax error: ';' expected",
+    );
   });
 });
