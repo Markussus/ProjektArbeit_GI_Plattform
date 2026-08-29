@@ -57,6 +57,11 @@ export function FASimulator({ ref }: FASimulatorProps) {
   const [isStorageReady, setIsStorageReady] = useState(
     () => useFASimulatorStore.getState().pendingProgram !== null,
   );
+  // Read at mount: the effect that clears the pending program runs before the
+  // restore effect below, so by then the store no longer shows one was queued.
+  const hadPendingProgramOnMount = useRef(
+    useFASimulatorStore.getState().pendingProgram !== null,
+  );
 
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
@@ -175,8 +180,8 @@ export function FASimulator({ ref }: FASimulatorProps) {
     }
     hasInitializedStorage.current = true;
 
-    // A pending program will be applied this render; don't restore over it.
-    if (useFASimulatorStore.getState().pendingProgram !== null) {
+    // An example/exercise queued a program for this mount; don't restore over it.
+    if (hadPendingProgramOnMount.current) {
       return;
     }
 

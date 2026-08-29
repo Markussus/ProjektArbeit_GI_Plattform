@@ -271,6 +271,31 @@ test.describe("Finite Automata — running a simulation", () => {
   });
 });
 
+test.describe("Finite Automata — opening an example", () => {
+  test("loads the example's automaton over a previously saved draft", async ({
+    page,
+  }) => {
+    // The blank free-mode starter autosaves, so by the time an example is
+    // opened there is always a stored draft that must not win.
+    await page.goto(FA_URL);
+    await page.getByRole("button", { name: "Simulation" }).click();
+    await page.getByRole("button", { name: /Start Simulation/i }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+      )
+      .not.toBeNull();
+
+    await page.getByRole("button", { name: "Examples" }).click();
+    await page.getByTestId("fa-example-card-ends-with-ab-select").click();
+    await page.getByTestId("fa-example-card-ends-with-ab-open").click();
+
+    await expect(page.getByLabel("δ(S0, a)")).toHaveValue("S1");
+    await expect(page.getByLabel("δ(S1, b)")).toHaveValue("S2");
+    await expect(page.getByPlaceholder("aab")).toHaveValue("aab");
+  });
+});
+
 test.describe("Finite Automata — Examples tab", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(FA_URL);
