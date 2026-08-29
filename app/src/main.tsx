@@ -4,10 +4,12 @@ import "@/i18n";
 import "./index.css";
 import App from "./App";
 import { applyTheme, getStoredTheme } from "./lib/theme";
+import { applyFont, getStoredFont } from "./lib/font";
 
-// Re-apply the persisted theme during hydration so the React tree and the
-// inline bootstrap script in index.html resolve to the same visual mode.
+// Re-apply the persisted theme and font during hydration so the React tree and
+// the inline bootstrap script in index.html resolve to the same visual mode.
 applyTheme(getStoredTheme());
+applyFont(getStoredFont());
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import {
+  DropdownSelect,
+  type DropdownSelectOption,
+} from "@/components/shared/DropdownSelect/DropdownSelect";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import {
@@ -8,6 +12,8 @@ import {
   type LicenseItem,
 } from "@/components/shared/LicenseList/LicenseList";
 import { trainingCenterStorage } from "@/lib/trainingCenter";
+import { useFont } from "@/hooks/useFont";
+import type { AppFont } from "@/lib/font";
 
 const licenseItems: LicenseItem[] = [
   {
@@ -43,6 +49,12 @@ const licenseItems: LicenseItem[] = [
 export function InfoPage() {
   const { t } = useTranslation();
   const location = useLocation();
+  const { font, setFont } = useFont();
+
+  const fontOptions: DropdownSelectOption<AppFont>[] = [
+    { value: "inter", label: t("common.font.inter") },
+    { value: "geist", label: t("common.font.geist") },
+  ];
 
   useEffect(() => {
     if (location.hash) {
@@ -64,6 +76,33 @@ export function InfoPage() {
         title={t("common.info.title")}
         description={t("common.info.description")}
       />
+
+      {/* Typography / Font Section */}
+      <section
+        id="typography"
+        className="bg-card ring-foreground/10 rounded-xl p-6 ring-1"
+      >
+        <h2 className="text-foreground text-lg font-semibold">
+          {t("common.font.title")}
+        </h2>
+        <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+          {t("common.font.description")}
+        </p>
+        <div className="mt-4 w-fit">
+          <DropdownSelect
+            value={font}
+            options={fontOptions}
+            onChange={(nextFont) => setFont(nextFont)}
+            ariaLabel={t("common.font.title")}
+            triggerClassName="h-9 min-w-36 justify-between gap-3 px-3 text-sm font-medium"
+            menuClassName="left-0 w-full min-w-36"
+            optionClassName="text-sm"
+            triggerTestId="font-select-trigger"
+            menuTestId="font-select-menu"
+            optionTestIdPrefix="font-select-option"
+          />
+        </div>
+      </section>
 
       {/* Progress Reset Section */}
       <section
