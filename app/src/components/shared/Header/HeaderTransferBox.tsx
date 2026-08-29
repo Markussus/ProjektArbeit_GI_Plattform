@@ -121,7 +121,7 @@ export function HeaderTransferBox() {
   return (
     <div
       data-testid="header-transfer-root"
-      className="relative flex max-w-sm min-w-0 flex-1 items-center gap-1 sm:gap-1.5 lg:max-w-md"
+      className="relative flex shrink-0 items-center gap-1 sm:gap-1.5"
     >
       <input
         type="text"
@@ -146,13 +146,14 @@ export function HeaderTransferBox() {
           }
         }}
         placeholder={t("common.simulation.transfer.placeholder")}
+        title={t("common.simulation.transfer.placeholder")}
         aria-label={
           isExportPreviewActive
             ? t("common.simulation.transfer.exportPreviewLabel")
             : undefined
         }
         className={cn(
-          "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 min-w-4 flex-1 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 sm:h-9 sm:min-w-16 md:min-w-24",
+          "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 w-8 shrink-0 rounded-md border px-1 text-center text-xs outline-none focus-visible:ring-2 sm:h-9 sm:w-9 lg:w-28 lg:px-2 lg:text-left xl:w-48",
           feedback === "importError" && "border-destructive",
         )}
         spellCheck={false}
@@ -169,7 +170,7 @@ export function HeaderTransferBox() {
         title={t("common.simulation.transfer.export")}
         className="bg-brand text-brand-foreground inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
-        <Download className="size-3.5" />
+        <Download className="size-3.5 shrink-0" />
         <span className="hidden lg:inline">
           {t("common.simulation.transfer.export")}
         </span>
@@ -184,7 +185,7 @@ export function HeaderTransferBox() {
         title={t("common.simulation.transfer.import")}
         className="bg-secondary text-secondary-foreground hover:bg-secondary/90 inline-flex size-8 shrink-0 items-center justify-center gap-1.5 rounded-md text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:size-9 lg:w-auto lg:px-2.5"
       >
-        <Upload className="size-3.5" />
+        <Upload className="size-3.5 shrink-0" />
         <span className="hidden lg:inline">
           {t("common.simulation.transfer.import")}
         </span>
@@ -194,7 +195,7 @@ export function HeaderTransferBox() {
         <span
           data-testid="header-transfer-status"
           className={cn(
-            "bg-background absolute top-full right-0 mt-1 rounded px-2 py-1 text-xs shadow-sm",
+            "bg-background absolute top-full right-0 z-50 mt-1 rounded px-2 py-1 text-xs whitespace-nowrap shadow-sm",
             feedback === "importError" || feedback === "exportError"
               ? "text-destructive"
               : "text-muted-foreground",

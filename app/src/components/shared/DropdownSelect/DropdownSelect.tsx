@@ -17,6 +17,7 @@ export interface DropdownSelectProps<T extends string> {
   disabled?: boolean;
   triggerIcon?: ReactNode;
   triggerClassName?: string;
+  chevronClassName?: string;
   menuClassName?: string;
   optionClassName?: string;
   triggerTestId?: string;
@@ -32,6 +33,7 @@ export function DropdownSelect<T extends string>({
   disabled = false,
   triggerIcon,
   triggerClassName,
+  chevronClassName,
   menuClassName,
   optionClassName,
   triggerTestId,
@@ -97,6 +99,7 @@ export function DropdownSelect<T extends string>({
           className={cn(
             "text-muted-foreground size-4 shrink-0 transition-transform",
             isOpen && !disabled && "rotate-180",
+            chevronClassName,
           )}
         />
       </button>

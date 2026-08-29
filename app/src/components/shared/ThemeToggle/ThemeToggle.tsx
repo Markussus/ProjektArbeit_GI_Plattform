@@ -14,7 +14,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       data-testid="theme-toggle"
       data-theme={resolvedTheme}
-      className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-8 items-center justify-center rounded-md"
+      className="border-border bg-background text-foreground hover:bg-muted/60 focus-visible:ring-ring inline-flex size-8 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none sm:size-9"
       aria-label={
         isDark
           ? t("common.theme.switchToLight")

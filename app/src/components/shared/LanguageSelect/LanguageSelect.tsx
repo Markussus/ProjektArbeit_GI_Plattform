@@ -27,7 +27,7 @@ export function LanguageSelect() {
   const options = supportedLanguages.map((language) => ({
     value: language,
     triggerLabel: (
-      <span className="hidden text-xs font-semibold tracking-wide uppercase min-[760px]:inline">
+      <span className="hidden text-xs font-semibold tracking-wide uppercase lg:inline">
         {languageLabels[language]}
       </span>
     ),
@@ -48,7 +48,8 @@ export function LanguageSelect() {
       }}
       ariaLabel={t("common.language.select")}
       triggerIcon={<Globe className="text-muted-foreground size-4 shrink-0" />}
-      triggerClassName="size-8 justify-center gap-0 px-0 min-[760px]:w-auto min-[760px]:gap-2 min-[760px]:px-2.5"
+      triggerClassName="size-8 sm:size-9 justify-center gap-0 px-0 shrink-0 lg:w-auto lg:gap-2 lg:px-2.5"
+      chevronClassName="hidden lg:block"
       menuClassName="right-0 min-w-32"
       optionClassName="text-sm"
       triggerTestId="language-select-trigger"

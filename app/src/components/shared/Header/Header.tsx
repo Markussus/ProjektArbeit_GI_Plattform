@@ -21,26 +21,30 @@ export function Header() {
       : t("common.nav.home");
 
   return (
-    <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-3 sm:px-6">
+    <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-        <Link to="/" className="flex shrink-0 items-center">
-          <img src={ThwsLogo} alt="THWS Logo" className="h-8 w-auto sm:h-9" />
+        <Link
+          to="/"
+          className="flex shrink-0 items-center"
+          aria-label={t("common.nav.home")}
+        >
+          <img
+            src={ThwsLogo}
+            alt="THWS Logo"
+            className="h-8 w-auto shrink-0 sm:h-9"
+          />
         </Link>
 
-        <div className="bg-border hidden h-7 w-px shrink-0 min-[760px]:block" />
+        <div className="bg-border hidden h-7 w-px shrink-0 min-[520px]:block" />
 
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="text-muted-foreground hidden truncate text-xs font-semibold tracking-wider uppercase min-[1250px]:inline">
-            {t("common.app.title")}
-          </span>
-          <span className="text-border hidden min-[1250px]:inline">/</span>
+        <div className="hidden min-w-0 items-center min-[520px]:flex">
           <span className="text-foreground truncate text-sm font-semibold sm:text-base">
             {headerLabel}
           </span>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <HeaderTransferBox />
         <LanguageSelect />
         <ThemeToggle />
