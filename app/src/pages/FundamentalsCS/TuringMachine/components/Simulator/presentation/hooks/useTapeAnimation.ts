@@ -137,11 +137,23 @@ export function useTapeHeadTracking({
         ? headIndicator.offsetParent
         : tapeScroller;
     const viewportRect = positioningParent.getBoundingClientRect();
+    const scrollerRect = tapeScroller.getBoundingClientRect();
     const focusedCellRect = focusedCell.getBoundingClientRect();
+
     const focusedCellCenterPx =
       focusedCellRect.left - viewportRect.left + focusedCellRect.width / 2;
+    const focusedCellCenterClientX =
+      focusedCellRect.left + focusedCellRect.width / 2;
 
-    headIndicator.style.opacity = "1";
+    if (
+      focusedCellCenterClientX < scrollerRect.left ||
+      focusedCellCenterClientX > scrollerRect.right
+    ) {
+      headIndicator.style.opacity = "0";
+    } else {
+      headIndicator.style.opacity = "1";
+    }
+
     headIndicator.style.transform = `translateX(${focusedCellCenterPx}px) translateX(-50%)`;
   }, [focusedCellRef, headIndicatorRef, tapeScrollerRef]);
 
