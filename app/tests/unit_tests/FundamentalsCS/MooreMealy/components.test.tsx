@@ -14,7 +14,7 @@ import { FormulaSelectorGrid } from "@/pages/FundamentalsCS/MooreMealy/component
 import { AutomataInputBuilder } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/presentation/AutomataInputBuilder";
 import { AutomataFormulaList } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/presentation/AutomataFormulaList";
 import { AutomataViewActions } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/presentation/AutomataViewActions";
-import { MooreSolutionCheckDialog } from "@/pages/FundamentalsCS/MooreMealy/components/MooreSolutionCheckDialog";
+import { AutomataSolutionCheckDialog } from "@/pages/FundamentalsCS/MooreMealy/components/AutomataSolutionCheckDialog";
 import { MooreTransitionTable } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/presentation/MooreTransitionTable";
 import { MooreOutputTable } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/presentation/MooreOutputTable";
 import { defaultMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/config/defaultMooreProgram";
@@ -234,10 +234,10 @@ describe("MooreMealy Presentation & Container Components", () => {
     expect(onAction).toHaveBeenCalled();
   });
 
-  it("renders MooreSolutionCheckDialog", () => {
+  it("renders AutomataSolutionCheckDialog", () => {
     const onClose = vi.fn();
     render(
-      <MooreSolutionCheckDialog
+      <AutomataSolutionCheckDialog
         checkResult={{
           passed: true,
           rows: [
@@ -253,7 +253,7 @@ describe("MooreMealy Presentation & Container Components", () => {
       />,
     );
     expect(
-      screen.getByTestId("moore-solution-check-dialog"),
+      screen.getByTestId("automata-solution-check-dialog"),
     ).toBeInTheDocument();
   });
 

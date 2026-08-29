@@ -1,36 +1,80 @@
 import { describe, expect, it } from "vitest";
 import {
-  getMooreExerciseScenario,
+  automataExerciseScenarios,
+  getAutomataExerciseScenario,
+  mealyExerciseScenarios,
+  mooreExerciseScenarios,
   mooreMealyExercises,
 } from "@/pages/FundamentalsCS/MooreMealy/exercises";
-import { runMooreValidation } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/automataSolutionChecker";
+import {
+  runMealyValidation,
+  runMooreValidation,
+} from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/automataSolutionChecker";
+import { validateMealyProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyProgram";
+import { validateMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreProgram";
 
-describe("mooreExercises scenarios and solution verification", () => {
-  it("defines 7 distinct exercise items with starter and solution programs", () => {
-    expect(mooreMealyExercises).toHaveLength(7);
-    for (const exercise of mooreMealyExercises) {
-      const scenario = getMooreExerciseScenario(exercise.titleKey);
-      expect(scenario).not.toBeNull();
-      expect(scenario!.starterProgram).toBeDefined();
-      expect(scenario!.solutionProgram).toBeDefined();
-      expect(scenario!.validationCases.length).toBeGreaterThan(0);
+describe("Moore and Mealy exercise scenarios", () => {
+  it("defines distinct, retrievable scenarios in both machine categories", () => {
+    expect(mooreExerciseScenarios).toHaveLength(7);
+    expect(mealyExerciseScenarios).toHaveLength(4);
+    expect(mooreMealyExercises).toHaveLength(11);
+
+    const ids = automataExerciseScenarios.map((scenario) => scenario.id);
+    const storageIds = automataExerciseScenarios.map(
+      (scenario) => scenario.storageId,
+    );
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(new Set(storageIds).size).toBe(storageIds.length);
+
+    for (const scenario of automataExerciseScenarios) {
+      expect(getAutomataExerciseScenario(scenario.id)).toBe(scenario);
+      expect(scenario.validationCases.length).toBeGreaterThan(0);
     }
   });
 
-  it("verifies that all exercise solutionPrograms pass 100% of their validationCases", async () => {
-    for (const exercise of mooreMealyExercises) {
-      const scenario = getMooreExerciseScenario(exercise.titleKey)!;
-      const result = await runMooreValidation(
-        scenario.solutionProgram,
-        scenario.validationCases,
-      );
-      expect(result.passed).toBe(true);
-      expect(result.error).toBeNull();
-      expect(result.rows.every((row) => row.passed)).toBe(true);
+  it("contains valid starter and solution programs", () => {
+    for (const scenario of mooreExerciseScenarios) {
+      expect(validateMooreProgram(scenario.starterProgram)).toEqual([]);
+      expect(validateMooreProgram(scenario.solutionProgram)).toEqual([]);
+    }
+    for (const scenario of mealyExerciseScenarios) {
+      expect(validateMealyProgram(scenario.starterProgram)).toEqual([]);
+      expect(validateMealyProgram(scenario.solutionProgram)).toEqual([]);
     }
   });
 
-  it("returns null for unknown exercise id", () => {
-    expect(getMooreExerciseScenario("unknown-id" as never)).toBeNull();
+  it("verifies every solution against independently specified output cases", () => {
+    for (const scenario of automataExerciseScenarios) {
+      const result =
+        scenario.machineType === "moore"
+          ? runMooreValidation(
+              scenario.solutionProgram,
+              scenario.validationCases,
+            )
+          : runMealyValidation(
+              scenario.solutionProgram,
+              scenario.validationCases,
+            );
+
+      expect(result.error, scenario.id).toBeNull();
+      expect(result.passed, scenario.id).toBe(true);
+      expect(
+        result.rows.every((row) => row.passed),
+        scenario.id,
+      ).toBe(true);
+
+      for (const validationCase of scenario.validationCases) {
+        const expectedLength =
+          validationCase.input.length +
+          (scenario.machineType === "moore" ? 1 : 0);
+        expect(validationCase.expectedOutputCodes, scenario.id).toHaveLength(
+          expectedLength,
+        );
+      }
+    }
+  });
+
+  it("returns null for an unknown exercise id", () => {
+    expect(getAutomataExerciseScenario("unknown-id" as never)).toBeNull();
   });
 });

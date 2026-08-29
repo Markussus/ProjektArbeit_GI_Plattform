@@ -82,9 +82,9 @@ describe("useMooreProgramEditor and useMealyProgramEditor hooks", () => {
       expect(result.current.issues).toHaveLength(0);
 
       act(() => {
-        result.current.handleTransitionChange("0", "S0", "S1");
+        result.current.handleTransitionChange("0", "START", "SEEN_1");
       });
-      expect(result.current.program.transitions["0"].S0).toBe("S1");
+      expect(result.current.program.transitions["0"].START).toBe("SEEN_1");
 
       act(() => {
         const added = result.current.handleAddState("M_STATE");
@@ -123,11 +123,11 @@ describe("useMooreProgramEditor and useMealyProgramEditor hooks", () => {
       expect(result.current.program.inputSymbols).not.toContain("alpha");
 
       act(() => {
-        result.current.handleOutputSymbolChange("0", "S0", "O_NEW");
-        result.current.handleOutputCodeChange("0", "S0", 55);
+        result.current.handleOutputSymbolChange("0", "START", "O_NEW");
+        result.current.handleOutputCodeChange("0", "START", 55);
       });
-      expect(result.current.program.outputs["0"].S0.symbol).toBe("O_NEW");
-      expect(result.current.program.outputs["0"].S0.code).toBe(55);
+      expect(result.current.program.outputs["0"].START.symbol).toBe("O_NEW");
+      expect(result.current.program.outputs["0"].START.code).toBe(55);
     });
   });
 });

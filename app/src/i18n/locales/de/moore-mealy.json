@@ -43,6 +43,34 @@
     "cruise": {
       "title": "Tempomat",
       "description": "Modelliere einen ausgeschalteten, bereiten und aktiven Tempomat mit On/Off, Set, Bremse, Beschleunigen, Reset, Cancel, Plus und Minus."
+    },
+    "edgeDetector": {
+      "title": "Flankendetektor",
+      "description": "Entwirf einen Mealy-Automaten, der nur beim Wechsel des Eingangssignals von 0 auf 1 einen Impuls RISING_EDGE ausgibt. Bleibt das Signal unverändert oder fällt es auf 0, wird NO_PULSE ausgegeben."
+    },
+    "doorController": {
+      "title": "Türsteuerung mit Aktionsimpulsen",
+      "description": "Modelliere eine verriegelte und eine entriegelte Tür als Mealy-Automaten. CARD erzeugt nur beim Entriegeln einen UNLOCK_PULSE; PASS erzeugt nur beim erneuten Verriegeln einen LOCK_PULSE. Wirkunglose Ereignisse liefern NO_ACTION."
+    },
+    "sequenceDetector": {
+      "title": "Folgendetektor für 01",
+      "description": "Entwirf einen überlappungsfähigen Mealy-Automaten, der für jedes gelesene Bit sofort ausgibt, ob mit diesem Bit die Folge 01 abgeschlossen wurde. Aufeinanderfolgende Nullen müssen als möglicher neuer Folgenanfang erhalten bleiben."
+    },
+    "parityTracker": {
+      "title": "Serielle Paritätsausgabe",
+      "description": "Entwirf einen Mealy-Automaten, der nach jedem eingelesenen Bit die Parität aller bisher gelesenen Einsen ausgibt. Eine 0 erhält die Parität, eine 1 wechselt zwischen EVEN_PARITY und ODD_PARITY."
+    }
+  },
+  "groups": {
+    "moore": {
+      "title": "Moore-Automaten",
+      "examplesDescription": "Zustandsabhängige Ausgaben: Der aktuelle Zustand bestimmt die Ausgabe unabhängig vom gerade gelesenen Eingabesymbol.",
+      "exercisesDescription": "Konstruiere Automaten, deren Ausgaben ausschließlich an Zustände gebunden sind."
+    },
+    "mealy": {
+      "title": "Mealy-Automaten",
+      "examplesDescription": "Übergangsabhängige Ausgaben: Das Beispiel erkennt die Bitfolge 101 einschließlich überlappender Treffer und gibt MATCH_101 genau auf dem abschließenden Übergang aus.",
+      "exercisesDescription": "Konstruiere Automaten mit unmittelbaren, von Zustand und Eingabe abhängigen Ausgaben."
     }
   },
   "examples": {
@@ -51,7 +79,7 @@
     "mooreTitle": "Moore-Beispielautomat",
     "mooreDescription": "Ein Moore-Automat mit vier Zuständen und zwei Eingabesymbolen.",
     "mealyTitle": "Mealy-Beispielautomat",
-    "mealyDescription": "Ein Mealy-Automat mit zwei Zuständen und ausgabeabhängigen Übergängen."
+    "mealyDescription": "Ein Mealy-Folgendetektor mit drei Zuständen erkennt die Bitfolge 101 einschließlich Überlappungen. NO_MATCH oder MATCH_101 wird direkt auf jedem Übergang ausgegeben; das Eingabewort enthält zwei Treffer."
   },
   "title": "Moore & Mealy Automaten",
   "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",

@@ -14,17 +14,27 @@ import {
 } from "./Simulator/MealySimulator";
 import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
 import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
-import { getMooreExerciseScenario } from "../exercises";
+import { getAutomataExerciseScenario } from "../exercises";
 import type { AutomataValidationResult } from "./Simulator/application/automataSolutionChecker";
-import { MooreSolutionCheckDialog } from "./MooreSolutionCheckDialog";
+import { AutomataSolutionCheckDialog } from "./AutomataSolutionCheckDialog";
 
 export const MOORE_EXAMPLE_ID = "moore-mealy.examples.mooreDefault";
 export const MEALY_EXAMPLE_ID = "moore-mealy.examples.mealyDefault";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
+  const isMooreExample = props.selectedItem?.id === MOORE_EXAMPLE_ID;
+  const isMealyExample = props.selectedItem?.id === MEALY_EXAMPLE_ID;
+  const exerciseScenario = useMemo(
+    () =>
+      props.selectedExercise
+        ? getAutomataExerciseScenario(props.selectedExercise.id)
+        : null,
+    [props.selectedExercise],
+  );
   const [machineType, setMachineType] = useState<"moore" | "mealy">(() =>
-    props.selectedItem?.id === MEALY_EXAMPLE_ID ||
+    exerciseScenario?.machineType === "mealy" ||
+    isMealyExample ||
     props.importedTaskStorageId === MEALY_SIMULATOR_TASK_STORAGE_ID
       ? "mealy"
       : "moore",
@@ -33,22 +43,23 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     useState<AutomataValidationResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [isMooreSimulatorReady, setIsMooreSimulatorReady] = useState(false);
+  const [isMealySimulatorReady, setIsMealySimulatorReady] = useState(false);
   const mooreSimulatorRef = useRef<MooreSimulatorHandle | null>(null);
   const mealySimulatorRef = useRef<MealySimulatorHandle | null>(null);
-  const isMooreExample = props.selectedItem?.id === MOORE_EXAMPLE_ID;
-  const isMealyExample = props.selectedItem?.id === MEALY_EXAMPLE_ID;
-  const exerciseScenario = useMemo(
-    () =>
-      props.selectedExercise
-        ? getMooreExerciseScenario(props.selectedExercise.id)
-        : null,
-    [props.selectedExercise],
-  );
+  const mooreExerciseScenario =
+    exerciseScenario?.machineType === "moore" ? exerciseScenario : null;
+  const mealyExerciseScenario =
+    exerciseScenario?.machineType === "mealy" ? exerciseScenario : null;
   const mooreInitialProgram =
-    exerciseScenario?.starterProgram ??
+    mooreExerciseScenario?.starterProgram ??
     (isMooreExample ? defaultMooreProgram : undefined);
-  const storageEnabled =
-    !isMooreExample && !isMealyExample && !exerciseScenario;
+  const storageEnabled = !isMooreExample && !isMealyExample;
+  const activeMachineType = exerciseScenario?.machineType ?? machineType;
+  const activeSimulatorReady =
+    exerciseScenario?.machineType === "mealy"
+      ? isMealySimulatorReady
+      : isMooreSimulatorReady;
+
   const handleMooreSimulatorRef = useCallback(
     (handle: MooreSimulatorHandle | null) => {
       mooreSimulatorRef.current = handle;
@@ -56,19 +67,36 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     },
     [],
   );
+  const handleMealySimulatorRef = useCallback(
+    (handle: MealySimulatorHandle | null) => {
+      mealySimulatorRef.current = handle;
+      setIsMealySimulatorReady(handle !== null);
+    },
+    [],
+  );
   const handleCheckSolution = async () => {
-    if (
-      !exerciseScenario ||
-      !mooreSimulatorRef.current ||
-      !isMooreSimulatorReady
-    ) {
+    if (!exerciseScenario || !activeSimulatorReady) {
       return;
     }
     setIsChecking(true);
     try {
-      setCheckResult(await mooreSimulatorRef.current.checkSolution());
+      const simulator =
+        exerciseScenario.machineType === "moore"
+          ? mooreSimulatorRef.current
+          : mealySimulatorRef.current;
+      if (simulator) {
+        setCheckResult(await simulator.checkSolution());
+      }
     } finally {
       setIsChecking(false);
+    }
+  };
+
+  const handleLoadSolution = () => {
+    if (exerciseScenario?.machineType === "moore") {
+      mooreSimulatorRef.current?.loadSolution();
+    } else if (exerciseScenario?.machineType === "mealy") {
+      mealySimulatorRef.current?.loadSolution();
     }
   };
 
@@ -82,9 +110,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
             <>
               <button
                 type="button"
-                onClick={() => mooreSimulatorRef.current?.loadSolution()}
-                disabled={!isMooreSimulatorReady}
-                data-testid="moore-load-solution"
+                onClick={handleLoadSolution}
+                disabled={!activeSimulatorReady}
+                data-testid="automata-load-solution"
                 className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("moore-mealy.exercises.loadSolution")}
@@ -92,8 +120,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
               <button
                 type="button"
                 onClick={handleCheckSolution}
-                disabled={isChecking || !isMooreSimulatorReady}
-                data-testid="moore-check-solution"
+                disabled={isChecking || !activeSimulatorReady}
+                data-testid="automata-check-solution"
                 className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isChecking
@@ -106,7 +134,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         emptyStateTextKey="common.simulation.emptyStates.moore"
         onReset={() => {
           setCheckResult(null);
-          if (machineType === "moore") {
+          if (activeMachineType === "moore") {
             mooreSimulatorRef.current?.resetStoredState();
           } else {
             mealySimulatorRef.current?.resetStoredState();
@@ -116,7 +144,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         <div className="space-y-6">
           <div className="mx-auto w-full max-w-[100rem] md:pr-24">
             <InlineTabNavigation
-              activeTab={machineType}
+              activeTab={activeMachineType}
               onTabChange={setMachineType}
               ariaLabel={t("moore-mealy.sim.machineType")}
               className="w-full"
@@ -135,30 +163,36 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
             />
           </div>
 
-          <div hidden={machineType !== "moore"}>
+          <div hidden={activeMachineType !== "moore"}>
             <MooreSimulator
               key={
-                exerciseScenario?.id ??
+                mooreExerciseScenario?.id ??
                 (isMooreExample ? MOORE_EXAMPLE_ID : "free")
               }
               ref={handleMooreSimulatorRef}
-              scenario={exerciseScenario}
+              scenario={mooreExerciseScenario}
               initialProgram={mooreInitialProgram}
               isExample={isMooreExample}
-              transferActive={machineType === "moore"}
+              transferActive={activeMachineType === "moore"}
             />
           </div>
-          <div hidden={machineType !== "mealy"}>
+          <div hidden={activeMachineType !== "mealy"}>
             <MealySimulator
-              ref={mealySimulatorRef}
+              key={
+                mealyExerciseScenario?.id ??
+                (isMealyExample ? MEALY_EXAMPLE_ID : "free")
+              }
+              ref={handleMealySimulatorRef}
+              scenario={mealyExerciseScenario}
               initialProgram={isMealyExample ? defaultMealyProgram : undefined}
               storageEnabled={storageEnabled}
-              transferActive={machineType === "mealy"}
+              isExample={isMealyExample}
+              transferActive={activeMachineType === "mealy"}
             />
           </div>
         </div>
       </TopicSimulationTab>
-      <MooreSolutionCheckDialog
+      <AutomataSolutionCheckDialog
         checkResult={checkResult}
         onClose={() => setCheckResult(null)}
       />

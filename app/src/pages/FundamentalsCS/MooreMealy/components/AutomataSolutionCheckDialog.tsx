@@ -2,15 +2,15 @@ import { useTranslation } from "react-i18next";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import type { AutomataValidationResult } from "./Simulator/application/automataSolutionChecker";
 
-interface MooreSolutionCheckDialogProps {
+interface AutomataSolutionCheckDialogProps {
   checkResult: AutomataValidationResult | null;
   onClose: () => void;
 }
 
-export function MooreSolutionCheckDialog({
+export function AutomataSolutionCheckDialog({
   checkResult,
   onClose,
-}: MooreSolutionCheckDialogProps) {
+}: AutomataSolutionCheckDialogProps) {
   const { t } = useTranslation();
 
   const resultRows = checkResult
@@ -35,10 +35,10 @@ export function MooreSolutionCheckDialog({
       open={checkResult !== null}
       title={t("moore-mealy.exercises.checkResultTitle")}
       onClose={onClose}
-      testId="moore-solution-check-dialog"
+      testId="automata-solution-check-dialog"
       summary={
         <p
-          data-testid="moore-solution-check-result"
+          data-testid="automata-solution-check-result"
           data-passed={String(checkResult?.passed)}
           className={
             checkResult?.passed
@@ -56,7 +56,7 @@ export function MooreSolutionCheckDialog({
         </p>
       }
       error={checkResult?.error}
-      tableTestIdPrefix="moore-solution-check-table"
+      tableTestIdPrefix="automata-solution-check-table"
       headers={[
         t("moore-mealy.exercises.validation.passed"),
         t("moore-mealy.exercises.validation.input"),

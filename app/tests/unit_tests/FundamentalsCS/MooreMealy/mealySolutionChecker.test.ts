@@ -6,7 +6,7 @@ describe("mealySolutionChecker", () => {
   it("returns the exact transition outputs for matching cases", () => {
     const cases = [
       { input: ["0"], expectedOutputCodes: [0] },
-      { input: ["0", "1"], expectedOutputCodes: [0, 1] },
+      { input: ["1", "0", "1"], expectedOutputCodes: [0, 0, 1] },
     ];
     const result = runMealyValidation(defaultMealyProgram, cases);
 
@@ -21,9 +21,9 @@ describe("mealySolutionChecker", () => {
         },
         {
           passed: true,
-          input: ["0", "1"],
-          outputCodes: [0, 1],
-          expectedOutputCodes: [0, 1],
+          input: ["1", "0", "1"],
+          outputCodes: [0, 0, 1],
+          expectedOutputCodes: [0, 0, 1],
           error: null,
         },
       ],
@@ -40,7 +40,7 @@ describe("mealySolutionChecker", () => {
     expect(result.passed).toBe(false);
     expect(result.rows[0]).toMatchObject({
       passed: false,
-      outputCodes: [2],
+      outputCodes: [0],
       expectedOutputCodes: [99],
       error: null,
     });

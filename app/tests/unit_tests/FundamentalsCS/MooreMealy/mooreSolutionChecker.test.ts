@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { runMooreValidation } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/automataSolutionChecker";
+import {
+  runMooreValidation,
+  type AutomataValidationCase,
+} from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/application/automataSolutionChecker";
 import type { MooreProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreTypes";
-import type { MooreValidationCase } from "@/pages/FundamentalsCS/MooreMealy/exercises";
 
 const solution: MooreProgram = {
   states: ["LOCKED", "UNLOCKED"],
@@ -20,7 +22,7 @@ const solution: MooreProgram = {
 };
 
 describe("runMooreValidation", () => {
-  const validationCases: MooreValidationCase[] = [
+  const validationCases: AutomataValidationCase[] = [
     { input: [], expectedOutputCodes: [0] },
     { input: ["COIN"], expectedOutputCodes: [0, 1] },
     { input: ["PASS"], expectedOutputCodes: [0, 0] },

@@ -30,6 +30,12 @@ test.describe("Number Systems page", () => {
     await test.step("The examples tab shows grouped examples", async () => {
       await page.getByTestId(appTestIds.tabExamples).click();
       await expect(
+        page.getByTestId("number-systems-examples-section-lecture"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("number-systems-examples-section-07"),
+      ).toBeVisible();
+      await expect(
         page.getByTestId("example-card-number-systems.example_u03_1-select"),
       ).toBeVisible();
       await expect(

@@ -15,12 +15,12 @@ import { emptyMealyProgram } from "@/pages/FundamentalsCS/MooreMealy/components/
 describe("mealyProgramUpdates", () => {
   it("adds and removes states", () => {
     const { nextProgram, stateName } = addMealyState(defaultMealyProgram);
-    expect(stateName).toBe("STATE_2");
-    expect(nextProgram.states).toContain("STATE_2");
-    expect(nextProgram.transitions["0"].STATE_2).toBe(
+    expect(stateName).toBe("STATE_3");
+    expect(nextProgram.states).toContain("STATE_3");
+    expect(nextProgram.transitions["0"].STATE_3).toBe(
       defaultMealyProgram.initialState,
     );
-    expect(nextProgram.outputs["0"].STATE_2).toBeDefined();
+    expect(nextProgram.outputs["0"].STATE_3).toBeDefined();
 
     const withCustom = addMealyState(nextProgram, "S_CUSTOM");
     expect(withCustom.stateName).toBe("S_CUSTOM");
@@ -38,19 +38,19 @@ describe("mealyProgramUpdates", () => {
   });
 
   it("renames states and remaps all transitions and outputs", () => {
-    const renamed = renameMealyState(defaultMealyProgram, "S0", "S_START");
+    const renamed = renameMealyState(defaultMealyProgram, "START", "S_START");
     expect(renamed).not.toBeNull();
     expect(renamed!.states).toContain("S_START");
-    expect(renamed!.states).not.toContain("S0");
+    expect(renamed!.states).not.toContain("START");
     expect(renamed!.initialState).toBe("S_START");
     expect(renamed!.transitions["0"].S_START).toBeDefined();
     expect(renamed!.outputs["0"].S_START).toBeDefined();
 
     // Invalid renames
-    expect(renameMealyState(defaultMealyProgram, "S0", "")).toBeNull();
-    expect(renameMealyState(defaultMealyProgram, "S0", "S1")).toBeNull();
+    expect(renameMealyState(defaultMealyProgram, "START", "")).toBeNull();
+    expect(renameMealyState(defaultMealyProgram, "START", "SEEN_1")).toBeNull();
     expect(
-      renameMealyState(defaultMealyProgram, "S0", "a".repeat(150)),
+      renameMealyState(defaultMealyProgram, "START", "a".repeat(150)),
     ).toBeNull();
   });
 
@@ -75,14 +75,19 @@ describe("mealyProgramUpdates", () => {
   });
 
   it("sets Mealy transitions and outputs", () => {
-    const withTrans = setMealyTransition(defaultMealyProgram, "0", "S0", "S1");
-    expect(withTrans.transitions["0"].S0).toBe("S1");
+    const withTrans = setMealyTransition(
+      defaultMealyProgram,
+      "0",
+      "START",
+      "SEEN_1",
+    );
+    expect(withTrans.transitions["0"].START).toBe("SEEN_1");
 
-    const withOut = setMealyOutput(defaultMealyProgram, "0", "S0", {
+    const withOut = setMealyOutput(defaultMealyProgram, "0", "START", {
       symbol: "OUT_SPECIAL",
       code: 99,
     });
-    expect(withOut.outputs["0"].S0.symbol).toBe("OUT_SPECIAL");
-    expect(withOut.outputs["0"].S0.code).toBe(99);
+    expect(withOut.outputs["0"].START.symbol).toBe("OUT_SPECIAL");
+    expect(withOut.outputs["0"].START.code).toBe(99);
   });
 });

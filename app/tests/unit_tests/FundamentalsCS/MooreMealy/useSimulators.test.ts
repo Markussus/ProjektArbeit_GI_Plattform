@@ -57,7 +57,7 @@ describe("useMooreSimulator and useMealySimulator hooks", () => {
       };
       const { result } = renderHook(() => useMealySimulator(program));
 
-      expect(result.current.runtime.currentState).toBe("S0");
+      expect(result.current.runtime.currentState).toBe("START");
       expect(result.current.runtime.inputPosition).toBe(0);
 
       act(() => {

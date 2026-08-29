@@ -18,6 +18,11 @@ import {
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
+import type { MealyExerciseScenario } from "../../exercises";
+import {
+  runMealyValidation,
+  type AutomataValidationResult,
+} from "./application/automataSolutionChecker";
 import { useMealySimulator } from "./application/useMealySimulator";
 import { useMealyProgramEditor } from "./application/useMealyProgramEditor";
 import { emptyMealyProgram } from "./config/emptyMealyProgram";
@@ -36,10 +41,13 @@ import { AutomataViewActions } from "./presentation/AutomataViewActions";
 
 export interface MealySimulatorHandle {
   resetStoredState: () => void;
+  loadSolution: () => void;
+  checkSolution: () => Promise<AutomataValidationResult>;
 }
 
 interface MealySimulatorProps {
   initialProgram?: MealyProgram;
+  scenario?: MealyExerciseScenario | null;
   storageEnabled?: boolean;
   isExample?: boolean;
   transferActive?: boolean;
@@ -53,6 +61,7 @@ export const MealySimulator = forwardRef<
 >(function MealySimulator(
   {
     initialProgram = emptyMealyProgram,
+    scenario = null,
     storageEnabled = true,
     isExample = false,
     transferActive = true,
@@ -61,6 +70,10 @@ export const MealySimulator = forwardRef<
 ) {
   const { t } = useTranslation();
   const effectiveStorageEnabled = storageEnabled && !isExample;
+  const scenarioProgram = useMemo(
+    () => cloneJson(scenario?.starterProgram ?? initialProgram),
+    [initialProgram, scenario],
+  );
   const {
     program,
     setProgram,
@@ -74,9 +87,9 @@ export const MealySimulator = forwardRef<
     handleRemoveInputSymbol,
     handleOutputSymbolChange,
     handleOutputCodeChange,
-  } = useMealyProgramEditor(cloneJson(initialProgram));
+  } = useMealyProgramEditor(cloneJson(scenarioProgram));
 
-  const [committed, setCommitted] = useState(() => cloneJson(initialProgram));
+  const [committed, setCommitted] = useState(() => cloneJson(scenarioProgram));
   const [mode, setMode] = useState<
     "edit" | "simulation" | "conversion" | "logic"
   >("edit");
@@ -91,9 +104,9 @@ export const MealySimulator = forwardRef<
     () =>
       createTrainingCenterIdentifier(
         TOPIC_STORAGE_IDS.mooreMealy,
-        MEALY_SIMULATOR_TASK_STORAGE_ID,
+        scenario?.storageId ?? MEALY_SIMULATOR_TASK_STORAGE_ID,
       ),
-    [],
+    [scenario?.storageId],
   );
   useActiveSimulatorTransfer({
     identifier,
@@ -143,18 +156,39 @@ export const MealySimulator = forwardRef<
           trainingCenterStorage.delete(identifier);
         }
         simulation.pause();
-        const resetProgram = cloneJson(initialProgram);
+        const resetProgram = cloneJson(scenarioProgram);
         setProgram(resetProgram);
         setCommitted(resetProgram);
         setMode("edit");
       },
+      loadSolution() {
+        if (scenario) {
+          loadProgram(cloneJson(scenario.solutionProgram));
+        }
+      },
+      checkSolution: async () => {
+        if (!scenario) {
+          return {
+            rows: [],
+            passed: false,
+            error: t(
+              "moore-mealy.exercises.validation.exampleCheckUnavailable",
+            ),
+          };
+        }
+        return runMealyValidation(program, scenario.validationCases);
+      },
     }),
     [
       identifier,
-      initialProgram,
+      loadProgram,
+      program,
+      scenario,
+      scenarioProgram,
       setProgram,
       simulation,
       effectiveStorageEnabled,
+      t,
     ],
   );
 

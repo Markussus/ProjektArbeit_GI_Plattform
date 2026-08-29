@@ -42,8 +42,8 @@ async function openMealySimulator(page: Page) {
 
 async function openExercise(page: Page, exerciseId: string) {
   await page.getByTestId("tab-button-exercises").click();
-  await page.getByTestId(`moore-exercise-card-${exerciseId}-select`).click();
-  await page.getByTestId(`moore-exercise-card-${exerciseId}-open`).click();
+  await page.getByTestId(`automata-exercise-card-${exerciseId}-select`).click();
+  await page.getByTestId(`automata-exercise-card-${exerciseId}-open`).click();
 }
 
 test.describe("Moore and Mealy simulation tab", () => {
@@ -113,17 +113,19 @@ test.describe("Moore and Mealy simulation tab", () => {
       page
         .getByTestId("mealy-config-view")
         .locator('[data-testid^="mealy-transition-output-symbol-"]'),
-    ).toHaveCount(4);
+    ).toHaveCount(6);
     await page.getByTestId("mealy-start-simulation").click();
     await page.getByTestId("mealy-controls-step").click();
 
-    await expect(page.getByTestId("mealy-runtime-output")).toContainText("a");
+    await expect(page.getByTestId("mealy-runtime-output")).toContainText(
+      "NO_MATCH",
+    );
     await expect(page.getByTestId("mealy-state-diagram")).toBeVisible();
     await expect(
       page
         .getByTestId("mealy-state-diagram")
         .locator('[data-testid^="state-machine-node-"]'),
-    ).toHaveCount(2);
+    ).toHaveCount(3);
     await page.getByTestId("mealy-state-diagram-zoom-in").click();
     await expect(
       page.getByTestId("mealy-state-diagram-zoom-percent-reset"),
@@ -252,6 +254,12 @@ test.describe("Moore and Mealy simulation tab", () => {
   }) => {
     await preparePage(page);
     await page.getByTestId("tab-button-examples").click();
+    await expect(
+      page.getByTestId("moore-mealy-examples-section-moore"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("moore-mealy-examples-section-mealy"),
+    ).toBeVisible();
 
     await page
       .getByTestId(
@@ -307,28 +315,44 @@ test.describe("Moore and Mealy simulation tab", () => {
     await mealyState.fill("CHANGED");
     await mealyState.press("Enter");
     await page.getByTestId("simulation-reset").click();
-    await expect(mealyState).toHaveValue("S0");
+    await expect(mealyState).toHaveValue("START");
   });
 
-  test("opens all worksheet exercises and loads their solutions", async ({
+  test("opens all exercises and verifies their bundled solutions", async ({
     page,
   }) => {
     await preparePage(page);
-    const exerciseIds = [
-      "moore-mealy.exercises.turnstile.title",
-      "moore-mealy.exercises.elevator.title",
-      "moore-mealy.exercises.barrier.title",
-      "moore-mealy.exercises.vending.title",
-      "moore-mealy.exercises.wiper.title",
-      "moore-mealy.exercises.alarm.title",
-      "moore-mealy.exercises.cruise.title",
+    await page.getByTestId("tab-button-exercises").click();
+    await expect(
+      page.getByTestId("moore-mealy-exercises-tab-section-moore"),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("moore-mealy-exercises-tab-section-mealy"),
+    ).toBeVisible();
+    const exercises = [
+      ["moore-mealy.exercises.turnstile.title", "moore-config-view"],
+      ["moore-mealy.exercises.elevator.title", "moore-config-view"],
+      ["moore-mealy.exercises.barrier.title", "moore-config-view"],
+      ["moore-mealy.exercises.vending.title", "moore-config-view"],
+      ["moore-mealy.exercises.wiper.title", "moore-config-view"],
+      ["moore-mealy.exercises.alarm.title", "moore-config-view"],
+      ["moore-mealy.exercises.cruise.title", "moore-config-view"],
+      ["moore-mealy.exercises.edgeDetector.title", "mealy-config-view"],
+      ["moore-mealy.exercises.doorController.title", "mealy-config-view"],
+      ["moore-mealy.exercises.sequenceDetector.title", "mealy-config-view"],
+      ["moore-mealy.exercises.parityTracker.title", "mealy-config-view"],
     ];
 
-    for (const exerciseId of exerciseIds) {
+    for (const [exerciseId, configTestId] of exercises) {
       await openExercise(page, exerciseId);
-      await expect(page.getByTestId("moore-config-view")).toBeVisible();
-      await page.getByTestId("moore-load-solution").click();
-      await expect(page.getByTestId("moore-config-error")).toHaveCount(0);
+      await expect(page.getByTestId(configTestId)).toBeVisible();
+      await page.getByTestId("automata-load-solution").click();
+      await expect(page.getByTestId(configTestId)).toBeVisible();
+      await page.getByTestId("automata-check-solution").click();
+      await expect(
+        page.getByTestId("automata-solution-check-result"),
+      ).toHaveAttribute("data-passed", "true");
+      await page.getByTestId("automata-solution-check-dialog-close").click();
     }
   });
 
@@ -346,29 +370,31 @@ test.describe("Moore and Mealy simulation tab", () => {
         .locator('[data-testid^="moore-input-symbol-"]'),
     ).toHaveCount(0);
 
-    await page.getByTestId("moore-check-solution").click();
+    await page.getByTestId("automata-check-solution").click();
     await expect(
-      page.getByTestId("moore-solution-check-result"),
+      page.getByTestId("automata-solution-check-result"),
     ).toHaveAttribute("data-passed", "false");
-    await expect(page.getByTestId("moore-solution-check-table")).toBeVisible();
+    await expect(
+      page.getByTestId("automata-solution-check-table"),
+    ).toBeVisible();
     await expect(
       page.locator(
-        '[data-testid^="moore-solution-check-table-row-"][data-passed="false"]',
+        '[data-testid^="automata-solution-check-table-row-"][data-passed="false"]',
       ),
     ).not.toHaveCount(0);
-    await page.getByTestId("moore-solution-check-dialog-close").click();
+    await page.getByTestId("automata-solution-check-dialog-close").click();
 
-    await page.getByTestId("moore-load-solution").click();
-    await page.getByTestId("moore-check-solution").click();
+    await page.getByTestId("automata-load-solution").click();
+    await page.getByTestId("automata-check-solution").click();
     await expect(
-      page.getByTestId("moore-solution-check-result"),
+      page.getByTestId("automata-solution-check-result"),
     ).toHaveAttribute("data-passed", "true");
     await expect(
       page.locator(
-        '[data-testid^="moore-solution-check-table-row-"][data-passed="false"]',
+        '[data-testid^="automata-solution-check-table-row-"][data-passed="false"]',
       ),
     ).toHaveCount(0);
-    await page.getByTestId("moore-solution-check-dialog-close").click();
+    await page.getByTestId("automata-solution-check-dialog-close").click();
     await page.getByTestId("simulation-reset").click();
     await expect(
       page
@@ -387,7 +413,7 @@ test.describe("Moore and Mealy simulation tab", () => {
   }) => {
     await preparePage(page);
     await openExercise(page, "moore-mealy.exercises.turnstile.title");
-    await page.getByTestId("moore-load-solution").click();
+    await page.getByTestId("automata-load-solution").click();
     await expect(
       page
         .getByTestId("moore-config-view")
@@ -431,11 +457,33 @@ test.describe("Moore and Mealy simulation tab", () => {
     ).toHaveValue("SAVED_STATE");
 
     await page.getByTestId("tab-button-exercises").click();
-    await page.getByTestId("moore-reset-all-exercises").click();
-    await page.getByTestId("moore-reset-all-exercises-confirm").click();
+    await page.getByTestId("automata-reset-all-exercises").click();
+    await page.getByTestId("automata-reset-all-exercises-confirm").click();
     await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
+    ).toHaveValue("STATE_0");
+
+    await page.getByTestId("tab-button-exercises").click();
+    await openExercise(page, "moore-mealy.exercises.edgeDetector.title");
+    const mealyStateName = page
+      .getByTestId("mealy-config-view")
+      .getByTestId("moore-state-name-0");
+    await mealyStateName.fill("SAVED_MEALY_STATE");
+    await mealyStateName.press("Enter");
+    await page.getByTestId("tab-button-overview").click();
+
+    await openExercise(page, "moore-mealy.exercises.edgeDetector.title");
+    await expect(
+      page.getByTestId("mealy-config-view").getByTestId("moore-state-name-0"),
+    ).toHaveValue("SAVED_MEALY_STATE");
+
+    await page.getByTestId("tab-button-exercises").click();
+    await page.getByTestId("automata-reset-all-exercises").click();
+    await page.getByTestId("automata-reset-all-exercises-confirm").click();
+    await openExercise(page, "moore-mealy.exercises.edgeDetector.title");
+    await expect(
+      page.getByTestId("mealy-config-view").getByTestId("moore-state-name-0"),
     ).toHaveValue("STATE_0");
   });
 

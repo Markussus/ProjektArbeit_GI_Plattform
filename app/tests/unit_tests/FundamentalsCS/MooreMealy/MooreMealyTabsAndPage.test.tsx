@@ -14,7 +14,10 @@ import { OverviewTab } from "@/pages/FundamentalsCS/MooreMealy/components/Overvi
 import { ExamplesTab } from "@/pages/FundamentalsCS/MooreMealy/components/ExamplesTab";
 import { ExercisesTab } from "@/pages/FundamentalsCS/MooreMealy/components/ExercisesTab";
 import { SimulationTab } from "@/pages/FundamentalsCS/MooreMealy/components/SimulationTab";
-import { mooreExerciseScenarios } from "@/pages/FundamentalsCS/MooreMealy/exercises";
+import {
+  mealyExerciseScenarios,
+  mooreExerciseScenarios,
+} from "@/pages/FundamentalsCS/MooreMealy/exercises";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -62,6 +65,12 @@ describe("MooreMealy Page and Tabs", () => {
         "moore-mealy-example-moore-mealy.examples.mooreDefault-select",
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("moore-mealy-examples-section-moore"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("moore-mealy-examples-section-mealy"),
+    ).toBeInTheDocument();
   });
 
   it("renders ExercisesTab and triggers exercise open and reset", () => {
@@ -69,8 +78,19 @@ describe("MooreMealy Page and Tabs", () => {
     render(<ExercisesTab onOpenExercise={onOpenExercise} />);
     expect(
       screen.getByTestId(
-        "moore-exercise-card-moore-mealy.exercises.turnstile.title-select",
+        "automata-exercise-card-moore-mealy.exercises.turnstile.title-select",
       ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId(
+        "automata-exercise-card-moore-mealy.exercises.edgeDetector.title-select",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("moore-mealy-exercises-tab-section-moore"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("moore-mealy-exercises-tab-section-mealy"),
     ).toBeInTheDocument();
   });
 
@@ -98,5 +118,18 @@ describe("MooreMealy Page and Tabs", () => {
     expect(
       screen.getByTestId("simulation-selected-exercise"),
     ).toBeInTheDocument();
+  });
+
+  it("opens a Mealy exercise in the Mealy simulator", async () => {
+    render(
+      <SimulationTab
+        selectedExercise={mealyExerciseScenarios[0]}
+        onSelectExercise={vi.fn()}
+        onResetActiveSimulator={vi.fn()}
+      />,
+    );
+
+    expect(await screen.findByTestId("mealy-config-view")).toBeVisible();
+    expect(screen.getByTestId("automata-load-solution")).toBeEnabled();
   });
 });
