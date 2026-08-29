@@ -5,18 +5,18 @@ import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 
 /**
- * Bestimmt welche Zeichen im Lösungseingabefeld erlaubt sind.
+ * Determines which characters are allowed in the solution input field.
  *
- * | Wert           | Erlaubte Zeichen                                  | Einsatz                            |
+ * | Value          | Allowed characters                                | Used by                            |
  * |----------------|---------------------------------------------------|------------------------------------|
- * | "binary"       | 0, 1                                              | Alle Binär-Arithmetik, NegNumbers  |
- * | "octal"        | 0-7                                               | Oktal-Konverter                    |
- * | "decimal"      | 0-9                                               | Dezimal-Konverter                  |
- * | "hex"          | 0-9, A-F (Groß/Klein)                             | Hex-Konverter                      |
- * | "float"        | 0-9, ., -, (für IEEE754-Dezimalergebnis)          | IEEEToDec-Ergebnis                 |
- * | "ieee-binary"  | 0, 1, Leerzeichen                                 | IEEE-Binary-String-Eingabe         |
- * | "compare"      | <, >, =                                           | Compare-Modul                      |
- * | "text"         | keine Einschränkung                               | Division (gemischtes Format)       |
+ * | "binary"       | 0, 1                                              | All binary arithmetic, NegNumbers  |
+ * | "octal"        | 0-7                                               | Octal converter                    |
+ * | "decimal"      | 0-9                                               | Decimal converter                  |
+ * | "hex"          | 0-9, A-F (case-insensitive)                       | Hex converter                      |
+ * | "float"        | 0-9, ., - (for IEEE754 decimal result)            | IEEEToDec result                   |
+ * | "ieee-binary"  | 0, 1, whitespace                                  | IEEE binary string input           |
+ * | "compare"      | <, >, =                                           | Compare module                     |
+ * | "text"         | no restriction                                    | Division (mixed format)            |
  */
 export type ValidationInputMode =
   | "binary"
@@ -30,7 +30,7 @@ export type ValidationInputMode =
   | "base64"
   | "hex-bytes";
 
-/** Filtert eine Zeichenkette basierend auf dem erlaubten `mode`. */
+/** Filters a string based on the allowed `mode`. */
 function filterInput(value: string, mode: ValidationInputMode): string {
   switch (mode) {
     case "binary":
@@ -42,13 +42,13 @@ function filterInput(value: string, mode: ValidationInputMode): string {
     case "hex":
       return value.replace(/[^0-9A-Fa-f]/g, "");
     case "float":
-      // Dezimalzahl mit optionalem Vorzeichen und Komma/Punkt
+      // Decimal number with optional sign and comma/dot
       return value.replace(/[^0-9.-]/g, "");
     case "ieee-binary":
-      // Binäre Bits und Leerzeichen (für "0 10000010 10100000...")
+      // Binary bits and whitespace (for "0 10000010 10100000...")
       return value.replace(/[^01 ]/g, "");
     case "compare":
-      // Nur Vergleichssymbole
+      // Only comparison symbols
       return value.replace(/[^<>=]/g, "");
     case "text":
     case "base64":
@@ -61,11 +61,11 @@ function filterInput(value: string, mode: ValidationInputMode): string {
 interface ExerciseValidationPanelProps {
   expectedResult: string | string[];
   onShowSolution: () => void;
-  /** Callback für "Übungsmodus verlassen" – wenn nicht angegeben, wird der Button nicht gezeigt */
+  /** Callback for "exit exercise mode" — if not provided, the button is hidden */
   onExitExercise?: () => void;
   /**
-   * Einschränkung der erlaubten Eingabezeichen.
-   * Entspricht dem Zahlenformat der gesuchten Antwort (z. B. "binary", "hex").
+   * Restricts the allowed input characters.
+   * Matches the number format of the expected answer (e.g. "binary", "hex").
    * @default "text"
    */
   inputMode?: ValidationInputMode;
@@ -139,7 +139,7 @@ export function ExerciseValidationPanel({
         <div className="bg-muted/30 border-border/50 border-b p-4">
           <h3 className="text-foreground flex items-center gap-2 font-semibold">
             <KeyRound className="text-primary h-5 w-5" />
-            {t("simulator.validation.title", "Ergebnis überprüfen")}
+            {t("simulator.validation.title", "Check result")}
           </h3>
         </div>
 
@@ -148,7 +148,7 @@ export function ExerciseValidationPanel({
             <label className="text-muted-foreground mb-2 block text-sm font-medium">
               {t(
                 "simulator.validation.enterSolution",
-                "Geben Sie hier Ihr Endergebnis ein...",
+                "Enter your final result here...",
               )}
             </label>
             <input
@@ -157,7 +157,7 @@ export function ExerciseValidationPanel({
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               data-testid={testIdPrefix ? `${testIdPrefix}-input` : undefined}
-              placeholder={placeholder || "z.B. 10110010"}
+              placeholder={placeholder || "e.g. 10110010"}
               className={cn(
                 "bg-background w-full rounded-md border px-4 py-3 font-mono text-sm focus:outline-none",
                 validationState === "incorrect"
@@ -176,7 +176,7 @@ export function ExerciseValidationPanel({
               <p>
                 {t(
                   "simulator.validation.incorrect",
-                  "Das Ergebnis ist leider nicht richtig. Versuchen Sie es nochmal!",
+                  "The result is not correct. Please try again!",
                 )}
               </p>
             </div>
@@ -188,7 +188,7 @@ export function ExerciseValidationPanel({
               <p>
                 {t(
                   "simulator.validation.correct",
-                  "Korrekt! Die Lösung wurde freigeschaltet.",
+                  "Correct! The solution has been unlocked.",
                 )}
               </p>
             </div>
@@ -201,7 +201,7 @@ export function ExerciseValidationPanel({
               data-testid={testIdPrefix ? `${testIdPrefix}-verify` : undefined}
               className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 rounded-md px-4 py-2.5 font-medium disabled:pointer-events-none disabled:opacity-50"
             >
-              {t("simulator.validation.verify", "Lösung überprüfen")}
+              {t("simulator.validation.verify", "Check solution")}
             </button>
 
             <button
@@ -212,11 +212,11 @@ export function ExerciseValidationPanel({
               className="bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 font-medium sm:flex-none"
             >
               <Eye className="h-4 w-4" />
-              {t("simulator.validation.showSolution", "Lösung anzeigen")}
+              {t("simulator.validation.showSolution", "Show solution")}
             </button>
           </div>
 
-          {/* "Übungsmodus verlassen" Button */}
+          {/* "Exit exercise mode" button */}
           {onExitExercise && (
             <div className="border-border/40 border-t pt-4">
               <button

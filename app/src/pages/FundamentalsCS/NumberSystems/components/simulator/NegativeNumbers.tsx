@@ -267,7 +267,7 @@ export function NegativeNumbers({
   );
 }
 
-// ResultRow bleibt lokal – sehr spezifisch für NegativeNumbers
+// ResultRow stays local as it is specific to NegativeNumbers
 function ResultRow({
   label,
   value,

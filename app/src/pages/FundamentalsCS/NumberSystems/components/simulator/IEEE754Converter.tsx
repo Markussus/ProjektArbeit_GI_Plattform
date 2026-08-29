@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { Info, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { IEEE754ConverterState } from "./nsTransferCodec";
+import { useIEEE754Converter } from "./useIEEE754Converter";
 
 interface IEEE754ConverterProps {
   isExerciseMode?: boolean;
@@ -26,98 +26,32 @@ export function IEEE754Converter({
   onChangeState,
 }: IEEE754ConverterProps) {
   const { t } = useTranslation("translation");
-  const locked = !!isExerciseMode && !showSolution;
-  const [inputValue, setInputValue] = useState<string>(
-    locked
-      ? initialValue || "12.5"
-      : (initialState?.inputValue ?? (initialValue || "12.5")),
-  );
-
-  const [converterMode, setConverterMode] = useState<"decToIeee" | "ieeeToDec">(
-    locked
-      ? initialConverterMode
-      : (initialState?.converterMode ?? initialConverterMode),
-  );
-
-  useEffect(() => {
-    onChangeState?.({ inputValue, converterMode });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, converterMode]);
-
-  // PARSE LOGIC
-  const cleanBinary = inputValue.replace(/[^01]/g, "");
-  const isIeeeToDecValid =
-    converterMode === "ieeeToDec" && cleanBinary.length === 32;
-
-  let isValid: boolean;
-  let floatVal = 0;
-  let isNaNVal = false;
-  let isSpecial = false;
-
-  let sign = "0";
-  let exponent = "00000000";
-  let mantissa = "00000000000000000000000";
-  let expVal = 0;
-
-  if (converterMode === "decToIeee") {
-    floatVal = parseFloat(inputValue.replace(",", "."));
-    isValid =
-      inputValue.trim() !== "" &&
-      !isNaN(floatVal) &&
-      inputValue.toLowerCase() !== "nan";
-    isNaNVal =
-      inputValue.toLowerCase() === "nan" ||
-      (inputValue.trim() !== "" && isNaN(floatVal) && !isValid);
-    isSpecial = isValid && (!isFinite(floatVal) || floatVal === 0);
-
-    if (isValid) {
-      const buffer = new ArrayBuffer(4);
-      const floatView = new Float32Array(buffer);
-      const intView = new Uint32Array(buffer);
-
-      floatView[0] = floatVal;
-      const bits = intView[0].toString(2).padStart(32, "0");
-
-      sign = bits[0];
-      exponent = bits.slice(1, 9);
-      mantissa = bits.slice(9);
-      expVal = parseInt(exponent, 2);
-    }
-  } else {
-    isValid = isIeeeToDecValid;
-    if (isValid) {
-      sign = cleanBinary[0];
-      exponent = cleanBinary.slice(1, 9);
-      mantissa = cleanBinary.slice(9);
-      expVal = parseInt(exponent, 2);
-
-      const buffer = new ArrayBuffer(4);
-      const floatView = new Float32Array(buffer);
-      const intView = new Uint32Array(buffer);
-
-      intView[0] = parseInt(cleanBinary, 2);
-      floatVal = floatView[0];
-
-      isNaNVal = isNaN(floatVal);
-      isSpecial = !isFinite(floatVal) || floatVal === 0;
-    }
-  }
-
-  const isZero = isValid && floatVal === 0;
-  const isInf = isValid && !isFinite(floatVal) && !isNaNVal;
-
-  // Fraction Math for Explanation
-  let sumOfFractions = 0;
-  const fractionSteps: number[] = [];
-  if (converterMode === "ieeeToDec" && isValid && !isSpecial && !isNaNVal) {
-    for (let i = 0; i < mantissa.length; i++) {
-      if (mantissa[i] === "1") {
-        const pow = Math.pow(2, -(i + 1));
-        sumOfFractions += pow;
-        fractionSteps.push(i + 1);
-      }
-    }
-  }
+  const {
+    inputValue,
+    setInputValue,
+    converterMode,
+    setConverterMode,
+    locked,
+    isValid,
+    isNaNVal,
+    isSpecial,
+    isZero,
+    isInf,
+    floatVal,
+    sign,
+    exponent,
+    mantissa,
+    expVal,
+    sumOfFractions,
+    fractionSteps,
+  } = useIEEE754Converter({
+    isExerciseMode,
+    showSolution,
+    initialValue,
+    initialConverterMode,
+    initialState,
+    onChangeState,
+  });
 
   return (
     <div className="animate-in fade-in zoom-in-95 space-y-8 duration-300">
