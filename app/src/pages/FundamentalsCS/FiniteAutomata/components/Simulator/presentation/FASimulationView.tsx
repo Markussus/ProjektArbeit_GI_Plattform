@@ -65,7 +65,7 @@ export function FASimulationView({
   return (
     <div className="rounded-[1rem] bg-(--fa-bg) p-6 text-(--fa-text)">
       {/* Top bar: title + edit button */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between md:pr-24">
         <h2 className="text-lg font-bold text-(--fa-text-bright)">
           {t("finite-automata.sim.title", "Simulation")}
         </h2>

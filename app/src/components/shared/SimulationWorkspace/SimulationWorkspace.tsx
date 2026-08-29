@@ -96,13 +96,13 @@ export function SimulationWorkspace({
       <div
         data-testid="simulation-workspace"
         className={cn(
-          "bg-card ring-foreground/10 relative flex flex-col rounded-xl p-4 sm:p-6 ring-1 transition-[min-height] duration-300 ease-in-out",
+          "bg-card ring-foreground/10 relative flex flex-col rounded-xl p-4 ring-1 transition-[min-height] duration-300 ease-in-out sm:p-6",
           isFocused ? "min-h-[calc(100vh-13rem)]" : "min-h-[24rem]",
         )}
       >
         <div
           data-testid="simulation-workspace-controls"
-          className="mb-4 flex shrink-0 items-center justify-end gap-2"
+          className="mb-4 flex shrink-0 items-center justify-end gap-2 md:absolute md:top-6 md:right-6 md:z-20 md:mb-0"
         >
           {onReset && (
             <button

@@ -496,7 +496,7 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
         className="flex h-full flex-col space-y-6"
       >
         {/* Dashboard Navigation */}
-        <div className="border-border flex gap-1 border-b">
+        <div className="border-border flex flex-wrap gap-1 border-b md:pr-24">
           {(
             [
               "integers",

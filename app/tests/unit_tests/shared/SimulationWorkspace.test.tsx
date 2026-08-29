@@ -130,7 +130,9 @@ describe("SimulationWorkspace", () => {
       />,
     );
 
-    const controlsContainer = screen.getByTestId("simulation-workspace-controls");
+    const controlsContainer = screen.getByTestId(
+      "simulation-workspace-controls",
+    );
     expect(controlsContainer).toBeInTheDocument();
     expect(controlsContainer).not.toHaveClass("absolute");
 

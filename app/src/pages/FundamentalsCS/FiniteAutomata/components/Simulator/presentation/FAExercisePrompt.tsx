@@ -17,7 +17,7 @@ export function FAExercisePrompt({ exercise }: FAExercisePromptProps) {
   return (
     <div
       data-testid="fa-exercise-prompt"
-      className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1"
+      className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1 md:mr-24"
     >
       {/* The goal comes first: several goals read "…the grammar below". */}
       <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">

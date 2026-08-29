@@ -131,7 +131,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         }}
       >
         <div className="space-y-6">
-          <div className="mx-auto w-full max-w-[100rem]">
+          <div className="mx-auto w-full max-w-[100rem] md:pr-24">
             <InlineTabNavigation
               activeTab={machineType}
               onTabChange={setMachineType}
