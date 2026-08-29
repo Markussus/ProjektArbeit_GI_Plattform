@@ -253,6 +253,61 @@ describe("tmProgramValidation", () => {
       );
     });
 
+    it("handles sparse or undefined transition table buckets cleanly", () => {
+      const issues = validateTMProgram(
+        createProgram({
+          transitions: {
+            "0": {
+              q0: undefined,
+            },
+            "1": undefined,
+          },
+        }),
+      );
+
+      expect(issues).toEqual([]);
+    });
+
+    it("reports multiple simultaneous issues on a single transition cell", () => {
+      const issues = validateTMProgram(
+        createProgram({
+          transitions: {
+            "0": {
+              ghostState: {
+                nextState: "phantomNext",
+                writeSymbol: "invalidWrite",
+                movement: "R",
+              },
+            },
+          },
+        }),
+      );
+
+      expect(issues).toContainEqual({
+        code: "transition_state_missing",
+        path: "transitions.0.ghostState",
+        params: { state: "ghostState", symbol: "0" },
+      });
+      expect(issues).toContainEqual({
+        code: "transition_next_state_missing",
+        path: "transitions.0.ghostState.nextState",
+        params: {
+          state: "ghostState",
+          symbol: "0",
+          nextState: "phantomNext",
+        },
+      });
+      expect(issues).toContainEqual({
+        code: "transition_write_symbol_invalid",
+        path: "transitions.0.ghostState.writeSymbol",
+        params: {
+          state: "ghostState",
+          symbol: "0",
+          writeSymbol: "invalidWrite",
+        },
+      });
+    });
+
     // Tests the derived-alphabet edge case showing that omitted blank and transition symbols are treated as present by validation.
     it("does not report missing-symbol issues for symbols that are derived from blank and transition usage", () => {
       const issues = validateTMProgram(
