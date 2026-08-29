@@ -2,21 +2,13 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
   type Ref,
 } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Settings,
-  Sparkles,
-  Play,
-  RotateCcw,
-  Maximize2,
-  X,
-} from "lucide-react";
+import { Play, Settings, Sparkles } from "lucide-react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
@@ -48,121 +40,92 @@ export interface FASimulatorHandle {
 
 interface FASimulatorProps {
   ref?: Ref<FASimulatorHandle>;
-  isFocused?: boolean;
-  onToggleFocus?: () => void;
-  onReset?: () => void;
 }
 
-export function FASimulator({
-  ref,
-  isFocused,
-  onToggleFocus,
-  onReset: onWorkspaceReset,
-}: FASimulatorProps) {
+export function FASimulator({ ref }: FASimulatorProps) {
   const { t } = useTranslation();
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  /** Brings the whole workspace panel, controls included, back into view. */
-  const scrollWorkspaceIntoView = () => {
-    requestAnimationFrame(() => {
-      rootRef.current
-        ?.closest("[data-testid='simulation-workspace']")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
-  const [program, setProgram] = useState<FAProgram>(() =>
-    cloneJson(emptyFAProgram),
+  const rootRef = useRef<HTMLDivElement>(null);
+  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
+  const pendingProgram = useFASimulatorStore((s) => s.pendingProgram);
+  const pendingInputWord = useFASimulatorStore((s) => s.pendingInputWord);
+  const pendingInputWordOverride = useFASimulatorStore(
+    (s) => s.pendingInputWordOverride,
   );
-  const [inputWord, setInputWord] = useState(emptyInputWord);
+  const consumePending = useFASimulatorStore((s) => s.consumePending);
+  const consumePendingInputWord = useFASimulatorStore(
+    (s) => s.consumePendingInputWord,
+  );
+  const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
+  const clearExerciseDraft = useFASimulatorStore((s) => s.clearExerciseDraft);
+
+  const isPendingMount = useRef(
+    useFASimulatorStore.getState().pendingProgram !== null,
+  );
+
+  const [program, setProgram] = useState<FAProgram>(
+    () => useFASimulatorStore.getState().pendingProgram ?? emptyFAProgram,
+  );
+  const [inputWord, setInputWord] = useState(
+    () => useFASimulatorStore.getState().pendingInputWord || emptyInputWord,
+  );
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
-  // A pending program (queued by an example/exercise) takes priority over the
-  // saved draft, so storage is considered ready immediately in that case.
-  const [isStorageReady, setIsStorageReady] = useState(
-    () => useFASimulatorStore.getState().pendingProgram !== null,
-  );
-  // Read at mount: the effect that clears the pending program runs before the
-  // restore effect below, so by then the store no longer shows one was queued.
-  const hadPendingProgramOnMount = useRef(
-    useFASimulatorStore.getState().pendingProgram !== null,
-  );
+  // Keep studentProgram in the store up to date so the parent SimulationTab can
+  // read it when the learner clicks "Check Solution".
+  useEffect(() => {
+    setStudentProgram(program);
+  }, [program, setStudentProgram]);
+
+  const storageIdentifier = activeExerciseId
+    ? createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.finiteAutomata,
+        SIMULATOR_TASK_STORAGE_ID,
+      )
+    : createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.finiteAutomata,
+        SIMULATOR_TASK_STORAGE_ID,
+      );
+
+  const [isStorageReady, setIsStorageReady] = useState(false);
 
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
 
-  // Persist the edited automaton to local storage using the same Training
-  // Center mechanism as the Turing Machine module: the simulator slot for this
-  // topic (no per-exercise scenario, so the shared simulator task id is used).
-  const storageIdentifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.finiteAutomata,
-        SIMULATOR_TASK_STORAGE_ID,
-      ),
-    [],
-  );
+  const scrollWorkspaceIntoView = () => {
+    rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
-  // Consume pending example from the store (loaded via ExamplesTab or by the
-  // exercise panel revealing a solution).
-  const pendingProgram = useFASimulatorStore((s) => s.pendingProgram);
-  const pendingInputWord = useFASimulatorStore((s) => s.pendingInputWord);
-  const consumePending = useFASimulatorStore((s) => s.consumePending);
-
-  // The exercise panel (rendered at the SimulationTab level) requests
-  // input-word changes via this override channel — no program reload.
-  const pendingInputWordOverride = useFASimulatorStore(
-    (s) => s.pendingInputWordOverride,
-  );
-  const consumePendingInputWord = useFASimulatorStore(
-    (s) => s.consumePendingInputWord,
-  );
-
-  // Publish the simulator's current program so the lifted exercise panel can
-  // validate against it. While editing this is the in-flight draft; while
-  // simulating it is the committed program.
-  const setStudentProgram = useFASimulatorStore((s) => s.setStudentProgram);
-  const exposedStudentProgram = isEditMode ? editor.draft : program;
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: exposedStudentProgram,
-    codec: faProgramTransferCodec,
-  });
-  useEffect(() => {
-    setStudentProgram(exposedStudentProgram);
-    return () => setStudentProgram(null);
-  }, [exposedStudentProgram, setStudentProgram]);
-
-  // Persist the in-progress automaton per exercise so re-opening the exercise
-  // restores the learner's work instead of the blank starter.
-  const activeExerciseId = useFASimulatorStore((s) => s.activeExerciseId);
-  const setExerciseDraft = useFASimulatorStore((s) => s.setExerciseDraft);
-  const clearExerciseDraft = useFASimulatorStore((s) => s.clearExerciseDraft);
-  useEffect(() => {
-    if (activeExerciseId) {
-      setExerciseDraft(activeExerciseId, exposedStudentProgram);
-    }
-  }, [activeExerciseId, exposedStudentProgram, setExerciseDraft]);
-
-  // Track which pending program has already been applied to avoid double-processing.
+  // Adopt freshly queued programs (from an example or exercise) into state.
+  // Must run during render so the editor is initialized with the example's
+  // program on the very frame the simulation tab opens, not one frame later.
   const [prevPendingProgram, setPrevPendingProgram] =
-    useState<typeof pendingProgram>(null);
-  if (pendingProgram !== null && pendingProgram !== prevPendingProgram) {
-    const loaded = cloneJson(pendingProgram);
+    useState<FAProgram | null>(null);
+  const [prevPendingWord, setPrevPendingWord] = useState<string | null>(null);
+
+  if (
+    pendingProgram !== null &&
+    (pendingProgram !== prevPendingProgram ||
+      pendingInputWord !== prevPendingWord)
+  ) {
     setPrevPendingProgram(pendingProgram);
-    setProgram(loaded);
-    setInputWord(pendingInputWord);
+    setPrevPendingWord(pendingInputWord);
+    setProgram(pendingProgram);
+    editor.resetToProgram(pendingProgram);
+    if (pendingInputWord !== null) {
+      setInputWord(pendingInputWord);
+    }
     setIsEditMode(true);
     setEditorMode("manual");
-    editor.resetToProgram(loaded);
   }
 
-  // Clear the store entry after the pending program has been applied.
   useEffect(() => {
-    if (pendingProgram) {
+    if (pendingProgram !== null) {
       consumePending();
     }
   }, [pendingProgram, consumePending]);
 
+  // Synchronize an example-provided input word into state on the frame it arrives.
   const [prevPendingWordOverride, setPrevPendingWordOverride] = useState<
     string | null
   >(null);
@@ -204,8 +167,12 @@ export function FASimulator({
     }
     hasInitializedStorage.current = true;
 
-    // An example/exercise queued a program for this mount; don't restore over it.
-    if (hadPendingProgramOnMount.current) {
+    // A pending program will be applied; don't restore over it.
+    if (
+      isPendingMount.current ||
+      useFASimulatorStore.getState().pendingProgram !== null
+    ) {
+      setIsStorageReady(true);
       return;
     }
 
@@ -228,6 +195,12 @@ export function FASimulator({
     };
   }, [handleImportProgram, storageIdentifier]);
 
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: isEditMode ? editor.draft : program,
+    codec: faProgramTransferCodec,
+  });
+
   // While an exercise is active its work persists to the per-exercise draft
   // above, so the shared free-mode slot is only autosaved outside exercises.
   useTrainingCenterAutoSave({
@@ -237,15 +210,11 @@ export function FASimulator({
     enabled: isStorageReady && activeExerciseId === null,
   });
 
-  const handleApplyProgram = () => {
+  const handleStartSimulation = () => {
     const result = editor.applyProgram();
     if (!result.ok) return;
     setProgram(result.program);
     setIsEditMode(false);
-    // Start Simulation sits at the bottom of a tall editor and swaps it for a
-    // much shorter simulation view, which would otherwise leave the page
-    // parked below the workspace header - reset, expand and Edit Configuration
-    // all scrolled out of sight above.
     scrollWorkspaceIntoView();
     void exportAndStoreTrainingCenterValue(
       storageIdentifier,
@@ -290,16 +259,17 @@ export function FASimulator({
     storageIdentifier,
   ]);
 
-  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
+  useImperativeHandle(ref, () => ({
+    resetStoredState,
+  }));
 
   const handleGrammarConvert = (converted: FAProgram) => {
     setProgram(converted);
     editor.resetToProgram(converted);
+    setIsEditMode(true);
     setEditorMode("manual");
   };
 
-  // The open exercise's problem statement stays visible while building and
-  // while simulating — the grammar family cannot be solved without it.
   const activeExercise = activeExerciseId
     ? findFAExercise(activeExerciseId)
     : undefined;
@@ -316,8 +286,8 @@ export function FASimulator({
 
       {isEditMode ? (
         <div className="flex flex-col gap-6">
-          {/* Mode Toggle & Workspace Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Mode Toggle */}
+          <div className="flex items-center justify-between gap-2 md:mr-24">
             <div className="bg-muted/40 inline-flex w-fit items-center gap-1 rounded-lg p-1">
               <ModeButton
                 active={editorMode === "manual"}
@@ -332,45 +302,6 @@ export function FASimulator({
                 label={t("finite-automata.editor.grammar", "From Grammar")}
               />
             </div>
-            <div className="flex items-center gap-2">
-              {onWorkspaceReset && (
-                <button
-                  type="button"
-                  onClick={onWorkspaceReset}
-                  data-testid="simulation-reset"
-                  aria-label={t("common.trainingCenter.resetCurrent")}
-                  title={t("common.trainingCenter.resetCurrent")}
-                  className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
-                >
-                  <RotateCcw className="size-4" />
-                </button>
-              )}
-              {onToggleFocus && (
-                <button
-                  type="button"
-                  onClick={onToggleFocus}
-                  data-testid="simulation-focus-toggle"
-                  aria-pressed={isFocused}
-                  aria-label={
-                    isFocused
-                      ? t("common.simulation.exitFocus")
-                      : t("common.simulation.expand")
-                  }
-                  title={
-                    isFocused
-                      ? t("common.simulation.close")
-                      : t("common.simulation.expand")
-                  }
-                  className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
-                >
-                  {isFocused ? (
-                    <X className="size-4" />
-                  ) : (
-                    <Maximize2 className="size-4" />
-                  )}
-                </button>
-              )}
-            </div>
           </div>
 
           {editorMode === "manual" && (
@@ -378,11 +309,11 @@ export function FASimulator({
               key="manual"
               className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-6 duration-300"
             >
-              <div className="bg-card rounded-xl border p-4 shadow-sm sm:p-6">
+              <div className="bg-card rounded-xl border p-6 shadow-sm">
                 <FAConfigView editor={editor} />
               </div>
 
-              <div className="bg-card flex flex-col gap-3 rounded-xl border p-4 shadow-sm sm:p-6">
+              <div className="bg-card flex flex-col gap-3 rounded-xl border p-6 shadow-sm">
                 <label className="text-sm font-semibold">
                   {t("finite-automata.config.inputWord", "Input Word")}
                 </label>
@@ -402,7 +333,8 @@ export function FASimulator({
               </div>
 
               <button
-                onClick={handleApplyProgram}
+                type="button"
+                onClick={handleStartSimulation}
                 disabled={!editor.isValid}
                 className="bg-brand text-brand-foreground inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -415,7 +347,7 @@ export function FASimulator({
           {editorMode === "grammar" && (
             <div
               key="grammar"
-              className="bg-card animate-in fade-in slide-in-from-bottom-2 rounded-xl border p-4 shadow-sm duration-300 sm:p-6"
+              className="bg-card animate-in fade-in slide-in-from-bottom-2 rounded-xl border p-6 shadow-sm duration-300"
             >
               <FAGrammarInput onConvert={handleGrammarConvert} />
             </div>
@@ -428,9 +360,6 @@ export function FASimulator({
           status={simulation.status}
           speed={simulation.speed}
           error={simulation.error}
-          isFocused={isFocused}
-          onToggleFocus={onToggleFocus}
-          onResetWorkspace={onWorkspaceReset}
           onEditConfig={handleEditProgram}
           onPlay={simulation.play}
           onPause={simulation.pause}

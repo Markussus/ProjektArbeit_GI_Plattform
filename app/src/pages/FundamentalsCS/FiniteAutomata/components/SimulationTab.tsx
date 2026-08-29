@@ -92,14 +92,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.automata"
         onReset={() => simulatorRef.current?.resetStoredState()}
-        hideWorkspaceControls
       >
-        <FASimulator
-          ref={simulatorRef}
-          isFocused={props.isFocused}
-          onToggleFocus={props.onToggleFocus}
-          onReset={() => simulatorRef.current?.resetStoredState()}
-        />
+        <FASimulator ref={simulatorRef} />
       </TopicSimulationTab>
 
       <SolutionCheckDialog

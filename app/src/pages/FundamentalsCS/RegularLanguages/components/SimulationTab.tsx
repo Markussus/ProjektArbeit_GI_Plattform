@@ -43,7 +43,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   // Reveal: Grammar → Language drops the enumerated words into the learner's
   // list; Language → Grammar drops the reference grammar into the editor.
-  // The reveal applies straight away, like the reveal on the other topics.
   const handleLoadSolution = () => {
     if (!activeExercise) {
       return;
@@ -123,13 +122,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.regularLanguages"
         onReset={() => simulatorRef.current?.resetStoredState()}
-        hideWorkspaceControls
       >
         <RLSimulator
           ref={simulatorRef}
-          isFocused={props.isFocused}
-          onToggleFocus={props.onToggleFocus}
-          onReset={() => simulatorRef.current?.resetStoredState()}
           onExitExercise={props.onExitExercise}
           importedTaskStorageId={props.importedTaskStorageId}
         />
