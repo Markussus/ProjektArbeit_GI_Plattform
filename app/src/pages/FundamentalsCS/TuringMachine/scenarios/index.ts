@@ -909,7 +909,7 @@ export const turingMachineExercises: TuringMachineExerciseScenario[] = (
   ] satisfies TuringMachineExerciseScenario[]
 ).sort(compareTuringMachineExercisesByDifficulty);
 
-export const turingMachineExamples: TuringMachineExampleScenario[] = [
+const turingMachineExamples: TuringMachineExampleScenario[] = [
   {
     kind: "example",
     id: "turing-machine.examples.example1",
