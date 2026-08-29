@@ -39,6 +39,19 @@
             resolvedTheme === "dark",
           );
           document.documentElement.style.colorScheme = resolvedTheme;
+
+          // Apply persisted font before React mounts
+          const fontRaw = localStorage.getItem("font-storage");
+          if (fontRaw) {
+            const parsedFont = JSON.parse(fontRaw);
+            if (parsedFont?.state?.font === "geist") {
+              document.documentElement.dataset.font = "geist";
+            } else {
+              document.documentElement.dataset.font = "inter";
+            }
+          } else {
+            document.documentElement.dataset.font = "inter";
+          }
         } catch {
           // ignore
         }
