@@ -1,19 +1,10 @@
 /** @vitest-environment jsdom */
 
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { TMTapeView } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/presentation/TMTapeView";
 
 describe("TMTapeView", () => {
-  beforeEach(() => {
-    global.ResizeObserver = class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-    Element.prototype.scrollTo = vi.fn();
-  });
-
   afterEach(() => {
     cleanup();
   });

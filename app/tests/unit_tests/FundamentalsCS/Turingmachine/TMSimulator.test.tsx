@@ -8,7 +8,7 @@ import {
   screen,
 } from "@testing-library/react";
 import { createRef } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   TMSimulator,
   type TMSimulatorHandle,
@@ -27,15 +27,6 @@ vi.mock("react-i18next", () => ({
 }));
 
 describe("TMSimulator", () => {
-  beforeEach(() => {
-    global.ResizeObserver = class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-    Element.prototype.scrollTo = vi.fn();
-  });
-
   afterEach(() => {
     cleanup();
   });

@@ -8,7 +8,7 @@ import {
   screen,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { OverviewTab } from "@/pages/FundamentalsCS/TuringMachine/components/OverviewTab";
 import { ExamplesTab } from "@/pages/FundamentalsCS/TuringMachine/components/ExamplesTab";
 import { ExercisesTab } from "@/pages/FundamentalsCS/TuringMachine/components/ExercisesTab";
@@ -43,15 +43,6 @@ vi.mock(
 );
 
 describe("TuringMachine Tabs and Page", () => {
-  beforeEach(() => {
-    global.ResizeObserver = class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-    Element.prototype.scrollTo = vi.fn();
-  });
-
   afterEach(() => {
     cleanup();
   });

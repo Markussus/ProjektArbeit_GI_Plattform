@@ -13,15 +13,6 @@ vi.mock("react-i18next", () => ({
 }));
 
 describe("TMSimulationView", () => {
-  beforeEach(() => {
-    global.ResizeObserver = class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-    Element.prototype.scrollTo = vi.fn();
-  });
-
   afterEach(() => {
     cleanup();
   });

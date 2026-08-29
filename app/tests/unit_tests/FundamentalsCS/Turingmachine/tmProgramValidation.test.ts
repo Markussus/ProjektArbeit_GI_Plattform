@@ -1,31 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
 import {
   isTMProgramValid,
   validateTMProgram,
 } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgramValidation";
-
-function createProgram(overrides: Partial<TMProgram> = {}): TMProgram {
-  return {
-    states: ["q0", "q1", "halt"],
-    inputAlphabet: ["0", "1"],
-    tapeAlphabet: ["0", "1", "_"],
-    blankSymbol: "_",
-    initialState: "q0",
-    haltStates: ["halt"],
-    transitions: {
-      "0": {
-        q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
-      },
-      "1": {
-        q1: { nextState: "halt", writeSymbol: "0", movement: "N" },
-      },
-    },
-    initialTape: ["0", "1"],
-    ...overrides,
-  };
-}
+import { createTestProgram as createProgram } from "./fixtures/defaultTMProgram";
 
 describe("tmProgramValidation", () => {
   describe("validateTMProgram", () => {
