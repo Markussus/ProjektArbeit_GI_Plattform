@@ -14,7 +14,6 @@ export function DnfPage() {
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
       testId="dnf-page"
-      confirmExerciseTabExit={false}
       clearSimulationSelectionOnTabExit
     />
   );
