@@ -6,6 +6,7 @@ import {
   type Ref,
 } from "react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
+import { SIMULATION_CONTROLS_INSET } from "@/components/shared/SimulationWorkspace/simulationControlsInset";
 import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,
@@ -129,7 +130,11 @@ export function RLSimulator({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
-      <RLModeSelector mode={mode} onChange={handleModeChange} />
+      {/* The selector spans the full width, so it keeps the workspace's
+          floating reset/expand controls clear on both axes. */}
+      <div className={SIMULATION_CONTROLS_INSET.fullWidthRow}>
+        <RLModeSelector mode={mode} onChange={handleModeChange} />
+      </div>
 
       {/*
         All three modes stay mounted and are toggled with `hidden`, mirroring

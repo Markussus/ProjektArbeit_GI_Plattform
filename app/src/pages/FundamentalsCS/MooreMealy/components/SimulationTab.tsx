@@ -2,6 +2,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
+import { SIMULATION_CONTROLS_INSET } from "@/components/shared/SimulationWorkspace/simulationControlsInset";
+import { cn } from "@/lib/utils";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import {
@@ -131,7 +133,12 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         }}
       >
         <div className="space-y-6">
-          <div className="mx-auto w-full max-w-[100rem]">
+          <div
+            className={cn(
+              "mx-auto w-full max-w-[100rem]",
+              SIMULATION_CONTROLS_INSET.compactRow,
+            )}
+          >
             <InlineTabNavigation
               activeTab={machineType}
               onTabChange={setMachineType}

@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
+import { SIMULATION_CONTROLS_INSET } from "@/components/shared/SimulationWorkspace/simulationControlsInset";
 import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
+import { cn } from "@/lib/utils";
 import {
   buildTransitionTableHeaders,
   buildTransitionTableRows,
@@ -64,8 +66,14 @@ export function FASimulationView({
 
   return (
     <div className="rounded-[1rem] bg-(--fa-bg) p-6 text-(--fa-text)">
-      {/* Top bar: title + edit button */}
-      <div className="mb-4 flex items-center justify-between">
+      {/* Top bar: title + edit button. Inset so the edit button is not piled
+          under the workspace's floating reset/expand controls. */}
+      <div
+        className={cn(
+          "mb-4 flex items-center justify-between",
+          SIMULATION_CONTROLS_INSET.fullWidthRow,
+        )}
+      >
         <h2 className="text-lg font-bold text-(--fa-text-bright)">
           {t("finite-automata.sim.title", "Simulation")}
         </h2>
