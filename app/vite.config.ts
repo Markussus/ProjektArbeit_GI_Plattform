@@ -11,7 +11,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   test: {
@@ -24,6 +24,26 @@ export default defineConfig({
       reporter: ["text", "html", "json"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: ["src/**/*.d.ts", "src/main.tsx"],
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (
+              id.includes("react-dom") ||
+              id.includes("react-router-dom") ||
+              id.includes("/react/")
+            ) {
+              return "vendor";
+            }
+            if (id.includes("motion") || id.includes("lucide-react")) {
+              return "ui";
+            }
+          }
+        },
+      },
     },
   },
 });
