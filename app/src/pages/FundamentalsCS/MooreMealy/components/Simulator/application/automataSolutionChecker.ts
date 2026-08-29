@@ -28,51 +28,87 @@ export function runMooreValidation(
   program: MooreProgram,
   validationCases: AutomataValidationCase[],
 ): AutomataValidationResult {
-  const issues = validateMooreProgram(program);
+  return runAutomataValidation(
+    "Moore",
+    program,
+    validationCases,
+    validateMooreProgram,
+    runMooreProgram,
+  );
+}
+
+export function runMealyValidation(
+  program: MealyProgram,
+  validationCases: AutomataValidationCase[],
+): AutomataValidationResult {
+  return runAutomataValidation(
+    "Mealy",
+    program,
+    validationCases,
+    validateMealyProgram,
+    runMealyProgram,
+  );
+}
+
+interface AutomataProgram {
+  inputSymbols: string[];
+}
+
+function runAutomataValidation<TProgram extends AutomataProgram>(
+  automataType: "Moore" | "Mealy",
+  program: TProgram,
+  validationCases: AutomataValidationCase[],
+  validateProgram: (program: TProgram) => string[],
+  runProgram: (program: TProgram, inputWord: string[]) => number[],
+): AutomataValidationResult {
+  const issues = validateProgram(program);
   if (issues.length > 0) {
     return {
       rows: [],
       passed: false,
-      error: `Invalid Moore program: ${issues.join(", ")}`,
+      error: `Invalid ${automataType} program: ${issues.join(", ")}`,
     };
   }
 
-  const rows = validationCases.map((validationCase) => {
-    if (
-      validationCase.input.some(
-        (symbol) => !program.inputSymbols.includes(symbol),
-      )
-    ) {
-      return {
-        passed: false,
-        input: validationCase.input,
-        outputCodes: [],
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: "input_symbol_missing",
-      };
-    }
+  const rows = validationCases.map<AutomataValidationResultRow>(
+    (validationCase) => {
+      if (
+        validationCase.input.some(
+          (symbol) => !program.inputSymbols.includes(symbol),
+        )
+      ) {
+        return {
+          passed: false,
+          input: validationCase.input,
+          outputCodes: [],
+          expectedOutputCodes: validationCase.expectedOutputCodes,
+          error: "input_symbol_missing",
+        };
+      }
 
-    try {
-      const outputCodes = runMooreProgram(program, validationCase.input);
-      return {
-        passed:
-          validationCase.expectedOutputCodes.join("|") ===
-          outputCodes.join("|"),
-        input: validationCase.input,
-        outputCodes,
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: null,
-      };
-    } catch (error) {
-      return {
-        passed: false,
-        input: validationCase.input,
-        outputCodes: [],
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: error instanceof Error ? error.message : "validation_failed",
-      };
-    }
-  });
+      try {
+        const outputCodes = runProgram(program, validationCase.input);
+        return {
+          passed: numberArraysEqual(
+            validationCase.expectedOutputCodes,
+            outputCodes,
+          ),
+          input: validationCase.input,
+          outputCodes,
+          expectedOutputCodes: validationCase.expectedOutputCodes,
+          error: null,
+        };
+      } catch (error) {
+        return {
+          passed: false,
+          input: validationCase.input,
+          outputCodes: [],
+          expectedOutputCodes: validationCase.expectedOutputCodes,
+          error: error instanceof Error ? error.message : "validation_failed",
+        };
+      }
+    },
+  );
 
   return {
     rows,
@@ -81,61 +117,11 @@ export function runMooreValidation(
   };
 }
 
-export function runMealyValidation(
-  program: MealyProgram,
-  validationCases: AutomataValidationCase[],
-): AutomataValidationResult {
-  const issues = validateMealyProgram(program);
-  if (issues.length > 0) {
-    return {
-      rows: [],
-      passed: false,
-      error: `Invalid Mealy program: ${issues.join(", ")}`,
-    };
-  }
-
-  const rows = validationCases.map((validationCase) => {
-    if (
-      validationCase.input.some(
-        (symbol) => !program.inputSymbols.includes(symbol),
-      )
-    ) {
-      return {
-        passed: false,
-        input: validationCase.input,
-        outputCodes: [],
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: "input_symbol_missing",
-      };
-    }
-
-    try {
-      const outputCodes = runMealyProgram(program, validationCase.input);
-      return {
-        passed:
-          validationCase.expectedOutputCodes.join("|") ===
-          outputCodes.join("|"),
-        input: validationCase.input,
-        outputCodes,
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: null,
-      };
-    } catch (error) {
-      return {
-        passed: false,
-        input: validationCase.input,
-        outputCodes: [],
-        expectedOutputCodes: validationCase.expectedOutputCodes,
-        error: error instanceof Error ? error.message : "validation_failed",
-      };
-    }
-  });
-
-  return {
-    rows,
-    passed: rows.every((row) => row.passed),
-    error: null,
-  };
+function numberArraysEqual(left: number[], right: number[]): boolean {
+  return (
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
+  );
 }
 
 function runMooreProgram(program: MooreProgram, inputWord: string[]): number[] {

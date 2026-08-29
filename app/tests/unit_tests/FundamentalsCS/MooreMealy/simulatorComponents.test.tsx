@@ -56,7 +56,7 @@ describe("Simulator Presentation & Components", () => {
   describe("MooreTransitionCell & MooreTransitionRow", () => {
     it("renders MooreTransitionCell and handles select and create new state", () => {
       const onTransitionChange = vi.fn();
-      const onAddState = vi.fn();
+      const onAddState = vi.fn().mockReturnValue("NEW");
 
       render(
         <table>
@@ -91,6 +91,67 @@ describe("Simulator Presentation & Components", () => {
       );
       fireEvent.pointerDown(optionReady);
       expect(onTransitionChange).toHaveBeenCalledWith("0", "HALT", "READY");
+
+      fireEvent.click(trigger);
+      fireEvent.change(screen.getByTestId("moore-transition-0-0-search"), {
+        target: { value: "NEW" },
+      });
+      fireEvent.pointerDown(screen.getByTestId("moore-transition-0-0-create"));
+
+      expect(onAddState).toHaveBeenCalledWith("NEW");
+      expect(onTransitionChange).toHaveBeenLastCalledWith("0", "HALT", "NEW");
+    });
+
+    it("edits Mealy output data and restores an invalid internal code", () => {
+      const onSymbolChange = vi.fn();
+      const onCodeChange = vi.fn();
+
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <MooreTransitionCell
+                inputSymbol="0"
+                state="HALT"
+                target="HALT"
+                states={["HALT"]}
+                inputIndex={0}
+                stateIndex={0}
+                dropdownWidth="10ch"
+                isInitialState={false}
+                representation="decimal"
+                outputColumnWidth={{ symbol: "9ch", code: "8ch" }}
+                outputControls={{
+                  getOutput: () => ({ symbol: "OUT", code: 5 }),
+                  onSymbolChange,
+                  onCodeChange,
+                  testIdPrefix: "mealy-output",
+                }}
+                onTransitionChange={vi.fn()}
+                onAddState={vi.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>,
+      );
+
+      const symbolInput = screen.getByTestId("mealy-output-symbol-0-0");
+      fireEvent.change(symbolInput, { target: { value: "NEXT" } });
+      fireEvent.input(symbolInput);
+      expect(onSymbolChange).toHaveBeenCalledWith("0", "HALT", "NEXT");
+      expect(symbolInput).toHaveStyle({ width: "56px" });
+
+      const codeInput = screen.getByTestId("mealy-output-code-0-0");
+      fireEvent.change(codeInput, { target: { value: "invalid" } });
+      fireEvent.blur(codeInput);
+      expect(codeInput).toHaveValue("5");
+      expect(onCodeChange).not.toHaveBeenCalled();
+
+      fireEvent.focus(codeInput);
+      fireEvent.change(codeInput, { target: { value: "12" } });
+      fireEvent.keyDown(codeInput, { key: "Enter" });
+      fireEvent.blur(codeInput);
+      expect(onCodeChange).toHaveBeenCalledWith("0", "HALT", 12);
     });
 
     it("renders MooreTransitionRow and handles input symbol rename and delete", () => {
