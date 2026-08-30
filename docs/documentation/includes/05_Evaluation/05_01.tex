@@ -1,3 +1,32 @@
 \subNsection{1}{Qualitätssicherung}{Enrico Ebert} \label{5_1_QS}
 
-CI/CD-Pipeline (GitLab Runner auf Raspberry Pi), automatisiertes Linting, Formatierung (Prettier), Unit-Tests (Vitest) und E2E-Tests (Playwright)
+Die Qualitätssicherung im Projekt folgte einem mehrstufigen Ansatz, der sowohl automatisierte als auch manuelle Prüfungen umfasste. Das Ziel war es, die Zuverlässigkeit der Plattform sicherzustellen und Fehler frühzeitig im Entwicklungsprozess zu erkennen.
+
+\subNsection{2}{CI/CD-Pipeline}{Enrico Ebert}
+
+Die automatisierte Pipeline wurde auf einem GitLab Runner betrieben, der auf einem Raspberry Pi gehostet wurde. Bei jedem Merge Request und Push in den Development-Branch wurde die Pipeline automatisch ausgelöst. Sie bestand aus mehreren Stufen:
+
+\begin{itemize}
+  \item \textbf{Linting und Formatierung:} ESLint prüfte den TypeScript-Code auf stilistische Probleme und potenzielle Fehler. Prettier stellte eine einheitliche Code-Formatierung sicher.
+  \item \textbf{Unit-Tests:} Vitest führte isolierte Komponententests durch. Besonderer Fokus lag auf mathematischen Funktionen, bei denen Genauigkeit entscheidend ist.
+  \item \textbf{Build:} Vite erstellte einen optimierten Produktions-Build. Fehler bei der Kompilierung führten zum sofortigen Pipeline-Stopp.
+  \item \textbf{E2E-Tests:} Playwright automatisierte Browser-Tests, die kritische Nutzerpfade wie Import/Export-Vorgänge und Simulationsabläufe abdeckten.
+\end{itemize}
+
+Nur wenn alle Stufen erfolgreich durchlaufen wurden, war ein Merge in den Development-Branch möglich. Dadurch wurden Inkonsistenzen und Regressionen frühzeitig erkannt.
+
+\subNsection{2}{Testing-Strategie}{Enrico Ebert}
+
+Die Teststrategie unterschied zwischen Unit-Tests und End-to-End-Tests. Unit-Tests wurden für mathematische Kernfunktionen geschrieben, da hier die größte Fehlergefahr bestand. Die Bitoperationen und mathematischen Berechnungen wurden systematisch mit bekannten Eingabe-Ausgabe-Paaren validiert.
+
+End-to-End-Tests konzentrierten sich auf die Simulator-Workflows. Ein typischer Testablauf umfasste das Laden einer Beispielmaschine, das Ausführen einer Simulation und das Überprüfen des erwarteten Ergebnisbandes. Die Playwright-Tests wurden headless auf dem CI-Runner ausgeführt und erstellten Screenshots bei Fehlern.
+
+\subNsection{2}{Manuelle Prüfung}{Enrico Ebert}
+
+Neben der Automatisierung wurde das Team in regelmäßigen Reviews zusammengebracht. Merge Requests erforderten die Genehmigung eines anderen Teammitglieds. Dabei wurden neben dem Code auch architektonische Entscheidungen und die Einhaltung der Projektkonventionen geprüft.
+
+\subNsection{2}{Erfahrungen}{Enrico Ebert}
+
+Die CI/CD-Pipeline auf dem Raspberry Pi erwies sich als zuverlässig, allerdings mit Einschränkungen bei der Geschwindigkeit. Die \gls{arm}-Architektur führte zu längeren Build-Zeiten im Vergleich zu Cloud-basierten Runnern. Für zukünftige Projekte würde eine Hybridlösung mit schnellerem Build-Runner und lokaler Testausführung empfohlen.
+
+Die Kombination aus automatisierten Tests und manuellem Code-Review half dabei, die KI-bedingten Fehlerquellen zu erkennen und zu korrigieren. Insbesondere Edge Cases wie \gls{nan}, Infinity und Overlong Encodings wurden durch gezielte Unit-Tests abgesichert.
