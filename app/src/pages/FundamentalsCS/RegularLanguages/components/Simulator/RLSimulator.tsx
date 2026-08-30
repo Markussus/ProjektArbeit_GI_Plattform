@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-  type Ref,
-} from "react";
+import { useCallback, useImperativeHandle, useState, type Ref } from "react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
@@ -70,7 +64,11 @@ export function RLSimulator({
   const [studentDraft, setStudentDraft] = useState("");
   const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
 
-  useEffect(() => {
+  // Adopt a freshly imported task's mode without an effect: react to the prop
+  // changing during render, the same way the input cards adopt seeded values.
+  const [appliedImportId, setAppliedImportId] = useState(importedTaskStorageId);
+  if (importedTaskStorageId !== appliedImportId) {
+    setAppliedImportId(importedTaskStorageId);
     const importedMode = Object.entries(RL_STORAGE_TASK_IDS).find(
       ([, taskStorageId]) => taskStorageId === importedTaskStorageId,
     )?.[0] as SimulationMode | undefined;
@@ -78,7 +76,7 @@ export function RLSimulator({
     if (importedMode) {
       setMode(importedMode);
     }
-  }, [importedTaskStorageId]);
+  }
 
   const isGrammarExercise = exercise?.mode === "grammarToLanguage";
   const isLanguageExercise = exercise?.mode === "languageToGrammar";
