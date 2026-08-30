@@ -149,7 +149,7 @@ describe("JavaSimulator", () => {
   });
 
   describe("when no exercise is selected yet", () => {
-    it("starts with the default Java starter code", () => {
+    it("starts with the default Java starter code and empty stdin", () => {
       render(<JavaSimulator selectedExercise={null} isFocused={false} />);
 
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
@@ -158,6 +158,7 @@ describe("JavaSimulator", () => {
       expect(screen.getByTestId("mock-java-editor-file").textContent).toBe(
         "Main.java",
       );
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue("");
     });
   });
 
@@ -180,6 +181,21 @@ describe("JavaSimulator", () => {
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
         "// TODO: sort the array in ascending order",
       );
+    });
+
+    it("prefills standard input if the exercise specifies a defaultStdin", () => {
+      render(
+        <JavaSimulator
+          selectedExercise={createExercise(
+            "java-programming.exercise6",
+            "Text aus Eingabe großschreiben",
+            "Uppercase input",
+          )}
+          isFocused={false}
+        />,
+      );
+
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue("hello java\n");
     });
   });
 
@@ -285,18 +301,24 @@ describe("JavaSimulator", () => {
         <JavaSimulator
           ref={ref}
           selectedExercise={createExercise(
-            "java-programming.exercise1",
-            "Hello World",
+            "java-programming.exercise6",
+            "Text aus Eingabe",
             "Desc",
           )}
           isFocused={false}
         />,
       );
 
-      // change code
+      // change code and stdin
       fireEvent.click(screen.getByTestId("mock-java-change-code"));
+      fireEvent.change(screen.getByTestId("java-stdin-input"), {
+        target: { value: "different input\n" },
+      });
       expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
         "changed code",
+      );
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue(
+        "different input\n",
       );
 
       act(() => {
@@ -304,8 +326,9 @@ describe("JavaSimulator", () => {
       });
 
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
-        "// TODO: print Hello World once",
+        "// TODO: print the text in uppercase",
       );
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue("hello java\n");
     });
 
     it("runs validation through checkSolution", async () => {

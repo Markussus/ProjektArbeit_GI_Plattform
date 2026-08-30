@@ -10,10 +10,29 @@ import {
   inlineScannerInput,
   mapDiagnostic,
   normalizeWorkerError,
+  ScannerInputCursor,
   type UpstreamWorkerMessage,
 } from "@/pages/Programming1/Java/components/Simulator/workers/javaRunnerHelpers";
 
 describe("javaRunnerHelpers", () => {
+  describe("ScannerInputCursor", () => {
+    it("reads lines and tokens sequentially", () => {
+      const cursor = new ScannerInputCursor("Ada Lovelace\n21\n");
+      expect(cursor.nextLine()).toBe("Ada Lovelace");
+      expect(cursor.nextInt()).toBe(21);
+      expect(cursor.nextLine()).toBe("");
+    });
+
+    it("reads tokens with whitespace skipping", () => {
+      const cursor = new ScannerInputCursor("   foo   bar   42   3.14   true   ");
+      expect(cursor.nextToken()).toBe("foo");
+      expect(cursor.nextToken()).toBe("bar");
+      expect(cursor.nextInt()).toBe(42);
+      expect(cursor.nextDouble()).toBe(3.14);
+      expect(cursor.nextBoolean()).toBe(true);
+    });
+  });
+
   describe("createJavaStringLiteral", () => {
     it("escapes special characters correctly", () => {
       expect(createJavaStringLiteral("Hello World")).toBe('"Hello World"');
@@ -40,14 +59,7 @@ describe("javaRunnerHelpers", () => {
     });
 
     it("inlines Scanner nextLine() calls with String literals and strips Scanner declaration", () => {
-      const code = `import java.util.Scanner;
-public class Main {
-  public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String line1 = sc.nextLine();
-    String line2 = sc.nextLine();
-  }
-}`;
+      const code = `import java.util.Scanner;\npublic class Main {\n  public static void main(String[] args) {\n    Scanner sc = new Scanner(System.in);\n    String line1 = sc.nextLine();\n    String line2 = sc.nextLine();\n  }\n}`;
       const stdin = "First Line\nSecond Line";
       const result = inlineScannerInput(code, stdin);
 
@@ -58,14 +70,7 @@ public class Main {
     });
 
     it("inlines Scanner nextInt() calls with integer constants", () => {
-      const code = `import java.util.Scanner;
-public class Main {
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    int a = scanner.nextInt();
-    int b = scanner.nextInt();
-  }
-}`;
+      const code = `import java.util.Scanner;\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    int a = scanner.nextInt();\n    int b = scanner.nextInt();\n  }\n}`;
       const stdin = "42 99";
       const result = inlineScannerInput(code, stdin);
 
@@ -75,9 +80,29 @@ public class Main {
       expect(result).toContain("int b = 99;");
     });
 
+    it("handles mixed nextLine() and nextInt() in sequence (Example 4 scenario)", () => {
+      const code = `import java.util.Scanner;\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    String name = scanner.nextLine();\n    int age = scanner.nextInt();\n\n    System.out.println("Hallo " + name + "! In 10 Jahren bist du " + (age + 10) + " Jahre alt.");\n  }\n}`;
+      const stdin = "Ada Lovelace\n21\n";
+      const result = inlineScannerInput(code, stdin);
+
+      expect(result).not.toContain("import java.util.Scanner;");
+      expect(result).not.toContain("Scanner scanner = new Scanner(System.in);");
+      expect(result).toContain('String name = "Ada Lovelace";');
+      expect(result).toContain("int age = 21;");
+    });
+
+    it("handles next(), nextDouble(), and nextBoolean() calls", () => {
+      const code = `String word = sc.next();\ndouble price = sc.nextDouble();\nboolean flag = sc.nextBoolean();`;
+      const stdin = "test 19.99 true";
+      const result = inlineScannerInput(code, stdin);
+
+      expect(result).toContain('String word = "test";');
+      expect(result).toContain("double price = 19.99;");
+      expect(result).toContain("boolean flag = true;");
+    });
+
     it("handles fallback to default values when stdin is exhausted or empty", () => {
-      const code = `String line = sc.nextLine();
-int num = sc.nextInt();`;
+      const code = `String line = sc.nextLine();\nint num = sc.nextInt();`;
       const result = inlineScannerInput(code, "");
 
       expect(result).toContain('String line = "";');

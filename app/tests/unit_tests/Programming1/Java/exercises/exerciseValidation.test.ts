@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { createExecutableSource } from "@/pages/Programming1/Java/components/Simulator/workers/javaRunnerHelpers";
 import {
+  getJavaDefaultStdin,
   getJavaFileName,
   getJavaScenario,
   getJavaStarterCode,
@@ -17,7 +19,7 @@ describe("Java Exercises & Definitions", () => {
   });
 
   it("exports all example definitions", () => {
-    expect(javaProgrammingExamples.length).toBe(3);
+    expect(javaProgrammingExamples.length).toBe(4);
   });
 
   it("retrieves scenario by id correctly", () => {
@@ -28,6 +30,11 @@ describe("Java Exercises & Definitions", () => {
     const example1 = getJavaScenario("java-programming.example1Title");
     expect(example1).toBeDefined();
     expect(example1?.kind).toBe("example");
+
+    const example4 = getJavaScenario("java-programming.example4Title");
+    expect(example4).toBeDefined();
+    expect(example4?.kind).toBe("example");
+    expect(example4?.code).toContain("Scanner");
 
     const unknown = getJavaScenario("non-existent-scenario");
     expect(unknown).toBeNull();
@@ -45,6 +52,30 @@ describe("Java Exercises & Definitions", () => {
 
     const defaultCode = getJavaStarterCode(null);
     expect(defaultCode).toContain("Start coding in Java!");
+  });
+
+  it("returns default stdin for exercises and examples with input", () => {
+    expect(getJavaDefaultStdin("java-programming.example4Title")).toBe(
+      "Ada Lovelace\n21\n",
+    );
+    expect(getJavaDefaultStdin("java-programming.exercise6")).toBe(
+      "hello java\n",
+    );
+    expect(getJavaDefaultStdin("java-programming.exercise1")).toBe("");
+    expect(getJavaDefaultStdin(null)).toBe("");
+  });
+
+  it("inlines example4 with Scanner properly into valid executable source", () => {
+    const example4 = getJavaScenario("java-programming.example4Title");
+    expect(example4).toBeDefined();
+    const executable = createExecutableSource(
+      example4!.code,
+      example4?.defaultStdin,
+    );
+    expect(executable).not.toContain("import java.util.Scanner;");
+    expect(executable).not.toContain("Scanner scanner = new Scanner(System.in);");
+    expect(executable).toContain('String name = "Ada Lovelace";');
+    expect(executable).toContain("int age = 21;");
   });
 
   it("returns file name for given items", () => {

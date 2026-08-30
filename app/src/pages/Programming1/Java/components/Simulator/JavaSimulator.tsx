@@ -20,6 +20,7 @@ import {
 } from "@/lib/trainingCenter";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
+  getJavaDefaultStdin,
   getJavaFileName,
   getJavaScenario,
   getJavaStarterCode,
@@ -80,7 +81,9 @@ const JavaSimulatorSession = forwardRef<
   const isStorageEnabled = scenario?.kind !== "example";
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
   const [isStorageReady, setIsStorageReady] = useState(false);
-  const [standardInput, setStandardInput] = useState("");
+  const [standardInput, setStandardInput] = useState(() =>
+    getJavaDefaultStdin(itemId),
+  );
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
   const { snapshot, preload, run, runAsync, stop, reset } =
@@ -174,7 +177,7 @@ const JavaSimulatorSession = forwardRef<
         }
 
         setCode(getJavaStarterCode(itemId));
-        setStandardInput("");
+        setStandardInput(getJavaDefaultStdin(itemId));
         setTimeoutSeconds(60);
         reset();
       },
@@ -224,9 +227,14 @@ const JavaSimulatorSession = forwardRef<
 
       <div className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm">
         <label className="block space-y-2">
-          <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java-programming.stdin.label")}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
+              {t("java-programming.stdin.label")}
+            </span>
+            <span className="text-muted-foreground text-xs font-mono">
+              Scanner (System.in)
+            </span>
+          </div>
           <textarea
             value={standardInput}
             onChange={(event) => setStandardInput(event.target.value)}

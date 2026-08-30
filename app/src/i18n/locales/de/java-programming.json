@@ -8,6 +8,8 @@
   "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausführen.",
   "example3Title": "Array sortieren",
   "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
+  "example4Title": "Benutzereingabe mit Scanner",
+  "example4Text": "Werte vorab im Eingabefeld angeben und mit Scanner.nextLine() und Scanner.nextInt() zeilen- und tokenweise einlesen.",
   "exercise1": "Hello World ausgeben",
   "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
   "exercise2": "Hello World fünfmal ausgeben",

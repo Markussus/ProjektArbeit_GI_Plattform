@@ -8,6 +8,8 @@
   "example2Text": "A for loop is the standard way to repeat the same instruction several times.",
   "example3Title": "Sorting an array",
   "example3Text": "An integer array can be sorted in ascending order with Arrays.sort.",
+  "example4Title": "User input with Scanner",
+  "example4Text": "Provide values in the input field beforehand and read them line- and token-wise using Scanner.nextLine() and Scanner.nextInt().",
   "exercise1": "Print Hello World",
   "exercise1Desc": "Write a Java program that prints Hello World to the console exactly once.",
   "exercise2": "Print Hello World five times",
