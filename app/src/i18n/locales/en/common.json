@@ -84,7 +84,7 @@
     "exitFocus": "Exit simulation focus",
     "close": "Close",
     "transfer": {
-      "placeholder": "Paste a transfer string here or generate one via export",
+      "placeholder": "Paste transfer string",
       "export": "Export",
       "import": "Import",
       "copied": "String copied to clipboard.",

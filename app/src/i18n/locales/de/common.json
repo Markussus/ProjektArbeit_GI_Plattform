@@ -84,7 +84,7 @@
     "exitFocus": "Simulationsfokus verlassen",
     "close": "Schließen",
     "transfer": {
-      "placeholder": "Transfer-String hier einfügen oder per Export erzeugen",
+      "placeholder": "Transfer-String einfügen",
       "export": "Export",
       "import": "Import",
       "copied": "String in die Zwischenablage kopiert.",
