@@ -153,7 +153,7 @@ export function RLWordRecognizer({
                   </span>
                   <span className="text-foreground/70 text-xs">
                     {t(
-                      `rl.simulator.reason.${r.reasonCode}` as TranslationKey,
+                      `regular-languages.simulator.reason.${r.reasonCode}` as TranslationKey,
                       { states: r.states },
                     )}
                   </span>

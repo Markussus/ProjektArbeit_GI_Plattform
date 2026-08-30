@@ -36,7 +36,7 @@ export type LanguageSpec = EnumerationLang | SetBuilderLang;
 
 /**
  * A parse failure as a translatable code plus its interpolation values.
- * The matching strings live under `rl.languageErrors.*`.
+ * The matching strings live under `regular-languages.languageErrors.*`.
  */
 export interface LanguageParseIssue {
   code:
@@ -61,7 +61,7 @@ export type ParseLanguageResult =
 
 /** Translation key for a language-spec issue, for use with i18next's `t()`. */
 export function languageIssueKey(issue: LanguageParseIssue): string {
-  return `rl.languageErrors.${issue.code}`;
+  return `regular-languages.languageErrors.${issue.code}`;
 }
 
 /** Render a language-spec issue in the active language. */

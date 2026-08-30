@@ -151,14 +151,9 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
   // Gaussian-blur glows have to be re-rasterised on every frame a node moves,
   // so they are dropped for the duration of a drag and restored on release.
   const isDragging = draggedNodeId !== null;
-  const isLargeGraph = layout.strategy === "force";
-
-  // Adaptive SVG element height: large graphs get more screen real estate so
-  // node/label sizes stay legible at the default zoom.
-  const svgMaxHeight = isLargeGraph ? 560 : 440;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface)">
+    <div className="flex h-full w-full flex-1 flex-col overflow-hidden rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface)">
       <div
         className="flex items-center justify-between gap-3 px-4 py-2"
         style={{
@@ -211,7 +206,6 @@ export function FAStateDiagram({ program, runtime }: FAStateDiagramProps) {
           preserveAspectRatio="xMidYMid meet"
           className="block h-full w-full select-none"
           style={{
-            maxHeight: svgMaxHeight,
             minHeight: 320,
             cursor: isPanning ? "grabbing" : "grab",
             touchAction: "none",
