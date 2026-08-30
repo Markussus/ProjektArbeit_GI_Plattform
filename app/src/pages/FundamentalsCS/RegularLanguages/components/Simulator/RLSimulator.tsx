@@ -52,13 +52,18 @@ export function RLSimulator({
   ref,
 }: RLSimulatorProps) {
   const [mode, setMode] = useState<SimulationMode>(() => {
+    // An open exercise or example dictates the mode: it is the more specific
+    // choice, and `importedTaskStorageId` lingers after an import, so letting
+    // the import win here leaves a later task without its editor.
+    if (exercise?.mode) return exercise.mode;
+    if (example?.mode) return example.mode;
     if (importedTaskStorageId) {
       const imported = Object.entries(RL_STORAGE_TASK_IDS).find(
         ([, id]) => id === importedTaskStorageId,
       )?.[0] as SimulationMode | undefined;
       if (imported) return imported;
     }
-    return exercise?.mode ?? example?.mode ?? "grammarToLanguage";
+    return "grammarToLanguage";
   });
 
   const [studentDraft, setStudentDraft] = useState("");
@@ -75,6 +80,20 @@ export function RLSimulator({
 
     if (importedMode) {
       setMode(importedMode);
+    }
+  }
+
+  // A newly picked exercise or example brings its own mode. Without this the
+  // simulator keeps whatever mode an earlier import left behind, and the task's
+  // editor never appears — the mode was only read in the initialiser, which
+  // does not run again when the selection changes.
+  const selectionId = exercise?.id ?? example?.id ?? null;
+  const [appliedSelectionId, setAppliedSelectionId] = useState(selectionId);
+  if (selectionId !== appliedSelectionId) {
+    setAppliedSelectionId(selectionId);
+    const selectionMode = exercise?.mode ?? example?.mode;
+    if (selectionMode) {
+      setMode(selectionMode);
     }
   }
 
