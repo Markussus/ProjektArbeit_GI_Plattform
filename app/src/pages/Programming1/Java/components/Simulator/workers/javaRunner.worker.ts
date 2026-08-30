@@ -1,11 +1,21 @@
 import { JAVA_COMPILER_ASSET_URLS } from "../domain/javaCompilerAssets";
 import type {
   JavaExecutionArtifacts,
-  JavaExecutionErrorCategory,
   JavaExecutionIssue,
   JavaWorkerCompileAndRunRequest,
   JavaWorkerRequest,
 } from "../domain/javaExecution";
+import {
+  buildWorkerErrorFromEvent,
+  createExecutableSource,
+  createWorkerError,
+  getErrorMessage,
+  inferCompilationCategory,
+  inferCompilationMessage,
+  mapDiagnostic,
+  normalizeWorkerError,
+  type UpstreamWorkerMessage,
+} from "./javaRunnerHelpers";
 
 interface JavaWorkerScope {
   onmessage:
@@ -33,18 +43,6 @@ interface RuntimeLoaderModule {
   }>;
 }
 
-interface UpstreamWorkerMessage {
-  command: string;
-  id?: string;
-  status?: "successful" | "errors";
-  severity?: "error" | "warning" | "other";
-  fileName?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  message?: string;
-  script?: Int8Array;
-}
-
 interface PendingCompilation {
   requestId: string;
   diagnostics: JavaExecutionIssue[];
@@ -53,7 +51,6 @@ interface PendingCompilation {
 }
 
 const workerScope = self as unknown as JavaWorkerScope;
-
 const LOAD_REQUEST_ID = "__load-classlib__";
 
 let compilerWorker: Worker | null = null;
@@ -66,31 +63,21 @@ let pendingCompilation: PendingCompilation | null = null;
 workerScope.onmessage = async (event: MessageEvent<JavaWorkerRequest>) => {
   const message = event.data;
 
-  switch (message.type) {
-    case "preload-compiler":
-      await preloadCompiler(message.requestId);
-      return;
-    case "compile-and-run":
-      await compileAndRun(message);
-      return;
-    case "stop":
-      disposeCompilerWorker();
-      return;
+  if (message.type === "preload-compiler") {
+    await preloadCompiler(message.requestId);
+  } else if (message.type === "compile-and-run") {
+    await compileAndRun(message);
+  } else if (message.type === "stop") {
+    disposeCompilerWorker();
   }
 };
 
-async function preloadCompiler(requestId?: string) {
-  workerScope.postMessage({
-    type: "compiler-loading",
-    requestId,
-  });
+async function preloadCompiler(requestId?: string): Promise<void> {
+  workerScope.postMessage({ type: "compiler-loading", requestId });
 
   try {
     await ensureCompilerReady();
-    workerScope.postMessage({
-      type: "compiler-ready",
-      requestId,
-    });
+    workerScope.postMessage({ type: "compiler-ready", requestId });
   } catch (error) {
     workerScope.postMessage({
       type: "compiler-load-error",
@@ -100,56 +87,29 @@ async function preloadCompiler(requestId?: string) {
   }
 }
 
-async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
+async function compileAndRun(
+  message: JavaWorkerCompileAndRunRequest,
+): Promise<void> {
   const { requestId, sourceCode, mainClass, stdin } = message;
 
   try {
     await ensureCompilerReady();
+    workerScope.postMessage({ type: "compile-started", requestId });
 
-    workerScope.postMessage({
-      type: "compile-started",
-      requestId,
-    });
-
-    const compilation = await compileSource(
-      requestId,
-      createExecutableSource(sourceCode, stdin),
-    );
+    const executableSource = createExecutableSource(sourceCode, stdin);
+    const compilation = await compileSource(requestId, executableSource);
     const diagnostics = compilation.diagnostics;
 
-    if (
-      compilation.result.status !== "successful" ||
-      !compilation.result.script
-    ) {
-      throw createWorkerError(
-        inferCompilationCategory(diagnostics),
-        inferCompilationMessage(diagnostics),
-        diagnostics,
-        null,
-      );
-    }
+    assertCompilationSuccessful(compilation.result, diagnostics);
 
-    const generatedScript = copyByteArray(compilation.result.script);
+    const generatedScript = copyByteArray(compilation.result.script!);
     const artifacts: JavaExecutionArtifacts = {
-      generatedFiles: [
-        {
-          path: "app.wasm",
-          size: generatedScript.byteLength,
-        },
-      ],
+      generatedFiles: [{ path: "app.wasm", size: generatedScript.byteLength }],
       mainClass: mainClass ?? "Main",
     };
 
-    workerScope.postMessage({
-      type: "compile-finished",
-      requestId,
-      artifacts,
-    });
-
-    workerScope.postMessage({
-      type: "run-started",
-      requestId,
-    });
+    workerScope.postMessage({ type: "compile-finished", requestId, artifacts });
+    workerScope.postMessage({ type: "run-started", requestId });
 
     const { stdout, stderr } = await runGeneratedProgram(
       generatedScript,
@@ -165,70 +125,37 @@ async function compileAndRun(message: JavaWorkerCompileAndRunRequest) {
       artifacts,
     });
   } catch (error) {
-    const normalized = normalizeWorkerError(error);
-    workerScope.postMessage({
-      type: "error",
-      requestId,
-      errorCategory: normalized.errorCategory,
-      message: normalized.message,
-      diagnostics: normalized.diagnostics,
-      artifacts: normalized.artifacts ?? null,
-    });
+    postCompilationError(requestId, error);
   }
 }
 
-function createExecutableSource(sourceCode: string, stdin?: string) {
-  if (!stdin) {
-    return sourceCode;
-  }
-
-  return inlineScannerInput(sourceCode, stdin);
-}
-
-function inlineScannerInput(sourceCode: string, stdin: string) {
-  const lines = stdin.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
-  const tokens = stdin.trim().length > 0 ? stdin.trim().split(/\s+/) : [];
-  let nextLineIndex = 0;
-  let nextTokenIndex = 0;
-
-  return sourceCode
-    .replace(/^\s*import\s+java\.util\.Scanner;\s*$/m, "")
-    .replace(
-      /^\s*Scanner\s+([A-Za-z_$][\w$]*)\s*=\s*new\s+Scanner\s*\(\s*System\.in\s*\)\s*;\s*$/gm,
-      "",
-    )
-    .replace(
-      /\bString\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\.nextLine\s*\(\s*\)\s*;/g,
-      (_match, variableName: string) =>
-        `String ${variableName} = ${createJavaStringLiteral(lines[nextLineIndex++] ?? "")};`,
-    )
-    .replace(
-      /\bint\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\.nextInt\s*\(\s*\)\s*;/g,
-      (_match, variableName: string) =>
-        `int ${variableName} = ${Number.parseInt(tokens[nextTokenIndex++] ?? "0", 10) || 0};`,
+function assertCompilationSuccessful(
+  result: UpstreamWorkerMessage,
+  diagnostics: JavaExecutionIssue[],
+): void {
+  if (result.status !== "successful" || !result.script) {
+    throw createWorkerError(
+      inferCompilationCategory(diagnostics),
+      inferCompilationMessage(diagnostics),
+      diagnostics,
+      null,
     );
+  }
 }
 
-function createJavaStringLiteral(value: string) {
-  return `"${Array.from(value, (char) => {
-    switch (char) {
-      case "\\":
-        return "\\\\";
-      case '"':
-        return '\\"';
-      case "\n":
-        return "\\n";
-      case "\r":
-        return "\\r";
-      case "\t":
-        return "\\t";
-      default:
-        return char;
-    }
-  }).join("")}"`;
+function postCompilationError(requestId: string, error: unknown): void {
+  const normalized = normalizeWorkerError(error);
+  workerScope.postMessage({
+    type: "error",
+    requestId,
+    errorCategory: normalized.errorCategory,
+    message: normalized.message,
+    diagnostics: normalized.diagnostics,
+    artifacts: normalized.artifacts ?? null,
+  });
 }
 
-async function ensureCompilerReady() {
+async function ensureCompilerReady(): Promise<void> {
   if (compilerReady && compilerWorker) {
     return;
   }
@@ -269,60 +196,57 @@ async function ensureCompilerReady() {
   return compilerReadyPromise;
 }
 
-function handleCompilerWorkerMessage(
-  event: MessageEvent<UpstreamWorkerMessage>,
-) {
-  const message = event.data;
+function handleClasslibInitialization(): void {
+  compilerWorker?.postMessage({
+    command: "load-classlib",
+    id: LOAD_REQUEST_ID,
+    url: absoluteAssetUrl(JAVA_COMPILER_ASSET_URLS.compileClasslib),
+    runtimeUrl: absoluteAssetUrl(JAVA_COMPILER_ASSET_URLS.runtimeClasslib),
+  });
+}
 
-  switch (message.command) {
-    case "initialized":
-      compilerWorker?.postMessage({
-        command: "load-classlib",
-        id: LOAD_REQUEST_ID,
-        url: absoluteAssetUrl(JAVA_COMPILER_ASSET_URLS.compileClasslib),
-        runtimeUrl: absoluteAssetUrl(JAVA_COMPILER_ASSET_URLS.runtimeClasslib),
-      });
-      return;
-    case "ok":
-      if (message.id === LOAD_REQUEST_ID) {
-        compilerReady = true;
-        resolveCompilerReady?.();
-        clearReadyPromise();
-      }
-      return;
-    case "compiler-diagnostic":
-    case "diagnostic":
-      if (pendingCompilation && message.id === pendingCompilation.requestId) {
-        pendingCompilation.diagnostics.push(mapDiagnostic(message));
-      }
-      return;
-    case "compilation-complete":
-      if (pendingCompilation && message.id === pendingCompilation.requestId) {
-        const current = pendingCompilation;
-        pendingCompilation = null;
-        current.resolve(message);
-      }
-      return;
-    default:
-      return;
+function handleClasslibReady(messageId?: string): void {
+  if (messageId === LOAD_REQUEST_ID) {
+    compilerReady = true;
+    resolveCompilerReady?.();
+    clearReadyPromise();
   }
 }
 
-function handleCompilerWorkerError(event: ErrorEvent) {
-  const workerError = createWorkerError(
-    compilerReady ? "teavm" : "compiler-load",
-    compilerReady
-      ? `WebAssembly generation failed. ${event.message || "Unknown compiler worker error"}`
-      : `Compiler could not be loaded. ${event.message || "Unknown compiler worker error"}`,
-    [
-      {
-        code: compilerReady ? "teavm_worker_failed" : "compiler_worker_failed",
-        stage: compilerReady ? "teavm" : "compiler-load",
-        severity: "error",
-        message: event.message || "Unknown compiler worker error",
-      },
-    ],
-  );
+function handleCompilerDiagnostic(message: UpstreamWorkerMessage): void {
+  if (pendingCompilation && message.id === pendingCompilation.requestId) {
+    pendingCompilation.diagnostics.push(mapDiagnostic(message));
+  }
+}
+
+function handleCompilationComplete(message: UpstreamWorkerMessage): void {
+  if (pendingCompilation && message.id === pendingCompilation.requestId) {
+    const current = pendingCompilation;
+    pendingCompilation = null;
+    current.resolve(message);
+  }
+}
+
+const messageHandlers: Record<
+  string,
+  (message: UpstreamWorkerMessage) => void
+> = {
+  initialized: () => handleClasslibInitialization(),
+  ok: (message) => handleClasslibReady(message.id),
+  "compiler-diagnostic": (message) => handleCompilerDiagnostic(message),
+  diagnostic: (message) => handleCompilerDiagnostic(message),
+  "compilation-complete": (message) => handleCompilationComplete(message),
+};
+
+function handleCompilerWorkerMessage(
+  event: MessageEvent<UpstreamWorkerMessage>,
+): void {
+  const handler = messageHandlers[event.data.command];
+  handler?.(event.data);
+}
+
+function handleCompilerWorkerError(event: ErrorEvent): void {
+  const workerError = buildWorkerErrorFromEvent(event, compilerReady);
 
   if (pendingCompilation) {
     const current = pendingCompilation;
@@ -371,7 +295,7 @@ async function runGeneratedProgram(
   wasmModule: Int8Array,
   requestId: string,
   artifacts: JavaExecutionArtifacts,
-) {
+): Promise<{ stdout: string; stderr: string }> {
   let stdout = "";
   let stderr = "";
 
@@ -383,28 +307,18 @@ async function runGeneratedProgram(
     )) as RuntimeLoaderModule;
 
     const loaded = await runtimeModule.load(wasmModule, {
-      stackDeobfuscator: {
-        enabled: false,
-      },
+      stackDeobfuscator: { enabled: false },
       installImports(imports) {
         const teavmConsole = (imports.teavmConsole ??= {});
         teavmConsole.putcharStdout = (charCode: number) => {
           const next = String.fromCharCode(charCode);
           stdout += next;
-          workerScope.postMessage({
-            type: "stdout",
-            requestId,
-            data: next,
-          });
+          workerScope.postMessage({ type: "stdout", requestId, data: next });
         };
         teavmConsole.putcharStderr = (charCode: number) => {
           const next = String.fromCharCode(charCode);
           stderr += next;
-          workerScope.postMessage({
-            type: "stderr",
-            requestId,
-            data: next,
-          });
+          workerScope.postMessage({ type: "stderr", requestId, data: next });
         };
       },
     });
@@ -426,13 +340,10 @@ async function runGeneratedProgram(
     );
   }
 
-  return {
-    stdout,
-    stderr,
-  };
+  return { stdout, stderr };
 }
 
-function disposeCompilerWorker() {
+function disposeCompilerWorker(): void {
   if (compilerWorker) {
     compilerWorker.terminate();
     compilerWorker = null;
@@ -456,105 +367,16 @@ function disposeCompilerWorker() {
   clearReadyPromise();
 }
 
-function clearReadyPromise() {
+function clearReadyPromise(): void {
   compilerReadyPromise = null;
   resolveCompilerReady = null;
   rejectCompilerReady = null;
 }
 
-function inferCompilationCategory(
-  diagnostics: JavaExecutionIssue[],
-): JavaExecutionErrorCategory {
-  if (diagnostics.some((diagnostic) => diagnostic.stage === "teavm")) {
-    return "teavm";
-  }
-
-  return "javac";
-}
-
-function inferCompilationMessage(diagnostics: JavaExecutionIssue[]) {
-  if (diagnostics.some((diagnostic) => diagnostic.stage === "teavm")) {
-    return "WebAssembly generation failed.";
-  }
-
-  return "Java compilation failed.";
-}
-
-function absoluteAssetUrl(pathname: string) {
+function absoluteAssetUrl(pathname: string): string {
   return new URL(pathname, self.location.origin).toString();
 }
 
-function copyByteArray(bytes: Int8Array) {
+function copyByteArray(bytes: Int8Array): Int8Array {
   return new Int8Array(bytes);
-}
-
-function mapDiagnostic(diagnostic: UpstreamWorkerMessage): JavaExecutionIssue {
-  const stage =
-    diagnostic.command === "compiler-diagnostic" ? "javac" : "teavm";
-  return {
-    code:
-      diagnostic.command === "compiler-diagnostic"
-        ? "javac_diagnostic"
-        : "teavm_diagnostic",
-    stage,
-    severity:
-      diagnostic.severity === "other" || !diagnostic.severity
-        ? "info"
-        : diagnostic.severity,
-    message: diagnostic.message ?? "Unknown compiler diagnostic",
-    fileName: diagnostic.fileName,
-    line: diagnostic.lineNumber,
-    column: diagnostic.columnNumber,
-  };
-}
-
-function createWorkerError(
-  errorCategory: JavaExecutionErrorCategory,
-  message: string,
-  diagnostics?: JavaExecutionIssue[],
-  artifacts?: JavaExecutionArtifacts | null,
-) {
-  return {
-    __javaWorkerError: true,
-    errorCategory,
-    message,
-    diagnostics,
-    artifacts,
-  };
-}
-
-function normalizeWorkerError(error: unknown) {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "__javaWorkerError" in error
-  ) {
-    return {
-      errorCategory: String(
-        (error as { errorCategory?: string }).errorCategory ?? "unknown",
-      ) as JavaExecutionErrorCategory,
-      message: String(
-        (error as { message?: string }).message ?? "Unknown error",
-      ),
-      diagnostics: (error as { diagnostics?: JavaExecutionIssue[] })
-        .diagnostics,
-      artifacts: (error as { artifacts?: JavaExecutionArtifacts | null })
-        .artifacts,
-    };
-  }
-
-  return {
-    errorCategory: "unknown" as const,
-    message: getErrorMessage(error),
-    diagnostics: undefined,
-    artifacts: null,
-  };
-}
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return String(error);
 }

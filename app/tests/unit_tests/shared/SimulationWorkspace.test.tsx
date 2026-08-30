@@ -116,7 +116,7 @@ describe("SimulationWorkspace", () => {
     expect(onCloseItem).toHaveBeenCalledTimes(1);
   });
 
-  it("handles reset and focus toggle controls", () => {
+  it("handles reset and focus toggle controls without absolute overlay", () => {
     const onReset = vi.fn();
     const onToggleFocus = vi.fn();
 
@@ -129,6 +129,12 @@ describe("SimulationWorkspace", () => {
         onReset={onReset}
       />,
     );
+
+    const controlsContainer = screen.getByTestId(
+      "simulation-workspace-controls",
+    );
+    expect(controlsContainer).toBeInTheDocument();
+    expect(controlsContainer).not.toHaveClass("absolute");
 
     const resetBtn = screen.getByTestId("simulation-reset");
     expect(resetBtn).toBeInTheDocument();

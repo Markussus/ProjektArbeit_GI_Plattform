@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultMealyProgram } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/config/defaultMealyProgram";
-import { buildMealyConversion } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyConversion";
+import { buildMealyConversion } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/automataConversion";
 import { MealyMachineSimulator } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyMachine";
 
 describe("MealyMachineSimulator", () => {
@@ -9,7 +9,14 @@ describe("MealyMachineSimulator", () => {
     simulator.initialize(defaultMealyProgram);
     while (!simulator.isFinished()) simulator.step();
 
-    expect(simulator.getCurrentState().outputSymbols.join("")).toBe("abcabb");
+    expect(simulator.getCurrentState().outputSymbols).toEqual([
+      "NO_MATCH",
+      "NO_MATCH",
+      "MATCH_101",
+      "NO_MATCH",
+      "NO_MATCH",
+      "MATCH_101",
+    ]);
     expect(simulator.getCurrentState().outputSymbols).toHaveLength(
       defaultMealyProgram.inputWord.length,
     );
@@ -39,9 +46,9 @@ describe("MealyMachineSimulator", () => {
         defaultMealyProgram.inputSymbols.length,
     );
     expect(conversion.output.rows[0]).toMatchObject({
-      currentState: "S0",
+      currentState: "START",
       inputSymbol: "0",
-      outputSymbol: "a",
+      outputSymbol: "NO_MATCH",
     });
     expect(
       conversion.output.formulas.every((formula) =>

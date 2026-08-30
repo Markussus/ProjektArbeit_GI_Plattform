@@ -1,8 +1,6 @@
 import { describe, expect, test } from "vitest";
-import {
-  encTransferCodec,
-  EncoderState,
-} from "../../../../src/pages/FundamentalsCS/Encoding/simulator/encTransferCodec";
+import { encTransferCodec } from "@/pages/FundamentalsCS/Encoding/simulator/encTransferCodec.ts";
+import type { EncoderState } from "@/pages/FundamentalsCS/Encoding/simulator/encTransferCodec.ts";
 
 describe("encTransferCodec", () => {
   describe("exportValue", () => {

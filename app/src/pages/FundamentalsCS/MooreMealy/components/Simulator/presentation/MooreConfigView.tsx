@@ -7,7 +7,7 @@ import type {
   InternalRepresentation,
   MooreProgram,
 } from "../domain/mooreTypes";
-import { MooreInputBuilder } from "./MooreInputBuilder";
+import { AutomataInputBuilder } from "./AutomataInputBuilder";
 import { MooreTransitionTable } from "./MooreTransitionTable";
 
 export interface MooreConfigViewProps {
@@ -106,7 +106,7 @@ export function MooreConfigView({
       )}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <MooreInputBuilder
+        <AutomataInputBuilder
           inputSymbols={program.inputSymbols}
           inputWord={program.inputWord}
           onChange={(inputWord) => onChange({ ...program, inputWord })}

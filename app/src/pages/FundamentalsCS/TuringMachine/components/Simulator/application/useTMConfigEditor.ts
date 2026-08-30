@@ -175,8 +175,12 @@ export function useTMConfigEditor(
   const handleCellBlur = useCallback(
     (rowIndex: number, colIndex: number) => {
       const draftKey = getCellKey(rowIndex, colIndex);
-      const value =
-        cellDrafts[draftKey] ?? committedRows[rowIndex]?.[colIndex] ?? "";
+      const value = resolveCellDraftValue(
+        cellDrafts,
+        committedRows,
+        rowIndex,
+        colIndex,
+      );
       const issue = validateTransitionTableCell(
         draft,
         orderedTapeAlphabet,
@@ -191,7 +195,7 @@ export function useTMConfigEditor(
       }
 
       const currentValue = committedRows[rowIndex]?.[colIndex] ?? "";
-      if (value !== currentValue) {
+      if (shouldCommitCellChange(value, currentValue)) {
         commitCellChange(
           dispatchEditorAction,
           orderedTapeAlphabet,
@@ -367,6 +371,23 @@ export function useTMConfigEditor(
     applyProgram,
     resetToProgram,
   };
+}
+
+function resolveCellDraftValue(
+  cellDrafts: Record<string, string>,
+  committedRows: string[][],
+  rowIndex: number,
+  colIndex: number,
+): string {
+  const draftKey = getCellKey(rowIndex, colIndex);
+  return cellDrafts[draftKey] ?? committedRows[rowIndex]?.[colIndex] ?? "";
+}
+
+function shouldCommitCellChange(
+  draftValue: string,
+  committedValue: string | undefined,
+): boolean {
+  return draftValue !== (committedValue ?? "");
 }
 
 function commitCellChange(

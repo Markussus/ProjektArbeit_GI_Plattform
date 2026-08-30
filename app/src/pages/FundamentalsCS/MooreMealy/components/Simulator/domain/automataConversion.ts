@@ -2,11 +2,18 @@ import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/Dn
 import { formatBooleanExpressionForDisplay } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
 import { computeSmallestBooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/minimalExpression";
 import { createTruthTableFromResults } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
+import {
+  bitsNeeded,
+  bitsToNumber,
+  createVariableNames,
+  toBits,
+} from "./programCommon";
 import type { MooreProgram } from "./mooreTypes";
+import type { MealyProgram } from "./mealyTypes";
 
 const MAX_MINIMIZATION_VARIABLES = 8;
 
-export interface MooreConversionRow {
+export interface AutomataConversionRow {
   currentState: string;
   inputSymbol?: string;
   nextState?: string;
@@ -16,7 +23,7 @@ export interface MooreConversionRow {
   resultBits: number[];
 }
 
-export interface MooreFormula {
+export interface AutomataFormula {
   name: string;
   variables: string[];
   canonical: string;
@@ -26,34 +33,36 @@ export interface MooreFormula {
   minimizationAvailable: boolean;
 }
 
-export interface MooreTransitionConversion {
+export interface AutomataTransitionConversion {
   stateVariables: string[];
   inputVariables: string[];
   targetVariables: string[];
-  rows: MooreConversionRow[];
-  formulas: MooreFormula[];
+  rows: AutomataConversionRow[];
+  formulas: AutomataFormula[];
 }
 
-export interface MooreOutputConversion {
+export interface AutomataOutputConversion {
   stateVariables: string[];
   inputVariables?: string[];
   outputVariables: string[];
-  rows: MooreConversionRow[];
-  formulas: MooreFormula[];
+  rows: AutomataConversionRow[];
+  formulas: AutomataFormula[];
 }
 
-export interface MooreConversion {
-  transition: MooreTransitionConversion;
-  output: MooreOutputConversion;
-  allFormulas: MooreFormula[];
+export interface AutomataConversion {
+  transition: AutomataTransitionConversion;
+  output: AutomataOutputConversion;
+  allFormulas: AutomataFormula[];
 }
 
-export function buildMooreConversion(program: MooreProgram): MooreConversion {
+export function buildMooreConversion(
+  program: MooreProgram,
+): AutomataConversion {
   const stateBitCount = bitsNeeded(program.states.length);
   const inputBitCount = bitsNeeded(program.inputSymbols.length);
   const maximumOutputCode = Math.max(
     0,
-    ...program.states.map((state) => program.outputs[state].code),
+    ...program.states.map((state) => program.outputs[state]?.code ?? 0),
   );
   const outputBitCount = bitsNeeded(maximumOutputCode + 1);
   const stateVariables = createVariableNames("S", stateBitCount);
@@ -61,28 +70,34 @@ export function buildMooreConversion(program: MooreProgram): MooreConversion {
   const targetVariables = createVariableNames("T", stateBitCount);
   const outputVariables = createVariableNames("y", outputBitCount);
 
-  const transitionRows = program.states.flatMap((state, stateIndex) =>
-    program.inputSymbols.map((inputSymbol, inputIndex) => {
-      const nextState = program.transitions[inputSymbol][state];
-      const nextStateIndex = program.states.indexOf(nextState);
-      return {
-        currentState: state,
-        inputSymbol,
-        nextState,
-        currentBits: toBits(stateIndex, stateBitCount),
-        inputBits: toBits(inputIndex, inputBitCount),
-        resultBits: toBits(nextStateIndex, stateBitCount),
-      };
-    }),
+  const transitionRows: AutomataConversionRow[] = program.states.flatMap(
+    (state, stateIndex) =>
+      program.inputSymbols.map((inputSymbol, inputIndex) => {
+        const nextState = program.transitions[inputSymbol]?.[state] ?? "";
+        const nextStateIndex = program.states.indexOf(nextState);
+        return {
+          currentState: state,
+          inputSymbol,
+          nextState,
+          currentBits: toBits(stateIndex, stateBitCount),
+          inputBits: toBits(inputIndex, inputBitCount),
+          resultBits: toBits(
+            nextStateIndex >= 0 ? nextStateIndex : 0,
+            stateBitCount,
+          ),
+        };
+      }),
   );
 
-  const outputRows = program.states.map((state, stateIndex) => ({
-    currentState: state,
-    outputSymbol: program.outputs[state].symbol,
-    currentBits: toBits(stateIndex, stateBitCount),
-    inputBits: [],
-    resultBits: toBits(program.outputs[state].code, outputBitCount),
-  }));
+  const outputRows: AutomataConversionRow[] = program.states.map(
+    (state, stateIndex) => ({
+      currentState: state,
+      outputSymbol: program.outputs[state]?.symbol ?? "",
+      currentBits: toBits(stateIndex, stateBitCount),
+      inputBits: [],
+      resultBits: toBits(program.outputs[state]?.code ?? 0, outputBitCount),
+    }),
+  );
 
   const transitionFormulas = buildFormulas(
     targetVariables,
@@ -113,11 +128,92 @@ export function buildMooreConversion(program: MooreProgram): MooreConversion {
   };
 }
 
+export function buildMealyConversion(
+  program: MealyProgram,
+): AutomataConversion {
+  const stateBitCount = bitsNeeded(program.states.length);
+  const inputBitCount = bitsNeeded(program.inputSymbols.length);
+  const outputCodes = program.inputSymbols.flatMap((input) =>
+    program.states.map((state) => program.outputs[input]?.[state]?.code ?? 0),
+  );
+  const outputBitCount = bitsNeeded(Math.max(0, ...outputCodes) + 1);
+  const stateVariables = createVariableNames("S", stateBitCount);
+  const inputVariables = createVariableNames("E", inputBitCount);
+  const targetVariables = createVariableNames("T", stateBitCount);
+  const outputVariables = createVariableNames("y", outputBitCount);
+
+  const transitionRows: AutomataConversionRow[] = program.states.flatMap(
+    (state, stateIndex) =>
+      program.inputSymbols.map((inputSymbol, inputIndex) => {
+        const nextState = program.transitions[inputSymbol]?.[state] ?? "";
+        const nextStateIndex = program.states.indexOf(nextState);
+        return {
+          currentState: state,
+          inputSymbol,
+          nextState,
+          currentBits: toBits(stateIndex, stateBitCount),
+          inputBits: toBits(inputIndex, inputBitCount),
+          resultBits: toBits(
+            nextStateIndex >= 0 ? nextStateIndex : 0,
+            stateBitCount,
+          ),
+        };
+      }),
+  );
+
+  const outputRows: AutomataConversionRow[] = program.states.flatMap(
+    (state, stateIndex) =>
+      program.inputSymbols.map((inputSymbol, inputIndex) => {
+        const output = program.outputs[inputSymbol]?.[state] ?? {
+          symbol: "",
+          code: 0,
+        };
+        return {
+          currentState: state,
+          inputSymbol,
+          outputSymbol: output.symbol,
+          currentBits: toBits(stateIndex, stateBitCount),
+          inputBits: toBits(inputIndex, inputBitCount),
+          resultBits: toBits(output.code, outputBitCount),
+        };
+      }),
+  );
+
+  const transitionFormulas = buildFormulas(
+    targetVariables,
+    [...stateVariables, ...inputVariables],
+    transitionRows,
+  );
+  const outputFormulas = buildFormulas(
+    outputVariables,
+    [...stateVariables, ...inputVariables],
+    outputRows,
+  );
+
+  return {
+    transition: {
+      stateVariables,
+      inputVariables,
+      targetVariables,
+      rows: transitionRows,
+      formulas: transitionFormulas,
+    },
+    output: {
+      stateVariables,
+      inputVariables,
+      outputVariables,
+      rows: outputRows,
+      formulas: outputFormulas,
+    },
+    allFormulas: [...transitionFormulas, ...outputFormulas],
+  };
+}
+
 export function buildFormulas(
   resultVariables: string[],
   inputVariables: string[],
-  rows: MooreConversionRow[],
-): MooreFormula[] {
+  rows: AutomataConversionRow[],
+): AutomataFormula[] {
   return resultVariables.map((name, resultIndex) => {
     const trueAssignments = rows
       .filter((row) => row.resultBits[resultIndex] === 1)
@@ -225,29 +321,10 @@ function formatCanonicalDnf(
     .map((assignment) =>
       assignment
         .map((bit, index) =>
-          bit === 1 ? variables[index] : `¬${variables[index]}`,
+          bit === 1 ? variables[index] : `\u00ac${variables[index]}`,
         )
-        .join(" ∧ "),
+        .join(" \u2227 "),
     )
     .map((term) => (variables.length > 1 ? `(${term})` : term))
-    .join(" ∨ ");
-}
-
-export function bitsNeeded(count: number): number {
-  return count <= 1 ? 1 : Math.ceil(Math.log2(count));
-}
-
-export function createVariableNames(prefix: string, count: number): string[] {
-  return Array.from({ length: count }, (_, index) => `${prefix}${index}`);
-}
-
-export function toBits(value: number, width: number): number[] {
-  return Array.from({ length: width }, (_, index) => {
-    const bitPosition = width - index - 1;
-    return Math.floor(value / 2 ** bitPosition) % 2;
-  });
-}
-
-function bitsToNumber(bits: number[]): number {
-  return bits.reduce((value, bit) => value * 2 + bit, 0);
+    .join(" \u2228 ");
 }

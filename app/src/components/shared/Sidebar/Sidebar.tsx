@@ -41,7 +41,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         collapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="flex h-14 items-center px-4">
+      <div className="flex h-14 shrink-0 items-center px-4">
         <button
           type="button"
           onClick={onToggle}
@@ -56,7 +56,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       {!collapsed && !isHome && hasModuleNavigation && activeModule && (
-        <div className="px-4 pb-3">
+        <div className="shrink-0 px-4 pb-3">
           <NavLink
             to={activeModule.path}
             className={cn(
@@ -70,7 +70,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       )}
 
       {!isHome && hasModuleNavigation && activeModule ? (
-        <nav className="flex-1 space-y-1 px-2 py-2">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-2">
           {activeModule.topics.map((topic) => {
             const Icon = topic.icon;
 
@@ -105,7 +105,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <div className="flex-1" />
       )}
 
-      <div className="border-border space-y-1 border-t px-2 py-3">
+      <div className="border-border shrink-0 space-y-1 border-t px-2 py-3">
         <Link
           to="/info"
           data-testid="sidebar-info-link"

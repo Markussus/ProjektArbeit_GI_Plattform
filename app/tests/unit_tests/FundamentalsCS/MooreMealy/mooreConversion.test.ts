@@ -8,8 +8,8 @@ import { defaultMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/component
 import {
   buildFormulas,
   buildMooreConversion,
-  toBits,
-} from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mooreConversion";
+} from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/automataConversion";
+import { toBits } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/programCommon";
 
 describe("Moore circuit conversion", () => {
   it("builds grouped transition rows from state and input codes", () => {

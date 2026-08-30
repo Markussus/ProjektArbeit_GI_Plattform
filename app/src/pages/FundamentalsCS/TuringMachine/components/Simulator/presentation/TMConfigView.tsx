@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { getOrderedTapeAlphabet } from "../adapters/tmTableAdapter";
 import type {
+  TMEditorCellIssue,
   TMEditorCellIssueCode,
   UseTMConfigEditorResult,
 } from "../application/useTMConfigEditor";
@@ -26,14 +27,11 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
     blankSymbol: editor.draft.blankSymbol,
     tapeAlphabet: deriveTapeAlphabet(editor.draft),
   });
-  const combinedError = [
-    ...editor.validationIssues.map((issue) => translateProgramIssue(t, issue)),
-    editor.blockingCellIssue
-      ? translateCellIssue(t, editor.blockingCellIssue.code)
-      : null,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+  const combinedError = buildConfigErrorMessage(
+    editor.validationIssues,
+    editor.blockingCellIssue,
+    t,
+  );
 
   const handleRemoveRow = (rowIndex: number) => {
     const symbol = orderedTapeAlphabet[rowIndex];
@@ -129,6 +127,19 @@ export function TMConfigView({ editor }: TMConfigViewProps) {
       </div>
     </div>
   );
+}
+
+function buildConfigErrorMessage(
+  validationIssues: TMProgramIssue[],
+  blockingCellIssue: TMEditorCellIssue | null,
+  t: TFunction,
+): string {
+  return [
+    ...validationIssues.map((issue) => translateProgramIssue(t, issue)),
+    blockingCellIssue ? translateCellIssue(t, blockingCellIssue.code) : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function translateCellIssue(t: TFunction, code: TMEditorCellIssueCode): string {

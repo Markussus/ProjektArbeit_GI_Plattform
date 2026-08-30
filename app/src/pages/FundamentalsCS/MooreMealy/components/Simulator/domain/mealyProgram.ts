@@ -1,14 +1,22 @@
 import { cloneJson } from "@/lib/utils";
-import { createNextInputSymbol, createNextStateName } from "./mooreProgram";
+import { hasUniqueNonEmptyValues } from "./programCommon";
+import {
+  renameMealyInputSymbol,
+  renameMealyState,
+} from "./mealyProgramUpdates";
 import type { MealyProgram } from "./mealyTypes";
 
-export { createNextInputSymbol, createNextStateName };
+export { createNextStateName } from "./programCommon";
+export { renameMealyState };
+export const renameMealyInput = renameMealyInputSymbol;
 
 export function validateMealyProgram(program: MealyProgram): string[] {
   const issues: string[] = [];
   if (!program.states.length) issues.push("states_invalid");
-  if (!unique(program.states)) issues.push("state_names_invalid");
-  if (!unique(program.inputSymbols)) issues.push("input_symbol_names_invalid");
+  if (!hasUniqueNonEmptyValues(program.states))
+    issues.push("state_names_invalid");
+  if (!hasUniqueNonEmptyValues(program.inputSymbols))
+    issues.push("input_symbol_names_invalid");
   if (!program.states.includes(program.initialState))
     issues.push("initial_state_invalid");
   if (
@@ -70,63 +78,4 @@ export function normalizeMealyProgram(program: MealyProgram): MealyProgram {
     ]),
   );
   return normalized;
-}
-
-export function renameMealyState(
-  program: MealyProgram,
-  previous: string,
-  nextValue: string,
-): MealyProgram | null {
-  const next = nextValue.trim();
-  if (!next || (next !== previous && program.states.includes(next)))
-    return null;
-  const result = cloneJson(program);
-  result.states = result.states.map((state) =>
-    state === previous ? next : state,
-  );
-  if (result.initialState === previous) result.initialState = next;
-  for (const input of result.inputSymbols) {
-    result.transitions[input][next] = result.transitions[input][previous];
-    result.outputs[input][next] = result.outputs[input][previous];
-    if (next !== previous) {
-      delete result.transitions[input][previous];
-      delete result.outputs[input][previous];
-    }
-    for (const state of result.states) {
-      if (result.transitions[input][state] === previous)
-        result.transitions[input][state] = next;
-    }
-  }
-  return result;
-}
-
-export function renameMealyInput(
-  program: MealyProgram,
-  previous: string,
-  nextValue: string,
-): MealyProgram | null {
-  const next = nextValue.trim();
-  if (!next || (next !== previous && program.inputSymbols.includes(next)))
-    return null;
-  const result = cloneJson(program);
-  result.inputSymbols = result.inputSymbols.map((input) =>
-    input === previous ? next : input,
-  );
-  result.transitions[next] = result.transitions[previous];
-  result.outputs[next] = result.outputs[previous];
-  if (next !== previous) {
-    delete result.transitions[previous];
-    delete result.outputs[previous];
-  }
-  result.inputWord = result.inputWord.map((input) =>
-    input === previous ? next : input,
-  );
-  return result;
-}
-
-function unique(values: string[]) {
-  return (
-    values.every((value) => value.trim()) &&
-    new Set(values).size === values.length
-  );
 }

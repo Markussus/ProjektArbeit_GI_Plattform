@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FileText, Binary } from "lucide-react";
 import { ExerciseCard } from "@/components/shared/ExerciseCard/ExerciseCard";
+import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
+import { TopicCategorySection } from "@/components/shared/TopicCategorySection/TopicCategorySection";
 import type { Exercise, DescriptionParams } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import { generateEncodingExercises } from "../utils/exerciseGenerator";
@@ -23,7 +24,6 @@ function replaceParams(text: string, params?: DescriptionParams): string {
 }
 
 const groupKeys = ["base64", "utf8"] as const;
-const groupIcons = { base64: FileText, utf8: Binary } as const;
 const difficultyOrder = { easy: 0, medium: 1, hard: 2 } as const;
 
 export function ExercisesTab({
@@ -32,7 +32,7 @@ export function ExercisesTab({
   onOpenExerciseInSimulation,
 }: ModuleExercisesTabProps) {
   const { t } = useTranslation();
-  const exercises = useMemo(() => generateEncodingExercises(), []);
+  const [exercises, setExercises] = useState(() => generateEncodingExercises());
 
   const translatedExercises: EncodingExercise[] = useMemo(
     () =>
@@ -61,23 +61,32 @@ export function ExercisesTab({
     return groups;
   }, [translatedExercises]);
 
-  return (
-    <div className="space-y-8">
-      {groupKeys.map((group) => {
-        const groupExercises = grouped[group];
-        if (!groupExercises?.length) return null;
-        const Icon = groupIcons[group];
+  const handleResetAllExercises = () => {
+    setExercises(generateEncodingExercises());
+  };
 
-        return (
-          <div
-            key={group}
-            className="bg-card ring-foreground/10 flex flex-col gap-4 rounded-xl p-6 shadow-sm ring-1"
-          >
-            <h3 className="text-foreground border-border/50 flex items-center gap-2 border-b pb-2 font-semibold">
-              <Icon className="text-primary h-5 w-5" />
-              {t(`encoding.simulator.group${group}`)}
-            </h3>
-            <div>
+  return (
+    <div data-testid="encoding-exercises-tab">
+      <div className="text-muted-foreground mb-4 flex items-center gap-2">
+        <InlineResetControl
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
+          onConfirm={handleResetAllExercises}
+          testId="encoding-reset-all-exercises"
+        />
+      </div>
+
+      <div className="flex flex-col gap-6">
+        {groupKeys.map((group) => {
+          const groupExercises = grouped[group];
+          if (!groupExercises?.length) return null;
+
+          return (
+            <TopicCategorySection
+              key={group}
+              testId={`encoding-exercises-section-${group}`}
+              title={t(`encoding.simulator.group${group}`)}
+            >
               {groupExercises.map((exercise, index) => {
                 const exerciseAsTopic: Exercise = {
                   id: exercise.id as TranslationKey,
@@ -112,10 +121,10 @@ export function ExercisesTab({
                   />
                 );
               })}
-            </div>
-          </div>
-        );
-      })}
+            </TopicCategorySection>
+          );
+        })}
+      </div>
     </div>
   );
 }

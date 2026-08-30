@@ -1,4 +1,4 @@
-export const JAVA_COMPILER_ASSET_BASE = "/java/compiler";
+const JAVA_COMPILER_ASSET_BASE = "/java/compiler";
 
 export const JAVA_COMPILER_ASSET_URLS = {
   compilerWasm: `${JAVA_COMPILER_ASSET_BASE}/compiler.wasm`,

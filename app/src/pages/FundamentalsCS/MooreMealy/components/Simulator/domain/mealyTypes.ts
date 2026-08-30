@@ -1,5 +1,7 @@
 import type { InternalRepresentation, MooreOutput } from "./mooreTypes";
 
+export type { InternalRepresentation };
+
 export interface MealyProgram {
   states: string[];
   inputSymbols: string[];

@@ -3,6 +3,7 @@ import { defaultMooreProgram } from "@/pages/FundamentalsCS/MooreMealy/component
 import {
   formatInternalNumber,
   getNextMooreOutputCode,
+  normalizeMooreProgram,
   parseInternalNumber,
   renameMooreInputSymbol,
   renameMooreState,
@@ -18,6 +19,14 @@ describe("Moore program operations", () => {
     };
 
     expect(validateMooreProgram(invalid)).toContain("outputs_invalid");
+  });
+
+  it("normalizes names and transitions for trimmed entries", () => {
+    const draft = structuredClone(defaultMooreProgram);
+    draft.states[0] = " HALT ";
+    const normalized = normalizeMooreProgram(draft);
+    expect(normalized.states[0]).toBe("HALT");
+    expect(normalized.outputs.HALT).toBeDefined();
   });
 
   it("derives the next output code from the largest existing code", () => {

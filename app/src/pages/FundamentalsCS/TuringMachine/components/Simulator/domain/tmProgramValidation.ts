@@ -1,5 +1,5 @@
 import { deriveTapeAlphabet, type TMProgram } from "./tmProgram";
-import { isSingleTapeSymbol } from "./tmTypes";
+import { isSingleTapeSymbol, type TMTransition } from "./tmTypes";
 
 export type TMProgramIssueCode =
   | "states_empty"
@@ -134,70 +134,94 @@ function validateTransitions(
   for (const [readSymbol, stateTransitions] of Object.entries(
     program.transitions,
   )) {
-    if (!tapeAlphabet.has(readSymbol)) {
-      issues.push({
-        code: "transition_read_symbol_missing",
-        path: `transitions.${readSymbol}`,
-        params: { symbol: readSymbol },
-      });
-    }
-
-    if (!isSingleTapeSymbol(readSymbol)) {
-      issues.push({
-        code: "transition_read_symbol_invalid",
-        path: `transitions.${readSymbol}`,
-        params: { symbol: readSymbol },
-      });
-    }
+    validateReadSymbol(readSymbol, tapeAlphabet, issues);
 
     for (const [state, transition] of Object.entries(stateTransitions ?? {})) {
-      if (!transition) {
-        continue;
-      }
-
-      if (!states.has(state)) {
-        issues.push({
-          code: "transition_state_missing",
-          path: `transitions.${readSymbol}.${state}`,
-          params: { state, symbol: readSymbol },
-        });
-      }
-
-      if (!states.has(transition.nextState)) {
-        issues.push({
-          code: "transition_next_state_missing",
-          path: `transitions.${readSymbol}.${state}.nextState`,
-          params: {
-            state,
-            symbol: readSymbol,
-            nextState: transition.nextState,
-          },
-        });
-      }
-
-      if (!tapeAlphabet.has(transition.writeSymbol)) {
-        issues.push({
-          code: "transition_write_symbol_missing",
-          path: `transitions.${readSymbol}.${state}.writeSymbol`,
-          params: {
-            state,
-            symbol: readSymbol,
-            writeSymbol: transition.writeSymbol,
-          },
-        });
-      }
-
-      if (!isSingleTapeSymbol(transition.writeSymbol)) {
-        issues.push({
-          code: "transition_write_symbol_invalid",
-          path: `transitions.${readSymbol}.${state}.writeSymbol`,
-          params: {
-            state,
-            symbol: readSymbol,
-            writeSymbol: transition.writeSymbol,
-          },
-        });
+      if (transition) {
+        validateSingleTransition(
+          readSymbol,
+          state,
+          transition,
+          states,
+          tapeAlphabet,
+          issues,
+        );
       }
     }
+  }
+}
+
+function validateReadSymbol(
+  readSymbol: string,
+  tapeAlphabet: Set<string>,
+  issues: TMProgramIssue[],
+): void {
+  if (!tapeAlphabet.has(readSymbol)) {
+    issues.push({
+      code: "transition_read_symbol_missing",
+      path: `transitions.${readSymbol}`,
+      params: { symbol: readSymbol },
+    });
+  }
+
+  if (!isSingleTapeSymbol(readSymbol)) {
+    issues.push({
+      code: "transition_read_symbol_invalid",
+      path: `transitions.${readSymbol}`,
+      params: { symbol: readSymbol },
+    });
+  }
+}
+
+function validateSingleTransition(
+  readSymbol: string,
+  state: string,
+  transition: TMTransition,
+  states: Set<string>,
+  tapeAlphabet: Set<string>,
+  issues: TMProgramIssue[],
+): void {
+  if (!states.has(state)) {
+    issues.push({
+      code: "transition_state_missing",
+      path: `transitions.${readSymbol}.${state}`,
+      params: { state, symbol: readSymbol },
+    });
+  }
+
+  if (!states.has(transition.nextState)) {
+    issues.push({
+      code: "transition_next_state_missing",
+      path: `transitions.${readSymbol}.${state}.nextState`,
+      params: {
+        state,
+        symbol: readSymbol,
+        nextState: transition.nextState,
+      },
+    });
+  }
+
+  if (!tapeAlphabet.has(transition.writeSymbol)) {
+    issues.push({
+      code: "transition_write_symbol_missing",
+      path: `transitions.${readSymbol}.${state}.writeSymbol`,
+      params: {
+        state,
+        symbol: readSymbol,
+        writeSymbol: transition.writeSymbol,
+      },
+    });
+  }
+
+  if (!isSingleTapeSymbol(transition.writeSymbol)) {
+    issues.push({
+      code: "transition_write_symbol_invalid",
+      path: `transitions.${readSymbol}.${state}.writeSymbol`,
+      params: {
+        state,
+        symbol: readSymbol,
+        writeSymbol: transition.writeSymbol,
+      },
+    });
   }
 }

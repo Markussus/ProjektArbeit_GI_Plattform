@@ -61,7 +61,7 @@ export function TMSimulationView({
       data-testid="tm-simulation-view"
       className="mx-auto flex w-full max-w-6xl flex-col gap-8"
     >
-      <div className="flex w-full items-center justify-between">
+      <div className="flex w-full items-center justify-between md:pr-24">
         <h2 data-testid="tm-simulation-title" className="text-xl font-bold">
           {t("turing-machine.sim.screen.title")}
         </h2>

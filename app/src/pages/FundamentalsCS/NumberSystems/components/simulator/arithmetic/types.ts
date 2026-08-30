@@ -9,7 +9,7 @@ export interface BaseArithmeticProps {
   isExerciseMode?: boolean;
   showSolution?: boolean;
   onShowSolution?: () => void;
-  /** Callback zum vollständigen Verlassen des Übungsmodus */
+  /** Callback invoked when fully exiting exercise mode */
   onExitExercise?: () => void;
   initialA?: string;
   initialB?: string;

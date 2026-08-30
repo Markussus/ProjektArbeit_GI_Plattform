@@ -34,3 +34,5 @@ dist-ssr
 # lighthouseci
 /.lighthouseci/
 .fallow/
+
+coverage/

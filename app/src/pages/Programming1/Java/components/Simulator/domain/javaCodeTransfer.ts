@@ -281,45 +281,52 @@ async function validateSourceCodeForExport(sourceCode: string): Promise<void> {
   }
 }
 
+function matchNextToken(
+  sourceCode: string,
+  offset: number,
+): { token: number; length: number } {
+  const matches = dictionaryMatchesByFirstCharacter.get(
+    sourceCode[offset] ?? "",
+  );
+  const dictionaryMatch = matches?.find(({ entry }) =>
+    sourceCode.startsWith(entry, offset),
+  );
+
+  if (dictionaryMatch) {
+    return {
+      token: dictionaryMatch.token,
+      length: dictionaryMatch.entry.length,
+    };
+  }
+
+  const codePoint = sourceCode.codePointAt(offset);
+  if (codePoint === undefined) {
+    throw new Error("java_transfer_source_invalid");
+  }
+
+  if (isAllowedAscii(codePoint)) {
+    return { token: codePoint, length: 1 };
+  }
+
+  const character = String.fromCodePoint(codePoint);
+  const specialToken = specialCharacterTokens.get(character);
+  if (specialToken === undefined) {
+    throw new Error("java_transfer_source_invalid");
+  }
+
+  return { token: specialToken, length: character.length };
+}
+
 async function tokenizeSourceCode(sourceCode: string): Promise<Uint8Array> {
   const tokens: number[] = [];
   let offset = 0;
   let processedCharacters = 0;
 
   while (offset < sourceCode.length) {
-    const matches = dictionaryMatchesByFirstCharacter.get(
-      sourceCode[offset] ?? "",
-    );
-    const dictionaryMatch = matches?.find(({ entry }) =>
-      sourceCode.startsWith(entry, offset),
-    );
-
-    if (dictionaryMatch) {
-      tokens.push(dictionaryMatch.token);
-      offset += dictionaryMatch.entry.length;
-      processedCharacters += dictionaryMatch.entry.length;
-    } else {
-      const codePoint = sourceCode.codePointAt(offset);
-      if (codePoint === undefined) {
-        throw new Error("java_transfer_source_invalid");
-      }
-
-      if (isAllowedAscii(codePoint)) {
-        tokens.push(codePoint);
-        offset++;
-        processedCharacters++;
-      } else {
-        const character = String.fromCodePoint(codePoint);
-        const specialToken = specialCharacterTokens.get(character);
-        if (specialToken === undefined) {
-          throw new Error("java_transfer_source_invalid");
-        }
-
-        tokens.push(specialToken);
-        offset += character.length;
-        processedCharacters += character.length;
-      }
-    }
+    const { token, length } = matchNextToken(sourceCode, offset);
+    tokens.push(token);
+    offset += length;
+    processedCharacters += length;
 
     if (processedCharacters >= TOKENIZATION_YIELD_INTERVAL) {
       processedCharacters = 0;
@@ -330,35 +337,43 @@ async function tokenizeSourceCode(sourceCode: string): Promise<Uint8Array> {
   return Uint8Array.from(tokens);
 }
 
+function decodeSingleToken(token: number): Uint8Array | readonly number[] {
+  if (token < SPECIAL_CHARACTER_TOKEN_START) {
+    if (!isAllowedAscii(token)) {
+      throw new Error(
+        `Java-Import fehlgeschlagen: Ungültiges ASCII-Byte 0x${token.toString(16).padStart(2, "0")} im Tokenstream.`,
+      );
+    }
+    return [token];
+  }
+
+  if (token < JAVA_DICTIONARY_TOKEN_START) {
+    const bytes = specialCharacterBytes[token - SPECIAL_CHARACTER_TOKEN_START];
+    if (bytes === undefined) {
+      throw new Error(
+        `Java-Import fehlgeschlagen: Unbekanntes Sonderzeichen-Token 0x${token.toString(16)}.`,
+      );
+    }
+    return bytes;
+  }
+
+  const bytes = dictionaryEntryBytes[token - JAVA_DICTIONARY_TOKEN_START];
+  if (bytes === undefined) {
+    throw new Error(
+      `Java-Import fehlgeschlagen: Unbekanntes Dictionary-Token 0x${token.toString(16)}.`,
+    );
+  }
+  return bytes;
+}
+
 async function decodeTokenStream(tokenStream: Uint8Array): Promise<string> {
   const outputBytes: number[] = [];
   let processedTokens = 0;
 
   for (const token of tokenStream) {
-    if (token < SPECIAL_CHARACTER_TOKEN_START) {
-      if (!isAllowedAscii(token)) {
-        throw new Error(
-          `Java-Import fehlgeschlagen: Ungültiges ASCII-Byte 0x${token.toString(16).padStart(2, "0")} im Tokenstream.`,
-        );
-      }
-      outputBytes.push(token);
-    } else if (token < JAVA_DICTIONARY_TOKEN_START) {
-      const bytes =
-        specialCharacterBytes[token - SPECIAL_CHARACTER_TOKEN_START];
-      if (bytes === undefined) {
-        throw new Error(
-          `Java-Import fehlgeschlagen: Unbekanntes Sonderzeichen-Token 0x${token.toString(16)}.`,
-        );
-      }
-      outputBytes.push(...bytes);
-    } else {
-      const bytes = dictionaryEntryBytes[token - JAVA_DICTIONARY_TOKEN_START];
-      if (bytes === undefined) {
-        throw new Error(
-          `Java-Import fehlgeschlagen: Unbekanntes Dictionary-Token 0x${token.toString(16)}.`,
-        );
-      }
-      outputBytes.push(...bytes);
+    const bytes = decodeSingleToken(token);
+    for (let index = 0; index < bytes.length; index++) {
+      outputBytes.push(bytes[index]!);
     }
 
     assertSourceSize(outputBytes.length);

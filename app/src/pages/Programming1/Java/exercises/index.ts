@@ -1056,9 +1056,6 @@ class ShoppingCart {
 export const javaProgrammingExerciseDefinitions: ExerciseDefinition[] =
   javaProgrammingExercises.map((exercise) => exercise.definition);
 
-export const javaProgrammingExampleDefinitions: ExampleDefinition[] =
-  javaProgrammingExamples.map((example) => example.definition);
-
 const scenarioById = new Map<TranslationKey, JavaScenario>(
   [...javaProgrammingExercises, ...javaProgrammingExamples].map((scenario) => [
     scenario.id,

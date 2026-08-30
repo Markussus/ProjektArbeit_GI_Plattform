@@ -13,8 +13,8 @@ import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   buildMooreConversion,
-  type MooreConversion,
-} from "./domain/mooreConversion";
+  type AutomataConversion,
+} from "./domain/automataConversion";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
@@ -23,33 +23,29 @@ import {
 } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import { useMooreSimulator } from "./application/useMooreSimulator";
+import { useMooreProgramEditor } from "./application/useMooreProgramEditor";
 import {
   runMooreValidation,
-  type MooreValidationResult,
-} from "./application/mooreSolutionChecker";
+  type AutomataValidationResult,
+} from "./application/automataSolutionChecker";
 import { emptyMooreProgram } from "./config/emptyMooreProgram";
 import type { MooreExerciseScenario } from "../../exercises";
 import {
-  createNextInputSymbol,
-  createNextStateName,
-  getNextMooreOutputCode,
   normalizeMooreProgram,
-  renameMooreInputSymbol,
-  renameMooreState,
   validateMooreProgram,
 } from "./domain/mooreProgram";
 import { mooreProgramTransferCodec } from "./domain/mooreProgramTransfer";
 import type { MooreProgram } from "./domain/mooreTypes";
 import { MooreConfigView } from "./presentation/MooreConfigView";
-import { MooreConversionView } from "./presentation/MooreConversionView";
-import { MooreLogicGateView } from "./presentation/MooreLogicGateView";
+import { AutomataConversionView } from "./presentation/AutomataConversionView";
+import { AutomataLogicGateView } from "./presentation/AutomataLogicGateView";
 import { MooreSimulationView } from "./presentation/MooreSimulationView";
-import { MooreViewActions } from "./presentation/MooreViewActions";
+import { AutomataViewActions } from "./presentation/AutomataViewActions";
 
 export interface MooreSimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
-  checkSolution: () => Promise<MooreValidationResult>;
+  checkSolution: () => Promise<AutomataValidationResult>;
 }
 
 interface MooreSimulatorProps {
@@ -76,9 +72,23 @@ export const MooreSimulator = forwardRef<
     () => cloneJson(scenario?.starterProgram ?? initialProgram),
     [initialProgram, scenario],
   );
-  const [program, setProgram] = useState<MooreProgram>(() =>
-    cloneJson(scenarioProgram),
-  );
+
+  const {
+    program,
+    setProgram,
+    issues,
+    handleTransitionChange,
+    handleStateRename,
+    handleInputSymbolRename,
+    handleAddState,
+    handleRemoveState,
+    handleAddInputSymbol,
+    handleRemoveInputSymbol,
+    handleOutputSymbolChange,
+    handleOutputCodeChange,
+    handleOutputSymbolCreate,
+  } = useMooreProgramEditor(cloneJson(scenarioProgram));
+
   const [committedProgram, setCommittedProgram] = useState<MooreProgram>(() =>
     cloneJson(scenarioProgram),
   );
@@ -90,8 +100,8 @@ export const MooreSimulator = forwardRef<
   const simulation = useMooreSimulator(committedProgram);
   const isStorageEnabled = !isExample;
   const pauseSimulation = simulation.pause;
-  const issues = useMemo(() => validateMooreProgram(program), [program]);
-  const conversion = useMemo<MooreConversion | null>(
+
+  const conversion = useMemo<AutomataConversion | null>(
     () => (issues.length === 0 ? buildMooreConversion(program) : null),
     [issues.length, program],
   );
@@ -117,7 +127,7 @@ export const MooreSimulator = forwardRef<
       setIsEditMode(true);
       setActiveView("main");
     },
-    [pauseSimulation],
+    [pauseSimulation, setProgram],
   );
 
   useEffect(() => {
@@ -192,205 +202,11 @@ export const MooreSimulator = forwardRef<
       program,
       scenario,
       scenarioProgram,
+      setProgram,
       storageIdentifier,
       t,
     ],
   );
-
-  const handleTransitionChange = (
-    inputSymbol: string,
-    state: string,
-    targetState: string,
-  ) => {
-    setProgram((current) => ({
-      ...current,
-      transitions: {
-        ...current.transitions,
-        [inputSymbol]: {
-          ...current.transitions[inputSymbol],
-          [state]: targetState,
-        },
-      },
-    }));
-  };
-
-  const handleStateRename = (
-    previousName: string,
-    nextName: string,
-  ): boolean => {
-    const renamed = renameMooreState(program, previousName, nextName);
-    if (!renamed) {
-      return false;
-    }
-    setProgram(renamed);
-    return true;
-  };
-
-  const handleInputSymbolRename = (
-    previousSymbol: string,
-    nextSymbol: string,
-  ): boolean => {
-    const renamed = renameMooreInputSymbol(program, previousSymbol, nextSymbol);
-    if (!renamed) {
-      return false;
-    }
-    setProgram(renamed);
-    return true;
-  };
-
-  const handleAddState = (requestedName?: string): string => {
-    const trimmedName = requestedName?.trim();
-    const stateName =
-      trimmedName && !program.states.includes(trimmedName)
-        ? trimmedName
-        : createNextStateName(program.states);
-
-    setProgram((current) => {
-      if (current.states.includes(stateName)) {
-        return current;
-      }
-      const transitions = Object.fromEntries(
-        current.inputSymbols.map((inputSymbol) => [
-          inputSymbol,
-          {
-            ...current.transitions[inputSymbol],
-            [stateName]: current.initialState,
-          },
-        ]),
-      );
-      return {
-        ...current,
-        states: [...current.states, stateName],
-        transitions,
-        outputs: {
-          ...current.outputs,
-          [stateName]: {
-            symbol: `OUT_${current.states.length}`,
-            code: getNextMooreOutputCode(current),
-          },
-        },
-      };
-    });
-    return stateName;
-  };
-
-  const handleRemoveState = (state: string) => {
-    setProgram((current) => {
-      if (current.states.length <= 1) {
-        return current;
-      }
-      const states = current.states.filter((candidate) => candidate !== state);
-      const fallbackState = states[0];
-      const transitions = Object.fromEntries(
-        current.inputSymbols.map((inputSymbol) => [
-          inputSymbol,
-          Object.fromEntries(
-            states.map((sourceState) => {
-              const target =
-                current.transitions[inputSymbol]?.[sourceState] ??
-                fallbackState;
-              return [sourceState, target === state ? fallbackState : target];
-            }),
-          ),
-        ]),
-      );
-      const outputs = { ...current.outputs };
-      delete outputs[state];
-      return {
-        ...current,
-        states,
-        transitions,
-        outputs,
-        initialState:
-          current.initialState === state ? fallbackState : current.initialState,
-      };
-    });
-  };
-
-  const handleAddInputSymbol = () => {
-    setProgram((current) => {
-      const symbol = createNextInputSymbol(current.inputSymbols);
-      return {
-        ...current,
-        inputSymbols: [...current.inputSymbols, symbol],
-        transitions: {
-          ...current.transitions,
-          [symbol]: Object.fromEntries(
-            current.states.map((state) => [state, current.initialState]),
-          ),
-        },
-      };
-    });
-  };
-
-  const handleRemoveInputSymbol = (symbol: string) => {
-    setProgram((current) => {
-      const transitions = { ...current.transitions };
-      delete transitions[symbol];
-      return {
-        ...current,
-        inputSymbols: current.inputSymbols.filter(
-          (candidate) => candidate !== symbol,
-        ),
-        inputWord: current.inputWord.filter(
-          (candidate) => candidate !== symbol,
-        ),
-        transitions,
-      };
-    });
-  };
-
-  const handleOutputSymbolChange = (state: string, symbol: string) => {
-    setProgram((current) => {
-      const existingOutput = current.states
-        .filter((candidate) => candidate !== state)
-        .map((candidate) => current.outputs[candidate])
-        .find((output) => output.symbol === symbol);
-      return {
-        ...current,
-        outputs: {
-          ...current.outputs,
-          [state]: {
-            symbol,
-            code: existingOutput?.code ?? current.outputs[state].code,
-          },
-        },
-      };
-    });
-  };
-
-  const handleOutputCodeChange = (state: string, code: number) => {
-    setProgram((current) => {
-      const symbol = current.outputs[state].symbol;
-      return {
-        ...current,
-        outputs: Object.fromEntries(
-          current.states.map((candidate) => [
-            candidate,
-            current.outputs[candidate].symbol === symbol
-              ? { ...current.outputs[candidate], code }
-              : current.outputs[candidate],
-          ]),
-        ),
-      };
-    });
-  };
-
-  const handleOutputSymbolCreate = (state: string, symbol: string) => {
-    setProgram((current) => {
-      const code = getNextMooreOutputCode(current);
-      return {
-        ...current,
-        outputs: {
-          ...current.outputs,
-          [state]: {
-            symbol: symbol.trim() || `OUT_${code}`,
-            code,
-          },
-        },
-      };
-    });
-  };
 
   const startSimulation = () => {
     const normalized = normalizeMooreProgram(program);
@@ -409,7 +225,7 @@ export const MooreSimulator = forwardRef<
         data-testid="moore-simulator"
         className="mx-auto w-full max-w-[100rem]"
       >
-        <MooreConversionView
+        <AutomataConversionView
           conversion={conversion}
           onBackToEditor={() => {
             setIsEditMode(true);
@@ -432,7 +248,7 @@ export const MooreSimulator = forwardRef<
         data-testid="moore-simulator"
         className="mx-auto w-full max-w-[100rem]"
       >
-        <MooreLogicGateView
+        <AutomataLogicGateView
           conversion={conversion}
           onEditDefinition={() => {
             setIsEditMode(true);
@@ -472,7 +288,7 @@ export const MooreSimulator = forwardRef<
             onOutputCodeChange={handleOutputCodeChange}
           />
 
-          <MooreViewActions
+          <AutomataViewActions
             actions={[
               {
                 label: t("moore-mealy.conversion.open"),
@@ -518,7 +334,7 @@ export const MooreSimulator = forwardRef<
             onReset={() => simulation.reset()}
             onSpeedChange={simulation.setSpeed}
           />
-          <MooreViewActions
+          <AutomataViewActions
             actions={[
               {
                 label: t("moore-mealy.navigation.editDefinition"),

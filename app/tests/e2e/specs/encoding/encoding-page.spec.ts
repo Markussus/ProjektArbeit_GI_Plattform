@@ -23,7 +23,15 @@ test.describe("Encoding page", () => {
 
     await test.step("The exercises tab exposes generated exercises", async () => {
       await page.getByTestId(appTestIds.tabExercises).click();
-      // We know there are generated exercises. We just check if at least one exercise card exists.
+      await expect(
+        page.getByTestId("encoding-exercises-section-base64"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("encoding-exercises-section-utf8"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("encoding-reset-all-exercises"),
+      ).toBeVisible();
       await expect(page.locator('button[data-testid$="-select"]')).toHaveCount(
         14,
       );
@@ -31,6 +39,12 @@ test.describe("Encoding page", () => {
 
     await test.step("The examples tab shows predefined examples", async () => {
       await page.getByTestId(appTestIds.tabExamples).click();
+      await expect(
+        page.getByTestId("encoding-examples-section-base64"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("encoding-examples-section-utf8"),
+      ).toBeVisible();
       await expect(
         page.getByTestId("example-card-encoding.example_base64_2-select"),
       ).toBeVisible();
@@ -46,6 +60,27 @@ test.describe("Encoding page", () => {
       await expect(page.getByTestId("encoding-tab-utf8")).toBeVisible();
       await expect(page.getByTestId("base64-input")).toBeVisible();
     });
+  });
+
+  test("resetting all exercises creates a fresh exercise set", async ({
+    page,
+  }) => {
+    await page.getByTestId(appTestIds.tabExercises).click();
+    const firstExercise = page
+      .locator('button[data-testid$="-select"]')
+      .first();
+    await firstExercise.click();
+    await expect(
+      page.locator('button[data-testid$="-open"]').first(),
+    ).toBeVisible();
+
+    await page.getByTestId("encoding-reset-all-exercises").click();
+    await page.getByTestId("encoding-reset-all-exercises-confirm").click();
+
+    await expect(page.locator('button[data-testid$="-select"]')).toHaveCount(
+      14,
+    );
+    await expect(page.locator('button[data-testid$="-open"]')).toHaveCount(0);
   });
 
   test("base64 simulator can encode and decode", async ({ page }) => {

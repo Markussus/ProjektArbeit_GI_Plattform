@@ -207,16 +207,10 @@ export function StateMachineGraph({
               labelLayout={labelLayout}
               arrowMarkerId={arrowMarkerId}
               activeArrowMarkerId={activeArrowMarkerId}
-              offset={
-                groupedEdges.some(
-                  (candidate) =>
-                    candidate.from === edge.to && candidate.to === edge.from,
-                )
-                  ? edge.from.localeCompare(edge.to) < 0
-                    ? 18
-                    : -18
-                  : 0
-              }
+              isBidirectional={groupedEdges.some(
+                (candidate) =>
+                  candidate.from === edge.to && candidate.to === edge.from,
+              )}
             />
           );
         })}
@@ -382,7 +376,7 @@ function GraphButton({
   children: React.ReactNode;
 }) {
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} side="bottom">
       <button
         type="button"
         aria-label={label}
@@ -448,7 +442,7 @@ function DirectedEdge({
   to,
   label,
   active,
-  offset = 0,
+  isBidirectional = false,
   labelLayout,
   arrowMarkerId,
   activeArrowMarkerId,
@@ -457,7 +451,7 @@ function DirectedEdge({
   to: Point;
   label: string;
   active?: boolean;
-  offset?: number;
+  isBidirectional?: boolean;
   labelLayout: "wrapped" | "list";
   arrowMarkerId: string;
   activeArrowMarkerId: string;
@@ -467,16 +461,60 @@ function DirectedEdge({
   const distance = Math.hypot(dx, dy) || 1;
   const unitX = dx / distance;
   const unitY = dy / distance;
+  const normX = -unitY;
+  const normY = unitX;
+
+  if (isBidirectional) {
+    const lateralShift = 10;
+    const curveAmount = 26;
+    const start = {
+      x: from.x + unitX * NODE_RADIUS + normX * lateralShift,
+      y: from.y + unitY * NODE_RADIUS + normY * lateralShift,
+    };
+    const end = {
+      x: to.x - unitX * (NODE_RADIUS + 8) + normX * lateralShift,
+      y: to.y - unitY * (NODE_RADIUS + 8) + normY * lateralShift,
+    };
+    const midX = (start.x + end.x) / 2;
+    const midY = (start.y + end.y) / 2;
+    const controlX = midX + normX * curveAmount;
+    const controlY = midY + normY * curveAmount;
+
+    const labelX = midX + normX * (curveAmount + 16);
+    const labelY = midY + normY * (curveAmount + 16);
+
+    const pathData = `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
+
+    return (
+      <g>
+        <path
+          d={pathData}
+          fill="none"
+          className={active ? "stroke-brand" : "stroke-muted-foreground"}
+          strokeWidth={active ? 4 : 2}
+          markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
+        />
+        <EdgeLabel
+          x={labelX}
+          y={labelY}
+          label={label}
+          active={active}
+          layout={labelLayout}
+        />
+      </g>
+    );
+  }
+
   const start = {
-    x: from.x + unitX * NODE_RADIUS - unitY * offset,
-    y: from.y + unitY * NODE_RADIUS + unitX * offset,
+    x: from.x + unitX * NODE_RADIUS,
+    y: from.y + unitY * NODE_RADIUS,
   };
   const end = {
-    x: to.x - unitX * (NODE_RADIUS + 8) - unitY * offset,
-    y: to.y - unitY * (NODE_RADIUS + 8) + unitX * offset,
+    x: to.x - unitX * (NODE_RADIUS + 8),
+    y: to.y - unitY * (NODE_RADIUS + 8),
   };
-  const labelX = (start.x + end.x) / 2 - unitY * 14;
-  const labelY = (start.y + end.y) / 2 + unitX * 14;
+  const labelX = (start.x + end.x) / 2 + normX * 16;
+  const labelY = (start.y + end.y) / 2 + normY * 16;
 
   return (
     <g>

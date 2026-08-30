@@ -31,6 +31,12 @@
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode"
   },
+  "font": {
+    "title": "Typography",
+    "description": "Choose between Geist and Inter as the primary platform font.",
+    "geist": "Geist",
+    "inter": "Inter"
+  },
   "language": {
     "select": "Select language",
     "de": "German",

@@ -30,19 +30,12 @@ import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
 import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
+import {
+  type JavaValidationRunResult,
+  runExerciseValidation,
+} from "./domain/javaValidationRunner";
 
-export interface JavaValidationRunRow {
-  id: string;
-  passed: boolean;
-  output: string;
-  expectedOutput: string;
-  phase: string;
-}
-
-export interface JavaValidationRunResult {
-  rows: JavaValidationRunRow[];
-  error?: string;
-}
+export type { JavaValidationRunResult };
 
 export interface JavaSimulatorHandle {
   loadSolution: () => void;
@@ -193,40 +186,17 @@ const JavaSimulatorSession = forwardRef<
         setCode(exerciseScenario.solutionCode);
         reset();
       },
-      checkSolution: async () => {
-        if (!exerciseScenario) {
-          return {
-            rows: [],
-            error: t("java-programming.validation.exampleCheckUnavailable"),
-          };
-        }
-
-        const rows: JavaValidationRunRow[] = [];
-
-        for (const validationCase of exerciseScenario.validationCases) {
-          const source = validationCase.sourceTransform?.(code) ?? code;
-          const result = await runAsync({
-            source,
-            exerciseId: exerciseScenario.id,
-            timeoutMs: timeoutSeconds * 1000,
-            stdin: validationCase.stdin ?? standardInput,
-          });
-          const output = result.stdout.join("");
-
-          rows.push({
-            id: validationCase.id,
-            passed:
-              result.phase === "done" &&
-              normalizeOutput(output) ===
-                normalizeOutput(validationCase.expectedStdout),
-            output,
-            expectedOutput: validationCase.expectedStdout,
-            phase: result.phase,
-          });
-        }
-
-        return { rows };
-      },
+      checkSolution: () =>
+        runExerciseValidation({
+          exerciseScenario,
+          code,
+          standardInput,
+          timeoutSeconds,
+          runAsync,
+          exampleCheckUnavailableError: t(
+            "java-programming.validation.exampleCheckUnavailable",
+          ),
+        }),
     }),
     [
       code,
@@ -351,7 +321,3 @@ const JavaSimulatorSession = forwardRef<
     </div>
   );
 });
-
-function normalizeOutput(output: string) {
-  return output.replace(/\r\n/g, "\n").trimEnd();
-}

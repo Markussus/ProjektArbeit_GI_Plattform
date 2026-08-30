@@ -104,6 +104,52 @@ export const tmProgramTransferCodec: ISimulatorTransferCodec<TMProgram> = {
 };
 
 function normalizeProgram(program: TMProgram): NormalizedProgram {
+  validateTransferProgram(program);
+
+  const haltStates = new Set(program.haltStates);
+  const { sourceStates, targetedStates } = collectReferencedStates(
+    program.transitions,
+    haltStates,
+  );
+  const { nonHaltStates, usedHaltStates, stateIds } = resolveNormalizedStates(
+    program,
+    sourceStates,
+    targetedStates,
+    haltStates,
+  );
+
+  const readableSymbols = Object.entries(program.transitions)
+    .filter(([, stateTransitions]) => stateTransitions !== undefined)
+    .map(([readSymbol]) => readSymbol);
+
+  const { symbols, symbolIds, readableSymbolIds } = resolveNormalizedSymbols(
+    program,
+    readableSymbols,
+    nonHaltStates,
+  );
+
+  const transitionCells = buildNormalizedTransitionCells(
+    program,
+    nonHaltStates,
+    readableSymbolIds,
+    symbols,
+    stateIds,
+    symbolIds,
+  );
+
+  return {
+    nonHaltStateCount: nonHaltStates.length,
+    haltStateCount: usedHaltStates.length,
+    symbols,
+    initialTape: program.initialTape.map((symbol) =>
+      getRequiredMapValue(symbolIds, symbol),
+    ),
+    readableSymbolIds,
+    transitionCells,
+  };
+}
+
+function validateTransferProgram(program: TMProgram): void {
   const programWithDerivedAlphabets = withDerivedAlphabets(program);
   if (
     !isTMProgramTransferValid(programWithDerivedAlphabets) ||
@@ -114,24 +160,40 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
   ) {
     throw new Error("tm_transfer_program_invalid");
   }
+}
 
-  const haltStates = new Set(program.haltStates);
-  const targetedStates = new Set<string>();
+function collectReferencedStates(
+  transitions: TMProgram["transitions"],
+  haltStates: Set<string>,
+): { sourceStates: Set<string>; targetedStates: Set<string> } {
   const sourceStates = new Set<string>();
+  const targetedStates = new Set<string>();
 
-  for (const stateTransitions of Object.values(program.transitions)) {
+  for (const stateTransitions of Object.values(transitions)) {
     for (const [sourceState, transition] of Object.entries(
       stateTransitions ?? {},
     )) {
       if (!transition || haltStates.has(sourceState)) {
         continue;
       }
-
       sourceStates.add(sourceState);
       targetedStates.add(transition.nextState);
     }
   }
 
+  return { sourceStates, targetedStates };
+}
+
+function resolveNormalizedStates(
+  program: TMProgram,
+  sourceStates: Set<string>,
+  targetedStates: Set<string>,
+  haltStates: Set<string>,
+): {
+  nonHaltStates: string[];
+  usedHaltStates: string[];
+  stateIds: Map<string, number>;
+} {
   const nonHaltStates = [
     program.initialState,
     ...program.states.filter(
@@ -146,7 +208,6 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
   );
 
   const stateIds = new Map<string, number>();
-
   for (const [stateId, state] of [
     ...nonHaltStates,
     ...usedHaltStates,
@@ -154,9 +215,18 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
     stateIds.set(state, stateId);
   }
 
-  const readableSymbols = Object.entries(program.transitions)
-    .filter(([, stateTransitions]) => stateTransitions !== undefined)
-    .map(([readSymbol]) => readSymbol);
+  return { nonHaltStates, usedHaltStates, stateIds };
+}
+
+function resolveNormalizedSymbols(
+  program: TMProgram,
+  readableSymbols: string[],
+  nonHaltStates: string[],
+): {
+  symbols: string[];
+  symbolIds: Map<string, number>;
+  readableSymbolIds: number[];
+} {
   const usedSymbols = collectUsedSymbols(
     program,
     readableSymbols,
@@ -170,10 +240,23 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
           ...SYMBOL_REGISTRY.filter((symbol) => usedSymbols.includes(symbol)),
         ]
       : usedSymbols;
+
   const symbolIds = new Map(symbols.map((symbol, index) => [symbol, index]));
   const readableSymbolIds = readableSymbols
     .map((symbol) => getRequiredMapValue(symbolIds, symbol))
     .sort((left, right) => left - right);
+
+  return { symbols, symbolIds, readableSymbolIds };
+}
+
+function buildNormalizedTransitionCells(
+  program: TMProgram,
+  nonHaltStates: string[],
+  readableSymbolIds: number[],
+  symbols: string[],
+  stateIds: Map<string, number>,
+  symbolIds: Map<string, number>,
+): Array<NormalizedTransition | undefined> {
   const transitionCells: Array<NormalizedTransition | undefined> = [];
 
   for (const symbolId of readableSymbolIds) {
@@ -190,16 +273,7 @@ function normalizeProgram(program: TMProgram): NormalizedProgram {
     }
   }
 
-  return {
-    nonHaltStateCount: nonHaltStates.length,
-    haltStateCount: usedHaltStates.length,
-    symbols,
-    initialTape: program.initialTape.map((symbol) =>
-      getRequiredMapValue(symbolIds, symbol),
-    ),
-    readableSymbolIds,
-    transitionCells,
-  };
+  return transitionCells;
 }
 
 function collectUsedSymbols(
@@ -422,35 +496,18 @@ function writeTransition(
 function restoreImportedProgram(serializedProgram: string): TMProgram {
   try {
     const reader = BitReader.fromBase64Url(serializedProgram);
-    const nonHaltStateCount = reader.readVarUint();
-    const haltStateCount = reader.readVarUint();
-    const symbolCount = reader.readVarUint();
-    const initialTapeLength = reader.readVarUint();
-
-    assertCollectionSize(nonHaltStateCount);
-    assertCollectionSize(haltStateCount);
-    assertCollectionSize(symbolCount);
-    assertCollectionSize(initialTapeLength);
-
-    if (nonHaltStateCount < 1 || symbolCount < 1) {
-      throw new Error("tm_transfer_payload_invalid");
-    }
-
-    const totalStateCount = nonHaltStateCount + haltStateCount;
-    assertCollectionSize(totalStateCount);
-
+    const header = readTransferHeader(reader);
     const symbolMode = reader.readBits(1);
     const transitionMode = reader.readBits(2);
-    const symbols = readSymbolDictionary(reader, symbolMode, symbolCount);
-    const readableSymbolIds: number[] = [];
+    const symbols = readSymbolDictionary(
+      reader,
+      symbolMode,
+      header.symbolCount,
+    );
+    const readableSymbolIds = readReadableSymbolIds(reader, header.symbolCount);
 
-    for (let symbolId = 0; symbolId < symbolCount; symbolId++) {
-      if (reader.readBit() === 1) {
-        readableSymbolIds.push(symbolId);
-      }
-    }
-
-    const possibleCellCount = readableSymbolIds.length * nonHaltStateCount;
+    const possibleCellCount =
+      readableSymbolIds.length * header.nonHaltStateCount;
     if (
       !Number.isSafeInteger(possibleCellCount) ||
       possibleCellCount > MAX_TRANSITION_CELLS
@@ -458,46 +515,36 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
       throw new Error("tm_transfer_payload_invalid");
     }
 
-    const symbolBits = bitsNeeded(symbolCount);
-    const initialTape = Array.from({ length: initialTapeLength }, () => {
+    const symbolBits = bitsNeeded(header.symbolCount);
+    const initialTape = Array.from({ length: header.initialTapeLength }, () => {
       const symbolId = reader.readBits(symbolBits);
-      assertIdInRange(symbolId, symbolCount);
+      assertIdInRange(symbolId, header.symbolCount);
       return symbols[symbolId];
     });
-    const stateBits = bitsNeeded(totalStateCount);
+    const stateBits = bitsNeeded(header.totalStateCount);
     const transitionCells = readTransitionCells(
       reader,
       transitionMode,
       possibleCellCount,
       stateBits,
       symbolBits,
-      totalStateCount,
-      symbolCount,
+      header.totalStateCount,
+      header.symbolCount,
     );
 
     reader.assertOnlyPaddingRemains();
 
-    const states = createCanonicalStateNames(nonHaltStateCount, haltStateCount);
-    const transitions: TMProgram["transitions"] = {};
-    let cellIndex = 0;
-
-    for (const symbolId of readableSymbolIds) {
-      const stateTransitions: NonNullable<TMProgram["transitions"][string]> =
-        {};
-
-      for (let stateId = 0; stateId < nonHaltStateCount; stateId++) {
-        const transition = transitionCells[cellIndex++];
-        if (transition) {
-          stateTransitions[states[stateId]] = {
-            nextState: states[transition.nextState],
-            writeSymbol: symbols[transition.writeSymbol],
-            movement: transition.movement,
-          };
-        }
-      }
-
-      transitions[symbols[symbolId]] = stateTransitions;
-    }
+    const states = createCanonicalStateNames(
+      header.nonHaltStateCount,
+      header.haltStateCount,
+    );
+    const transitions = reconstructProgramTransitions(
+      states,
+      symbols,
+      readableSymbolIds,
+      header.nonHaltStateCount,
+      transitionCells,
+    );
 
     const program = withDerivedAlphabets({
       states,
@@ -505,7 +552,7 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
       tapeAlphabet: symbols,
       blankSymbol: DEFAULT_BLANK_SYMBOL,
       initialState: "q0",
-      haltStates: states.slice(nonHaltStateCount),
+      haltStates: states.slice(header.nonHaltStateCount),
       transitions,
       initialTape,
     });
@@ -520,6 +567,82 @@ function restoreImportedProgram(serializedProgram: string): TMProgram {
   }
 }
 
+function readTransferHeader(reader: BitReader): {
+  nonHaltStateCount: number;
+  haltStateCount: number;
+  symbolCount: number;
+  initialTapeLength: number;
+  totalStateCount: number;
+} {
+  const nonHaltStateCount = reader.readVarUint();
+  const haltStateCount = reader.readVarUint();
+  const symbolCount = reader.readVarUint();
+  const initialTapeLength = reader.readVarUint();
+
+  assertCollectionSize(nonHaltStateCount);
+  assertCollectionSize(haltStateCount);
+  assertCollectionSize(symbolCount);
+  assertCollectionSize(initialTapeLength);
+
+  if (nonHaltStateCount < 1 || symbolCount < 1) {
+    throw new Error("tm_transfer_payload_invalid");
+  }
+
+  const totalStateCount = nonHaltStateCount + haltStateCount;
+  assertCollectionSize(totalStateCount);
+
+  return {
+    nonHaltStateCount,
+    haltStateCount,
+    symbolCount,
+    initialTapeLength,
+    totalStateCount,
+  };
+}
+
+function readReadableSymbolIds(
+  reader: BitReader,
+  symbolCount: number,
+): number[] {
+  const readableSymbolIds: number[] = [];
+  for (let symbolId = 0; symbolId < symbolCount; symbolId++) {
+    if (reader.readBit() === 1) {
+      readableSymbolIds.push(symbolId);
+    }
+  }
+  return readableSymbolIds;
+}
+
+function reconstructProgramTransitions(
+  states: string[],
+  symbols: string[],
+  readableSymbolIds: number[],
+  nonHaltStateCount: number,
+  transitionCells: Array<NormalizedTransition | undefined>,
+): TMProgram["transitions"] {
+  const transitions: TMProgram["transitions"] = {};
+  let cellIndex = 0;
+
+  for (const symbolId of readableSymbolIds) {
+    const stateTransitions: NonNullable<TMProgram["transitions"][string]> = {};
+
+    for (let stateId = 0; stateId < nonHaltStateCount; stateId++) {
+      const transition = transitionCells[cellIndex++];
+      if (transition) {
+        stateTransitions[states[stateId]] = {
+          nextState: states[transition.nextState],
+          writeSymbol: symbols[transition.writeSymbol],
+          movement: transition.movement,
+        };
+      }
+    }
+
+    transitions[symbols[symbolId]] = stateTransitions;
+  }
+
+  return transitions;
+}
+
 function isTMProgramTransferValid(program: TMProgram): boolean {
   return validateTMProgram(program).every(
     (issue) => issue.code === "halt_states_empty",
@@ -532,25 +655,39 @@ function readSymbolDictionary(
   symbolCount: number,
 ): string[] {
   if (symbolMode === SymbolMode.Registry) {
-    const symbols = [DEFAULT_BLANK_SYMBOL];
-
-    for (const symbol of SYMBOL_REGISTRY) {
-      if (reader.readBit() === 1) {
-        symbols.push(symbol);
-      }
-    }
-
-    if (symbols.length !== symbolCount) {
-      throw new Error("tm_transfer_payload_invalid");
-    }
-
-    return symbols;
+    return readRegistrySymbolDictionary(reader, symbolCount);
   }
 
-  if (symbolMode !== SymbolMode.RawUtf8) {
+  if (symbolMode === SymbolMode.RawUtf8) {
+    return readRawUtf8SymbolDictionary(reader, symbolCount);
+  }
+
+  throw new Error("tm_transfer_payload_invalid");
+}
+
+function readRegistrySymbolDictionary(
+  reader: BitReader,
+  symbolCount: number,
+): string[] {
+  const symbols = [DEFAULT_BLANK_SYMBOL];
+
+  for (const symbol of SYMBOL_REGISTRY) {
+    if (reader.readBit() === 1) {
+      symbols.push(symbol);
+    }
+  }
+
+  if (symbols.length !== symbolCount) {
     throw new Error("tm_transfer_payload_invalid");
   }
 
+  return symbols;
+}
+
+function readRawUtf8SymbolDictionary(
+  reader: BitReader,
+  symbolCount: number,
+): string[] {
   const decoder = new TextDecoder("utf-8", { fatal: true });
   const symbols = [DEFAULT_BLANK_SYMBOL];
 

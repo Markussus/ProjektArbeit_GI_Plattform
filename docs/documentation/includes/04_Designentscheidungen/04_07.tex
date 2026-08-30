@@ -1,23 +1,35 @@
 \subNsection{1}{Encoding}{Enrico Ebert}
 
-Ziel des Encoding-Moduls ist es, die Transformation zwischen unstrukturiertem Text, Codepoints und binären Byte-Sequenzen transparent zu machen. Wir haben die praxisrelevanten Standards UTF-8 und Base64 vollständig implementiert. Der Fokus liegt darauf, die mathematischen und bitweisen Zwischenschritte – wie Bitmasken bei UTF-8 oder das Padding bei Base64 – für Studierende visuell nachvollziehbar darzustellen.
+Ziel des Encoding-Moduls ist es, die Transformation zwischen unstrukturiertem Text, Codepoints und binären Byte-Sequenzen transparent zu machen. Wir haben die praxisrelevanten Standards \gls{utf8} und \gls{base64} vollständig implementiert. Der Fokus liegt darauf, die mathematischen und bitweisen Zwischenschritte – wie Bitmasken bei \gls{utf8} oder das Padding bei \gls{base64} – für Studierende visuell nachvollziehbar darzustellen.
+
+\subNsection{2}{Anforderungen und Herausforderungen}{Enrico Ebert}
+
+Die Implementierung von Encoding-Verfahren stellte uns vor die Herausforderung, komplexe Byte-Operationen für Studierende verständlich zu machen. UTF-8 und \gls{base64} sind in der Praxis allgegenwärtig, doch die internen Abläufe bleiben oft undurchsichtig. Wir wollten einen Simulator schaffen, der jeden Zwischenschritt einzeln sichtbar macht und so das Verständnis für die zugrundeliegenden Algorithmen fördert.
 
 \subNsection{2}{Architektur}{Enrico Ebert}
 
-Die Architektur trennt Datenmodell, Transformationslogik und UI strikt. Der Zustand wird zentral verwaltet. Child-Komponenten besitzen keinen eigenen Zustand für verarbeitete Daten, sondern geben Änderungen über State Lifting an die Simulator-Komponente weiter. Um beim Wechsel von Übungen einen sauberen Zustand ohne Artefakte zu garantieren, erzwingen wir über dynamische \texttt{key}-Attribute gezielte React-Remounts.
+Wir haben die Architektur in drei klar getrennte Schichten unterteilt: Datenmodell, Transformationslogik und UI. Diese Trennung ermöglichte es uns, die Logik unabhängig von der Darstellung zu entwickeln und zu testen. Der Zustand wird zentral in der Simulator-Komponente verwaltet. Child-Komponenten besitzen keinen eigenen Zustand für verarbeitete Daten, sondern geben Änderungen über State Lifting an die übergeordnete Komponente weiter.
 
-Die UTF-8-Logik nutzt konsequent \texttt{Array.from()} zur sicheren Iteration über Unicode-Codepoints, um Fehler durch Surrogate-Pairs (UTF-16) zu vermeiden. Der Decoder validiert Byteströme streng und weist Sicherheitsrisiken wie \textit{Overlong Encodings} konsequent ab. Die Base64-Pipeline arbeitet iterativ in vier Stufen: ASCII-Konvertierung, 8-Bit-Verkettung, 6-Bit-Aufteilung und abschließendes Padding (\texttt{======}).
+Ein technisches Detail verdient besondere Erwähnung: Um beim Wechsel von Übungen einen sauberen Zustand ohne Artefakte zu garantieren, erzwingen wir über dynamische \texttt{key}-Attribute gezielte React-Remounts. Diese Technik stellte sich als notwendig heraus, da reguläres State-Clearing manchmal zu Race Conditions bei schnellen Übergängen führte.
 
-Übungen werden programmgesteuert dynamisch generiert; eine statische Liste existiert nicht. Der Generator erzeugt pro Schwierigkeitsgrad (z.\,B. reines ASCII für \textit{easy}, 3-Byte-Unicode für \textit{hard}) Aufgaben inklusive der kanonischen Lösung. Da diese Aufgaben ephemere IDs erhalten, wird der Fortschritt hier im Gegensatz zum freien Modus nicht dauerhaft gespeichert.
+Die \gls{utf8}-Logik nutzt konsequent \texttt{Array.from()} zur sicheren Iteration über Unicode-Codepoints. Diese Entscheidung begründet sich darin, dass JavaScripts String-Iteration über Surrogate-Pairs stolpern kann, was zu fehlerhaften Ergebnissen bei emoji und anderen 4-Byte-Zeichen führt. Der Decoder validiert Byteströme streng und weist Sicherheitsrisiken wie \textit{Overlong Encodings} konsequent ab. Solche Encodings würden mehr Bytes vorschützen als nötig und stellen ein Sicherheitsrisiko dar.
+
+Die \gls{base64}-Pipeline arbeitet iterativ in vier Stufen: ASCII-Konvertierung, 8-Bit-Verkettung, 6-Bit-Aufteilung und abschließendes Padding. Wir haben uns für diese schrittweise Darstellung entschieden, damit Studierende sehen können, wie die ursprünglichen 8-Bit-Bytes in die 6-Bit-Gruppen von \gls{base64} zerlegt werden.
+
+\subNsection{2}{Übungsmodus}{Enrico Ebert}
+
+Wir haben uns dagegen entschieden, eine statische Liste von Übungen zu pflegen. Stattdessen werden Übungen programmgesteuert dynamisch generiert. Der Generator erzeugt pro Schwierigkeitsgrad Aufgaben inklusive der kanonischen Lösung. Für den Schwierigkeitsgrad \textit{easy} beschränken wir uns auf reines \gls{ascii}, für \textit{medium} nutzen wir 2-Byte-\gls{unicode}, und für \textit{hard} kommen 3-Byte-\gls{unicode}-Zeichen zum Einsatz.
+
+Da diese Aufgaben ephemere IDs erhalten, wird der Fortschritt im Übungsmodus nicht dauerhaft gespeichert. Diese Entscheidung reflektiert die Natur von Übungen als Wegwerf-Tests. Der freie Simulator speichert jedoch weiterhin automatisch, um ein gutes Benutzererlebnis zu gewährleisten.
 
 \subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
 
-Das UI visualisiert abstrakte Bitoperationen detailliert auf Byte-Ebene. Jeder Zwischenschritt lässt sich aufklappen. Bei UTF-8 werden Steuerbits zur besseren Unterscheidung rot und Nutzbits blau hervorgehoben. Bei Base64 weisen wir die 6-Bit-Gruppen und das Padding explizit aus. Nicht-druckbare Zeichen werden als Escape-Sequenzen (z.\,B. \texttt{\textbackslash x0A}) dargestellt, um das Layout nicht zu brechen.
+Das UI visualisiert abstrakte Bitoperationen detailliert auf Byte-Ebene. Wir haben jeden Zwischenschritt aufklappbar gemacht, sodass Studierende selbst entscheiden können, wie tief sie in die Details einsteigen möchten.
 
-Wir verzichten bewusst auf zeitgesteuerte Animationen. Der statische \textit{Step-by-Step}-Ansatz gibt den Studierenden die nötige Zeit, die Transformationen in ihrem eigenen Tempo zu analysieren.
+Bei \gls{utf8} werden Steuerbits zur besseren Unterscheidung rot und Nutzbits blau hervorgehoben. Diese Farbcodierung half uns dabei, die komplexen Bitmuster der \gls{utf8}-Länge-Codierung verständlicher zu machen. Bei \gls{base64} weisen wir die 6-Bit-Gruppen und das Padding explizit aus. Nicht-druckbare Zeichen werden als Escape-Sequenzen dargestellt, um das Layout nicht zu brechen.
 
-Im Übungsmodus gibt ein Validierungspanel die Lösung erst bei korrekter Eingabe frei. Ein Warn-Dialog verhindert versehentlichen Fortschrittsverlust beim Tab-Wechsel. Das automatische Speichern ist im Übungsmodus deaktiviert und greift nur im freien Simulator-Modus.
+Wir verzichten bewusst auf zeitgesteuerte Animationen. Der statische Step-by-Step-Ansatz gibt den Studierenden die nötige Zeit, die Transformationen in ihrem eigenen Tempo zu analysieren. Animationen hätten zwar optisch ansprechender gewirkt, aber den didaktischen Wert reduziert, da Studierende nicht in der Lage sind, einzelne Schritte zu kontrollieren.
 
-\subNsection{2}{Andere Entscheidungen}{Enrico Ebert}
+Im Übungsmodus gibt ein Validierungspanel die Lösung erst bei korrekter Eingabe frei. Das automatische Speichern ist im Übungsmodus deaktiviert und greift nur im freien Simulator-Modus, da wir es als wichtig erachteten, dass Studierende ihre Eingaben bewusst und nicht versehentlich speichern.
 
-Der Modul-übergreifende Zustandstransfer (\textit{Import/Export}) erfolgt Unicode-sicher via Base64URL-Kodierung inklusive Fallback auf Standard-JSON.
+

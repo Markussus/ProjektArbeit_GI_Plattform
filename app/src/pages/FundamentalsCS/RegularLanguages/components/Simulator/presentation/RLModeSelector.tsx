@@ -1,22 +1,11 @@
 import { useTranslation } from "react-i18next";
-import {
-  Eye,
-  FileText,
-  ListOrdered,
-  Maximize2,
-  RotateCcw,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { Eye, FileText, ListOrdered, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SimulationMode } from "../domain/rlTypes";
 
 interface RLModeSelectorProps {
   mode: SimulationMode;
   onChange: (mode: SimulationMode) => void;
-  isFocused?: boolean;
-  onToggleFocus?: () => void;
-  onReset?: () => void;
 }
 
 interface ModeMeta {
@@ -47,19 +36,12 @@ const MODES: ModeMeta[] = [
   },
 ];
 
-export function RLModeSelector({
-  mode,
-  onChange,
-  isFocused,
-  onToggleFocus,
-  onReset,
-}: RLModeSelectorProps) {
+export function RLModeSelector({ mode, onChange }: RLModeSelectorProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      {/* 3 distinct standalone blocks with even spacing */}
-      <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="bg-card ring-foreground/10 rounded-xl p-2 ring-1 md:mr-24">
+      <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
         {MODES.map(({ id, icon: Icon, labelKey, fallback }) => {
           const active = mode === id;
           return (
@@ -68,10 +50,10 @@ export function RLModeSelector({
               type="button"
               onClick={() => onChange(id)}
               className={cn(
-                "flex items-center justify-center gap-2 rounded-xl border p-3 text-center text-sm font-medium transition-all",
+                "flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "bg-brand text-brand-foreground border-brand font-semibold shadow-sm"
-                  : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground shadow-xs",
+                  ? "bg-brand text-brand-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -80,49 +62,6 @@ export function RLModeSelector({
           );
         })}
       </div>
-
-      {/* Action buttons (Reset & Expand) placed alongside without any overlap */}
-      {(onReset || onToggleFocus) && (
-        <div className="flex shrink-0 items-center justify-end gap-2">
-          {onReset && (
-            <button
-              type="button"
-              onClick={onReset}
-              data-testid="simulation-reset"
-              aria-label={t("common.trainingCenter.resetCurrent")}
-              title={t("common.trainingCenter.resetCurrent")}
-              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
-            >
-              <RotateCcw className="size-4" />
-            </button>
-          )}
-          {onToggleFocus && (
-            <button
-              type="button"
-              onClick={onToggleFocus}
-              data-testid="simulation-focus-toggle"
-              aria-pressed={isFocused}
-              aria-label={
-                isFocused
-                  ? t("common.simulation.exitFocus")
-                  : t("common.simulation.expand")
-              }
-              title={
-                isFocused
-                  ? t("common.simulation.close")
-                  : t("common.simulation.expand")
-              }
-              className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex size-9 shrink-0 items-center justify-center rounded-md border focus-visible:ring-2 focus-visible:outline-none"
-            >
-              {isFocused ? (
-                <X className="size-4" />
-              ) : (
-                <Maximize2 className="size-4" />
-              )}
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }

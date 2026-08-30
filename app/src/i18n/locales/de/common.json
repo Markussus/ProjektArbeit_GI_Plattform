@@ -31,6 +31,12 @@
     "switchToLight": "Zu hellem Modus wechseln",
     "switchToDark": "Zu dunklem Modus wechseln"
   },
+  "font": {
+    "title": "Schriftart",
+    "description": "Wähle zwischen Geist und Inter als primäre Schriftart der Plattform.",
+    "geist": "Geist",
+    "inter": "Inter"
+  },
   "language": {
     "select": "Sprache auswählen",
     "de": "Deutsch",

@@ -43,6 +43,34 @@
     "cruise": {
       "title": "Cruise control",
       "description": "Model simplified cruise control with OFF, READY, and ACTIVE states. ON_OFF controls power, SET activates regulation, braking or accelerating deactivates it, RESET resumes the stored speed, CANCEL deactivates it, and PLUS/MINUS adjust the speed while active. Abstract from the concrete speed value and define suitable Moore outputs."
+    },
+    "edgeDetector": {
+      "title": "Rising-edge detector",
+      "description": "Design a Mealy machine that emits RISING_EDGE only when the input signal changes from 0 to 1. An unchanged signal or a falling edge emits NO_PULSE."
+    },
+    "doorController": {
+      "title": "Door control with action pulses",
+      "description": "Model a locked and an unlocked door as a Mealy machine. CARD emits UNLOCK_PULSE only when it unlocks the door; PASS emits LOCK_PULSE only when it locks the door again. Events without an effect emit NO_ACTION."
+    },
+    "sequenceDetector": {
+      "title": "01 sequence detector",
+      "description": "Design an overlap-capable Mealy machine that reports immediately for every input bit whether that bit completes the sequence 01. Consecutive zeros must remain a possible start of the next match."
+    },
+    "parityTracker": {
+      "title": "Serial parity output",
+      "description": "Design a Mealy machine that outputs the parity of all ones read so far after every input bit. A zero preserves parity; a one toggles between EVEN_PARITY and ODD_PARITY."
+    }
+  },
+  "groups": {
+    "moore": {
+      "title": "Moore machines",
+      "examplesDescription": "State-dependent output: the current state determines the output independently of the input symbol currently being read.",
+      "exercisesDescription": "Construct machines whose outputs are associated exclusively with states."
+    },
+    "mealy": {
+      "title": "Mealy machines",
+      "examplesDescription": "Transition-dependent output: the example detects the bit sequence 101, including overlapping matches, and emits MATCH_101 on the transition that completes a match.",
+      "exercisesDescription": "Construct machines with immediate outputs that depend on both the current state and the input."
     }
   },
   "examples": {
@@ -51,7 +79,7 @@
     "mooreTitle": "Moore example machine",
     "mooreDescription": "A Moore machine with four states and two input symbols.",
     "mealyTitle": "Mealy example machine",
-    "mealyDescription": "A Mealy machine with two states and transition-dependent outputs."
+    "mealyDescription": "A three-state Mealy sequence detector recognizes 101, including overlapping matches. It emits NO_MATCH or MATCH_101 directly on every transition; the bundled input contains two matches."
   },
   "title": "Moore & Mealy Machines",
   "description": "Explore sequential circuit design with Moore and Mealy state machines. Learn the differences and when to apply each model.",

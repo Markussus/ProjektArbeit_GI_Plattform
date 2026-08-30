@@ -5,10 +5,9 @@
  * Ausführen aus dem `app/`-Ordner:
  *
  *   node scripts/fallow-filter.mjs --[tm|dnf|encoding|fa|mm|ns|rl|java|shared|rest|all]
- *   (oder: npm run fallow:filter -- --[tm|dnf|encoding|fa|mm|ns|rl|java|shared|rest|all])
  *
  * ----------------------------------------------------------------------------
- * 1. MODULE & TOPIC FLAGS:
+ * 1. MODULE & TOPIC FLAGS (inkl. zugehöriger Unit- & E2E-Tests):
  * ----------------------------------------------------------------------------
  *   FundamentalsCS:
  *     --tm | --turing | --turing-machine   -> TuringMachine
@@ -23,7 +22,7 @@
  *     --java                               -> Java
  *
  *   Komponenten & Rest:
- *     --shared                             -> Shared Components (src/components/shared/)
+ *     --shared                             -> Shared Components (src/components/shared/ & tests/unit_tests/shared/)
  *     --rest | --other                     -> Rest der Seite (weder Topic noch Shared)
  *     --all | -a                           -> Gesamte Codebase (alle Findings)
  *
@@ -50,7 +49,7 @@
  * ----------------------------------------------------------------------------
  * 4. BEISPIELE FÜR ERLAUBTE KOMBINATIONEN:
  * ----------------------------------------------------------------------------
- *   # Einzelnes Modul:
+ *   # Einzelnes Modul (inkl. Tests):
  *   node scripts/fallow-filter.mjs --tm
  *   node scripts/fallow-filter.mjs --shared
  *   node scripts/fallow-filter.mjs --rest
@@ -111,7 +110,8 @@ function normalizePath(p) {
 }
 
 /**
- * Discover all topics in FundamentalsCS and Programming1, plus shared components.
+ * Discover all topics in FundamentalsCS and Programming1, plus shared components,
+ * and build comprehensive path prefixes including source code, unit tests, and e2e tests.
  */
 function discoverTopics() {
   const topics = new Map();
@@ -152,6 +152,47 @@ function discoverTopics() {
           aliases.add("--turing");
         }
 
+        const catLower = categoryLabel.toLowerCase();
+        const pathPrefixes = [
+          // Source folders
+          relPath.toLowerCase(),
+          `src/pages/${catLower}/${lower}/`,
+          `src/pages/${catLower}/${kebab}/`,
+          `src/pages/${lower}/`,
+          `src/pages/${kebab}/`,
+
+          // Unit tests (both categorized and top-level subfolders)
+          `tests/unit_tests/${catLower}/${lower}/`,
+          `tests/unit_tests/${catLower}/${kebab}/`,
+          `tests/unit_tests/${lower}/`,
+          `tests/unit_tests/${kebab}/`,
+          `tests/unit_tests/${folderName.toLowerCase()}/`,
+
+          // Unit test standalone files
+          `tests/unit_tests/${catLower}/${lower}.test.`,
+          `tests/unit_tests/${catLower}/${kebab}.test.`,
+          `tests/unit_tests/${catLower}/${lower}.spec.`,
+          `tests/unit_tests/${catLower}/${kebab}.spec.`,
+          `tests/unit_tests/${lower}.test.`,
+          `tests/unit_tests/${kebab}.test.`,
+          `tests/unit_tests/${lower}.spec.`,
+          `tests/unit_tests/${kebab}.spec.`,
+
+          // E2E spec folders
+          `tests/e2e/specs/${catLower}/${lower}/`,
+          `tests/e2e/specs/${catLower}/${kebab}/`,
+          `tests/e2e/specs/${lower}/`,
+          `tests/e2e/specs/${kebab}/`,
+
+          // E2E root spec files
+          `tests/e2e/${kebab}.spec.`,
+          `tests/e2e/${lower}.spec.`,
+          `tests/e2e/${kebab}.test.`,
+          `tests/e2e/${lower}.test.`,
+          `tests/e2e/${folderName.toLowerCase()}.spec.`,
+          `tests/e2e/${folderName.toLowerCase()}.test.`,
+        ];
+
         topics.set(folderName.toLowerCase(), {
           id: folderName.toLowerCase(),
           displayName: `${categoryLabel} / ${folderName}`,
@@ -160,6 +201,7 @@ function discoverTopics() {
           relPath,
           category: categoryLabel,
           aliases: Array.from(aliases),
+          pathPrefixes,
         });
       }
     }
@@ -168,7 +210,7 @@ function discoverTopics() {
   scanFolder("src/pages/FundamentalsCS", "FundamentalsCS");
   scanFolder("src/pages/Programming1", "Programming1");
 
-  // Shared components
+  // Shared components & shared tests
   topics.set("shared", {
     id: "shared",
     displayName: "Shared Components (src/components/shared)",
@@ -177,6 +219,15 @@ function discoverTopics() {
     relPath: "src/components/shared/",
     category: "Components",
     aliases: ["shared", "components-shared", "--shared", "-s"],
+    pathPrefixes: [
+      "src/components/shared/",
+      "tests/unit_tests/shared/",
+      "tests/e2e/specs/shared/",
+      "tests/e2e/shared.spec.",
+      "tests/e2e/shared.test.",
+      "tests/unit_tests/shared.spec.",
+      "tests/unit_tests/shared.test.",
+    ],
   });
 
   return topics;
@@ -347,12 +398,13 @@ function printHelp() {
   console.log(`
 ${colors.bold}${colors.cyan}Fallow Topic Filter CLI${colors.reset}
 Filter and inspect fallow analysis findings by topic, shared components, or rest of the project.
+(Findings automatically include topic source code, unit tests, and e2e test cases).
 
 ${colors.bold}USAGE:${colors.reset}
   node scripts/fallow-filter.mjs [TOPIC_FLAGS] [OPTIONS]
   npm run fallow:filter -- [TOPIC_FLAGS] [OPTIONS]
 
-${colors.bold}TOPIC FLAGS:${colors.reset}
+${colors.bold}TOPIC FLAGS (includes source + test files):${colors.reset}
   ${colors.green}--turing-machine, --turing, --tm${colors.reset}    FundamentalsCS / TuringMachine
   ${colors.green}--dnf${colors.reset}                              FundamentalsCS / Dnf
   ${colors.green}--encoding${colors.reset}                         FundamentalsCS / Encoding
@@ -361,7 +413,7 @@ ${colors.bold}TOPIC FLAGS:${colors.reset}
   ${colors.green}--number-systems, --ns${colors.reset}             FundamentalsCS / NumberSystems
   ${colors.green}--regular-languages, --rl${colors.reset}          FundamentalsCS / RegularLanguages
   ${colors.green}--java${colors.reset}                             Programming1 / Java
-  ${colors.green}--shared${colors.reset}                           Shared Components (src/components/shared)
+  ${colors.green}--shared${colors.reset}                           Shared Components (src/components/shared & tests/unit_tests/shared)
   ${colors.green}--rest, --other${colors.reset}                    Rest of the site (everything not in a topic or shared)
   ${colors.green}--all, -a${colors.reset}                          All findings across the entire codebase
 
@@ -382,7 +434,7 @@ ${colors.bold}OUTPUT & CONTROL OPTIONS:${colors.reset}
   ${colors.cyan}-h, --help${colors.reset}                         Show this help message
 
 ${colors.bold}EXAMPLES:${colors.reset}
-  # Inspect Turing Machine findings:
+  # Inspect Turing Machine findings (source + tests):
   node scripts/fallow-filter.mjs --turing-machine
 
   # Inspect shared components:
@@ -457,16 +509,15 @@ function runFallowJson() {
  * Check if a file path belongs to a specific topic, shared, or rest.
  */
 function testPathScope(filePath, topicKey) {
-  const norm = normalizePath(filePath);
+  const norm = normalizePath(filePath).toLowerCase();
   if (!norm) return false;
 
   if (topicKey === "all") return true;
 
   if (topicKey === "rest") {
-    // True if path is NOT in src/components/shared AND NOT in any discovered topic
-    if (norm.startsWith("src/components/shared/")) return false;
+    // True if path is NOT in any discovered topic (including shared)
     for (const meta of discoveredTopics.values()) {
-      if (meta.id !== "shared" && norm.startsWith(meta.relPath)) {
+      if (testPathScope(filePath, meta.id)) {
         return false;
       }
     }
@@ -475,7 +526,10 @@ function testPathScope(filePath, topicKey) {
 
   const topicMeta = discoveredTopics.get(topicKey);
   if (!topicMeta) return false;
-  return norm.startsWith(topicMeta.relPath);
+
+  return topicMeta.pathPrefixes.some((prefix) =>
+    norm.startsWith(prefix.toLowerCase()),
+  );
 }
 
 /**
@@ -758,7 +812,7 @@ function renderFilteredReport(report, options) {
               options.showAll,
             );
             const marker = isMatch
-              ? `${colors.bold}${colors.cyan}➜${colors.reset} `
+              ? `${colors.bold}${colors.cyan}➔${colors.reset} `
               : `  `;
             console.log(
               `     ${marker}${isMatch ? colors.bold : colors.dim}${f}${colors.reset}`,
@@ -815,7 +869,7 @@ function renderFilteredReport(report, options) {
           options.showAll,
         );
         const marker = isMatch
-          ? `${colors.bold}${colors.cyan}➜${colors.reset} `
+          ? `${colors.bold}${colors.cyan}➔${colors.reset} `
           : `  `;
         console.log(
           `     ${marker}${isMatch ? colors.bold : colors.dim}${inst.file}:${inst.start_line}-${inst.end_line}${colors.reset}`,

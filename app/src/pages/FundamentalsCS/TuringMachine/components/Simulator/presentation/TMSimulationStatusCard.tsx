@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { formatTMStateName } from "../domain/tmFormatting";
 import type { TMProgram } from "../domain/tmProgram";
 import type { TMRuntime } from "../domain/tmRuntime";
@@ -10,6 +11,14 @@ export interface TMSimulationStatusCardProps {
   error: Error | null;
 }
 
+interface StatusItem {
+  key: string;
+  label: string;
+  value: string;
+  testId: string;
+  isMono?: boolean;
+}
+
 export function TMSimulationStatusCard({
   program,
   runtime,
@@ -17,13 +26,8 @@ export function TMSimulationStatusCard({
 }: TMSimulationStatusCardProps) {
   const { t } = useTranslation();
   const currentSymbol = readCurrentSymbol(program, runtime);
-  const haltReasonMessage =
-    runtime.haltReason?.type === "missing_transition"
-      ? t("turing-machine.sim.haltReason.missingTransition", {
-          state: formatTMStateName(runtime.haltReason.state),
-          symbol: runtime.haltReason.symbol,
-        })
-      : null;
+  const haltReasonMessage = resolveHaltReasonMessage(runtime.haltReason, t);
+  const statusItems = buildStatusItems(runtime, currentSymbol, t);
 
   return (
     <div
@@ -39,33 +43,17 @@ export function TMSimulationStatusCard({
       </h3>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="text-muted-foreground">
-          {t("turing-machine.sim.status.state")}:
-        </div>
-        <div data-testid="tm-status-current-state" className="font-mono">
-          {formatTMStateName(runtime.currentState)}
-        </div>
-
-        <div className="text-muted-foreground">
-          {t("turing-machine.sim.status.symbol")}:
-        </div>
-        <div data-testid="tm-status-current-symbol" className="font-mono">
-          {currentSymbol}
-        </div>
-
-        <div className="text-muted-foreground">
-          {t("turing-machine.sim.status.step")}:
-        </div>
-        <div data-testid="tm-status-step-count">{runtime.stepCount}</div>
-
-        <div className="text-muted-foreground">
-          {t("turing-machine.sim.status.halt")}:
-        </div>
-        <div data-testid="tm-status-halted">
-          {runtime.halted
-            ? t("turing-machine.sim.status.yes")
-            : t("turing-machine.sim.status.no")}
-        </div>
+        {statusItems.map((item) => (
+          <div key={item.key} className="contents">
+            <div className="text-muted-foreground">{item.label}:</div>
+            <div
+              data-testid={item.testId}
+              className={item.isMono ? "font-mono" : undefined}
+            >
+              {item.value}
+            </div>
+          </div>
+        ))}
       </div>
 
       {haltReasonMessage && (
@@ -87,4 +75,57 @@ export function TMSimulationStatusCard({
       )}
     </div>
   );
+}
+
+function resolveHaltReasonMessage(
+  haltReason: TMRuntime["haltReason"],
+  t: TFunction,
+): string | null {
+  if (haltReason?.type !== "missing_transition") {
+    return null;
+  }
+
+  return t("turing-machine.sim.haltReason.missingTransition", {
+    state: formatTMStateName(haltReason.state),
+    symbol: haltReason.symbol,
+  });
+}
+
+function buildStatusItems(
+  runtime: TMRuntime,
+  currentSymbol: string,
+  t: TFunction,
+): StatusItem[] {
+  return [
+    {
+      key: "state",
+      label: t("turing-machine.sim.status.state"),
+      value: formatTMStateName(runtime.currentState),
+      testId: "tm-status-current-state",
+      isMono: true,
+    },
+    {
+      key: "symbol",
+      label: t("turing-machine.sim.status.symbol"),
+      value: currentSymbol,
+      testId: "tm-status-current-symbol",
+      isMono: true,
+    },
+    {
+      key: "step",
+      label: t("turing-machine.sim.status.step"),
+      value: String(runtime.stepCount),
+      testId: "tm-status-step-count",
+    },
+    {
+      key: "halt",
+      label: t("turing-machine.sim.status.halt"),
+      value: t(
+        runtime.halted
+          ? "turing-machine.sim.status.yes"
+          : "turing-machine.sim.status.no",
+      ),
+      testId: "tm-status-halted",
+    },
+  ];
 }

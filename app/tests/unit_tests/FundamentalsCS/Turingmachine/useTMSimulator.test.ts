@@ -6,6 +6,10 @@ import type { ISimulator } from "@/types/simulator";
 import { useTMSimulator } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/application/useTMSimulator";
 import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
 import type { TMRuntime } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmRuntime";
+import {
+  createTestProgram as createProgram,
+  createTestRuntime as createRuntime,
+} from "./fixtures/defaultTMProgram";
 
 const mockState = vi.hoisted(() => {
   return {
@@ -25,42 +29,6 @@ vi.mock("@/hooks/useSimulationEngine", () => {
     },
   };
 });
-
-function createProgram(overrides: Partial<TMProgram> = {}): TMProgram {
-  return {
-    states: ["q0", "q1", "halt"],
-    inputAlphabet: ["0", "1"],
-    tapeAlphabet: ["0", "1", "_"],
-    blankSymbol: "_",
-    initialState: "q0",
-    haltStates: ["halt"],
-    transitions: {
-      "0": {
-        q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
-      },
-      "1": {
-        q1: { nextState: "halt", writeSymbol: "0", movement: "L" },
-      },
-      _: {
-        q0: { nextState: "halt", writeSymbol: "_", movement: "N" },
-      },
-    },
-    initialTape: ["0", "1"],
-    ...overrides,
-  };
-}
-
-function createRuntime(overrides: Partial<TMRuntime> = {}): TMRuntime {
-  return {
-    currentState: "q0",
-    headPosition: 0,
-    tape: { 0: "0", 1: "1" },
-    stepCount: 0,
-    halted: false,
-    haltReason: null,
-    ...overrides,
-  };
-}
 
 function setupHook(program: TMProgram = createProgram()) {
   const engine = {
