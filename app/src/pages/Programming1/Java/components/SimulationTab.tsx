@@ -32,7 +32,11 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   );
 
   const handleCheckSolution = async () => {
-    if (!simulatorRef.current || !isSimulatorReady || scenario?.kind !== "exercise") {
+    if (
+      !simulatorRef.current ||
+      !isSimulatorReady ||
+      scenario?.kind !== "exercise"
+    ) {
       return;
     }
     setIsChecking(true);
