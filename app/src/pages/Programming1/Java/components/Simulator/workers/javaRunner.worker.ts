@@ -299,6 +299,27 @@ async function runGeneratedProgram(
   let stdout = "";
   let stderr = "";
 
+  let stdoutBuffer = "";
+  let stderrBuffer = "";
+  let stdoutTimeout: number | undefined;
+  let stderrTimeout: number | undefined;
+
+  const flushStdout = () => {
+    if (stdoutBuffer) {
+      workerScope.postMessage({ type: "stdout", requestId, data: stdoutBuffer });
+      stdoutBuffer = "";
+    }
+    stdoutTimeout = undefined;
+  };
+
+  const flushStderr = () => {
+    if (stderrBuffer) {
+      workerScope.postMessage({ type: "stderr", requestId, data: stderrBuffer });
+      stderrBuffer = "";
+    }
+    stderrTimeout = undefined;
+  };
+
   try {
     const runtimeModule = (await import(
       /* @vite-ignore */ absoluteAssetUrl(
@@ -313,12 +334,18 @@ async function runGeneratedProgram(
         teavmConsole.putcharStdout = (charCode: number) => {
           const next = String.fromCharCode(charCode);
           stdout += next;
-          workerScope.postMessage({ type: "stdout", requestId, data: next });
+          stdoutBuffer += next;
+          if (stdoutTimeout === undefined) {
+            stdoutTimeout = self.setTimeout(flushStdout, 50);
+          }
         };
         teavmConsole.putcharStderr = (charCode: number) => {
           const next = String.fromCharCode(charCode);
           stderr += next;
-          workerScope.postMessage({ type: "stderr", requestId, data: next });
+          stderrBuffer += next;
+          if (stderrTimeout === undefined) {
+            stderrTimeout = self.setTimeout(flushStderr, 50);
+          }
         };
       },
     });
@@ -338,6 +365,11 @@ async function runGeneratedProgram(
       ],
       artifacts,
     );
+  } finally {
+    if (stdoutTimeout !== undefined) self.clearTimeout(stdoutTimeout);
+    flushStdout();
+    if (stderrTimeout !== undefined) self.clearTimeout(stderrTimeout);
+    flushStderr();
   }
 
   return { stdout, stderr };
