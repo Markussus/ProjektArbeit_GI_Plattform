@@ -2,10 +2,14 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { StateMachineGraph } from "@/components/shared/StateMachineGraph";
+import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
+import {
+  buildMealyTableHeaders,
+  buildMealyTableRows,
+  getActiveMealyTransitionCell,
+} from "../adapters/automataTableAdapter";
 import type { MealyProgram, MealyRuntime } from "../domain/mealyTypes";
-import { useDragScroll } from "@/hooks/useDragScroll";
-import { cn } from "@/lib/utils";
 
 interface Props {
   program: MealyProgram;
@@ -50,6 +54,26 @@ export function MealySimulationView(props: Props) {
       ),
     [nextInput, props.program, props.runtime.currentState],
   );
+
+  const tableHeaders = useMemo(
+    () =>
+      buildMealyTableHeaders(
+        props.program.states,
+        t("moore-mealy.sim.event", "Event"),
+      ),
+    [props.program.states, t],
+  );
+
+  const tableRows = useMemo(
+    () => buildMealyTableRows(props.program),
+    [props.program],
+  );
+
+  const activeCell = useMemo(
+    () => getActiveMealyTransitionCell(props.program, props.runtime),
+    [props.program, props.runtime],
+  );
+
   return (
     <div data-testid="mealy-simulation-view" className="space-y-5">
       <h2 className="text-lg font-bold">
@@ -94,88 +118,17 @@ export function MealySimulationView(props: Props) {
         compact
         defaultLabelLayout="list"
       />
-      <MealyRuntimeTable
-        program={props.program}
-        currentState={props.runtime.currentState}
-        nextInput={nextInput}
-        nextState={nextState}
+      <TableView
+        testIdPrefix="mealy-runtime-transition-table"
+        headers={tableHeaders}
+        rows={tableRows}
+        activeCell={activeCell}
+        className="w-full"
+        tableClassName="w-full table-auto"
+        firstColumnWidthClassName=""
+        dataColumnWidthClassName=""
+        disableActiveCellAutoScroll
       />
-    </div>
-  );
-}
-
-function MealyRuntimeTable({
-  program,
-  currentState,
-  nextInput,
-  nextState,
-}: {
-  program: MealyProgram;
-  currentState: string;
-  nextInput?: string;
-  nextState?: string;
-}) {
-  const { t } = useTranslation();
-  const { setElementRef, onMouseDown, isDragging } =
-    useDragScroll<HTMLDivElement>();
-  return (
-    <div
-      ref={setElementRef}
-      onMouseDown={onMouseDown}
-      data-testid="mealy-runtime-table-scroll"
-      className={cn(
-        "border-border max-h-72 overflow-auto rounded-xl border select-none",
-        isDragging ? "cursor-grabbing" : "cursor-grab",
-      )}
-    >
-      <table
-        data-testid="mealy-runtime-transition-table"
-        className="w-full min-w-max border-collapse text-center text-sm"
-      >
-        <thead>
-          <tr className="bg-muted/50 border-b">
-            <th className="border-r p-2">{t("moore-mealy.sim.state")}</th>
-            <th className="border-r p-2">{t("moore-mealy.sim.event")}</th>
-            <th className="border-r p-2">
-              {t("moore-mealy.conversion.nextState")}
-            </th>
-            <th className="p-2">{t("moore-mealy.sim.output")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {program.states.flatMap((state) =>
-            program.inputSymbols.map((input) => {
-              const active = state === currentState && input === nextInput;
-              const target = program.transitions[input][state];
-              return (
-                <tr
-                  key={`${state}-${input}`}
-                  className={cn(
-                    "border-b last:border-b-0",
-                    active && "bg-brand/20 text-brand font-bold",
-                  )}
-                >
-                  <td className="border-r p-2 font-mono">{state}</td>
-                  <td className="border-r p-2 font-mono">{input}</td>
-                  <td
-                    className={cn(
-                      "border-r p-2 font-mono",
-                      active &&
-                        target === nextState &&
-                        "outline-brand outline-2 -outline-offset-4 outline-dashed",
-                    )}
-                  >
-                    {target}
-                  </td>
-                  <td className="p-2 font-mono">
-                    {program.outputs[input][state].symbol}
-                  </td>
-                </tr>
-              );
-            }),
-          )}
-        </tbody>
-      </table>
     </div>
   );
 }
