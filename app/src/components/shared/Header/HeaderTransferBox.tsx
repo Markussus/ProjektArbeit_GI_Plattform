@@ -150,7 +150,7 @@ export function HeaderTransferBox() {
         aria-label={
           isExportPreviewActive
             ? t("common.simulation.transfer.exportPreviewLabel")
-            : undefined
+            : t("common.simulation.transfer.placeholder")
         }
         className={cn(
           "border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring h-8 w-8 shrink-0 rounded-md border px-1 text-center text-xs outline-none focus-visible:ring-2 sm:h-9 sm:w-9 lg:w-28 lg:px-2 lg:text-left xl:w-48",
@@ -193,6 +193,8 @@ export function HeaderTransferBox() {
 
       {feedback && (
         <span
+          role="status"
+          aria-live="polite"
           data-testid="header-transfer-status"
           className={cn(
             "bg-background absolute top-full right-0 z-50 mt-1 rounded px-2 py-1 text-xs whitespace-nowrap shadow-sm",

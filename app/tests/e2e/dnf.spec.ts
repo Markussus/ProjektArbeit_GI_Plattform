@@ -188,7 +188,7 @@ test.describe("DNF page", () => {
     await page.getByTestId("dnf-edit-table-config").click();
     await expect(page.getByTestId("dnf-table-builder-controls")).toBeVisible();
     await expect(page.getByTestId("dnf-variable-count-input")).toHaveValue("3");
-    await page.getByRole("button", { name: "Commit table" }).click();
+    await page.getByTestId("dnf-commit-table").click();
     await expect(page.getByTestId("dnf-exercise-workspace")).toBeVisible();
     await page.getByTestId("dnf-exercise-answer").fill("a");
     await page.getByTestId("simulation-reset").click();
@@ -272,7 +272,7 @@ test.describe("DNF page", () => {
 
     await page.getByTestId("dnf-mode-tab-truth_table_to_dnf").click();
     await page.getByTestId("dnf-fill-table").click();
-    await page.getByRole("button", { name: "Commit table" }).click();
+    await page.getByTestId("dnf-commit-table").click();
     await page.getByTestId("dnf-exercise-answer").fill("a");
     await switchTab(page, "overview");
     await expect

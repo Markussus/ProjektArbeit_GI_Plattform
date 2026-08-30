@@ -140,6 +140,7 @@ export function FATransitionTableEditor({
                 >
                   <button
                     type="button"
+                    data-testid="fa-add-epsilon-transitions"
                     onClick={() => setShowEpsilon(true)}
                     className="text-primary hover:text-primary/80 text-xs font-semibold tracking-wide"
                   >

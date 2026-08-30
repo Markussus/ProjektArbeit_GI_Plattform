@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Play, Shuffle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -128,6 +129,7 @@ export function TableSetup({
       <div>
         <button
           type="button"
+          data-testid="dnf-commit-table"
           onClick={onCommit}
           className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
         >
@@ -237,4 +239,3 @@ function createRandomResultValues(rowCount: number): boolean[] {
 
   return values;
 }
-import type { ReactNode } from "react";

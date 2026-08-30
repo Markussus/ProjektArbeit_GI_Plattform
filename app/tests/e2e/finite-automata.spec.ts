@@ -1,17 +1,31 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const FA_URL = "/fundamentals-cs/finite-automata";
 
+async function gotoFAPage(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.clear();
+    window.localStorage.setItem("i18nextLng", "en");
+  });
+  await page.goto(FA_URL);
+  await expect(page.getByTestId("tab-button-simulation")).toBeVisible();
+}
+
+async function openSimulationTab(page: Page) {
+  await gotoFAPage(page);
+  await page.getByTestId("tab-button-simulation").click();
+  await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
+}
+
 test.describe("Finite Automata page", () => {
   test("page loads and shows the topic title", async ({ page }) => {
-    await page.goto(FA_URL);
+    await gotoFAPage(page);
     await expect(page).toHaveURL(new RegExp("finite-automata"));
-    // The page title is rendered via t("finite-automata.topic.title") — check a key element exists
     await expect(page.locator("body")).toBeVisible();
   });
 
   test("shows the four navigation tabs", async ({ page }) => {
-    await page.goto(FA_URL);
+    await gotoFAPage(page);
     await expect(page.getByTestId("tab-button-overview")).toBeVisible();
     await expect(page.getByTestId("tab-button-exercises")).toBeVisible();
     await expect(page.getByTestId("tab-button-examples")).toBeVisible();
@@ -19,20 +33,17 @@ test.describe("Finite Automata page", () => {
   });
 
   test("shows only the tutorial video", async ({ page }) => {
-    await page.goto(FA_URL);
+    await gotoFAPage(page);
     await expect(page.getByTestId("automata-tutorial-video")).toBeVisible();
   });
 });
 
 test.describe("Finite Automata — Simulation tab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
-    await page.getByTestId("tab-button-simulation").click();
+    await openSimulationTab(page);
   });
 
   test("switches to the Simulation tab", async ({ page }) => {
-    // The editor panel is visible — look for the mode toggle
     await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
   });
 
@@ -76,7 +87,6 @@ test.describe("Finite Automata — Simulation tab", () => {
   });
 
   test("shows the alphabet symbol rows (a and b)", async ({ page }) => {
-    // The first column of each row shows the symbol
     const cells = page.locator("td").filter({ hasText: /^a$/ });
     await expect(cells.first()).toBeVisible();
     const cellsB = page.locator("td").filter({ hasText: /^b$/ });
@@ -95,19 +105,13 @@ test.describe("Finite Automata — Simulation tab", () => {
   });
 
   test("shows the Start Simulation button", async ({ page }) => {
-    await expect(
-      page.getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      }),
-    ).toBeVisible();
+    await expect(page.getByTestId("fa-start-simulation")).toBeVisible();
   });
 });
 
 test.describe("Finite Automata — editor interactions", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
-    await page.getByTestId("tab-button-simulation").click();
+    await openSimulationTab(page);
   });
 
   test("allows editing a transition input", async ({ page }) => {
@@ -133,15 +137,12 @@ test.describe("Finite Automata — editor interactions", () => {
   test("Start Simulation button is enabled when the program is valid", async ({
     page,
   }) => {
-    const btn = page.getByRole("button", {
-      name: /Start Simulation|Simulation starten/i,
-    });
+    const btn = page.getByTestId("fa-start-simulation");
     await expect(btn).toBeEnabled();
   });
 
   test("switches to the grammar editor mode", async ({ page }) => {
     await page.getByTestId("fa-mode-tab-grammar").click();
-    // Grammar input panel should appear — it won't show the transition table
     await expect(
       page.getByText(/Transition Table|Übergangstabelle/i),
     ).not.toBeVisible();
@@ -160,7 +161,6 @@ test.describe("Finite Automata — editor interactions", () => {
   test("reset deletes the saved draft and restores the blank starter", async ({
     page,
   }) => {
-    await page.evaluate(() => localStorage.clear());
     await page.getByTestId("header-transfer-export").click();
     const defaultExport = await page
       .getByTestId("header-transfer-input")
@@ -168,11 +168,7 @@ test.describe("Finite Automata — editor interactions", () => {
     const transition = page.getByLabel("δ(S0, a)");
     await transition.fill("S0");
     await page.getByPlaceholder("aab").fill("ab");
-    await page
-      .getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      })
-      .click();
+    await page.getByTestId("fa-start-simulation").click();
     await expect
       .poll(() =>
         page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
@@ -200,24 +196,16 @@ test.describe("Finite Automata — editor interactions", () => {
 
 test.describe("Finite Automata — Grammar tab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
-    await page.getByTestId("tab-button-simulation").click();
+    await openSimulationTab(page);
     await page.getByTestId("fa-mode-tab-grammar").click();
   });
 
   test("shows the Convert to Automaton button", async ({ page }) => {
-    await expect(
-      page.getByRole("button", {
-        name: /Convert to Automaton|In Automat umwandeln/i,
-      }),
-    ).toBeVisible();
+    await expect(page.getByTestId("fa-convert-grammar")).toBeVisible();
   });
 
   test("shows the Load Example button", async ({ page }) => {
-    await expect(
-      page.getByRole("button", { name: /Load Example|Beispiel laden/i }),
-    ).toBeVisible();
+    await expect(page.getByTestId("fa-load-grammar-example")).toBeVisible();
   });
 
   test("shows the Supported Formats section", async ({ page }) => {
@@ -235,9 +223,7 @@ test.describe("Finite Automata — Grammar tab", () => {
   test("loading example populates grammar and detects simplified format", async ({
     page,
   }) => {
-    await page
-      .getByRole("button", { name: /Load Example|Beispiel laden/i })
-      .click();
+    await page.getByTestId("fa-load-grammar-example").click();
     await expect(
       page.getByText(/Detected format|Erkanntes Format/i),
     ).toContainText(/Simplified|Vereinfacht/i);
@@ -258,14 +244,8 @@ test.describe("Finite Automata — Grammar tab", () => {
   test("converts the loaded example grammar and returns to the manual editor", async ({
     page,
   }) => {
-    await page
-      .getByRole("button", { name: /Load Example|Beispiel laden/i })
-      .click();
-    await page
-      .getByRole("button", {
-        name: /Convert to Automaton|In Automat umwandeln/i,
-      })
-      .click();
+    await page.getByTestId("fa-load-grammar-example").click();
+    await page.getByTestId("fa-convert-grammar").click();
     await expect(
       page.getByText(/Transition Table|Übergangstabelle/i),
     ).toBeVisible();
@@ -274,47 +254,27 @@ test.describe("Finite Automata — Grammar tab", () => {
 
 test.describe("Finite Automata — running a simulation", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
-    await page.getByTestId("tab-button-simulation").click();
+    await openSimulationTab(page);
   });
 
   test("clicking Start Simulation shows the simulation view", async ({
     page,
   }) => {
-    await page
-      .getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      })
-      .click();
-    // The simulation view replaces the editor; the edit button should now appear
-    await expect(
-      page.getByRole("button", { name: /Edit|Bearbeiten/i }),
-    ).toBeVisible({
+    await page.getByTestId("fa-start-simulation").click();
+    await expect(page.getByTestId("fa-edit-simulation")).toBeVisible({
       timeout: 5000,
     });
   });
 
   test("simulation view shows the input word", async ({ page }) => {
     await page.getByPlaceholder("aab").fill("aab");
-    await page
-      .getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      })
-      .click();
-    // The input word "aab" should be displayed in the simulation view
+    await page.getByTestId("fa-start-simulation").click();
     await expect(page.getByText("aab")).toBeVisible({ timeout: 5000 });
   });
 
   test("can return to edit mode by clicking Edit", async ({ page }) => {
-    await page
-      .getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      })
-      .click();
-    await page
-      .getByRole("button", { name: /Edit|Bearbeiten/i })
-      .click({ timeout: 5000 });
+    await page.getByTestId("fa-start-simulation").click();
+    await page.getByTestId("fa-edit-simulation").click({ timeout: 5000 });
     await expect(
       page.getByText(/Transition Table|Übergangstabelle/i),
     ).toBeVisible({
@@ -327,16 +287,8 @@ test.describe("Finite Automata — opening an example", () => {
   test("loads the example's automaton over a previously saved draft", async ({
     page,
   }) => {
-    // The blank free-mode starter autosaves, so by the time an example is
-    // opened there is always a stored draft that must not win.
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
-    await page.getByTestId("tab-button-simulation").click();
-    await page
-      .getByRole("button", {
-        name: /Start Simulation|Simulation starten/i,
-      })
-      .click();
+    await openSimulationTab(page);
+    await page.getByTestId("fa-start-simulation").click();
     await expect
       .poll(() =>
         page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
@@ -355,18 +307,15 @@ test.describe("Finite Automata — opening an example", () => {
 
 test.describe("Finite Automata — Examples tab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(FA_URL);
-    await page.evaluate(() => localStorage.clear());
+    await gotoFAPage(page);
     await page.getByTestId("tab-button-examples").click();
   });
 
   test("shows the Examples tab content", async ({ page }) => {
-    // The examples tab should be visible with at least one example card
     await expect(page.locator("body")).toBeVisible();
   });
 
   test("displays at least one example card", async ({ page }) => {
-    // Examples are shown as cards — just verify the tab has content
     const content = page.locator("main, [role='main'], .p-8, .p-4").first();
     await expect(content).toBeVisible();
   });

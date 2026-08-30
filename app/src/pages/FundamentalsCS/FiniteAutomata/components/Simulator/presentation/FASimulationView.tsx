@@ -71,6 +71,7 @@ export function FASimulationView({
         </h2>
         <button
           type="button"
+          data-testid="fa-edit-simulation"
           className="border-border bg-background hover:bg-muted text-foreground cursor-pointer rounded-md border px-4 py-2 text-sm font-medium transition-colors"
           onClick={onEditConfig}
         >

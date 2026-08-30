@@ -188,6 +188,7 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
+          data-testid="fa-convert-grammar"
           onClick={handleConvert}
           disabled={!parsed.ok}
           className="bg-brand text-brand-foreground rounded-md px-4 py-2 font-semibold hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
@@ -196,6 +197,7 @@ export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
         </button>
         <button
           type="button"
+          data-testid="fa-load-grammar-example"
           onClick={handleLoadExample}
           className="bg-muted hover:bg-muted/80 rounded-md px-3 py-2 text-sm font-medium"
         >

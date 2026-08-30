@@ -307,6 +307,7 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
 
               <button
                 type="button"
+                data-testid="fa-start-simulation"
                 onClick={handleStartSimulation}
                 disabled={!editor.isValid}
                 className="bg-brand text-brand-foreground inline-flex items-center justify-center gap-2 self-center rounded-lg px-6 py-3 font-semibold shadow-md transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
