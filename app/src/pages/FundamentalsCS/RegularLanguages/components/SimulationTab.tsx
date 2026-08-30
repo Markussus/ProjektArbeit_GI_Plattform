@@ -1,94 +1,45 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import {
-  checkGrammarEnumerationExercise,
-  checkLanguageToGrammarExercise,
-  G2L_EXERCISE_ENUMERATION,
-  type RLCheckResult,
-} from "./Simulator/domain/rlSolutionChecker";
-import { enumerateLanguage } from "./Simulator/domain/rlLanguageOps";
-import { parseGrammar } from "./Simulator/domain/rlGrammarValidation";
+import type { RLCheckResult } from "./Simulator/domain/rlSolutionChecker";
 import { findRLExercise } from "../exercises/rlExerciseDefinitions";
-import { useRLSimulatorStore } from "../store/rlSimulatorStore";
+import { findRLExample } from "./Simulator/config/rlExamples";
 import { RLSimulator, type RLSimulatorHandle } from "./Simulator/RLSimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
-  const setActiveExercise = useRLSimulatorStore((s) => s.setActiveExercise);
-  const revealEnumeration = useRLSimulatorStore((s) => s.revealEnumeration);
-  const revealGrammar = useRLSimulatorStore((s) => s.revealGrammar);
   const simulatorRef = useRef<RLSimulatorHandle>(null);
 
-  // The opened exercise (if any) drives the action buttons. Examples still flow
-  // through the shared "Selected example" card with no actions.
-  const activeExercise = props.selectedExercise
-    ? findRLExercise(props.selectedExercise.id)
-    : undefined;
+  const activeExercise = useMemo(
+    () =>
+      props.selectedExercise
+        ? findRLExercise(props.selectedExercise.id)
+        : null,
+    [props.selectedExercise],
+  );
+
+  const activeExample = useMemo(
+    () => (props.selectedItem ? findRLExample(props.selectedItem.id) : null),
+    [props.selectedItem],
+  );
 
   const [checkResult, setCheckResult] = useState<RLCheckResult | null>(null);
 
-  // Keep the store flag in sync with what is actually displayed.
-  useEffect(() => {
-    setActiveExercise(activeExercise?.id ?? null);
-  }, [activeExercise?.id, setActiveExercise]);
-
-  // Each exercise type gets its own reveal/check path: Grammar → Language keeps
-  // the grammar fixed and asks for the language; Language → Grammar keeps the
-  // language fixed and asks for a grammar.
   const isGrammarExercise = activeExercise?.mode === "grammarToLanguage";
   const isLanguageExercise = activeExercise?.mode === "languageToGrammar";
-
-  // Reveal: Grammar → Language drops the enumerated words into the learner's
-  // list; Language → Grammar drops the reference grammar into the editor.
-  const handleLoadSolution = () => {
-    if (!activeExercise) {
-      return;
-    }
-    if (isGrammarExercise) {
-      const parsed = parseGrammar(activeExercise.seed.grammarSource ?? "");
-      if (!parsed.ok || !parsed.grammar) {
-        return;
-      }
-      const { words } = enumerateLanguage(
-        parsed.grammar,
-        G2L_EXERCISE_ENUMERATION,
-      );
-      revealEnumeration(words.map((w) => (w === "" ? "ε" : w)).join(", "));
-      return;
-    }
-    if (isLanguageExercise && activeExercise.referenceGrammar) {
-      revealGrammar(activeExercise.referenceGrammar);
-    }
-  };
-
-  // Auto-checking applies to both guided exercise types.
   const canCheck = isGrammarExercise || isLanguageExercise;
 
+  const handleLoadSolution = () => {
+    simulatorRef.current?.loadSolution();
+  };
+
   const handleCheckSolution = () => {
-    if (!activeExercise) {
-      return;
+    const result = simulatorRef.current?.checkSolution();
+    if (result) {
+      setCheckResult(result);
     }
-    const studentSource =
-      useRLSimulatorStore.getState().exerciseDrafts[activeExercise.id] ?? "";
-    if (isGrammarExercise) {
-      setCheckResult(
-        checkGrammarEnumerationExercise(
-          studentSource,
-          activeExercise.seed.grammarSource ?? "",
-        ),
-      );
-      return;
-    }
-    setCheckResult(
-      checkLanguageToGrammarExercise(
-        studentSource,
-        activeExercise.seed.languageSource ?? "",
-        activeExercise.rejectWords ?? [],
-      ),
-    );
   };
 
   const headerActions = activeExercise ? (
@@ -121,10 +72,16 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.regularLanguages"
-        onReset={() => simulatorRef.current?.resetStoredState()}
+        onReset={() => {
+          setCheckResult(null);
+          simulatorRef.current?.resetStoredState();
+        }}
       >
         <RLSimulator
+          key={activeExercise?.id ?? activeExample?.id ?? "__rl-free-mode__"}
           ref={simulatorRef}
+          exercise={activeExercise}
+          example={activeExample}
           onExitExercise={props.onExitExercise}
           importedTaskStorageId={props.importedTaskStorageId}
         />

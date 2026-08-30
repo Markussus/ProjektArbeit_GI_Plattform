@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 import type { FAProgram } from "../domain/faTypes";
 import type { FARuntime } from "../domain/faRuntime";
 
@@ -26,11 +27,12 @@ export function FASimulationStatusCard({
     return t("finite-automata.sim.status.halted", "Halted");
   })();
 
-  const statusColor = (() => {
-    if (error) return "var(--fa-red)";
-    if (!runtime.halted) return "var(--fa-cyan)";
-    if (runtime.haltReason?.type === "accepted") return "var(--fa-green)";
-    return "var(--fa-red)";
+  const statusClassName = (() => {
+    if (error) return "text-destructive";
+    if (!runtime.halted) return "text-brand";
+    if (runtime.haltReason?.type === "accepted")
+      return "text-emerald-600 dark:text-emerald-400";
+    return "text-destructive";
   })();
 
   const explanation = (() => {
@@ -78,63 +80,51 @@ export function FASimulationStatusCard({
   })();
 
   return (
-    <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <div className="flex flex-col gap-3">
         {/* Status header */}
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+          <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             {t("finite-automata.sim.status.label", "Status")}
           </span>
-          <span
-            className="text-sm font-bold"
-            style={{
-              color: statusColor,
-              textShadow: `0 0 8px ${statusColor}40`,
-            }}
-          >
+          <span className={cn("text-sm font-bold", statusClassName)}>
             {statusLabel}
           </span>
         </div>
 
         {/* Info grid */}
-        <div
-          className="flex flex-col gap-1.5"
-          style={{ fontSize: "0.8125rem" }}
-        >
+        <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between">
-            <span style={{ color: "var(--fa-text-dim)" }}>
+            <span className="text-muted-foreground">
               {t("finite-automata.sim.status.type", "Type")}
             </span>
-            <span style={{ color: "var(--fa-text)", fontWeight: 600 }}>
+            <span className="text-foreground font-semibold">
               {program.type}
             </span>
           </div>
           <div className="flex justify-between">
-            <span style={{ color: "var(--fa-text-dim)" }}>
+            <span className="text-muted-foreground">
               {t("finite-automata.sim.status.step", "Step")}
             </span>
-            <span style={{ color: "var(--fa-cyan)", fontWeight: 600 }}>
+            <span className="text-brand font-semibold">
               {runtime.stepCount}
             </span>
           </div>
           <div className="flex justify-between">
-            <span style={{ color: "var(--fa-text-dim)" }}>
+            <span className="text-muted-foreground">
               {t("finite-automata.sim.status.activeStates", "Active States")}
             </span>
-            <span
-              className="font-mono"
-              style={{ color: "var(--fa-text)", fontWeight: 600 }}
-            >
+            <span className="text-foreground font-mono font-semibold">
               {runtime.activeStates.length > 0
                 ? runtime.activeStates.join(", ")
                 : "∅"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span style={{ color: "var(--fa-text-dim)" }}>
+            <span className="text-muted-foreground">
               {t("finite-automata.sim.status.position", "Position")}
             </span>
-            <span style={{ color: "var(--fa-text)", fontWeight: 600 }}>
+            <span className="text-foreground font-semibold">
               {runtime.inputPosition} / {runtime.inputWord.length}
             </span>
           </div>
@@ -142,14 +132,7 @@ export function FASimulationStatusCard({
 
         {/* Explanation */}
         {explanation && (
-          <div
-            className="rounded-md p-3 text-sm leading-relaxed"
-            style={{
-              background: "var(--fa-surface-raised)",
-              border: "1px solid var(--fa-border-subtle)",
-              color: "var(--fa-text-dim)",
-            }}
-          >
+          <div className="border-border bg-muted/40 text-muted-foreground rounded-lg border p-3 text-sm leading-relaxed">
             {explanation}
           </div>
         )}

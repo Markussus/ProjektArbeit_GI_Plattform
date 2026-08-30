@@ -1,66 +1,44 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import { FASimulator, type FASimulatorHandle } from "./Simulator/FASimulator";
-import type { FAProgram } from "./Simulator/domain/faTypes";
 import {
-  validateAgainstSolution,
-  type ValidationResult,
-} from "./Simulator/domain/faExerciseValidation";
+  FASimulator,
+  type FASimulatorHandle,
+  type FACheckResult,
+} from "./Simulator/FASimulator";
 import { findFAExercise } from "../exercises/faExerciseDefinitions";
-import { useFASimulatorStore } from "../store/faSimulatorStore";
-
-type CheckResult = ValidationResult | "unbuilt";
+import { findFAExample } from "./Simulator/config/faExamples";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
-  const setActiveExercise = useFASimulatorStore((s) => s.setActiveExercise);
-  const loadExample = useFASimulatorStore((s) => s.loadExample);
   const simulatorRef = useRef<FASimulatorHandle>(null);
 
-  // The opened exercise (if any) drives the action buttons. Examples still flow
-  // through the shared "Selected example" card with no actions.
-  const activeExercise = props.selectedExercise
-    ? findFAExercise(props.selectedExercise.id)
-    : undefined;
+  const activeExercise = useMemo(
+    () =>
+      props.selectedExercise
+        ? findFAExercise(props.selectedExercise.id)
+        : null,
+    [props.selectedExercise],
+  );
 
-  const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
+  const activeExample = useMemo(
+    () => (props.selectedItem ? findFAExample(props.selectedItem.id) : null),
+    [props.selectedItem],
+  );
 
-  // Keep the store flag in sync so other consumers agree with what is shown.
-  useEffect(() => {
-    setActiveExercise(activeExercise?.id ?? null);
-  }, [activeExercise?.id, setActiveExercise]);
+  const [checkResult, setCheckResult] = useState<FACheckResult | null>(null);
 
-  // Revealing the solution replaces the learner's automaton right away - the
-  // same one-click reveal the other topics use.
   const handleLoadSolution = () => {
-    if (!activeExercise) {
-      return;
-    }
-    const seedInput =
-      activeExercise.exampleWords?.accept.find((w) => w.length > 0) ?? "";
-    loadExample(activeExercise.solution, seedInput);
+    simulatorRef.current?.loadSolution();
   };
 
   const handleCheckSolution = () => {
-    if (!activeExercise) {
-      return;
+    const result = simulatorRef.current?.checkSolution();
+    if (result) {
+      setCheckResult(result);
     }
-    const studentProgram =
-      useFASimulatorStore.getState().studentProgram ?? activeExercise.starter;
-
-    if (isUnbuilt(studentProgram)) {
-      setCheckResult("unbuilt");
-      return;
-    }
-
-    setCheckResult(
-      validateAgainstSolution(studentProgram, activeExercise.solution, {
-        maxLen: activeExercise.maxTestLen ?? 4,
-      }),
-    );
   };
 
   const headerActions = activeExercise ? (
@@ -91,9 +69,17 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.automata"
-        onReset={() => simulatorRef.current?.resetStoredState()}
+        onReset={() => {
+          setCheckResult(null);
+          simulatorRef.current?.resetStoredState();
+        }}
       >
-        <FASimulator ref={simulatorRef} />
+        <FASimulator
+          key={activeExercise?.id ?? activeExample?.id ?? "__fa-free-mode__"}
+          ref={simulatorRef}
+          exercise={activeExercise}
+          example={activeExample}
+        />
       </TopicSimulationTab>
 
       <SolutionCheckDialog
@@ -110,16 +96,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   );
 }
 
-/** A "fresh starter" automaton has no accept states and no transitions. */
-function isUnbuilt(program: FAProgram): boolean {
-  const noAccept = program.acceptStates.length === 0;
-  const noTransitions = Object.values(program.transitions).every(
-    (row) => Object.keys(row).length === 0,
-  );
-  return noAccept && noTransitions;
-}
-
-function CheckSummary({ result }: { result: CheckResult }) {
+function CheckSummary({ result }: { result: FACheckResult }) {
   const { t } = useTranslation();
 
   if (result === "unbuilt") {

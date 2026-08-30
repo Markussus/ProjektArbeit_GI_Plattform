@@ -112,47 +112,47 @@
     },
     "g2lFiniteBinary": {
       "title": "Grammatik → Sprache (Drei-Bit-Wörter)",
-      "description": "Zählen Sie jedes Wort auf, das diese Grammatik ableiten kann.",
+      "description": "Zählen Sie alle Wörter auf, die von dieser Grammatik abgeleitet werden können (vollständige Sprache L(G)).",
       "goal": "Listen Sie die vollständige (endliche) Sprache L(G) auf."
     },
     "g2lTrailingZero": {
       "title": "Grammatik → Sprache (Einsen zwischen Nullen)",
-      "description": "Bestimmen Sie die von dieser Grammatik erzeugte Sprache.",
+      "description": "Ermitteln Sie die von dieser Grammatik erzeugte Sprache und listen Sie die ersten Wörter auf.",
       "goal": "Beschreiben Sie die (unendliche) Sprache und nennen Sie die ersten Wörter."
     },
     "g2lEpsilonLoop": {
       "title": "Grammatik → Sprache (Rekursion mit ε)",
-      "description": "Listen Sie die ableitbaren Wörter auf, wenn B auch das leere Wort erzeugen darf.",
+      "description": "Listen Sie die erzeugten Wörter auf und beachten Sie die ε-Produktion von B.",
       "goal": "Zählen Sie die kürzesten Wörter auf und beachten Sie die ε-Produktion von B."
     },
     "g2lGrouped": {
       "title": "Grammatik → Sprache (Gruppierte Alternativen)",
-      "description": "Lösen Sie die gruppierten Regeln auf und zählen Sie die erzeugte Sprache auf.",
+      "description": "Lösen Sie die gruppierten Regeln auf und listen Sie die ableitbaren Wörter auf.",
       "goal": "Lesen Sie die Klammern als gewöhnliche Alternativen und listen Sie die Wörter auf."
     },
     "l2gZeroOnesZero": {
       "title": "Sprache → Grammatik (Eine 0, einige 1en, eine 0)",
-      "description": "Finden Sie eine reguläre Grammatik, die genau diese Wörter erzeugt.",
+      "description": "Schreiben Sie rechtslineare Regeln, die genau die Wörter 0 1ⁿ 0 für n ≥ 1 erzeugen.",
       "goal": "Schreiben Sie rechtslineare Regeln, die 0 1ⁿ 0 für n ≥ 1 erzeugen."
     },
     "l2gFourWords": {
       "title": "Sprache → Grammatik (Vier feste Wörter)",
-      "description": "Schreiben Sie eine Grammatik, die genau diese endliche Sprache ableitet.",
+      "description": "Schreiben Sie eine Grammatik, die genau die vier 4-Bit-Wörter {1011, 0011, 0111, 1111} ableitet.",
       "goal": "Erzeugen Sie genau diese vier 4-Bit-Wörter und nichts sonst."
     },
     "l2gNestedZeros": {
       "title": "Sprache → Grammatik (Blöcke von Nullen)",
-      "description": "Konstruieren Sie eine Grammatik, die diese Sprache erzeugt.",
+      "description": "Konstruieren Sie eine Grammatik, die Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1 erzeugt.",
       "goal": "Erzeugen Sie Wörter der Form 1 0ⁿ 1 0ᵐ 1 mit n, m ≥ 1."
     },
     "appliedIntegers": {
       "title": "Sprache → Grammatik (Ganzzahlen)",
-      "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen.",
+      "description": "Schreiben Sie eine Grammatik für gültige Ganzzahlen: optionales Minuszeichen, keine führenden Nullen (z. B. 0, 42, -100).",
       "goal": "Akzeptieren Sie 0, 42, -100…, aber lehnen Sie 007 und ein einzelnes Minus ab."
     },
     "appliedIdentifiers": {
       "title": "Sprache → Grammatik (Bezeichner)",
-      "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener erster Buchstabe, gefolgt von Groß- oder Kleinbuchstaben, keine Ziffern.",
+      "description": "Schreiben Sie eine Grammatik für Variablennamen: kleingeschriebener Anfangsbuchstabe gefolgt von Buchstaben, keine Ziffern (z. B. x, foo, myVar).",
       "goal": "Akzeptieren Sie x, foo, myVar…, aber lehnen Sie Großbuchstaben oder Ziffern am Anfang ab."
     }
   },

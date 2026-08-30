@@ -11,7 +11,6 @@ import {
   type RLExample,
   type RLExampleCategory,
 } from "./Simulator/config/rlExamples";
-import { useRLSimulatorStore } from "../store/rlSimulatorStore";
 
 /** Section order on the page — one block per kind of task. */
 const CATEGORY_ORDER: RLExampleCategory[] = [
@@ -26,19 +25,12 @@ export function ExamplesTab({
   onOpenExampleInSimulation,
 }: ModuleExamplesTabProps) {
   const { t } = useTranslation();
-  const loadScenario = useRLSimulatorStore((s) => s.loadScenario);
 
   const handleOpen = useCallback(
     (example: RLExample) => {
-      loadScenario({
-        mode: example.mode,
-        grammarSource: example.grammarSource,
-        languageSource: example.languageSource,
-        testWord: example.testWord,
-      });
       onOpenExampleInSimulation(toTopicExample(example, t));
     },
-    [loadScenario, onOpenExampleInSimulation, t],
+    [onOpenExampleInSimulation, t],
   );
 
   // Card numbering runs across the whole tab, not per section.

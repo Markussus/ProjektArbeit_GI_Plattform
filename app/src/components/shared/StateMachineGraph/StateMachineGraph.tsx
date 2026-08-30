@@ -17,8 +17,10 @@ export interface StateMachineGraphNode {
   label: string;
   output?: string;
   isStart?: boolean;
+  isAccept?: boolean;
   isActive?: boolean;
   isPreview?: boolean;
+  isViolation?: boolean;
 }
 
 export interface StateMachineGraphEdge {
@@ -26,6 +28,7 @@ export interface StateMachineGraphEdge {
   to: string;
   label: string;
   isActive?: boolean;
+  isViolation?: boolean;
 }
 
 export interface StateMachineGraphProps {
@@ -36,9 +39,8 @@ export interface StateMachineGraphProps {
   testId?: string;
   compact?: boolean;
   defaultLabelLayout?: "wrapped" | "list";
+  nodeRadius?: number;
 }
-
-const NODE_RADIUS = 42;
 
 export function StateMachineGraph({
   nodes,
@@ -48,12 +50,24 @@ export function StateMachineGraph({
   testId,
   compact = false,
   defaultLabelLayout = "wrapped",
+  nodeRadius: customNodeRadius,
 }: StateMachineGraphProps) {
   const { t } = useTranslation();
   const markerPrefix = useId().replaceAll(":", "");
   const arrowMarkerId = `${markerPrefix}-state-machine-arrow`;
   const activeArrowMarkerId = `${markerPrefix}-state-machine-arrow-active`;
-  const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
+  const violationArrowMarkerId = `${markerPrefix}-state-machine-arrow-violation`;
+
+  const hasOutputs = useMemo(
+    () => nodes.some((node) => node.output !== undefined),
+    [nodes],
+  );
+  const nodeRadius = customNodeRadius ?? (hasOutputs ? 36 : 30);
+
+  const layout = useMemo(
+    () => createCircularLayout(nodes, nodeRadius),
+    [nodes, nodeRadius],
+  );
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
   const [nodePositions, setNodePositions] = useState<Map<string, Point>>(
     () => new Map(),
@@ -86,9 +100,9 @@ export function StateMachineGraph({
     const activeNodeChanged = previousActiveNodeIdRef.current !== activeNodeId;
     previousActiveNodeIdRef.current = activeNodeId;
     if (activePosition && activeNodeChanged) {
-      ensurePointVisible(activePosition.x, activePosition.y, NODE_RADIUS);
+      ensurePointVisible(activePosition.x, activePosition.y, nodeRadius);
     }
-  }, [activeNodeId, activePosition, ensurePointVisible]);
+  }, [activeNodeId, activePosition, ensurePointVisible, nodeRadius]);
 
   useEffect(() => {
     if (!draggedNodeId) {
@@ -123,7 +137,7 @@ export function StateMachineGraph({
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("mouseup", handleUp);
     };
-  }, [draggedNodeId, layout.height, layout.width]);
+  }, [draggedNodeId]);
 
   const resetGraph = () => {
     setNodePositions(new Map());
@@ -177,6 +191,17 @@ export function StateMachineGraph({
           >
             <path d="M 0 0 L 10 4 L 0 8 z" className="fill-brand" />
           </marker>
+          <marker
+            id={violationArrowMarkerId}
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M 0 0 L 10 4 L 0 8 z" className="fill-destructive" />
+          </marker>
         </defs>
 
         {groupedEdges.map((edge) => {
@@ -193,9 +218,12 @@ export function StateMachineGraph({
               y={from.y}
               label={edge.label}
               active={edge.isActive}
+              isViolation={edge.isViolation}
               labelLayout={labelLayout}
               arrowMarkerId={arrowMarkerId}
               activeArrowMarkerId={activeArrowMarkerId}
+              violationArrowMarkerId={violationArrowMarkerId}
+              nodeRadius={nodeRadius}
             />
           ) : (
             <DirectedEdge
@@ -204,9 +232,12 @@ export function StateMachineGraph({
               to={to}
               label={edge.label}
               active={edge.isActive}
+              isViolation={edge.isViolation}
               labelLayout={labelLayout}
               arrowMarkerId={arrowMarkerId}
               activeArrowMarkerId={activeArrowMarkerId}
+              violationArrowMarkerId={violationArrowMarkerId}
+              nodeRadius={nodeRadius}
               isBidirectional={groupedEdges.some(
                 (candidate) =>
                   candidate.from === edge.to && candidate.to === edge.from,
@@ -240,54 +271,89 @@ export function StateMachineGraph({
               {node.isStart && (
                 <>
                   <line
-                    x1={position.x - NODE_RADIUS - 48}
+                    x1={position.x - nodeRadius - 40}
                     y1={position.y}
-                    x2={position.x - NODE_RADIUS - 7}
+                    x2={position.x - nodeRadius - 5}
                     y2={position.y}
                     className="stroke-muted-foreground"
                     strokeWidth="2"
                     markerEnd={`url(#${arrowMarkerId})`}
                   />
                   <text
-                    x={position.x - NODE_RADIUS - 52}
-                    y={position.y - 7}
+                    x={position.x - nodeRadius - 44}
+                    y={position.y - 5}
                     textAnchor="end"
-                    className="fill-muted-foreground text-[11px]"
+                    className="fill-muted-foreground text-[11px] font-medium"
                   >
-                    {t("moore-mealy.graph.start")}
+                    {t("moore-mealy.graph.start", "Start")}
                   </text>
                 </>
+              )}
+              {node.isAccept && (
+                <circle
+                  cx={position.x}
+                  cy={position.y}
+                  r={nodeRadius + 6}
+                  className={cn(
+                    "fill-none stroke-border transition-colors",
+                    node.isActive && "stroke-brand",
+                    node.isViolation && "stroke-destructive",
+                  )}
+                  strokeWidth={node.isActive ? 2.5 : 1.5}
+                />
               )}
               <circle
                 cx={position.x}
                 cy={position.y}
-                r={NODE_RADIUS}
+                r={nodeRadius}
                 className={cn(
                   "fill-card stroke-border transition-colors",
                   node.isActive && "fill-brand/15 stroke-brand",
                   node.isPreview && "fill-brand/5 stroke-brand",
+                  node.isViolation && "fill-destructive/15 stroke-destructive",
                 )}
-                strokeWidth={node.isActive || node.isPreview ? 4 : 2}
+                strokeWidth={
+                  node.isActive || node.isPreview || node.isViolation ? 3.5 : 2
+                }
                 strokeDasharray={node.isPreview ? "8 6" : undefined}
               />
               <text
                 x={position.x}
-                y={position.y - (node.output ? 13 : 0)}
+                y={position.y - (node.output ? 9 : -4)}
                 textAnchor="middle"
                 className={cn(
-                  "fill-foreground text-[13px] font-semibold",
+                  "fill-foreground text-[13px] font-semibold select-none",
                   node.isActive && "fill-brand",
                   node.isPreview && "fill-brand",
+                  node.isViolation && "fill-destructive",
                 )}
               >
                 {node.label}
               </text>
+              {node.isViolation && (
+                <g>
+                  <circle
+                    cx={position.x + nodeRadius * 0.7}
+                    cy={position.y - nodeRadius * 0.7}
+                    r={7.5}
+                    className="fill-destructive"
+                  />
+                  <text
+                    x={position.x + nodeRadius * 0.7}
+                    y={position.y - nodeRadius * 0.7 + 3.5}
+                    textAnchor="middle"
+                    className="fill-destructive-foreground text-[10px] font-extrabold"
+                  >
+                    !
+                  </text>
+                </g>
+              )}
               {node.output !== undefined && (
                 <>
                   <line
-                    x1={position.x - NODE_RADIUS + 5}
+                    x1={position.x - nodeRadius + 4}
                     y1={position.y}
-                    x2={position.x + NODE_RADIUS - 5}
+                    x2={position.x + nodeRadius - 4}
                     y2={position.y}
                     className={cn(
                       "stroke-border",
@@ -297,7 +363,7 @@ export function StateMachineGraph({
                   />
                   <text
                     x={position.x}
-                    y={position.y + 21}
+                    y={position.y + 19}
                     textAnchor="middle"
                     className="fill-muted-foreground text-[12px]"
                   >
@@ -395,27 +461,65 @@ interface Point {
   y: number;
 }
 
-function createCircularLayout(nodes: StateMachineGraphNode[]) {
-  const width = Math.max(520, nodes.length * 150);
-  const height = Math.max(360, Math.min(620, nodes.length * 100));
-  const centerX = width / 2;
-  const centerY = height / 2;
+function createCircularLayout(
+  nodes: StateMachineGraphNode[],
+  nodeRadius: number,
+) {
+  const n = nodes.length;
   const radius =
-    nodes.length <= 1 ? 0 : Math.min(width, height) / 2 - NODE_RADIUS - 54;
-  const positions = new Map<string, Point>();
+    n <= 1
+      ? 0
+      : n === 2
+        ? 120
+        : Math.max(120, (n * (nodeRadius * 2 + 55)) / (2 * Math.PI));
 
+  const rawPositions = new Map<string, Point>();
   nodes.forEach((node, index) => {
-    const angle =
-      nodes.length === 2
-        ? index === 0
-          ? Math.PI
-          : 0
-        : -Math.PI / 2 + (index * Math.PI * 2) / Math.max(nodes.length, 1);
-    positions.set(node.id, {
-      x: centerX + Math.cos(angle) * radius,
-      y: centerY + Math.sin(angle) * radius,
+    let angle: number;
+    if (n === 2) {
+      angle = index === 0 ? Math.PI : 0;
+    } else {
+      angle = -Math.PI / 2 + (index * Math.PI * 2) / Math.max(n, 1);
+    }
+    rawPositions.set(node.id, {
+      x: radius * Math.cos(angle),
+      y: radius * Math.sin(angle),
     });
   });
+
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const p of rawPositions.values()) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+
+  const paddingLeft = nodeRadius + 60;
+  const paddingRight = nodeRadius + 50;
+  const paddingTop = nodeRadius + 75;
+  const paddingBottom = nodeRadius + 50;
+
+  const contentWidth = maxX - minX + paddingLeft + paddingRight;
+  const contentHeight = maxY - minY + paddingTop + paddingBottom;
+
+  const width = Math.max(n <= 1 ? 300 : n <= 2 ? 380 : 440, contentWidth);
+  const height = Math.max(n <= 1 ? 240 : n <= 2 ? 280 : 360, contentHeight);
+
+  const offsetX = paddingLeft - minX + (width - contentWidth) / 2;
+  const offsetY = paddingTop - minY + (height - contentHeight) / 2;
+
+  const positions = new Map<string, Point>();
+  for (const [id, p] of rawPositions.entries()) {
+    positions.set(id, {
+      x: p.x + offsetX,
+      y: p.y + offsetY,
+    });
+  }
 
   return { width, height, positions };
 }
@@ -429,6 +533,7 @@ function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
     if (existing) {
       existing.label = `${existing.label}, ${edge.label}`;
       existing.isActive ||= edge.isActive;
+      existing.isViolation ||= edge.isViolation;
     } else {
       grouped.set(key, { ...edge });
     }
@@ -442,19 +547,25 @@ function DirectedEdge({
   to,
   label,
   active,
+  isViolation,
   isBidirectional = false,
   labelLayout,
   arrowMarkerId,
   activeArrowMarkerId,
+  violationArrowMarkerId,
+  nodeRadius,
 }: {
   from: Point;
   to: Point;
   label: string;
   active?: boolean;
+  isViolation?: boolean;
   isBidirectional?: boolean;
   labelLayout: "wrapped" | "list";
   arrowMarkerId: string;
   activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+  nodeRadius: number;
 }) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -464,24 +575,35 @@ function DirectedEdge({
   const normX = -unitY;
   const normY = unitX;
 
+  const edgeColorClass = active
+    ? "stroke-brand"
+    : isViolation
+      ? "stroke-destructive"
+      : "stroke-muted-foreground";
+  const markerId = active
+    ? activeArrowMarkerId
+    : isViolation
+      ? violationArrowMarkerId
+      : arrowMarkerId;
+
   if (isBidirectional) {
-    const lateralShift = 10;
-    const curveAmount = 26;
+    const lateralShift = 6;
+    const curveAmount = 24;
     const start = {
-      x: from.x + unitX * NODE_RADIUS + normX * lateralShift,
-      y: from.y + unitY * NODE_RADIUS + normY * lateralShift,
+      x: from.x + unitX * nodeRadius + normX * lateralShift,
+      y: from.y + unitY * nodeRadius + normY * lateralShift,
     };
     const end = {
-      x: to.x - unitX * (NODE_RADIUS + 8) + normX * lateralShift,
-      y: to.y - unitY * (NODE_RADIUS + 8) + normY * lateralShift,
+      x: to.x - unitX * (nodeRadius + 6) + normX * lateralShift,
+      y: to.y - unitY * (nodeRadius + 6) + normY * lateralShift,
     };
     const midX = (start.x + end.x) / 2;
     const midY = (start.y + end.y) / 2;
     const controlX = midX + normX * curveAmount;
     const controlY = midY + normY * curveAmount;
 
-    const labelX = midX + normX * (curveAmount + 16);
-    const labelY = midY + normY * (curveAmount + 16);
+    const labelX = midX + normX * (curveAmount + 14);
+    const labelY = midY + normY * (curveAmount + 14);
 
     const pathData = `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
 
@@ -490,15 +612,16 @@ function DirectedEdge({
         <path
           d={pathData}
           fill="none"
-          className={active ? "stroke-brand" : "stroke-muted-foreground"}
-          strokeWidth={active ? 4 : 2}
-          markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
+          className={edgeColorClass}
+          strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
+          markerEnd={`url(#${markerId})`}
         />
         <EdgeLabel
           x={labelX}
           y={labelY}
           label={label}
           active={active}
+          isViolation={isViolation}
           layout={labelLayout}
         />
       </g>
@@ -506,15 +629,15 @@ function DirectedEdge({
   }
 
   const start = {
-    x: from.x + unitX * NODE_RADIUS,
-    y: from.y + unitY * NODE_RADIUS,
+    x: from.x + unitX * nodeRadius,
+    y: from.y + unitY * nodeRadius,
   };
   const end = {
-    x: to.x - unitX * (NODE_RADIUS + 8),
-    y: to.y - unitY * (NODE_RADIUS + 8),
+    x: to.x - unitX * (nodeRadius + 6),
+    y: to.y - unitY * (nodeRadius + 6),
   };
-  const labelX = (start.x + end.x) / 2 + normX * 16;
-  const labelY = (start.y + end.y) / 2 + normY * 16;
+  const labelX = (start.x + end.x) / 2 + normX * 14;
+  const labelY = (start.y + end.y) / 2 + normY * 14;
 
   return (
     <g>
@@ -523,15 +646,16 @@ function DirectedEdge({
         y1={start.y}
         x2={end.x}
         y2={end.y}
-        className={active ? "stroke-brand" : "stroke-muted-foreground"}
-        strokeWidth={active ? 4 : 2}
-        markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
+        className={edgeColorClass}
+        strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
+        markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel
         x={labelX}
         y={labelY}
         label={label}
         active={active}
+        isViolation={isViolation}
         layout={labelLayout}
       />
     </g>
@@ -543,34 +667,62 @@ function SelfLoop({
   y,
   label,
   active,
+  isViolation,
   labelLayout,
   arrowMarkerId,
   activeArrowMarkerId,
+  violationArrowMarkerId,
+  nodeRadius,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  isViolation?: boolean;
   labelLayout: "wrapped" | "list";
   arrowMarkerId: string;
   activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+  nodeRadius: number;
 }) {
-  const path = `M ${x - 22} ${y - 36} C ${x - 58} ${y - 92}, ${x + 58} ${y - 92}, ${x + 22} ${y - 36}`;
+  const startX = x - nodeRadius * 0.45;
+  const startY = y - nodeRadius * 0.9;
+  const endX = x + nodeRadius * 0.45;
+  const endY = y - nodeRadius * 0.9;
+  const ctrl1X = x - nodeRadius * 1.35;
+  const ctrl1Y = y - nodeRadius * 2.5;
+  const ctrl2X = x + nodeRadius * 1.35;
+  const ctrl2Y = y - nodeRadius * 2.5;
+
+  const path = `M ${startX} ${startY} C ${ctrl1X} ${ctrl1Y}, ${ctrl2X} ${ctrl2Y}, ${endX} ${endY}`;
+  const labelY = y - nodeRadius * 2.0;
+
+  const edgeColorClass = active
+    ? "stroke-brand"
+    : isViolation
+      ? "stroke-destructive"
+      : "stroke-muted-foreground";
+  const markerId = active
+    ? activeArrowMarkerId
+    : isViolation
+      ? violationArrowMarkerId
+      : arrowMarkerId;
 
   return (
     <g>
       <path
         d={path}
         fill="none"
-        className={active ? "stroke-brand" : "stroke-muted-foreground"}
-        strokeWidth={active ? 4 : 2}
-        markerEnd={`url(#${active ? activeArrowMarkerId : arrowMarkerId})`}
+        className={edgeColorClass}
+        strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
+        markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel
         x={x}
-        y={y - 84}
+        y={labelY}
         label={label}
         active={active}
+        isViolation={isViolation}
         layout={labelLayout}
       />
     </g>
@@ -582,19 +734,27 @@ function EdgeLabel({
   y,
   label,
   active,
+  isViolation,
   layout,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  isViolation?: boolean;
   layout: "wrapped" | "list";
 }) {
   const labels = label.split(", ");
   const lines =
     layout === "list" ? labels : wrapCommaSeparatedLabels(labels, 24);
-  const width = Math.max(30, ...lines.map((line) => line.length * 7 + 14));
-  const height = Math.max(24, lines.length * 18 + 8);
+  const width = Math.max(28, ...lines.map((line) => line.length * 7 + 12));
+  const height = Math.max(22, lines.length * 16 + 6);
+
+  const rectBgClass = active
+    ? "fill-brand/15 stroke-brand"
+    : isViolation
+      ? "fill-destructive/15 stroke-destructive"
+      : "fill-card stroke-border";
 
   return (
     <g>
@@ -603,20 +763,19 @@ function EdgeLabel({
         y={y - height / 2}
         width={width}
         height={height}
-        rx={6}
-        className={
-          active ? "fill-brand/15 stroke-brand" : "fill-card stroke-border"
-        }
+        rx={5}
+        className={rectBgClass}
       />
       {lines.map((line, index) => (
         <text
           key={`${line}-${index}`}
           x={x}
-          y={y - ((lines.length - 1) * 18) / 2 + index * 18 + 4}
+          y={y - ((lines.length - 1) * 16) / 2 + index * 16 + 4}
           textAnchor="middle"
           className={cn(
-            "fill-foreground text-[12px] font-semibold",
+            "fill-foreground text-[11.5px] font-semibold select-none",
             active && "fill-brand",
+            isViolation && "fill-destructive",
           )}
         >
           {line}

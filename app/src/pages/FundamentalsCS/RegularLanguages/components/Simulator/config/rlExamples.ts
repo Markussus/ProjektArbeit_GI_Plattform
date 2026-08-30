@@ -145,3 +145,7 @@ export const rlExamples: RLExample[] = [
   exampleLectureLanguage1,
   exampleRecognizeWord,
 ];
+
+export function findRLExample(id: string): RLExample | undefined {
+  return rlExamples.find((e) => e.id === id || e.titleKey === id);
+}

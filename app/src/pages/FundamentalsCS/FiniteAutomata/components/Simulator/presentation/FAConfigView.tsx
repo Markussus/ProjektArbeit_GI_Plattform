@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import type { UseFAConfigEditorResult } from "../application/useFAConfigEditor";
 import type { FAProgramIssueCode } from "../domain/faProgramValidation";
 import { FATransitionTableEditor } from "./FATransitionTableEditor";
@@ -45,6 +46,23 @@ export interface FAConfigViewProps {
 
 export function FAConfigView({ editor }: FAConfigViewProps) {
   const { t } = useTranslation();
+
+  const typeOptions = useMemo(
+    () => [
+      { value: "DFA" as const, label: "DFA" },
+      { value: "NFA" as const, label: "NFA" },
+    ],
+    [],
+  );
+
+  const startStateOptions = useMemo(
+    () =>
+      editor.draft.states.map((s) => ({
+        value: s,
+        label: <span className="font-mono">{s}</span>,
+      })),
+    [editor.draft.states],
+  );
 
   const issueMessages = editor.validationIssues
     .map((issue) => translateIssue(issue.code))
@@ -114,16 +132,17 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           <label className={labelClass}>
             {t("finite-automata.config.type", "Type")}
           </label>
-          <select
+          <DropdownSelect<"DFA" | "NFA">
             value={editor.draft.type}
-            onChange={(e) =>
-              editor.setAutomatonType(e.target.value as "DFA" | "NFA")
-            }
-            className={inputClass}
-          >
-            <option value="DFA">DFA</option>
-            <option value="NFA">NFA</option>
-          </select>
+            options={typeOptions}
+            onChange={(val) => editor.setAutomatonType(val)}
+            ariaLabel={t("finite-automata.config.type", "Type")}
+            triggerClassName="w-full h-[38px] px-3 py-2 text-sm"
+            menuClassName="right-0 left-0"
+            triggerTestId="fa-type-select"
+            menuTestId="fa-type-menu"
+            optionTestIdPrefix="fa-type-option"
+          />
         </div>
 
         {/* Alphabet */}
@@ -144,17 +163,17 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
           <label className={labelClass}>
             {t("finite-automata.config.startState", "Start State")}
           </label>
-          <select
+          <DropdownSelect<string>
             value={editor.draft.startState}
-            onChange={(e) => editor.setStartState(e.target.value)}
-            className={inputClass}
-          >
-            {editor.draft.states.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            options={startStateOptions}
+            onChange={(val) => editor.setStartState(val)}
+            ariaLabel={t("finite-automata.config.startState", "Start State")}
+            triggerClassName="w-full h-[38px] px-3 py-2 text-sm"
+            menuClassName="right-0 left-0"
+            triggerTestId="fa-start-state-select"
+            menuTestId="fa-start-state-menu"
+            optionTestIdPrefix="fa-start-state-option"
+          />
         </div>
 
         {/* Accept States — sits beside Start State so the 2×2 grid has no

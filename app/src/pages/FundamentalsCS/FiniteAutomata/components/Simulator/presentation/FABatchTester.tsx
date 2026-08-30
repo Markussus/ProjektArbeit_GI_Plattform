@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Play, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { runBatch, type FABatchResult } from "../domain/faBatchRunner";
 import type { FAProgram } from "../domain/faTypes";
 
@@ -42,12 +43,12 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
 
   return (
     <div
-      className="flex w-full min-w-0 flex-col gap-3 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-4"
+      className="border-border bg-card flex w-full min-w-0 flex-col gap-3 rounded-xl border p-4"
       style={{ height: "100%", minHeight: 0 }}
     >
       {/* Header */}
-      <div className="flex flex-shrink-0 items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
           {t("finite-automata.batch.title", "Batch Testing")}
         </span>
       </div>
@@ -55,7 +56,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
       {/* Input area — hidden once results are shown */}
       {!results ? (
         <textarea
-          className="rounded-md border border-(--fa-border) bg-(--fa-surface) p-3 font-mono text-[0.8125rem] text-(--fa-text) transition-colors duration-200 outline-none placeholder:text-(--fa-text-dim) focus:border-(--fa-cyan)"
+          className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-brand rounded-md border p-3 font-mono text-sm transition-colors outline-none"
           rows={4}
           style={{ flex: "1 1 auto", minHeight: 80, resize: "none" }}
           value={rawInput}
@@ -73,17 +74,14 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
         >
           {/* Summary bar */}
           {summary && (
-            <div
-              className="flex flex-shrink-0 items-center gap-3"
-              style={{ fontSize: "0.75rem", fontWeight: 600 }}
-            >
-              <span style={{ color: "var(--fa-green)" }}>
+            <div className="text-muted-foreground flex shrink-0 items-center gap-3 text-xs font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-400">
                 ✅ {summary.accepted}
               </span>
-              <span style={{ color: "var(--fa-red)" }}>
+              <span className="text-destructive">
                 ❌ {summary.rejected}
               </span>
-              <span style={{ color: "var(--fa-text-dim)" }}>
+              <span>
                 / {summary.total} {t("finite-automata.batch.total", "total")}
               </span>
             </div>
@@ -99,38 +97,30 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                 key={i}
                 type="button"
                 onClick={() => onSelectWord?.(r.inputWord)}
-                className="flex w-full min-w-0 flex-shrink-0 items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left transition-colors"
-                style={{
-                  background: "var(--fa-surface)",
-                  border: "1px solid var(--fa-border-subtle)",
-                  fontSize: "0.8125rem",
-                  cursor: "pointer",
-                }}
+                className="border-border bg-background hover:bg-muted/50 flex w-full min-w-0 shrink-0 cursor-pointer items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-sm transition-colors"
                 title={r.inputWord || "ε"}
               >
                 <span
-                  className="min-w-0 flex-1 truncate font-mono"
-                  style={{
-                    color: r.accepted ? "var(--fa-green)" : "var(--fa-red)",
-                  }}
+                  className={cn(
+                    "min-w-0 flex-1 truncate font-mono",
+                    r.accepted
+                      ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                      : "text-destructive font-medium",
+                  )}
                 >
                   {r.inputWord || "ε"}
                 </span>
-                <span
-                  className="flex shrink-0 items-center gap-1.5"
-                  style={{ fontSize: "0.75rem" }}
-                >
-                  <span style={{ color: "var(--fa-text-dim)" }}>
+                <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-xs">
+                  <span>
                     {r.steps} {t("finite-automata.batch.steps", "steps")}
                   </span>
                   <span
-                    className="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-bold"
-                    style={{
-                      background: r.accepted
-                        ? "var(--fa-green-dim)"
-                        : "var(--fa-red-dim)",
-                      color: r.accepted ? "var(--fa-green)" : "var(--fa-red)",
-                    }}
+                    className={cn(
+                      "inline-flex items-center rounded px-1.5 py-0.5 text-xs font-bold",
+                      r.accepted
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-destructive/10 text-destructive",
+                    )}
                   >
                     {r.accepted ? "✅" : "❌"}
                   </span>
@@ -142,54 +132,27 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
       )}
 
       {/* Action buttons — always at bottom */}
-      <div className="flex flex-shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1.5">
         <button
           type="button"
-          className="cursor-pointer rounded-md border border-(--fa-cyan) bg-(--fa-cyan-dim) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-cyan) transition-all duration-200 hover:brightness-[1.15]"
+          className="bg-brand text-brand-foreground hover:opacity-90 flex flex-1 cursor-pointer items-center justify-center gap-1.5 truncate rounded-md px-3 py-2 text-sm font-semibold transition-opacity"
           onClick={handleRun}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 4,
-            whiteSpace: "nowrap",
-            flex: "1 1 0%",
-            paddingInline: "0.4rem",
-            overflow: "hidden",
-          }}
           title={t("finite-automata.batch.runAll", "Run All")}
         >
-          <Play
-            style={{
-              width: 14,
-              height: 14,
-              fill: "currentcolor",
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+          <Play className="size-3.5 shrink-0 fill-current" />
+          <span className="truncate">
             {t("finite-automata.batch.runAll", "Run All")}
           </span>
         </button>
         {results && (
           <button
             type="button"
-            className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
+            className="border-border bg-background hover:bg-muted text-foreground flex flex-1 cursor-pointer items-center justify-center gap-1.5 truncate rounded-md border px-3 py-2 text-sm font-medium transition-colors"
             onClick={handleClear}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 4,
-              whiteSpace: "nowrap",
-              flex: "1 1 0%",
-              paddingInline: "0.4rem",
-              overflow: "hidden",
-            }}
             title={t("finite-automata.batch.clear", "Clear")}
           >
-            <RotateCcw style={{ width: 14, height: 14, flexShrink: 0 }} />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            <RotateCcw className="size-3.5 shrink-0" />
+            <span className="truncate">
               {t("finite-automata.batch.clear", "Clear")}
             </span>
           </button>

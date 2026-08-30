@@ -10,9 +10,17 @@ import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
-import { useRLSimulatorStore } from "../../store/rlSimulatorStore";
-import { findRLExercise } from "../../exercises/rlExerciseDefinitions";
+import type { RLExerciseDefinition } from "../../exercises/rlExerciseDefinitions";
+import type { RLExample } from "./config/rlExamples";
 import type { SimulationMode } from "./domain/rlTypes";
+import {
+  checkGrammarEnumerationExercise,
+  checkLanguageToGrammarExercise,
+  G2L_EXERCISE_ENUMERATION,
+  type RLCheckResult,
+} from "./domain/rlSolutionChecker";
+import { enumerateLanguage } from "./domain/rlLanguageOps";
+import { parseGrammar } from "./domain/rlGrammarValidation";
 import { RLModeSelector } from "./presentation/RLModeSelector";
 import { RLGrammarToLanguage } from "./presentation/RLGrammarToLanguage";
 import { RLGrammarEnumerationExercise } from "./presentation/RLGrammarEnumerationExercise";
@@ -21,7 +29,9 @@ import { RLLanguageToGrammar } from "./presentation/RLLanguageToGrammar";
 import { RLWordRecognizer } from "./presentation/RLWordRecognizer";
 import { RL_STORAGE_TASK_IDS } from "./useRLPersistedSource";
 
-interface RLSimulatorProps {
+export interface RLSimulatorProps {
+  exercise?: RLExerciseDefinition | null;
+  example?: RLExample | null;
   /** Clears the active exercise (set by ModuleTopicPage when one is open). */
   onExitExercise?: () => void;
   importedTaskStorageId?: number;
@@ -30,6 +40,8 @@ interface RLSimulatorProps {
 
 export interface RLSimulatorHandle {
   resetStoredState: () => void;
+  loadSolution: () => void;
+  checkSolution: () => RLCheckResult | null;
 }
 
 const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
@@ -39,22 +51,23 @@ const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
 };
 
 export function RLSimulator({
+  exercise,
+  example,
   onExitExercise,
   importedTaskStorageId,
   ref,
 }: RLSimulatorProps) {
-  const mode = useRLSimulatorStore((s) => s.mode);
-  const setMode = useRLSimulatorStore((s) => s.setMode);
-  const activeExerciseId = useRLSimulatorStore((s) => s.activeExerciseId);
-  const pendingGrammarSource = useRLSimulatorStore(
-    (s) => s.pendingGrammarSource,
-  );
-  const pendingLanguageSource = useRLSimulatorStore(
-    (s) => s.pendingLanguageSource,
-  );
-  const pendingTestWord = useRLSimulatorStore((s) => s.pendingTestWord);
-  const consumePending = useRLSimulatorStore((s) => s.consumePending);
-  const clearExerciseDraft = useRLSimulatorStore((s) => s.clearExerciseDraft);
+  const [mode, setMode] = useState<SimulationMode>(() => {
+    if (importedTaskStorageId) {
+      const imported = Object.entries(RL_STORAGE_TASK_IDS).find(
+        ([, id]) => id === importedTaskStorageId,
+      )?.[0] as SimulationMode | undefined;
+      if (imported) return imported;
+    }
+    return exercise?.mode ?? example?.mode ?? "grammarToLanguage";
+  });
+
+  const [studentDraft, setStudentDraft] = useState("");
   const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
 
   useEffect(() => {
@@ -65,32 +78,24 @@ export function RLSimulator({
     if (importedMode) {
       setMode(importedMode);
     }
-  }, [importedTaskStorageId, setMode]);
+  }, [importedTaskStorageId]);
 
-  // An active exercise replaces the free converter with a guided workspace:
-  // Grammar → Language gives the grammar and asks for the language; Language →
-  // Grammar gives the language and asks for a grammar.
-  const activeExercise = activeExerciseId
-    ? findRLExercise(activeExerciseId)
-    : undefined;
-  const isGrammarExercise = activeExercise?.mode === "grammarToLanguage";
-  const isLanguageExercise = activeExercise?.mode === "languageToGrammar";
+  const isGrammarExercise = exercise?.mode === "grammarToLanguage";
+  const isLanguageExercise = exercise?.mode === "languageToGrammar";
 
-  // Switching modes while an exercise is active simply abandons it - the same
-  // uninterrupted switch the module tabs and the Moore/Mealy tabs use.
   const handleModeChange = (target: SimulationMode) => {
     if (target === mode) {
       return;
     }
-    if (activeExerciseId) {
+    if (exercise) {
       onExitExercise?.();
     }
     setMode(target);
   };
 
   const resetStoredState = useCallback(() => {
-    if (activeExerciseId) {
-      clearExerciseDraft(activeExerciseId);
+    if (exercise) {
+      setStudentDraft("");
       return;
     }
 
@@ -104,66 +109,92 @@ export function RLSimulator({
       ...versions,
       [mode]: versions[mode] + 1,
     }));
-  }, [activeExerciseId, clearExerciseDraft, mode]);
+  }, [exercise, mode]);
 
-  useImperativeHandle(ref, () => ({ resetStoredState }), [resetStoredState]);
-
-  // When a pending scenario arrives the mode cards pick it up via a
-  // render-time prop sync (see each card); we then clear the store so the
-  // value isn't re-applied and the user's later edits stick.
-  useEffect(() => {
-    if (
-      pendingGrammarSource !== null ||
-      pendingLanguageSource !== null ||
-      pendingTestWord !== null
+  const loadSolution = useCallback(() => {
+    if (!exercise) return;
+    if (exercise.mode === "grammarToLanguage") {
+      const parsed = parseGrammar(exercise.seed.grammarSource ?? "");
+      if (!parsed.ok || !parsed.grammar) return;
+      const { words } = enumerateLanguage(
+        parsed.grammar,
+        G2L_EXERCISE_ENUMERATION,
+      );
+      const revealed = words.map((w) => (w === "" ? "ε" : w)).join(", ");
+      setStudentDraft(revealed);
+    } else if (
+      exercise.mode === "languageToGrammar" &&
+      exercise.referenceGrammar
     ) {
-      const clearPending = setTimeout(() => consumePending(), 0);
-      return () => clearTimeout(clearPending);
+      setStudentDraft(exercise.referenceGrammar);
     }
-  }, [
-    pendingGrammarSource,
-    pendingLanguageSource,
-    pendingTestWord,
-    consumePending,
-  ]);
+  }, [exercise]);
+
+  const checkSolution = useCallback((): RLCheckResult | null => {
+    if (!exercise) return null;
+    if (exercise.mode === "grammarToLanguage") {
+      return checkGrammarEnumerationExercise(
+        studentDraft,
+        exercise.seed.grammarSource ?? "",
+      );
+    }
+    if (exercise.mode === "languageToGrammar") {
+      return checkLanguageToGrammarExercise(
+        studentDraft,
+        exercise.seed.languageSource ?? "",
+        exercise.rejectWords ?? [],
+      );
+    }
+    return null;
+  }, [exercise, studentDraft]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetStoredState,
+      loadSolution,
+      checkSolution,
+    }),
+    [resetStoredState, loadSolution, checkSolution],
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-2 sm:p-4">
       <RLModeSelector mode={mode} onChange={handleModeChange} />
 
-      {/*
-        All three modes stay mounted and are toggled with `hidden`, mirroring
-        the Moore/Mealy simulator's tab handling. This preserves each mode's
-        in-progress edits when the learner switches between them, so returning
-        to a mode behaves like the initial navigation instead of resetting to
-        its default example. A pending seed is only handed to the mode it
-        targets (the grammar field is shared by two modes).
-      */}
       <div hidden={mode !== "grammarToLanguage"}>
-        {isGrammarExercise && activeExercise ? (
-          <RLGrammarEnumerationExercise exercise={activeExercise} />
+        {isGrammarExercise && exercise ? (
+          <RLGrammarEnumerationExercise
+            exercise={exercise}
+            value={studentDraft}
+            onChange={setStudentDraft}
+          />
         ) : (
           <RLGrammarToLanguage
             transferActive={mode === "grammarToLanguage"}
             resetVersion={resetVersions.grammarToLanguage}
             initialGrammar={
               mode === "grammarToLanguage"
-                ? (pendingGrammarSource ?? undefined)
+                ? (example?.grammarSource ?? undefined)
                 : undefined
             }
           />
         )}
       </div>
       <div hidden={mode !== "languageToGrammar"}>
-        {isLanguageExercise && activeExercise ? (
-          <RLLanguageGrammarExercise exercise={activeExercise} />
+        {isLanguageExercise && exercise ? (
+          <RLLanguageGrammarExercise
+            exercise={exercise}
+            value={studentDraft}
+            onChange={setStudentDraft}
+          />
         ) : (
           <RLLanguageToGrammar
             transferActive={mode === "languageToGrammar"}
             resetVersion={resetVersions.languageToGrammar}
             initialSource={
               mode === "languageToGrammar"
-                ? (pendingLanguageSource ?? undefined)
+                ? (example?.languageSource ?? undefined)
                 : undefined
             }
           />
@@ -175,12 +206,12 @@ export function RLSimulator({
           resetVersion={resetVersions.recognizeWord}
           initialGrammar={
             mode === "recognizeWord"
-              ? (pendingGrammarSource ?? undefined)
+              ? (example?.grammarSource ?? undefined)
               : undefined
           }
           initialWord={
             mode === "recognizeWord"
-              ? (pendingTestWord ?? undefined)
+              ? (example?.testWord ?? undefined)
               : undefined
           }
         />

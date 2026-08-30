@@ -35,7 +35,7 @@ export function RLGrammarInputCard({
         .join(", ");
 
   return (
-    <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+    <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
       <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
         {t(
           titleKey ?? "regular-languages.simulator.grammarInput",

@@ -25,11 +25,9 @@ const STRUCTURED_EXAMPLE = [
   "A -> 0A | 1",
 ].join("\n");
 
-const DEFAULT_GRAMMAR_SOURCE = SIMPLE_EXAMPLE;
-
 export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(DEFAULT_GRAMMAR_SOURCE);
+  const [source, setSource] = useState("");
   const [submitErrors, setSubmitErrors] = useState<string[]>([]);
   const [helpOpen, setHelpOpen] = useState(false);
 

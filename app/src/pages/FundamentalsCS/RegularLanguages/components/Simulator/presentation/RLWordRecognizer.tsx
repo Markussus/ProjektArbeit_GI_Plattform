@@ -109,7 +109,7 @@ export function RLWordRecognizer({
         />
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           {t("regular-languages.simulator.testWord", "Words to Test")}
         </h4>
@@ -136,7 +136,7 @@ export function RLWordRecognizer({
               <li
                 key={`${r.word}-${idx}`}
                 className={cn(
-                  "ring-foreground/10 flex items-start gap-2 rounded-md px-3 py-2 text-sm ring-1",
+                  "border-border flex items-start gap-2 rounded-md border px-3 py-2 text-sm",
                   r.accepted
                     ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                     : "bg-rose-500/10 text-rose-700 dark:text-rose-400",

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,6 @@ import {
   RL_STORAGE_TASK_IDS,
   useRLPersistedSource,
 } from "../useRLPersistedSource";
-import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
@@ -91,16 +90,6 @@ export function RLLanguageToGrammar({
     enabled: transferActive,
   });
 
-  // Publish the current language so the lifted exercise "Check solution" action
-  // can validate it; clear it when this mode unmounts.
-  const setStudentLanguageSource = useRLSimulatorStore(
-    (s) => s.setStudentLanguageSource,
-  );
-  useEffect(() => {
-    setStudentLanguageSource(source);
-    return () => setStudentLanguageSource(null);
-  }, [source, setStudentLanguageSource]);
-
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
     if (!parsed.ok) {
@@ -144,7 +133,7 @@ export function RLLanguageToGrammar({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
-        <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+        <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
             {t(
               "regular-languages.simulator.languageDefinition",
@@ -216,7 +205,7 @@ export function RLLanguageToGrammar({
         </div>
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
             <ArrowRight className="text-primary h-4 w-4" />

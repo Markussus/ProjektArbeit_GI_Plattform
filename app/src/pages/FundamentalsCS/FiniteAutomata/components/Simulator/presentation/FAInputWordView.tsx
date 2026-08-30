@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 import type { FARuntime } from "../domain/faRuntime";
 
 interface FAInputWordViewProps {
@@ -12,27 +13,17 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   // instead of collapsing to a line of text beside the step timeline.
   if (runtime.inputWord.length === 0) {
     return (
-      <div className="min-w-0 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+      <div className="border-border bg-card min-w-0 rounded-xl border p-4">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+          <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
             {t("finite-automata.sim.inputWord", "Input Word")}
           </span>
-          <span className="text-[0.65rem] font-medium text-(--fa-text-dim)">
+          <span className="text-muted-foreground text-xs font-medium">
             {t("finite-automata.sim.emptyWord", "Empty word (ε)")}
           </span>
         </div>
         <div className="flex items-center gap-1 pb-1">
-          <div
-            className="flex items-center justify-center font-mono text-sm"
-            style={{
-              width: 36,
-              height: 36,
-              flexShrink: 0,
-              borderRadius: "0.375rem",
-              border: "1px dashed var(--fa-border)",
-              color: "var(--fa-text-dim)",
-            }}
-          >
+          <div className="border-border text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-md border border-dashed font-mono text-sm">
             ε
           </div>
         </div>
@@ -41,12 +32,12 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   }
 
   return (
-    <div className="min-w-0 rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+    <div className="border-border bg-card min-w-0 rounded-xl border p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-wider text-(--fa-text-dim) uppercase">
+        <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
           {t("finite-automata.sim.inputWord", "Input Word")}
         </span>
-        <span className="text-[0.65rem] font-medium text-(--fa-text-dim)">
+        <span className="text-muted-foreground text-xs font-medium">
           {t("finite-automata.sim.inputWordLength", "{{count}} symbols", {
             count: runtime.inputWord.length,
           })}
@@ -64,40 +55,13 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
           return (
             <div
               key={index}
-              className="flex items-center justify-center font-mono text-sm font-medium"
-              style={{
-                width: 36,
-                height: 36,
-                flexShrink: 0,
-                borderRadius: "0.375rem",
-                transition: "all 0.3s",
-                ...(isCurrent
-                  ? {
-                      background: "var(--fa-cyan-dim)",
-                      border: "2px solid var(--fa-cyan)",
-                      color: "var(--fa-cyan)",
-                    }
-                  : isRead
-                    ? {
-                        background: "var(--fa-surface)",
-                        border: "1px solid var(--fa-border-subtle)",
-                        color: "var(--fa-text-dim)",
-                        opacity: 0.5,
-                      }
-                    : isUpcoming
-                      ? {
-                          background: "var(--fa-surface)",
-                          border: "1px solid var(--fa-border)",
-                          color: "var(--fa-text)",
-                        }
-                      : {
-                          // Halted, beyond position
-                          background: "var(--fa-surface)",
-                          border: "1px solid var(--fa-border-subtle)",
-                          color: "var(--fa-text-dim)",
-                          opacity: 0.4,
-                        }),
-              }}
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center rounded-md border font-mono text-sm font-medium transition-all",
+                isCurrent && "border-brand bg-brand/10 text-brand border-2 font-bold",
+                !isCurrent && isRead && "border-border bg-muted/50 text-muted-foreground opacity-50",
+                !isCurrent && isUpcoming && "border-border bg-background text-foreground",
+                !isCurrent && !isRead && !isUpcoming && "border-border bg-muted/30 text-muted-foreground opacity-40",
+              )}
             >
               {symbol}
             </div>

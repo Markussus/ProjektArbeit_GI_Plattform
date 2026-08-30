@@ -107,3 +107,7 @@ export const faExamples: FAExample[] = [
   exampleGrammar,
   exampleContainsAba,
 ];
+
+export function findFAExample(id: string): FAExample | undefined {
+  return faExamples.find((e) => e.id === id || e.titleKey === id);
+}

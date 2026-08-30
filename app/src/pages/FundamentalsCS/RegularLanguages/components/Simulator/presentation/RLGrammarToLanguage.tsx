@@ -144,7 +144,7 @@ export function RLGrammarToLanguage({
         </RLGrammarInputCard>
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           <ArrowRight className="text-primary h-4 w-4" />
           {t(
@@ -201,7 +201,7 @@ export function RLGrammarToLanguage({
                   {result.words.map((w) => (
                     <span
                       key={w || "ε"}
-                      className="bg-background ring-foreground/10 rounded-md px-2 py-0.5 text-xs ring-1"
+                      className="border-border bg-background rounded-md border px-2 py-0.5 text-xs"
                     >
                       {w === "" ? "ε" : w}
                     </span>

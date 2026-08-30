@@ -63,15 +63,15 @@ export function FASimulationView({
   );
 
   return (
-    <div className="rounded-[1rem] bg-(--fa-bg) p-6 text-(--fa-text)">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       {/* Top bar: title + edit button */}
-      <div className="mb-4 flex items-center justify-between md:pr-24">
-        <h2 className="text-lg font-bold text-(--fa-text-bright)">
+      <div className="flex items-center justify-between md:pr-24">
+        <h2 className="text-xl font-bold">
           {t("finite-automata.sim.title", "Simulation")}
         </h2>
         <button
           type="button"
-          className="cursor-pointer rounded-md border border-(--fa-border) bg-(--fa-surface-raised) px-4 py-2 text-[0.8125rem] font-semibold text-(--fa-text) transition-all duration-200 hover:border-(--fa-cyan) hover:text-(--fa-cyan)"
+          className="border-border bg-background hover:bg-muted text-foreground cursor-pointer rounded-md border px-4 py-2 text-sm font-medium transition-colors"
           onClick={onEditConfig}
         >
           {t("finite-automata.sim.edit", "Edit Configuration")}
@@ -83,7 +83,7 @@ export function FASimulationView({
           inside its own panel), and the step timeline grows to take the
           remaining width so neither panel leaves a large empty gap.
           `min-w-0` lets both flex children shrink rather than blow out the row. */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-stretch">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
         <div className="min-w-0 lg:max-w-[45%] lg:flex-[0_1_auto]">
           <FAInputWordView runtime={runtime} />
         </div>
@@ -92,10 +92,10 @@ export function FASimulationView({
         </div>
       </div>
 
-      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-stretch">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Left: Controls + Status */}
         <div className="flex w-full min-w-0 flex-col gap-4 lg:w-1/4">
-          <div className="rounded-[0.75rem] border border-(--fa-border) bg-(--fa-surface) p-3">
+          <div className="border-border bg-card rounded-xl border p-3">
             <SimulatorControls
               status={status}
               speed={speed}

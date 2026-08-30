@@ -11,7 +11,6 @@ import {
   type FAExample,
   type FAExampleCategory,
 } from "./Simulator/config/faExamples";
-import { useFASimulatorStore } from "../store/faSimulatorStore";
 
 /** Section order on the page — one block per kind of automaton. */
 const CATEGORY_ORDER: FAExampleCategory[] = [
@@ -26,14 +25,12 @@ export function ExamplesTab({
   onOpenExampleInSimulation,
 }: ModuleExamplesTabProps) {
   const { t } = useTranslation();
-  const loadExample = useFASimulatorStore((s) => s.loadExample);
 
   const handleOpen = useCallback(
     (example: FAExample) => {
-      loadExample(example.program, example.inputWord);
       onOpenExampleInSimulation(toTopicExample(example, t));
     },
-    [loadExample, onOpenExampleInSimulation, t],
+    [onOpenExampleInSimulation, t],
   );
 
   // Card numbering runs across the whole tab, not per section.
