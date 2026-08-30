@@ -1,13 +1,10 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { getJavaScenario } from "../exercises";
-import {
-  buildValidationTableRows,
-  type JavaValidationRunResult,
-} from "./Simulator/domain/javaValidationRunner";
+import { JavaSolutionCheckDialog } from "./JavaSolutionCheckDialog";
+import type { JavaValidationRunResult } from "./Simulator/domain/javaValidationRunner";
 import {
   JavaSimulator,
   type JavaSimulatorHandle,
@@ -22,9 +19,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const [isChecking, setIsChecking] = useState(false);
 
   const scenario = useMemo(() => {
-    if (!props.selectedItem) {
-      return null;
-    }
+    if (!props.selectedItem) return null;
     return getJavaScenario(props.selectedItem.id);
   }, [props.selectedItem]);
 
@@ -36,25 +31,13 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     [],
   );
 
-  const handleLoadSolution = () => {
-    simulatorRef.current?.loadSolution();
-  };
-
-  const handleReset = () => {
-    setCheckResult(null);
-    simulatorRef.current?.resetStoredState();
-  };
-
   const handleCheckSolution = async () => {
-    const isExercise = scenario?.kind === "exercise";
-    if (!simulatorRef.current || !isSimulatorReady || !isExercise) {
+    if (!simulatorRef.current || !isSimulatorReady || scenario?.kind !== "exercise") {
       return;
     }
-
     setIsChecking(true);
     try {
-      const result = await simulatorRef.current.checkSolution();
-      setCheckResult(result);
+      setCheckResult(await simulatorRef.current.checkSolution());
     } finally {
       setIsChecking(false);
     }
@@ -62,18 +45,29 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const headerActions =
     scenario?.kind === "exercise" ? (
-      <JavaSimulationHeaderActions
-        isSimulatorReady={isSimulatorReady}
-        isChecking={isChecking}
-        onLoadSolution={handleLoadSolution}
-        onCheckSolution={handleCheckSolution}
-      />
+      <>
+        <button
+          type="button"
+          onClick={() => simulatorRef.current?.loadSolution()}
+          disabled={!isSimulatorReady}
+          data-testid="java-load-solution"
+          className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {t("java-programming.actions.loadSolution")}
+        </button>
+        <button
+          type="button"
+          onClick={handleCheckSolution}
+          disabled={isChecking || !isSimulatorReady}
+          data-testid="java-check-solution"
+          className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isChecking
+            ? t("java-programming.actions.checkingSolution")
+            : t("java-programming.actions.checkSolution")}
+        </button>
+      </>
     ) : null;
-
-  const resultRows = useMemo(
-    () => buildValidationTableRows(checkResult, t),
-    [checkResult, t],
-  );
 
   return (
     <>
@@ -82,7 +76,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
         emptyStateTextKey="common.simulation.emptyStates.java"
-        onReset={handleReset}
+        onReset={() => {
+          setCheckResult(null);
+          simulatorRef.current?.resetStoredState();
+        }}
         resetDisabled={!isSimulatorReady}
         overlayControls
       >
@@ -95,67 +92,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         />
       </TopicSimulationTab>
 
-      <SolutionCheckDialog
-        open={checkResult !== null}
-        title={t("java-programming.validation.popupTitle")}
+      <JavaSolutionCheckDialog
+        checkResult={checkResult}
         onClose={() => setCheckResult(null)}
-        testId="java-solution-check-dialog"
-        error={checkResult?.error}
-        errorTestId="java-solution-check-error"
-        tableTestIdPrefix="java-solution-check-table"
-        headers={[
-          t("java-programming.validation.table.passed"),
-          t("java-programming.validation.table.case"),
-          t("java-programming.validation.table.output"),
-          t("java-programming.validation.table.expectedOutput"),
-          t("java-programming.validation.table.phase"),
-        ]}
-        rows={resultRows}
-        getRowTestAttributes={(rowIndex) => ({
-          "data-passed": String(checkResult?.rows[rowIndex]?.passed),
-        })}
       />
-    </>
-  );
-}
-
-interface JavaSimulationHeaderActionsProps {
-  isSimulatorReady: boolean;
-  isChecking: boolean;
-  onLoadSolution: () => void;
-  onCheckSolution: () => void;
-}
-
-function JavaSimulationHeaderActions({
-  isSimulatorReady,
-  isChecking,
-  onLoadSolution,
-  onCheckSolution,
-}: JavaSimulationHeaderActionsProps) {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={onLoadSolution}
-        disabled={!isSimulatorReady}
-        data-testid="java-load-solution"
-        className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {t("java-programming.actions.loadSolution")}
-      </button>
-      <button
-        type="button"
-        onClick={onCheckSolution}
-        disabled={isChecking || !isSimulatorReady}
-        data-testid="java-check-solution"
-        className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isChecking
-          ? t("java-programming.actions.checkingSolution")
-          : t("java-programming.actions.checkSolution")}
-      </button>
     </>
   );
 }

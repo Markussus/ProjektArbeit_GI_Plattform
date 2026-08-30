@@ -135,6 +135,14 @@ function createExercise(
   };
 }
 
+async function renderJavaSimulator(ui: React.ReactElement) {
+  let result: ReturnType<typeof render>;
+  await act(async () => {
+    result = render(ui);
+  });
+  return result!;
+}
+
 describe("JavaSimulator", () => {
   afterEach(() => {
     cleanup();
@@ -149,8 +157,10 @@ describe("JavaSimulator", () => {
   });
 
   describe("when no exercise is selected yet", () => {
-    it("starts with the default Java starter code and empty stdin", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("starts with the default Java starter code and empty stdin", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
         'System.out.println("Start coding in Java!");',
@@ -163,8 +173,8 @@ describe("JavaSimulator", () => {
   });
 
   describe("when a specific exercise is opened in simulation", () => {
-    it("boots the editor with that exercise starter code", () => {
-      render(
+    it("boots the editor with that exercise starter code", async () => {
+      await renderJavaSimulator(
         <JavaSimulator
           selectedExercise={createExercise(
             "java-programming.exercise4",
@@ -183,8 +193,8 @@ describe("JavaSimulator", () => {
       );
     });
 
-    it("prefills standard input if the exercise specifies a defaultStdin", () => {
-      render(
+    it("prefills standard input if the exercise specifies a defaultStdin", async () => {
+      await renderJavaSimulator(
         <JavaSimulator
           selectedExercise={createExercise(
             "java-programming.exercise6",
@@ -202,11 +212,17 @@ describe("JavaSimulator", () => {
   });
 
   describe("when the user changes code before execution", () => {
-    it("runs the latest changed editor content", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("runs the latest changed editor content", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
-      fireEvent.click(screen.getByTestId("mock-java-change-code"));
-      fireEvent.click(screen.getByTestId("mock-java-run-code"));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("mock-java-change-code"));
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("mock-java-run-code"));
+      });
 
       expect(runSpy).toHaveBeenCalledWith({
         source: "changed code",
@@ -216,13 +232,19 @@ describe("JavaSimulator", () => {
       });
     });
 
-    it("passes standard input to the Java execution flow", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("passes standard input to the Java execution flow", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
-      fireEvent.change(screen.getByTestId("java-stdin-input"), {
-        target: { value: "hello java\n" },
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("java-stdin-input"), {
+          target: { value: "hello java\n" },
+        });
       });
-      fireEvent.click(screen.getByTestId("mock-java-run-code"));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("mock-java-run-code"));
+      });
 
       expect(runSpy).toHaveBeenCalledWith({
         source: expect.any(String),
@@ -232,10 +254,14 @@ describe("JavaSimulator", () => {
       });
     });
 
-    it("stops execution without forwarding the React click event", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("stops execution without forwarding the React click event", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
-      fireEvent.click(screen.getByTestId("mock-java-stop-code"));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("mock-java-stop-code"));
+      });
 
       expect(stopSpy).toHaveBeenCalledOnce();
       expect(stopSpy).toHaveBeenCalledWith();
@@ -243,8 +269,10 @@ describe("JavaSimulator", () => {
   });
 
   describe("when the simulator initializes", () => {
-    it("starts compiler preload in the background and exposes the timeout control", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("starts compiler preload in the background and exposes the timeout control", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
       expect(preloadSpy).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("java-timeout-input")).toHaveValue(60);
@@ -253,10 +281,14 @@ describe("JavaSimulator", () => {
       ).toBeInTheDocument();
     });
 
-    it("opens the Java command overview with version and command information", () => {
-      render(<JavaSimulator selectedExercise={null} isFocused={false} />);
+    it("opens the Java command overview with version and command information", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
 
-      fireEvent.click(screen.getByTestId("java-command-overview-button"));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("java-command-overview-button"));
+      });
 
       expect(
         screen.getByTestId("java-command-overview-dialog"),
@@ -274,9 +306,9 @@ describe("JavaSimulator", () => {
   });
 
   describe("imperative handle methods", () => {
-    it("loads solution code when loadSolution is invoked", () => {
+    it("loads solution code when loadSolution is invoked", async () => {
       const ref = createRef<JavaSimulatorHandle>();
-      render(
+      await renderJavaSimulator(
         <JavaSimulator
           ref={ref}
           selectedExercise={createExercise(
@@ -288,7 +320,7 @@ describe("JavaSimulator", () => {
         />,
       );
 
-      act(() => {
+      await act(async () => {
         ref.current?.loadSolution();
       });
 
@@ -297,9 +329,9 @@ describe("JavaSimulator", () => {
       );
     });
 
-    it("resets state when resetStoredState is invoked", () => {
+    it("resets state when resetStoredState is invoked", async () => {
       const ref = createRef<JavaSimulatorHandle>();
-      render(
+      await renderJavaSimulator(
         <JavaSimulator
           ref={ref}
           selectedExercise={createExercise(
@@ -312,9 +344,13 @@ describe("JavaSimulator", () => {
       );
 
       // change code and stdin
-      fireEvent.click(screen.getByTestId("mock-java-change-code"));
-      fireEvent.change(screen.getByTestId("java-stdin-input"), {
-        target: { value: "different input\n" },
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("mock-java-change-code"));
+      });
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("java-stdin-input"), {
+          target: { value: "different input\n" },
+        });
       });
       expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
         "changed code",
@@ -323,7 +359,7 @@ describe("JavaSimulator", () => {
         "different input\n",
       );
 
-      act(() => {
+      await act(async () => {
         ref.current?.resetStoredState();
       });
 
@@ -346,7 +382,7 @@ describe("JavaSimulator", () => {
       });
 
       const ref = createRef<JavaSimulatorHandle>();
-      render(
+      await renderJavaSimulator(
         <JavaSimulator
           ref={ref}
           selectedExercise={createExercise(

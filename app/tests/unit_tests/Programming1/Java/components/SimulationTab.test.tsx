@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import type { ComponentProps } from "react";
+import { useEffect, type ComponentProps } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { SimulationTab } from "@/pages/Programming1/Java/components/SimulationTab";
@@ -21,22 +21,23 @@ const mockCheckSolution = vi.fn();
 vi.mock("@/pages/Programming1/Java/components/Simulator/JavaSimulator", () => {
   return {
     JavaSimulator: ({ ref }: ComponentProps<typeof JavaSimulator>) => {
-      // simulate exposing handle
-      if (ref) {
-        if (typeof ref === "function") {
-          ref({
-            loadSolution: mockLoadSolution,
-            resetStoredState: mockResetStoredState,
-            checkSolution: mockCheckSolution,
-          });
-        } else if ("current" in ref) {
-          (ref as { current: unknown }).current = {
-            loadSolution: mockLoadSolution,
-            resetStoredState: mockResetStoredState,
-            checkSolution: mockCheckSolution,
-          };
+      useEffect(() => {
+        if (ref) {
+          if (typeof ref === "function") {
+            ref({
+              loadSolution: mockLoadSolution,
+              resetStoredState: mockResetStoredState,
+              checkSolution: mockCheckSolution,
+            });
+          } else if ("current" in ref) {
+            (ref as { current: unknown }).current = {
+              loadSolution: mockLoadSolution,
+              resetStoredState: mockResetStoredState,
+              checkSolution: mockCheckSolution,
+            };
+          }
         }
-      }
+      }, [ref]);
       return <div data-testid="mock-java-simulator-component" />;
     },
   };
@@ -113,17 +114,23 @@ describe("SimulationTab", () => {
       onTabChange: vi.fn(),
     };
 
-    it("renders header actions when an exercise is selected", () => {
-      render(<SimulationTab {...defaultProps} />);
+    it("renders header actions when an exercise is selected", async () => {
+      await act(async () => {
+        render(<SimulationTab {...defaultProps} />);
+      });
 
       expect(screen.getByTestId("java-load-solution")).toBeInTheDocument();
       expect(screen.getByTestId("java-check-solution")).toBeInTheDocument();
     });
 
-    it("calls loadSolution when load-solution button is clicked", () => {
-      render(<SimulationTab {...defaultProps} />);
+    it("calls loadSolution when load-solution button is clicked", async () => {
+      await act(async () => {
+        render(<SimulationTab {...defaultProps} />);
+      });
 
-      fireEvent.click(screen.getByTestId("java-load-solution"));
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("java-load-solution"));
+      });
       expect(mockLoadSolution).toHaveBeenCalledTimes(1);
     });
 
@@ -140,7 +147,9 @@ describe("SimulationTab", () => {
         ],
       });
 
-      render(<SimulationTab {...defaultProps} />);
+      await act(async () => {
+        render(<SimulationTab {...defaultProps} />);
+      });
 
       await act(async () => {
         fireEvent.click(screen.getByTestId("java-check-solution"));

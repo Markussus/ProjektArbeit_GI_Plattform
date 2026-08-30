@@ -92,10 +92,9 @@ export const MooreSimulator = forwardRef<
   const [committedProgram, setCommittedProgram] = useState<MooreProgram>(() =>
     cloneJson(scenarioProgram),
   );
-  const [isEditMode, setIsEditMode] = useState(true);
-  const [activeView, setActiveView] = useState<"main" | "conversion" | "logic">(
-    "main",
-  );
+  const [mode, setMode] = useState<
+    "edit" | "simulation" | "conversion" | "logic"
+  >("edit");
   const [isStorageReady, setIsStorageReady] = useState(false);
   const simulation = useMooreSimulator(committedProgram);
   const isStorageEnabled = !isExample;
@@ -124,8 +123,7 @@ export const MooreSimulator = forwardRef<
     (nextProgram: MooreProgram) => {
       pauseSimulation();
       setProgram(normalizeMooreProgram(nextProgram));
-      setIsEditMode(true);
-      setActiveView("main");
+      setMode("edit");
     },
     [pauseSimulation, setProgram],
   );
@@ -173,8 +171,7 @@ export const MooreSimulator = forwardRef<
         const resetProgram = cloneJson(scenarioProgram);
         setProgram(resetProgram);
         setCommittedProgram(resetProgram);
-        setIsEditMode(true);
-        setActiveView("main");
+        setMode("edit");
       },
       loadSolution() {
         if (!scenario) {
@@ -215,11 +212,21 @@ export const MooreSimulator = forwardRef<
     }
     setProgram(normalized);
     setCommittedProgram(normalized);
-    setIsEditMode(false);
-    setActiveView("main");
+    setMode("simulation");
   };
 
-  if (activeView === "conversion" && conversion) {
+  const edit = () => {
+    simulation.pause();
+    setProgram(cloneJson(committedProgram));
+    setMode("edit");
+  };
+
+  const showSimulation = () => {
+    setCommittedProgram(normalizeMooreProgram(program));
+    setMode("simulation");
+  };
+
+  if (mode === "conversion" && conversion) {
     return (
       <div
         data-testid="moore-simulator"
@@ -227,22 +234,15 @@ export const MooreSimulator = forwardRef<
       >
         <AutomataConversionView
           conversion={conversion}
-          onBackToEditor={() => {
-            setIsEditMode(true);
-            setActiveView("main");
-          }}
-          onShowSimulator={() => {
-            setCommittedProgram(program);
-            setIsEditMode(false);
-            setActiveView("main");
-          }}
-          onShowLogic={() => setActiveView("logic")}
+          onBackToEditor={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowLogic={() => setMode("logic")}
         />
       </div>
     );
   }
 
-  if (activeView === "logic" && conversion) {
+  if (mode === "logic" && conversion) {
     return (
       <div
         data-testid="moore-simulator"
@@ -250,16 +250,9 @@ export const MooreSimulator = forwardRef<
       >
         <AutomataLogicGateView
           conversion={conversion}
-          onEditDefinition={() => {
-            setIsEditMode(true);
-            setActiveView("main");
-          }}
-          onShowSimulator={() => {
-            setCommittedProgram(program);
-            setIsEditMode(false);
-            setActiveView("main");
-          }}
-          onShowConversion={() => setActiveView("conversion")}
+          onEditDefinition={() => setMode("edit")}
+          onShowSimulator={showSimulation}
+          onShowConversion={() => setMode("conversion")}
         />
       </div>
     );
@@ -270,7 +263,7 @@ export const MooreSimulator = forwardRef<
       data-testid="moore-simulator"
       className="mx-auto w-full max-w-[100rem]"
     >
-      {isEditMode ? (
+      {mode === "edit" ? (
         <div className="space-y-6">
           <MooreConfigView
             program={program}
@@ -292,7 +285,7 @@ export const MooreSimulator = forwardRef<
             actions={[
               {
                 label: t("moore-mealy.conversion.open"),
-                onClick: () => setActiveView("conversion"),
+                onClick: () => setMode("conversion"),
                 icon: TableProperties,
                 testId: "moore-open-conversion",
                 disabled: !conversion,
@@ -306,7 +299,7 @@ export const MooreSimulator = forwardRef<
               },
               {
                 label: t("moore-mealy.logic.open"),
-                onClick: () => setActiveView("logic"),
+                onClick: () => setMode("logic"),
                 icon: CircuitBoard,
                 testId: "moore-open-logic",
                 disabled: !conversion,
@@ -322,11 +315,7 @@ export const MooreSimulator = forwardRef<
             status={simulation.status}
             speed={simulation.speed}
             error={simulation.error}
-            onEdit={() => {
-              simulation.pause();
-              setProgram(cloneJson(committedProgram));
-              setIsEditMode(true);
-            }}
+            onEdit={edit}
             onPlay={simulation.play}
             onPause={simulation.pause}
             onStep={simulation.step}
@@ -338,11 +327,7 @@ export const MooreSimulator = forwardRef<
             actions={[
               {
                 label: t("moore-mealy.navigation.editDefinition"),
-                onClick: () => {
-                  simulation.pause();
-                  setProgram(cloneJson(committedProgram));
-                  setIsEditMode(true);
-                },
+                onClick: edit,
                 icon: Pencil,
                 testId: "moore-bottom-edit-configuration",
               },
@@ -350,7 +335,7 @@ export const MooreSimulator = forwardRef<
                 label: t("moore-mealy.navigation.showConversion"),
                 onClick: () => {
                   simulation.pause();
-                  setActiveView("conversion");
+                  setMode("conversion");
                 },
                 icon: TableProperties,
                 testId: "moore-open-conversion",
@@ -360,7 +345,7 @@ export const MooreSimulator = forwardRef<
                 label: t("moore-mealy.navigation.showLogic"),
                 onClick: () => {
                   simulation.pause();
-                  setActiveView("logic");
+                  setMode("logic");
                 },
                 icon: CircuitBoard,
                 testId: "moore-open-logic",

@@ -31,24 +31,32 @@ describe("MooreMealy Page and Tabs", () => {
     cleanup();
   });
 
-  it("renders MooreMealyPage and switches between tabs", () => {
-    render(
-      <MemoryRouter>
-        <MooreMealyPage />
-      </MemoryRouter>,
-    );
+  it("renders MooreMealyPage and switches between tabs", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <MooreMealyPage />
+        </MemoryRouter>,
+      );
+    });
     expect(screen.getByTestId("tab-button-overview")).toBeInTheDocument();
 
     const examplesTabBtn = screen.getByTestId("tab-button-examples");
-    fireEvent.click(examplesTabBtn);
+    await act(async () => {
+      fireEvent.click(examplesTabBtn);
+    });
     expect(screen.getByTestId("tab-button-examples")).toBeInTheDocument();
 
     const exercisesTabBtn = screen.getByTestId("tab-button-exercises");
-    fireEvent.click(exercisesTabBtn);
+    await act(async () => {
+      fireEvent.click(exercisesTabBtn);
+    });
     expect(screen.getByTestId("tab-button-exercises")).toBeInTheDocument();
 
     const simulationTabBtn = screen.getByTestId("tab-button-simulation");
-    fireEvent.click(simulationTabBtn);
+    await act(async () => {
+      fireEvent.click(simulationTabBtn);
+    });
     expect(screen.getByTestId("simulation-workspace")).toBeInTheDocument();
   });
 
@@ -96,18 +104,22 @@ describe("MooreMealy Page and Tabs", () => {
 
   it("renders SimulationTab in free simulator and exercise mode", async () => {
     const onSelectExercise = vi.fn();
-    const { rerender } = render(
-      <SimulationTab
-        selectedExercise={null}
-        onSelectExercise={onSelectExercise}
-        onResetActiveSimulator={vi.fn()}
-      />,
-    );
+    let rerenderFn: ReturnType<typeof render>["rerender"];
+    await act(async () => {
+      const { rerender } = render(
+        <SimulationTab
+          selectedExercise={null}
+          onSelectExercise={onSelectExercise}
+          onResetActiveSimulator={vi.fn()}
+        />,
+      );
+      rerenderFn = rerender;
+    });
     expect(screen.getByTestId("simulation-workspace")).toBeInTheDocument();
 
     // Rerender with an exercise scenario
     await act(async () => {
-      rerender(
+      rerenderFn(
         <SimulationTab
           selectedExercise={mooreExerciseScenarios[0]}
           onSelectExercise={onSelectExercise}
@@ -121,13 +133,15 @@ describe("MooreMealy Page and Tabs", () => {
   });
 
   it("opens a Mealy exercise in the Mealy simulator", async () => {
-    render(
-      <SimulationTab
-        selectedExercise={mealyExerciseScenarios[0]}
-        onSelectExercise={vi.fn()}
-        onResetActiveSimulator={vi.fn()}
-      />,
-    );
+    await act(async () => {
+      render(
+        <SimulationTab
+          selectedExercise={mealyExerciseScenarios[0]}
+          onSelectExercise={vi.fn()}
+          onResetActiveSimulator={vi.fn()}
+        />,
+      );
+    });
 
     expect(await screen.findByTestId("mealy-config-view")).toBeVisible();
     expect(screen.getByTestId("automata-load-solution")).toBeEnabled();
