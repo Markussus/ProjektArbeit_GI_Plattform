@@ -1,0 +1,146 @@
+% ---------------------------------------------------------------------------
+% Fachmodul Endliche Automaten (Kristian Popov)
+%
+% Inhaltlich abgeleitet aus Abschnitt 4.2 der Dokumentation.
+%
+% Der ausformulierte Sprechtext liegt in:
+%     docs/presentation/Sprechtext_Automaten_Sprachen.md
+%
+% Die Kurznotizen stehen in \note{...}. Sie sind standardmäßig unsichtbar.
+% Zum Anzeigen in presentation.tex vor \begin{document} ergänzen:
+%     \setbeameroption{show notes}
+% oder für einen zweiten Bildschirm:
+%     \setbeameroption{show notes on second screen=right}
+% ---------------------------------------------------------------------------
+
+\addsectionframe{Fachmodul: Endliche Automaten}
+
+% ---------------------------------------------------------------------------
+\begin{itemframe}{Endliche Automaten -- Überblick}
+  \item Studierende definieren \textbf{DFA und NFA} selbst und führen ein Eingabewort Schritt für Schritt aus.
+  \item Jeder Schritt erscheint gleichzeitig in \textbf{Übergangstabelle} und \textbf{Zustandsdiagramm}.
+  \item Ein \textbf{Stapeltest} prüft mehrere Wörter auf einmal -- erkennt der Automat die beabsichtigte Sprache?
+  \item Ein Automat lässt sich aus einer \textbf{rechtslinearen Grammatik} erzeugen.
+  \item Übungen geben eine automatische Rückmeldung mit Gegenbeispiel.
+\end{itemframe}
+\note{%
+  Einstieg: Das Thema verbindet die formale Definition mit ihrer grafischen Darstellung.
+  Kurz halten -- die Details kommen auf den nächsten beiden Folien.
+  Überleitung: "Zwei Entscheidungen haben den Aufbau geprägt -- eine in der Architektur, eine im UI."
+}
+
+% ---------------------------------------------------------------------------
+\begin{fullframe}{Ein Ausführungskern für DFA und NFA}
+  \vspace{1mm}
+  \begin{center}
+    \begin{tikzpicture}[
+        >=Stealth,
+        st/.style   ={circle, draw=thwsblue, very thick, minimum size=9mm, font=\small, fill=white},
+        acc/.style  ={st, double, double distance=1.2pt},
+        setbox/.style={draw=thwsorange, very thick, rounded corners=4pt, fill=white,
+                      inner xsep=3.5mm, inner ysep=2.2mm, font=\small\ttfamily, text=black},
+        lbl/.style  ={font=\small, text=thwsblue},
+        notelbl/.style={font=\small\itshape, align=left, anchor=west}
+      ]
+
+      % --- Oberer Teil: NFA mit zwei Wegen auf 'a'
+      \node[st]               (q0) at (0, 1.8) {$q_0$};
+      \node[st]               (q1) at (2.4, 1.8) {$q_1$};
+      \node[acc]              (q2) at (4.8, 1.8) {$q_2$};
+
+      \draw[->, thick] (-1.0, 1.8) -- (q0);
+      \draw[->, thick] (q0) to[loop above] node[lbl] {a} (q0);
+      \draw[->, thick] (q0) -- node[lbl, above] {a} (q1);
+      \draw[->, thick] (q1) -- node[lbl, above] {b} (q2);
+
+      \node[notelbl] at (6.0, 1.8) {%
+        \textcolor{black!80}{\textbf{Nichtdeterminismus:}}\\[0.8mm]
+        \textcolor{gray!85!black}{$a$ führt in zwei Zustände}
+      };
+
+      % --- Unterer Teil: Mengengestützte Schrittausführung
+      \node[setbox] (s0) at (0, -0.6) {\{$q_0$\}};
+      \node[setbox] (s1) at (2.4, -0.6) {\{$q_0, q_1$\}};
+      \node[setbox] (s2) at (4.8, -0.6) {\{$q_2$\}};
+
+      \draw[->, very thick, thwsorange] (s0) -- node[lbl, above, thwsorange] {\textbf{a}} (s1);
+      \draw[->, very thick, thwsorange] (s1) -- node[lbl, above, thwsorange] {\textbf{b}} (s2);
+
+      \node[notelbl, text=gray!85!black] at (6.0, -0.6) {%
+        beim DFA enthält die Menge\\
+        höchstens ein Element
+      };
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{3mm}
+  \begin{center}
+    \begin{tikzpicture}
+      \node[draw=thwsblue!30, thick, rounded corners=3pt, fill=thwsblue!5,
+            inner xsep=5mm, inner ysep=2mm, font=\footnotesize, align=center]
+        {Der Kern führt immer eine \textbf{Zustandsmenge} aus: $S' = \varepsilon\text{-Hülle}\left(\bigcup_{q \in S} \delta(q, a)\right)$ \\
+         Der deklarierte Typ (DFA/NFA) steuert nur die \textbf{Validierung}, nicht den Ausführungspfad.};
+    \end{tikzpicture}
+  \end{center}
+\end{fullframe}
+\note{%
+  Ausformuliert im Sprechtext (Sprechtext_Automaten_Sprachen.md, Folie 2).
+  Am Diagramm entlangsprechen: Typ oben -> nur Validierung; der Kern unten kennt den Typ gar nicht.
+  Mögliche Rückfrage: "Warum dann überhaupt zwischen DFA und NFA unterscheiden?"
+  Antwort: didaktisch -- Studierende sollen Determinismusverstöße gemeldet bekommen.
+}
+
+% ---------------------------------------------------------------------------
+\begin{fullframe}{UI: zwei Sichten, derselbe Schritt}
+  \begin{columns}[c]
+    \begin{column}{0.44\textwidth}
+      \centering
+      \footnotesize
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{c|c|c|c}
+        $\delta$ & $\to$S0 & S1 & *S2 \\ \hline
+        a        & S1      & S1 & S1  \\ \hline
+        b        & S0      & \colorbox{thwsorange!35}{\textbf{S2}} & S0 \\
+      \end{tabular}
+
+      \vspace{3mm}
+      {\scriptsize\itshape Übergangstabelle: die formale Definition}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \centering
+      \begin{tikzpicture}[
+          >=Stealth, node distance=14mm,
+          st/.style={circle, draw=thwsblue, very thick, minimum size=8mm, font=\small},
+          acc/.style={st, double, double distance=1pt},
+          lbl/.style={font=\footnotesize, thwsblue}
+        ]
+        \node[st]               (s0) {S0};
+        \node[st,  right=of s0] (s1) {S1};
+        \node[acc, right=of s1] (s2) {S2};
+
+        \draw[->, thick] (-1.0,0) -- (s0);
+        \draw[->, thick] (s0) -- node[lbl, above] {a} (s1);
+        % der hervorgehobene Übergang entspricht der markierten Tabellenzelle
+        \draw[->, very thick, thwsorange] (s1) -- node[font=\footnotesize, above, thwsorange] {\textbf{b}} (s2);
+        \draw[->, thick] (s0) to[loop above] node[lbl] {b} (s0);
+      \end{tikzpicture}
+
+      \vspace{2mm}
+      {\scriptsize\itshape Zustandsdiagramm: der Weg des Wortes}
+    \end{column}
+  \end{columns}
+
+  \vspace{5mm}
+  \begin{center}
+    \begin{tikzpicture}
+      \node[draw=thwsorange, very thick, rounded corners=3pt, fill=thwsorange!8,
+            inner xsep=5mm, inner ysep=2mm, font=\footnotesize]
+        {markierte \textbf{Zelle} und markierte \textbf{Kante} stammen aus demselben Simulationsschritt};
+    \end{tikzpicture}
+  \end{center}
+\end{fullframe}
+\note{%
+  Das ist die wichtigste Folie des Blocks -- hier ruhig zeigen, dass Zelle und Kante dasselbe sind.
+  Ehrlich erzählen: das Diagramm war NICHT von Anfang an geplant, es kam aus dem Ausprobieren.
+  Ausformuliert im Sprechtext (Folie 3). Wenn Zeit: Determinismusverstöße werden im Diagramm markiert.
+}
