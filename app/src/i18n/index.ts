@@ -1,60 +1,105 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
+import { normalizeSupportedLanguage } from "./languages";
 
-// English split translation modules
+// Common translation modules loaded eagerly for instant initial render (Header, Home, Footer, etc.)
 import enCommon from "./locales/en/common.json";
-import enFiniteAutomata from "./locales/en/finite-automata.json";
-import enNumberSystems from "./locales/en/number-systems.json";
-import enEncoding from "./locales/en/encoding.json";
-import enMooreMealy from "./locales/en/moore-mealy.json";
-import enDnf from "./locales/en/dnf.json";
-import enJavaProgramming from "./locales/en/java-programming.json";
-import enTuringMachine from "./locales/en/turing-machine.json";
-import enRegularLanguages from "./locales/en/regular-languages.json";
-
-// German split translation modules
 import deCommon from "./locales/de/common.json";
-import deFiniteAutomata from "./locales/de/finite-automata.json";
-import deNumberSystems from "./locales/de/number-systems.json";
-import deEncoding from "./locales/de/encoding.json";
-import deMooreMealy from "./locales/de/moore-mealy.json";
-import deDnf from "./locales/de/dnf.json";
-import deJavaProgramming from "./locales/de/java-programming.json";
-import deTuringMachine from "./locales/de/turing-machine.json";
-import deRegularLanguages from "./locales/de/regular-languages.json";
 
-const en = {
-  common: enCommon,
-  "finite-automata": enFiniteAutomata,
-  "number-systems": enNumberSystems,
-  encoding: enEncoding,
-  "moore-mealy": enMooreMealy,
-  dnf: enDnf,
-  "java-programming": enJavaProgramming,
-  "turing-machine": enTuringMachine,
-  "regular-languages": enRegularLanguages,
-};
+const loadedLanguages = new Set<string>();
 
-const de = {
-  common: deCommon,
-  "finite-automata": deFiniteAutomata,
-  "number-systems": deNumberSystems,
-  encoding: deEncoding,
-  "moore-mealy": deMooreMealy,
-  dnf: deDnf,
-  "java-programming": deJavaProgramming,
-  "turing-machine": deTuringMachine,
-  "regular-languages": deRegularLanguages,
-};
+export async function loadTopicTranslations(language?: string): Promise<void> {
+  const norm = normalizeSupportedLanguage(
+    language ?? i18n.resolvedLanguage ?? i18n.language,
+  );
+  if (loadedLanguages.has(norm)) return;
+  loadedLanguages.add(norm);
+
+  if (norm === "de") {
+    const [
+      finiteAutomata,
+      numberSystems,
+      encoding,
+      mooreMealy,
+      dnf,
+      javaProgramming,
+      turingMachine,
+      regularLanguages,
+    ] = await Promise.all([
+      import("./locales/de/finite-automata.json"),
+      import("./locales/de/number-systems.json"),
+      import("./locales/de/encoding.json"),
+      import("./locales/de/moore-mealy.json"),
+      import("./locales/de/dnf.json"),
+      import("./locales/de/java-programming.json"),
+      import("./locales/de/turing-machine.json"),
+      import("./locales/de/regular-languages.json"),
+    ]);
+
+    i18n.addResourceBundle(
+      "de",
+      "translation",
+      {
+        "finite-automata": finiteAutomata.default,
+        "number-systems": numberSystems.default,
+        encoding: encoding.default,
+        "moore-mealy": mooreMealy.default,
+        dnf: dnf.default,
+        "java-programming": javaProgramming.default,
+        "turing-machine": turingMachine.default,
+        "regular-languages": regularLanguages.default,
+      },
+      true,
+      true,
+    );
+  } else {
+    const [
+      finiteAutomata,
+      numberSystems,
+      encoding,
+      mooreMealy,
+      dnf,
+      javaProgramming,
+      turingMachine,
+      regularLanguages,
+    ] = await Promise.all([
+      import("./locales/en/finite-automata.json"),
+      import("./locales/en/number-systems.json"),
+      import("./locales/en/encoding.json"),
+      import("./locales/en/moore-mealy.json"),
+      import("./locales/en/dnf.json"),
+      import("./locales/en/java-programming.json"),
+      import("./locales/en/turing-machine.json"),
+      import("./locales/en/regular-languages.json"),
+    ]);
+
+    i18n.addResourceBundle(
+      "en",
+      "translation",
+      {
+        "finite-automata": finiteAutomata.default,
+        "number-systems": numberSystems.default,
+        encoding: encoding.default,
+        "moore-mealy": mooreMealy.default,
+        dnf: dnf.default,
+        "java-programming": javaProgramming.default,
+        "turing-machine": turingMachine.default,
+        "regular-languages": regularLanguages.default,
+      },
+      true,
+      true,
+    );
+  }
+}
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { translation: en },
-      de: { translation: de },
+      en: { translation: { common: enCommon } },
+      de: { translation: { common: deCommon } },
     },
     fallbackLng: "en",
     detection: {
@@ -66,5 +111,13 @@ i18n
       escapeValue: false,
     },
   });
+
+// Load topic translations for initial language immediately in background
+void loadTopicTranslations();
+
+// Load topic translations whenever language is changed
+i18n.on("languageChanged", (lng) => {
+  void loadTopicTranslations(lng);
+});
 
 export default i18n;
