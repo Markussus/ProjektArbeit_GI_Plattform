@@ -17,9 +17,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const activeExercise = useMemo(
     () =>
-      props.selectedExercise
-        ? findFAExercise(props.selectedExercise.id)
-        : null,
+      props.selectedExercise ? findFAExercise(props.selectedExercise.id) : null,
     [props.selectedExercise],
   );
 

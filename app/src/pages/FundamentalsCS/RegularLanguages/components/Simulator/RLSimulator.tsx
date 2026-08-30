@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-  type Ref,
-} from "react";
+import { useCallback, useImperativeHandle, useState, type Ref } from "react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
@@ -67,10 +61,9 @@ export function RLSimulator({
     return exercise?.mode ?? example?.mode ?? "grammarToLanguage";
   });
 
-  const [studentDraft, setStudentDraft] = useState("");
-  const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
-
-  useEffect(() => {
+  const [prevImportedId, setPrevImportedId] = useState(importedTaskStorageId);
+  if (prevImportedId !== importedTaskStorageId) {
+    setPrevImportedId(importedTaskStorageId);
     const importedMode = Object.entries(RL_STORAGE_TASK_IDS).find(
       ([, taskStorageId]) => taskStorageId === importedTaskStorageId,
     )?.[0] as SimulationMode | undefined;
@@ -78,7 +71,10 @@ export function RLSimulator({
     if (importedMode) {
       setMode(importedMode);
     }
-  }, [importedTaskStorageId]);
+  }
+
+  const [studentDraft, setStudentDraft] = useState("");
+  const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
 
   const isGrammarExercise = exercise?.mode === "grammarToLanguage";
   const isLanguageExercise = exercise?.mode === "languageToGrammar";

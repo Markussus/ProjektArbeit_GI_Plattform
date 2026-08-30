@@ -24,7 +24,9 @@ describe("javaRunnerHelpers", () => {
     });
 
     it("reads tokens with whitespace skipping", () => {
-      const cursor = new ScannerInputCursor("   foo   bar   42   3.14   true   ");
+      const cursor = new ScannerInputCursor(
+        "   foo   bar   42   3.14   true   ",
+      );
       expect(cursor.nextToken()).toBe("foo");
       expect(cursor.nextToken()).toBe("bar");
       expect(cursor.nextInt()).toBe(42);

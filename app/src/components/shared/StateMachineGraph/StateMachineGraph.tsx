@@ -295,7 +295,7 @@ export function StateMachineGraph({
                   cy={position.y}
                   r={nodeRadius + 6}
                   className={cn(
-                    "fill-none stroke-border transition-colors",
+                    "stroke-border fill-none transition-colors",
                     node.isActive && "stroke-brand",
                     node.isViolation && "stroke-destructive",
                   )}

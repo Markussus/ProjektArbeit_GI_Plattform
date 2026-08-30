@@ -306,7 +306,11 @@ async function runGeneratedProgram(
 
   const flushStdout = () => {
     if (stdoutBuffer) {
-      workerScope.postMessage({ type: "stdout", requestId, data: stdoutBuffer });
+      workerScope.postMessage({
+        type: "stdout",
+        requestId,
+        data: stdoutBuffer,
+      });
       stdoutBuffer = "";
     }
     stdoutTimeout = undefined;
@@ -314,7 +318,11 @@ async function runGeneratedProgram(
 
   const flushStderr = () => {
     if (stderrBuffer) {
-      workerScope.postMessage({ type: "stderr", requestId, data: stderrBuffer });
+      workerScope.postMessage({
+        type: "stderr",
+        requestId,
+        data: stderrBuffer,
+      });
       stderrBuffer = "";
     }
     stderrTimeout = undefined;

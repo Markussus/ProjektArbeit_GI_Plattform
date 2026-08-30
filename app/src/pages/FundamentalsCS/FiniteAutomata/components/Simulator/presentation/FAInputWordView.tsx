@@ -57,10 +57,18 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
               key={index}
               className={cn(
                 "flex size-9 shrink-0 items-center justify-center rounded-md border font-mono text-sm font-medium transition-all",
-                isCurrent && "border-brand bg-brand/10 text-brand border-2 font-bold",
-                !isCurrent && isRead && "border-border bg-muted/50 text-muted-foreground opacity-50",
-                !isCurrent && isUpcoming && "border-border bg-background text-foreground",
-                !isCurrent && !isRead && !isUpcoming && "border-border bg-muted/30 text-muted-foreground opacity-40",
+                isCurrent &&
+                  "border-brand bg-brand/10 text-brand border-2 font-bold",
+                !isCurrent &&
+                  isRead &&
+                  "border-border bg-muted/50 text-muted-foreground opacity-50",
+                !isCurrent &&
+                  isUpcoming &&
+                  "border-border bg-background text-foreground",
+                !isCurrent &&
+                  !isRead &&
+                  !isUpcoming &&
+                  "border-border bg-muted/30 text-muted-foreground opacity-40",
               )}
             >
               {symbol}

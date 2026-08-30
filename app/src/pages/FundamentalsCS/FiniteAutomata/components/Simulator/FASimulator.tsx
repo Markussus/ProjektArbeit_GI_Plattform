@@ -73,7 +73,9 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     SIMULATOR_TASK_STORAGE_ID,
   );
 
-  const [isStorageReady, setIsStorageReady] = useState(false);
+  const [isStorageReady, setIsStorageReady] = useState(
+    Boolean(exercise || example),
+  );
 
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
@@ -99,15 +101,10 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
   // In free mode (no exercise/example), restore saved automaton from storage.
   const hasInitializedStorage = useRef(false);
   useEffect(() => {
-    if (hasInitializedStorage.current) {
+    if (hasInitializedStorage.current || exercise || example) {
       return;
     }
     hasInitializedStorage.current = true;
-
-    if (exercise || example) {
-      setIsStorageReady(true);
-      return;
-    }
 
     let isCancelled = false;
     void loadTrainingCenterValue(storageIdentifier, faProgramTransferCodec)

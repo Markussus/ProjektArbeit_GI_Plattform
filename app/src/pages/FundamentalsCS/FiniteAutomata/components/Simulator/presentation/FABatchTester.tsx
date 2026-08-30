@@ -78,9 +78,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
               <span className="text-emerald-600 dark:text-emerald-400">
                 ✅ {summary.accepted}
               </span>
-              <span className="text-destructive">
-                ❌ {summary.rejected}
-              </span>
+              <span className="text-destructive">❌ {summary.rejected}</span>
               <span>
                 / {summary.total} {t("finite-automata.batch.total", "total")}
               </span>
@@ -104,7 +102,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
                   className={cn(
                     "min-w-0 flex-1 truncate font-mono",
                     r.accepted
-                      ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                      ? "font-medium text-emerald-600 dark:text-emerald-400"
                       : "text-destructive font-medium",
                   )}
                 >
@@ -135,7 +133,7 @@ export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
       <div className="flex shrink-0 items-center gap-1.5">
         <button
           type="button"
-          className="bg-brand text-brand-foreground hover:opacity-90 flex flex-1 cursor-pointer items-center justify-center gap-1.5 truncate rounded-md px-3 py-2 text-sm font-semibold transition-opacity"
+          className="bg-brand text-brand-foreground flex flex-1 cursor-pointer items-center justify-center gap-1.5 truncate rounded-md px-3 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
           onClick={handleRun}
           title={t("finite-automata.batch.runAll", "Run All")}
         >

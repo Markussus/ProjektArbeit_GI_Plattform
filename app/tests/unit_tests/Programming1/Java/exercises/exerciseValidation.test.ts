@@ -73,7 +73,9 @@ describe("Java Exercises & Definitions", () => {
       example4?.defaultStdin,
     );
     expect(executable).not.toContain("import java.util.Scanner;");
-    expect(executable).not.toContain("Scanner scanner = new Scanner(System.in);");
+    expect(executable).not.toContain(
+      "Scanner scanner = new Scanner(System.in);",
+    );
     expect(executable).toContain('String name = "Ada Lovelace";');
     expect(executable).toContain("int age = 21;");
   });

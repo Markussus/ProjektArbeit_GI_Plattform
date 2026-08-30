@@ -195,7 +195,9 @@ describe("JavaSimulator", () => {
         />,
       );
 
-      expect(screen.getByTestId("java-stdin-input")).toHaveValue("hello java\n");
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue(
+        "hello java\n",
+      );
     });
   });
 
@@ -328,7 +330,9 @@ describe("JavaSimulator", () => {
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
         "// TODO: print the text in uppercase",
       );
-      expect(screen.getByTestId("java-stdin-input")).toHaveValue("hello java\n");
+      expect(screen.getByTestId("java-stdin-input")).toHaveValue(
+        "hello java\n",
+      );
     });
 
     it("runs validation through checkSolution", async () => {

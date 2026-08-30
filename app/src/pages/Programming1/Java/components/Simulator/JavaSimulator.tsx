@@ -231,7 +231,7 @@ const JavaSimulatorSession = forwardRef<
             <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
               {t("java-programming.stdin.label")}
             </span>
-            <span className="text-muted-foreground text-xs font-mono">
+            <span className="text-muted-foreground font-mono text-xs">
               Scanner (System.in)
             </span>
           </div>
