@@ -73,7 +73,9 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     SIMULATOR_TASK_STORAGE_ID,
   );
 
-  const [isStorageReady, setIsStorageReady] = useState(
+  // A seeded exercise or example takes priority over the saved draft, so there
+  // is nothing to restore and the autosave slot is ready straight away.
+  const [isStorageReady, setIsStorageReady] = useState(() =>
     Boolean(exercise || example),
   );
 
