@@ -4,6 +4,7 @@ import { SimulatorControls } from "@/components/shared/SimulatorControls/Simulat
 import { StateMachineGraph } from "@/components/shared/StateMachineGraph";
 import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
+import { cn } from "@/lib/utils";
 import {
   buildMealyTableHeaders,
   buildMealyTableRows,
@@ -27,51 +28,49 @@ interface Props {
 
 export function MealySimulationView(props: Props) {
   const { t } = useTranslation();
-  const nextInput = props.program.inputWord[props.runtime.inputPosition];
+  const { program, runtime } = props;
+  const nextInput = program.inputWord[runtime.inputPosition];
   const nextState = nextInput
-    ? props.program.transitions[nextInput][props.runtime.currentState]
+    ? program.transitions[nextInput]?.[runtime.currentState]
     : undefined;
   const nodes = useMemo(
     () =>
-      props.program.states.map((state) => ({
+      program.states.map((state) => ({
         id: state,
         label: state,
-        isStart: state === props.program.initialState,
-        isActive: state === props.runtime.currentState,
-        isPreview: state === nextState && state !== props.runtime.currentState,
+        isStart: state === program.initialState,
+        isActive: state === runtime.currentState,
+        isPreview: state === nextState && state !== runtime.currentState,
       })),
-    [nextState, props.program, props.runtime.currentState],
+    [nextState, program, runtime.currentState],
   );
   const edges = useMemo(
     () =>
-      props.program.inputSymbols.flatMap((input) =>
-        props.program.states.map((state) => ({
+      program.inputSymbols.flatMap((input) =>
+        program.states.map((state) => ({
           from: state,
-          to: props.program.transitions[input][state],
-          label: `${input} / ${props.program.outputs[input][state].symbol}`,
-          isActive: state === props.runtime.currentState && input === nextInput,
+          to: program.transitions[input]?.[state],
+          label: `${input} / ${program.outputs[input]?.[state]?.symbol ?? ""}`,
+          isActive: state === runtime.currentState && input === nextInput,
         })),
       ),
-    [nextInput, props.program, props.runtime.currentState],
+    [nextInput, program, runtime.currentState],
   );
 
   const tableHeaders = useMemo(
     () =>
       buildMealyTableHeaders(
-        props.program.states,
+        program.states,
         t("moore-mealy.sim.event", "Event"),
       ),
-    [props.program.states, t],
+    [program.states, t],
   );
 
-  const tableRows = useMemo(
-    () => buildMealyTableRows(props.program),
-    [props.program],
-  );
+  const tableRows = useMemo(() => buildMealyTableRows(program), [program]);
 
   const activeCell = useMemo(
-    () => getActiveMealyTransitionCell(props.program, props.runtime),
-    [props.program, props.runtime],
+    () => getActiveMealyTransitionCell(program, runtime),
+    [program, runtime],
   );
 
   return (
@@ -91,22 +90,42 @@ export function MealySimulationView(props: Props) {
             onReset={props.onReset}
             onSpeedChange={props.onSpeedChange}
             testIdPrefix="mealy-controls"
+            className="max-w-none"
           />
-          <div className="border-border bg-card rounded-xl border p-3 text-sm">
-            <strong>{t("moore-mealy.sim.currentState")}:</strong>{" "}
-            {props.runtime.currentState}
+          <div className="border-border bg-card space-y-2 rounded-xl border p-3">
+            <StatusRow
+              label={t("moore-mealy.sim.currentState")}
+              value={runtime.currentState}
+            />
+            <StatusRow
+              label={t("moore-mealy.sim.progress")}
+              value={`${runtime.inputPosition} / ${program.inputWord.length}`}
+            />
+            <StatusRow
+              label={t("moore-mealy.sim.status")}
+              value={
+                props.error
+                  ? t("moore-mealy.sim.error")
+                  : runtime.halted
+                    ? t("moore-mealy.sim.finished")
+                    : t("moore-mealy.sim.ready")
+              }
+            />
           </div>
         </div>
-        <div className="space-y-3">
-          <Sequence
+        <div className="grid grid-rows-2 gap-3">
+          <SymbolSequence
             title={t("moore-mealy.sim.inputWord")}
-            values={props.program.inputWord}
+            symbols={program.inputWord}
+            activeIndex={runtime.inputPosition}
             testId="mealy-runtime-input"
           />
-          <Sequence
+          <SymbolSequence
             title={t("moore-mealy.sim.outputWord")}
-            values={props.runtime.outputSymbols}
+            symbols={runtime.outputSymbols}
+            activeIndex={runtime.outputSymbols.length - 1}
             testId="mealy-runtime-output"
+            showEmptyWord={false}
           />
         </div>
       </div>
@@ -133,27 +152,52 @@ export function MealySimulationView(props: Props) {
   );
 }
 
-function Sequence({
+function StatusRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-mono font-semibold">{value}</span>
+    </div>
+  );
+}
+
+function SymbolSequence({
   title,
-  values,
+  symbols,
+  activeIndex,
   testId,
+  showEmptyWord = true,
 }: {
   title: string;
-  values: string[];
+  symbols: string[];
+  activeIndex: number;
   testId: string;
+  showEmptyWord?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
-    <section data-testid={testId}>
-      <h3 className="mb-1 text-sm font-semibold">{title}</h3>
-      <div className="border-border bg-card flex min-h-12 gap-2 overflow-x-auto rounded-lg border p-2">
-        {values.map((value, index) => (
-          <span
-            key={`${value}-${index}`}
-            className="bg-background rounded border px-3 py-1 font-mono"
-          >
-            {value}
+    <section data-testid={testId} className="space-y-1">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <div className="border-border bg-card flex min-h-12 items-center gap-2 overflow-x-auto rounded-lg border p-2">
+        {symbols.length ? (
+          symbols.map((symbol, index) => (
+            <span
+              key={`${symbol}-${index}`}
+              className={cn(
+                "border-border bg-background rounded-md border px-3 py-1.5 font-mono",
+                index < activeIndex && "bg-muted text-muted-foreground",
+                index === activeIndex &&
+                  "border-brand bg-brand/10 text-brand border-2 font-semibold",
+              )}
+            >
+              {symbol}
+            </span>
+          ))
+        ) : showEmptyWord ? (
+          <span className="text-muted-foreground text-sm italic">
+            {t("moore-mealy.sim.emptyWord")}
           </span>
-        ))}
+        ) : null}
       </div>
     </section>
   );

@@ -33,11 +33,18 @@ interface MooreTransitionTableProps {
   onRemoveInputSymbol: (symbol: string) => void;
   outputControls?: {
     getOutput: (inputSymbol: string, state: string) => MooreOutput | undefined;
+    outputOptions: string[];
     onSymbolChange: (
       inputSymbol: string,
       state: string,
       symbol: string,
     ) => void;
+    onSymbolCreate?: (
+      inputSymbol: string,
+      state: string,
+      symbol: string,
+    ) => void;
+    onSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
     onCodeChange: (inputSymbol: string, state: string, code: number) => void;
     testIdPrefix: string;
   };
@@ -46,6 +53,7 @@ interface MooreTransitionTableProps {
     outputAlphabet: MooreOutput[];
     onSymbolChange: (state: string, symbol: string) => void;
     onSymbolCreate: (state: string, symbol: string) => void;
+    onSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
     onCodeChange: (state: string, code: number) => void;
   };
 }
@@ -71,14 +79,16 @@ export function MooreTransitionTable({
     Math.max(...program.states.map((state) => state.length), 0) + 4,
   )}ch`;
   const outputColumnWidths = program.states.map((state) => ({
-    symbol: getTextInputWidth(
-      getLongestValue(
-        program.inputSymbols.map(
+    symbol: `${Math.max(
+      10,
+      Math.max(
+        ...program.inputSymbols.map(
           (inputSymbol) =>
-            outputControls?.getOutput(inputSymbol, state)?.symbol ?? "",
+            outputControls?.getOutput(inputSymbol, state)?.symbol?.length ?? 0,
         ),
-      ),
-    ),
+        0,
+      ) + 4,
+    )}ch`,
     code: getTextInputWidth(
       getLongestValue(
         program.inputSymbols.map((inputSymbol) =>
@@ -195,6 +205,7 @@ export function MooreTransitionTable({
                 outputAlphabet={mooreOutputControls.outputAlphabet}
                 onOutputSymbolChange={mooreOutputControls.onSymbolChange}
                 onOutputSymbolCreate={mooreOutputControls.onSymbolCreate}
+                onOutputSymbolRename={mooreOutputControls.onSymbolRename}
                 onOutputCodeChange={mooreOutputControls.onCodeChange}
               />
             )}

@@ -17,6 +17,7 @@ interface MooreOutputCellProps {
   representation: MooreProgram["representation"];
   onOutputSymbolChange: (state: string, symbol: string) => void;
   onOutputSymbolCreate: (state: string, symbol: string) => void;
+  onOutputSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -30,6 +31,7 @@ export function MooreOutputCell({
   representation,
   onOutputSymbolChange,
   onOutputSymbolCreate,
+  onOutputSymbolRename,
   onOutputCodeChange,
 }: MooreOutputCellProps) {
   const { t } = useTranslation();
@@ -45,9 +47,17 @@ export function MooreOutputCell({
           options={outputOptions}
           onChange={(symbol) => onOutputSymbolChange(state, symbol)}
           onCreate={(symbol) => onOutputSymbolCreate(state, symbol)}
+          onRename={(prev, next) =>
+            onOutputSymbolRename
+              ? onOutputSymbolRename(prev, next)
+              : onOutputSymbolChange(state, next)
+          }
           ariaLabel={t("moore-mealy.sim.outputForState", { state })}
           createLabel={(symbol) =>
             t("moore-mealy.sim.createNamedOutput", { symbol })
+          }
+          renameLabel={(previous, next) =>
+            t("moore-mealy.sim.renameNamedOutput", { previous, next })
           }
           emptyCreateLabel={t("moore-mealy.sim.createOutput")}
           notFoundLabel={t("moore-mealy.sim.outputNotFound")}

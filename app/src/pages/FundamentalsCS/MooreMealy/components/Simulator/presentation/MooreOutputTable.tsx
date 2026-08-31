@@ -10,6 +10,7 @@ interface MooreOutputTableProps {
   outputAlphabet: MooreOutput[];
   onOutputSymbolChange: (state: string, symbol: string) => void;
   onOutputSymbolCreate: (state: string, symbol: string) => void;
+  onOutputSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -18,6 +19,7 @@ export function MooreOutputTable({
   outputAlphabet,
   onOutputSymbolChange,
   onOutputSymbolCreate,
+  onOutputSymbolRename,
   onOutputCodeChange,
 }: MooreOutputTableProps) {
   const { t } = useTranslation();
@@ -44,6 +46,7 @@ export function MooreOutputTable({
           representation={program.representation}
           onOutputSymbolChange={onOutputSymbolChange}
           onOutputSymbolCreate={onOutputSymbolCreate}
+          onOutputSymbolRename={onOutputSymbolRename}
           onOutputCodeChange={onOutputCodeChange}
         />
       ))}

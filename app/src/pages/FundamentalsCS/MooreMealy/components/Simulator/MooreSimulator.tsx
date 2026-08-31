@@ -85,6 +85,7 @@ export const MooreSimulator = forwardRef<
     handleAddInputSymbol,
     handleRemoveInputSymbol,
     handleOutputSymbolChange,
+    handleOutputSymbolRename,
     handleOutputCodeChange,
     handleOutputSymbolCreate,
   } = useMooreProgramEditor(cloneJson(scenarioProgram));
@@ -278,6 +279,7 @@ export const MooreSimulator = forwardRef<
             onRemoveInputSymbol={handleRemoveInputSymbol}
             onOutputSymbolChange={handleOutputSymbolChange}
             onOutputSymbolCreate={handleOutputSymbolCreate}
+            onOutputSymbolRename={handleOutputSymbolRename}
             onOutputCodeChange={handleOutputCodeChange}
           />
 

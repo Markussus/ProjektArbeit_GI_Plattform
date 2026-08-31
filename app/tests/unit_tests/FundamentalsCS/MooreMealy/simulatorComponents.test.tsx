@@ -104,6 +104,7 @@ describe("Simulator Presentation & Components", () => {
 
     it("edits Mealy output data and restores an invalid internal code", () => {
       const onSymbolChange = vi.fn();
+      const onSymbolCreate = vi.fn();
       const onCodeChange = vi.fn();
 
       render(
@@ -123,7 +124,9 @@ describe("Simulator Presentation & Components", () => {
                 outputColumnWidth={{ symbol: "9ch", code: "8ch" }}
                 outputControls={{
                   getOutput: () => ({ symbol: "OUT", code: 5 }),
+                  outputOptions: ["OUT", "OTHER"],
                   onSymbolChange,
+                  onSymbolCreate,
                   onCodeChange,
                   testIdPrefix: "mealy-output",
                 }}
@@ -135,11 +138,22 @@ describe("Simulator Presentation & Components", () => {
         </table>,
       );
 
-      const symbolInput = screen.getByTestId("mealy-output-symbol-0-0");
-      fireEvent.change(symbolInput, { target: { value: "NEXT" } });
-      fireEvent.input(symbolInput);
-      expect(onSymbolChange).toHaveBeenCalledWith("0", "HALT", "NEXT");
-      expect(symbolInput).toHaveStyle({ width: "56px" });
+      const symbolSelect = screen.getByTestId("mealy-output-symbol-0-0");
+      expect(symbolSelect).toBeInTheDocument();
+
+      fireEvent.click(symbolSelect);
+      const otherOption = screen.getByTestId(
+        "mealy-output-symbol-0-0-option-OTHER",
+      );
+      fireEvent.pointerDown(otherOption);
+      expect(onSymbolChange).toHaveBeenCalledWith("0", "HALT", "OTHER");
+
+      fireEvent.click(symbolSelect);
+      const search = screen.getByTestId("mealy-output-symbol-0-0-search");
+      fireEvent.change(search, { target: { value: "BRAND_NEW" } });
+      const createBtn = screen.getByTestId("mealy-output-symbol-0-0-create");
+      fireEvent.pointerDown(createBtn);
+      expect(onSymbolCreate).toHaveBeenCalledWith("0", "HALT", "BRAND_NEW");
 
       const codeInput = screen.getByTestId("mealy-output-code-0-0");
       fireEvent.change(codeInput, { target: { value: "invalid" } });

@@ -11,14 +11,17 @@ function renderSelect(
 ) {
   const onChange = vi.fn();
   const onCreate = vi.fn();
+  const onRename = vi.fn();
   render(
     <SearchableCreatableSelect
       value="A"
       options={["A", "B", "C", "D", "E", "F"]}
       onChange={onChange}
       onCreate={onCreate}
+      onRename={onRename}
       ariaLabel="State"
       createLabel={(value) => `+ "${value}" create`}
+      renameLabel={(prev, next) => `Rename "${prev}" to "${next}"`}
       emptyCreateLabel="Create new state"
       notFoundLabel="Nothing found"
       searchPlaceholder="Search..."
@@ -26,7 +29,7 @@ function renderSelect(
       {...overrides}
     />,
   );
-  return { onChange, onCreate };
+  return { onChange, onCreate, onRename };
 }
 
 describe("SearchableCreatableSelect", () => {
@@ -92,5 +95,20 @@ describe("SearchableCreatableSelect", () => {
     fireEvent.keyDown(search, { key: "Escape" });
     expect(screen.queryByTestId("state-select-search")).not.toBeInTheDocument();
     await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it("allows renaming an existing value by clicking rename action", () => {
+    const { onRename } = renderSelect({ value: "A" });
+    fireEvent.click(screen.getByTestId("state-select"));
+    const search = screen.getByTestId("state-select-search");
+    fireEvent.change(search, { target: { value: "RENAMED" } });
+
+    expect(screen.getByTestId("state-select-rename")).toBeVisible();
+    expect(screen.getByTestId("state-select-rename")).toHaveTextContent(
+      'Rename "A" to "RENAMED"',
+    );
+
+    fireEvent.pointerDown(screen.getByTestId("state-select-rename"));
+    expect(onRename).toHaveBeenCalledWith("A", "RENAMED");
   });
 });

@@ -27,6 +27,10 @@ export interface MooreConfigViewProps {
   onRemoveInputSymbol: (symbol: string) => void;
   onOutputSymbolChange: (state: string, symbol: string) => void;
   onOutputSymbolCreate: (state: string, symbol: string) => void;
+  onOutputSymbolRename?: (
+    previousSymbol: string,
+    nextSymbol: string,
+  ) => boolean;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -43,6 +47,7 @@ export function MooreConfigView({
   onRemoveInputSymbol,
   onOutputSymbolChange,
   onOutputSymbolCreate,
+  onOutputSymbolRename,
   onOutputCodeChange,
 }: MooreConfigViewProps) {
   const { t } = useTranslation();
@@ -164,6 +169,7 @@ export function MooreConfigView({
             outputAlphabet,
             onSymbolChange: onOutputSymbolChange,
             onSymbolCreate: onOutputSymbolCreate,
+            onSymbolRename: onOutputSymbolRename,
             onCodeChange: onOutputCodeChange,
           }}
         />

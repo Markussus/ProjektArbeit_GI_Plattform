@@ -15,6 +15,7 @@ import {
   createNextStateName,
   validateMooreProgram,
 } from "../domain/mooreProgram";
+import { MAX_NAME_LENGTH } from "../domain/programCommon";
 import type { MooreProgram } from "../domain/mooreTypes";
 
 export function useMooreProgramEditor(initialProgram: MooreProgram) {
@@ -105,19 +106,70 @@ export function useMooreProgramEditor(initialProgram: MooreProgram) {
     [],
   );
 
+  const handleOutputSymbolRename = useCallback(
+    (previousSymbol: string, nextSymbol: string): boolean => {
+      const trimmed = nextSymbol.trim();
+      if (!trimmed || trimmed.length > MAX_NAME_LENGTH) {
+        return false;
+      }
+      if (trimmed === previousSymbol) {
+        return true;
+      }
+
+      setProgram((current) => {
+        const existingCode = current.states
+          .map((s) => current.outputs[s])
+          .find((out) => out?.symbol === trimmed)?.code;
+
+        return {
+          ...current,
+          outputs: Object.fromEntries(
+            current.states.map((s) => {
+              const out = current.outputs[s];
+              if (!out) return [s, out];
+              if (out.symbol === previousSymbol) {
+                return [s, { symbol: trimmed, code: existingCode ?? out.code }];
+              }
+              return [s, out];
+            }),
+          ),
+        };
+      });
+      return true;
+    },
+    [],
+  );
+
   const handleOutputCodeChange = useCallback((state: string, code: number) => {
     setProgram((current) => {
       const symbol = current.outputs[state]?.symbol;
       if (!symbol) return setMooreOutputCode(current, state, code);
+      const oldCode = current.outputs[state]?.code ?? 0;
+      if (oldCode === code) return current;
+
+      const collidingState = current.states.find(
+        (s) =>
+          current.outputs[s]?.symbol !== symbol &&
+          current.outputs[s]?.code === code,
+      );
+      const collidingSymbol = collidingState
+        ? current.outputs[collidingState]?.symbol
+        : undefined;
+
       return {
         ...current,
         outputs: Object.fromEntries(
-          current.states.map((candidate) => [
-            candidate,
-            current.outputs[candidate]?.symbol === symbol
-              ? { ...current.outputs[candidate], code }
-              : current.outputs[candidate],
-          ]),
+          current.states.map((candidate) => {
+            const currentOutput = current.outputs[candidate];
+            if (!currentOutput) return [candidate, currentOutput];
+            if (currentOutput.symbol === symbol) {
+              return [candidate, { ...currentOutput, code }];
+            }
+            if (collidingSymbol && currentOutput.symbol === collidingSymbol) {
+              return [candidate, { ...currentOutput, code: oldCode }];
+            }
+            return [candidate, currentOutput];
+          }),
         ),
       };
     });
@@ -142,6 +194,7 @@ export function useMooreProgramEditor(initialProgram: MooreProgram) {
     handleAddInputSymbol,
     handleRemoveInputSymbol,
     handleOutputSymbolChange,
+    handleOutputSymbolRename,
     handleOutputCodeChange,
     handleOutputSymbolCreate,
   };

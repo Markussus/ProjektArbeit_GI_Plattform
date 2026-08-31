@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Check, ChevronDown } from "lucide-react";
+import {
+  CLOSE_DROPDOWNS_EVENT,
+  notifyDropdownOpened,
+} from "@/lib/dropdownEvents";
 import { cn } from "@/lib/utils";
 
 export interface DropdownSelectOption<T extends string> {
@@ -42,6 +46,7 @@ export function DropdownSelect<T extends string>({
 }: DropdownSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const instanceId = useId();
   const selectedOption = options.find((option) => option.value === value);
 
   useEffect(() => {
@@ -57,14 +62,26 @@ export function DropdownSelect<T extends string>({
       }
     };
 
+    const handleOtherDropdownOpen = (event: Event) => {
+      const customEvent = event as CustomEvent<{ id: string }>;
+      if (customEvent.detail?.id !== instanceId) {
+        setIsOpen(false);
+      }
+    };
+
     window.addEventListener("pointerdown", handlePointerDown);
     window.addEventListener("keydown", handleEscape);
+    window.addEventListener(CLOSE_DROPDOWNS_EVENT, handleOtherDropdownOpen);
 
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("keydown", handleEscape);
+      window.removeEventListener(
+        CLOSE_DROPDOWNS_EVENT,
+        handleOtherDropdownOpen,
+      );
     };
-  }, []);
+  }, [instanceId]);
 
   if (!selectedOption) {
     return null;
@@ -76,7 +93,13 @@ export function DropdownSelect<T extends string>({
         type="button"
         onClick={() => {
           if (!disabled) {
-            setIsOpen((previousValue) => !previousValue);
+            setIsOpen((previousValue) => {
+              const next = !previousValue;
+              if (next) {
+                notifyDropdownOpened(instanceId);
+              }
+              return next;
+            });
           }
         }}
         aria-haspopup="listbox"

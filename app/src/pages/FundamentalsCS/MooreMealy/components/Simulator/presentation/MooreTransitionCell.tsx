@@ -21,11 +21,18 @@ interface MooreTransitionCellProps {
   outputColumnWidth?: { symbol: string; code: string };
   outputControls?: {
     getOutput: (inputSymbol: string, state: string) => MooreOutput | undefined;
+    outputOptions: string[];
     onSymbolChange: (
       inputSymbol: string,
       state: string,
       symbol: string,
     ) => void;
+    onSymbolCreate?: (
+      inputSymbol: string,
+      state: string,
+      symbol: string,
+    ) => void;
+    onSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
     onCodeChange: (inputSymbol: string, state: string, code: number) => void;
     testIdPrefix: string;
   };
@@ -54,7 +61,6 @@ export function MooreTransitionCell({
 }: MooreTransitionCellProps) {
   const { t } = useTranslation();
   const output = outputControls?.getOutput(inputSymbol, state);
-  const symbolColumnKey = `${stateIndex}-symbol`;
   const codeColumnKey = `${stateIndex}-code`;
 
   return (
@@ -89,25 +95,37 @@ export function MooreTransitionCell({
         />
         {outputControls && (
           <>
-            <input
+            <SearchableCreatableSelect
               value={output?.symbol ?? ""}
-              onChange={(event) =>
-                outputControls.onSymbolChange(
-                  inputSymbol,
-                  state,
-                  event.target.value,
-                )
+              options={outputControls.outputOptions}
+              onChange={(symbol) =>
+                outputControls.onSymbolChange(inputSymbol, state, symbol)
               }
-              onInput={(event) =>
-                resizeColumnTextInputs(event.currentTarget, symbolColumnKey)
+              onCreate={(symbol) =>
+                outputControls.onSymbolCreate
+                  ? outputControls.onSymbolCreate(inputSymbol, state, symbol)
+                  : outputControls.onSymbolChange(inputSymbol, state, symbol)
               }
-              aria-label={`${t("moore-mealy.sim.symbolOutput")} ${state} ${inputSymbol}`}
-              data-testid={`${outputControls.testIdPrefix}-symbol-${inputIndex}-${stateIndex}`}
-              data-output-column={symbolColumnKey}
+              onRename={(prev, next) =>
+                outputControls.onSymbolRename
+                  ? outputControls.onSymbolRename(prev, next)
+                  : outputControls.onSymbolChange(inputSymbol, state, next)
+              }
+              ariaLabel={`${t("moore-mealy.sim.symbolOutput")} ${state} ${inputSymbol}`}
+              createLabel={(symbol) =>
+                t("moore-mealy.sim.createNamedOutput", { symbol })
+              }
+              renameLabel={(previous, next) =>
+                t("moore-mealy.sim.renameNamedOutput", { previous, next })
+              }
+              emptyCreateLabel={t("moore-mealy.sim.createOutput")}
+              notFoundLabel={t("moore-mealy.sim.outputNotFound")}
+              searchPlaceholder={t("moore-mealy.sim.search")}
+              testId={`${outputControls.testIdPrefix}-symbol-${inputIndex}-${stateIndex}`}
+              className="min-w-0"
               style={{
                 width: outputColumnWidth?.symbol,
               }}
-              className="border-input bg-background focus:ring-ring h-9 min-w-0 rounded-md border px-2 font-mono outline-none focus:ring-1"
             />
             <input
               key={`${representation}-${inputSymbol}-${state}-${output?.code ?? 0}`}

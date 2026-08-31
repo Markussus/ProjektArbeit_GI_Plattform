@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -7,16 +8,22 @@ import {
   type KeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, Plus, Search } from "lucide-react";
+import { Check, ChevronDown, Pencil, Plus, Search } from "lucide-react";
+import {
+  CLOSE_DROPDOWNS_EVENT,
+  notifyDropdownOpened,
+} from "@/lib/dropdownEvents";
 import { cn } from "@/lib/utils";
 
 export interface SearchableCreatableSelectProps {
   value: string;
-  options: string[];
+  options?: string[];
   onChange: (value: string) => void;
   onCreate?: (value: string) => void;
+  onRename?: (previousValue: string, nextValue: string) => void;
   ariaLabel: string;
   createLabel: (value: string) => string;
+  renameLabel?: (previousValue: string, nextValue: string) => string;
   emptyCreateLabel: string;
   notFoundLabel: string;
   searchPlaceholder: string;
@@ -28,11 +35,13 @@ export interface SearchableCreatableSelectProps {
 
 export function SearchableCreatableSelect({
   value,
-  options,
+  options = [],
   onChange,
   onCreate,
+  onRename,
   ariaLabel,
   createLabel,
+  renameLabel,
   emptyCreateLabel,
   notFoundLabel,
   searchPlaceholder,
@@ -43,60 +52,141 @@ export function SearchableCreatableSelect({
 }: SearchableCreatableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const instanceId = useId();
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [menuPosition, setMenuPosition] = useState({
     left: 0,
     top: 0,
-    maxHeight: 224,
+    maxHeight: 280,
   });
+
   const normalizedQuery = query.trim();
+
   const matchingOptions = useMemo(
     () =>
-      options.filter((option) =>
-        option.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+      (options ?? []).filter((option) =>
+        option
+          .toLocaleLowerCase()
+          .includes(normalizedQuery.toLocaleLowerCase()),
       ),
-    [options, query],
+    [options, normalizedQuery],
   );
-  const canCreate =
-    Boolean(onCreate) &&
-    (normalizedQuery.length === 0 ||
-      !options.some(
+
+  const isExactOptionMatch = useMemo(
+    () =>
+      (options ?? []).some(
         (option) =>
           option.toLocaleLowerCase() === normalizedQuery.toLocaleLowerCase(),
-      ));
+      ),
+    [options, normalizedQuery],
+  );
+
+  const canCreate = Boolean(
+    onCreate && (normalizedQuery.length === 0 || !isExactOptionMatch),
+  );
+
+  const canRename = Boolean(
+    onRename &&
+    value &&
+    value.trim().length > 0 &&
+    normalizedQuery.length > 0 &&
+    normalizedQuery !== value &&
+    !isExactOptionMatch,
+  );
+
+  // Total navigable action items: options -> create -> rename
+  const createActionIndex = canCreate ? matchingOptions.length : -1;
+  const renameActionIndex = canRename
+    ? canCreate
+      ? matchingOptions.length + 1
+      : matchingOptions.length
+    : -1;
+  const totalNavigableItems =
+    matchingOptions.length + (canCreate ? 1 : 0) + (canRename ? 1 : 0);
+
+  const openMenu = () => {
+    if (disabled) return;
+    notifyDropdownOpened(instanceId);
+    setIsOpen(true);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+    setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
+  };
+
+  const selectValue = (nextValue: string) => {
+    onChange(nextValue);
+    setIsOpen(false);
+    setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
+  };
+
+  const executeCreate = (nextValue: string) => {
+    if (!onCreate) return;
+    onCreate(nextValue);
+    setIsOpen(false);
+    setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
+  };
+
+  const executeRename = (nextValue: string) => {
+    if (!onRename) return;
+    onRename(value, nextValue);
+    setIsOpen(false);
+    setQuery("");
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
+    const handlePointerDown = (event: MouseEvent | PointerEvent) => {
+      const target = event.target as Node | null;
       if (
-        !containerRef.current?.contains(event.target as Node) &&
-        !menuRef.current?.contains(event.target as Node)
+        containerRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
       ) {
-        setIsOpen(false);
-        setQuery("");
+        return;
       }
+      setIsOpen(false);
+      setQuery("");
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
         setIsOpen(false);
         setQuery("");
-        window.setTimeout(() => triggerRef.current?.focus());
+        window.setTimeout(() => triggerRef.current?.focus(), 0);
       }
     };
 
-    window.addEventListener("pointerdown", handlePointerDown);
-    window.addEventListener("keydown", handleEscape);
+    const handleOtherDropdownOpen = (event: Event) => {
+      const customEvent = event as CustomEvent<{ id: string }>;
+      if (customEvent.detail?.id !== instanceId) {
+        setIsOpen(false);
+        setQuery("");
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+    window.addEventListener(CLOSE_DROPDOWNS_EVENT, handleOtherDropdownOpen);
 
     return () => {
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener(
+        CLOSE_DROPDOWNS_EVENT,
+        handleOtherDropdownOpen,
+      );
     };
-  }, [isOpen]);
+  }, [instanceId, isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -125,72 +215,58 @@ export function SearchableCreatableSelect({
         });
       }
       setActiveIndex(0);
-      inputRef.current?.focus();
+      window.setTimeout(() => inputRef.current?.focus(), 0);
     }
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (!isOpen) return;
     const close = () => {
       setIsOpen(false);
       setQuery("");
     };
     window.addEventListener("resize", close);
-    return () => {
-      window.removeEventListener("resize", close);
-    };
+    return () => window.removeEventListener("resize", close);
   }, [isOpen]);
 
-  const selectValue = (nextValue: string) => {
-    onChange(nextValue);
-    setIsOpen(false);
-    setQuery("");
-    window.setTimeout(() => triggerRef.current?.focus());
-  };
-
-  const createValue = () => {
-    if (!canCreate) {
-      return;
-    }
-
-    onCreate?.(normalizedQuery);
-    setIsOpen(false);
-    setQuery("");
-    window.setTimeout(() => triggerRef.current?.focus());
-  };
-
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const itemCount = matchingOptions.length + (canCreate ? 1 : 0);
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      if (itemCount === 0) {
-        return;
-      }
+      if (totalNavigableItems === 0) return;
       setActiveIndex((current) => {
         const direction = event.key === "ArrowDown" ? 1 : -1;
-        const next = (current + direction + itemCount) % itemCount;
+        const next =
+          (current + direction + totalNavigableItems) % totalNavigableItems;
         window.setTimeout(() =>
-          optionRefs.current[next]?.scrollIntoView({
-            block: "nearest",
-          }),
+          optionRefs.current[next]?.scrollIntoView({ block: "nearest" }),
         );
         return next;
       });
       return;
     }
-    if (event.key !== "Enter") {
-      return;
-    }
+
+    if (event.key !== "Enter") return;
 
     event.preventDefault();
-    if (activeIndex < matchingOptions.length) {
+    if (activeIndex >= 0 && activeIndex < matchingOptions.length) {
       selectValue(matchingOptions[activeIndex]);
       return;
     }
+    if (canCreate && activeIndex === createActionIndex) {
+      executeCreate(normalizedQuery);
+      return;
+    }
+    if (canRename && activeIndex === renameActionIndex) {
+      executeRename(normalizedQuery);
+      return;
+    }
 
-    createValue();
+    // Default Enter behavior when query was typed without specific navigation
+    if (canCreate) {
+      executeCreate(normalizedQuery);
+    } else if (canRename) {
+      executeRename(normalizedQuery);
+    }
   };
 
   return (
@@ -202,7 +278,15 @@ export function SearchableCreatableSelect({
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => !disabled && setIsOpen((current) => !current)}
+        onClick={() => {
+          if (!disabled) {
+            if (isOpen) {
+              closeMenu();
+            } else {
+              openMenu();
+            }
+          }
+        }}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -239,7 +323,10 @@ export function SearchableCreatableSelect({
               <input
                 ref={inputRef}
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setActiveIndex(0);
+                }}
                 onKeyDown={handleInputKeyDown}
                 aria-label={`${ariaLabel} search`}
                 placeholder={searchPlaceholder}
@@ -290,34 +377,67 @@ export function SearchableCreatableSelect({
               )}
             </div>
 
-            {onCreate && (
-              <div className="border-border border-t pt-1">
-                <button
-                  ref={(element) => {
-                    optionRefs.current[matchingOptions.length] = element;
-                  }}
-                  type="button"
-                  disabled={!canCreate}
-                  onPointerDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    createValue();
-                  }}
-                  data-testid={testId ? `${testId}-create` : undefined}
-                  className={cn(
-                    "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
-                    canCreate &&
-                      activeIndex === matchingOptions.length &&
-                      "bg-muted",
-                  )}
-                >
-                  <Plus className="text-brand size-4 shrink-0" />
-                  <span className="truncate">
-                    {normalizedQuery
-                      ? createLabel(normalizedQuery)
-                      : emptyCreateLabel}
-                  </span>
-                </button>
+            {(onCreate || canRename) && (
+              <div className="border-border flex flex-col gap-0.5 border-t pt-1">
+                {onCreate && (
+                  <button
+                    ref={(element) => {
+                      if (createActionIndex >= 0) {
+                        optionRefs.current[createActionIndex] = element;
+                      }
+                    }}
+                    type="button"
+                    disabled={!canCreate}
+                    onPointerDown={(event) => {
+                      if (!canCreate) return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      executeCreate(normalizedQuery);
+                    }}
+                    data-testid={testId ? `${testId}-create` : undefined}
+                    className={cn(
+                      "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
+                      canCreate &&
+                        activeIndex === createActionIndex &&
+                        "bg-muted",
+                    )}
+                  >
+                    <Plus className="text-brand size-4 shrink-0" />
+                    <span className="truncate">
+                      {normalizedQuery
+                        ? createLabel(normalizedQuery)
+                        : emptyCreateLabel}
+                    </span>
+                  </button>
+                )}
+
+                {canRename && (
+                  <button
+                    ref={(element) => {
+                      if (renameActionIndex >= 0) {
+                        optionRefs.current[renameActionIndex] = element;
+                      }
+                    }}
+                    type="button"
+                    onPointerDown={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      executeRename(normalizedQuery);
+                    }}
+                    data-testid={testId ? `${testId}-rename` : undefined}
+                    className={cn(
+                      "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
+                      activeIndex === renameActionIndex && "bg-muted",
+                    )}
+                  >
+                    <Pencil className="text-brand size-4 shrink-0" />
+                    <span className="truncate">
+                      {renameLabel
+                        ? renameLabel(value, normalizedQuery)
+                        : `"${value}" in "${normalizedQuery}" umbenennen`}
+                    </span>
+                  </button>
+                )}
               </div>
             )}
           </div>,

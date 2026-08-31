@@ -30,6 +30,15 @@ export interface MealyConfigViewProps {
     state: string,
     symbol: string,
   ) => void;
+  onOutputSymbolCreate?: (
+    inputSymbol: string,
+    state: string,
+    symbol: string,
+  ) => void;
+  onOutputSymbolRename?: (
+    previousSymbol: string,
+    nextSymbol: string,
+  ) => boolean;
   onOutputCodeChange: (
     inputSymbol: string,
     state: string,
@@ -49,21 +58,28 @@ export function MealyConfigView({
   onAddInput,
   onRemoveInput,
   onOutputSymbolChange,
+  onOutputSymbolCreate,
+  onOutputSymbolRename,
   onOutputCodeChange,
 }: MealyConfigViewProps) {
   const { t } = useTranslation();
   const outputs = useMemo(() => {
-    const unique = new Map<number, string>();
+    const unique = new Map<string, number>();
     for (const input of program.inputSymbols) {
       for (const state of program.states) {
         const output = program.outputs[input]?.[state];
-        if (output && !unique.has(output.code)) {
-          unique.set(output.code, output.symbol);
+        if (output?.symbol && !unique.has(output.symbol)) {
+          unique.set(output.symbol, output.code);
         }
       }
     }
-    return [...unique];
+    return [...unique.entries()].map(([symbol, code]) => ({ symbol, code }));
   }, [program]);
+
+  const outputOptions = useMemo(
+    () => outputs.map((out) => out.symbol),
+    [outputs],
+  );
 
   const stateOptions = useMemo(
     () =>
@@ -167,7 +183,10 @@ export function MealyConfigView({
           onRemoveInputSymbol={onRemoveInput}
           outputControls={{
             getOutput: (input, state) => program.outputs[input]?.[state],
+            outputOptions,
             onSymbolChange: onOutputSymbolChange,
+            onSymbolCreate: onOutputSymbolCreate,
+            onSymbolRename: onOutputSymbolRename,
             onCodeChange: onOutputCodeChange,
             testIdPrefix: "mealy-transition-output",
           }}
@@ -193,8 +212,8 @@ export function MealyConfigView({
             title={t("moore-mealy.sim.outputAlphabet")}
             emptyText={t("moore-mealy.sim.noSymbols")}
             testId="mealy-output-alphabet"
-            items={outputs.map(([code, symbol]) => ({
-              key: String(code),
+            items={outputs.map(({ symbol, code }) => ({
+              key: symbol,
               content: (
                 <>
                   {symbol}

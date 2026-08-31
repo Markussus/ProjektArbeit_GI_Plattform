@@ -122,6 +122,7 @@
     "outputLambda": "Ausgabe λ",
     "createOutput": "Neues Ausgabesymbol erstellen",
     "createNamedOutput": "+ \"{{symbol}}\" erstellen",
+    "renameNamedOutput": "\"{{previous}}\" in \"{{next}}\" umbenennen",
     "outputNotFound": "Kein Ausgabesymbol gefunden",
     "outputForState": "Ausgabe für Zustand {{state}}",
     "outputCodeForState": "Interner Ausgabecode für Zustand {{state}}",

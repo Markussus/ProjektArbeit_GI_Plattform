@@ -86,6 +86,8 @@ export const MealySimulator = forwardRef<
     handleAddInputSymbol,
     handleRemoveInputSymbol,
     handleOutputSymbolChange,
+    handleOutputSymbolRename,
+    handleOutputSymbolCreate,
     handleOutputCodeChange,
   } = useMealyProgramEditor(cloneJson(scenarioProgram));
 
@@ -259,6 +261,8 @@ export const MealySimulator = forwardRef<
             onAddInput={handleAddInputSymbol}
             onRemoveInput={handleRemoveInputSymbol}
             onOutputSymbolChange={handleOutputSymbolChange}
+            onOutputSymbolRename={handleOutputSymbolRename}
+            onOutputSymbolCreate={handleOutputSymbolCreate}
             onOutputCodeChange={handleOutputCodeChange}
           />
           <AutomataViewActions

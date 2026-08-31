@@ -18,11 +18,18 @@ interface MooreTransitionRowProps {
   outputColumnWidths?: { symbol: string; code: string }[];
   outputControls?: {
     getOutput: (inputSymbol: string, state: string) => MooreOutput | undefined;
+    outputOptions: string[];
     onSymbolChange: (
       inputSymbol: string,
       state: string,
       symbol: string,
     ) => void;
+    onSymbolCreate?: (
+      inputSymbol: string,
+      state: string,
+      symbol: string,
+    ) => void;
+    onSymbolRename?: (previousSymbol: string, nextSymbol: string) => void;
     onCodeChange: (inputSymbol: string, state: string, code: number) => void;
     testIdPrefix: string;
   };
