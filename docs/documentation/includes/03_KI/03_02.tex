@@ -1,41 +1,21 @@
-\subNsection{1}{KI Reflexion}{Richard Schröder}
+\subNsection{1}{KI-Reflexion}{Richard Schröder}
 
 \subNsection{2}{KI als Co-Developer}{Richard Schröder}
 
-Im Rahmen der Projektarbeit wurden verschiedene \gls{ki}-gestützte Werkzeuge als unterstützende Systeme in der Softwareentwicklung eingesetzt. Dazu zählten insbesondere ChatGPT, Codex in den Entwicklungsumgebungen WebStorm und Zed sowie lokal ausgeführte Modelle über Ollama in Zed. Ergänzend wurde Gemini vereinzelt für Rechercheaufgaben genutzt, wenn zusätzliche externe Informationen oder alternative Formulierungen benötigt wurden.
+Ich setzte ChatGPT, Codex in WebStorm und Zed sowie lokal über Ollama ausgeführte Modelle für Planung, Implementierung und Code-Reviews ein. Gemini nutzte ich ergänzend für Recherchen und Formulierungsvorschläge. Die Ergebnisse dienten jeweils als Entwurf. Architekturänderungen, bestehende Abhängigkeiten und Tests prüfte ich vor der Übernahme im Projekt.
 
-Der Einsatz dieser Werkzeuge hat den Entwicklungsprozess deutlich erleichtert, da Entwürfe, Implementierungsvorschläge und Reviews wesentlich schneller erstellt werden konnten. Gleichzeitig zeigte sich jedoch, dass die generierten Ergebnisse nicht unkritisch übernommen werden dürfen. Eine fachliche Kontrolle blieb in allen Phasen notwendig, insbesondere bei Architekturentscheidungen, bei Änderungen an bestehendem Code und bei der Bewertung der Testabdeckung.
+Mein wiederkehrender Ablauf bestand aus drei Phasen. In der Planung beschrieb ich den Zielzustand, prüfte den erzeugten Architekturvorschlag und zerlegte ihn in Arbeitspakete. In der Umsetzung bearbeitete ich diese Pakete einzeln und verglich jede Änderung mit dem geplanten Aufbau. Für die unabhängige Prüfung verwendete ich einen neuen Chat und kontrollierte die Befunde anschließend selbst im Code und in den Unit- und \gls{e2e}-Tests.
 
-Das allgemeine Vorgehen beim Einsatz von \gls{ki} als Co-Developer bestand aus mehreren wiederkehrenden Schritten:
-
-\begin{enumerate}
-    \item Zunächst wurde der gewünschte Zielzustand des Systems möglichst detailliert beschrieben. Auf dieser Grundlage wurde ein erster Architekturvorschlag durch das \gls{ki}-System erzeugt, der als Ausgangspunkt für die weitere Planung diente.
-
-    \item Anschließend wurde der Architekturvorschlag fachlich geprüft und überarbeitet. Dies war erforderlich, da die ersten Vorschläge teilweise zu allgemein waren oder sich nicht optimal in die bereits bestehende Systemarchitektur einfügten.
-
-    \item Der verbesserte Architekturentwurf wurde danach in konkrete Arbeitspakete zerlegt. Auch diese Aufteilung wurde kontrolliert, um sicherzustellen, dass die Aufgaben fachlich sinnvoll abgegrenzt waren und keine relevanten Abhängigkeiten übersehen wurden.
-
-    \item Die einzelnen Arbeitspakete wurden anschließend in separaten Prompts bearbeitet, wobei die Gesamtarchitektur weiterhin als Kontext mitgegeben wurde. Nach jeder Umsetzung wurde die generierte Implementierung manuell überprüft, um Fehler, unpassende Änderungen oder Abweichungen vom geplanten Vorgehen frühzeitig zu erkennen.
-
-    \item Zusätzlich wurde der generierte Code in einem neuen Chat erneut durch \gls{ki} geprüft. Dabei lag der Fokus auf der Übereinstimmung mit dem zuvor definierten Architekturdokument sowie auf einem allgemeinen Code Review hinsichtlich Verständlichkeit, Struktur und möglicher Schwachstellen.
-
-    \item Besondere Aufmerksamkeit wurde auf korrekte und vollständige Tests gelegt. Neben Unit-Tests wurden auch \gls{e2e}-Tests betrachtet, da diese für die Absicherung der implementierten Nutzerabläufe und der Integration verschiedener Komponenten besonders relevant waren.
-\end{enumerate}
+Bei einem getrennten Code-Review der Turingmaschinenimplementierung fand Codex zwei Fehler, die von den vorhandenen Tests nicht abgedeckt waren. Nach dem Austausch des Anfangsbandes wurde das Eingabealphabet nicht neu abgeleitet. Außerdem akzeptierte die Lösungskontrolle eine passende Ausgabe auch dann, wenn die Maschine wegen eines fehlenden Übergangs statt in einem vorgesehenen Haltezustand stoppte. Ich prüfte beide Befunde, korrigierte die Logik und ergänzte Regressionstests für die beiden Fälle. Der Review fand zudem nicht verwendeten Produktivcode, vier Kopien derselben Zustandsformatierung und fehlende direkte Tests der Bandansicht.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Richard Schröder}
 
-Ein weiteres Einsatzfeld der \gls{ki}-Systeme war die automatisierte Generierung von Aufgaben. Zu Beginn waren die Ergebnisse nur eingeschränkt verwendbar, insbesondere bei Aufgaben zur Turingmaschine. Häufig wurde das geforderte \gls{json}-Format nicht korrekt eingehalten, und die erzeugten Lösungen zeigten, dass ChatGPT und Codex in diesem speziellen Themenbereich nicht ohne zusätzliche Vorgaben als zuverlässige Experten eingesetzt werden konnten.
+Bei den ersten erzeugten Turingmaschinenaufgaben entstanden sowohl ungültige JSON-Ausgaben als auch Maschinen, die sich nicht wie vorgesehen ausführen ließen. Ich gab den Modellen danach gültige Aufgabenobjekte als Beispiele und prüfte jede erzeugte Maschine durch Import und Simulation. Die Aufgaben werden als geprüfte Szenarien in der Anwendung gespeichert.
 
-Die Qualität der Ergebnisse verbesserte sich, nachdem mehrere korrekt aufgebaute Turingmaschinen erstellt und als Kontext für weitere Generierungen verwendet wurden. Dadurch konnten sich die Modelle besser an das gewünschte Format und die erwartete Aufgabenstruktur orientieren. Dennoch blieb weiterhin eine fachliche Kontrolle notwendig, da auch mit verbessertem Kontext nicht alle generierten Turingmaschinen vollständig korrekt waren.
+Für die Übertragung von Aufgaben aus Skript und Übungsblättern verwendete ich bestehende JSON-Beispiele zusammen mit einem Screenshot der jeweiligen Lösung. Diese Eingaben halfen den Modellen, Struktur und Inhalt der Vorlage zuzuordnen. Vor der Aufnahme kontrollierte ich weiterhin das JSON-Format, die Übergänge und die erwarteten Ergebnisse der Validierungsfälle.
 
-Das Nachbauen von Aufgaben aus Skript und Übungsblättern war hingegen gut umsetzbar, wenn ausreichend \gls{json}-Beispiele als Kontext bereitgestellt wurden. Besonders hilfreich war dabei die Kombination aus bestehenden Aufgabenbeispielen und einem Screenshot der jeweiligen Lösung. Auf dieser Grundlage konnte ChatGPT vergleichsweise zuverlässig Lösungen erzeugen, die sich an Struktur und Formulierung der Vorlagen orientierten.
+\subNsection{2}{Grenzen der eingesetzten Arbeitsweise}{Richard Schröder}
 
-\subNsection{2}{Kritische Reflexion}{Richard Schröder}
+Ein einzelner Auftrag für eine Turingmaschine einschließlich Datenmodell, Simulator, Editor und Darstellung verlor Anforderungen aus dem vorgegebenen Aufbau oder es wurden Stellen geändert die nichts mit dem Auftrag zu tun hatten. Bei kleineren Arbeitspaketen konnte ich nach jedem Schritt prüfen, ob Schnittstellen und Zuständigkeiten noch dem Architekturdokument entsprachen.
 
-Insgesamt stellte der Einsatz von \gls{ki} im Projekt eine erhebliche Unterstützung dar, insbesondere um Entwicklungsaufgaben schneller zu strukturieren, Implementierungen vorzubereiten und alternative Lösungsansätze zu prüfen. Dadurch konnte effizienter gearbeitet werden, ohne jeden Entwurf oder jede technische Detailentscheidung vollständig von Grund auf manuell ausarbeiten zu müssen. Der Nutzen war jedoch besonders dann hoch, wenn die Anfragen klar eingegrenzt und die Ergebnisse anschließend überprüft wurden.
-
-Eine zentrale Einschränkung bestand darin, dass zu große Aufgaben nicht zuverlässig in einem einzigen Schritt bearbeitet werden konnten. Wurde beispielsweise versucht, eine vollständige Turingmaschine mit allen Details auf einmal generieren zu lassen, konnten Teile der Anforderungen aus dem Kontext verloren gehen oder fehlerhaft umgesetzt werden. Daher erwies es sich als sinnvoller, komplexe Aufgaben in kleinere Einheiten zu zerlegen und diese nacheinander zu bearbeiten.
-
-Darüber hinaus zeigte sich gelegentlich eine Tendenz der \gls{ki}-Systeme, einfache Problemstellungen unnötig komplex zu lösen. In solchen Fällen wurden umfangreiche Strukturen, zusätzliche Abstraktionen oder technische Umwege vorgeschlagen, obwohl eine deutlich einfachere Lösung ausreichend gewesen wäre. Dies machte eine kritische Bewertung der vorgeschlagenen Architektur und Implementierung besonders wichtig.
-
-Problematisch war außerdem, dass \gls{ki}-generierte Änderungen nicht immer an der fachlich passenden Stelle vorgenommen wurden. Teilweise wurden allgemeine oder gemeinsam genutzte Komponenten angepasst, obwohl eine lokale Änderung innerhalb des jeweiligen Moduls angemessener gewesen wäre. Solche Änderungen können unerwünschte Auswirkungen auf andere Teile des Systems haben und verdeutlichen, dass \gls{ki}-Unterstützung nur in Verbindung mit einem guten Verständnis der bestehenden Codebasis sinnvoll eingesetzt werden sollte.
+In einem weiteren Versuch ergänzte ein Modell Abstraktionen, obwohl sie nur an einer Stelle verwendet wurden, und änderte eine gemeinsam genutzte Komponente für ein modulspezifisches Problem. Ich verwarf diese Änderungen und setzte die Anpassung im betroffenen Modul um. Deshalb prüfe ich bei generierten Änderungen zuerst den Dateiumfang, die Zahl der tatsächlichen Nutzer einer neuen Abstraktion und mögliche Auswirkungen auf Shared Components.
