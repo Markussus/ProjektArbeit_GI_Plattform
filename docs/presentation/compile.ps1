@@ -30,7 +30,7 @@ Write-Host "Cleaning build files..."
 $Extensions = @(
     "aux", "bbl", "bcf", "blg", "log", "out",
     "run.xml", "toc", "lof", "lot", "fls", "fdb_latexmk",
-    "synctex.gz", "snm", "vrb"
+    "synctex.gz", "snm", "vrb", "nav"
 )
 
 foreach ($ext in $Extensions) {
