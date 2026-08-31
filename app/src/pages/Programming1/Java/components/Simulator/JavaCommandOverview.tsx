@@ -71,7 +71,7 @@ export function JavaCommandOverview({
                     <p className="text-sm font-semibold">
                       {translate(capability.titleKey)}
                     </p>
-                    <p className="text-muted-foreground mt-1 text-sm">
+                    <p className="text-muted-foreground mt-1 text-sm whitespace-pre-line">
                       {translate(capability.descriptionKey)}
                     </p>
                   </div>

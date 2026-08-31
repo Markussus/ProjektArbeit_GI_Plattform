@@ -53,11 +53,36 @@ describe("javaRunnerHelpers", () => {
   });
 
   describe("inlineScannerInput and createExecutableSource", () => {
-    it("returns unmodified sourceCode if no stdin is provided", () => {
+    it("returns unmodified sourceCode if no Scanner is in the code", () => {
       const code =
         "public class Main { public static void main(String[] args) {} }";
       expect(createExecutableSource(code)).toBe(code);
       expect(createExecutableSource(code, "")).toBe(code);
+    });
+
+    it("inlines Scanner even when stdin is empty or not provided (user bug reproduction)", () => {
+      const userCode = `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int a = sc.nextInt();
+    int b = sc.nextInt();
+
+    System.out.println("Summe: " + (a + b));
+  }
+}`;
+      const resultWithoutStdin = createExecutableSource(userCode);
+      expect(resultWithoutStdin).not.toContain("import java.util.Scanner;");
+      expect(resultWithoutStdin).not.toContain(
+        "Scanner sc = new Scanner(System.in);",
+      );
+      expect(resultWithoutStdin).toContain("int a = 0;");
+      expect(resultWithoutStdin).toContain("int b = 0;");
+
+      const resultWithStdin = createExecutableSource(userCode, "12 30");
+      expect(resultWithStdin).toContain("int a = 12;");
+      expect(resultWithStdin).toContain("int b = 30;");
     });
 
     it("inlines Scanner nextLine() calls with String literals and strips Scanner declaration", () => {
@@ -101,6 +126,17 @@ describe("javaRunnerHelpers", () => {
       expect(result).toContain('String word = "test";');
       expect(result).toContain("double price = 19.99;");
       expect(result).toContain("boolean flag = true;");
+    });
+
+    it("handles sc.close() and standalone sc.nextLine() calls", () => {
+      const code = `import java.util.Scanner;\npublic class Main {\n  public static void main(String[] args) {\n    Scanner sc = new Scanner(System.in);\n    int a = sc.nextInt();\n    sc.nextLine();\n    String line = sc.nextLine();\n    sc.close();\n  }\n}`;
+      const stdin = "100\nHello World\n";
+      const result = inlineScannerInput(code, stdin);
+
+      expect(result).not.toContain("sc.close();");
+      expect(result).not.toContain("import java.util.Scanner;");
+      expect(result).toContain("int a = 100;");
+      expect(result).toContain('String line = "Hello World";');
     });
 
     it("handles fallback to default values when stdin is exhausted or empty", () => {

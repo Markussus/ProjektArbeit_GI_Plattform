@@ -89,8 +89,8 @@
         "description": "Die UI sendet aktuell eine Quelldatei. Packe Hilfsklassen in dieselbe Datei statt ein Mehrdateien-Projekt zu erwarten."
       },
       "input": {
-        "title": "Konsoleneingabe",
-        "description": "Das Eingabefeld unterstützt einfache Deklarationen mit Scanner.nextLine() und Scanner.nextInt(). Die Werte werden vor dem Kompilieren in den Quelltext eingesetzt; ein echter interaktiver System.in-Stream und BufferedReader werden nicht unterstützt."
+        "title": "Konsoleneingabe (Scanner & System.in)",
+        "description": "So nutzt du die Konsoleneingabe im Browser-Simulator:\n\n1. Initialisierung im Code:\n• Importiere die Scanner-Klasse: import java.util.Scanner;\n• Erstelle das Scanner-Objekt: Scanner sc = new Scanner(System.in);\n\n2. Eingabemethoden:\n• sc.nextLine() liest die nächste vollständige Zeile bis zum Zeilenumbruch (Enter) als String ein.\n• sc.next() liest das nächste einzelne Wort/Token als String ein (getrennt durch Leerzeichen oder neue Zeile).\n• sc.nextInt(), sc.nextDouble(), sc.nextLong(), sc.nextBoolean() lesen das nächste passende Token und wandeln es um.\n\n3. Eingabe im Feld 'Programmeingabe':\n• Leerzeichen / Tabs: Trennen einzelne Werte/Tokens (z. B. '10 20' für zwei sc.nextInt()-Aufrufe in derselben Zeile).\n• Zeilenumbruch (Enter): Trennt zeilenweise Eingaben (z. B. für aufeinanderfolgende sc.nextLine()-Aufrufe).\n• Werte werden vor Programmstart bereitgestellt. Ein interaktives Tippen während der Laufzeit ist im Browser nicht möglich."
       },
       "cli": {
         "title": "Terminalbefehle",

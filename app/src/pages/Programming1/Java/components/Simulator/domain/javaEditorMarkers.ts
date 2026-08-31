@@ -42,6 +42,57 @@ export function syncMonacoMarkers(
     "java",
     createMonacoMarkers(issues, monacoInstance),
   );
+
+  if (issues.length === 0 && editorInstance) {
+    const domNode = editorInstance.getDomNode();
+    const markerWidget = domNode?.querySelector(".marker-widget, .zone-widget");
+
+    // Only close if a marker widget is actually open to avoid stealing focus / scrolling
+    if (markerWidget) {
+      const closeBtn = markerWidget.querySelector<HTMLElement>(
+        "[aria-label*='Close'], .codicon-close, .action-label.codicon-widget-close",
+      );
+
+      if (closeBtn) {
+        closeBtn.click();
+      } else {
+        const hadFocus =
+          typeof document !== "undefined" &&
+          Boolean(domNode?.contains(document.activeElement));
+        const activeElement =
+          typeof document !== "undefined"
+            ? (document.activeElement as HTMLElement | null)
+            : null;
+        const scrollX = typeof window !== "undefined" ? window.scrollX : 0;
+        const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
+
+        try {
+          editorInstance.trigger(
+            "java-markers",
+            "closeMarkersNavigation",
+            null,
+          );
+          editorInstance.trigger("java-markers", "closeMarkerNavigation", null);
+        } catch {
+          // ignore if command is not registered or unavailable
+        }
+
+        if (!hadFocus) {
+          if (typeof window !== "undefined") {
+            window.scrollTo(scrollX, scrollY);
+          }
+          if (activeElement && typeof activeElement.focus === "function") {
+            activeElement.focus({ preventScroll: true });
+          } else if (
+            typeof document !== "undefined" &&
+            domNode?.contains(document.activeElement)
+          ) {
+            (document.activeElement as HTMLElement)?.blur();
+          }
+        }
+      }
+    }
+  }
 }
 
 export function createPasteLimitListener(

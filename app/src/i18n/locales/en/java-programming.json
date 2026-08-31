@@ -89,8 +89,8 @@
         "description": "The UI currently sends one source file. Put helper classes into the same file instead of using a multi-file project."
       },
       "input": {
-        "title": "Console input",
-        "description": "The input box supports simple declarations using Scanner.nextLine() and Scanner.nextInt(). Values are substituted into the source before compilation; a real interactive System.in stream and BufferedReader are not supported."
+        "title": "Console input (Scanner & System.in)",
+        "description": "How to use console input in the browser simulator:\n\n1. Initialization in code:\n• Import the Scanner class: import java.util.Scanner;\n• Create the Scanner object: Scanner sc = new Scanner(System.in);\n\n2. Input methods:\n• sc.nextLine() reads the next full line up to the line break (Enter) as a String.\n• sc.next() reads the next individual word/token as a String (separated by spaces or newlines).\n• sc.nextInt(), sc.nextDouble(), sc.nextLong(), sc.nextBoolean() read the next matching token and convert it.\n\n3. Input in the 'Program input' field:\n• Space / Tab: Separates individual tokens/values (e.g. '10 20' for two sc.nextInt() calls in the same line).\n• Line break (Enter): Separates line-based inputs (e.g. for successive sc.nextLine() calls).\n• Values are supplied before program execution starts. Interactive typing during execution is not supported in the browser."
       },
       "cli": {
         "title": "Terminal commands",

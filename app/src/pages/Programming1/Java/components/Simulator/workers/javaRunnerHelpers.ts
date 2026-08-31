@@ -29,7 +29,7 @@ export class ScannerInputCursor {
   private pos: number = 0;
 
   constructor(stdin: string) {
-    this.text = stdin.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    this.text = (stdin ?? "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   }
 
   nextLine(): string {
@@ -89,69 +89,87 @@ export function createExecutableSource(
   sourceCode: string,
   stdin?: string,
 ): string {
-  if (!stdin) {
-    return sourceCode;
-  }
-  return inlineScannerInput(sourceCode, stdin);
+  return inlineScannerInput(sourceCode, stdin ?? "");
 }
 
 export function inlineScannerInput(sourceCode: string, stdin: string): string {
-  const cursor = new ScannerInputCursor(stdin);
+  if (
+    !/Scanner|\b(?:sc|scanner)\b|\.next(?:Line|Int|Long|Double|Float|Boolean|Short|Byte)?\s*\(/i.test(
+      sourceCode,
+    )
+  ) {
+    return sourceCode;
+  }
 
-  let code = sourceCode.replace(/^\s*import\s+java\.util\.Scanner;\s*$/gm, "");
+  const cursor = new ScannerInputCursor(stdin ?? "");
 
-  code = code.replace(
-    /^\s*Scanner\s+[A-Za-z_$][\w$]*\s*=\s*new\s+Scanner\s*\(\s*System\.in\s*\)\s*;\s*$/gm,
+  let code = sourceCode.replace(
+    /^[ \t]*import\s+(?:java\.util\.)?Scanner\s*;[ \t]*\r?\n?/gm,
     "",
   );
 
-  const statementRegex =
-    /\b(?:(String|int|long|double|float|boolean)\s+)?([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\.(nextLine|nextInt|nextLong|nextDouble|nextFloat|nextBoolean|next)\s*\(\s*\)\s*;/g;
+  const unifiedScannerRegex =
+    /(?:^[ \t]*(?:final\s+)?(?:java\.util\.)?Scanner\s+[A-Za-z_$][\w$]*(?:\s*=\s*(?:new\s+(?:java\.util\.)?Scanner\s*\(\s*System\.in\s*\)|null))?\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\s*=\s*new\s+(?:java\.util\.)?Scanner\s*\(\s*System\.in\s*\)\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\.close\s*\(\s*\)\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\.(?<standaloneMethod>nextLine|nextInt|nextLong|nextDouble|nextFloat|nextBoolean|nextShort|nextByte|next)\s*\(\s*\)\s*;[ \t]*\r?\n?)|(?:\b[A-Za-z_$][\w$]*\.(?<exprMethod>nextLine|nextInt|nextLong|nextDouble|nextFloat|nextBoolean|nextShort|nextByte|next)\s*\(\s*\))/gm;
 
-  code = code.replace(
-    statementRegex,
-    (
-      _match,
-      type: string | undefined,
-      varName: string,
-      _scName: string,
-      method: string,
-    ) => {
-      const typePrefix = type ? `${type} ` : "";
-      switch (method) {
-        case "nextLine": {
-          const val = cursor.nextLine();
-          return `${typePrefix}${varName} = ${createJavaStringLiteral(val)};`;
-        }
-        case "next": {
-          const val = cursor.nextToken();
-          return `${typePrefix}${varName} = ${createJavaStringLiteral(val)};`;
-        }
-        case "nextInt": {
-          const val = cursor.nextInt();
-          return `${typePrefix}${varName} = ${val};`;
-        }
-        case "nextLong": {
-          const val = cursor.nextLong();
-          return `${typePrefix}${varName} = ${val};`;
-        }
-        case "nextDouble": {
-          const val = cursor.nextDouble();
-          return `${typePrefix}${varName} = ${val};`;
-        }
-        case "nextFloat": {
-          const val = cursor.nextDouble();
-          return `${typePrefix}${varName} = ${val}f;`;
-        }
-        case "nextBoolean": {
-          const val = cursor.nextBoolean();
-          return `${typePrefix}${varName} = ${val};`;
-        }
-        default:
-          return _match;
+  code = code.replace(unifiedScannerRegex, (...args: unknown[]) => {
+    const groups = (args[args.length - 1] ?? {}) as {
+      standaloneMethod?: string;
+      exprMethod?: string;
+    };
+
+    if (groups.standaloneMethod) {
+      switch (groups.standaloneMethod) {
+        case "nextLine":
+          cursor.nextLine();
+          break;
+        case "next":
+          cursor.nextToken();
+          break;
+        case "nextInt":
+        case "nextShort":
+        case "nextByte":
+          cursor.nextInt();
+          break;
+        case "nextLong":
+          cursor.nextLong();
+          break;
+        case "nextDouble":
+        case "nextFloat":
+          cursor.nextDouble();
+          break;
+        case "nextBoolean":
+          cursor.nextBoolean();
+          break;
       }
-    },
-  );
+      return "";
+    }
+
+    if (groups.exprMethod) {
+      switch (groups.exprMethod) {
+        case "nextLine":
+          return createJavaStringLiteral(cursor.nextLine());
+        case "next":
+          return createJavaStringLiteral(cursor.nextToken());
+        case "nextInt":
+          return String(cursor.nextInt());
+        case "nextLong":
+          return cursor.nextLong();
+        case "nextDouble":
+          return String(cursor.nextDouble());
+        case "nextFloat":
+          return `${cursor.nextDouble()}f`;
+        case "nextBoolean":
+          return String(cursor.nextBoolean());
+        case "nextShort":
+          return `((short) ${cursor.nextInt()})`;
+        case "nextByte":
+          return `((byte) ${cursor.nextInt()})`;
+      }
+    }
+
+    // Scanner declaration, assignment, or close statement
+    return "";
+  });
 
   return code;
 }

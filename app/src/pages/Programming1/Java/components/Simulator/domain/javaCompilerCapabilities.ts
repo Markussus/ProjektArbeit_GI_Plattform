@@ -144,9 +144,18 @@ export const JAVA_COMPILER_CAPABILITIES: JavaCompilerCapability[] = [
     titleKey: "java-programming.commandOverview.capabilities.input.title",
     descriptionKey:
       "java-programming.commandOverview.capabilities.input.description",
-    examples: ["Scanner.nextLine()", "Scanner.nextInt()"],
+    examples: [
+      "import java.util.Scanner;",
+      "Scanner sc = new Scanner(System.in);",
+      "sc.nextLine()",
+      "sc.next()",
+      "sc.nextInt()",
+      "sc.nextDouble()",
+      "sc.nextBoolean()",
+    ],
     snippets: [
-      "Scanner scanner = new Scanner(System.in);\nString line = scanner.nextLine();",
+      "import java.util.Scanner;\n\nScanner sc = new Scanner(System.in);\nString name = sc.nextLine(); // Ganze Zeile (Enter)\nint a = sc.nextInt();        // Token/Zahl (Leerzeichen)\nint b = sc.nextInt();",
+      "// Programmeingabe:\n// 1. Token-Eingabe (getrennt durch Leerzeichen/Tabs):\n// 10 20\n// 2. Zeilenweise Eingabe (getrennt durch Enter):\n// Max Mustermann\n// 42",
     ],
   },
   {

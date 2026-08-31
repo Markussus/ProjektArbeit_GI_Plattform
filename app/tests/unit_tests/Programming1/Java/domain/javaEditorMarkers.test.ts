@@ -76,6 +76,8 @@ describe("javaEditorMarkers", () => {
       const mockModel = {} as editor.ITextModel;
       const mockEditor = {
         getModel: () => mockModel,
+        getDomNode: () => null,
+        trigger: vi.fn(),
       } as unknown as editor.IStandaloneCodeEditor;
 
       syncMonacoMarkers(mockEditor, mockMonaco, [
@@ -93,6 +95,83 @@ describe("javaEditorMarkers", () => {
         mockModel,
         "java",
         expect.any(Array),
+      );
+    });
+
+    it("does not trigger commands when issues are empty and no marker widget is open", () => {
+      const mockModel = {} as editor.ITextModel;
+      const mockDom = {
+        querySelector: vi.fn(() => null),
+        contains: vi.fn(() => false),
+      } as unknown as HTMLElement;
+
+      const mockEditor = {
+        getModel: () => mockModel,
+        getDomNode: () => mockDom,
+        trigger: vi.fn(),
+      } as unknown as editor.IStandaloneCodeEditor;
+
+      syncMonacoMarkers(mockEditor, mockMonaco, []);
+
+      expect(mockMonaco.editor.setModelMarkers).toHaveBeenCalledWith(
+        mockModel,
+        "java",
+        [],
+      );
+      expect(mockEditor.trigger).not.toHaveBeenCalled();
+    });
+
+    it("clicks close button when marker widget is open with close button", () => {
+      const mockModel = {} as editor.ITextModel;
+      const closeBtn = { click: vi.fn() } as unknown as HTMLElement;
+      const markerWidget = {
+        querySelector: vi.fn(() => closeBtn),
+      } as unknown as HTMLElement;
+
+      const mockDom = {
+        querySelector: vi.fn((sel: string) =>
+          sel.includes("marker-widget") ? markerWidget : null,
+        ),
+        contains: vi.fn(() => false),
+      } as unknown as HTMLElement;
+
+      const mockEditor = {
+        getModel: () => mockModel,
+        getDomNode: () => mockDom,
+        trigger: vi.fn(),
+      } as unknown as editor.IStandaloneCodeEditor;
+
+      syncMonacoMarkers(mockEditor, mockMonaco, []);
+
+      expect(closeBtn.click).toHaveBeenCalled();
+      expect(mockEditor.trigger).not.toHaveBeenCalled();
+    });
+
+    it("triggers closeMarkersNavigation on editor when marker widget is open without button", () => {
+      const mockModel = {} as editor.ITextModel;
+      const markerWidget = {
+        querySelector: vi.fn(() => null),
+      } as unknown as HTMLElement;
+
+      const mockDom = {
+        querySelector: vi.fn((sel: string) =>
+          sel.includes("marker-widget") ? markerWidget : null,
+        ),
+        contains: vi.fn(() => false),
+      } as unknown as HTMLElement;
+
+      const mockEditor = {
+        getModel: () => mockModel,
+        getDomNode: () => mockDom,
+        trigger: vi.fn(),
+      } as unknown as editor.IStandaloneCodeEditor;
+
+      syncMonacoMarkers(mockEditor, mockMonaco, []);
+
+      expect(mockEditor.trigger).toHaveBeenCalledWith(
+        "java-markers",
+        "closeMarkersNavigation",
+        null,
       );
     });
 

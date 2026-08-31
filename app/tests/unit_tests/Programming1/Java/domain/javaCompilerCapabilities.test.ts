@@ -8,8 +8,13 @@ describe("JAVA_COMPILER_CAPABILITIES", () => {
     );
 
     expect(inputCapability?.examples).toEqual([
-      "Scanner.nextLine()",
-      "Scanner.nextInt()",
+      "import java.util.Scanner;",
+      "Scanner sc = new Scanner(System.in);",
+      "sc.nextLine()",
+      "sc.next()",
+      "sc.nextInt()",
+      "sc.nextDouble()",
+      "sc.nextBoolean()",
     ]);
     expect(inputCapability?.examples.join(" ")).not.toContain("BufferedReader");
   });
