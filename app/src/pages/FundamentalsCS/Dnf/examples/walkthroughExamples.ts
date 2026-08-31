@@ -3,10 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import type { TranslationKey } from "@/types/i18n";
 
 type DnfWalkthroughExampleId =
-  | "lecture-expression"
-  | "parentheses"
-  | "dnf-intro"
-  | "exercise-two";
+  "lecture-expression" | "parentheses" | "dnf-intro" | "exercise-two";
 
 interface DnfWalkthroughExampleBase {
   id: DnfWalkthroughExampleId;

@@ -28,9 +28,7 @@ export interface TMTablePosition {
 }
 
 export type TMEditorCellIssueCode =
-  | "symbol_single_char"
-  | "symbol_duplicate"
-  | "transition_invalid";
+  "symbol_single_char" | "symbol_duplicate" | "transition_invalid";
 
 export interface TMEditorCellIssue {
   code: TMEditorCellIssueCode;
@@ -38,8 +36,7 @@ export interface TMEditorCellIssue {
 }
 
 export type ApplyTMProgramResult =
-  | { ok: true; program: TMProgram }
-  | { ok: false };
+  { ok: true; program: TMProgram } | { ok: false };
 
 export interface UseTMConfigEditorResult {
   draft: TMProgram;

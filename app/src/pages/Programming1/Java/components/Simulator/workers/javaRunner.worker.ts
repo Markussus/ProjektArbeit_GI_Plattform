@@ -19,8 +19,7 @@ import {
 
 interface JavaWorkerScope {
   onmessage:
-    | ((event: MessageEvent<JavaWorkerRequest>) => void | Promise<void>)
-    | null;
+    ((event: MessageEvent<JavaWorkerRequest>) => void | Promise<void>) | null;
   postMessage: (message: unknown) => void;
 }
 

@@ -1,13 +1,7 @@
 import type { BooleanExpression } from "./booleanExpression";
 
 type TokenType =
-  | "constant"
-  | "variable"
-  | "not"
-  | "and"
-  | "or"
-  | "left_paren"
-  | "right_paren";
+  "constant" | "variable" | "not" | "and" | "or" | "left_paren" | "right_paren";
 
 interface Token {
   type: TokenType;
@@ -39,8 +33,7 @@ export type DnfParseResult =
   | { ok: false; issue: DnfParseIssue };
 
 type TokenizeResult =
-  | { ok: true; tokens: Token[] }
-  | { ok: false; issue: DnfParseIssue };
+  { ok: true; tokens: Token[] } | { ok: false; issue: DnfParseIssue };
 
 const MAX_EXPRESSION_LENGTH = 2048;
 const MAX_TOKEN_COUNT = 512;

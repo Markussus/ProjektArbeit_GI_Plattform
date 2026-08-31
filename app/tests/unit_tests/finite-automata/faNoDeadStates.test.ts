@@ -39,7 +39,7 @@ function deadStates(program: FAProgram): string[] {
   const reachable = reachableStates(program);
   const live = new Set(program.acceptStates.filter((s) => reachable.has(s)));
 
-  for (let grew = true; grew; ) {
+  for (let grew = true; grew;) {
     grew = false;
     for (const state of reachable) {
       if (live.has(state)) continue;

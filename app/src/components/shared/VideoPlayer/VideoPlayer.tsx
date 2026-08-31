@@ -2,11 +2,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type VideoTrackKind =
-  | "subtitles"
-  | "captions"
-  | "descriptions"
-  | "chapters"
-  | "metadata";
+  "subtitles" | "captions" | "descriptions" | "chapters" | "metadata";
 
 export interface VideoPlayerTrack {
   src: string;

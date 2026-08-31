@@ -177,7 +177,7 @@ export function TMTapeView({
             onMouseDown={dragScroll.onMouseDown}
             onScroll={updateHeadIndicatorPosition}
             className={cn(
-              "w-full overflow-x-auto overflow-y-hidden pt-2 pb-3 [scrollbar-width:thin]",
+              "w-full [scrollbar-width:thin] overflow-x-auto overflow-y-hidden pt-2 pb-3",
               "[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent",
               dragScroll.isDragging ? "cursor-grabbing" : "cursor-grab",
             )}

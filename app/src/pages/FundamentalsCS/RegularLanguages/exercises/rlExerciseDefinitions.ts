@@ -10,9 +10,7 @@ import type { SimulationMode } from "../components/Simulator/domain/rlTypes";
  * simulator in language-to-grammar mode like `languageToGrammar`.
  */
 export type RLExerciseCategory =
-  | "grammarToLanguage"
-  | "languageToGrammar"
-  | "applied";
+  "grammarToLanguage" | "languageToGrammar" | "applied";
 
 export interface RLExerciseDefinition extends ExerciseDefinition {
   id: string;

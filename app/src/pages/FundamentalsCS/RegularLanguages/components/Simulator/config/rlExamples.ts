@@ -12,9 +12,7 @@ import type { SimulationMode } from "../domain/rlTypes";
  * word list and a compact pattern) live under `languageToGrammar`.
  */
 export type RLExampleCategory =
-  | "grammarToLanguage"
-  | "languageToGrammar"
-  | "recognizeWord";
+  "grammarToLanguage" | "languageToGrammar" | "recognizeWord";
 
 export interface RLExample {
   id: string;

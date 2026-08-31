@@ -32,11 +32,7 @@ import {
 } from "./exerciseStateResolver";
 
 export type SimulatorMode =
-  | "integers"
-  | "negative"
-  | "fractional"
-  | "ieee754"
-  | "arithmetic";
+  "integers" | "negative" | "fractional" | "ieee754" | "arithmetic";
 
 export interface SimulatorHandle {
   resetStoredState: () => void;

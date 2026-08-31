@@ -250,8 +250,7 @@ export function useFAConfigEditor(
   );
 
   const applyProgram = useCallback(():
-    | { ok: true; program: FAProgram }
-    | { ok: false } => {
+    { ok: true; program: FAProgram } | { ok: false } => {
     const issues = validateFAProgram(draft);
     if (issues.length > 0) {
       return { ok: false };

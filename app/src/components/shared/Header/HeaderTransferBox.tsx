@@ -7,11 +7,7 @@ import { resolveTrainingCenterImportTarget } from "@/lib/trainingCenter/training
 import { useActiveSimulatorTransferStore } from "@/hooks/useActiveSimulatorTransfer";
 
 type Feedback =
-  | "importError"
-  | "exportError"
-  | "clipboardError"
-  | "copied"
-  | null;
+  "importError" | "exportError" | "clipboardError" | "copied" | null;
 
 const EXPORT_PREVIEW_DURATION_MS = 5000;
 

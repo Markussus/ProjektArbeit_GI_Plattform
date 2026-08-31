@@ -2,11 +2,7 @@ import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 
 export type BaseType = "dec" | "bin" | "oct" | "hex";
 export type SimulatorMode =
-  | "integers"
-  | "negative"
-  | "fractional"
-  | "ieee754"
-  | "arithmetic";
+  "integers" | "negative" | "fractional" | "ieee754" | "arithmetic";
 export type ArithmeticModeType =
   | "addition"
   | "subtraction"

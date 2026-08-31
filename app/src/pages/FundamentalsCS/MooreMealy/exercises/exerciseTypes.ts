@@ -22,5 +22,4 @@ export type MooreExerciseScenario = BaseExerciseScenario<"moore", MooreProgram>;
 export type MealyExerciseScenario = BaseExerciseScenario<"mealy", MealyProgram>;
 
 export type AutomataExerciseScenario =
-  | MooreExerciseScenario
-  | MealyExerciseScenario;
+  MooreExerciseScenario | MealyExerciseScenario;

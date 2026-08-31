@@ -38,8 +38,7 @@ export interface TuringMachineExampleScenario extends TMScenarioBase {
 }
 
 export type TuringMachineScenario =
-  | TuringMachineExerciseScenario
-  | TuringMachineExampleScenario;
+  TuringMachineExerciseScenario | TuringMachineExampleScenario;
 
 const exerciseDifficultyOrder: Record<ExerciseDifficulty, number> = {
   easy: 0,

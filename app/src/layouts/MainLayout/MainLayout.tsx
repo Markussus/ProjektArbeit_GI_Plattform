@@ -17,7 +17,7 @@ export function MainLayout() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
 
-        <main className="bg-background flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+        <main className="bg-background flex-1 [scrollbar-gutter:stable] overflow-y-auto">
           <Suspense fallback={<LoadingFallback className="min-h-full" />}>
             <Outlet />
           </Suspense>
