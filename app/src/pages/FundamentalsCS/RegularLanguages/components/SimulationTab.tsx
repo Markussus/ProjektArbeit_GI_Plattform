@@ -7,6 +7,7 @@ import type { RLCheckResult } from "./Simulator/domain/rlSolutionChecker";
 import { findRLExercise } from "../exercises/rlExerciseDefinitions";
 import { findRLExample } from "./Simulator/config/rlExamples";
 import { RLSimulator, type RLSimulatorHandle } from "./Simulator/RLSimulator";
+import { RLCheckSummary } from "./RLCheckSummary";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
@@ -92,7 +93,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         testId="rl-solution-check-dialog"
         summary={
           checkResult && (
-            <CheckSummary
+            <RLCheckSummary
               result={checkResult}
               isGrammarExercise={isGrammarExercise}
             />
@@ -103,74 +104,5 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         rows={[]}
       />
     </>
-  );
-}
-
-function formatWords(words: string[]): string {
-  return words.map((word) => (word === "" ? "ε" : word)).join(", ");
-}
-
-function CheckSummary({
-  result,
-  isGrammarExercise,
-}: {
-  result: RLCheckResult;
-  isGrammarExercise: boolean;
-}) {
-  const { t } = useTranslation();
-
-  if (result.status === "invalid") {
-    const messageKey =
-      result.reason === "studentParse"
-        ? "regular-languages.exerciseWorkspace.checkInvalidGrammar"
-        : result.reason === "reference"
-          ? "regular-languages.exerciseWorkspace.checkUnavailable"
-          : "regular-languages.exerciseWorkspace.checkEmpty";
-    return <p className="text-muted-foreground text-sm">{t(messageKey)}</p>;
-  }
-
-  if (result.status === "match") {
-    return (
-      <div>
-        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-          {t("regular-languages.exerciseWorkspace.checkMatch")}
-        </p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "regular-languages.exerciseWorkspace.checkMatchDetailG2L"
-              : "regular-languages.exerciseWorkspace.checkMatchDetailL2G",
-          )}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <p className="text-destructive text-sm font-semibold">
-        {t("regular-languages.exerciseWorkspace.checkMismatch")}
-      </p>
-      {result.wrong.length > 0 && (
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "regular-languages.exerciseWorkspace.checkWrongG2L"
-              : "regular-languages.exerciseWorkspace.checkWrongL2G",
-            { words: formatWords(result.wrong) },
-          )}
-        </p>
-      )}
-      {result.missing.length > 0 && (
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "regular-languages.exerciseWorkspace.checkMissingG2L"
-              : "regular-languages.exerciseWorkspace.checkMissingL2G",
-            { words: formatWords(result.missing) },
-          )}
-        </p>
-      )}
-    </div>
   );
 }
