@@ -9,10 +9,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import {
-  formatBooleanExpressionForDisplay,
-  reformatBooleanExpressionInput,
-} from "../domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "../domain/booleanExpression";
+import { reformatBooleanExpressionInput } from "../domain/booleanExpressionInputFormat";
 import type { DnfSimplificationCheckResult } from "../domain/dnfSimplificationCheck";
 import { buildDnfSimplificationWalkthrough } from "../domain/dnfSimplificationWalkthrough";
 import type { TruthTable } from "../domain/truthTable";

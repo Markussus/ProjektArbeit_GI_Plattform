@@ -2,7 +2,7 @@ import {
   analyzeDnfSource,
   analyzeDnfTruthTable,
 } from "./DnfBuilder/application/dnfAnalysis";
-import { formatBooleanExpressionForDisplay } from "./DnfBuilder/domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "./DnfBuilder/domain/booleanExpression";
 import {
   createDnfAttemptDraft,
   type DnfAttemptTransferDraft,

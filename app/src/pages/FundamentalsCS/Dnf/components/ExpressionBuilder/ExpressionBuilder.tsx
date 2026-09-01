@@ -14,7 +14,7 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
-import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpression";
 import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import { formatBooleanInput } from "../DnfBuilder/domain/booleanSyntax";

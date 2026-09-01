@@ -7,7 +7,7 @@ import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
-import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpression";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,

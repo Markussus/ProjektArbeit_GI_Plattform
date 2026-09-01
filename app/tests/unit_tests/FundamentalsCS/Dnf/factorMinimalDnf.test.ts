@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   evaluateBooleanExpression,
+  formatBooleanExpressionForDisplay,
   type BooleanExpression,
 } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
-import { formatBooleanExpressionForDisplay } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
 import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 import {
   countExpressionLiterals,
@@ -38,27 +38,26 @@ describe("factorMinimalDnf", () => {
   it("keeps the minimal DNF unchanged when no literal is shared", () => {
     // XOR-equivalence over 3 vars: each minterm has different polarities,
     // no literal appears in both groups — greedy factoring is a no-op.
-    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
-
-    const minimal = computeMinimalDnf(table);
-    const factored = factor(table);
-
-    expect(countExpressionLiterals(factored)).toBe(minimal.literalCount);
-    expectEquivalent(factored, table);
-  });
-
-  it("factors recursively across nested shared literals", () => {
-    // (a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)
-    //   → factor a out of the first two terms
-    //   → then factor b out of the resulting inner OR
-    //   → result has shape (a ∧ b ∧ (c ∨ d)) ∨ (e ∧ f) with 5 literals.
     const table = generateTruthTable(
-      parse("(a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)"),
+      parse("(a ∧ ¬b ∧ ¬c) ∨ (¬a ∧ b ∧ ¬c) ∨ (¬a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ c)"),
     );
 
     const factored = factor(table);
 
-    expect(countExpressionLiterals(factored)).toBeLessThan(8);
+    expect(countExpressionLiterals(factored)).toBe(12);
+    expectEquivalent(factored, table);
+  });
+
+  it("factors nested common literals across multiple terms", () => {
+    // f = (a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (a ∧ e) — optimal factoring is
+    // a ∧ ((b ∧ (c ∨ d)) ∨ e), dropping from 8 literals down to 5.
+    const table = generateTruthTable(
+      parse("(a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (a ∧ e)"),
+    );
+
+    const factored = factor(table);
+
+    expect(countExpressionLiterals(factored)).toBe(5);
     expectEquivalent(factored, table);
   });
 

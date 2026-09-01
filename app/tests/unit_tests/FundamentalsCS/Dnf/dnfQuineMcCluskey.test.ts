@@ -226,54 +226,69 @@ interface OracleImplicant {
   literals: number;
 }
 
+function decodeTernaryPattern(
+  term: number,
+  variableCount: number,
+): {
+  fixed: Array<0 | 1 | null>;
+  literals: number;
+} {
+  const fixed: Array<0 | 1 | null> = [];
+  let digits = term;
+  let literals = 0;
+  for (let position = 0; position < variableCount; position += 1) {
+    const digit = digits % 3;
+    digits = Math.floor(digits / 3);
+    if (digit === 0) {
+      fixed.push(null);
+    } else {
+      fixed.push(digit === 1 ? 0 : 1);
+      literals += 1;
+    }
+  }
+  return { fixed, literals };
+}
+
+function matchesRowPattern(
+  fixed: Array<0 | 1 | null>,
+  row: number,
+  variableCount: number,
+): boolean {
+  return fixed.every((bit, variableIndex) => {
+    if (bit === null) return true;
+    const bitPosition = variableCount - variableIndex - 1;
+    return ((row >> bitPosition) & 1) === bit;
+  });
+}
+
+function computeTermCover(
+  fixed: Array<0 | 1 | null>,
+  results: boolean[],
+  variableCount: number,
+): number | null {
+  let cover = 0;
+  for (let row = 0; row < results.length; row += 1) {
+    if (!matchesRowPattern(fixed, row, variableCount)) continue;
+    if (!results[row]) return null; // covers a 0-row -> not an implicant
+    cover |= 1 << row;
+  }
+  return cover === 0 ? null : cover;
+}
+
 /** All product terms that cover only 1-rows, deduped to the cheapest per cover. */
 function enumerateImplicants(
   results: boolean[],
   variableCount: number,
 ): OracleImplicant[] {
-  const rowCount = results.length;
   const cheapestByCover = new Map<number, number>();
-
-  // Each variable is fixed to 0, fixed to 1, or "don't care" — base-3 digits.
   const termCount = 3 ** variableCount;
+
   for (let term = 0; term < termCount; term += 1) {
-    const fixed: Array<0 | 1 | null> = [];
-    let digits = term;
-    let literals = 0;
-    for (let position = 0; position < variableCount; position += 1) {
-      const digit = digits % 3;
-      digits = Math.floor(digits / 3);
-      if (digit === 0) {
-        fixed.push(null);
-      } else {
-        fixed.push(digit === 1 ? 0 : 1);
-        literals += 1;
-      }
-    }
+    const { fixed, literals } = decodeTernaryPattern(term, variableCount);
+    if (literals === 0) continue;
 
-    let cover = 0;
-    let valid = literals > 0;
-    for (let row = 0; row < rowCount && valid; row += 1) {
-      const matches = fixed.every((bit, variableIndex) => {
-        if (bit === null) {
-          return true;
-        }
-        const bitPosition = variableCount - variableIndex - 1;
-        return ((row >> bitPosition) & 1) === bit;
-      });
-      if (!matches) {
-        continue;
-      }
-      if (!results[row]) {
-        valid = false; // covers a 0-row → not an implicant
-        break;
-      }
-      cover |= 1 << row;
-    }
-
-    if (!valid || cover === 0) {
-      continue;
-    }
+    const cover = computeTermCover(fixed, results, variableCount);
+    if (cover === null) continue;
 
     const existing = cheapestByCover.get(cover);
     if (existing === undefined || literals < existing) {

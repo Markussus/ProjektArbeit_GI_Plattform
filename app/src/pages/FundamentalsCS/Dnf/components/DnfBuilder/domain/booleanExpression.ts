@@ -59,6 +59,49 @@ export function formatBooleanValue(value: boolean): "0" | "1" {
   return value ? "1" : "0";
 }
 
+type ParentContext = "or" | "and" | "not" | "root";
+
+export function formatBooleanExpressionForDisplay(
+  expression: BooleanExpression,
+): string {
+  return renderNode(expression, "root");
+}
+
+function renderNode(node: BooleanExpression, parent: ParentContext): string {
+  if (node.type === "constant") return node.value ? "1" : "0";
+  if (node.type === "variable") return node.name;
+  if (node.type === "not") return `¬${renderNode(node.operand, "not")}`;
+  return renderBinary(node, parent);
+}
+
+function renderBinary(
+  node: Extract<BooleanExpression, { type: "binary" }>,
+  parent: ParentContext,
+): string {
+  const isOr = node.operator === "or";
+  const glue = isOr ? " ∨ " : " ∧ ";
+  const targetContext: ParentContext = isOr ? "or" : "and";
+  const items = flattenBinary(node, node.operator);
+  const text = items.map((c) => renderNode(c, targetContext)).join(glue);
+  const needsParens = isOr
+    ? parent === "and" || parent === "not"
+    : parent === "or" || parent === "not";
+  return needsParens ? `(${text})` : text;
+}
+
+function flattenBinary(
+  node: BooleanExpression,
+  operator: "and" | "or",
+): BooleanExpression[] {
+  if (node.type === "binary" && node.operator === operator) {
+    return [
+      ...flattenBinary(node.left, operator),
+      ...flattenBinary(node.right, operator),
+    ];
+  }
+  return [node];
+}
+
 function visitExpression(
   expression: BooleanExpression,
   visitor: (node: BooleanExpression) => void,

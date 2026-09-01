@@ -1,5 +1,5 @@
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
-import { formatBooleanExpressionForDisplay } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 import { computeSmallestBooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/minimalExpression";
 import { createTruthTableFromResults } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/truthTable";
 import {
@@ -321,10 +321,10 @@ function formatCanonicalDnf(
     .map((assignment) =>
       assignment
         .map((bit, index) =>
-          bit === 1 ? variables[index] : `\u00ac${variables[index]}`,
+          bit === 1 ? variables[index] : `¬${variables[index]}`,
         )
-        .join(" \u2227 "),
+        .join(" ∧ "),
     )
     .map((term) => (variables.length > 1 ? `(${term})` : term))
-    .join(" \u2228 ");
+    .join(" ∨ ");
 }
