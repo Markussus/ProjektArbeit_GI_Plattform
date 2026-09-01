@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { Multiplication } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Multiplication.tsx";
 import {
   changeBinaryInput,
@@ -9,7 +9,9 @@ import {
   expectValidationResult,
   getInputs,
   renderArithmeticExercise,
+  setupArithmeticTests,
 } from "./arithmeticTestSetup.tsx";
+import { vi } from "vitest";
 
 vi.mock("react-i18next", async () => {
   const { mockReactI18next } = await import("./arithmeticTestSetup");
@@ -29,11 +31,9 @@ vi.mock(
   },
 );
 
-describe("Multiplication", () => {
-  afterEach(() => {
-    cleanup();
-  });
+setupArithmeticTests();
 
+describe("Multiplication", () => {
   describe("when rendering in free mode", () => {
     it("shows two binary inputs", () => {
       render(<Multiplication renderModeSelector={null} />);

@@ -138,7 +138,7 @@ export function ModeTitle({ activeMode }: { activeMode: NegativeStepMode }) {
   );
 }
 
-export function StepIntro({
+function StepIntro({
   activeMode,
   parsed,
 }: {

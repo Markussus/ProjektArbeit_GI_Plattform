@@ -5,12 +5,12 @@ import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationP
 import type { BaseArithmeticProps } from "./types";
 import {
   SimulatorLayout,
-  BinaryInput,
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
 import { useBinaryOperands } from "./useBinaryOperands";
+import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
 
 import type { TFunction } from "i18next";
 
@@ -367,31 +367,22 @@ export function Compare({
   return (
     <SimulatorLayout
       inputPanel={
-        <>
-          <div>
-            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("number-systems.simulator.arithmetic.common.operands")}
-            </h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {t("number-systems.simulator.arithmetic.compare.desc")}
-            </p>
-          </div>
-          <div className="space-y-4">
-            {renderModeSelector}
-            <BinaryInput
-              label={t("number-systems.simulator.arithmetic.common.operandA")}
-              value={valA}
-              onChange={handleInputA}
-              locked={locked}
-            />
-            <BinaryInput
-              label={t("number-systems.simulator.arithmetic.common.operandB")}
-              value={valB}
-              onChange={handleInputB}
-              locked={locked}
-            />
-          </div>
-        </>
+        <ArithmeticInputPanel
+          titleKey="number-systems.simulator.arithmetic.common.operands"
+          descKey="number-systems.simulator.arithmetic.compare.desc"
+          renderModeSelector={renderModeSelector}
+          locked={locked}
+          operandA={{
+            value: valA,
+            onChange: handleInputA,
+            labelKey: "number-systems.simulator.arithmetic.common.operandA",
+          }}
+          operandB={{
+            value: valB,
+            onChange: handleInputB,
+            labelKey: "number-systems.simulator.arithmetic.common.operandB",
+          }}
+        />
       }
       resultPanel={
         locked ? (

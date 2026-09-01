@@ -1,7 +1,13 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { afterEach, vi } from "vitest";
 import type { BaseArithmeticProps } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/types";
 import { mockSimulatorShared } from "../../../shared/simulatorSharedMock";
+
+export function setupArithmeticTests() {
+  afterEach(() => {
+    cleanup();
+  });
+}
 
 export function mockReactI18next() {
   return {

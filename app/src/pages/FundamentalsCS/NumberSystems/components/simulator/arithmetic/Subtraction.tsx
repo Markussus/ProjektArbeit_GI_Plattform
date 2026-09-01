@@ -5,7 +5,6 @@ import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationP
 import type { BaseArithmeticProps } from "./types";
 import {
   SimulatorLayout,
-  BinaryInput,
   StepByStepToggle,
   CollapsibleStep,
   WarningBanner,
@@ -13,6 +12,7 @@ import {
 } from "@/components/shared/SimulatorShared";
 import { useBinaryOperands } from "./useBinaryOperands";
 import { addBinary8Bit } from "./binaryArithmetic";
+import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
 
 interface OnesComplementStep {
   position: number;
@@ -195,35 +195,23 @@ export function Subtraction({
   return (
     <SimulatorLayout
       inputPanel={
-        <>
-          <div>
-            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("number-systems.simulator.arithmetic.common.operands8bit")}
-            </h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {t("number-systems.simulator.arithmetic.subtraction.desc")}
-            </p>
-          </div>
-          <div className="space-y-4">
-            {renderModeSelector}
-            <BinaryInput
-              label={t(
-                "number-systems.simulator.arithmetic.subtraction.minuend",
-              )}
-              value={valA}
-              onChange={handleInputA}
-              locked={locked}
-            />
-            <BinaryInput
-              label={t(
-                "number-systems.simulator.arithmetic.subtraction.subtrahend",
-              )}
-              value={valB}
-              onChange={handleInputB}
-              locked={locked}
-            />
-          </div>
-        </>
+        <ArithmeticInputPanel
+          titleKey="number-systems.simulator.arithmetic.common.operands8bit"
+          descKey="number-systems.simulator.arithmetic.subtraction.desc"
+          renderModeSelector={renderModeSelector}
+          locked={locked}
+          operandA={{
+            value: valA,
+            onChange: handleInputA,
+            labelKey: "number-systems.simulator.arithmetic.subtraction.minuend",
+          }}
+          operandB={{
+            value: valB,
+            onChange: handleInputB,
+            labelKey:
+              "number-systems.simulator.arithmetic.subtraction.subtrahend",
+          }}
+        />
       }
       resultPanel={
         locked ? (

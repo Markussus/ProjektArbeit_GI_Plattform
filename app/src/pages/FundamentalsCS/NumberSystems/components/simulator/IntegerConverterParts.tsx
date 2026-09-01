@@ -77,7 +77,7 @@ const baseOptions = (t: TFunction<"translation">) => [
   { value: "hex" as const, label: t("number-systems.simulator.numbers.hex") },
 ];
 
-export function BaseSelector({
+function BaseSelector({
   label,
   value,
   onChange,
@@ -154,7 +154,7 @@ export function ValueInput({
   );
 }
 
-export function ConversionResult({
+function ConversionResult({
   decValue,
   targetValue,
   locked,

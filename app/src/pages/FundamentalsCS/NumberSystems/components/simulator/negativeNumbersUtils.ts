@@ -17,11 +17,11 @@ export function parse8Bit(value: string): number | null {
   return Number(value);
 }
 
-export function to8BitBinary(absValue: number): string {
+function to8BitBinary(absValue: number): string {
   return absValue.toString(2).padStart(BITS, "0");
 }
 
-export function getPositiveBinary(value: number): string {
+function getPositiveBinary(value: number): string {
   return to8BitBinary(Math.abs(value));
 }
 

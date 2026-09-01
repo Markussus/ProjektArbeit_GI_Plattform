@@ -1,31 +1,31 @@
 import type { BaseType } from "./nsTransferCodec";
 
-export const BASE_LIMITS: Record<BaseType, number> = {
+const BASE_LIMITS: Record<BaseType, number> = {
   bin: 16,
   oct: 6,
   dec: 5,
   hex: 4,
 };
 
-export const BASE_PATTERNS: Record<BaseType, RegExp> = {
+const BASE_PATTERNS: Record<BaseType, RegExp> = {
   bin: /[^01]/g,
   oct: /[^0-7]/g,
   dec: /[^0-9]/g,
   hex: /[^0-9A-Fa-f]/g,
 };
 
-export const BASE_VALIDATORS: Record<BaseType, RegExp> = {
+const BASE_VALIDATORS: Record<BaseType, RegExp> = {
   bin: /^[01]+$/,
   oct: /^[0-7]+$/,
   dec: /^[0-9]+$/,
   hex: /^[0-9A-Fa-f]+$/,
 };
 
-export function cleanInputForBase(value: string, base: BaseType): string {
+function cleanInputForBase(value: string, base: BaseType): string {
   return value.replace(BASE_PATTERNS[base], "");
 }
 
-export function clampInputLength(value: string, base: BaseType): string {
+function clampInputLength(value: string, base: BaseType): string {
   const limit = BASE_LIMITS[base];
   return value.length > limit ? value.slice(0, limit) : value;
 }
