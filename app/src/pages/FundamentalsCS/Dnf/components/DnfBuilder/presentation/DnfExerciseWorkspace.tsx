@@ -24,7 +24,7 @@ interface DnfExerciseWorkspaceProps {
   dnfAnswer: string;
   feedback: DnfExerciseCheckResult | null;
   showSolution: boolean;
-  resultHeader: string;
+  resultHeader?: string;
   requiresTruthTableAnswers: boolean;
   canEditTruthTableResults?: boolean;
   canToggleFullTable?: boolean;
@@ -91,33 +91,25 @@ export function DnfExerciseWorkspace({
     event: KeyboardEvent<HTMLDivElement>,
     rowIndex: number,
   ) => {
-    if (event.key === "0" || event.key === "1") {
-      event.preventDefault();
-      updateTruthTableAnswer(rowIndex, event.key === "1");
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      focusResultRow(Math.min(rowIndex + 1, truthTable.rows.length - 1));
-      return;
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      focusResultRow(Math.max(rowIndex - 1, 0));
-      return;
-    }
-
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      updateTruthTableAnswer(rowIndex, false);
-      return;
-    }
-
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      updateTruthTableAnswer(rowIndex, true);
+    switch (event.key) {
+      case "0":
+      case "ArrowLeft":
+        event.preventDefault();
+        updateTruthTableAnswer(rowIndex, false);
+        break;
+      case "1":
+      case "ArrowRight":
+        event.preventDefault();
+        updateTruthTableAnswer(rowIndex, true);
+        break;
+      case "ArrowDown":
+        event.preventDefault();
+        focusResultRow(Math.min(rowIndex + 1, truthTable.rows.length - 1));
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        focusResultRow(Math.max(rowIndex - 1, 0));
+        break;
     }
   };
 
@@ -224,7 +216,7 @@ export function DnfExerciseWorkspace({
 
           <DnfTruthTable
             truthTable={truthTable}
-            resultHeader={resultHeader}
+            resultHeader={resultHeader ?? t("dnf.builder.truthTableResult")}
             isScrollable={isScrollableTruthTable}
             testId="dnf-exercise-truth-table"
             getRowTestId={(rowIndex) =>

@@ -32,7 +32,10 @@ import {
   buildDnfTruthTableWalkthroughValue,
 } from "./dnfWalkthroughSeed";
 import { getDnfExerciseDefinition } from "../exercises";
-import { getDnfWalkthroughExample } from "../examples/walkthroughExamples";
+import {
+  getDnfWalkthroughExample,
+  type DnfWalkthroughExample,
+} from "../examples/walkthroughExamples";
 
 const simulatorModes: DnfSimulatorMode[] = [
   "expression_to_truth_table",
@@ -50,6 +53,32 @@ interface DnfSimulatorProps {
 export interface DnfSimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
+}
+
+function getInitialExpressionValue(
+  storedValue: DnfTransferValue | null,
+  walkthroughExample: DnfWalkthroughExample | null,
+) {
+  if (storedValue?.mode === "expression_to_truth_table") {
+    return storedValue;
+  }
+  if (walkthroughExample?.mode === "expression_to_truth_table") {
+    return buildDnfExpressionWalkthroughValue(walkthroughExample);
+  }
+  return undefined;
+}
+
+function getInitialTruthTableValue(
+  storedValue: DnfTransferValue | null,
+  walkthroughExample: DnfWalkthroughExample | null,
+) {
+  if (storedValue?.mode === "truth_table_to_dnf") {
+    return storedValue;
+  }
+  if (walkthroughExample?.mode === "truth_table_to_dnf") {
+    return buildDnfTruthTableWalkthroughValue(walkthroughExample);
+  }
+  return undefined;
 }
 
 export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
@@ -245,17 +274,13 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       }
 
       if (visibleMode === "expression_to_truth_table") {
-        const initialValue =
-          storedValue?.mode === "expression_to_truth_table"
-            ? storedValue
-            : activeWalkthroughExample?.mode === "expression_to_truth_table"
-              ? buildDnfExpressionWalkthroughValue(activeWalkthroughExample)
-              : undefined;
-
         return (
           <ExpressionBuilder
             key={`${activeWalkthroughExample?.id ?? "free-expression"}-${contentKey}`}
-            initialValue={initialValue}
+            initialValue={getInitialExpressionValue(
+              storedValue,
+              activeWalkthroughExample,
+            )}
             onTransferValueChange={
               isStorageReady ? handleExpressionChange : undefined
             }
@@ -266,17 +291,13 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
         );
       }
 
-      const initialValue =
-        storedValue?.mode === "truth_table_to_dnf"
-          ? storedValue
-          : activeWalkthroughExample?.mode === "truth_table_to_dnf"
-            ? buildDnfTruthTableWalkthroughValue(activeWalkthroughExample)
-            : undefined;
-
       return (
         <TableToDnfBuilder
           key={`${activeWalkthroughExample?.id ?? "free-table"}-${contentKey}`}
-          initialValue={initialValue}
+          initialValue={getInitialTruthTableValue(
+            storedValue,
+            activeWalkthroughExample,
+          )}
           onTransferValueChange={
             isStorageReady ? handleTruthTableChange : undefined
           }
