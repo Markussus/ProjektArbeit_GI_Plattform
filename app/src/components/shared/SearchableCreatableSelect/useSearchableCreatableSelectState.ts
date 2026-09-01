@@ -189,34 +189,51 @@ export function useSearchableCreatableSelectState({
     return () => window.removeEventListener("resize", close);
   }, [isOpen, resetAndClose]);
 
+  const handleArrowNavigation = (key: "ArrowDown" | "ArrowUp") => {
+    if (totalNavigableItems === 0) return;
+    setActiveIndex((current) => {
+      const direction = key === "ArrowDown" ? 1 : -1;
+      const next =
+        (current + direction + totalNavigableItems) % totalNavigableItems;
+      window.setTimeout(() =>
+        optionRefs.current[next]?.scrollIntoView({ block: "nearest" }),
+      );
+      return next;
+    });
+  };
+
+  const handleEnterAction = () => {
+    if (activeIndex >= 0 && activeIndex < matchingOptions.length) {
+      selectValue(matchingOptions[activeIndex]);
+      return;
+    }
+    if (canCreate && activeIndex === createActionIndex) {
+      executeCreate(normalizedQuery);
+      return;
+    }
+    if (canRename && activeIndex === renameActionIndex) {
+      executeRename(normalizedQuery);
+      return;
+    }
+    if (canCreate) {
+      executeCreate(normalizedQuery);
+      return;
+    }
+    if (canRename) {
+      executeRename(normalizedQuery);
+    }
+  };
+
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      if (totalNavigableItems === 0) return;
-      setActiveIndex((current) => {
-        const direction = event.key === "ArrowDown" ? 1 : -1;
-        const next =
-          (current + direction + totalNavigableItems) % totalNavigableItems;
-        window.setTimeout(() =>
-          optionRefs.current[next]?.scrollIntoView({ block: "nearest" }),
-        );
-        return next;
-      });
+      handleArrowNavigation(event.key);
       return;
     }
 
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    if (activeIndex >= 0 && activeIndex < matchingOptions.length) {
-      selectValue(matchingOptions[activeIndex]);
-    } else if (canCreate && activeIndex === createActionIndex) {
-      executeCreate(normalizedQuery);
-    } else if (canRename && activeIndex === renameActionIndex) {
-      executeRename(normalizedQuery);
-    } else if (canCreate) {
-      executeCreate(normalizedQuery);
-    } else if (canRename) {
-      executeRename(normalizedQuery);
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleEnterAction();
     }
   };
 

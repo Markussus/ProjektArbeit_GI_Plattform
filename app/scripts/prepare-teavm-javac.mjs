@@ -138,7 +138,7 @@ async function ensureGradleWrapper() {
   }
 }
 
-async function canSkipBuild() {
+async function isCommitMatching() {
   if (!(await pathExists(stampPath))) {
     return false;
   }
@@ -153,15 +153,26 @@ async function canSkipBuild() {
       cwd: sourceDir,
     })
   ).trim();
-  if (head !== TEAVM_JAVAC_COMMIT) {
-    return false;
-  }
+  return head === TEAVM_JAVAC_COMMIT;
+}
 
+async function hasAllOutputFiles() {
   for (const fileName of requiredOutputFiles) {
     const outputFile = path.join(outputDir, fileName);
     if (!(await pathExists(outputFile))) {
       return false;
     }
+  }
+  return true;
+}
+
+async function canSkipBuild() {
+  if (!(await isCommitMatching())) {
+    return false;
+  }
+
+  if (!(await hasAllOutputFiles())) {
+    return false;
   }
 
   return outputMatchesOfficialArtifacts();

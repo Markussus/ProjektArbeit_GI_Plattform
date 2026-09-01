@@ -349,6 +349,49 @@ function GraphButton({
   );
 }
 
+function getNodeStatusStyle(node: StateMachineGraphNode) {
+  if (node.isViolation) {
+    return {
+      circle: "fill-destructive/15 stroke-destructive",
+      text: "fill-destructive",
+      strokeWidth: 3.5,
+    };
+  }
+  if (node.isActive) {
+    return {
+      circle: "fill-brand/15 stroke-brand",
+      text: "fill-brand",
+      strokeWidth: 3.5,
+    };
+  }
+  if (node.isPreview) {
+    return {
+      circle: "fill-brand/5 stroke-brand",
+      text: "fill-brand",
+      strokeWidth: 3.5,
+    };
+  }
+  return {
+    circle: "",
+    text: "",
+    strokeWidth: 2,
+  };
+}
+
+function getStateNodeVisuals(node: StateMachineGraphNode) {
+  const style = getNodeStatusStyle(node);
+  return {
+    circleClass: cn("fill-card stroke-border transition-colors", style.circle),
+    textClass: cn(
+      "fill-foreground text-[13px] font-semibold select-none",
+      style.text,
+    ),
+    strokeWidth: style.strokeWidth,
+    dashArray: node.isPreview ? "8 6" : undefined,
+    textYOffset: node.output ? 9 : -4,
+  };
+}
+
 function StateNode({
   node,
   position,
@@ -372,6 +415,8 @@ function StateNode({
     event.stopPropagation();
     onDragStart(node.id);
   };
+
+  const visuals = getStateNodeVisuals(node);
 
   return (
     <g
@@ -397,27 +442,15 @@ function StateNode({
         cx={position.x}
         cy={position.y}
         r={nodeRadius}
-        className={cn(
-          "fill-card stroke-border transition-colors",
-          node.isActive && "fill-brand/15 stroke-brand",
-          node.isPreview && "fill-brand/5 stroke-brand",
-          node.isViolation && "fill-destructive/15 stroke-destructive",
-        )}
-        strokeWidth={
-          node.isActive || node.isPreview || node.isViolation ? 3.5 : 2
-        }
-        strokeDasharray={node.isPreview ? "8 6" : undefined}
+        className={visuals.circleClass}
+        strokeWidth={visuals.strokeWidth}
+        strokeDasharray={visuals.dashArray}
       />
       <text
         x={position.x}
-        y={position.y - (node.output ? 9 : -4)}
+        y={position.y - visuals.textYOffset}
         textAnchor="middle"
-        className={cn(
-          "fill-foreground text-[13px] font-semibold select-none",
-          node.isActive && "fill-brand",
-          node.isPreview && "fill-brand",
-          node.isViolation && "fill-destructive",
-        )}
+        className={visuals.textClass}
       >
         {node.label}
       </text>
@@ -567,7 +600,7 @@ function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
   const grouped = new Map<string, StateMachineGraphEdge>();
 
   for (const edge of edges) {
-    const key = `${edge.from}\u0000${edge.to}`;
+    const key = `${edge.from}\0${edge.to}`;
     const existing = grouped.get(key);
     if (existing) {
       existing.label = `${existing.label}, ${edge.label}`;
@@ -579,6 +612,40 @@ function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
   }
 
   return [...grouped.values()];
+}
+
+function getEdgeVisualProps({
+  active,
+  isViolation,
+  arrowMarkerId,
+  activeArrowMarkerId,
+  violationArrowMarkerId,
+}: {
+  active?: boolean;
+  isViolation?: boolean;
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+}) {
+  if (active) {
+    return {
+      edgeColorClass: "stroke-brand",
+      markerId: activeArrowMarkerId,
+      strokeWidth: 3.5,
+    };
+  }
+  if (isViolation) {
+    return {
+      edgeColorClass: "stroke-destructive",
+      markerId: violationArrowMarkerId,
+      strokeWidth: 2.5,
+    };
+  }
+  return {
+    edgeColorClass: "stroke-muted-foreground",
+    markerId: arrowMarkerId,
+    strokeWidth: 1.75,
+  };
 }
 
 function DirectedEdge({
@@ -606,16 +673,13 @@ function DirectedEdge({
   violationArrowMarkerId: string;
   nodeRadius: number;
 }) {
-  const edgeColorClass = active
-    ? "stroke-brand"
-    : isViolation
-      ? "stroke-destructive"
-      : "stroke-muted-foreground";
-  const markerId = active
-    ? activeArrowMarkerId
-    : isViolation
-      ? violationArrowMarkerId
-      : arrowMarkerId;
+  const { edgeColorClass, markerId, strokeWidth } = getEdgeVisualProps({
+    active,
+    isViolation,
+    arrowMarkerId,
+    activeArrowMarkerId,
+    violationArrowMarkerId,
+  });
   const geometry = createDirectedEdgeGeometry(
     from,
     to,
@@ -623,40 +687,27 @@ function DirectedEdge({
     isBidirectional,
   );
 
-  if (geometry.control) {
-    const pathData = `M ${geometry.start.x} ${geometry.start.y} Q ${geometry.control.x} ${geometry.control.y} ${geometry.end.x} ${geometry.end.y}`;
-    return (
-      <g>
-        <path
-          d={pathData}
-          fill="none"
-          className={edgeColorClass}
-          strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
-          markerEnd={`url(#${markerId})`}
-        />
-        <EdgeLabel
-          x={geometry.label.x}
-          y={geometry.label.y}
-          label={label}
-          active={active}
-          isViolation={isViolation}
-          layout={labelLayout}
-        />
-      </g>
-    );
-  }
-
   return (
     <g>
-      <line
-        x1={geometry.start.x}
-        y1={geometry.start.y}
-        x2={geometry.end.x}
-        y2={geometry.end.y}
-        className={edgeColorClass}
-        strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
-        markerEnd={`url(#${markerId})`}
-      />
+      {geometry.control ? (
+        <path
+          d={`M ${geometry.start.x} ${geometry.start.y} Q ${geometry.control.x} ${geometry.control.y} ${geometry.end.x} ${geometry.end.y}`}
+          fill="none"
+          className={edgeColorClass}
+          strokeWidth={strokeWidth}
+          markerEnd={`url(#${markerId})`}
+        />
+      ) : (
+        <line
+          x1={geometry.start.x}
+          y1={geometry.start.y}
+          x2={geometry.end.x}
+          y2={geometry.end.y}
+          className={edgeColorClass}
+          strokeWidth={strokeWidth}
+          markerEnd={`url(#${markerId})`}
+        />
+      )}
       <EdgeLabel
         x={geometry.label.x}
         y={geometry.label.y}
@@ -693,17 +744,13 @@ function SelfLoop({
   nodeRadius: number;
 }) {
   const geometry = createSelfLoopGeometry({ x, y }, nodeRadius);
-
-  const edgeColorClass = active
-    ? "stroke-brand"
-    : isViolation
-      ? "stroke-destructive"
-      : "stroke-muted-foreground";
-  const markerId = active
-    ? activeArrowMarkerId
-    : isViolation
-      ? violationArrowMarkerId
-      : arrowMarkerId;
+  const { edgeColorClass, markerId, strokeWidth } = getEdgeVisualProps({
+    active,
+    isViolation,
+    arrowMarkerId,
+    activeArrowMarkerId,
+    violationArrowMarkerId,
+  });
 
   return (
     <g>
@@ -711,7 +758,7 @@ function SelfLoop({
         d={geometry.path}
         fill="none"
         className={edgeColorClass}
-        strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
+        strokeWidth={strokeWidth}
         markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel

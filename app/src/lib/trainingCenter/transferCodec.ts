@@ -63,6 +63,59 @@ export interface SymbolDictionaryCodec {
   read(reader: BitReader, mode: number, expectedCount: number): string[];
 }
 
+function readRegistrySymbols(
+  reader: BitReader,
+  registry: readonly string[],
+  expectedCount: number,
+  payloadError: string,
+): string[] {
+  const symbols: string[] = [];
+  for (const symbol of registry) {
+    if (reader.readBit() === 1) {
+      symbols.push(symbol);
+    }
+  }
+  if (symbols.length !== expectedCount) {
+    throw new Error(payloadError);
+  }
+  return symbols;
+}
+
+function readRawUtf8Symbols(
+  reader: BitReader,
+  expectedCount: number,
+  payloadError: string,
+  isReserved?: (symbol: string) => boolean,
+): string[] {
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  const symbols: string[] = [];
+
+  for (let symbolId = 0; symbolId < expectedCount; symbolId++) {
+    const byteLength = reader.readVarUint();
+    assertCollectionSize(byteLength, payloadError);
+    if (byteLength === 0) {
+      throw new Error(payloadError);
+    }
+
+    const bytes = Uint8Array.from({ length: byteLength }, () =>
+      reader.readBits(8),
+    );
+    const symbol = decoder.decode(bytes);
+
+    if (
+      Array.from(symbol).length !== 1 ||
+      symbols.includes(symbol) ||
+      isReserved?.(symbol)
+    ) {
+      throw new Error(payloadError);
+    }
+
+    symbols.push(symbol);
+  }
+
+  return symbols;
+}
+
 /**
  * Bind a symbol dictionary to one registry and error message. `write` and
  * `read` are exact inverses as long as both sides pass the same mode, which is
@@ -111,50 +164,24 @@ export function createSymbolDictionaryCodec({
 
     read(reader, mode, expectedCount) {
       if (mode === SymbolMode.Registry) {
-        const symbols: string[] = [];
-        for (const symbol of registry) {
-          if (reader.readBit() === 1) {
-            symbols.push(symbol);
-          }
-        }
-        if (symbols.length !== expectedCount) {
-          throw new Error(payloadError);
-        }
-        return symbols;
+        return readRegistrySymbols(
+          reader,
+          registry,
+          expectedCount,
+          payloadError,
+        );
       }
 
       if (mode !== SymbolMode.RawUtf8) {
         throw new Error(payloadError);
       }
 
-      const decoder = new TextDecoder("utf-8", { fatal: true });
-      const symbols: string[] = [];
-
-      for (let symbolId = 0; symbolId < expectedCount; symbolId++) {
-        const byteLength = reader.readVarUint();
-        assertCollectionSize(byteLength, payloadError);
-        if (byteLength === 0) {
-          throw new Error(payloadError);
-        }
-
-        const bytes = Uint8Array.from({ length: byteLength }, () =>
-          reader.readBits(8),
-        );
-        const symbol = decoder.decode(bytes);
-
-        // Symbols are single characters, distinct, and never reserved.
-        if (
-          Array.from(symbol).length !== 1 ||
-          symbols.includes(symbol) ||
-          isReserved?.(symbol)
-        ) {
-          throw new Error(payloadError);
-        }
-
-        symbols.push(symbol);
-      }
-
-      return symbols;
+      return readRawUtf8Symbols(
+        reader,
+        expectedCount,
+        payloadError,
+        isReserved,
+      );
     },
   };
 }

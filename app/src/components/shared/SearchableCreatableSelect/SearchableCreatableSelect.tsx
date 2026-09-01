@@ -1,4 +1,4 @@
-import { useId, type CSSProperties } from "react";
+import { useId, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Pencil, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -110,6 +110,206 @@ export function SearchableCreatableSelect({
   );
 }
 
+interface SearchableSearchInputProps {
+  inputRef: RefObject<HTMLInputElement | null>;
+  query: string;
+  setQuery: (query: string) => void;
+  setActiveIndex: (index: number) => void;
+  handleInputKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  ariaLabel: string;
+  searchPlaceholder: string;
+  testId?: string;
+}
+
+function SearchableSearchInput({
+  inputRef,
+  query,
+  setQuery,
+  setActiveIndex,
+  handleInputKeyDown,
+  ariaLabel,
+  searchPlaceholder,
+  testId,
+}: SearchableSearchInputProps) {
+  return (
+    <div className="border-border relative border-b p-1 pb-2">
+      <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
+      <input
+        ref={inputRef}
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setActiveIndex(0);
+        }}
+        onKeyDown={handleInputKeyDown}
+        aria-label={`${ariaLabel} search`}
+        placeholder={searchPlaceholder}
+        data-testid={testId ? `${testId}-search` : undefined}
+        className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
+        autoComplete="off"
+        spellCheck={false}
+      />
+    </div>
+  );
+}
+
+interface SearchableOptionListProps {
+  matchingOptions: string[];
+  value: string;
+  activeIndex: number;
+  notFoundLabel: string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  selectValue: (value: string) => void;
+}
+
+function SearchableOptionList({
+  matchingOptions,
+  value,
+  activeIndex,
+  notFoundLabel,
+  testId,
+  setOptionRef,
+  selectValue,
+}: SearchableOptionListProps) {
+  return (
+    <div
+      data-testid={testId ? `${testId}-options` : undefined}
+      className="max-h-[180px] min-h-0 overflow-y-auto py-1"
+    >
+      {matchingOptions.map((option, index) => (
+        <button
+          ref={(element) => setOptionRef(index, element)}
+          key={option}
+          type="button"
+          role="option"
+          data-testid={testId ? `${testId}-option-${option}` : undefined}
+          aria-selected={option === value}
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            selectValue(option);
+          }}
+          className={cn(
+            "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
+            (option === value || index === activeIndex) && "bg-muted",
+          )}
+        >
+          <span className="truncate">{option}</span>
+          {option === value && <Check className="text-brand size-4 shrink-0" />}
+        </button>
+      ))}
+      {matchingOptions.length === 0 && (
+        <p className="text-muted-foreground px-3 py-2 text-sm">
+          {notFoundLabel}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface SearchableCreateButtonProps {
+  canCreate: boolean;
+  createActionIndex: number;
+  activeIndex: number;
+  normalizedQuery: string;
+  createLabel: (value: string) => string;
+  emptyCreateLabel: string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  executeCreate: (value: string) => void;
+}
+
+function SearchableCreateButton({
+  canCreate,
+  createActionIndex,
+  activeIndex,
+  normalizedQuery,
+  createLabel,
+  emptyCreateLabel,
+  testId,
+  setOptionRef,
+  executeCreate,
+}: SearchableCreateButtonProps) {
+  return (
+    <button
+      ref={(element) => {
+        if (createActionIndex >= 0) {
+          setOptionRef(createActionIndex, element);
+        }
+      }}
+      type="button"
+      disabled={!canCreate}
+      onPointerDown={(event) => {
+        if (!canCreate) return;
+        event.preventDefault();
+        event.stopPropagation();
+        executeCreate(normalizedQuery);
+      }}
+      data-testid={testId ? `${testId}-create` : undefined}
+      className={cn(
+        "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
+        canCreate && activeIndex === createActionIndex && "bg-muted",
+      )}
+    >
+      <Plus className="text-brand size-4 shrink-0" />
+      <span className="truncate">
+        {normalizedQuery ? createLabel(normalizedQuery) : emptyCreateLabel}
+      </span>
+    </button>
+  );
+}
+
+interface SearchableRenameButtonProps {
+  renameActionIndex: number;
+  activeIndex: number;
+  value: string;
+  normalizedQuery: string;
+  renameLabel?: (previousValue: string, nextValue: string) => string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  executeRename: (value: string) => void;
+}
+
+function SearchableRenameButton({
+  renameActionIndex,
+  activeIndex,
+  value,
+  normalizedQuery,
+  renameLabel,
+  testId,
+  setOptionRef,
+  executeRename,
+}: SearchableRenameButtonProps) {
+  return (
+    <button
+      ref={(element) => {
+        if (renameActionIndex >= 0) {
+          setOptionRef(renameActionIndex, element);
+        }
+      }}
+      type="button"
+      onPointerDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        executeRename(normalizedQuery);
+      }}
+      data-testid={testId ? `${testId}-rename` : undefined}
+      className={cn(
+        "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
+        activeIndex === renameActionIndex && "bg-muted",
+      )}
+    >
+      <Pencil className="text-brand size-4 shrink-0" />
+      <span className="truncate">
+        {renameLabel
+          ? renameLabel(value, normalizedQuery)
+          : `"${value}" in "${normalizedQuery}" umbenennen`}
+      </span>
+    </button>
+  );
+}
+
 function SearchableSelectMenu({
   state,
   value,
@@ -162,119 +362,53 @@ function SearchableSelectMenu({
       style={menuPosition}
       className="bg-popover text-popover-foreground border-border fixed z-[100] flex w-64 flex-col overflow-hidden rounded-lg border p-1 shadow-xl"
     >
-      <div className="border-border relative border-b p-1 pb-2">
-        <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setActiveIndex(0);
-          }}
-          onKeyDown={handleInputKeyDown}
-          aria-label={`${ariaLabel} search`}
-          placeholder={searchPlaceholder}
-          data-testid={testId ? `${testId}-search` : undefined}
-          className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
-          autoComplete="off"
-          spellCheck={false}
-        />
-      </div>
+      <SearchableSearchInput
+        inputRef={inputRef}
+        query={query}
+        setQuery={setQuery}
+        setActiveIndex={setActiveIndex}
+        handleInputKeyDown={handleInputKeyDown}
+        ariaLabel={ariaLabel}
+        searchPlaceholder={searchPlaceholder}
+        testId={testId}
+      />
 
-      <div
-        data-testid={testId ? `${testId}-options` : undefined}
-        className="max-h-[180px] min-h-0 overflow-y-auto py-1"
-      >
-        {matchingOptions.map((option, index) => (
-          <button
-            ref={(element) => {
-              setOptionRef(index, element);
-            }}
-            key={option}
-            type="button"
-            role="option"
-            data-testid={testId ? `${testId}-option-${option}` : undefined}
-            aria-selected={option === value}
-            onPointerDown={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              selectValue(option);
-            }}
-            className={cn(
-              "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
-              (option === value || index === activeIndex) && "bg-muted",
-            )}
-          >
-            <span className="truncate">{option}</span>
-            {option === value && (
-              <Check className="text-brand size-4 shrink-0" />
-            )}
-          </button>
-        ))}
-        {matchingOptions.length === 0 && (
-          <p className="text-muted-foreground px-3 py-2 text-sm">
-            {notFoundLabel}
-          </p>
-        )}
-      </div>
+      <SearchableOptionList
+        matchingOptions={matchingOptions}
+        value={value}
+        activeIndex={activeIndex}
+        notFoundLabel={notFoundLabel}
+        testId={testId}
+        setOptionRef={setOptionRef}
+        selectValue={selectValue}
+      />
 
       {(showCreateAction || canRename) && (
         <div className="border-border flex flex-col gap-0.5 border-t pt-1">
           {showCreateAction && (
-            <button
-              ref={(element) => {
-                if (createActionIndex >= 0) {
-                  setOptionRef(createActionIndex, element);
-                }
-              }}
-              type="button"
-              disabled={!canCreate}
-              onPointerDown={(event) => {
-                if (!canCreate) return;
-                event.preventDefault();
-                event.stopPropagation();
-                executeCreate(normalizedQuery);
-              }}
-              data-testid={testId ? `${testId}-create` : undefined}
-              className={cn(
-                "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
-                canCreate && activeIndex === createActionIndex && "bg-muted",
-              )}
-            >
-              <Plus className="text-brand size-4 shrink-0" />
-              <span className="truncate">
-                {normalizedQuery
-                  ? createLabel(normalizedQuery)
-                  : emptyCreateLabel}
-              </span>
-            </button>
+            <SearchableCreateButton
+              canCreate={canCreate}
+              createActionIndex={createActionIndex}
+              activeIndex={activeIndex}
+              normalizedQuery={normalizedQuery}
+              createLabel={createLabel}
+              emptyCreateLabel={emptyCreateLabel}
+              testId={testId}
+              setOptionRef={setOptionRef}
+              executeCreate={executeCreate}
+            />
           )}
           {canRename && (
-            <button
-              ref={(element) => {
-                if (renameActionIndex >= 0) {
-                  setOptionRef(renameActionIndex, element);
-                }
-              }}
-              type="button"
-              onPointerDown={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                executeRename(normalizedQuery);
-              }}
-              data-testid={testId ? `${testId}-rename` : undefined}
-              className={cn(
-                "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
-                activeIndex === renameActionIndex && "bg-muted",
-              )}
-            >
-              <Pencil className="text-brand size-4 shrink-0" />
-              <span className="truncate">
-                {renameLabel
-                  ? renameLabel(value, normalizedQuery)
-                  : `"${value}" in "${normalizedQuery}" umbenennen`}
-              </span>
-            </button>
+            <SearchableRenameButton
+              renameActionIndex={renameActionIndex}
+              activeIndex={activeIndex}
+              value={value}
+              normalizedQuery={normalizedQuery}
+              renameLabel={renameLabel}
+              testId={testId}
+              setOptionRef={setOptionRef}
+              executeRename={executeRename}
+            />
           )}
         </div>
       )}

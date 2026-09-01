@@ -9,14 +9,8 @@ import deCommon from "./locales/de/common.json";
 
 const loadedLanguages = new Set<string>();
 
-export async function loadTopicTranslations(language?: string): Promise<void> {
-  const norm = normalizeSupportedLanguage(
-    language ?? i18n.resolvedLanguage ?? i18n.language,
-  );
-  if (loadedLanguages.has(norm)) return;
-  loadedLanguages.add(norm);
-
-  if (norm === "de") {
+async function fetchTopicBundles(lang: "de" | "en") {
+  if (lang === "de") {
     const [
       finiteAutomata,
       numberSystems,
@@ -37,60 +31,64 @@ export async function loadTopicTranslations(language?: string): Promise<void> {
       import("./locales/de/regular-languages.json"),
     ]);
 
-    i18n.addResourceBundle(
-      "de",
-      "translation",
-      {
-        "finite-automata": finiteAutomata.default,
-        "number-systems": numberSystems.default,
-        encoding: encoding.default,
-        "moore-mealy": mooreMealy.default,
-        dnf: dnf.default,
-        "java-programming": javaProgramming.default,
-        "turing-machine": turingMachine.default,
-        "regular-languages": regularLanguages.default,
-      },
-      true,
-      true,
-    );
-  } else {
-    const [
-      finiteAutomata,
-      numberSystems,
-      encoding,
-      mooreMealy,
-      dnf,
-      javaProgramming,
-      turingMachine,
-      regularLanguages,
-    ] = await Promise.all([
-      import("./locales/en/finite-automata.json"),
-      import("./locales/en/number-systems.json"),
-      import("./locales/en/encoding.json"),
-      import("./locales/en/moore-mealy.json"),
-      import("./locales/en/dnf.json"),
-      import("./locales/en/java-programming.json"),
-      import("./locales/en/turing-machine.json"),
-      import("./locales/en/regular-languages.json"),
-    ]);
-
-    i18n.addResourceBundle(
-      "en",
-      "translation",
-      {
-        "finite-automata": finiteAutomata.default,
-        "number-systems": numberSystems.default,
-        encoding: encoding.default,
-        "moore-mealy": mooreMealy.default,
-        dnf: dnf.default,
-        "java-programming": javaProgramming.default,
-        "turing-machine": turingMachine.default,
-        "regular-languages": regularLanguages.default,
-      },
-      true,
-      true,
-    );
+    return {
+      "finite-automata": finiteAutomata.default,
+      "number-systems": numberSystems.default,
+      encoding: encoding.default,
+      "moore-mealy": mooreMealy.default,
+      dnf: dnf.default,
+      "java-programming": javaProgramming.default,
+      "turing-machine": turingMachine.default,
+      "regular-languages": regularLanguages.default,
+    };
   }
+
+  const [
+    finiteAutomata,
+    numberSystems,
+    encoding,
+    mooreMealy,
+    dnf,
+    javaProgramming,
+    turingMachine,
+    regularLanguages,
+  ] = await Promise.all([
+    import("./locales/en/finite-automata.json"),
+    import("./locales/en/number-systems.json"),
+    import("./locales/en/encoding.json"),
+    import("./locales/en/moore-mealy.json"),
+    import("./locales/en/dnf.json"),
+    import("./locales/en/java-programming.json"),
+    import("./locales/en/turing-machine.json"),
+    import("./locales/en/regular-languages.json"),
+  ]);
+
+  return {
+    "finite-automata": finiteAutomata.default,
+    "number-systems": numberSystems.default,
+    encoding: encoding.default,
+    "moore-mealy": mooreMealy.default,
+    dnf: dnf.default,
+    "java-programming": javaProgramming.default,
+    "turing-machine": turingMachine.default,
+    "regular-languages": regularLanguages.default,
+  };
+}
+
+function getCurrentLanguage(language?: string): "de" | "en" {
+  const target = language || i18n.resolvedLanguage || i18n.language;
+  return normalizeSupportedLanguage(target) === "de" ? "de" : "en";
+}
+
+export async function loadTopicTranslations(language?: string): Promise<void> {
+  const norm = getCurrentLanguage(language);
+  if (loadedLanguages.has(norm)) {
+    return;
+  }
+  loadedLanguages.add(norm);
+
+  const bundle = await fetchTopicBundles(norm);
+  i18n.addResourceBundle(norm, "translation", bundle, true, true);
 }
 
 i18n
