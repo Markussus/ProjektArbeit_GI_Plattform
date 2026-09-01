@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -9,8 +9,8 @@ import {
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { useBinaryOperands } from "./useBinaryOperands";
 
 interface CompareStep {
   step: number;
@@ -33,31 +33,27 @@ export function Compare({
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "10110");
-  const [valB, setValB] = useState(initialB || "10011");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-    if (initialB) setValB(initialB);
-  }, [initialA, initialB]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, valB);
-  }, [valA, valB, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 16));
-  };
-  const handleInputB = (val: string) => {
-    if (locked) return;
-    setValB(val.replace(/[^01]/g, "").slice(0, 16));
-  };
+  const {
+    valA,
+    valB,
+    locked,
+    handleInputA,
+    handleInputB,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+  } = useBinaryOperands({
+    defaultA: "10110",
+    defaultB: "10011",
+    maxLengthA: 16,
+    maxLengthB: 16,
+    initialA,
+    initialB,
+    isExerciseMode,
+    showSolution,
+    onChangeValues,
+  });
 
   const { padA, padB, diffIndex, result, compareSteps } = useMemo(() => {
     if (!valA || !valB)

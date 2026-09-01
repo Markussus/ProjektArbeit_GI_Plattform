@@ -9,10 +9,11 @@ import {
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
-  ModeToggle,
   WarningBanner,
+  ModeToggle,
+  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { StepByStepSection } from "./StepByStepSection";
 
 const BASE64_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -371,36 +372,30 @@ export function Base64Encoder({
                   </div>
                 )}
 
-                <StepByStepToggle
+                <StepByStepSection
                   open={expanded.has("1")}
                   onToggle={() => toggle("1")}
-                />
-
-                {expanded.has("1") && (
+                  title={t("encoding.simulator.step2GroupBits")}
+                >
                   <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.step2GroupBits")}
-                    </h4>
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-muted-foreground mb-1 text-xs">
-                          {t("encoding.simulator.asciiHexLabel")}:
-                        </p>
-                        <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                          {encodingSteps.map((s) => s.hex).join(" ")}
-                        </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1 text-xs">
+                        {t("encoding.simulator.asciiHexLabel")}:
+                      </p>
+                      <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+                        {encodingSteps.map((s) => s.hex).join(" ")}
                       </div>
-                      <div>
-                        <p className="text-muted-foreground mb-1 text-xs">
-                          {t("encoding.simulator.binaryConcatLabel")}:
-                        </p>
-                        <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                          {encodingSteps.map((s) => s.binary).join("")}
-                        </div>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1 text-xs">
+                        {t("encoding.simulator.binaryConcatLabel")}:
+                      </p>
+                      <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+                        {encodingSteps.map((s) => s.binary).join("")}
                       </div>
                     </div>
                   </div>
-                )}
+                </StepByStepSection>
 
                 <StepByStepToggle
                   open={expanded.has("2")}
@@ -499,21 +494,15 @@ export function Base64Encoder({
                   </div>
                 )}
 
-                <StepByStepToggle
+                <StepByStepSection
                   open={expanded.has("1")}
                   onToggle={() => toggle("1")}
-                />
-
-                {expanded.has("1") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.decodeStep2ConcatBits")}
-                    </h4>
-                    <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                      {decodeSteps.map((s) => s.bits).join("")}
-                    </div>
+                  title={t("encoding.simulator.decodeStep2ConcatBits")}
+                >
+                  <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+                    {decodeSteps.map((s) => s.bits).join("")}
                   </div>
-                )}
+                </StepByStepSection>
 
                 <StepByStepToggle
                   open={expanded.has("2")}

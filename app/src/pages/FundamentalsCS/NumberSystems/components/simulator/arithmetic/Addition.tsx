@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -10,18 +10,9 @@ import {
   CollapsibleStep,
   WarningBanner,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
-
-interface BitStep {
-  position: number;
-  bitA: number;
-  bitB: number;
-  carryIn: number;
-  sum: number;
-  carryOut: number;
-  explanation: string;
-}
+import { useBinaryOperands } from "./useBinaryOperands";
+import { addBinary8Bit, type BitStep } from "./binaryArithmetic";
 
 export function Addition({
   isExerciseMode,
@@ -34,93 +25,56 @@ export function Addition({
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "01100101");
-  const [valB, setValB] = useState(initialB || "00111100");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-    if (initialB) setValB(initialB);
-  }, [initialA, initialB]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, valB);
-  }, [valA, valB, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 8));
-  };
-  const handleInputB = (val: string) => {
-    if (locked) return;
-    setValB(val.replace(/[^01]/g, "").slice(0, 8));
-  };
+  const {
+    valA,
+    valB,
+    locked,
+    handleInputA,
+    handleInputB,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+  } = useBinaryOperands({
+    defaultA: "01100101",
+    defaultB: "00111100",
+    maxLengthA: 8,
+    maxLengthB: 8,
+    initialA,
+    initialB,
+    isExerciseMode,
+    showSolution,
+    onChangeValues,
+  });
 
   const { padA, padB, sum, carries, overflow, carryOut, bitSteps } =
     useMemo(() => {
-      const padA = valA.padStart(8, "0");
-      const padB = valB.padStart(8, "0");
-
-      const carriesArr = Array(9).fill(0);
-      const sumArr = Array(8).fill(0);
-      const steps: BitStep[] = [];
-
-      for (let i = 7; i >= 0; i--) {
-        const bitA = parseInt(padA[i] || "0");
-        const bitB = parseInt(padB[i] || "0");
-        const cIn = carriesArr[7 - i];
-        const s = bitA + bitB + cIn;
-        sumArr[i] = s % 2;
-        const cOut = Math.floor(s / 2);
-        carriesArr[7 - i + 1] = cOut;
-
-        let explanation = "";
-        if (bitA === 0 && bitB === 0 && cIn === 0) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step0");
-        } else if (bitA === 1 && bitB === 0 && cIn === 0) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step1");
-        } else if (bitA === 0 && bitB === 1 && cIn === 0) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step2");
-        } else if (bitA === 0 && bitB === 0 && cIn === 1) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step3");
-        } else if (bitA === 1 && bitB === 1 && cIn === 0) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step4");
-        } else if (bitA === 1 && bitB === 0 && cIn === 1) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step5");
-        } else if (bitA === 0 && bitB === 1 && cIn === 1) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step6");
-        } else if (bitA === 1 && bitB === 1 && cIn === 1) {
-          explanation = t("number-systems.simulator.arithmetic.addition.step7");
+      const getExplanation = (step: BitStep) => {
+        if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 0) {
+          return t("number-systems.simulator.arithmetic.addition.step0");
         }
-
-        steps.unshift({
-          position: 7 - i,
-          bitA,
-          bitB,
-          carryIn: cIn,
-          sum: sumArr[i],
-          carryOut: cOut,
-          explanation,
-        });
-      }
-
-      const overflow = carriesArr[7] !== carriesArr[8];
-      const carryOut = carriesArr[8] === 1;
-      const visCarries = [...carriesArr].reverse();
-
-      return {
-        padA,
-        padB,
-        sum: sumArr.join(""),
-        carries: visCarries,
-        overflow,
-        carryOut,
-        bitSteps: steps,
+        if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 0) {
+          return t("number-systems.simulator.arithmetic.addition.step1");
+        }
+        if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 0) {
+          return t("number-systems.simulator.arithmetic.addition.step2");
+        }
+        if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 1) {
+          return t("number-systems.simulator.arithmetic.addition.step3");
+        }
+        if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 0) {
+          return t("number-systems.simulator.arithmetic.addition.step4");
+        }
+        if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 1) {
+          return t("number-systems.simulator.arithmetic.addition.step5");
+        }
+        if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 1) {
+          return t("number-systems.simulator.arithmetic.addition.step6");
+        }
+        return t("number-systems.simulator.arithmetic.addition.step7");
       };
+
+      return addBinary8Bit(valA, valB, getExplanation);
     }, [valA, valB, t]);
 
   return (

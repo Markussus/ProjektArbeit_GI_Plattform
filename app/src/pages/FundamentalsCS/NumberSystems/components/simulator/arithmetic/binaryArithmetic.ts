@@ -1,0 +1,71 @@
+export interface BitStep {
+  position: number;
+  bitA: number;
+  bitB: number;
+  carryIn: number;
+  sum: number;
+  carryOut: number;
+  explanation?: string;
+}
+
+export interface AddBinary8BitResult {
+  padA: string;
+  padB: string;
+  sum: string;
+  carries: number[];
+  overflow: boolean;
+  carryOut: boolean;
+  bitSteps: BitStep[];
+}
+
+export function addBinary8Bit(
+  a: string,
+  b: string,
+  getStepExplanation?: (step: BitStep) => string,
+): AddBinary8BitResult {
+  const padA = a.padStart(8, "0");
+  const padB = b.padStart(8, "0");
+
+  const carriesArr = Array(9).fill(0);
+  const sumArr = Array(8).fill(0);
+  const steps: BitStep[] = [];
+
+  for (let i = 7; i >= 0; i--) {
+    const bitA = parseInt(padA[i] || "0");
+    const bitB = parseInt(padB[i] || "0");
+    const carryIn = carriesArr[7 - i];
+    const s = bitA + bitB + carryIn;
+    sumArr[i] = s % 2;
+    const carryOut = Math.floor(s / 2);
+    carriesArr[7 - i + 1] = carryOut;
+
+    const step: BitStep = {
+      position: 7 - i,
+      bitA,
+      bitB,
+      carryIn,
+      sum: sumArr[i],
+      carryOut,
+    };
+
+    if (getStepExplanation) {
+      step.explanation = getStepExplanation(step);
+    }
+
+    steps.unshift(step);
+  }
+
+  const overflow = carriesArr[7] !== carriesArr[8];
+  const carryOut = carriesArr[8] === 1;
+  const visCarries = [...carriesArr].reverse();
+
+  return {
+    padA,
+    padB,
+    sum: sumArr.join(""),
+    carries: visCarries,
+    overflow,
+    carryOut,
+    bitSteps: steps,
+  };
+}

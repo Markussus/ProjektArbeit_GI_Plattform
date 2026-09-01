@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -9,8 +9,8 @@ import {
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { useBinaryOperands } from "./useBinaryOperands";
 
 interface DivisionStep {
   step: number;
@@ -34,31 +34,27 @@ export function Division({
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "11010");
-  const [valB, setValB] = useState(initialB || "101");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-    if (initialB) setValB(initialB);
-  }, [initialA, initialB]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, valB);
-  }, [valA, valB, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 12));
-  };
-  const handleInputB = (val: string) => {
-    if (locked) return;
-    setValB(val.replace(/[^01]/g, "").slice(0, 8));
-  };
+  const {
+    valA,
+    valB,
+    locked,
+    handleInputA,
+    handleInputB,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+  } = useBinaryOperands({
+    defaultA: "11010",
+    defaultB: "101",
+    maxLengthA: 12,
+    maxLengthB: 8,
+    initialA,
+    initialB,
+    isExerciseMode,
+    showSolution,
+    onChangeValues,
+  });
 
   const { steps, quotient, remainder, isZeroDiv } = useMemo(() => {
     if (!valA || !valB)

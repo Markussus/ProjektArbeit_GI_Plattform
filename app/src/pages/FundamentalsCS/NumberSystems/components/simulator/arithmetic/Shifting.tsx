@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Info, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -9,8 +9,8 @@ import {
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { useBinaryOperand } from "./useBinaryOperand";
 
 interface ShiftStep {
   step: number;
@@ -30,27 +30,24 @@ export function Shifting({
   renderModeSelector,
 }: SingleOperandProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "1101");
+  const {
+    valA,
+    locked,
+    handleInputA,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+  } = useBinaryOperand({
+    defaultA: "1101",
+    maxLengthA: 16,
+    initialA,
+    isExerciseMode,
+    showSolution,
+    onChangeValues,
+  });
   const [shiftAmount, setShiftAmount] = useState<number>(2);
   const [direction, setDirection] = useState<"left" | "right">("left");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-  }, [initialA]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, "");
-  }, [valA, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 16));
-  };
 
   const { resultStr, decimalBefore, decimalAfter, explanation, shiftSteps } =
     useMemo(() => {

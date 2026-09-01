@@ -3,105 +3,24 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Multiplication } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Multiplication.tsx";
+import { getInputs } from "./arithmeticTestSetup.tsx";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
-  }),
-}));
-
-vi.mock("@/components/shared/SimulatorShared", () => ({
-  SimulatorLayout: ({
-    inputPanel,
-    resultPanel,
-  }: {
-    inputPanel: React.ReactNode;
-    resultPanel: React.ReactNode;
-  }) => (
-    <div data-testid="mock-simulator-layout">
-      <div data-testid="mock-input-panel">{inputPanel}</div>
-      <div data-testid="mock-result-panel">{resultPanel}</div>
-    </div>
-  ),
-  BinaryInput: ({
-    value,
-    onChange,
-    locked,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    locked: boolean;
-  }) => (
-    <input
-      data-testid="mock-binary-input"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      readOnly={locked}
-    />
-  ),
-  StepByStepToggle: ({ onToggle }: { open: boolean; onToggle: () => void }) => (
-    <button data-testid="mock-step-toggle" onClick={onToggle}>
-      toggle
-    </button>
-  ),
-  CollapsibleStep: ({
-    header,
-    children,
-    isOpen,
-  }: {
-    header: React.ReactNode;
-    children: React.ReactNode;
-    isOpen: boolean;
-  }) => (
-    <div data-testid="mock-collapsible-step" data-open={isOpen}>
-      <div data-testid="mock-step-header">{header}</div>
-      {isOpen && <div data-testid="mock-step-content">{children}</div>}
-    </div>
-  ),
-  WarningBanner: ({
-    title,
-    children,
-  }: {
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <div data-testid="mock-warning-banner">
-      <span>{title}</span>
-      <span>{children}</span>
-    </div>
-  ),
-  ResultSectionHeader: ({ title }: { title: string }) => (
-    <div data-testid="mock-result-header">{title}</div>
-  ),
-  useToggleSet: (initial: string[]) => ({
-    expanded: new Set(initial),
-    toggle: vi.fn(),
-  }),
-}));
-
+vi.mock("react-i18next", async () => {
+  const { mockReactI18next } = await import("./arithmeticTestSetup");
+  return mockReactI18next();
+});
+vi.mock("@/components/shared/SimulatorShared", async () => {
+  const { mockSimulatorShared } = await import("./arithmeticTestSetup");
+  return mockSimulatorShared();
+});
 vi.mock(
   "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
-  () => ({
-    ExerciseValidationPanel: ({
-      expectedResult,
-    }: {
-      expectedResult: string | string[];
-    }) => (
-      <div data-testid="mock-validation-panel">
-        <span data-testid="mock-validation-expected-result">
-          {Array.isArray(expectedResult)
-            ? expectedResult.join(",")
-            : expectedResult}
-        </span>
-      </div>
-    ),
-  }),
+  async () => {
+    const { mockExerciseValidationPanel } =
+      await import("./arithmeticTestSetup");
+    return mockExerciseValidationPanel();
+  },
 );
-
-function getInputs() {
-  return screen.getAllByTestId("mock-binary-input") as HTMLInputElement[];
-}
 
 describe("Multiplication", () => {
   afterEach(() => {
@@ -112,6 +31,13 @@ describe("Multiplication", () => {
     it("shows two binary inputs", () => {
       render(<Multiplication renderModeSelector={null} />);
       expect(getInputs().length).toBe(2);
+    });
+
+    it("defaults to 1101 and 101", () => {
+      render(<Multiplication renderModeSelector={null} />);
+      const inputs = getInputs();
+      expect(inputs[0].value).toBe("1101");
+      expect(inputs[1].value).toBe("101");
     });
   });
 
@@ -132,8 +58,8 @@ describe("Multiplication", () => {
           isExerciseMode
           showSolution={false}
           onShowSolution={vi.fn()}
-          initialA="00001011"
-          initialB="00000100"
+          initialA="00000010"
+          initialB="00000011"
           renderModeSelector={null}
         />,
       );
@@ -148,30 +74,30 @@ describe("Multiplication", () => {
           isExerciseMode
           showSolution={false}
           onShowSolution={vi.fn()}
-          initialA="00001011"
-          initialB="00000100"
+          initialA="00000010"
+          initialB="00000011"
           renderModeSelector={null}
         />,
       );
       expect(screen.getByTestId("mock-validation-panel")).toBeTruthy();
       expect(
         screen.getByTestId("mock-validation-expected-result").textContent,
-      ).toContain("101100");
+      ).toContain("110");
     });
   });
 
   describe("when initialized with values", () => {
-    it("sets initial operands", () => {
+    it("sets initial operand A and B", () => {
       render(
         <Multiplication
-          initialA="1011"
-          initialB="11001"
+          initialA="10101010"
+          initialB="01010101"
           renderModeSelector={null}
         />,
       );
       const inputs = getInputs();
-      expect(inputs[0].value).toBe("1011");
-      expect(inputs[1].value).toBe("11001");
+      expect(inputs[0].value).toBe("10101010");
+      expect(inputs[1].value).toBe("01010101");
     });
   });
 });

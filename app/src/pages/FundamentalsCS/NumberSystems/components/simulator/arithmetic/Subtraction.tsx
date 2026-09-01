@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
@@ -10,8 +10,9 @@ import {
   CollapsibleStep,
   WarningBanner,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { useBinaryOperands } from "./useBinaryOperands";
+import { addBinary8Bit } from "./binaryArithmetic";
 
 interface OnesComplementStep {
   position: number;
@@ -29,16 +30,6 @@ interface TwosComplementStep {
   explanation: string;
 }
 
-interface AdditionStep {
-  position: number;
-  bitA: number;
-  bitB: number;
-  carryIn: number;
-  sum: number;
-  carryOut: number;
-  explanation: string;
-}
-
 export function Subtraction({
   isExerciseMode,
   showSolution = true,
@@ -50,31 +41,27 @@ export function Subtraction({
   renderModeSelector,
 }: BaseArithmeticProps) {
   const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "00101010");
-  const [valB, setValB] = useState(initialB || "00001010");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-    if (initialB) setValB(initialB);
-  }, [initialA, initialB]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, valB);
-  }, [valA, valB, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 8));
-  };
-  const handleInputB = (val: string) => {
-    if (locked) return;
-    setValB(val.replace(/[^01]/g, "").slice(0, 8));
-  };
+  const {
+    valA,
+    valB,
+    locked,
+    handleInputA,
+    handleInputB,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+  } = useBinaryOperands({
+    defaultA: "00101010",
+    defaultB: "00001010",
+    maxLengthA: 8,
+    maxLengthB: 8,
+    initialA,
+    initialB,
+    isExerciseMode,
+    showSolution,
+    onChangeValues,
+  });
 
   const {
     padA,
@@ -151,79 +138,44 @@ export function Subtraction({
       });
     }
 
-    const carriesArr = Array(9).fill(0);
-    const sumArr = Array(8).fill(0);
-    const addSteps: AdditionStep[] = [];
-
-    for (let i = 7; i >= 0; i--) {
-      const bitA = parseInt(padA[i] || "0");
-      const bitB = parseInt(twosComp[i] || "0");
-      const cIn = carriesArr[7 - i];
-      const s = bitA + bitB + cIn;
-      sumArr[i] = s % 2;
-      const cOut = Math.floor(s / 2);
-      carriesArr[7 - i + 1] = cOut;
-
-      let explanation = "";
-      if (bitA === 0 && bitB === 0 && cIn === 0) {
-        explanation = t(
-          "number-systems.simulator.arithmetic.subtraction.add0",
-          {
-            pos: 7 - i,
-          },
-        );
-      } else if (
-        (bitA === 1 && bitB === 0 && cIn === 1) ||
-        (bitA === 0 && bitB === 1 && cIn === 1)
-      ) {
-        explanation = t(
-          "number-systems.simulator.arithmetic.subtraction.add1",
-          {
-            pos: 7 - i,
-          },
-        );
-      } else if (bitA === 1 && bitB === 1 && cIn === 0) {
-        explanation = t(
-          "number-systems.simulator.arithmetic.subtraction.add2",
-          {
-            pos: 7 - i,
-          },
-        );
-      } else if (bitA === 1 && bitB === 1 && cIn === 1) {
-        explanation = t(
-          "number-systems.simulator.arithmetic.subtraction.add3",
-          {
-            pos: 7 - i,
-          },
-        );
-      } else {
-        explanation = t(
-          "number-systems.simulator.arithmetic.subtraction.add4",
-          {
-            pos: 7 - i,
-            a: bitA,
-            b: bitB,
-            c: cIn,
-            sum: sumArr[i],
-            carry: cOut,
-          },
-        );
+    const additionResult = addBinary8Bit(padA, twosComp, (step) => {
+      if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 0) {
+        return t("number-systems.simulator.arithmetic.subtraction.add0", {
+          pos: step.position,
+        });
       }
-
-      addSteps.unshift({
-        position: 7 - i,
-        bitA,
-        bitB,
-        carryIn: cIn,
-        sum: sumArr[i],
-        carryOut: cOut,
-        explanation,
+      if (
+        (step.bitA === 1 && step.bitB === 0 && step.carryIn === 1) ||
+        (step.bitA === 0 && step.bitB === 1 && step.carryIn === 1)
+      ) {
+        return t("number-systems.simulator.arithmetic.subtraction.add1", {
+          pos: step.position,
+        });
+      }
+      if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 0) {
+        return t("number-systems.simulator.arithmetic.subtraction.add2", {
+          pos: step.position,
+        });
+      }
+      if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 1) {
+        return t("number-systems.simulator.arithmetic.subtraction.add3", {
+          pos: step.position,
+        });
+      }
+      return t("number-systems.simulator.arithmetic.subtraction.add4", {
+        pos: step.position,
+        a: step.bitA,
+        b: step.bitB,
+        c: step.carryIn,
+        sum: step.sum,
+        carry: step.carryOut,
       });
-    }
+    });
 
-    const overflow = carriesArr[7] !== carriesArr[8];
-    const carryOut = carriesArr[8] === 1;
-    const visCarries = [...carriesArr].reverse();
+    const addSteps = additionResult.bitSteps.map((step) => ({
+      ...step,
+      explanation: step.explanation ?? "",
+    }));
 
     return {
       padA,
@@ -233,10 +185,10 @@ export function Subtraction({
       onesSteps,
       twosSteps,
       addSteps,
-      sum: sumArr.join(""),
-      carries: visCarries,
-      overflow,
-      carryOut,
+      sum: additionResult.sum,
+      carries: additionResult.carries,
+      overflow: additionResult.overflow,
+      carryOut: additionResult.carryOut,
     };
   }, [valA, valB, t]);
 

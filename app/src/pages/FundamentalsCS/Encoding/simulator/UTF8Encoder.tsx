@@ -9,10 +9,11 @@ import {
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
-  ModeToggle,
   WarningBanner,
+  ModeToggle,
+  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { StepByStepSection } from "./StepByStepSection";
 
 interface UTF8EncoderProps {
   isExerciseMode?: boolean;
@@ -812,77 +813,61 @@ export function UTF8Encoder({
                   </div>
                 )}
 
-                <StepByStepToggle
+                <StepByStepSection
                   open={expanded.has("1")}
                   onToggle={() => toggle("1")}
-                />
+                  title={t("encoding.simulator.decodeStep2CodePoints")}
+                >
+                  {utf8DecodeCharSteps.map((step) => (
+                    <CollapsibleStep
+                      key={step.index}
+                      isOpen={expanded.has(`utf8char-${step.index}`)}
+                      onToggle={() => toggle(`utf8char-${step.index}`)}
+                      header={
+                        <span className="font-mono text-sm">
+                          {step.bytesUsed.join(" ")} → '{step.char}' (
+                          {step.codePointHex})
+                        </span>
+                      }
+                    >
+                      <div className="space-y-1 text-sm">
+                        <p>
+                          {t("encoding.simulator.bytesUsed")}:{" "}
+                          <code className="font-mono">
+                            {step.bytesUsed.join(" ")}
+                          </code>
+                        </p>
+                        <p>
+                          {t("encoding.simulator.codePointLabel")}:{" "}
+                          <code className="font-mono">{step.codePointHex}</code>
+                        </p>
+                        <p>
+                          {t("encoding.simulator.decimalLabel")}:{" "}
+                          <code className="font-mono">{step.codePoint}</code>
+                        </p>
+                        <p>
+                          {t("encoding.simulator.charLabel")}:{" "}
+                          <code className="font-mono">
+                            {displayChar(step.char)}
+                          </code>
+                        </p>
+                      </div>
+                    </CollapsibleStep>
+                  ))}
+                </StepByStepSection>
 
-                {expanded.has("1") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.decodeStep2CodePoints")}
-                    </h4>
-                    {utf8DecodeCharSteps.map((step) => (
-                      <CollapsibleStep
-                        key={step.index}
-                        isOpen={expanded.has(`utf8char-${step.index}`)}
-                        onToggle={() => toggle(`utf8char-${step.index}`)}
-                        header={
-                          <span className="font-mono text-sm">
-                            {step.bytesUsed.join(" ")} → '{step.char}' (
-                            {step.codePointHex})
-                          </span>
-                        }
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            {t("encoding.simulator.bytesUsed")}:{" "}
-                            <code className="font-mono">
-                              {step.bytesUsed.join(" ")}
-                            </code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.codePointLabel")}:{" "}
-                            <code className="font-mono">
-                              {step.codePointHex}
-                            </code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.decimalLabel")}:{" "}
-                            <code className="font-mono">{step.codePoint}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.charLabel")}:{" "}
-                            <code className="font-mono">
-                              {displayChar(step.char)}
-                            </code>
-                          </p>
-                        </div>
-                      </CollapsibleStep>
-                    ))}
-                  </div>
-                )}
-
-                <StepByStepToggle
+                <StepByStepSection
                   open={expanded.has("2")}
                   onToggle={() => toggle("2")}
-                />
-
-                {expanded.has("2") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.decodeStep3FullText")}
-                    </h4>
-                    <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs">
-                      <p className="text-muted-foreground mb-1">
-                        {t("encoding.simulator.decodedResult")}:
-                      </p>
-                      <p className="text-base break-all">
-                        {displayText(result)}
-                      </p>
-                    </div>
+                  title={t("encoding.simulator.decodeStep3FullText")}
+                >
+                  <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs">
+                    <p className="text-muted-foreground mb-1">
+                      {t("encoding.simulator.decodedResult")}:
+                    </p>
+                    <p className="text-base break-all">{displayText(result)}</p>
                   </div>
-                )}
+                </StepByStepSection>
 
                 {inputValue.trim().length > 0 && !result && (
                   <WarningBanner
