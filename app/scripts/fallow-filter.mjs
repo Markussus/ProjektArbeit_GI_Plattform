@@ -83,15 +83,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 
+function hasProjectMarker(dir) {
+  return (
+    fs.existsSync(path.join(dir, ".git")) ||
+    fs.existsSync(path.join(dir, ".idea"))
+  );
+}
+
 function findProjectRoot(startDir) {
   let curr = startDir;
   while (curr && curr !== path.dirname(curr)) {
-    if (
-      fs.existsSync(path.join(curr, ".git")) ||
-      fs.existsSync(path.join(curr, ".idea"))
-    ) {
-      return curr;
-    }
+    if (hasProjectMarker(curr)) return curr;
     curr = path.dirname(curr);
   }
   return startDir;
@@ -126,36 +128,151 @@ function normalizePath(p) {
   return p.replace(/\\/g, "/").replace(/^\.\//, "");
 }
 
-/**
- * Format a file path and line/col into a standard CLI link recognized by
- * VS Code, WebStorm (JetBrains), Zed, and modern terminal emulators.
- * Resolves relative to the IDE project root (where .git / .idea resides)
- * so that WebStorm and Zed recognise it as a project file and only display
- * the filename in the editor tab.
- */
-function formatFileLink(filePath, line, col) {
-  if (!filePath || typeof filePath !== "string") return filePath || "";
-  if (
-    filePath.startsWith("package:") ||
-    filePath === "project" ||
-    !filePath.includes(".")
-  ) {
-    return filePath;
-  }
+function fallback(val, def) {
+  return val !== undefined && val !== null ? val : def;
+}
+
+function hasValue(v) {
+  return v !== undefined && v !== null && v !== "";
+}
+
+function isSpecialPath(filePath) {
+  if (!filePath || typeof filePath !== "string") return true;
+  if (filePath.startsWith("package:") || filePath === "project") return true;
+  return !filePath.includes(".");
+}
+
+function resolveProjectPath(filePath) {
+  if (isSpecialPath(filePath)) return filePath || "";
   const absPath = path.isAbsolute(filePath)
     ? filePath
     : path.resolve(appRoot, filePath);
 
-  const relPath = path.relative(projectRoot, absPath).replace(/\\/g, "/");
-  const base = relPath || filePath.replace(/\\/g, "/");
+  const rel = path.relative(projectRoot, absPath);
+  return normalizePath(rel) || normalizePath(filePath);
+}
 
-  if (line !== undefined && line !== null && line !== "") {
-    if (col !== undefined && col !== null && col !== "") {
-      return `${base}:${line}:${col}`;
-    }
-    return `${base}:${line}`;
+function formatPosition(line, col) {
+  if (!hasValue(line)) return "";
+  if (hasValue(col)) return `:${line}:${col}`;
+  return `:${line}`;
+}
+
+/**
+ * Format a file path and line/col into a standard CLI link recognized by
+ * VS Code, WebStorm (JetBrains), Zed, and modern terminal emulators.
+ */
+function formatFileLink(filePath, line, col) {
+  const base = resolveProjectPath(filePath);
+  if (!base || !filePath.includes(".")) return base;
+  return `${base}${formatPosition(line, col)}`;
+}
+
+function buildTopicPathPrefixes(folderName, categoryLabel, relPath) {
+  const kebab = folderName.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+  const lower = folderName.toLowerCase();
+  const catLower = categoryLabel.toLowerCase();
+
+  return [
+    // Source folders
+    relPath.toLowerCase(),
+    `src/pages/${catLower}/${lower}/`,
+    `src/pages/${catLower}/${kebab}/`,
+    `src/pages/${lower}/`,
+    `src/pages/${kebab}/`,
+
+    // Unit tests (both categorized and top-level subfolders)
+    `tests/unit_tests/${catLower}/${lower}/`,
+    `tests/unit_tests/${catLower}/${kebab}/`,
+    `tests/unit_tests/${lower}/`,
+    `tests/unit_tests/${kebab}/`,
+    `tests/unit_tests/${lower}/`,
+
+    // Unit test standalone files
+    `tests/unit_tests/${catLower}/${lower}.test.`,
+    `tests/unit_tests/${catLower}/${kebab}.test.`,
+    `tests/unit_tests/${catLower}/${lower}.spec.`,
+    `tests/unit_tests/${catLower}/${kebab}.spec.`,
+    `tests/unit_tests/${lower}.test.`,
+    `tests/unit_tests/${kebab}.test.`,
+    `tests/unit_tests/${lower}.spec.`,
+    `tests/unit_tests/${kebab}.spec.`,
+
+    // E2E spec folders
+    `tests/e2e/specs/${catLower}/${lower}/`,
+    `tests/e2e/specs/${catLower}/${kebab}/`,
+    `tests/e2e/specs/${lower}/`,
+    `tests/e2e/specs/${kebab}/`,
+
+    // E2E root spec files
+    `tests/e2e/${kebab}.spec.`,
+    `tests/e2e/${lower}.spec.`,
+    `tests/e2e/${kebab}.test.`,
+    `tests/e2e/${lower}.test.`,
+    `tests/e2e/${lower}.spec.`,
+    `tests/e2e/${lower}.test.`,
+  ];
+}
+
+function buildTopicAliases(folderName, kebab, lower) {
+  const capitalLetters = (folderName.match(/[A-Z]/g) || [])
+    .join("")
+    .toLowerCase();
+  const primaryFlag = `--${kebab}`;
+  const aliases = new Set([
+    folderName,
+    lower,
+    kebab,
+    primaryFlag,
+    `--${lower}`,
+  ]);
+
+  if (capitalLetters.length > 1) {
+    aliases.add(capitalLetters);
+    aliases.add(`--${capitalLetters}`);
   }
-  return base;
+
+  if (folderName === "TuringMachine") {
+    aliases.add("turing");
+    aliases.add("--turing");
+  }
+
+  return { primaryFlag, aliases: Array.from(aliases) };
+}
+
+function registerTopicEntry(topics, folderName, categoryLabel, parentDir) {
+  const relPath = `${parentDir}/${folderName}/`;
+  const kebab = folderName.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+  const lower = folderName.toLowerCase();
+  const { primaryFlag, aliases } = buildTopicAliases(folderName, kebab, lower);
+  const pathPrefixes = buildTopicPathPrefixes(
+    folderName,
+    categoryLabel,
+    relPath,
+  );
+
+  topics.set(lower, {
+    id: lower,
+    displayName: `${categoryLabel} / ${folderName}`,
+    shortName: folderName,
+    primaryFlag,
+    relPath,
+    category: categoryLabel,
+    aliases,
+    pathPrefixes,
+  });
+}
+
+function scanFolderForTopics(parentDir, categoryLabel, topics) {
+  const fullParent = path.join(appRoot, parentDir);
+  if (!fs.existsSync(fullParent)) return;
+
+  const entries = fs.readdirSync(fullParent, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      registerTopicEntry(topics, entry.name, categoryLabel, parentDir);
+    }
+  }
 }
 
 /**
@@ -165,99 +282,8 @@ function formatFileLink(filePath, line, col) {
 function discoverTopics() {
   const topics = new Map();
 
-  function scanFolder(parentDir, categoryLabel) {
-    const fullParent = path.join(appRoot, parentDir);
-    if (!fs.existsSync(fullParent)) return;
-
-    const entries = fs.readdirSync(fullParent, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const folderName = entry.name;
-        const relPath = `${parentDir}/${folderName}/`;
-        const kebab = folderName
-          .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-          .toLowerCase();
-        const lower = folderName.toLowerCase();
-        const capitalLetters =
-          folderName.match(/[A-Z]/g)?.join("").toLowerCase() || "";
-
-        const primaryFlag = `--${kebab}`;
-        const aliases = new Set([
-          folderName,
-          lower,
-          kebab,
-          primaryFlag,
-          `--${lower}`,
-        ]);
-
-        if (capitalLetters.length > 1) {
-          aliases.add(capitalLetters);
-          aliases.add(`--${capitalLetters}`);
-        }
-
-        // Custom well-known shorthands
-        if (folderName === "TuringMachine") {
-          aliases.add("turing");
-          aliases.add("--turing");
-        }
-
-        const catLower = categoryLabel.toLowerCase();
-        const pathPrefixes = [
-          // Source folders
-          relPath.toLowerCase(),
-          `src/pages/${catLower}/${lower}/`,
-          `src/pages/${catLower}/${kebab}/`,
-          `src/pages/${lower}/`,
-          `src/pages/${kebab}/`,
-
-          // Unit tests (both categorized and top-level subfolders)
-          `tests/unit_tests/${catLower}/${lower}/`,
-          `tests/unit_tests/${catLower}/${kebab}/`,
-          `tests/unit_tests/${lower}/`,
-          `tests/unit_tests/${kebab}/`,
-          `tests/unit_tests/${folderName.toLowerCase()}/`,
-
-          // Unit test standalone files
-          `tests/unit_tests/${catLower}/${lower}.test.`,
-          `tests/unit_tests/${catLower}/${kebab}.test.`,
-          `tests/unit_tests/${catLower}/${lower}.spec.`,
-          `tests/unit_tests/${catLower}/${kebab}.spec.`,
-          `tests/unit_tests/${lower}.test.`,
-          `tests/unit_tests/${kebab}.test.`,
-          `tests/unit_tests/${lower}.spec.`,
-          `tests/unit_tests/${kebab}.spec.`,
-
-          // E2E spec folders
-          `tests/e2e/specs/${catLower}/${lower}/`,
-          `tests/e2e/specs/${catLower}/${kebab}/`,
-          `tests/e2e/specs/${lower}/`,
-          `tests/e2e/specs/${kebab}/`,
-
-          // E2E root spec files
-          `tests/e2e/${kebab}.spec.`,
-          `tests/e2e/${lower}.spec.`,
-          `tests/e2e/${kebab}.test.`,
-          `tests/e2e/${lower}.test.`,
-          `tests/e2e/${folderName.toLowerCase()}.spec.`,
-          `tests/e2e/${folderName.toLowerCase()}.test.`,
-        ];
-
-        topics.set(folderName.toLowerCase(), {
-          id: folderName.toLowerCase(),
-          displayName: `${categoryLabel} / ${folderName}`,
-          shortName: folderName,
-          primaryFlag,
-          relPath,
-          category: categoryLabel,
-          aliases: Array.from(aliases),
-          pathPrefixes,
-        });
-      }
-    }
-  }
-
-  scanFolder("src/pages/FundamentalsCS", "FundamentalsCS");
-  scanFolder("src/pages/Programming1", "Programming1");
+  scanFolderForTopics("src/pages/FundamentalsCS", "FundamentalsCS", topics);
+  scanFolderForTopics("src/pages/Programming1", "Programming1", topics);
 
   // Shared components & shared tests
   topics.set("shared", {
@@ -284,162 +310,201 @@ function discoverTopics() {
 
 const discoveredTopics = discoverTopics();
 
+function matchTopicKey(meta, key, trimmed) {
+  if (key === trimmed || meta.shortName.toLowerCase() === trimmed) return true;
+  return meta.aliases.some(
+    (a) => a.replace(/^--/, "").toLowerCase() === trimmed,
+  );
+}
+
+function findMatchingTopicKey(trimmed) {
+  for (const [key, meta] of discoveredTopics.entries()) {
+    if (matchTopicKey(meta, key, trimmed)) return key;
+  }
+  return null;
+}
+
+function resolveSingleTopic(rawName, targetSet, state) {
+  const trimmed = rawName.trim().toLowerCase();
+  if (trimmed === "rest" || trimmed === "other") {
+    state.showRest = true;
+    return;
+  }
+  if (trimmed === "all") {
+    state.showAll = true;
+    return;
+  }
+
+  const matched = findMatchingTopicKey(trimmed);
+  if (matched) {
+    targetSet.add(matched);
+    return;
+  }
+
+  console.error(
+    `${colors.red}Error: Unknown topic "${rawName}". Use --list to view available topics.${colors.reset}`,
+  );
+  process.exit(1);
+}
+
+function resolveTopicList(rawList, targetSet, state) {
+  const topicVals = rawList.split(",");
+  for (const t of topicVals) {
+    resolveSingleTopic(t, targetSet, state);
+  }
+}
+
+const FLAG_HANDLERS = {
+  "--help": () => {
+    printHelp();
+    process.exit(0);
+  },
+  "-h": () => {
+    printHelp();
+    process.exit(0);
+  },
+  "--list": (s) => {
+    s.listOnly = true;
+  },
+  "--list-topics": (s) => {
+    s.listOnly = true;
+  },
+  "-l": (s) => {
+    s.listOnly = true;
+  },
+  "--json": (s) => {
+    s.jsonOutput = true;
+  },
+  "--summary": (s) => {
+    s.summaryOnly = true;
+  },
+  "--summary-only": (s) => {
+    s.summaryOnly = true;
+  },
+  "--fail-on-issues": (s) => {
+    s.failOnIssues = true;
+  },
+  "--all": (s) => {
+    s.showAll = true;
+  },
+  "-a": (s) => {
+    s.showAll = true;
+  },
+  "--rest": (s) => {
+    s.showRest = true;
+  },
+  "--other": (s) => {
+    s.showRest = true;
+  },
+  rest: (s) => {
+    s.showRest = true;
+  },
+  other: (s) => {
+    s.showRest = true;
+  },
+  "--dead-code": (s) => {
+    s.analysisFilter = "dead-code";
+  },
+  "--check": (s) => {
+    s.analysisFilter = "dead-code";
+  },
+  "--dupes": (s) => {
+    s.analysisFilter = "dupes";
+  },
+  "--duplicates": (s) => {
+    s.analysisFilter = "dupes";
+  },
+  "--health": (s) => {
+    s.analysisFilter = "health";
+  },
+  "--complexity": (s) => {
+    s.analysisFilter = "health";
+  },
+  "--no-color": () => {},
+};
+
+function handleStandardFlag(arg, state) {
+  const handler = FLAG_HANDLERS[arg];
+  if (!handler) return false;
+  handler(state);
+  return true;
+}
+
+function matchDirectTopicAlias(arg, targetSet) {
+  const lowerArg = arg.toLowerCase();
+  for (const [key, meta] of discoveredTopics.entries()) {
+    if (meta.aliases.includes(arg) || meta.aliases.includes(lowerArg)) {
+      targetSet.add(key);
+      return true;
+    }
+  }
+  return false;
+}
+
+function processTopicArg(arg, i, args, selectedTopicKeys, state) {
+  if (arg.startsWith("--topic=")) {
+    resolveTopicList(arg.slice("--topic=".length), selectedTopicKeys, state);
+    return i;
+  }
+  if (arg === "--topic" || arg === "-t") {
+    const nextArg = args[i + 1];
+    if (nextArg) {
+      resolveTopicList(nextArg, selectedTopicKeys, state);
+      return i + 1;
+    }
+  }
+  return i;
+}
+
+function processCustomArg(arg, selectedTopicKeys, state) {
+  if (matchDirectTopicAlias(arg, selectedTopicKeys)) return;
+  if (!arg.startsWith("-")) {
+    resolveSingleTopic(arg, selectedTopicKeys, state);
+  } else {
+    console.error(
+      `${colors.yellow}Warning: Unknown argument "${arg}". Run with --help for options.${colors.reset}`,
+    );
+  }
+}
+
 /**
  * Parse CLI arguments into filter options.
  */
 function parseArgs() {
   const args = process.argv.slice(2);
   const selectedTopicKeys = new Set();
-  let showRest = false;
-  let showAll = false;
-  let listOnly = false;
-  let jsonOutput = false;
-  let summaryOnly = false;
-  let failOnIssues = false;
-  let analysisFilter = null; // 'dead-code' | 'dupes' | 'health' | null (all)
+  const state = {
+    showRest: false,
+    showAll: false,
+    listOnly: false,
+    jsonOutput: false,
+    summaryOnly: false,
+    failOnIssues: false,
+    analysisFilter: null,
+  };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
+    if (handleStandardFlag(arg, state)) continue;
 
-    if (arg === "--help" || arg === "-h") {
-      printHelp();
-      process.exit(0);
-    }
-
-    if (arg === "--list" || arg === "--list-topics" || arg === "-l") {
-      listOnly = true;
+    const nextI = processTopicArg(arg, i, args, selectedTopicKeys, state);
+    if (nextI !== i) {
+      i = nextI;
       continue;
     }
 
-    if (arg === "--json") {
-      jsonOutput = true;
-      continue;
-    }
-
-    if (arg === "--summary" || arg === "--summary-only") {
-      summaryOnly = true;
-      continue;
-    }
-
-    if (arg === "--fail-on-issues") {
-      failOnIssues = true;
-      continue;
-    }
-
-    if (arg === "--all" || arg === "-a") {
-      showAll = true;
-      continue;
-    }
-
-    if (
-      arg === "--rest" ||
-      arg === "--other" ||
-      arg === "rest" ||
-      arg === "other"
-    ) {
-      showRest = true;
-      continue;
-    }
-
-    if (arg === "--dead-code" || arg === "--check") {
-      analysisFilter = "dead-code";
-      continue;
-    }
-
-    if (arg === "--dupes" || arg === "--duplicates") {
-      analysisFilter = "dupes";
-      continue;
-    }
-
-    if (arg === "--health" || arg === "--complexity") {
-      analysisFilter = "health";
-      continue;
-    }
-
-    if (arg === "--no-color") {
-      continue;
-    }
-
-    if (arg.startsWith("--topic=")) {
-      const topicVals = arg.slice("--topic=".length).split(",");
-      for (const t of topicVals) resolveTopicArg(t, selectedTopicKeys);
-      continue;
-    }
-
-    if (arg === "--topic" || arg === "-t") {
-      const nextArg = args[++i];
-      if (nextArg) {
-        const topicVals = nextArg.split(",");
-        for (const t of topicVals) resolveTopicArg(t, selectedTopicKeys);
-      }
-      continue;
-    }
-
-    // Direct flag matching (e.g. --turing-machine, --tm, --shared, --java)
-    let matched = false;
-    for (const [key, meta] of discoveredTopics.entries()) {
-      if (
-        meta.aliases.includes(arg) ||
-        meta.aliases.includes(arg.toLowerCase())
-      ) {
-        selectedTopicKeys.add(key);
-        matched = true;
-        break;
-      }
-    }
-
-    if (!matched) {
-      if (!arg.startsWith("-")) {
-        resolveTopicArg(arg, selectedTopicKeys);
-      } else {
-        console.error(
-          `${colors.yellow}Warning: Unknown argument "${arg}". Run with --help for options.${colors.reset}`,
-        );
-      }
-    }
-  }
-
-  function resolveTopicArg(rawName, targetSet) {
-    const trimmed = rawName.trim().toLowerCase();
-    if (trimmed === "rest" || trimmed === "other") {
-      showRest = true;
-      return;
-    }
-    if (trimmed === "all") {
-      showAll = true;
-      return;
-    }
-
-    let found = false;
-    for (const [key, meta] of discoveredTopics.entries()) {
-      if (
-        key === trimmed ||
-        meta.shortName.toLowerCase() === trimmed ||
-        meta.aliases.some((a) => a.replace(/^--/, "").toLowerCase() === trimmed)
-      ) {
-        targetSet.add(key);
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      console.error(
-        `${colors.red}Error: Unknown topic "${rawName}". Use --list to view available topics.${colors.reset}`,
-      );
-      process.exit(1);
-    }
+    processCustomArg(arg, selectedTopicKeys, state);
   }
 
   return {
     selectedTopicKeys: Array.from(selectedTopicKeys),
-    showRest,
-    showAll,
-    listOnly,
-    jsonOutput,
-    summaryOnly,
-    failOnIssues,
-    analysisFilter,
+    showRest: state.showRest,
+    showAll: state.showAll,
+    listOnly: state.listOnly,
+    jsonOutput: state.jsonOutput,
+    summaryOnly: state.summaryOnly,
+    failOnIssues: state.failOnIssues,
+    analysisFilter: state.analysisFilter,
   };
 }
 
@@ -500,47 +565,29 @@ ${colors.bold}EXAMPLES:${colors.reset}
 `);
 }
 
-/**
- * Execute fallow and parse JSON report safely across OS platforms without shell deprecation warnings.
- */
-function runFallowJson() {
+function resolveFallowCommand() {
   const nodeBinDir = path.dirname(process.execPath);
   const npxCli =
     process.platform === "win32"
       ? path.join(nodeBinDir, "node_modules", "npm", "bin", "npx-cli.js")
       : null;
 
-  const cmd =
-    process.platform === "win32" && !npxCli
-      ? "npx.cmd"
-      : npxCli
-        ? process.execPath
-        : "npx";
-  const args = npxCli
-    ? [npxCli, "fallow", "-f", "json"]
-    : ["fallow", "-f", "json"];
-
-  const result = spawnSync(cmd, args, {
-    cwd: appRoot,
-    encoding: "utf8",
-    maxBuffer: 64 * 1024 * 1024,
-    shell: false,
-  });
-
-  if (result.error) {
-    console.error(
-      `${colors.red}Failed to execute fallow: ${result.error.message}${colors.reset}`,
-    );
-    process.exit(1);
+  if (npxCli) {
+    return { cmd: process.execPath, args: [npxCli, "fallow", "-f", "json"] };
   }
+  return {
+    cmd: process.platform === "win32" ? "npx.cmd" : "npx",
+    args: ["fallow", "-f", "json"],
+  };
+}
 
-  const rawOut = result.stdout || "";
+function parseFallowJsonOutput(rawOut, stderr) {
   const jsonStart = rawOut.indexOf("{");
   if (jsonStart === -1) {
     console.error(
       `${colors.red}Fallow did not produce JSON output.${colors.reset}`,
     );
-    if (result.stderr) console.error(result.stderr);
+    if (stderr) console.error(stderr);
     process.exit(1);
   }
 
@@ -555,6 +602,41 @@ function runFallowJson() {
 }
 
 /**
+ * Execute fallow and parse JSON report safely across OS platforms without shell deprecation warnings.
+ */
+function runFallowJson() {
+  const { cmd, args } = resolveFallowCommand();
+  const result = spawnSync(cmd, args, {
+    cwd: appRoot,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+    shell: false,
+  });
+
+  if (result.error) {
+    console.error(
+      `${colors.red}Failed to execute fallow: ${result.error.message}${colors.reset}`,
+    );
+    process.exit(1);
+  }
+
+  return parseFallowJsonOutput(result.stdout || "", result.stderr);
+}
+
+function isTopicPrefixMatch(norm, meta) {
+  return meta.pathPrefixes.some((prefix) =>
+    norm.startsWith(prefix.toLowerCase()),
+  );
+}
+
+function matchesAnyDiscoveredTopic(filePath) {
+  for (const meta of discoveredTopics.values()) {
+    if (testPathScope(filePath, meta.id)) return true;
+  }
+  return false;
+}
+
+/**
  * Check if a file path belongs to a specific topic, shared, or rest.
  */
 function testPathScope(filePath, topicKey) {
@@ -562,136 +644,156 @@ function testPathScope(filePath, topicKey) {
   if (!norm) return false;
 
   if (topicKey === "all") return true;
-
-  if (topicKey === "rest") {
-    // True if path is NOT in any discovered topic (including shared)
-    for (const meta of discoveredTopics.values()) {
-      if (testPathScope(filePath, meta.id)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  if (topicKey === "rest") return !matchesAnyDiscoveredTopic(filePath);
 
   const topicMeta = discoveredTopics.get(topicKey);
   if (!topicMeta) return false;
 
-  return topicMeta.pathPrefixes.some((prefix) =>
-    norm.startsWith(prefix.toLowerCase()),
-  );
+  return isTopicPrefixMatch(norm, topicMeta);
+}
+
+function isIgnoredScriptFile(p) {
+  const norm = normalizePath(p).toLowerCase();
+  return norm.endsWith("scripts/fallow-filter.mjs");
+}
+
+function isPathMatching(p, filterKeys, showRest) {
+  if (!p || isIgnoredScriptFile(p)) return false;
+  if (showRest && testPathScope(p, "rest")) return true;
+  return filterKeys.some((key) => testPathScope(p, key));
 }
 
 /**
  * Match a finding against active topic filters.
  */
 function matchesFilters(paths, filterKeys, showRest, showAll) {
-  if (showAll) return true;
   const list = Array.isArray(paths) ? paths : [paths];
+  if (showAll) {
+    return list.some((p) => p && !isIgnoredScriptFile(p));
+  }
+  return list.some((p) => isPathMatching(p, filterKeys, showRest));
+}
 
-  for (const p of list) {
-    if (!p) continue;
-    if (showRest && testPathScope(p, "rest")) return true;
-    for (const key of filterKeys) {
-      if (testPathScope(p, key)) return true;
+function getCircularFiles(item) {
+  if (item.files) return item.files;
+  if (item.edges) return item.edges.map((e) => e.path);
+  return [];
+}
+
+function filterCheckItem(item, category, options) {
+  const { selectedTopicKeys, showRest, showAll } = options;
+  if (category === "circular_dependencies") {
+    return matchesFilters(
+      getCircularFiles(item),
+      selectedTopicKeys,
+      showRest,
+      showAll,
+    );
+  }
+  if (item.path) {
+    return matchesFilters(item.path, selectedTopicKeys, showRest, showAll);
+  }
+  return Boolean(item.package_name && (showAll || showRest));
+}
+
+function filterCheckSection(check, options) {
+  if (!check) return {};
+  const result = {};
+  for (const [category, items] of Object.entries(check)) {
+    if (!Array.isArray(items)) continue;
+    const filtered = items.filter((item) =>
+      filterCheckItem(item, category, options),
+    );
+    if (filtered.length > 0) {
+      result[category] = filtered;
     }
   }
-  return false;
+  return result;
+}
+
+function filterCloneGroupList(cloneGroups, options) {
+  return cloneGroups.filter((cg) => {
+    const files = (cg.instances || []).map((inst) => inst.file);
+    return matchesFilters(
+      files,
+      options.selectedTopicKeys,
+      options.showRest,
+      options.showAll,
+    );
+  });
+}
+
+function filterDupesSection(dupes, options) {
+  if (!dupes?.clone_groups) return { clone_groups: [] };
+  return { clone_groups: filterCloneGroupList(dupes.clone_groups, options) };
+}
+
+function filterArrayByPath(arr, options) {
+  if (!Array.isArray(arr)) return [];
+  return arr.filter((item) =>
+    matchesFilters(
+      item.path,
+      options.selectedTopicKeys,
+      options.showRest,
+      options.showAll,
+    ),
+  );
+}
+
+function filterHealthSection(health, options) {
+  if (!health) return { findings: [], targets: [], large_functions: [] };
+  return {
+    findings: filterArrayByPath(health.findings, options),
+    targets: filterArrayByPath(health.targets, options),
+    large_functions: filterArrayByPath(health.large_functions, options),
+  };
 }
 
 /**
  * Filter fallow data according to options.
  */
 function filterReport(fallowData, options) {
-  const { selectedTopicKeys, showRest, showAll, analysisFilter } = options;
+  const filter = options.analysisFilter;
+  const includeCheck = !filter || filter === "dead-code";
+  const includeDupes = !filter || filter === "dupes";
+  const includeHealth = !filter || filter === "health";
 
-  const filtered = {
+  return {
     kind: fallowData.kind,
     version: fallowData.version,
-    check: {},
-    dupes: { clone_groups: [] },
-    health: { findings: [], targets: [], large_functions: [] },
+    check: includeCheck ? filterCheckSection(fallowData.check, options) : {},
+    dupes: includeDupes
+      ? filterDupesSection(fallowData.dupes, options)
+      : { clone_groups: [] },
+    health: includeHealth
+      ? filterHealthSection(fallowData.health, options)
+      : { findings: [], targets: [], large_functions: [] },
   };
+}
 
-  const includeCheck = !analysisFilter || analysisFilter === "dead-code";
-  const includeDupes = !analysisFilter || analysisFilter === "dupes";
-  const includeHealth = !analysisFilter || analysisFilter === "health";
+function safeArrayLength(arr) {
+  return Array.isArray(arr) ? arr.length : 0;
+}
 
-  // Filter check
-  if (includeCheck && fallowData.check) {
-    for (const [category, items] of Object.entries(fallowData.check)) {
-      if (!Array.isArray(items)) continue;
-
-      const filteredItems = items.filter((item) => {
-        if (category === "circular_dependencies") {
-          const files =
-            item.files || (item.edges ? item.edges.map((e) => e.path) : []);
-          return matchesFilters(files, selectedTopicKeys, showRest, showAll);
-        }
-        if (item.path) {
-          return matchesFilters(
-            item.path,
-            selectedTopicKeys,
-            showRest,
-            showAll,
-          );
-        }
-        // Package-level findings (unused dependencies, etc.)
-        if (item.package_name) {
-          return showAll || showRest;
-        }
-        return false;
-      });
-
-      if (filteredItems.length > 0) {
-        filtered.check[category] = filteredItems;
-      }
-    }
+function countCheckFindings(check) {
+  if (!check) return 0;
+  let count = 0;
+  for (const items of Object.values(check)) {
+    count += safeArrayLength(items);
   }
-
-  // Filter dupes
-  if (includeDupes && fallowData.dupes?.clone_groups) {
-    filtered.dupes.clone_groups = fallowData.dupes.clone_groups.filter((cg) => {
-      const files = (cg.instances || []).map((inst) => inst.file);
-      return matchesFilters(files, selectedTopicKeys, showRest, showAll);
-    });
-  }
-
-  // Filter health
-  if (includeHealth && fallowData.health) {
-    if (Array.isArray(fallowData.health.findings)) {
-      filtered.health.findings = fallowData.health.findings.filter((f) =>
-        matchesFilters(f.path, selectedTopicKeys, showRest, showAll),
-      );
-    }
-    if (Array.isArray(fallowData.health.targets)) {
-      filtered.health.targets = fallowData.health.targets.filter((t) =>
-        matchesFilters(t.path, selectedTopicKeys, showRest, showAll),
-      );
-    }
-    if (Array.isArray(fallowData.health.large_functions)) {
-      filtered.health.large_functions =
-        fallowData.health.large_functions.filter((lf) =>
-          matchesFilters(lf.path, selectedTopicKeys, showRest, showAll),
-        );
-    }
-  }
-
-  return filtered;
+  return count;
 }
 
 /**
  * Count total findings in a filtered report.
  */
 function countFindings(report) {
-  let checkCount = 0;
-  for (const items of Object.values(report.check || {})) {
-    if (Array.isArray(items)) checkCount += items.length;
-  }
-  const dupesCount = report.dupes?.clone_groups?.length || 0;
-  const healthCount =
-    (report.health?.findings?.length || 0) +
-    (report.health?.targets?.length || 0);
-  const largeFuncCount = report.health?.large_functions?.length || 0;
+  const checkCount = countCheckFindings(report?.check);
+  const dupesCount = safeArrayLength(report?.dupes?.clone_groups);
+  const healthFindings = safeArrayLength(report?.health?.findings);
+  const healthTargets = safeArrayLength(report?.health?.targets);
+  const healthCount = healthFindings + healthTargets;
+  const largeFuncCount = safeArrayLength(report?.health?.large_functions);
 
   return {
     checkCount,
@@ -709,24 +811,21 @@ function formatCategoryName(cat) {
   return cat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/**
- * Print topic list with finding counts.
- */
-function printTopicList(fallowData) {
-  console.log(
-    `\n${colors.bold}${colors.cyan}=== Available Topics & Fallow Finding Counts ===${colors.reset}\n`,
-  );
+function createScopeReport(fallowData, keys, showRest, showAll) {
+  return filterReport(fallowData, {
+    selectedTopicKeys: keys,
+    showRest,
+    showAll,
+    analysisFilter: null,
+  });
+}
 
+function buildTopicRows(fallowData) {
   const rows = [];
-
   for (const [key, meta] of discoveredTopics.entries()) {
-    const report = filterReport(fallowData, {
-      selectedTopicKeys: [key],
-      showRest: false,
-      showAll: false,
-      analysisFilter: null,
-    });
-    const counts = countFindings(report);
+    const counts = countFindings(
+      createScopeReport(fallowData, [key], false, false),
+    );
     rows.push({
       topic: meta.displayName,
       flag: meta.primaryFlag,
@@ -737,14 +836,9 @@ function printTopicList(fallowData) {
     });
   }
 
-  // Rest
-  const restReport = filterReport(fallowData, {
-    selectedTopicKeys: [],
-    showRest: true,
-    showAll: false,
-    analysisFilter: null,
-  });
-  const restCounts = countFindings(restReport);
+  const restCounts = countFindings(
+    createScopeReport(fallowData, [], true, false),
+  );
   rows.push({
     topic: "Rest of site (non-topic & non-shared)",
     flag: "--rest",
@@ -754,31 +848,40 @@ function printTopicList(fallowData) {
     total: restCounts.total,
   });
 
-  // Print table
+  return rows;
+}
+
+function getRowTotalColor(total) {
+  if (total <= 0) return colors.green;
+  return total > 15 ? colors.red : colors.yellow;
+}
+
+function printTopicTableRow(row) {
+  const totalColor = getRowTotalColor(row.total);
+  console.log(
+    `${row.topic.padEnd(45)} ${colors.cyan}${row.flag.padEnd(20)}${colors.reset} ${String(row.deadCode).padStart(9)} ${String(row.dupes).padStart(7)} ${String(row.health).padStart(8)} ${totalColor}${String(row.total).padStart(8)}${colors.reset}`,
+  );
+}
+
+/**
+ * Print topic list with finding counts.
+ */
+function printTopicList(fallowData) {
+  console.log(
+    `\n${colors.bold}${colors.cyan}=== Available Topics & Fallow Finding Counts ===${colors.reset}\n`,
+  );
   console.log(
     `${colors.bold}${"Topic / Area".padEnd(45)} ${"CLI Flag".padEnd(20)} ${"DeadCode".padStart(9)} ${"Dupes".padStart(7)} ${"Health".padStart(8)} ${"Total".padStart(8)}${colors.reset}`,
   );
   console.log("-".repeat(101));
 
+  const rows = buildTopicRows(fallowData);
   for (const row of rows) {
-    const totalColor =
-      row.total > 0
-        ? row.total > 15
-          ? colors.red
-          : colors.yellow
-        : colors.green;
-    console.log(
-      `${row.topic.padEnd(45)} ${colors.cyan}${row.flag.padEnd(20)}${colors.reset} ${String(row.deadCode).padStart(9)} ${String(row.dupes).padStart(7)} ${String(row.health).padStart(8)} ${totalColor}${String(row.total).padStart(8)}${colors.reset}`,
-    );
+    printTopicTableRow(row);
   }
 
   const allCounts = countFindings(
-    filterReport(fallowData, {
-      selectedTopicKeys: [],
-      showRest: false,
-      showAll: true,
-      analysisFilter: null,
-    }),
+    createScopeReport(fallowData, [], false, true),
   );
   console.log("-".repeat(101));
   console.log(
@@ -786,25 +889,23 @@ function printTopicList(fallowData) {
   );
 }
 
-/**
- * Render human readable filtered findings to console.
- */
-function renderFilteredReport(report, options) {
-  const counts = countFindings(report);
-
-  // Header
-  const activeLabels = [];
-  if (options.showAll) {
-    activeLabels.push("All Codebase");
-  } else {
-    for (const k of options.selectedTopicKeys) {
-      const meta = discoveredTopics.get(k);
-      if (meta) activeLabels.push(meta.displayName);
-    }
-    if (options.showRest) {
-      activeLabels.push("Rest of Site (Non-topic & non-shared)");
-    }
+function getActiveLabels(options) {
+  if (options.showAll) return ["All Codebase"];
+  const labels = [];
+  for (const k of options.selectedTopicKeys) {
+    const meta = discoveredTopics.get(k);
+    if (meta) labels.push(meta.displayName);
   }
+  if (options.showRest) {
+    labels.push("Rest of Site (Non-topic & non-shared)");
+  }
+  return labels;
+}
+
+function renderReportHeader(options, counts) {
+  const activeLabels = getActiveLabels(options);
+  const totalIssuesStr =
+    counts.total > 0 ? colors.yellow + counts.total : colors.green + "0";
 
   console.log(
     `\n${colors.bold}${colors.cyan}════════════════════════════════════════════════════════════════════════════════${colors.reset}`,
@@ -818,11 +919,213 @@ function renderFilteredReport(report, options) {
     );
   }
   console.log(
-    ` ${colors.bold}Total Issues:${colors.reset} ${counts.total > 0 ? colors.yellow + counts.total : colors.green + "0"} ${colors.dim}(Dead Code: ${counts.checkCount}, Duplication: ${counts.dupesCount}, Health: ${counts.healthCount})${colors.reset}`,
+    ` ${colors.bold}Total Issues:${colors.reset} ${totalIssuesStr} ${colors.dim}(Dead Code: ${counts.checkCount}, Duplication: ${counts.dupesCount}, Health: ${counts.healthCount})${colors.reset}`,
   );
   console.log(
     `${colors.bold}${colors.cyan}════════════════════════════════════════════════════════════════════════════════${colors.reset}\n`,
   );
+}
+
+function renderCircularCycleItem(item, options) {
+  const cycleFiles = getCircularFiles(item);
+  const cycleLen = item.length || cycleFiles.length;
+  console.log(
+    `   ${colors.red}• Circular Dependency Cycle (${cycleLen} files):${colors.reset}`,
+  );
+  for (const f of cycleFiles) {
+    const isMatch = matchesFilters(
+      f,
+      options.selectedTopicKeys,
+      options.showRest,
+      options.showAll,
+    );
+    const marker = isMatch
+      ? `${colors.bold}${colors.cyan}➔${colors.reset} `
+      : `  `;
+    const fileLink = formatFileLink(f);
+    console.log(
+      `     ${marker}${isMatch ? colors.bold : colors.dim}${fileLink}${colors.reset}`,
+    );
+  }
+}
+
+function renderStandardCheckItem(item) {
+  const targetPath = item.path || item.package_name || "project";
+  const targetLink = formatFileLink(targetPath, item.line, item.col);
+  const symbol = item.export_name
+    ? ` -> ${colors.cyan}${item.export_name}${colors.reset}`
+    : "";
+
+  console.log(
+    `   ${colors.yellow}•${colors.reset} ${colors.bold}${targetLink}${colors.reset}${symbol}`,
+  );
+
+  const actionDesc = item.actions?.[0]?.description;
+  if (actionDesc) {
+    console.log(`     ${colors.dim}Fix: ${actionDesc}${colors.reset}`);
+  }
+}
+
+function renderCheckCategoryItems(category, items, options) {
+  console.log(
+    `\n ${colors.bold}${colors.magenta}[${formatCategoryName(category)}]${colors.reset} (${items.length})`,
+  );
+
+  for (const item of items) {
+    if (category === "circular_dependencies") {
+      renderCircularCycleItem(item, options);
+    } else {
+      renderStandardCheckItem(item);
+    }
+  }
+}
+
+function renderCheckSection(check, checkCount, options) {
+  if (Object.keys(check).length === 0) return;
+
+  console.log(
+    `${colors.bold}${colors.yellow}▶ DEAD CODE & HYGIENE ISSUES (${checkCount})${colors.reset}`,
+  );
+  console.log(
+    `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
+  );
+
+  for (const [category, items] of Object.entries(check)) {
+    renderCheckCategoryItems(category, items, options);
+  }
+  console.log();
+}
+
+function formatLineSpan(startLine, endLine) {
+  if (endLine && endLine !== startLine) {
+    return ` ${colors.dim}(lines ${startLine}–${endLine})${colors.reset}`;
+  }
+  return "";
+}
+
+function renderCloneInstance(inst, options) {
+  const isMatch = matchesFilters(
+    inst.file,
+    options.selectedTopicKeys,
+    options.showRest,
+    options.showAll,
+  );
+  const marker = isMatch
+    ? `${colors.bold}${colors.cyan}➔${colors.reset} `
+    : `  `;
+  const instLink = formatFileLink(inst.file, inst.start_line);
+  const lineSpan = formatLineSpan(inst.start_line, inst.end_line);
+
+  console.log(
+    `     ${marker}${isMatch ? colors.bold : colors.dim}${instLink}${colors.reset}${lineSpan}`,
+  );
+}
+
+function renderCloneGroup(cg, idx, options) {
+  const instanceCount = safeArrayLength(cg.instances);
+  console.log(
+    `\n   ${colors.bold}Clone #${idx + 1}:${colors.reset} ${colors.yellow}${cg.line_count} lines, ${cg.token_count} tokens${colors.reset} across ${instanceCount} locations:`,
+  );
+
+  for (const inst of cg.instances || []) {
+    renderCloneInstance(inst, options);
+  }
+
+  const rec = cg.actions?.[0]?.description;
+  if (rec) {
+    console.log(`     ${colors.dim}Recommendation: ${rec}${colors.reset}`);
+  }
+}
+
+function renderDupesSection(dupes, options) {
+  if (!dupes?.clone_groups || dupes.clone_groups.length === 0) return;
+
+  console.log(
+    `${colors.bold}${colors.yellow}▶ CODE DUPLICATION CLONES (${dupes.clone_groups.length})${colors.reset}`,
+  );
+  console.log(
+    `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
+  );
+
+  for (let idx = 0; idx < dupes.clone_groups.length; idx++) {
+    renderCloneGroup(dupes.clone_groups[idx], idx, options);
+  }
+  console.log();
+}
+
+function getSeverityColor(sev) {
+  return sev === "critical" ? colors.red : colors.yellow;
+}
+
+function formatHealthMetrics(f) {
+  const cog = fallback(f.cognitive, "?");
+  const cyc = fallback(f.cyclomatic, "?");
+  const crap = fallback(f.crap, "?");
+  const lines = fallback(f.line_count, "?");
+  return `Cognitive Complexity: ${cog}, Cyclomatic: ${cyc}, CRAP: ${crap}, Lines: ${lines}`;
+}
+
+function renderHealthFindingItem(f) {
+  const sevColor = getSeverityColor(f.severity);
+  const sevLabel = String(fallback(f.severity, "warning")).toUpperCase();
+  const lineNum = fallback(f.line, 1);
+  const healthLink = formatFileLink(f.path, lineNum);
+  const funcName = fallback(f.name, "anonymous");
+
+  console.log(
+    `\n   ${sevColor}[${sevLabel}]${colors.reset} ${colors.bold}${healthLink}${colors.reset} in ${colors.cyan}${funcName}${colors.reset}`,
+  );
+  console.log(`     ${colors.dim}${formatHealthMetrics(f)}${colors.reset}`);
+
+  const actionDesc = f.actions?.[0]?.description;
+  if (actionDesc) {
+    console.log(`     ${colors.dim}Action: ${actionDesc}${colors.reset}`);
+  }
+}
+
+function renderTargetItem(t) {
+  const targetLink = formatFileLink(t.path);
+  console.log(
+    `\n   ${colors.magenta}[REFACTOR TARGET]${colors.reset} ${colors.bold}${targetLink}${colors.reset} (Priority: ${t.priority}, Efficiency: ${t.efficiency})`,
+  );
+  if (t.recommendation) {
+    console.log(
+      `     ${colors.dim}Recommendation: ${t.recommendation}${colors.reset}`,
+    );
+  }
+}
+
+function renderHealthSection(health) {
+  const healthFindings = health?.findings || [];
+  const targets = health?.targets || [];
+  const totalHealth = healthFindings.length + targets.length;
+
+  if (totalHealth === 0) return;
+
+  console.log(
+    `${colors.bold}${colors.yellow}▶ CODE HEALTH & COMPLEXITY FINDINGS (${totalHealth})${colors.reset}`,
+  );
+  console.log(
+    `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
+  );
+
+  for (const f of healthFindings) {
+    renderHealthFindingItem(f);
+  }
+
+  for (const t of targets) {
+    renderTargetItem(t);
+  }
+  console.log();
+}
+
+/**
+ * Render human readable filtered findings to console.
+ */
+function renderFilteredReport(report, options) {
+  const counts = countFindings(report);
+
+  renderReportHeader(options, counts);
 
   if (counts.total === 0 && counts.largeFuncCount === 0) {
     console.log(
@@ -831,154 +1134,20 @@ function renderFilteredReport(report, options) {
     return;
   }
 
-  // 1. Dead Code / Check Findings
-  if (Object.keys(report.check).length > 0) {
-    console.log(
-      `${colors.bold}${colors.yellow}▶ DEAD CODE & HYGIENE ISSUES (${counts.checkCount})${colors.reset}`,
-    );
-    console.log(
-      `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
-    );
+  renderCheckSection(report.check, counts.checkCount, options);
+  renderDupesSection(report.dupes, options);
+  renderHealthSection(report.health);
+}
 
-    for (const [category, items] of Object.entries(report.check)) {
-      console.log(
-        `\n ${colors.bold}${colors.magenta}[${formatCategoryName(category)}]${colors.reset} (${items.length})`,
-      );
-
-      for (const item of items) {
-        if (category === "circular_dependencies") {
-          console.log(
-            `   ${colors.red}• Circular Dependency Cycle (${item.length || item.files?.length} files):${colors.reset}`,
-          );
-          const cycleFiles =
-            item.files || (item.edges ? item.edges.map((e) => e.path) : []);
-          for (let i = 0; i < cycleFiles.length; i++) {
-            const f = cycleFiles[i];
-            const isMatch = matchesFilters(
-              f,
-              options.selectedTopicKeys,
-              options.showRest,
-              options.showAll,
-            );
-            const marker = isMatch
-              ? `${colors.bold}${colors.cyan}➔${colors.reset} `
-              : `  `;
-            const fileLink = formatFileLink(f);
-            console.log(
-              `     ${marker}${isMatch ? colors.bold : colors.dim}${fileLink}${colors.reset}`,
-            );
-          }
-          continue;
-        }
-
-        const targetPath = item.path || item.package_name || "project";
-        const targetLink = formatFileLink(targetPath, item.line, item.col);
-        const symbol = item.export_name
-          ? ` -> ${colors.cyan}${item.export_name}${colors.reset}`
-          : "";
-
-        console.log(
-          `   ${colors.yellow}•${colors.reset} ${colors.bold}${targetLink}${colors.reset}${symbol}`,
-        );
-
-        if (item.actions && item.actions.length > 0) {
-          const firstAction = item.actions[0];
-          if (firstAction.description) {
-            console.log(
-              `     ${colors.dim}Fix: ${firstAction.description}${colors.reset}`,
-            );
-          }
-        }
-      }
-    }
-    console.log();
+function handleOutputMode(options, fallowData, filtered) {
+  if (options.listOnly) {
+    printTopicList(fallowData);
+    process.exit(0);
   }
 
-  // 2. Code Duplication
-  if (report.dupes?.clone_groups?.length > 0) {
-    console.log(
-      `${colors.bold}${colors.yellow}▶ CODE DUPLICATION CLONES (${report.dupes.clone_groups.length})${colors.reset}`,
-    );
-    console.log(
-      `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
-    );
-
-    for (let idx = 0; idx < report.dupes.clone_groups.length; idx++) {
-      const cg = report.dupes.clone_groups[idx];
-      console.log(
-        `\n   ${colors.bold}Clone #${idx + 1}:${colors.reset} ${colors.yellow}${cg.line_count} lines, ${cg.token_count} tokens${colors.reset} across ${cg.instances?.length || 0} locations:`,
-      );
-
-      for (const inst of cg.instances || []) {
-        const isMatch = matchesFilters(
-          inst.file,
-          options.selectedTopicKeys,
-          options.showRest,
-          options.showAll,
-        );
-        const marker = isMatch
-          ? `${colors.bold}${colors.cyan}➔${colors.reset} `
-          : `  `;
-        const instLink = formatFileLink(inst.file, inst.start_line);
-        const lineSpan =
-          inst.end_line && inst.end_line !== inst.start_line
-            ? ` ${colors.dim}(lines ${inst.start_line}–${inst.end_line})${colors.reset}`
-            : "";
-        console.log(
-          `     ${marker}${isMatch ? colors.bold : colors.dim}${instLink}${colors.reset}${lineSpan}`,
-        );
-      }
-
-      if (cg.actions && cg.actions[0]?.description) {
-        console.log(
-          `     ${colors.dim}Recommendation: ${cg.actions[0].description}${colors.reset}`,
-        );
-      }
-    }
-    console.log();
-  }
-
-  // 3. Health & Complexity
-  const healthFindings = report.health?.findings || [];
-  const targets = report.health?.targets || [];
-
-  if (healthFindings.length > 0 || targets.length > 0) {
-    console.log(
-      `${colors.bold}${colors.yellow}▶ CODE HEALTH & COMPLEXITY FINDINGS (${healthFindings.length + targets.length})${colors.reset}`,
-    );
-    console.log(
-      `${colors.gray}────────────────────────────────────────────────────────────────────────${colors.reset}`,
-    );
-
-    for (const f of healthFindings) {
-      const sevColor = f.severity === "critical" ? colors.red : colors.yellow;
-      const healthLink = formatFileLink(f.path, f.line || 1);
-      console.log(
-        `\n   ${sevColor}[${(f.severity || "warning").toUpperCase()}]${colors.reset} ${colors.bold}${healthLink}${colors.reset} in ${colors.cyan}${f.name || "anonymous"}${colors.reset}`,
-      );
-      console.log(
-        `     ${colors.dim}Cognitive Complexity: ${f.cognitive ?? "?"}, Cyclomatic: ${f.cyclomatic ?? "?"}, CRAP: ${f.crap ?? "?"}, Lines: ${f.line_count ?? "?"}${colors.reset}`,
-      );
-
-      if (f.actions && f.actions[0]?.description) {
-        console.log(
-          `     ${colors.dim}Action: ${f.actions[0].description}${colors.reset}`,
-        );
-      }
-    }
-
-    for (const t of targets) {
-      const targetLink = formatFileLink(t.path);
-      console.log(
-        `\n   ${colors.magenta}[REFACTOR TARGET]${colors.reset} ${colors.bold}${targetLink}${colors.reset} (Priority: ${t.priority}, Efficiency: ${t.efficiency})`,
-      );
-      if (t.recommendation) {
-        console.log(
-          `     ${colors.dim}Recommendation: ${t.recommendation}${colors.reset}`,
-        );
-      }
-    }
-    console.log();
+  if (options.jsonOutput) {
+    console.log(JSON.stringify(filtered, null, 2));
+    process.exit(0);
   }
 }
 
@@ -987,21 +1156,10 @@ function renderFilteredReport(report, options) {
  */
 function main() {
   const options = parseArgs();
-
   const fallowData = runFallowJson();
-
-  if (options.listOnly) {
-    printTopicList(fallowData);
-    process.exit(0);
-  }
-
   const filtered = filterReport(fallowData, options);
 
-  if (options.jsonOutput) {
-    console.log(JSON.stringify(filtered, null, 2));
-    process.exit(0);
-  }
-
+  handleOutputMode(options, fallowData, filtered);
   renderFilteredReport(filtered, options);
 
   const counts = countFindings(filtered);
