@@ -17,9 +17,6 @@ export * from "./topicStorageIds";
 
 export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
-const DEFAULT_TUTORIAL_VIDEO_URL =
-  "https://oc-stream.thws.de/static/mh_default_org/api/fc50e633-53d5-4c66-a1ac-9bd74d5ec83d/ebe5bb19-e657-47dd-87c0-8d156efbe342/block_opencast_video_upload2WyzUn_TM_Video.mp4";
-
 export interface ModuleTopicDefinition {
   id: string;
   storageId: number;
@@ -57,7 +54,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/turing-machine",
         icon: Cpu,
         accent: "orange",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/f2cab67e-deb0-4782-9c50-0637d42a0fea/0a59a17d-dba9-49de-967c-35fc72b14c78/Turingmaschine.mp4",
       },
       {
         id: "finite-automata",
@@ -67,7 +65,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/finite-automata",
         icon: GitBranch,
         accent: "blue",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/e26956ef-d5cd-488e-86bb-c6f413983674/8af0bd95-c3fd-4314-bc4b-700787439c14/Endliche_Automaten_Walkthrough_Stimme.mp4",
       },
       {
         id: "regular-languages",
@@ -77,7 +76,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/regular-languages",
         icon: Languages,
         accent: "purple",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/0d1aa41b-7961-42a9-a63e-a8be0b0ee1e5/cd8e8a63-3d8b-4324-8b57-36d0468f03d8/Regulaere_Sprachen_Walkthrough_Stimme.mp4",
       },
       {
         id: "number-systems",
@@ -87,7 +87,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/number-systems",
         icon: Hash,
         accent: "purple",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/e726391f-38f5-4207-8ff6-e32adeec2357/8a00c06f-5def-465b-80d3-9d905813099f/NumberSys.mp4",
       },
       {
         id: "moore-mealy",
@@ -97,7 +98,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/moore-mealy",
         icon: ToggleLeft,
         accent: "green",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/35415389-368d-4554-84fd-8a166a1924c3/29f4b8e4-b484-4195-8f16-b03d36e0dc4c/Moore_Mealy.mp4",
       },
       {
         id: "dnf",
@@ -107,7 +109,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/dnf",
         icon: TableProperties,
         accent: "rose",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/b43e3e7c-5675-4280-9f3e-00189823bbe4/c02cf048-0577-4eb2-9dc8-6978397aa4dc/DNF.mp4",
       },
       {
         id: "encoding",
@@ -117,7 +120,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/fundamentals-cs/encoding",
         icon: Code2,
         accent: "blue",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/4d18e2f3-2be3-464a-8116-a2421648bf67/e3aac70a-1839-41b6-99bd-36fbd7059833/encoding.mp4",
       },
     ],
   },
@@ -136,7 +140,8 @@ export const learningModules: LearningModuleDefinition[] = [
         path: "/programming-1/java-programming",
         icon: Coffee,
         accent: "orange",
-        tutorialVideoUrl: DEFAULT_TUTORIAL_VIDEO_URL,
+        tutorialVideoUrl:
+          "https://oc-stream.thws.de/static/mh_default_org/api/a07b549a-be18-4662-a5f3-d8aed3bf8c3d/f6863cae-b648-4bcf-b13d-a3869a4512b3/Java.mp4",
       },
     ],
   },
