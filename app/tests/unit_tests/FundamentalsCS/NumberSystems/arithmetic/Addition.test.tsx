@@ -1,16 +1,23 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Addition } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Addition.tsx";
-import { getInputs } from "./arithmeticTestSetup.tsx";
+import {
+  changeBinaryInput,
+  expectInputsLocked,
+  expectValidationResult,
+  getInputs,
+  renderArithmeticExercise,
+} from "./arithmeticTestSetup.tsx";
 
 vi.mock("react-i18next", async () => {
   const { mockReactI18next } = await import("./arithmeticTestSetup");
   return mockReactI18next();
 });
 vi.mock("@/components/shared/SimulatorShared", async () => {
-  const { mockSimulatorShared } = await import("./arithmeticTestSetup");
+  const { mockSimulatorShared } =
+    await import("../../../shared/simulatorSharedMock");
   return mockSimulatorShared();
 });
 vi.mock(
@@ -44,45 +51,27 @@ describe("Addition", () => {
   describe("when computing binary addition", () => {
     it("renders the result panel", () => {
       render(<Addition renderModeSelector={null} />);
-      const inputs = getInputs();
-      fireEvent.change(inputs[0], { target: { value: "00000001" } });
-      fireEvent.change(inputs[1], { target: { value: "00000001" } });
+      changeBinaryInput(0, "00000001");
+      changeBinaryInput(1, "00000001");
       expect(screen.getByTestId("mock-result-panel")).toBeTruthy();
     });
   });
 
   describe("when in exercise mode", () => {
     it("locks both inputs", () => {
-      render(
-        <Addition
-          isExerciseMode
-          showSolution={false}
-          onShowSolution={vi.fn()}
-          initialA="00001010"
-          initialB="00000101"
-          renderModeSelector={null}
-        />,
-      );
-      const inputs = getInputs();
-      expect(inputs[0].hasAttribute("readonly")).toBe(true);
-      expect(inputs[1].hasAttribute("readonly")).toBe(true);
+      renderArithmeticExercise(Addition, {
+        initialA: "00001010",
+        initialB: "00000101",
+      });
+      expectInputsLocked();
     });
 
     it("shows validation panel with expected sum", () => {
-      render(
-        <Addition
-          isExerciseMode
-          showSolution={false}
-          onShowSolution={vi.fn()}
-          initialA="00001010"
-          initialB="00000101"
-          renderModeSelector={null}
-        />,
-      );
-      expect(screen.getByTestId("mock-validation-panel")).toBeTruthy();
-      expect(
-        screen.getByTestId("mock-validation-expected-result").textContent,
-      ).toContain("00001111");
+      renderArithmeticExercise(Addition, {
+        initialA: "00001010",
+        initialB: "00000101",
+      });
+      expectValidationResult("00001111");
     });
   });
 

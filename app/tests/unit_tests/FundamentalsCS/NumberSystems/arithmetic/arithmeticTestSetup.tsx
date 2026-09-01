@@ -1,5 +1,7 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
+import type { BaseArithmeticProps } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/types";
+import { mockSimulatorShared } from "../../../shared/simulatorSharedMock";
 
 export function mockReactI18next() {
   return {
@@ -10,81 +12,7 @@ export function mockReactI18next() {
   };
 }
 
-export function mockSimulatorShared() {
-  return {
-    SimulatorLayout: ({
-      inputPanel,
-      resultPanel,
-    }: {
-      inputPanel: React.ReactNode;
-      resultPanel: React.ReactNode;
-    }) => (
-      <div data-testid="mock-simulator-layout">
-        <div data-testid="mock-input-panel">{inputPanel}</div>
-        <div data-testid="mock-result-panel">{resultPanel}</div>
-      </div>
-    ),
-    BinaryInput: ({
-      value,
-      onChange,
-      locked,
-    }: {
-      value: string;
-      onChange: (v: string) => void;
-      locked: boolean;
-    }) => (
-      <input
-        data-testid="mock-binary-input"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        readOnly={locked}
-      />
-    ),
-    StepByStepToggle: ({
-      onToggle,
-    }: {
-      open: boolean;
-      onToggle: () => void;
-    }) => (
-      <button data-testid="mock-step-toggle" onClick={onToggle}>
-        toggle
-      </button>
-    ),
-    CollapsibleStep: ({
-      header,
-      children,
-      isOpen,
-    }: {
-      header: React.ReactNode;
-      children: React.ReactNode;
-      isOpen: boolean;
-    }) => (
-      <div data-testid="mock-collapsible-step" data-open={isOpen}>
-        <div data-testid="mock-step-header">{header}</div>
-        {isOpen && <div data-testid="mock-step-content">{children}</div>}
-      </div>
-    ),
-    WarningBanner: ({
-      title,
-      children,
-    }: {
-      title: string;
-      children: React.ReactNode;
-    }) => (
-      <div data-testid="mock-warning-banner">
-        <span>{title}</span>
-        <span>{children}</span>
-      </div>
-    ),
-    ResultSectionHeader: ({ title }: { title: string }) => (
-      <div data-testid="mock-result-header">{title}</div>
-    ),
-    useToggleSet: (initial: string[]) => ({
-      expanded: new Set(initial),
-      toggle: vi.fn(),
-    }),
-  };
-}
+export { mockSimulatorShared };
 
 export function mockExerciseValidationPanel() {
   return {
@@ -115,4 +43,44 @@ export function getInputs() {
 
 export function getInput() {
   return screen.getAllByTestId("mock-binary-input")[0] as HTMLInputElement;
+}
+
+export interface ArithmeticExerciseOptions {
+  initialA: string;
+  initialB?: string;
+}
+
+export function expectInputsLocked() {
+  const inputs = getInputs();
+  inputs.forEach((input) => {
+    expect(input.hasAttribute("readonly")).toBe(true);
+  });
+}
+
+export function renderArithmeticExercise(
+  Component: React.ComponentType<BaseArithmeticProps>,
+  { initialA, initialB }: ArithmeticExerciseOptions,
+) {
+  render(
+    <Component
+      isExerciseMode
+      showSolution={false}
+      onShowSolution={vi.fn()}
+      initialA={initialA}
+      initialB={initialB}
+      renderModeSelector={null}
+    />,
+  );
+}
+
+export function expectValidationResult(expected: string) {
+  expect(screen.getByTestId("mock-validation-panel")).toBeTruthy();
+  expect(
+    screen.getByTestId("mock-validation-expected-result").textContent,
+  ).toContain(expected);
+}
+
+export function changeBinaryInput(index: number, value: string) {
+  const inputs = getInputs();
+  fireEvent.change(inputs[index], { target: { value } });
 }

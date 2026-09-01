@@ -1,16 +1,17 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Shifting } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Shifting.tsx";
-import { getInput } from "./arithmeticTestSetup.tsx";
+import { expectValidationResult, getInput } from "./arithmeticTestSetup.tsx";
 
 vi.mock("react-i18next", async () => {
   const { mockReactI18next } = await import("./arithmeticTestSetup");
   return mockReactI18next();
 });
 vi.mock("@/components/shared/SimulatorShared", async () => {
-  const { mockSimulatorShared } = await import("./arithmeticTestSetup");
+  const { mockSimulatorShared } =
+    await import("../../../shared/simulatorSharedMock");
   return mockSimulatorShared();
 });
 vi.mock(
@@ -58,10 +59,7 @@ describe("Shifting", () => {
           renderModeSelector={null}
         />,
       );
-      expect(screen.getByTestId("mock-validation-panel")).toBeTruthy();
-      expect(
-        screen.getByTestId("mock-validation-expected-result").textContent,
-      ).toContain("00001000");
+      expectValidationResult("00001000");
     });
   });
 

@@ -1,5 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { appTestIds } from "../../support/app-shell";
+
+async function openSimulatorTab(page: Page, tabTestId: string) {
+  await page.getByTestId(appTestIds.tabSimulation).click();
+  await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
+  await page.getByTestId(tabTestId).click();
+}
 
 test.describe("Number Systems page", () => {
   test.beforeEach(async ({ page }) => {
@@ -122,9 +128,7 @@ test.describe("Number Systems page", () => {
   test("fractional converter toggles between decToBin and binToDec", async ({
     page,
   }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsTabFractional).click();
+    await openSimulatorTab(page, appTestIds.nsTabFractional);
 
     await test.step("Default mode is decToBin with result visible", async () => {
       await expect(
@@ -155,9 +159,7 @@ test.describe("Number Systems page", () => {
   test("IEEE754 converter encodes decimal to binary and decodes back", async ({
     page,
   }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsTabIeee754).click();
+    await openSimulatorTab(page, appTestIds.nsTabIeee754);
 
     await test.step("Default mode is decToIeee with result visible", async () => {
       await expect(page.getByTestId(appTestIds.nsIeee754Input)).toBeVisible();
@@ -175,9 +177,7 @@ test.describe("Number Systems page", () => {
   });
 
   test("negative numbers shows three representations", async ({ page }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsNegativeTab).click();
+    await openSimulatorTab(page, appTestIds.nsNegativeTab);
 
     await test.step("Input field and result rows are visible", async () => {
       await expect(
@@ -203,9 +203,7 @@ test.describe("Number Systems page", () => {
   });
 
   test("arithmetic mode selector is visible", async ({ page }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsArithmeticTab).click();
+    await openSimulatorTab(page, appTestIds.nsArithmeticTab);
 
     await test.step("Arithmetic mode dropdown is visible", async () => {
       await expect(
