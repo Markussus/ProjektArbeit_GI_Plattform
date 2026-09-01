@@ -1,3 +1,4 @@
+// fallow-ignore-file unused-file
 /**
  * ============================================================================
  * Fallow Topic Filter Script
@@ -82,6 +83,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 
+function findProjectRoot(startDir) {
+  let curr = startDir;
+  while (curr && curr !== path.dirname(curr)) {
+    if (
+      fs.existsSync(path.join(curr, ".git")) ||
+      fs.existsSync(path.join(curr, ".idea"))
+    ) {
+      return curr;
+    }
+    curr = path.dirname(curr);
+  }
+  return startDir;
+}
+
+const projectRoot = findProjectRoot(appRoot);
+
 // ANSI Color helper
 const useColor =
   process.stdout.isTTY &&
@@ -107,6 +124,38 @@ const colors = {
 function normalizePath(p) {
   if (!p) return "";
   return p.replace(/\\/g, "/").replace(/^\.\//, "");
+}
+
+/**
+ * Format a file path and line/col into a standard CLI link recognized by
+ * VS Code, WebStorm (JetBrains), Zed, and modern terminal emulators.
+ * Resolves relative to the IDE project root (where .git / .idea resides)
+ * so that WebStorm and Zed recognise it as a project file and only display
+ * the filename in the editor tab.
+ */
+function formatFileLink(filePath, line, col) {
+  if (!filePath || typeof filePath !== "string") return filePath || "";
+  if (
+    filePath.startsWith("package:") ||
+    filePath === "project" ||
+    !filePath.includes(".")
+  ) {
+    return filePath;
+  }
+  const absPath = path.isAbsolute(filePath)
+    ? filePath
+    : path.resolve(appRoot, filePath);
+
+  const relPath = path.relative(projectRoot, absPath).replace(/\\/g, "/");
+  const base = relPath || filePath.replace(/\\/g, "/");
+
+  if (line !== undefined && line !== null && line !== "") {
+    if (col !== undefined && col !== null && col !== "") {
+      return `${base}:${line}:${col}`;
+    }
+    return `${base}:${line}`;
+  }
+  return base;
 }
 
 /**
@@ -814,23 +863,22 @@ function renderFilteredReport(report, options) {
             const marker = isMatch
               ? `${colors.bold}${colors.cyan}➔${colors.reset} `
               : `  `;
+            const fileLink = formatFileLink(f);
             console.log(
-              `     ${marker}${isMatch ? colors.bold : colors.dim}${f}${colors.reset}`,
+              `     ${marker}${isMatch ? colors.bold : colors.dim}${fileLink}${colors.reset}`,
             );
           }
           continue;
         }
 
-        const loc = item.line
-          ? `:${item.line}${item.col ? `:${item.col}` : ""}`
-          : "";
         const targetPath = item.path || item.package_name || "project";
+        const targetLink = formatFileLink(targetPath, item.line, item.col);
         const symbol = item.export_name
           ? ` -> ${colors.cyan}${item.export_name}${colors.reset}`
           : "";
 
         console.log(
-          `   ${colors.yellow}•${colors.reset} ${colors.bold}${targetPath}${loc}${colors.reset}${symbol}`,
+          `   ${colors.yellow}•${colors.reset} ${colors.bold}${targetLink}${colors.reset}${symbol}`,
         );
 
         if (item.actions && item.actions.length > 0) {
@@ -871,8 +919,13 @@ function renderFilteredReport(report, options) {
         const marker = isMatch
           ? `${colors.bold}${colors.cyan}➔${colors.reset} `
           : `  `;
+        const instLink = formatFileLink(inst.file, inst.start_line);
+        const lineSpan =
+          inst.end_line && inst.end_line !== inst.start_line
+            ? ` ${colors.dim}(lines ${inst.start_line}–${inst.end_line})${colors.reset}`
+            : "";
         console.log(
-          `     ${marker}${isMatch ? colors.bold : colors.dim}${inst.file}:${inst.start_line}-${inst.end_line}${colors.reset}`,
+          `     ${marker}${isMatch ? colors.bold : colors.dim}${instLink}${colors.reset}${lineSpan}`,
         );
       }
 
@@ -899,8 +952,9 @@ function renderFilteredReport(report, options) {
 
     for (const f of healthFindings) {
       const sevColor = f.severity === "critical" ? colors.red : colors.yellow;
+      const healthLink = formatFileLink(f.path, f.line || 1);
       console.log(
-        `\n   ${sevColor}[${(f.severity || "warning").toUpperCase()}]${colors.reset} ${colors.bold}${f.path}:${f.line || 1}${colors.reset} in ${colors.cyan}${f.name || "anonymous"}${colors.reset}`,
+        `\n   ${sevColor}[${(f.severity || "warning").toUpperCase()}]${colors.reset} ${colors.bold}${healthLink}${colors.reset} in ${colors.cyan}${f.name || "anonymous"}${colors.reset}`,
       );
       console.log(
         `     ${colors.dim}Cognitive Complexity: ${f.cognitive ?? "?"}, Cyclomatic: ${f.cyclomatic ?? "?"}, CRAP: ${f.crap ?? "?"}, Lines: ${f.line_count ?? "?"}${colors.reset}`,
@@ -914,8 +968,9 @@ function renderFilteredReport(report, options) {
     }
 
     for (const t of targets) {
+      const targetLink = formatFileLink(t.path);
       console.log(
-        `\n   ${colors.magenta}[REFACTOR TARGET]${colors.reset} ${colors.bold}${t.path}${colors.reset} (Priority: ${t.priority}, Efficiency: ${t.efficiency})`,
+        `\n   ${colors.magenta}[REFACTOR TARGET]${colors.reset} ${colors.bold}${targetLink}${colors.reset} (Priority: ${t.priority}, Efficiency: ${t.efficiency})`,
       );
       if (t.recommendation) {
         console.log(
