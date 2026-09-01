@@ -105,6 +105,21 @@ describe("FractionalConverter", () => {
       fireEvent.change(input, { target: { value: "--10..5" } });
       expect((input as HTMLInputElement).value).toBe("-10.5");
     });
+
+    it("removes a minus sign that is not at the start", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "10-5" } });
+      expect((input as HTMLInputElement).value).toBe("105");
+    });
+
+    it("limits input length to 20 characters", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      const longValue = "1234567890123456789012345";
+      fireEvent.change(input, { target: { value: longValue } });
+      expect((input as HTMLInputElement).value).toHaveLength(20);
+    });
   });
 
   describe("when switching to binToDec mode", () => {
@@ -208,6 +223,22 @@ describe("FractionalConverter", () => {
       ).toBe(true);
     });
 
+    it("does not change mode or input when toggle buttons are clicked", () => {
+      render(
+        <FractionalConverter
+          isExerciseMode
+          showSolution={false}
+          onShowSolution={vi.fn()}
+          initialValue="10.5"
+        />,
+      );
+      fireEvent.click(screen.getByTestId("ns-frac-dec-to-bin-button"));
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      expect(
+        (screen.getByTestId("ns-fractional-input") as HTMLInputElement).value,
+      ).toBe("10.5");
+    });
+
     it("shows the validation panel when solution is hidden", () => {
       render(
         <FractionalConverter
@@ -246,6 +277,28 @@ describe("FractionalConverter", () => {
       const input = screen.getByTestId("ns-fractional-input");
       expect(input.hasAttribute("disabled")).toBe(true);
     });
+
+    it("ignores input changes while the solution is hidden", () => {
+      const onChangeState = vi.fn();
+      render(
+        <FractionalConverter
+          isExerciseMode
+          showSolution={false}
+          onShowSolution={vi.fn()}
+          initialValue="10.5"
+          onChangeState={onChangeState}
+        />,
+      );
+      fireEvent.change(screen.getByTestId("ns-fractional-input"), {
+        target: { value: "99.9" },
+      });
+      expect(
+        (screen.getByTestId("ns-fractional-input") as HTMLInputElement).value,
+      ).toBe("10.5");
+      expect(onChangeState).not.toHaveBeenCalledWith(
+        expect.objectContaining({ inputValue: "99.9" }),
+      );
+    });
   });
 
   describe("when initialized with exercise value", () => {
@@ -254,6 +307,35 @@ describe("FractionalConverter", () => {
       expect(
         (screen.getByTestId("ns-fractional-input") as HTMLInputElement).value,
       ).toBe("3.375");
+    });
+  });
+
+  describe("when initialized with initial state", () => {
+    it("uses the initial value when initialState has no inputValue", () => {
+      render(
+        <FractionalConverter
+          initialValue="5.25"
+          initialState={{ converterMode: "decToBin" }}
+        />,
+      );
+      expect(
+        (screen.getByTestId("ns-fractional-input") as HTMLInputElement).value,
+      ).toBe("5.25");
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "101.01",
+      );
+    });
+
+    it("uses the inputValue from initialState when provided", () => {
+      render(
+        <FractionalConverter
+          initialValue="3.375"
+          initialState={{ inputValue: "0.5", converterMode: "decToBin" }}
+        />,
+      );
+      expect(
+        (screen.getByTestId("ns-fractional-input") as HTMLInputElement).value,
+      ).toBe("0.5");
     });
   });
 });

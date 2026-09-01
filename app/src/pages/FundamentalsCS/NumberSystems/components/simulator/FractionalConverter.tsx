@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
 import { Info, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
-import type { FractionalConverterState } from "./nsTransferCodec";
-import { computeFractionalConversion } from "./fractionalConversion";
 import {
   DecToBinExplanation,
   BinToDecExplanation,
 } from "./FractionalConverterExplanation";
+import { useFractionalConverter } from "./useFractionalConverter";
 
 interface FractionalConverterProps {
   isExerciseMode?: boolean;
@@ -15,8 +13,10 @@ interface FractionalConverterProps {
   onShowSolution?: () => void;
   onExitExercise?: () => void;
   initialValue?: string;
-  initialState?: FractionalConverterState;
-  onChangeState?: (state: FractionalConverterState) => void;
+  initialState?: import("./nsTransferCodec").FractionalConverterState;
+  onChangeState?: (
+    state: import("./nsTransferCodec").FractionalConverterState,
+  ) => void;
 }
 
 export function FractionalConverter({
@@ -29,61 +29,22 @@ export function FractionalConverter({
   onChangeState,
 }: FractionalConverterProps) {
   const { t } = useTranslation("translation");
-  const locked = !!isExerciseMode && !showSolution;
-  const [inputValue, setInputValue] = useState<string>(
-    locked
-      ? initialValue || "10.5"
-      : (initialState?.inputValue ?? (initialValue || "10.5")),
-  );
-  const [converterMode, setConverterMode] = useState<"decToBin" | "binToDec">(
-    locked ? "decToBin" : (initialState?.converterMode ?? "decToBin"),
-  );
-
-  useEffect(() => {
-    onChangeState?.({ inputValue, converterMode });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, converterMode]);
-
-  const handleInputChange = (v: string) => {
-    if (isExerciseMode && !showSolution) return;
-
-    let cleanV = v;
-    if (converterMode === "decToBin") {
-      cleanV = cleanV.replace(/[^0-9.-]/g, "");
-    } else {
-      cleanV = cleanV.replace(/[^01.-]/g, "");
-    }
-
-    // Ensure only one minus at the start
-    if (cleanV.indexOf("-") > 0) {
-      cleanV = cleanV.replace(/-/g, "");
-    }
-    const minusCount = (cleanV.match(/-/g) || []).length;
-    if (minusCount > 1) {
-      cleanV = "-" + cleanV.replace(/-/g, "");
-    }
-
-    // Ensure only one dot
-    const parts = cleanV.split(".");
-    if (parts.length > 2) {
-      cleanV = parts[0] + "." + parts.slice(1).join("");
-    }
-
-    // Limit length to avoid huge computations
-    if (cleanV.length > 20) {
-      cleanV = cleanV.slice(0, 20);
-    }
-
-    setInputValue(cleanV);
-  };
-
-  // Compute conversion steps
-  const conversionData = useMemo(
-    () => computeFractionalConversion(inputValue, converterMode),
-    [inputValue, converterMode],
-  );
-
-  const isValidInput = conversionData !== null;
+  const {
+    inputValue,
+    converterMode,
+    locked,
+    conversionData,
+    isValidInput,
+    handleInputChange,
+    handleSetDecToBin,
+    handleSetBinToDec,
+  } = useFractionalConverter({
+    isExerciseMode,
+    showSolution,
+    initialValue,
+    initialState,
+    onChangeState,
+  });
 
   return (
     <div className="animate-in fade-in zoom-in-95 space-y-8 duration-300">
@@ -108,12 +69,7 @@ export function FractionalConverter({
               <div className="bg-muted mb-2 flex shrink-0 rounded-md p-1 sm:mb-0">
                 <button
                   data-testid="ns-frac-dec-to-bin-button"
-                  onClick={() => {
-                    if (!isExerciseMode) {
-                      setConverterMode("decToBin");
-                      setInputValue("10.5");
-                    }
-                  }}
+                  onClick={handleSetDecToBin}
                   disabled={isExerciseMode}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "decToBin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"} ${isExerciseMode && "cursor-not-allowed opacity-50"}`}
                 >
@@ -121,12 +77,7 @@ export function FractionalConverter({
                 </button>
                 <button
                   data-testid="ns-frac-bin-to-dec-button"
-                  onClick={() => {
-                    if (!isExerciseMode) {
-                      setConverterMode("binToDec");
-                      setInputValue("1010.1");
-                    }
-                  }}
+                  onClick={handleSetBinToDec}
                   disabled={isExerciseMode}
                   className={`rounded-sm px-3 py-1.5 text-xs font-medium ${converterMode === "binToDec" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"} ${isExerciseMode && "cursor-not-allowed opacity-50"}`}
                 >
@@ -144,8 +95,8 @@ export function FractionalConverter({
                 data-testid="ns-fractional-input"
                 value={inputValue}
                 onChange={(e) => handleInputChange(e.target.value)}
-                disabled={isExerciseMode && !showSolution}
-                className={`bg-background text-foreground w-full max-w-xs rounded-md border px-3 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 ${isExerciseMode && !showSolution ? "border-input bg-muted" : "border-input focus:ring-primary/20 focus:ring-1 focus:outline-none"}`}
+                disabled={locked}
+                className={`bg-background text-foreground w-full max-w-xs rounded-md border px-3 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 ${locked ? "border-input bg-muted" : "border-input focus:ring-primary/20 focus:ring-1 focus:outline-none"}`}
                 placeholder="e.g. 10.5"
               />
             </div>
@@ -171,7 +122,7 @@ export function FractionalConverter({
                       data-testid="ns-fractional-result"
                       className="bg-brand text-brand-foreground rounded-lg px-6 py-2 font-mono font-bold tracking-wider shadow-sm"
                     >
-                      {conversionData.finalResult}
+                      {conversionData!.finalResult}
                     </div>
                   </div>
                 </div>
@@ -203,10 +154,10 @@ export function FractionalConverter({
                   <div className="text-muted-foreground flex items-center justify-center p-8 text-sm">
                     {t("number-systems.simulator.numbers.enterValue")}
                   </div>
-                ) : conversionData.mode === "decToBin" ? (
-                  <DecToBinExplanation data={conversionData} />
+                ) : conversionData!.mode === "decToBin" ? (
+                  <DecToBinExplanation data={conversionData!} />
                 ) : (
-                  <BinToDecExplanation data={conversionData} />
+                  <BinToDecExplanation data={conversionData!} />
                 )}
               </>
             )}

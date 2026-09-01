@@ -48,7 +48,6 @@ export function useBinaryOperands({
   const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialA) setValA(initialA);
 
     if (initialB) setValB(initialB);

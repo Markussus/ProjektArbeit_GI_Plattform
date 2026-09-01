@@ -11,33 +11,33 @@ import type {
   SimulatorMode,
 } from "./nsTransferCodec";
 
-export const BASE_TO_CHAR: Record<BaseType, string> = {
+const BASE_TO_CHAR: Record<BaseType, string> = {
   dec: "d",
   bin: "b",
   oct: "o",
   hex: "h",
 };
 
-export const BASE_FROM_CHAR: Record<string, BaseType> = {
+const BASE_FROM_CHAR: Record<string, BaseType> = {
   d: "dec",
   b: "bin",
   o: "oct",
   h: "hex",
 };
 
-export const NEGATIVE_MODE_TO_CHAR: Record<NegativeStepMode, string> = {
+const NEGATIVE_MODE_TO_CHAR: Record<NegativeStepMode, string> = {
   twos: "t",
   ones: "o",
   sign: "s",
 };
 
-export const NEGATIVE_MODE_FROM_CHAR: Record<string, NegativeStepMode> = {
+const NEGATIVE_MODE_FROM_CHAR: Record<string, NegativeStepMode> = {
   t: "twos",
   o: "ones",
   s: "sign",
 };
 
-export const ARITHMETIC_TO_CHAR: Record<ArithmeticModeType, string> = {
+const ARITHMETIC_TO_CHAR: Record<ArithmeticModeType, string> = {
   addition: "a",
   subtraction: "s",
   multiplication: "m",
@@ -46,7 +46,7 @@ export const ARITHMETIC_TO_CHAR: Record<ArithmeticModeType, string> = {
   compare: "c",
 };
 
-export const ARITHMETIC_FROM_CHAR: Record<string, ArithmeticModeType> = {
+const ARITHMETIC_FROM_CHAR: Record<string, ArithmeticModeType> = {
   a: "addition",
   s: "subtraction",
   m: "multiplication",
@@ -198,7 +198,7 @@ function pushFractionalParts(
   parts: string[],
   fractional?: FractionalConverterState,
 ): void {
-  if (!fractional) {
+  if (!fractional || !fractional.inputValue) {
     return;
   }
   parts.push(fractional.converterMode === "decToBin" ? "d" : "b");

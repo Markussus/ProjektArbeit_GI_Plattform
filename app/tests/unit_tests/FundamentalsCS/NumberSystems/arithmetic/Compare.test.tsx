@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { Compare } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Compare.tsx";
 import {
   changeBinaryInput,
@@ -9,7 +9,9 @@ import {
   expectValidationResult,
   getInputs,
   renderArithmeticExercise,
+  setupArithmeticTests,
 } from "./arithmeticTestSetup.tsx";
+import { vi } from "vitest";
 
 vi.mock("react-i18next", async () => {
   const { mockReactI18next } = await import("./arithmeticTestSetup");
@@ -29,11 +31,9 @@ vi.mock(
   },
 );
 
-describe("Compare", () => {
-  afterEach(() => {
-    cleanup();
-  });
+setupArithmeticTests();
 
+describe("Compare", () => {
   describe("when rendering in free mode", () => {
     it("shows two binary inputs", () => {
       render(<Compare renderModeSelector={null} />);
@@ -54,6 +54,48 @@ describe("Compare", () => {
       changeBinaryInput(0, "00000100");
       changeBinaryInput(1, "00000010");
       expect(screen.getByTestId("mock-result-panel")).toBeTruthy();
+    });
+
+    it("shows the greater result when A is larger", () => {
+      render(<Compare renderModeSelector={null} />);
+      changeBinaryInput(0, "00000100");
+      changeBinaryInput(1, "00000010");
+      expect(
+        screen.getByText(
+          "number-systems.simulator.arithmetic.compare.resultGreater",
+        ),
+      ).toBeTruthy();
+    });
+
+    it("shows the less result when A is smaller", () => {
+      render(<Compare renderModeSelector={null} />);
+      changeBinaryInput(0, "00000010");
+      changeBinaryInput(1, "00000100");
+      expect(
+        screen.getByText(
+          "number-systems.simulator.arithmetic.compare.resultLess",
+        ),
+      ).toBeTruthy();
+    });
+
+    it("shows the equal result when both operands are identical", () => {
+      render(<Compare renderModeSelector={null} />);
+      changeBinaryInput(0, "00000100");
+      changeBinaryInput(1, "00000100");
+      expect(
+        screen.getByText(
+          "number-systems.simulator.arithmetic.compare.resultEq",
+        ),
+      ).toBeTruthy();
+    });
+
+    it("renders step-by-step comparison headers", () => {
+      render(<Compare renderModeSelector={null} />);
+      changeBinaryInput(0, "00000100");
+      changeBinaryInput(1, "00000010");
+      fireEvent.click(screen.getByTestId("mock-step-toggle"));
+      const headers = screen.getAllByTestId("mock-step-header");
+      expect(headers.length).toBeGreaterThan(0);
     });
   });
 

@@ -1,6 +1,11 @@
-import type { BaseType } from "./nsTransferCodec";
-import type { ArithmeticModeType } from "./nsTransferCodec";
+import type {
+  BaseType,
+  ArithmeticModeType,
+  SimulatorMode,
+} from "./nsTransferCodec";
 import type { ExerciseStateInit } from "./exerciseStateConfig";
+import { exerciseStateConfig } from "./exerciseStateConfig";
+import type { TopicItem } from "@/types/exercise";
 
 /** Returns a random integer between min and max (inclusive). */
 const randInt = (min: number, max: number): number =>
@@ -137,3 +142,94 @@ export const defaultExerciseState: ExerciseStateInit = {
   initialSubMode: "addition" as ArithmeticModeType,
   initialConverterMode: "decToIeee",
 };
+
+/**
+ * Resolves the initial simulator mode for an exercise/example ID.
+ * Falls back to prefix heuristics when no explicit config exists.
+ */
+export function getInitialActiveMode(id: string): SimulatorMode {
+  const config = exerciseStateConfig[id];
+  if (config) return config.mode;
+
+  if (
+    id.includes("floatToBin") ||
+    id.includes("example_u05_1") ||
+    id.includes("example_u05_2")
+  )
+    return "fractional";
+  if (
+    id.includes("ieee") ||
+    id.includes("example_u05_3") ||
+    id.includes("example_u05_4") ||
+    id.includes("example_u07_5")
+  )
+    return "ieee754";
+  if (
+    id.includes("Add") ||
+    id.includes("Sub") ||
+    id.includes("mult") ||
+    id.includes("example_u06") ||
+    id.includes("example_u03_2") ||
+    id.includes("example_u07_2") ||
+    id.includes("example_u07_4")
+  )
+    return "arithmetic";
+  if (id.includes("example_u07_3")) return "negative";
+  return "integers";
+}
+
+export interface ResolvedExerciseInitialState {
+  isExerciseMode: boolean;
+  showSolution: boolean;
+  activeMode: SimulatorMode;
+  initialValue: string;
+  initialBase: BaseType;
+  initialTargetBase: BaseType;
+  initialValueA: string;
+  initialValueB: string;
+  initialSubMode: ArithmeticModeType;
+  initialConverterMode: "decToIeee" | "ieeeToDec";
+}
+
+/**
+ * Resolves the complete initial state for the simulator when a
+ * selected exercise changes. Exported so it can be unit-tested.
+ */
+export function resolveExerciseInitialState(
+  selectedExercise: TopicItem | null | undefined,
+): ResolvedExerciseInitialState {
+  if (!selectedExercise) {
+    return {
+      isExerciseMode: false,
+      showSolution: true,
+      activeMode: defaultExerciseState.mode,
+      initialValue: defaultExerciseState.initialValue ?? "",
+      initialBase: defaultExerciseState.initialBase ?? "dec",
+      initialTargetBase: defaultExerciseState.initialTargetBase ?? "bin",
+      initialValueA: defaultExerciseState.initialValueA ?? "",
+      initialValueB: defaultExerciseState.initialValueB ?? "",
+      initialSubMode: defaultExerciseState.initialSubMode ?? "addition",
+      initialConverterMode:
+        defaultExerciseState.initialConverterMode ?? "decToIeee",
+    };
+  }
+
+  const isExample = selectedExercise.id.includes(".example");
+  const config = exerciseStateConfig[selectedExercise.id];
+  const init = config
+    ? resolveRandomInit(config)
+    : { mode: getInitialActiveMode(selectedExercise.id) };
+
+  return {
+    isExerciseMode: !isExample,
+    showSolution: isExample,
+    activeMode: init.mode,
+    initialValue: init.initialValue ?? "",
+    initialBase: init.initialBase ?? "dec",
+    initialTargetBase: init.initialTargetBase ?? "bin",
+    initialValueA: init.initialValueA ?? "",
+    initialValueB: init.initialValueB ?? "",
+    initialSubMode: init.initialSubMode ?? "addition",
+    initialConverterMode: init.initialConverterMode ?? "decToIeee",
+  };
+}
