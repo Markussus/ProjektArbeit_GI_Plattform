@@ -24,15 +24,12 @@ import {
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { numberSystemsExercises } from "../../exercises";
 import { nsTransferCodec } from "./nsTransferCodec";
-import type { NumberSystemState } from "./nsTransferCodec";
+import type { NumberSystemState, SimulatorMode } from "./nsTransferCodec";
 import { exerciseStateConfig } from "./exerciseStateConfig";
 import {
   resolveRandomInit,
   defaultExerciseState,
 } from "./exerciseStateResolver";
-
-export type SimulatorMode =
-  "integers" | "negative" | "fractional" | "ieee754" | "arithmetic";
 
 export interface SimulatorHandle {
   resetStoredState: () => void;
