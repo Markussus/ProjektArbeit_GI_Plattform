@@ -276,6 +276,106 @@ describe("Simulator", () => {
     });
   });
 
+  describe("fallback mode mapping for unknown exercise IDs", () => {
+    it("maps ids containing floatToBin to fractional mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_floatToBin_task",
+            "Fractional fallback",
+            "Fractional fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u05_1 or example_u05_2 to fractional mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u05_1_unknown",
+            "Fractional example fallback",
+            "Fractional example fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing ieee to ieee754 mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_ieee_task",
+            "IEEE fallback",
+            "IEEE fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-ieee-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u05_3, example_u05_4 or example_u07_5 to ieee754 mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u05_3_unknown",
+            "IEEE example fallback",
+            "IEEE example fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-ieee-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing Add, Sub, mult, example_u06, example_u03_2, example_u07_2 or example_u07_4 to arithmetic mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_Add_task",
+            "Arithmetic fallback",
+            "Arithmetic fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-arithmetic-mode")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u07_3 to negative mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u07_3_unknown",
+            "Negative fallback",
+            "Negative fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-negative-numbers")).toBeTruthy();
+    });
+
+    it("defaults to integers mode when no known pattern matches", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.unknown_task",
+            "Unknown",
+            "Unknown",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-integer-converter")).toBeTruthy();
+    });
+  });
+
   describe("when an example is selected", () => {
     it("sets showSolution to true for examples", () => {
       render(
