@@ -11,9 +11,7 @@ const Programming1Page = lazy(async () => ({
   default: (await import("@/pages/Programming1/Programming1Page"))
     .Programming1Page,
 }));
-const DnfTopicPage = lazy(async () => ({
-  default: (await import("@/pages/FundamentalsCS/Dnf/DnfPage")).DnfPage,
-}));
+const DnfTopicPage = lazy(() => import("@/pages/FundamentalsCS/Dnf/DnfPage"));
 const FiniteAutomataTopicPage = lazy(async () => ({
   default: (
     await import("@/pages/FundamentalsCS/FiniteAutomata/FiniteAutomataPage")

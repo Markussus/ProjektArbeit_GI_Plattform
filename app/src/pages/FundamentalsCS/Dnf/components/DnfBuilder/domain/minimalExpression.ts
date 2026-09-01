@@ -7,7 +7,7 @@ import {
 } from "./quineMcCluskey";
 import type { TruthTable } from "./truthTable";
 
-export const MAX_EXACT_OPTIMAL_VARIABLES = 4;
+const MAX_EXACT_OPTIMAL_VARIABLES = 4;
 
 export type SmallestExpressionSource =
   "constant" | "minimal_dnf" | "factored_dnf" | "exact";

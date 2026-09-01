@@ -4,7 +4,7 @@ import { ExercisesTab } from "./components/ExercisesTab";
 import { OverviewTab } from "./components/OverviewTab";
 import { SimulationTab } from "./components/SimulationTab";
 
-export function DnfPage() {
+export default function DnfPage() {
   return (
     <ModuleTopicPage
       titleKey="dnf.title"
