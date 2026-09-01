@@ -87,98 +87,134 @@ function pruneTransitions(
   return pruned;
 }
 
-function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
-  switch (action.type) {
-    case "SET_AUTOMATON_TYPE": {
-      const type = action.payload;
-      if (type === state.type) return state;
+/**
+ * Switching type swaps one canned default for the other, so a learner who has
+ * not edited anything yet gets a worked automaton of the kind they picked.
+ * Anything else keeps its table and only changes the label.
+ */
+function switchAutomatonType(state: FAProgram, type: AutomatonType): FAProgram {
+  if (type === state.type) return state;
 
-      // If switching types and the current program is exactly the default, swap to the other default
-      const isDefaultDFA =
-        JSON.stringify({ ...state, type: "DFA" }) ===
-        JSON.stringify(defaultDFAProgram);
-      const isDefaultNFA =
-        JSON.stringify({ ...state, type: "NFA" }) ===
-        JSON.stringify(defaultNFAProgram);
+  const matchesDefault = (candidate: FAProgram) =>
+    JSON.stringify({ ...state, type: candidate.type }) ===
+    JSON.stringify(candidate);
 
-      if (type === "NFA" && isDefaultDFA) {
-        return JSON.parse(JSON.stringify(defaultNFAProgram));
-      }
-      if (type === "DFA" && isDefaultNFA) {
-        return JSON.parse(JSON.stringify(defaultDFAProgram));
-      }
-
-      return { ...state, type };
-    }
-    case "SET_STATES": {
-      const states = parseCSV(action.payload);
-      const acceptStates = state.acceptStates.filter((s) => states.includes(s));
-      const startState = states.includes(state.startState)
-        ? state.startState
-        : states[0] || "";
-      const transitions = pruneTransitions(
-        state.transitions,
-        states,
-        state.alphabet,
-      );
-      return { ...state, states, acceptStates, startState, transitions };
-    }
-    case "SET_ALPHABET": {
-      const alphabet = parseAlphabetCSV(action.payload);
-      const transitions = pruneTransitions(
-        state.transitions,
-        state.states,
-        alphabet,
-      );
-      return { ...state, alphabet, transitions };
-    }
-    case "SET_START_STATE":
-      return { ...state, startState: action.payload.trim() };
-    case "SET_ACCEPT_STATES": {
-      const acceptStates = parseCSV(action.payload);
-      return { ...state, acceptStates };
-    }
-    case "SET_TRANSITION": {
-      const targets = parseCSV(action.targets);
-      const newTransitions: FATransitionMap = { ...state.transitions };
-      if (!newTransitions[action.from]) {
-        newTransitions[action.from] = {};
-      }
-      const updatedRow = { ...newTransitions[action.from] };
-      if (targets.length === 0) {
-        delete updatedRow[action.symbol];
-      } else {
-        updatedRow[action.symbol] = targets;
-      }
-      newTransitions[action.from] = updatedRow;
-      return { ...state, transitions: newTransitions };
-    }
-    case "ADD_STATE": {
-      const newState = findNextStateName(state.states);
-      const states = [...state.states, newState];
-      const startState = state.startState || newState;
-      return { ...state, states, startState };
-    }
-    case "REMOVE_STATE": {
-      // Keep at least one state so the program stays well-formed.
-      if (state.states.length <= 1) return state;
-      const target = action.payload;
-      const states = state.states.filter((s) => s !== target);
-      const acceptStates = state.acceptStates.filter((s) => s !== target);
-      const startState =
-        state.startState === target ? states[0] : state.startState;
-      const transitions = pruneTransitions(
-        state.transitions,
-        states,
-        state.alphabet,
-      );
-      return { ...state, states, acceptStates, startState, transitions };
-    }
-    case "RESET":
-      return action.payload;
-    default:
-      return state;
+  if (type === "NFA" && matchesDefault(defaultDFAProgram)) {
+    return cloneProgram(defaultNFAProgram);
   }
+  if (type === "DFA" && matchesDefault(defaultNFAProgram)) {
+    return cloneProgram(defaultDFAProgram);
+  }
+
+  return { ...state, type };
+}
+
+function cloneProgram(program: FAProgram): FAProgram {
+  return JSON.parse(JSON.stringify(program)) as FAProgram;
+}
+
+/**
+ * Rewrite the state list, dropping whatever the new list no longer covers:
+ * accept states, the start state, and every transition into or out of a state
+ * that is gone.
+ */
+function withStates(state: FAProgram, states: string[]): FAProgram {
+  return {
+    ...state,
+    states,
+    acceptStates: state.acceptStates.filter((s) => states.includes(s)),
+    startState: states.includes(state.startState)
+      ? state.startState
+      : states[0] || "",
+    transitions: pruneTransitions(state.transitions, states, state.alphabet),
+  };
+}
+
+/** Write one table cell; clearing its targets removes the cell entirely. */
+function withTransition(
+  state: FAProgram,
+  from: string,
+  symbol: string,
+  targets: string[],
+): FAProgram {
+  const row = { ...(state.transitions[from] ?? {}) };
+  if (targets.length === 0) {
+    delete row[symbol];
+  } else {
+    row[symbol] = targets;
+  }
+
+  return {
+    ...state,
+    transitions: { ...state.transitions, [from]: row },
+  };
+}
+
+/** Narrow the alphabet, dropping transitions on symbols that just left it. */
+function withAlphabet(state: FAProgram, alphabet: string[]): FAProgram {
+  return {
+    ...state,
+    alphabet,
+    transitions: pruneTransitions(state.transitions, state.states, alphabet),
+  };
+}
+
+/** Append the first unused S-name, adopting it as start state if there is none. */
+function withNewState(state: FAProgram): FAProgram {
+  const newState = findNextStateName(state.states);
+  return {
+    ...state,
+    states: [...state.states, newState],
+    startState: state.startState || newState,
+  };
+}
+
+/** Drop a state and everything referring to it. The last state always stays. */
+function withoutState(state: FAProgram, target: string): FAProgram {
+  // Keep at least one state so the program stays well-formed.
+  if (state.states.length <= 1) return state;
+
+  const states = state.states.filter((s) => s !== target);
+  return {
+    ...withStates(state, states),
+    startState: state.startState === target ? states[0] : state.startState,
+  };
+}
+
+/**
+ * One handler per action, so the reducer itself is a lookup rather than a
+ * nine-way switch. Each handler owns exactly the edit its action describes.
+ */
+const EDITOR_ACTION_HANDLERS: {
+  [K in EditorAction["type"]]: (
+    state: FAProgram,
+    action: Extract<EditorAction, { type: K }>,
+  ) => FAProgram;
+} = {
+  SET_AUTOMATON_TYPE: (state, action) =>
+    switchAutomatonType(state, action.payload),
+  SET_STATES: (state, action) => withStates(state, parseCSV(action.payload)),
+  SET_ALPHABET: (state, action) =>
+    withAlphabet(state, parseAlphabetCSV(action.payload)),
+  SET_START_STATE: (state, action) => ({
+    ...state,
+    startState: action.payload.trim(),
+  }),
+  SET_ACCEPT_STATES: (state, action) => ({
+    ...state,
+    acceptStates: parseCSV(action.payload),
+  }),
+  SET_TRANSITION: (state, action) =>
+    withTransition(state, action.from, action.symbol, parseCSV(action.targets)),
+  ADD_STATE: (state) => withNewState(state),
+  REMOVE_STATE: (state, action) => withoutState(state, action.payload),
+  RESET: (_state, action) => action.payload,
+};
+
+function editorReducer(state: FAProgram, action: EditorAction): FAProgram {
+  const handler = EDITOR_ACTION_HANDLERS[action.type] as
+    ((state: FAProgram, action: EditorAction) => FAProgram) | undefined;
+  return handler ? handler(state, action) : state;
 }
 
 // --- Hook ---

@@ -6,6 +6,29 @@ interface FAInputWordViewProps {
   runtime: FARuntime;
 }
 
+/**
+ * Where one symbol sits relative to the read head. `stopped` is the symbol the
+ * run halted on: neither already read nor still ahead.
+ */
+type SymbolPhase = "read" | "current" | "upcoming" | "stopped";
+
+function symbolPhase(runtime: FARuntime, index: number): SymbolPhase {
+  if (index === runtime.inputPosition) {
+    return runtime.halted ? "stopped" : "current";
+  }
+  return index < runtime.inputPosition ? "read" : "upcoming";
+}
+
+const SYMBOL_CELL_CLASS =
+  "flex size-9 shrink-0 items-center justify-center rounded-md border font-mono text-sm font-medium transition-all";
+
+const SYMBOL_PHASE_CLASS: Record<SymbolPhase, string> = {
+  current: "border-brand bg-brand/10 text-brand border-2 font-bold",
+  read: "border-border bg-muted/50 text-muted-foreground opacity-50",
+  upcoming: "border-border bg-background text-foreground",
+  stopped: "border-border bg-muted/30 text-muted-foreground opacity-40",
+};
+
 export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   const { t } = useTranslation();
 
@@ -47,34 +70,17 @@ export function FAInputWordView({ runtime }: FAInputWordViewProps) {
         className="flex items-center gap-1 overflow-x-auto pb-1"
         style={{ scrollbarWidth: "thin" }}
       >
-        {runtime.inputWord.map((symbol, index) => {
-          const isRead = index < runtime.inputPosition;
-          const isCurrent = index === runtime.inputPosition && !runtime.halted;
-          const isUpcoming = index > runtime.inputPosition;
-
-          return (
-            <div
-              key={index}
-              className={cn(
-                "flex size-9 shrink-0 items-center justify-center rounded-md border font-mono text-sm font-medium transition-all",
-                isCurrent &&
-                  "border-brand bg-brand/10 text-brand border-2 font-bold",
-                !isCurrent &&
-                  isRead &&
-                  "border-border bg-muted/50 text-muted-foreground opacity-50",
-                !isCurrent &&
-                  isUpcoming &&
-                  "border-border bg-background text-foreground",
-                !isCurrent &&
-                  !isRead &&
-                  !isUpcoming &&
-                  "border-border bg-muted/30 text-muted-foreground opacity-40",
-              )}
-            >
-              {symbol}
-            </div>
-          );
-        })}
+        {runtime.inputWord.map((symbol, index) => (
+          <div
+            key={index}
+            className={cn(
+              SYMBOL_CELL_CLASS,
+              SYMBOL_PHASE_CLASS[symbolPhase(runtime, index)],
+            )}
+          >
+            {symbol}
+          </div>
+        ))}
       </div>
     </div>
   );

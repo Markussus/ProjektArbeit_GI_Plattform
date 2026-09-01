@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { FAProgram } from "../domain/faTypes";
@@ -7,6 +8,61 @@ interface FASimulationStatusCardProps {
   program: FAProgram;
   runtime: FARuntime;
   error: Error | null;
+}
+
+/** What the machine is doing while the run is still in progress. */
+function runningExplanation(runtime: FARuntime, t: TFunction): string {
+  if (runtime.inputPosition >= runtime.inputWord.length) {
+    return t("finite-automata.sim.explanation.processing", "Processing...");
+  }
+
+  return t(
+    "finite-automata.sim.explanation.reading",
+    "Reading symbol '{{symbol}}' at position {{pos}}. Active states: {{states}}",
+    {
+      symbol: runtime.inputWord[runtime.inputPosition],
+      pos: runtime.inputPosition + 1,
+      states: runtime.activeStates.join(", ") || "∅",
+    },
+  );
+}
+
+/** Why the run ended, once it has halted. */
+function haltedExplanation(runtime: FARuntime, t: TFunction): string {
+  if (runtime.haltReason?.type === "accepted") {
+    return t(
+      "finite-automata.sim.explanation.accepted",
+      "The word is accepted. Final states {{states}} include an accept state.",
+      { states: runtime.activeStates.join(", ") },
+    );
+  }
+
+  if (runtime.haltReason?.type !== "rejected") return "";
+
+  // An empty active set means the run dead-ended rather than finishing the word.
+  if (runtime.activeStates.length === 0) {
+    return t(
+      "finite-automata.sim.explanation.rejectedDead",
+      "The word is rejected. No reachable states (dead end).",
+    );
+  }
+
+  return t(
+    "finite-automata.sim.explanation.rejected",
+    "The word is rejected. Final states {{states}} do not include an accept state.",
+    { states: runtime.activeStates.join(", ") },
+  );
+}
+
+function explanationFor(
+  runtime: FARuntime,
+  error: Error | null,
+  t: TFunction,
+): string {
+  if (error) return error.message;
+  return runtime.halted
+    ? haltedExplanation(runtime, t)
+    : runningExplanation(runtime, t);
 }
 
 export function FASimulationStatusCard({
@@ -35,49 +91,7 @@ export function FASimulationStatusCard({
     return "text-destructive";
   })();
 
-  const explanation = (() => {
-    if (error) return error.message;
-    if (!runtime.halted) {
-      if (runtime.inputPosition < runtime.inputWord.length) {
-        const symbol = runtime.inputWord[runtime.inputPosition];
-        return t(
-          "finite-automata.sim.explanation.reading",
-          "Reading symbol '{{symbol}}' at position {{pos}}. Active states: {{states}}",
-          {
-            symbol,
-            pos: runtime.inputPosition + 1,
-            states: runtime.activeStates.join(", ") || "∅",
-          },
-        );
-      }
-      return t("finite-automata.sim.explanation.processing", "Processing...");
-    }
-    if (runtime.haltReason?.type === "accepted") {
-      return t(
-        "finite-automata.sim.explanation.accepted",
-        "The word is accepted. Final states {{states}} include an accept state.",
-        {
-          states: runtime.activeStates.join(", "),
-        },
-      );
-    }
-    if (runtime.haltReason?.type === "rejected") {
-      if (runtime.activeStates.length === 0) {
-        return t(
-          "finite-automata.sim.explanation.rejectedDead",
-          "The word is rejected. No reachable states (dead end).",
-        );
-      }
-      return t(
-        "finite-automata.sim.explanation.rejected",
-        "The word is rejected. Final states {{states}} do not include an accept state.",
-        {
-          states: runtime.activeStates.join(", "),
-        },
-      );
-    }
-    return "";
-  })();
+  const explanation = explanationFor(runtime, error, t);
 
   return (
     <div className="border-border bg-card rounded-xl border p-4">
