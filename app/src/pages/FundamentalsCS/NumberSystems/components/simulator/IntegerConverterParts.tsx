@@ -64,13 +64,18 @@ interface ConverterInputPanelProps {
   targetValue: string;
 }
 
-const baseOptions = (t: TFunction<"translation">) =>
-  [
-    { value: "dec" as const, label: t("number-systems.simulator.numbers.decimal") },
-    { value: "bin" as const, label: t("number-systems.simulator.numbers.binary") },
-    { value: "oct" as const, label: t("number-systems.simulator.numbers.octal") },
-    { value: "hex" as const, label: t("number-systems.simulator.numbers.hex") },
-  ];
+const baseOptions = (t: TFunction<"translation">) => [
+  {
+    value: "dec" as const,
+    label: t("number-systems.simulator.numbers.decimal"),
+  },
+  {
+    value: "bin" as const,
+    label: t("number-systems.simulator.numbers.binary"),
+  },
+  { value: "oct" as const, label: t("number-systems.simulator.numbers.octal") },
+  { value: "hex" as const, label: t("number-systems.simulator.numbers.hex") },
+];
 
 export function BaseSelector({
   label,
