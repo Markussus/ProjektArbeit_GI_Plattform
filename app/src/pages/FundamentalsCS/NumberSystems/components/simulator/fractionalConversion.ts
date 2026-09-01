@@ -65,7 +65,7 @@ export function parseFractionalInput(
   if (!inputValue || inputValue === "-" || inputValue === ".") return null;
 
   const isNegative = inputValue.startsWith("-");
-  const absValueStr = isNegative ? inputValue.substring(1) : inputValue;
+  const absValueStr = inputValue.substring(isNegative ? 1 : 0);
 
   const parts = absValueStr.split(".");
   const intPartStr = parts[0] || "0";
@@ -95,13 +95,10 @@ export function convertDecToBin(parsed: ParsedFractionalInput): DecToBinResult {
     }
   }
 
-  const binIntPart =
-    intSteps.length > 0
-      ? [...intSteps]
-          .reverse()
-          .map((s) => s.remainder)
-          .join("")
-      : "0";
+  const binIntPart = [...intSteps]
+    .reverse()
+    .map((s) => s.remainder)
+    .join("");
 
   let currentFrac = parseFloat("0." + fracPartStr);
   const fracSteps: DecToBinFracStep[] = [];

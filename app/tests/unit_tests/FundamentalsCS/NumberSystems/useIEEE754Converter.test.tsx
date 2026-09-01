@@ -59,6 +59,19 @@ describe("useIEEE754Converter", () => {
     expect(result.current.converterMode).toBe("decToIeee");
   });
 
+  it("falls back to default value and mode when locked and no exercise values are given", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({
+        isExerciseMode: true,
+        showSolution: false,
+      }),
+    );
+
+    expect(result.current.locked).toBe(true);
+    expect(result.current.inputValue).toBe("12.5");
+    expect(result.current.converterMode).toBe("decToIeee");
+  });
+
   it("reports decToIeee analysis for 12.5", () => {
     const { result } = renderHook(() =>
       useIEEE754Converter({ initialValue: "12.5" }),
@@ -157,5 +170,94 @@ describe("useIEEE754Converter", () => {
         converterMode: "decToIeee",
       }),
     );
+  });
+
+  it("detects zero as a special case in decToIeee mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({ initialValue: "0" }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isSpecial).toBe(true);
+    expect(result.current.isZero).toBe(true);
+    expect(result.current.isInf).toBe(false);
+    expect(result.current.isNaNVal).toBe(false);
+  });
+
+  it("detects infinity as a special case in decToIeee mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({ initialValue: "Infinity" }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isSpecial).toBe(true);
+    expect(result.current.isInf).toBe(true);
+    expect(result.current.isZero).toBe(false);
+    expect(result.current.isNaNVal).toBe(false);
+  });
+
+  it("detects negative infinity as a special case in decToIeee mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({ initialValue: "-Infinity" }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isInf).toBe(true);
+    expect(result.current.sign).toBe("1");
+  });
+
+  it("decodes IEEE infinity in ieeeToDec mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({
+        initialValue: "01111111100000000000000000000000",
+        initialConverterMode: "ieeeToDec",
+      }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isInf).toBe(true);
+    expect(result.current.isSpecial).toBe(true);
+    expect(result.current.isNaNVal).toBe(false);
+  });
+
+  it("decodes IEEE NaN in ieeeToDec mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({
+        initialValue: "01111111100000000000000000000001",
+        initialConverterMode: "ieeeToDec",
+      }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isNaNVal).toBe(true);
+    expect(result.current.isSpecial).toBe(true);
+  });
+
+  it("decodes IEEE zero in ieeeToDec mode", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({
+        initialValue: "00000000000000000000000000000000",
+        initialConverterMode: "ieeeToDec",
+      }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isZero).toBe(true);
+    expect(result.current.isSpecial).toBe(true);
+    expect(result.current.floatVal).toBe(0);
+  });
+
+  it("decodes a subnormal IEEE number and computes fraction steps", () => {
+    const { result } = renderHook(() =>
+      useIEEE754Converter({
+        initialValue: "00000000010000000000000000000000",
+        initialConverterMode: "ieeeToDec",
+      }),
+    );
+
+    expect(result.current.isValid).toBe(true);
+    expect(result.current.isSpecial).toBe(false);
+    expect(result.current.sumOfFractions).toBeGreaterThan(0);
+    expect(result.current.fractionSteps.length).toBeGreaterThan(0);
   });
 });

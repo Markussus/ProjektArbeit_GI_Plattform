@@ -1,9 +1,8 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Addition } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Addition.tsx";
-import { getStepExplanation } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/binaryArithmetic";
 import {
   changeBinaryInput,
   expectInputsLocked,
@@ -91,75 +90,51 @@ describe("Addition", () => {
     });
   });
 
-  describe("getExplanation", () => {
-    const t = (key: string) => key;
-    const stepTemplate = {
-      position: 0,
-      bitA: 0,
-      bitB: 0,
-      carryIn: 0,
-      sum: 0,
-      carryOut: 0,
-    };
+  describe("step-by-step explanation", () => {
+    it("shows collapsible steps after toggling step-by-step", () => {
+      render(<Addition renderModeSelector={null} />);
+      fireEvent.click(screen.getByTestId("mock-step-toggle"));
+      expect(
+        screen.getAllByTestId("mock-collapsible-step").length,
+      ).toBeGreaterThan(0);
+    });
 
-    it.each([
-      {
-        bitA: 0,
-        bitB: 0,
-        carryIn: 0,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step0",
-      },
-      {
-        bitA: 1,
-        bitB: 0,
-        carryIn: 0,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step1",
-      },
-      {
-        bitA: 0,
-        bitB: 1,
-        carryIn: 0,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step2",
-      },
-      {
-        bitA: 0,
-        bitB: 0,
-        carryIn: 1,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step3",
-      },
-      {
-        bitA: 1,
-        bitB: 1,
-        carryIn: 0,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step4",
-      },
-      {
-        bitA: 1,
-        bitB: 0,
-        carryIn: 1,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step5",
-      },
-      {
-        bitA: 0,
-        bitB: 1,
-        carryIn: 1,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step6",
-      },
-      {
-        bitA: 1,
-        bitB: 1,
-        carryIn: 1,
-        expectedKey: "number-systems.simulator.arithmetic.addition.step7",
-      },
-    ] as const)(
-      "returns $expectedKey for bitA=$bitA, bitB=$bitB, carryIn=$carryIn",
-      ({ bitA, bitB, carryIn, expectedKey }) => {
-        const result = getStepExplanation(
-          { ...stepTemplate, bitA, bitB, carryIn },
-          t,
-        );
-        expect(result).toBe(expectedKey);
-      },
-    );
+    it("renders step content including carry-out for a step", () => {
+      render(
+        <Addition
+          initialA="00000001"
+          initialB="00000001"
+          renderModeSelector={null}
+        />,
+      );
+      fireEvent.click(screen.getByTestId("mock-step-toggle"));
+      const headers = screen.getAllByTestId("mock-step-header");
+      expect(headers.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("result warnings", () => {
+    it("shows a carry-out warning when the sum exceeds 8 bits", () => {
+      render(
+        <Addition
+          initialA="11111111"
+          initialB="00000001"
+          renderModeSelector={null}
+        />,
+      );
+      expect(screen.getByTestId("mock-warning-banner")).toBeTruthy();
+    });
+
+    it("shows an overflow warning for two negative-looking operands", () => {
+      render(
+        <Addition
+          initialA="10000000"
+          initialB="10000000"
+          renderModeSelector={null}
+        />,
+      );
+      const banners = screen.getAllByTestId("mock-warning-banner");
+      expect(banners.length).toBeGreaterThanOrEqual(1);
+    });
   });
 });

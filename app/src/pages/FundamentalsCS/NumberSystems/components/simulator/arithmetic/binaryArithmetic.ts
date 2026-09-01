@@ -61,8 +61,8 @@ export function addBinary8Bit(
   const steps: BitStep[] = [];
 
   for (let i = 7; i >= 0; i--) {
-    const bitA = parseInt(padA[i] || "0");
-    const bitB = parseInt(padB[i] || "0");
+    const bitA = parseInt(padA[i]);
+    const bitB = parseInt(padB[i]);
     const carryIn = carriesArr[7 - i];
     const s = bitA + bitB + carryIn;
     sumArr[i] = s % 2;

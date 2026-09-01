@@ -43,6 +43,22 @@ describe("fractionalConversion", () => {
         fracPartStr: "0",
       });
     });
+
+    it("fills missing integer part with '0'", () => {
+      expect(parseFractionalInput(".5")).toEqual({
+        isNegative: false,
+        intPartStr: "0",
+        fracPartStr: "5",
+      });
+    });
+
+    it("fills missing fractional digits with '0'", () => {
+      expect(parseFractionalInput("10.")).toEqual({
+        isNegative: false,
+        intPartStr: "10",
+        fracPartStr: "0",
+      });
+    });
   });
 
   describe("convertDecToBin", () => {
@@ -95,6 +111,36 @@ describe("fractionalConversion", () => {
         fracPartStr: "1",
       });
       expect(result.fracSteps.length).toBeLessThanOrEqual(10);
+    });
+
+    it("falls back to zero for non-numeric integer parts", () => {
+      const result = convertDecToBin({
+        isNegative: false,
+        intPartStr: "not-a-number",
+        fracPartStr: "0",
+      });
+      expect(result.intVal).toBe(0);
+      expect(result.binIntPart).toBe("0");
+    });
+
+    it("appends ellipsis when fractional part does not terminate within max steps", () => {
+      const result = convertDecToBin({
+        isNegative: false,
+        intPartStr: "0",
+        fracPartStr: "1",
+      });
+      expect(result.fracSteps.length).toBe(10);
+      expect(result.binFracDisplay).toMatch(/\.\.\.$/);
+    });
+
+    it("does not append ellipsis for terminating fractional parts", () => {
+      const result = convertDecToBin({
+        isNegative: false,
+        intPartStr: "0",
+        fracPartStr: "5",
+      });
+      expect(result.binFracDisplay).not.toContain("...");
+      expect(result.binFracPart).toBe("1");
     });
   });
 

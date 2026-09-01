@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   resolveRandomInit,
   defaultExerciseState,
@@ -6,6 +6,10 @@ import {
 import { exerciseStateConfig } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/exerciseStateConfig";
 
 describe("exerciseStateResolver", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("returns default state when no exercise is active", () => {
     expect(defaultExerciseState).toEqual({
       mode: "integers",
@@ -137,5 +141,73 @@ describe("exerciseStateResolver", () => {
     const init = resolveRandomInit(config);
 
     expect(init).not.toHaveProperty("randomDecToBin");
+  });
+
+  it("generates a hex target base when randomBinToHexOct rolls high", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.9);
+    const config = exerciseStateConfig["number-systems.ex_u04_binToHexOct"];
+    const init = resolveRandomInit(config);
+    expect(init.initialTargetBase).toBe("hex");
+  });
+
+  it("generates an oct target base when randomBinToHexOct rolls low", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.1);
+    const config = exerciseStateConfig["number-systems.ex_u04_binToHexOct"];
+    const init = resolveRandomInit(config);
+    expect(init.initialTargetBase).toBe("oct");
+  });
+
+  it("generates addition when randomAddSub rolls high", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.9);
+    const config = exerciseStateConfig["number-systems.ex_u06_addSub"];
+    const init = resolveRandomInit(config);
+    expect(init.initialSubMode).toBe("addition");
+  });
+
+  it("generates subtraction when randomAddSub rolls low", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.1);
+    const config = exerciseStateConfig["number-systems.ex_u06_addSub"];
+    const init = resolveRandomInit(config);
+    expect(init.initialSubMode).toBe("subtraction");
+  });
+
+  it("generates negative and positive float values for floatToBin", () => {
+    const config = exerciseStateConfig["number-systems.ex_u05_floatToBin"];
+
+    vi.spyOn(Math, "random").mockReturnValue(0.0);
+    const initLow = resolveRandomInit(config);
+    expect(Number(initLow.initialValue)).toBeLessThan(0);
+
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const initHigh = resolveRandomInit(config);
+    expect(Number(initHigh.initialValue)).toBeGreaterThan(0);
+  });
+
+  it("generates positive and negative IEEE encode values", () => {
+    const config = exerciseStateConfig["number-systems.ex_u05_ieeeEncode"];
+
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const init = resolveRandomInit(config);
+    expect(Number(init.initialValue)).toBeGreaterThan(0);
+
+    vi.spyOn(Math, "random").mockReturnValue(0.0);
+    const initNeg = resolveRandomInit(config);
+    expect(Number(initNeg.initialValue)).toBeLessThan(0);
+  });
+
+  it("generates sign 1 for ieeeDecode when random rolls low", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.0);
+    const config = exerciseStateConfig["number-systems.ex_u05_ieeeDecode"];
+    const init = resolveRandomInit(config);
+    expect(init.initialValue?.startsWith("1")).toBe(true);
+    expect(init.initialValue).toMatch(/^[01]{32}$/);
+  });
+
+  it("generates sign 0 for ieeeDecode when random rolls high", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const config = exerciseStateConfig["number-systems.ex_u05_ieeeDecode"];
+    const init = resolveRandomInit(config);
+    expect(init.initialValue?.startsWith("0")).toBe(true);
+    expect(init.initialValue).toMatch(/^[01]{32}$/);
   });
 });
