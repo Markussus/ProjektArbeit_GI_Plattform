@@ -49,23 +49,12 @@ function SidebarToggleHeader({ onToggle }: SidebarToggleHeaderProps) {
 }
 
 interface SidebarModuleHeaderProps {
-  module: LearningModuleDefinition | undefined;
+  module: LearningModuleDefinition;
   isOverview: boolean;
-  collapsed: boolean;
-  showNavigation: boolean;
 }
 
-function SidebarModuleHeader({
-  module,
-  isOverview,
-  collapsed,
-  showNavigation,
-}: SidebarModuleHeaderProps) {
+function SidebarModuleHeader({ module, isOverview }: SidebarModuleHeaderProps) {
   const { t } = useTranslation();
-
-  if (collapsed || !showNavigation || !module) {
-    return null;
-  }
 
   return (
     <div className="shrink-0 px-4 pb-3">
@@ -80,6 +69,24 @@ function SidebarModuleHeader({
       </NavLink>
     </div>
   );
+}
+
+interface SidebarModuleSectionProps {
+  module: LearningModuleDefinition | undefined;
+  isOverview: boolean;
+  collapsed: boolean;
+}
+
+function SidebarModuleSection({
+  module,
+  isOverview,
+  collapsed,
+}: SidebarModuleSectionProps) {
+  if (!module || collapsed) {
+    return null;
+  }
+
+  return <SidebarModuleHeader module={module} isOverview={isOverview} />;
 }
 
 interface SidebarTopicItemProps {
@@ -133,16 +140,11 @@ function SidebarTopicNav({ module, collapsed }: SidebarTopicNavProps) {
 
 interface SidebarNavContentProps {
   module: LearningModuleDefinition | undefined;
-  showNavigation: boolean;
   collapsed: boolean;
 }
 
-function SidebarNavContent({
-  module,
-  showNavigation,
-  collapsed,
-}: SidebarNavContentProps) {
-  if (!showNavigation || !module) {
+function SidebarNavContent({ module, collapsed }: SidebarNavContentProps) {
+  if (!module) {
     return <div className="flex-1" />;
   }
 
@@ -177,20 +179,25 @@ function SidebarInfoLink({ collapsed }: SidebarInfoLinkProps) {
   );
 }
 
+function resolveActiveSidebarState(pathname: string) {
+  const activeModule = findModuleByPath(pathname);
+  const showNav = pathname !== "/" && Boolean(activeModule);
+  return {
+    activeModule: showNav ? activeModule : undefined,
+    isOverview: Boolean(activeModule && pathname === activeModule.path),
+  };
+}
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
-
-  const isHome = location.pathname === "/";
-  const activeModule = findModuleByPath(location.pathname);
-  const showNavigation = !isHome && Boolean(activeModule);
-  const isModuleOverview = Boolean(
-    activeModule && location.pathname === activeModule.path,
+  const { activeModule, isOverview } = resolveActiveSidebarState(
+    location.pathname,
   );
 
   return (
     <aside
       data-testid="sidebar"
-      data-collapsed={collapsed ? "true" : "false"}
+      data-collapsed={String(collapsed)}
       className={cn(
         "border-border bg-background flex h-full flex-col border-r",
         collapsed ? "w-16" : "w-64",
@@ -198,18 +205,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       <SidebarToggleHeader onToggle={onToggle} />
 
-      <SidebarModuleHeader
+      <SidebarModuleSection
         module={activeModule}
-        isOverview={isModuleOverview}
+        isOverview={isOverview}
         collapsed={collapsed}
-        showNavigation={showNavigation}
       />
 
-      <SidebarNavContent
-        module={activeModule}
-        showNavigation={showNavigation}
-        collapsed={collapsed}
-      />
+      <SidebarNavContent module={activeModule} collapsed={collapsed} />
 
       <SidebarInfoLink collapsed={collapsed} />
     </aside>
