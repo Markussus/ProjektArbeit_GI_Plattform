@@ -2,9 +2,12 @@ import { useCallback, useMemo, useState } from "react";
 import {
   addMealyInputSymbol,
   addMealyState,
+  changeMealyOutputCode,
+  findMealyOutputCodeBySymbol,
   removeMealyInputSymbol,
   removeMealyState,
   renameMealyInputSymbol,
+  renameMealyOutputSymbol,
   renameMealyState,
   setMealyOutput,
   setMealyTransition,
@@ -14,7 +17,6 @@ import {
   getNextMealyOutputCode,
   validateMealyProgram,
 } from "../domain/mealyProgram";
-import { MAX_NAME_LENGTH } from "../domain/programCommon";
 import type { MealyProgram } from "../domain/mealyTypes";
 
 export function useMealyProgramEditor(initialProgram: MealyProgram) {
@@ -88,17 +90,7 @@ export function useMealyProgramEditor(initialProgram: MealyProgram) {
   const handleOutputSymbolChange = useCallback(
     (inputSymbol: string, state: string, symbol: string) => {
       setProgram((current) => {
-        let existingCode: number | undefined;
-        for (const input of current.inputSymbols) {
-          for (const s of current.states) {
-            const out = current.outputs[input]?.[s];
-            if (out && out.symbol === symbol) {
-              existingCode = out.code;
-              break;
-            }
-          }
-          if (existingCode !== undefined) break;
-        }
+        const existingCode = findMealyOutputCodeBySymbol(current, symbol);
         const code = existingCode ?? getNextMealyOutputCode(current);
         return setMealyOutput(current, inputSymbol, state, { symbol, code });
       });
@@ -108,50 +100,16 @@ export function useMealyProgramEditor(initialProgram: MealyProgram) {
 
   const handleOutputSymbolRename = useCallback(
     (previousSymbol: string, nextSymbol: string): boolean => {
-      const trimmed = nextSymbol.trim();
-      if (!trimmed || trimmed.length > MAX_NAME_LENGTH) {
-        return false;
-      }
-      if (trimmed === previousSymbol) {
-        return true;
-      }
-
-      setProgram((current) => {
-        let existingCode: number | undefined;
-        for (const input of current.inputSymbols) {
-          for (const s of current.states) {
-            const out = current.outputs[input]?.[s];
-            if (out && out.symbol === trimmed) {
-              existingCode = out.code;
-              break;
-            }
-          }
-          if (existingCode !== undefined) break;
-        }
-
-        const nextOutputs = { ...current.outputs };
-        for (const input of current.inputSymbols) {
-          if (!current.outputs[input]) continue;
-          nextOutputs[input] = { ...current.outputs[input] };
-          for (const s of current.states) {
-            const out = nextOutputs[input][s];
-            if (!out) continue;
-            if (out.symbol === previousSymbol) {
-              nextOutputs[input][s] = {
-                symbol: trimmed,
-                code: existingCode ?? out.code,
-              };
-            }
-          }
-        }
-        return {
-          ...current,
-          outputs: nextOutputs,
-        };
-      });
+      const renamed = renameMealyOutputSymbol(
+        program,
+        previousSymbol,
+        nextSymbol,
+      );
+      if (!renamed) return false;
+      setProgram(renamed);
       return true;
     },
-    [],
+    [program],
   );
 
   const handleOutputSymbolCreate = useCallback(
@@ -170,57 +128,9 @@ export function useMealyProgramEditor(initialProgram: MealyProgram) {
 
   const handleOutputCodeChange = useCallback(
     (inputSymbol: string, state: string, code: number) => {
-      setProgram((current) => {
-        const targetSymbol = current.outputs[inputSymbol]?.[state]?.symbol;
-        if (!targetSymbol) {
-          return setMealyOutput(current, inputSymbol, state, { code });
-        }
-        const oldCode = current.outputs[inputSymbol]?.[state]?.code ?? 0;
-        if (oldCode === code) {
-          return current;
-        }
-
-        // Check if another symbol already has this code (collision -> swap)
-        let collidingSymbol: string | undefined;
-        for (const input of current.inputSymbols) {
-          for (const s of current.states) {
-            const out = current.outputs[input]?.[s];
-            if (out && out.symbol !== targetSymbol && out.code === code) {
-              collidingSymbol = out.symbol;
-              break;
-            }
-          }
-          if (collidingSymbol) break;
-        }
-
-        const nextOutputs = { ...current.outputs };
-        for (const input of current.inputSymbols) {
-          if (!current.outputs[input]) continue;
-          nextOutputs[input] = { ...current.outputs[input] };
-          for (const s of current.states) {
-            const currentCell = nextOutputs[input][s];
-            if (!currentCell) continue;
-            if (currentCell.symbol === targetSymbol) {
-              nextOutputs[input][s] = {
-                ...currentCell,
-                code,
-              };
-            } else if (
-              collidingSymbol &&
-              currentCell.symbol === collidingSymbol
-            ) {
-              nextOutputs[input][s] = {
-                ...currentCell,
-                code: oldCode,
-              };
-            }
-          }
-        }
-        return {
-          ...current,
-          outputs: nextOutputs,
-        };
-      });
+      setProgram((current) =>
+        changeMealyOutputCode(current, inputSymbol, state, code),
+      );
     },
     [],
   );

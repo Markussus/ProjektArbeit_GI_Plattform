@@ -129,5 +129,38 @@ describe("useMooreProgramEditor and useMealyProgramEditor hooks", () => {
       expect(result.current.program.outputs["0"].START.symbol).toBe("O_NEW");
       expect(result.current.program.outputs["0"].START.code).toBe(55);
     });
+
+    it("normalizes optional names and rejects invalid renames", () => {
+      const { result } = renderHook(() =>
+        useMealyProgramEditor(defaultMealyProgram),
+      );
+
+      act(() => {
+        expect(result.current.handleStateRename("START", "SEEN_1")).toBe(false);
+        expect(result.current.handleInputSymbolRename("0", "1")).toBe(false);
+        expect(result.current.handleOutputSymbolRename("NO_MATCH", "")).toBe(
+          false,
+        );
+      });
+
+      let generatedState = "";
+      act(() => {
+        generatedState = result.current.handleAddState(" START ");
+      });
+      expect(generatedState).not.toBe("START");
+      expect(result.current.program.states).toContain(generatedState);
+
+      act(() => {
+        result.current.handleOutputSymbolChange("0", "START", "MATCH_101");
+      });
+      expect(result.current.program.outputs["0"].START.code).toBe(1);
+
+      act(() => {
+        result.current.handleOutputSymbolCreate("0", "START", "   ");
+      });
+      expect(result.current.program.outputs["0"].START.symbol).toMatch(
+        /^OUT_\d+$/,
+      );
+    });
   });
 });

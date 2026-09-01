@@ -11,6 +11,12 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
 import { Tooltip } from "@/components/shared/Tooltip";
+import {
+  createCircularLayout,
+  createDirectedEdgeGeometry,
+  createSelfLoopGeometry,
+  type Point,
+} from "./stateMachineGraphGeometry";
 
 export interface StateMachineGraphNode {
   id: string;
@@ -248,131 +254,18 @@ export function StateMachineGraph({
 
         {nodes.map((node) => {
           const position = positions.get(node.id);
-          if (!position) {
-            return null;
-          }
-
-          return (
-            <g
+          return position ? (
+            <StateNode
               key={node.id}
-              data-testid={`state-machine-node-${node.id}`}
-              onMouseDown={(event) => {
-                if (event.button !== 0) {
-                  return;
-                }
-                event.preventDefault();
-                event.stopPropagation();
-                setDraggedNodeId(node.id);
-              }}
-              className={
-                draggedNodeId === node.id ? "cursor-grabbing" : "cursor-grab"
-              }
-            >
-              {node.isStart && (
-                <>
-                  <line
-                    x1={position.x - nodeRadius - 40}
-                    y1={position.y}
-                    x2={position.x - nodeRadius - 5}
-                    y2={position.y}
-                    className="stroke-muted-foreground"
-                    strokeWidth="2"
-                    markerEnd={`url(#${arrowMarkerId})`}
-                  />
-                  <text
-                    x={position.x - nodeRadius - 44}
-                    y={position.y - 5}
-                    textAnchor="end"
-                    className="fill-muted-foreground text-[11px] font-medium"
-                  >
-                    {t("moore-mealy.graph.start", "Start")}
-                  </text>
-                </>
-              )}
-              {node.isAccept && (
-                <circle
-                  cx={position.x}
-                  cy={position.y}
-                  r={nodeRadius + 6}
-                  className={cn(
-                    "stroke-border fill-none transition-colors",
-                    node.isActive && "stroke-brand",
-                    node.isViolation && "stroke-destructive",
-                  )}
-                  strokeWidth={node.isActive ? 2.5 : 1.5}
-                />
-              )}
-              <circle
-                cx={position.x}
-                cy={position.y}
-                r={nodeRadius}
-                className={cn(
-                  "fill-card stroke-border transition-colors",
-                  node.isActive && "fill-brand/15 stroke-brand",
-                  node.isPreview && "fill-brand/5 stroke-brand",
-                  node.isViolation && "fill-destructive/15 stroke-destructive",
-                )}
-                strokeWidth={
-                  node.isActive || node.isPreview || node.isViolation ? 3.5 : 2
-                }
-                strokeDasharray={node.isPreview ? "8 6" : undefined}
-              />
-              <text
-                x={position.x}
-                y={position.y - (node.output ? 9 : -4)}
-                textAnchor="middle"
-                className={cn(
-                  "fill-foreground text-[13px] font-semibold select-none",
-                  node.isActive && "fill-brand",
-                  node.isPreview && "fill-brand",
-                  node.isViolation && "fill-destructive",
-                )}
-              >
-                {node.label}
-              </text>
-              {node.isViolation && (
-                <g>
-                  <circle
-                    cx={position.x + nodeRadius * 0.7}
-                    cy={position.y - nodeRadius * 0.7}
-                    r={7.5}
-                    className="fill-destructive"
-                  />
-                  <text
-                    x={position.x + nodeRadius * 0.7}
-                    y={position.y - nodeRadius * 0.7 + 3.5}
-                    textAnchor="middle"
-                    className="fill-destructive-foreground text-[10px] font-extrabold"
-                  >
-                    !
-                  </text>
-                </g>
-              )}
-              {node.output !== undefined && (
-                <>
-                  <line
-                    x1={position.x - nodeRadius + 4}
-                    y1={position.y}
-                    x2={position.x + nodeRadius - 4}
-                    y2={position.y}
-                    className={cn(
-                      "stroke-border",
-                      (node.isActive || node.isPreview) && "stroke-brand",
-                    )}
-                    strokeWidth="1.5"
-                  />
-                  <text
-                    x={position.x}
-                    y={position.y + 19}
-                    textAnchor="middle"
-                    className="fill-muted-foreground text-[12px]"
-                  >
-                    {node.output}
-                  </text>
-                </>
-              )}
-            </g>
-          );
+              node={node}
+              position={position}
+              nodeRadius={nodeRadius}
+              arrowMarkerId={arrowMarkerId}
+              startLabel={t("moore-mealy.graph.start", "Start")}
+              isDragged={draggedNodeId === node.id}
+              onDragStart={setDraggedNodeId}
+            />
+          ) : null;
         })}
       </svg>
       <div className="absolute top-3 right-3 flex gap-1" data-no-pan>
@@ -456,72 +349,218 @@ function GraphButton({
   );
 }
 
-interface Point {
-  x: number;
-  y: number;
+function StateNode({
+  node,
+  position,
+  nodeRadius,
+  arrowMarkerId,
+  startLabel,
+  isDragged,
+  onDragStart,
+}: {
+  node: StateMachineGraphNode;
+  position: Point;
+  nodeRadius: number;
+  arrowMarkerId: string;
+  startLabel: string;
+  isDragged: boolean;
+  onDragStart: (nodeId: string) => void;
+}) {
+  const handleMouseDown = (event: React.MouseEvent<SVGGElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onDragStart(node.id);
+  };
+
+  return (
+    <g
+      data-testid={`state-machine-node-${node.id}`}
+      onMouseDown={handleMouseDown}
+      className={isDragged ? "cursor-grabbing" : "cursor-grab"}
+    >
+      <StateStartIndicator
+        visible={Boolean(node.isStart)}
+        position={position}
+        nodeRadius={nodeRadius}
+        arrowMarkerId={arrowMarkerId}
+        label={startLabel}
+      />
+      <StateAcceptRing
+        visible={Boolean(node.isAccept)}
+        position={position}
+        nodeRadius={nodeRadius}
+        active={Boolean(node.isActive)}
+        violation={Boolean(node.isViolation)}
+      />
+      <circle
+        cx={position.x}
+        cy={position.y}
+        r={nodeRadius}
+        className={cn(
+          "fill-card stroke-border transition-colors",
+          node.isActive && "fill-brand/15 stroke-brand",
+          node.isPreview && "fill-brand/5 stroke-brand",
+          node.isViolation && "fill-destructive/15 stroke-destructive",
+        )}
+        strokeWidth={
+          node.isActive || node.isPreview || node.isViolation ? 3.5 : 2
+        }
+        strokeDasharray={node.isPreview ? "8 6" : undefined}
+      />
+      <text
+        x={position.x}
+        y={position.y - (node.output ? 9 : -4)}
+        textAnchor="middle"
+        className={cn(
+          "fill-foreground text-[13px] font-semibold select-none",
+          node.isActive && "fill-brand",
+          node.isPreview && "fill-brand",
+          node.isViolation && "fill-destructive",
+        )}
+      >
+        {node.label}
+      </text>
+      <StateViolationIndicator
+        visible={Boolean(node.isViolation)}
+        position={position}
+        nodeRadius={nodeRadius}
+      />
+      <StateOutput
+        output={node.output}
+        position={position}
+        nodeRadius={nodeRadius}
+        highlighted={Boolean(node.isActive || node.isPreview)}
+      />
+    </g>
+  );
 }
 
-function createCircularLayout(
-  nodes: StateMachineGraphNode[],
-  nodeRadius: number,
-) {
-  const n = nodes.length;
-  const radius =
-    n <= 1
-      ? 0
-      : n === 2
-        ? 120
-        : Math.max(120, (n * (nodeRadius * 2 + 55)) / (2 * Math.PI));
+function StateStartIndicator({
+  visible,
+  position,
+  nodeRadius,
+  arrowMarkerId,
+  label,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+  arrowMarkerId: string;
+  label: string;
+}) {
+  if (!visible) return null;
+  return (
+    <>
+      <line
+        x1={position.x - nodeRadius - 40}
+        y1={position.y}
+        x2={position.x - nodeRadius - 5}
+        y2={position.y}
+        className="stroke-muted-foreground"
+        strokeWidth="2"
+        markerEnd={`url(#${arrowMarkerId})`}
+      />
+      <text
+        x={position.x - nodeRadius - 44}
+        y={position.y - 5}
+        textAnchor="end"
+        className="fill-muted-foreground text-[11px] font-medium"
+      >
+        {label}
+      </text>
+    </>
+  );
+}
 
-  const rawPositions = new Map<string, Point>();
-  nodes.forEach((node, index) => {
-    let angle: number;
-    if (n === 2) {
-      angle = index === 0 ? Math.PI : 0;
-    } else {
-      angle = -Math.PI / 2 + (index * Math.PI * 2) / Math.max(n, 1);
-    }
-    rawPositions.set(node.id, {
-      x: radius * Math.cos(angle),
-      y: radius * Math.sin(angle),
-    });
-  });
+function StateAcceptRing({
+  visible,
+  position,
+  nodeRadius,
+  active,
+  violation,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+  active: boolean;
+  violation: boolean;
+}) {
+  if (!visible) return null;
+  return (
+    <circle
+      cx={position.x}
+      cy={position.y}
+      r={nodeRadius + 6}
+      className={cn(
+        "stroke-border fill-none transition-colors",
+        active && "stroke-brand",
+        violation && "stroke-destructive",
+      )}
+      strokeWidth={active ? 2.5 : 1.5}
+    />
+  );
+}
 
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minY = Infinity;
-  let maxY = -Infinity;
+function StateViolationIndicator({
+  visible,
+  position,
+  nodeRadius,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+}) {
+  if (!visible) return null;
+  const x = position.x + nodeRadius * 0.7;
+  const y = position.y - nodeRadius * 0.7;
+  return (
+    <g>
+      <circle cx={x} cy={y} r={7.5} className="fill-destructive" />
+      <text
+        x={x}
+        y={y + 3.5}
+        textAnchor="middle"
+        className="fill-destructive-foreground text-[10px] font-extrabold"
+      >
+        !
+      </text>
+    </g>
+  );
+}
 
-  for (const p of rawPositions.values()) {
-    if (p.x < minX) minX = p.x;
-    if (p.x > maxX) maxX = p.x;
-    if (p.y < minY) minY = p.y;
-    if (p.y > maxY) maxY = p.y;
-  }
-
-  const paddingLeft = nodeRadius + 60;
-  const paddingRight = nodeRadius + 50;
-  const paddingTop = nodeRadius + 75;
-  const paddingBottom = nodeRadius + 50;
-
-  const contentWidth = maxX - minX + paddingLeft + paddingRight;
-  const contentHeight = maxY - minY + paddingTop + paddingBottom;
-
-  const width = Math.max(n <= 1 ? 300 : n <= 2 ? 380 : 440, contentWidth);
-  const height = Math.max(n <= 1 ? 240 : n <= 2 ? 280 : 360, contentHeight);
-
-  const offsetX = paddingLeft - minX + (width - contentWidth) / 2;
-  const offsetY = paddingTop - minY + (height - contentHeight) / 2;
-
-  const positions = new Map<string, Point>();
-  for (const [id, p] of rawPositions.entries()) {
-    positions.set(id, {
-      x: p.x + offsetX,
-      y: p.y + offsetY,
-    });
-  }
-
-  return { width, height, positions };
+function StateOutput({
+  output,
+  position,
+  nodeRadius,
+  highlighted,
+}: {
+  output?: string;
+  position: Point;
+  nodeRadius: number;
+  highlighted: boolean;
+}) {
+  if (output === undefined) return null;
+  return (
+    <>
+      <line
+        x1={position.x - nodeRadius + 4}
+        y1={position.y}
+        x2={position.x + nodeRadius - 4}
+        y2={position.y}
+        className={cn("stroke-border", highlighted && "stroke-brand")}
+        strokeWidth="1.5"
+      />
+      <text
+        x={position.x}
+        y={position.y + 19}
+        textAnchor="middle"
+        className="fill-muted-foreground text-[12px]"
+      >
+        {output}
+      </text>
+    </>
+  );
 }
 
 function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
@@ -567,14 +606,6 @@ function DirectedEdge({
   violationArrowMarkerId: string;
   nodeRadius: number;
 }) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const distance = Math.hypot(dx, dy) || 1;
-  const unitX = dx / distance;
-  const unitY = dy / distance;
-  const normX = -unitY;
-  const normY = unitX;
-
   const edgeColorClass = active
     ? "stroke-brand"
     : isViolation
@@ -585,28 +616,15 @@ function DirectedEdge({
     : isViolation
       ? violationArrowMarkerId
       : arrowMarkerId;
+  const geometry = createDirectedEdgeGeometry(
+    from,
+    to,
+    nodeRadius,
+    isBidirectional,
+  );
 
-  if (isBidirectional) {
-    const lateralShift = 6;
-    const curveAmount = 24;
-    const start = {
-      x: from.x + unitX * nodeRadius + normX * lateralShift,
-      y: from.y + unitY * nodeRadius + normY * lateralShift,
-    };
-    const end = {
-      x: to.x - unitX * (nodeRadius + 6) + normX * lateralShift,
-      y: to.y - unitY * (nodeRadius + 6) + normY * lateralShift,
-    };
-    const midX = (start.x + end.x) / 2;
-    const midY = (start.y + end.y) / 2;
-    const controlX = midX + normX * curveAmount;
-    const controlY = midY + normY * curveAmount;
-
-    const labelX = midX + normX * (curveAmount + 14);
-    const labelY = midY + normY * (curveAmount + 14);
-
-    const pathData = `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
-
+  if (geometry.control) {
+    const pathData = `M ${geometry.start.x} ${geometry.start.y} Q ${geometry.control.x} ${geometry.control.y} ${geometry.end.x} ${geometry.end.y}`;
     return (
       <g>
         <path
@@ -617,8 +635,8 @@ function DirectedEdge({
           markerEnd={`url(#${markerId})`}
         />
         <EdgeLabel
-          x={labelX}
-          y={labelY}
+          x={geometry.label.x}
+          y={geometry.label.y}
           label={label}
           active={active}
           isViolation={isViolation}
@@ -628,31 +646,20 @@ function DirectedEdge({
     );
   }
 
-  const start = {
-    x: from.x + unitX * nodeRadius,
-    y: from.y + unitY * nodeRadius,
-  };
-  const end = {
-    x: to.x - unitX * (nodeRadius + 6),
-    y: to.y - unitY * (nodeRadius + 6),
-  };
-  const labelX = (start.x + end.x) / 2 + normX * 14;
-  const labelY = (start.y + end.y) / 2 + normY * 14;
-
   return (
     <g>
       <line
-        x1={start.x}
-        y1={start.y}
-        x2={end.x}
-        y2={end.y}
+        x1={geometry.start.x}
+        y1={geometry.start.y}
+        x2={geometry.end.x}
+        y2={geometry.end.y}
         className={edgeColorClass}
         strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
         markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel
-        x={labelX}
-        y={labelY}
+        x={geometry.label.x}
+        y={geometry.label.y}
         label={label}
         active={active}
         isViolation={isViolation}
@@ -685,17 +692,7 @@ function SelfLoop({
   violationArrowMarkerId: string;
   nodeRadius: number;
 }) {
-  const startX = x - nodeRadius * 0.45;
-  const startY = y - nodeRadius * 0.9;
-  const endX = x + nodeRadius * 0.45;
-  const endY = y - nodeRadius * 0.9;
-  const ctrl1X = x - nodeRadius * 1.35;
-  const ctrl1Y = y - nodeRadius * 2.5;
-  const ctrl2X = x + nodeRadius * 1.35;
-  const ctrl2Y = y - nodeRadius * 2.5;
-
-  const path = `M ${startX} ${startY} C ${ctrl1X} ${ctrl1Y}, ${ctrl2X} ${ctrl2Y}, ${endX} ${endY}`;
-  const labelY = y - nodeRadius * 2.0;
+  const geometry = createSelfLoopGeometry({ x, y }, nodeRadius);
 
   const edgeColorClass = active
     ? "stroke-brand"
@@ -711,15 +708,15 @@ function SelfLoop({
   return (
     <g>
       <path
-        d={path}
+        d={geometry.path}
         fill="none"
         className={edgeColorClass}
         strokeWidth={active ? 3.5 : isViolation ? 2.5 : 1.75}
         markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel
-        x={x}
-        y={labelY}
+        x={geometry.label.x}
+        y={geometry.label.y}
         label={label}
         active={active}
         isViolation={isViolation}

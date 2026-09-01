@@ -81,6 +81,16 @@ describe("SearchableCreatableSelect", () => {
     expect(onChange).toHaveBeenCalledWith("B");
   });
 
+  it("selects an option through its stable test id", () => {
+    const { onChange } = renderSelect();
+    fireEvent.click(screen.getByTestId("state-select"));
+
+    fireEvent.pointerDown(screen.getByTestId("state-select-option-C"));
+
+    expect(onChange).toHaveBeenCalledWith("C");
+    expect(screen.queryByTestId("state-select-search")).not.toBeInTheDocument();
+  });
+
   it("does not create an existing value and closes with Escape", async () => {
     const { onCreate } = renderSelect();
     const trigger = screen.getByTestId("state-select");
@@ -110,5 +120,23 @@ describe("SearchableCreatableSelect", () => {
 
     fireEvent.pointerDown(screen.getByTestId("state-select-rename"));
     expect(onRename).toHaveBeenCalledWith("A", "RENAMED");
+  });
+
+  it("closes on an outside pointer event", () => {
+    renderSelect();
+    fireEvent.click(screen.getByTestId("state-select"));
+    expect(screen.getByTestId("state-select-search")).toBeVisible();
+
+    fireEvent.pointerDown(document.body);
+
+    expect(screen.queryByTestId("state-select-search")).not.toBeInTheDocument();
+  });
+
+  it("does not open while disabled", () => {
+    renderSelect({ disabled: true });
+
+    fireEvent.click(screen.getByTestId("state-select"));
+
+    expect(screen.queryByTestId("state-select-search")).not.toBeInTheDocument();
   });
 });

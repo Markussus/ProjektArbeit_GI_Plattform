@@ -15,6 +15,13 @@ import { ExamplesTab } from "@/pages/FundamentalsCS/MooreMealy/components/Exampl
 import { ExercisesTab } from "@/pages/FundamentalsCS/MooreMealy/components/ExercisesTab";
 import { SimulationTab } from "@/pages/FundamentalsCS/MooreMealy/components/SimulationTab";
 import {
+  MEALY_EXAMPLE_ID,
+  MOORE_EXAMPLE_ID,
+  resolveAutomataSimulationContext,
+  resolveInitialMachineType,
+} from "@/pages/FundamentalsCS/MooreMealy/components/automataSimulationContext";
+import { MEALY_SIMULATOR_TASK_STORAGE_ID } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/MealySimulator";
+import {
   mealyExerciseScenarios,
   mooreExerciseScenarios,
 } from "@/pages/FundamentalsCS/MooreMealy/exercises";
@@ -29,6 +36,71 @@ vi.mock("react-i18next", () => ({
 describe("MooreMealy Page and Tabs", () => {
   afterEach(() => {
     cleanup();
+  });
+
+  it("resolves the initial machine type for exercises, examples, and imports", () => {
+    expect(
+      resolveInitialMachineType({
+        exerciseScenario: mealyExerciseScenarios[0],
+        isMealyExample: false,
+      }),
+    ).toBe("mealy");
+    expect(
+      resolveInitialMachineType({
+        exerciseScenario: null,
+        isMealyExample: true,
+      }),
+    ).toBe("mealy");
+    expect(
+      resolveInitialMachineType({
+        exerciseScenario: null,
+        isMealyExample: false,
+        importedTaskStorageId: MEALY_SIMULATOR_TASK_STORAGE_ID,
+      }),
+    ).toBe("mealy");
+    expect(
+      resolveInitialMachineType({
+        exerciseScenario: null,
+        isMealyExample: false,
+      }),
+    ).toBe("moore");
+  });
+
+  it("resolves the complete free, example, and exercise contexts", () => {
+    expect(
+      resolveAutomataSimulationContext({
+        exerciseScenario: null,
+        selectedItemId: MOORE_EXAMPLE_ID,
+        machineType: "moore",
+      }),
+    ).toMatchObject({
+      isMooreExample: true,
+      isMealyExample: false,
+      storageEnabled: false,
+      activeMachineType: "moore",
+    });
+    expect(
+      resolveAutomataSimulationContext({
+        exerciseScenario: mealyExerciseScenarios[0],
+        selectedItemId: MEALY_EXAMPLE_ID,
+        machineType: "moore",
+      }),
+    ).toMatchObject({
+      isMooreExample: false,
+      isMealyExample: true,
+      storageEnabled: false,
+      activeMachineType: "mealy",
+      mealyExerciseScenario: mealyExerciseScenarios[0],
+    });
+    expect(
+      resolveAutomataSimulationContext({
+        exerciseScenario: null,
+        machineType: "mealy",
+      }),
+    ).toMatchObject({
+      storageEnabled: true,
+      activeMachineType: "mealy",
+    });
   });
 
   it("renders MooreMealyPage and switches between tabs", async () => {
@@ -66,8 +138,15 @@ describe("MooreMealy Page and Tabs", () => {
   });
 
   it("renders ExamplesTab and triggers card selection", () => {
-    const onOpenExample = vi.fn();
-    render(<ExamplesTab onOpenExample={onOpenExample} />);
+    const onSelectExample = vi.fn();
+    const onOpenExampleInSimulation = vi.fn();
+    render(
+      <ExamplesTab
+        selectedExample={null}
+        onSelectExample={onSelectExample}
+        onOpenExampleInSimulation={onOpenExampleInSimulation}
+      />,
+    );
     expect(
       screen.getByTestId(
         "moore-mealy-example-moore-mealy.examples.mooreDefault-select",
@@ -79,6 +158,20 @@ describe("MooreMealy Page and Tabs", () => {
     expect(
       screen.getByTestId("moore-mealy-examples-section-mealy"),
     ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByTestId(
+        "moore-mealy-example-moore-mealy.examples.mooreDefault-select",
+      ),
+    );
+    fireEvent.doubleClick(
+      screen.getByTestId(
+        "moore-mealy-example-moore-mealy.examples.mealyDefault-select",
+      ),
+    );
+
+    expect(onSelectExample).toHaveBeenCalledOnce();
+    expect(onOpenExampleInSimulation).toHaveBeenCalledOnce();
   });
 
   it("renders ExercisesTab and triggers exercise open and reset", () => {

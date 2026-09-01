@@ -190,4 +190,142 @@ describe("javaRunner.worker", () => {
       "Syntax error: ';' expected",
     );
   });
+
+  it("reports compiler construction failures as load errors", async () => {
+    class ThrowingWorker {
+      constructor() {
+        throw new Error("Worker unavailable");
+      }
+    }
+    (globalThis as unknown as { Worker: typeof ThrowingWorker }).Worker =
+      ThrowingWorker;
+
+    await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
+
+    await onMessage?.({
+      data: { type: "preload-compiler", requestId: "req-load-error" },
+    });
+
+    expect(postedMessages).toContainEqual(
+      expect.objectContaining({
+        type: "compiler-load-error",
+        requestId: "req-load-error",
+        error: expect.stringContaining("Worker unavailable"),
+      }),
+    );
+  });
+
+  it("reports asynchronous upstream worker load failures", async () => {
+    let triggerWorkerError: ((message: string) => void) | undefined;
+    class AsyncFailingWorker {
+      onmessage: ((event: { data: UpstreamWorkerMessage }) => void) | null =
+        null;
+      onerror: ((event: { message: string }) => void) | null = null;
+      postMessage = vi.fn();
+      terminate = terminateSpy;
+
+      constructor() {
+        triggerWorkerError = (message) => this.onerror?.({ message });
+      }
+    }
+    (globalThis as unknown as { Worker: typeof AsyncFailingWorker }).Worker =
+      AsyncFailingWorker;
+
+    await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
+
+    const preload = onMessage?.({
+      data: { type: "preload-compiler", requestId: "req-async-load-error" },
+    });
+    triggerWorkerError?.("Network request failed");
+    await preload;
+
+    expect(terminateSpy).toHaveBeenCalledOnce();
+    expect(postedMessages).toContainEqual(
+      expect.objectContaining({
+        type: "compiler-load-error",
+        requestId: "req-async-load-error",
+        error: expect.stringContaining("Network request failed"),
+      }),
+    );
+  });
+
+  it("rejects concurrent compilation and stops the pending request", async () => {
+    class HangingCompileWorker {
+      onmessage: ((event: { data: UpstreamWorkerMessage }) => void) | null =
+        null;
+      onerror: ((event: { message: string }) => void) | null = null;
+      postMessage = vi.fn((data: UpstreamWorkerMessage) => {
+        if (data.command === "load-classlib") {
+          queueMicrotask(() => {
+            this.onmessage?.({ data: { command: "ok", id: data.id } });
+          });
+        }
+      });
+      terminate = terminateSpy;
+
+      constructor() {
+        queueMicrotask(() => {
+          this.onmessage?.({ data: { command: "initialized" } });
+        });
+      }
+    }
+    (globalThis as unknown as { Worker: typeof HangingCompileWorker }).Worker =
+      HangingCompileWorker;
+
+    await import("@/pages/Programming1/Java/components/Simulator/workers/javaRunner.worker");
+    const onMessage = (
+      globalThis as unknown as {
+        onmessage?: (e: { data: Record<string, unknown> }) => Promise<void>;
+      }
+    ).onmessage;
+
+    const firstRequest = onMessage?.({
+      data: {
+        type: "compile-and-run",
+        requestId: "req-pending",
+        sourceCode: "class Main {}",
+      },
+    });
+    await vi.waitFor(() => {
+      expect(postedMessages).toContainEqual({
+        type: "compile-started",
+        requestId: "req-pending",
+      });
+    });
+
+    await onMessage?.({
+      data: {
+        type: "compile-and-run",
+        requestId: "req-concurrent",
+        sourceCode: "class Main {}",
+      },
+    });
+    await onMessage?.({ data: { type: "stop" } });
+    await firstRequest;
+
+    expect(postedMessages).toContainEqual(
+      expect.objectContaining({
+        type: "error",
+        requestId: "req-concurrent",
+        message: "Another Java compilation is already running.",
+      }),
+    );
+    expect(postedMessages).toContainEqual(
+      expect.objectContaining({
+        type: "error",
+        requestId: "req-pending",
+        errorCategory: "stopped",
+      }),
+    );
+  });
 });

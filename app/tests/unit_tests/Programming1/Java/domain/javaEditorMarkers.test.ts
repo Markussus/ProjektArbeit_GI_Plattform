@@ -175,6 +175,26 @@ describe("javaEditorMarkers", () => {
       );
     });
 
+    it("tolerates unavailable Monaco close commands", () => {
+      const mockModel = {} as editor.ITextModel;
+      const markerWidget = {
+        querySelector: vi.fn(() => null),
+      } as unknown as HTMLElement;
+      const mockDom = {
+        querySelector: vi.fn(() => markerWidget),
+        contains: vi.fn(() => false),
+      } as unknown as HTMLElement;
+      const mockEditor = {
+        getModel: () => mockModel,
+        getDomNode: () => mockDom,
+        trigger: vi.fn(() => {
+          throw new Error("Command unavailable");
+        }),
+      } as unknown as editor.IStandaloneCodeEditor;
+
+      expect(() => syncMonacoMarkers(mockEditor, mockMonaco, [])).not.toThrow();
+    });
+
     it("does nothing when editor or monaco is null", () => {
       expect(() => syncMonacoMarkers(null, mockMonaco, [])).not.toThrow();
       expect(() =>
@@ -245,6 +265,27 @@ describe("javaEditorMarkers", () => {
       listener(event);
 
       expect(preventDefault).not.toHaveBeenCalled();
+      expect(onLimitExceeded).not.toHaveBeenCalled();
+    });
+
+    it("ignores paste events without an editor model or clipboard text", () => {
+      const onLimitExceeded = vi.fn();
+      const listener = createPasteLimitListener(
+        {
+          getModel: () => null,
+          getSelection: () => null,
+        } as unknown as editor.IStandaloneCodeEditor,
+        onLimitExceeded,
+      );
+      const event = {
+        clipboardData: null,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as ClipboardEvent;
+
+      listener(event);
+
+      expect(event.preventDefault).not.toHaveBeenCalled();
       expect(onLimitExceeded).not.toHaveBeenCalled();
     });
   });

@@ -71,4 +71,22 @@ describe("StateMachineGraph", () => {
       "100%",
     );
   });
+
+  it("starts node dragging only with the primary mouse button", () => {
+    render(
+      <StateMachineGraph
+        nodes={nodes}
+        edges={edges}
+        ariaLabel="Machine"
+        testId="machine"
+      />,
+    );
+    const node = screen.getByTestId("state-machine-node-A");
+
+    fireEvent.mouseDown(node, { button: 2 });
+    expect(node).toHaveClass("cursor-grab");
+
+    fireEvent.mouseDown(node, { button: 0 });
+    expect(node).toHaveClass("cursor-grabbing");
+  });
 });

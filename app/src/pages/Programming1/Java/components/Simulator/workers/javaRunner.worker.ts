@@ -16,6 +16,10 @@ import {
   normalizeWorkerError,
   type UpstreamWorkerMessage,
 } from "./javaRunnerHelpers";
+import {
+  createBufferedWorkerOutput,
+  installTeaVmConsole,
+} from "./javaRuntimeOutput";
 
 interface JavaWorkerScope {
   onmessage:
@@ -295,37 +299,19 @@ async function runGeneratedProgram(
   requestId: string,
   artifacts: JavaExecutionArtifacts,
 ): Promise<{ stdout: string; stderr: string }> {
-  let stdout = "";
-  let stderr = "";
-
-  let stdoutBuffer = "";
-  let stderrBuffer = "";
-  let stdoutTimeout: number | undefined;
-  let stderrTimeout: number | undefined;
-
-  const flushStdout = () => {
-    if (stdoutBuffer) {
-      workerScope.postMessage({
-        type: "stdout",
-        requestId,
-        data: stdoutBuffer,
-      });
-      stdoutBuffer = "";
-    }
-    stdoutTimeout = undefined;
+  const outputOptions = {
+    requestId,
+    postMessage: workerScope.postMessage,
+    scheduler: self,
   };
-
-  const flushStderr = () => {
-    if (stderrBuffer) {
-      workerScope.postMessage({
-        type: "stderr",
-        requestId,
-        data: stderrBuffer,
-      });
-      stderrBuffer = "";
-    }
-    stderrTimeout = undefined;
-  };
+  const stdout = createBufferedWorkerOutput({
+    ...outputOptions,
+    stream: "stdout",
+  });
+  const stderr = createBufferedWorkerOutput({
+    ...outputOptions,
+    stream: "stderr",
+  });
 
   try {
     const runtimeModule = (await import(
@@ -337,23 +323,7 @@ async function runGeneratedProgram(
     const loaded = await runtimeModule.load(wasmModule, {
       stackDeobfuscator: { enabled: false },
       installImports(imports) {
-        const teavmConsole = (imports.teavmConsole ??= {});
-        teavmConsole.putcharStdout = (charCode: number) => {
-          const next = String.fromCharCode(charCode);
-          stdout += next;
-          stdoutBuffer += next;
-          if (stdoutTimeout === undefined) {
-            stdoutTimeout = self.setTimeout(flushStdout, 50);
-          }
-        };
-        teavmConsole.putcharStderr = (charCode: number) => {
-          const next = String.fromCharCode(charCode);
-          stderr += next;
-          stderrBuffer += next;
-          if (stderrTimeout === undefined) {
-            stderrTimeout = self.setTimeout(flushStderr, 50);
-          }
-        };
+        installTeaVmConsole(imports, stdout, stderr);
       },
     });
 
@@ -373,13 +343,11 @@ async function runGeneratedProgram(
       artifacts,
     );
   } finally {
-    if (stdoutTimeout !== undefined) self.clearTimeout(stdoutTimeout);
-    flushStdout();
-    if (stderrTimeout !== undefined) self.clearTimeout(stderrTimeout);
-    flushStderr();
+    stdout.dispose();
+    stderr.dispose();
   }
 
-  return { stdout, stderr };
+  return { stdout: stdout.getOutput(), stderr: stderr.getOutput() };
 }
 
 function disposeCompilerWorker(): void {

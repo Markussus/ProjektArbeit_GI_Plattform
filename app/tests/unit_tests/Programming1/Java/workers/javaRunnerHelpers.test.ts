@@ -33,6 +33,14 @@ describe("javaRunnerHelpers", () => {
       expect(cursor.nextDouble()).toBe(3.14);
       expect(cursor.nextBoolean()).toBe(true);
     });
+
+    it("normalizes Windows and legacy line endings", () => {
+      const cursor = new ScannerInputCursor("first\r\nsecond\rthird");
+
+      expect(cursor.nextLine()).toBe("first");
+      expect(cursor.nextLine()).toBe("second");
+      expect(cursor.nextLine()).toBe("third");
+    });
   });
 
   describe("createJavaStringLiteral", () => {
@@ -128,6 +136,19 @@ public class Main {
       expect(result).toContain("boolean flag = true;");
     });
 
+    it("handles numeric Scanner variants", () => {
+      const code = `long id = sc.nextLong();
+float ratio = sc.nextFloat();
+short small = sc.nextShort();
+byte tiny = sc.nextByte();`;
+      const result = inlineScannerInput(code, "42 1.5 7 3");
+
+      expect(result).toContain("long id = 42L;");
+      expect(result).toContain("float ratio = 1.5f;");
+      expect(result).toContain("short small = ((short) 7);");
+      expect(result).toContain("byte tiny = ((byte) 3);");
+    });
+
     it("handles sc.close() and standalone sc.nextLine() calls", () => {
       const code = `import java.util.Scanner;\npublic class Main {\n  public static void main(String[] args) {\n    Scanner sc = new Scanner(System.in);\n    int a = sc.nextInt();\n    sc.nextLine();\n    String line = sc.nextLine();\n    sc.close();\n  }\n}`;
       const stdin = "100\nHello World\n";
@@ -212,16 +233,24 @@ public class Main {
     });
   });
 
+  describe("getErrorMessage", () => {
+    it("reads messages from structured worker errors", () => {
+      expect(getErrorMessage({ message: "Worker unavailable" })).toBe(
+        "Worker unavailable",
+      );
+    });
+  });
+
   describe("buildWorkerErrorFromEvent", () => {
     it("builds error when compiler was already ready", () => {
-      const event = new ErrorEvent("error", { message: "Out of memory" });
+      const event = { message: "Out of memory" };
       const error = buildWorkerErrorFromEvent(event, true);
       expect(error.errorCategory).toBe("teavm");
       expect(error.message).toContain("WebAssembly generation failed");
     });
 
     it("builds error when compiler was not yet ready", () => {
-      const event = new ErrorEvent("error", { message: "Network error" });
+      const event = { message: "Network error" };
       const error = buildWorkerErrorFromEvent(event, false);
       expect(error.errorCategory).toBe("compiler-load");
       expect(error.message).toContain("Compiler could not be loaded");

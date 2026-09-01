@@ -6,6 +6,93 @@ import {
 } from "./programCommon";
 import type { MealyProgram } from "./mealyTypes";
 
+type MealyOutput = MealyProgram["outputs"][string][string];
+
+function findOutput(
+  program: MealyProgram,
+  predicate: (output: MealyOutput) => boolean,
+): MealyOutput | undefined {
+  for (const input of program.inputSymbols) {
+    for (const state of program.states) {
+      const output = program.outputs[input]?.[state];
+      if (output && predicate(output)) {
+        return output;
+      }
+    }
+  }
+  return undefined;
+}
+
+export function findMealyOutputCodeBySymbol(
+  program: MealyProgram,
+  symbol: string,
+): number | undefined {
+  return findOutput(program, (output) => output.symbol === symbol)?.code;
+}
+
+export function renameMealyOutputSymbol(
+  program: MealyProgram,
+  previousSymbol: string,
+  nextSymbol: string,
+): MealyProgram | null {
+  const normalized = nextSymbol.trim();
+  if (!normalized || normalized.length > MAX_NAME_LENGTH) {
+    return null;
+  }
+  if (normalized === previousSymbol) {
+    return program;
+  }
+
+  const existingCode = findMealyOutputCodeBySymbol(program, normalized);
+  const nextProgram = cloneJson(program);
+  for (const input of nextProgram.inputSymbols) {
+    for (const state of nextProgram.states) {
+      const output = nextProgram.outputs[input]?.[state];
+      if (output?.symbol === previousSymbol) {
+        output.symbol = normalized;
+        output.code = existingCode ?? output.code;
+      }
+    }
+  }
+  return nextProgram;
+}
+
+export function changeMealyOutputCode(
+  program: MealyProgram,
+  inputSymbol: string,
+  state: string,
+  nextCode: number,
+): MealyProgram {
+  const selectedOutput = program.outputs[inputSymbol]?.[state];
+  if (!selectedOutput?.symbol) {
+    return setMealyOutput(program, inputSymbol, state, { code: nextCode });
+  }
+  if (selectedOutput.code === nextCode) {
+    return program;
+  }
+
+  const targetSymbol = selectedOutput.symbol;
+  const previousCode = selectedOutput.code;
+  const collidingSymbol = findOutput(
+    program,
+    (output) => output.symbol !== targetSymbol && output.code === nextCode,
+  )?.symbol;
+  const nextProgram = cloneJson(program);
+
+  for (const input of nextProgram.inputSymbols) {
+    for (const currentState of nextProgram.states) {
+      const output = nextProgram.outputs[input]?.[currentState];
+      if (output?.symbol === targetSymbol) {
+        output.code = nextCode;
+      } else if (collidingSymbol && output?.symbol === collidingSymbol) {
+        output.code = previousCode;
+      }
+    }
+  }
+
+  return nextProgram;
+}
+
 function remapStateTransitions(
   transitions: Record<string, Record<string, string>>,
   previousName: string,

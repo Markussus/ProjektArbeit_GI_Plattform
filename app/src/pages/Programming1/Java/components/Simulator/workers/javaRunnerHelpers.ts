@@ -24,6 +24,10 @@ export interface CustomWorkerError {
   artifacts?: JavaExecutionArtifacts | null;
 }
 
+interface WorkerErrorEventLike {
+  message: string;
+}
+
 export class ScannerInputCursor {
   private text: string;
   private pos: number = 0;
@@ -85,6 +89,58 @@ export class ScannerInputCursor {
   }
 }
 
+type ScannerMethod =
+  | "nextLine"
+  | "next"
+  | "nextInt"
+  | "nextLong"
+  | "nextDouble"
+  | "nextFloat"
+  | "nextBoolean"
+  | "nextShort"
+  | "nextByte";
+
+interface ScannerMatchGroups {
+  standaloneMethod?: ScannerMethod;
+  exprMethod?: ScannerMethod;
+}
+
+const scannerValueReaders: Record<
+  ScannerMethod,
+  (cursor: ScannerInputCursor) => string
+> = {
+  nextLine: (cursor) => createJavaStringLiteral(cursor.nextLine()),
+  next: (cursor) => createJavaStringLiteral(cursor.nextToken()),
+  nextInt: (cursor) => String(cursor.nextInt()),
+  nextLong: (cursor) => cursor.nextLong(),
+  nextDouble: (cursor) => String(cursor.nextDouble()),
+  nextFloat: (cursor) => `${cursor.nextDouble()}f`,
+  nextBoolean: (cursor) => String(cursor.nextBoolean()),
+  nextShort: (cursor) => `((short) ${cursor.nextInt()})`,
+  nextByte: (cursor) => `((byte) ${cursor.nextInt()})`,
+};
+
+function consumeScannerValue(
+  cursor: ScannerInputCursor,
+  method: ScannerMethod,
+): void {
+  scannerValueReaders[method](cursor);
+}
+
+function replaceScannerOperation(
+  cursor: ScannerInputCursor,
+  groups: ScannerMatchGroups,
+): string {
+  if (groups.standaloneMethod) {
+    consumeScannerValue(cursor, groups.standaloneMethod);
+    return "";
+  }
+
+  return groups.exprMethod
+    ? scannerValueReaders[groups.exprMethod](cursor)
+    : "";
+}
+
 export function createExecutableSource(
   sourceCode: string,
   stdin?: string,
@@ -112,63 +168,8 @@ export function inlineScannerInput(sourceCode: string, stdin: string): string {
     /(?:^[ \t]*(?:final\s+)?(?:java\.util\.)?Scanner\s+[A-Za-z_$][\w$]*(?:\s*=\s*(?:new\s+(?:java\.util\.)?Scanner\s*\(\s*System\.in\s*\)|null))?\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\s*=\s*new\s+(?:java\.util\.)?Scanner\s*\(\s*System\.in\s*\)\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\.close\s*\(\s*\)\s*;[ \t]*\r?\n?)|(?:^[ \t]*[A-Za-z_$][\w$]*\.(?<standaloneMethod>nextLine|nextInt|nextLong|nextDouble|nextFloat|nextBoolean|nextShort|nextByte|next)\s*\(\s*\)\s*;[ \t]*\r?\n?)|(?:\b[A-Za-z_$][\w$]*\.(?<exprMethod>nextLine|nextInt|nextLong|nextDouble|nextFloat|nextBoolean|nextShort|nextByte|next)\s*\(\s*\))/gm;
 
   code = code.replace(unifiedScannerRegex, (...args: unknown[]) => {
-    const groups = (args[args.length - 1] ?? {}) as {
-      standaloneMethod?: string;
-      exprMethod?: string;
-    };
-
-    if (groups.standaloneMethod) {
-      switch (groups.standaloneMethod) {
-        case "nextLine":
-          cursor.nextLine();
-          break;
-        case "next":
-          cursor.nextToken();
-          break;
-        case "nextInt":
-        case "nextShort":
-        case "nextByte":
-          cursor.nextInt();
-          break;
-        case "nextLong":
-          cursor.nextLong();
-          break;
-        case "nextDouble":
-        case "nextFloat":
-          cursor.nextDouble();
-          break;
-        case "nextBoolean":
-          cursor.nextBoolean();
-          break;
-      }
-      return "";
-    }
-
-    if (groups.exprMethod) {
-      switch (groups.exprMethod) {
-        case "nextLine":
-          return createJavaStringLiteral(cursor.nextLine());
-        case "next":
-          return createJavaStringLiteral(cursor.nextToken());
-        case "nextInt":
-          return String(cursor.nextInt());
-        case "nextLong":
-          return cursor.nextLong();
-        case "nextDouble":
-          return String(cursor.nextDouble());
-        case "nextFloat":
-          return `${cursor.nextDouble()}f`;
-        case "nextBoolean":
-          return String(cursor.nextBoolean());
-        case "nextShort":
-          return `((short) ${cursor.nextInt()})`;
-        case "nextByte":
-          return `((byte) ${cursor.nextInt()})`;
-      }
-    }
-
-    // Scanner declaration, assignment, or close statement
-    return "";
+    const groups = (args[args.length - 1] ?? {}) as ScannerMatchGroups;
+    return replaceScannerOperation(cursor, groups);
   });
 
   return code;
@@ -231,7 +232,7 @@ export function createWorkerError(
 }
 
 export function buildWorkerErrorFromEvent(
-  event: ErrorEvent,
+  event: WorkerErrorEventLike,
   compilerReady: boolean,
 ): CustomWorkerError {
   const stage: JavaExecutionErrorCategory = compilerReady
@@ -283,6 +284,14 @@ export function normalizeWorkerError(error: unknown): {
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
+    return error.message;
+  }
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
     return error.message;
   }
   return String(error);
