@@ -159,7 +159,7 @@ export function getTableCellState({
   };
 }
 
-export function getNextScrollPosition({
+function getNextScrollPosition({
   currentScroll,
   viewportStart,
   viewportSize,

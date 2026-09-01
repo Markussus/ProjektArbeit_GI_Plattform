@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 type VideoTrackKind =
   "subtitles" | "captions" | "descriptions" | "chapters" | "metadata";
 
-export interface VideoPlayerTrack {
+interface VideoPlayerTrack {
   src: string;
   label: string;
   srcLang: string;

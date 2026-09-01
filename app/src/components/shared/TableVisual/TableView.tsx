@@ -34,15 +34,7 @@ import {
   type TableViewProps,
 } from "./TableView.logic";
 
-export {
-  DEFAULT_DATA_COLUMN_WIDTH_CLASS,
-  DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
-} from "./TableView.logic";
-export type {
-  TableEditMode,
-  TablePosition,
-  TableViewProps,
-} from "./TableView.logic";
+export type { TablePosition, TableViewProps } from "./TableView.logic";
 
 export function TableView({
   headers,

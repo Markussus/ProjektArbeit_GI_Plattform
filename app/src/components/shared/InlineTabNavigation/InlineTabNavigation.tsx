@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export interface InlineTabItem<T extends string> {
+interface InlineTabItem<T extends string> {
   id: T;
   label: React.ReactNode;
   testId?: string;
