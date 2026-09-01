@@ -4,15 +4,11 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { MainLayout } from "@/layouts/MainLayout/MainLayout";
 import { learningRoutes } from "@/data/moduleCatalog";
 
-const HomePage = lazy(async () => ({
-  default: (await import("@/pages/Home/HomePage")).HomePage,
-}));
+const HomePage = lazy(() => import("@/pages/Home/HomePage"));
 const InfoPage = lazy(async () => ({
   default: (await import("@/pages/Info/InfoPage")).InfoPage,
 }));
-const NotFoundPage = lazy(async () => ({
-  default: (await import("@/pages/NotFound/NotFoundPage")).NotFoundPage,
-}));
+const NotFoundPage = lazy(() => import("@/pages/NotFound/NotFoundPage"));
 
 export const router = createBrowserRouter([
   {

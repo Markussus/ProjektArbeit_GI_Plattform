@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import type { TranslationKey } from "@/types/i18n";
 
 export type ExerciseDifficulty = "easy" | "medium" | "hard";
-export type TopicItemKind = "exercise" | "example";
+type TopicItemKind = "exercise" | "example";
 
 export interface DescriptionParams {
   [key: string]: string | number | boolean;

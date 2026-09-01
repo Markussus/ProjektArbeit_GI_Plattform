@@ -1,7 +1,7 @@
 import { HeroSection } from "./components/HeroSection";
 import { ModuleSelector } from "./components/ModuleSelector";
 
-export function HomePage() {
+export default function HomePage() {
   return (
     <div
       data-testid="home-page"

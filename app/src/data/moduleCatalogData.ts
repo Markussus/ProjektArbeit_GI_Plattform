@@ -17,7 +17,7 @@ export * from "./topicStorageIds";
 
 export type TopicAccent = "orange" | "blue" | "purple" | "green" | "rose";
 
-export const DEFAULT_TUTORIAL_VIDEO_URL =
+const DEFAULT_TUTORIAL_VIDEO_URL =
   "https://oc-stream.thws.de/static/mh_default_org/api/fc50e633-53d5-4c66-a1ac-9bd74d5ec83d/ebe5bb19-e657-47dd-87c0-8d156efbe342/block_opencast_video_upload2WyzUn_TM_Video.mp4";
 
 export interface ModuleTopicDefinition {

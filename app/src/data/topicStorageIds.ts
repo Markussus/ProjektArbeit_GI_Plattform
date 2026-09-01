@@ -8,7 +8,3 @@ export const TOPIC_STORAGE_IDS = {
   encoding: 6,
   javaProgramming: 7,
 } as const;
-
-export type TopicStorageIdKey = keyof typeof TOPIC_STORAGE_IDS;
-export type TopicStorageId =
-  (typeof TOPIC_STORAGE_IDS)[keyof typeof TOPIC_STORAGE_IDS];

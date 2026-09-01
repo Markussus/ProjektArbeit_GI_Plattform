@@ -4,10 +4,9 @@ import { learningModules } from "./moduleCatalogData";
 
 export * from "./moduleCatalogData";
 
-const FundamentalsCSPage = lazy(async () => ({
-  default: (await import("@/pages/FundamentalsCS/FundamentalsCSPage"))
-    .FundamentalsCSPage,
-}));
+const FundamentalsCSPage = lazy(
+  () => import("@/pages/FundamentalsCS/FundamentalsCSPage"),
+);
 const Programming1Page = lazy(async () => ({
   default: (await import("@/pages/Programming1/Programming1Page"))
     .Programming1Page,
@@ -69,7 +68,7 @@ const learningModuleRoutes = learningModules.map((module) => ({
   element: modulePageElements[module.id],
 }));
 
-export const learningTopicRoutes = learningModules.flatMap((module) =>
+const learningTopicRoutes = learningModules.flatMap((module) =>
   module.topics.map((topic) => ({
     path: topic.path,
     element: topicPageElements[topic.id],

@@ -63,25 +63,3 @@ export interface IExecutable<TInput, TOutput> {
   /** Returns the current output (may be partial while running). */
   getOutput(): TOutput;
 }
-
-/**
- * A validation issue reported by any simulator or executor.
- * Provides a common format for errors, warnings and info messages
- * that can be rendered uniformly across all simulators.
- */
-export interface IValidationIssue {
-  /** Machine-readable error identifier. */
-  code: string;
-
-  /** Severity level of the issue. */
-  severity: "error" | "warning" | "info";
-
-  /** Human-readable description of the problem. */
-  message: string;
-
-  /** 1-based line number where the issue occurred (optional). */
-  line?: number;
-
-  /** 1-based column number where the issue occurred (optional). */
-  column?: number;
-}

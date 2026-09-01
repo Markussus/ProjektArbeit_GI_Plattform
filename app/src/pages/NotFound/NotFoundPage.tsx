@@ -2,7 +2,7 @@ import { Skull, ArrowLeft, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-export function NotFoundPage() {
+export default function NotFoundPage() {
   const { t } = useTranslation();
   const location = useLocation();
 

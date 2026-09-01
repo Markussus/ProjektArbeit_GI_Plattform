@@ -2,7 +2,7 @@ import type { Theme } from "@/store/themeStore";
 
 export type ResolvedTheme = "light" | "dark";
 
-export const THEME_STORAGE_KEY = "theme-storage";
+const THEME_STORAGE_KEY = "theme-storage";
 
 function isBrowser() {
   return typeof window !== "undefined";

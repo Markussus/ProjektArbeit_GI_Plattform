@@ -8,7 +8,7 @@ import type { BitReader, BitWriter } from "./bitStream";
  */
 
 /** Upper bound on any length read from a payload, before allocating for it. */
-export const MAX_COLLECTION_SIZE = 1_000_000;
+const MAX_COLLECTION_SIZE = 1_000_000;
 
 /** Reject a length that is negative, fractional, or implausibly large. */
 export function assertCollectionSize(
@@ -33,13 +33,13 @@ export function assertIdInRange(
 }
 
 /** How a payload stores its symbol alphabet. */
-export const SymbolMode = {
+const SymbolMode = {
   /** One bit per registry entry — cheapest when every symbol is well known. */
   Registry: 0,
   /** Length-prefixed UTF-8 per symbol — the fallback for everything else. */
   RawUtf8: 1,
 } as const;
-export type SymbolMode = (typeof SymbolMode)[keyof typeof SymbolMode];
+type SymbolMode = (typeof SymbolMode)[keyof typeof SymbolMode];
 
 export interface SymbolDictionaryOptions {
   /**
