@@ -1,6 +1,46 @@
+% ---------------------------------------------------------------------------
+% Fachmodul Disjunktive Normalform (Duy Tan Pham)
+%
+% Inhaltlich abgeleitet aus Abschnitt 4.6 der Dokumentation
+% (includes/04_Designentscheidungen/04_06.tex).
+% ---------------------------------------------------------------------------
+
 \addsectionframe{Fachmodul: Disjunktive Normalform}
 
 % ---------------------------------------------------------------------------
 \begin{itemframe}{Disjunktive Normalform -- Überblick}
-  \item Meine Erklärung
+  \item Zwei Aufgabenmodi: Wahrheitstabelle nach DNF und umgekehrt
+  \item Drei Stufen: kanonische DNF, minimale DNF und Minimalform
+  \item Minimierung mit Quine-McCluskey und Branch-and-Bound
+  \item Semantische Prüfung erkennt logische Äquivalenz
+  \item Begrenzung auf maximal 4 Variablen für exakte Synthese
 \end{itemframe}
+
+% ---------------------------------------------------------------------------
+\begin{contentsframe}{Schrittausführung}
+\centering
+\vspace{1mm}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[node distance=15mm and 11mm]
+  \node[diagramnode, minimum width=3.3cm, font=\normalsize] (input) {Eingabe: Formel /\\Wahrheitstabelle};
+  \node[diagramnode, right=of input, minimum width=3.3cm, font=\normalsize] (ast) {Parser \& AST\\$\le 4$ Variablen};
+  \node[diagramnode, right=of ast, minimum width=3.5cm, font=\normalsize] (table) {Wahrheitstabelle\\1-Zeilen filtern};
+  \node[diagramnode, right=16mm of table, minimum width=3.5cm, font=\normalsize] (cdnf) {Kanonische DNF\\(Vollminterme)};
+
+  \node[diagramnode, below=15mm of input, minimum width=3.3cm, font=\normalsize] (student) {Übungseingabe\\der Lernenden};
+  \node[diagramnode, below=15mm of ast, minimum width=3.3cm, font=\normalsize] (check) {Semantische Prüfung\\Zeilenvergleich};
+  \node[diagramnode, below=15mm of table, minimum width=3.5cm, font=\normalsize] (exact) {Globale Synthese\\Literalminimum};
+  \node[diagramnode, below=15mm of cdnf, minimum width=3.5cm, font=\normalsize] (qmc) {Minimale DNF\\QMC + B\&B};
+
+  \draw[diagramarrow] (input) -- (ast);
+  \draw[diagramarrow] (ast) -- (table);
+  \draw[diagramarrow] (table) -- node[above, font=\small, text=black] {1 Zeile} (cdnf);
+  \draw[diagramarrow] (cdnf) -- (qmc);
+  \draw[diagramarrow] (qmc) -- (exact);
+
+  \draw[diagramarrow] (student) -- (check);
+  \draw[diagramarrow] (table) -- node[pos=0.35, anchor=west, xshift=5mm, font=\small, text=black] {Referenz} (check);
+  \draw[diagramarrow] (check.south) to[out=215, in=325] node[below, font=\small, text=black] {Feedback \& Äquivalenz} (student.south);
+\end{tikzpicture}%
+}
+\end{contentsframe}
