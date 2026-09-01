@@ -1,3 +1,5 @@
+import type { TFunction } from "i18next";
+
 export interface BitStep {
   position: number;
   bitA: number;
@@ -6,6 +8,34 @@ export interface BitStep {
   sum: number;
   carryOut: number;
   explanation?: string;
+}
+
+export function getStepExplanation(
+  step: BitStep,
+  t: TFunction<"translation">,
+): string {
+  if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 0) {
+    return t("number-systems.simulator.arithmetic.addition.step0");
+  }
+  if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 0) {
+    return t("number-systems.simulator.arithmetic.addition.step1");
+  }
+  if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 0) {
+    return t("number-systems.simulator.arithmetic.addition.step2");
+  }
+  if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 1) {
+    return t("number-systems.simulator.arithmetic.addition.step3");
+  }
+  if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 0) {
+    return t("number-systems.simulator.arithmetic.addition.step4");
+  }
+  if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 1) {
+    return t("number-systems.simulator.arithmetic.addition.step5");
+  }
+  if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 1) {
+    return t("number-systems.simulator.arithmetic.addition.step6");
+  }
+  return t("number-systems.simulator.arithmetic.addition.step7");
 }
 
 export interface AddBinary8BitResult {

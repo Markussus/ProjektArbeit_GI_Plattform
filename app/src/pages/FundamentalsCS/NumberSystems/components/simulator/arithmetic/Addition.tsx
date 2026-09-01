@@ -12,7 +12,7 @@ import {
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
 import { useBinaryOperands } from "./useBinaryOperands";
-import { addBinary8Bit, type BitStep } from "./binaryArithmetic";
+import { addBinary8Bit, getStepExplanation } from "./binaryArithmetic";
 
 export function Addition({
   isExerciseMode,
@@ -47,35 +47,10 @@ export function Addition({
     onChangeValues,
   });
 
-  const { padA, padB, sum, carries, overflow, carryOut, bitSteps } =
-    useMemo(() => {
-      const getExplanation = (step: BitStep) => {
-        if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 0) {
-          return t("number-systems.simulator.arithmetic.addition.step0");
-        }
-        if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 0) {
-          return t("number-systems.simulator.arithmetic.addition.step1");
-        }
-        if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 0) {
-          return t("number-systems.simulator.arithmetic.addition.step2");
-        }
-        if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 1) {
-          return t("number-systems.simulator.arithmetic.addition.step3");
-        }
-        if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 0) {
-          return t("number-systems.simulator.arithmetic.addition.step4");
-        }
-        if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 1) {
-          return t("number-systems.simulator.arithmetic.addition.step5");
-        }
-        if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 1) {
-          return t("number-systems.simulator.arithmetic.addition.step6");
-        }
-        return t("number-systems.simulator.arithmetic.addition.step7");
-      };
-
-      return addBinary8Bit(valA, valB, getExplanation);
-    }, [valA, valB, t]);
+  const { padA, padB, sum, carries, overflow, carryOut, bitSteps } = useMemo(
+    () => addBinary8Bit(valA, valB, (step) => getStepExplanation(step, t)),
+    [valA, valB, t],
+  );
 
   return (
     <SimulatorLayout

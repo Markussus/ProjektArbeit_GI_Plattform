@@ -3,6 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Addition } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Addition.tsx";
+import { getStepExplanation } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/binaryArithmetic";
 import {
   changeBinaryInput,
   expectInputsLocked,
@@ -88,5 +89,77 @@ describe("Addition", () => {
       expect(inputs[0].value).toBe("10101010");
       expect(inputs[1].value).toBe("01010101");
     });
+  });
+
+  describe("getExplanation", () => {
+    const t = (key: string) => key;
+    const stepTemplate = {
+      position: 0,
+      bitA: 0,
+      bitB: 0,
+      carryIn: 0,
+      sum: 0,
+      carryOut: 0,
+    };
+
+    it.each([
+      {
+        bitA: 0,
+        bitB: 0,
+        carryIn: 0,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step0",
+      },
+      {
+        bitA: 1,
+        bitB: 0,
+        carryIn: 0,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step1",
+      },
+      {
+        bitA: 0,
+        bitB: 1,
+        carryIn: 0,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step2",
+      },
+      {
+        bitA: 0,
+        bitB: 0,
+        carryIn: 1,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step3",
+      },
+      {
+        bitA: 1,
+        bitB: 1,
+        carryIn: 0,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step4",
+      },
+      {
+        bitA: 1,
+        bitB: 0,
+        carryIn: 1,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step5",
+      },
+      {
+        bitA: 0,
+        bitB: 1,
+        carryIn: 1,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step6",
+      },
+      {
+        bitA: 1,
+        bitB: 1,
+        carryIn: 1,
+        expectedKey: "number-systems.simulator.arithmetic.addition.step7",
+      },
+    ] as const)(
+      "returns $expectedKey for bitA=$bitA, bitB=$bitB, carryIn=$carryIn",
+      ({ bitA, bitB, carryIn, expectedKey }) => {
+        const result = getStepExplanation(
+          { ...stepTemplate, bitA, bitB, carryIn },
+          t,
+        );
+        expect(result).toBe(expectedKey);
+      },
+    );
   });
 });
