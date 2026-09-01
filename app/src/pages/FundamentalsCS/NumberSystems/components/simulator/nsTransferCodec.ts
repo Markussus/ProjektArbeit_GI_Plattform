@@ -24,7 +24,7 @@ export interface NegativeNumbersState {
 }
 
 export interface FractionalConverterState {
-  inputValue: string;
+  inputValue?: string;
   converterMode: "decToBin" | "binToDec";
 }
 

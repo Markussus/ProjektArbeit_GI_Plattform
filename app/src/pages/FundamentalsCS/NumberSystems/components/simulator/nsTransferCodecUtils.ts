@@ -198,7 +198,7 @@ function pushFractionalParts(
   parts: string[],
   fractional?: FractionalConverterState,
 ): void {
-  if (!fractional) {
+  if (!fractional || !fractional.inputValue) {
     return;
   }
   parts.push(fractional.converterMode === "decToBin" ? "d" : "b");

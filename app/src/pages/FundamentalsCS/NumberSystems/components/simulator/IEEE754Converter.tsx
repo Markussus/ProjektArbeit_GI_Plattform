@@ -2,10 +2,8 @@ import { useTranslation } from "react-i18next";
 import { useIEEE754Converter } from "./useIEEE754Converter";
 import {
   ConverterCard,
-  DecToIeeeResult,
   ExplanationPanel,
   IeeeInputField,
-  IeeeToDecResult,
   ModeToggle,
   ResultSection,
   SpecialCaseBanner,
@@ -103,5 +101,3 @@ export function IEEE754Converter({
     </div>
   );
 }
-
-export { DecToIeeeResult, IeeeToDecResult };
