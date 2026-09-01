@@ -13,3 +13,7 @@ if (typeof globalThis !== "undefined") {
 if (typeof Element !== "undefined" && !Element.prototype.scrollTo) {
   Element.prototype.scrollTo = () => {};
 }
+
+if (typeof Element !== "undefined" && !Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}
