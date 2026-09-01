@@ -145,7 +145,7 @@ export function FractionalConverter({
                 value={inputValue}
                 onChange={(e) => handleInputChange(e.target.value)}
                 disabled={isExerciseMode && !showSolution}
-                className={`bg-background text-foreground placeholder:text-muted-foreground/50 w-full max-w-xs rounded-md border px-3 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 ${isExerciseMode && !showSolution ? "border-input bg-muted" : "border-input focus:border-primary focus:ring-primary/20 focus:ring-1 focus:outline-none"}`}
+                className={`bg-background text-foreground w-full max-w-xs rounded-md border px-3 py-2 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-50 ${isExerciseMode && !showSolution ? "border-input bg-muted" : "border-input focus:ring-primary/20 focus:ring-1 focus:outline-none"}`}
                 placeholder="e.g. 10.5"
               />
             </div>

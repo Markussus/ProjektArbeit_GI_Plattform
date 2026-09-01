@@ -2,24 +2,26 @@
   "ci": {
     "collect": {
       "url": [
-        "http://127.0.0.1:45059/",
-        "http://127.0.0.1:45059/info",
-        "http://127.0.0.1:45059/__lhci-not-found__",
-        "http://127.0.0.1:45059/fundamentals-cs",
-        "http://127.0.0.1:45059/fundamentals-cs/turing-machine",
-        "http://127.0.0.1:45059/fundamentals-cs/finite-automata",
-        "http://127.0.0.1:45059/fundamentals-cs/regular-languages",
-        "http://127.0.0.1:45059/fundamentals-cs/number-systems",
-        "http://127.0.0.1:45059/fundamentals-cs/moore-mealy",
-        "http://127.0.0.1:45059/fundamentals-cs/dnf",
-        "http://127.0.0.1:45059/fundamentals-cs/encoding",
-        "http://127.0.0.1:45059/programming-1",
-        "http://127.0.0.1:45059/programming-1/java-programming"
+        "http://127.0.0.1:34637/",
+        "http://127.0.0.1:34637/info",
+        "http://127.0.0.1:34637/__lhci-not-found__",
+        "http://127.0.0.1:34637/fundamentals-cs",
+        "http://127.0.0.1:34637/fundamentals-cs/turing-machine",
+        "http://127.0.0.1:34637/fundamentals-cs/finite-automata",
+        "http://127.0.0.1:34637/fundamentals-cs/regular-languages",
+        "http://127.0.0.1:34637/fundamentals-cs/number-systems",
+        "http://127.0.0.1:34637/fundamentals-cs/moore-mealy",
+        "http://127.0.0.1:34637/fundamentals-cs/dnf",
+        "http://127.0.0.1:34637/fundamentals-cs/encoding",
+        "http://127.0.0.1:34637/programming-1",
+        "http://127.0.0.1:34637/programming-1/java-programming"
       ],
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop",
-        "onlyCategories": ["performance"],
+        "onlyCategories": [
+          "performance"
+        ],
         "chromeFlags": "--no-sandbox --user-data-dir=./.lighthouseci/chrome-profile"
       }
     },
