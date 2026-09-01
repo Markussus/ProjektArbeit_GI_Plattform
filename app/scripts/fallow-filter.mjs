@@ -136,6 +136,24 @@ function hasValue(v) {
   return v !== undefined && v !== null && v !== "";
 }
 
+function getNumericScore(val) {
+  const n = Number(val);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+const SEVERITY_ORDER = {
+  critical: 1,
+  high: 2,
+  moderate: 3,
+  warning: 4,
+  low: 5,
+};
+
+function getSeverityRank(sev) {
+  const s = String(sev || "").toLowerCase();
+  return SEVERITY_ORDER[s] || 99;
+}
+
 function isSpecialPath(filePath) {
   if (!filePath || typeof filePath !== "string") return true;
   if (filePath.startsWith("package:") || filePath === "project") return true;
@@ -696,6 +714,23 @@ function filterCheckItem(item, category, options) {
   return Boolean(item.package_name && (showAll || showRest));
 }
 
+function compareCheckItems(a, b) {
+  const pathA = resolveProjectPath(a.path || a.package_name || "");
+  const pathB = resolveProjectPath(b.path || b.package_name || "");
+  const pathDiff = pathA.localeCompare(pathB);
+  if (pathDiff !== 0) return pathDiff;
+
+  const lineDiff = getNumericScore(a.line) - getNumericScore(b.line);
+  if (lineDiff !== 0) return lineDiff;
+
+  return getNumericScore(a.col) - getNumericScore(b.col);
+}
+
+function sortCheckItems(items) {
+  if (!Array.isArray(items)) return [];
+  return [...items].sort(compareCheckItems);
+}
+
 function filterCheckSection(check, options) {
   if (!check) return {};
   const result = {};
@@ -705,7 +740,7 @@ function filterCheckSection(check, options) {
       filterCheckItem(item, category, options),
     );
     if (filtered.length > 0) {
-      result[category] = filtered;
+      result[category] = sortCheckItems(filtered);
     }
   }
   return result;
@@ -723,9 +758,29 @@ function filterCloneGroupList(cloneGroups, options) {
   });
 }
 
+function compareCloneGroups(a, b) {
+  const instA = safeArrayLength(a.instances);
+  const instB = safeArrayLength(b.instances);
+  if (instB !== instA) return instB - instA;
+
+  const linesA = getNumericScore(a.line_count);
+  const linesB = getNumericScore(b.line_count);
+  if (linesB !== linesA) return linesB - linesA;
+
+  const tokensA = getNumericScore(a.token_count);
+  const tokensB = getNumericScore(b.token_count);
+  return tokensB - tokensA;
+}
+
+function sortCloneGroups(cloneGroups) {
+  if (!Array.isArray(cloneGroups)) return [];
+  return [...cloneGroups].sort(compareCloneGroups);
+}
+
 function filterDupesSection(dupes, options) {
   if (!dupes?.clone_groups) return { clone_groups: [] };
-  return { clone_groups: filterCloneGroupList(dupes.clone_groups, options) };
+  const filtered = filterCloneGroupList(dupes.clone_groups, options);
+  return { clone_groups: sortCloneGroups(filtered) };
 }
 
 function filterArrayByPath(arr, options) {
@@ -740,12 +795,81 @@ function filterArrayByPath(arr, options) {
   );
 }
 
+function getFileMaxCrapMap(findings) {
+  const maxMap = new Map();
+  for (const f of findings) {
+    const key = `${getSeverityRank(f.severity)}:${resolveProjectPath(f.path || "")}`;
+    const crap = getNumericScore(f.crap);
+    const curr = maxMap.get(key) || 0;
+    if (crap > curr) {
+      maxMap.set(key, crap);
+    }
+  }
+  return maxMap;
+}
+
+function compareHealthFindingInSameFile(a, b) {
+  const diffCrap = getNumericScore(b.crap) - getNumericScore(a.crap);
+  if (diffCrap !== 0) return diffCrap;
+
+  const diffCyc = getNumericScore(b.cyclomatic) - getNumericScore(a.cyclomatic);
+  if (diffCyc !== 0) return diffCyc;
+
+  return getNumericScore(a.line) - getNumericScore(b.line);
+}
+
+function compareHealthFindings(a, b, fileMaxCrapMap) {
+  const rankDiff = getSeverityRank(a.severity) - getSeverityRank(b.severity);
+  if (rankDiff !== 0) return rankDiff;
+
+  const pathA = resolveProjectPath(a.path || "");
+  const pathB = resolveProjectPath(b.path || "");
+  const keyA = `${getSeverityRank(a.severity)}:${pathA}`;
+  const keyB = `${getSeverityRank(b.severity)}:${pathB}`;
+
+  const maxCrapA = fileMaxCrapMap.get(keyA) || 0;
+  const maxCrapB = fileMaxCrapMap.get(keyB) || 0;
+  if (maxCrapB !== maxCrapA) return maxCrapB - maxCrapA;
+
+  if (pathA !== pathB) return pathA.localeCompare(pathB);
+  return compareHealthFindingInSameFile(a, b);
+}
+
+function sortHealthFindings(findings) {
+  if (!Array.isArray(findings)) return [];
+  const fileMaxCrapMap = getFileMaxCrapMap(findings);
+  return [...findings].sort((a, b) =>
+    compareHealthFindings(a, b, fileMaxCrapMap),
+  );
+}
+
+function compareRefactorTargets(a, b) {
+  const prioDiff = getNumericScore(b.priority) - getNumericScore(a.priority);
+  if (prioDiff !== 0) return prioDiff;
+
+  const effDiff = getNumericScore(b.efficiency) - getNumericScore(a.efficiency);
+  if (effDiff !== 0) return effDiff;
+
+  const pathA = resolveProjectPath(a.path || "");
+  const pathB = resolveProjectPath(b.path || "");
+  return pathA.localeCompare(pathB);
+}
+
+function sortHealthTargets(targets) {
+  if (!Array.isArray(targets)) return [];
+  return [...targets].sort(compareRefactorTargets);
+}
+
 function filterHealthSection(health, options) {
   if (!health) return { findings: [], targets: [], large_functions: [] };
+  const findings = filterArrayByPath(health.findings, options);
+  const targets = filterArrayByPath(health.targets, options);
+  const largeFunctions = filterArrayByPath(health.large_functions, options);
+
   return {
-    findings: filterArrayByPath(health.findings, options),
-    targets: filterArrayByPath(health.targets, options),
-    large_functions: filterArrayByPath(health.large_functions, options),
+    findings: sortHealthFindings(findings),
+    targets: sortHealthTargets(targets),
+    large_functions: largeFunctions,
   };
 }
 
