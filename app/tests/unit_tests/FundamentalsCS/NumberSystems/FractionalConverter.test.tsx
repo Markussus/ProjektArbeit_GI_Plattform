@@ -50,6 +50,61 @@ describe("FractionalConverter", () => {
         "-1010.1",
       );
     });
+
+    it("converts 0.0 decimal to 0.0 binary", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "0.0" } });
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "0.0",
+      );
+    });
+
+    it("converts 0.5 decimal to 0.1 binary", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "0.5" } });
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "0.1",
+      );
+    });
+
+    it("limits fractional binary digits to avoid huge computations", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "0.1" } });
+      const fractionalPart = screen
+        .getByTestId("ns-fractional-result")
+        .textContent?.split(".")[1];
+      expect(fractionalPart?.length).toBeLessThanOrEqual(10);
+    });
+
+    it("does not render a result for empty, minus-only or dot-only input", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+
+      fireEvent.change(input, { target: { value: "" } });
+      expect(
+        screen.queryByTestId("ns-fractional-result"),
+      ).not.toBeInTheDocument();
+
+      fireEvent.change(input, { target: { value: "-" } });
+      expect(
+        screen.queryByTestId("ns-fractional-result"),
+      ).not.toBeInTheDocument();
+
+      fireEvent.change(input, { target: { value: "." } });
+      expect(
+        screen.queryByTestId("ns-fractional-result"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("sanitizes multiple minus signs and dots", () => {
+      render(<FractionalConverter />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "--10..5" } });
+      expect((input as HTMLInputElement).value).toBe("-10.5");
+    });
   });
 
   describe("when switching to binToDec mode", () => {
@@ -62,6 +117,72 @@ describe("FractionalConverter", () => {
       expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
         "10.5",
       );
+    });
+
+    it("converts 0.1 binary to 0.5 decimal", () => {
+      render(<FractionalConverter />);
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      fireEvent.change(screen.getByTestId("ns-fractional-input"), {
+        target: { value: "0.1" },
+      });
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "0.5",
+      );
+    });
+
+    it("converts 0.0 binary to 0 decimal", () => {
+      render(<FractionalConverter />);
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      fireEvent.change(screen.getByTestId("ns-fractional-input"), {
+        target: { value: "0.0" },
+      });
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "0",
+      );
+    });
+
+    it("converts negative binary -1010.1 to -10.5 decimal", () => {
+      render(<FractionalConverter />);
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      fireEvent.change(screen.getByTestId("ns-fractional-input"), {
+        target: { value: "-1010.1" },
+      });
+      expect(screen.getByTestId("ns-fractional-result").textContent).toContain(
+        "-10.5",
+      );
+    });
+  });
+
+  describe("when in binToDec mode", () => {
+    it("sanitizes non-binary characters", () => {
+      render(<FractionalConverter />);
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "10a1b0.1" } });
+      expect((input as HTMLInputElement).value).toBe("1010.1");
+    });
+  });
+
+  describe("state changes", () => {
+    it("reports state changes via onChangeState", () => {
+      const onChangeState = vi.fn();
+      render(<FractionalConverter onChangeState={onChangeState} />);
+      const input = screen.getByTestId("ns-fractional-input");
+      fireEvent.change(input, { target: { value: "3.375" } });
+      expect(onChangeState).toHaveBeenLastCalledWith({
+        inputValue: "3.375",
+        converterMode: "decToBin",
+      });
+    });
+
+    it("reports mode switch via onChangeState", () => {
+      const onChangeState = vi.fn();
+      render(<FractionalConverter onChangeState={onChangeState} />);
+      fireEvent.click(screen.getByTestId("ns-frac-bin-to-dec-button"));
+      expect(onChangeState).toHaveBeenLastCalledWith({
+        inputValue: "1010.1",
+        converterMode: "binToDec",
+      });
     });
   });
 
