@@ -40,30 +40,57 @@ export interface GrammarGraph<TNode> {
 }
 
 /**
+ * Breadth-first walk from the start node, naming nodes S, A, B, C, … in the
+ * order they are reached. The folded node never gets a name — edges into it
+ * become terminal-only rules — and nodes unreachable from the start are simply
+ * never enqueued, so they drop out of the grammar.
+ */
+function assignNonTerminalNames<TNode>({
+  start,
+  edgesOf,
+  foldedNode,
+}: GrammarGraph<TNode>): { names: Map<TNode, string>; order: TNode[] } {
+  const names = new Map<TNode, string>([[start, NON_TERMINAL_NAMES.start]]);
+  const order: TNode[] = [start];
+  let nextIndex = 0;
+
+  for (let head = 0; head < order.length; head++) {
+    for (const edge of edgesOf(order[head])) {
+      if (edge.to === foldedNode || names.has(edge.to)) continue;
+      names.set(edge.to, nonTerminalName(nextIndex++));
+      order.push(edge.to);
+    }
+  }
+
+  return { names, order };
+}
+
+/** One production per outgoing edge, in the edge order the caller supplied. */
+function productionsOf<TNode>(
+  node: TNode,
+  lhs: string,
+  { edgesOf, foldedNode }: GrammarGraph<TNode>,
+  names: Map<TNode, string>,
+): ProductionRule[] {
+  return [...edgesOf(node)].map((edge) => ({
+    lhs,
+    terminal: edge.terminal,
+    // An edge into the folded node becomes a terminal-only rule.
+    nextNonTerminal:
+      edge.to === foldedNode ? null : (names.get(edge.to) ?? null),
+  }));
+}
+
+/**
  * Walk a grammar graph breadth-first from its start node, name the nodes
  * S, A, B, C, … in the order they are reached, and read the productions off
  * the edges. Nodes unreachable from the start are dropped: they cannot
  * contribute to any derivation.
  */
-export function emitRightLinearGrammar<TNode>({
-  start,
-  edgesOf,
-  isAccepting,
-  foldedNode,
-}: GrammarGraph<TNode>): RegularGrammar {
-  const names = new Map<TNode, string>([[start, NON_TERMINAL_NAMES.start]]);
-  const order: TNode[] = [start];
-  const queue: TNode[] = [start];
-  let nextIndex = 0;
-
-  for (let head = 0; head < queue.length; head++) {
-    for (const edge of edgesOf(queue[head])) {
-      if (edge.to === foldedNode || names.has(edge.to)) continue;
-      names.set(edge.to, nonTerminalName(nextIndex++));
-      order.push(edge.to);
-      queue.push(edge.to);
-    }
-  }
+export function emitRightLinearGrammar<TNode>(
+  graph: GrammarGraph<TNode>,
+): RegularGrammar {
+  const { names, order } = assignNonTerminalNames(graph);
 
   const nonTerminals: string[] = [];
   const terminals = new Set<string>();
@@ -73,17 +100,11 @@ export function emitRightLinearGrammar<TNode>({
   for (const node of order) {
     const name = names.get(node)!;
     nonTerminals.push(name);
-    if (isAccepting(node)) epsilonProducingNonTerminals.push(name);
+    if (graph.isAccepting(node)) epsilonProducingNonTerminals.push(name);
 
-    for (const edge of edgesOf(node)) {
-      terminals.add(edge.terminal);
-      productions.push({
-        lhs: name,
-        terminal: edge.terminal,
-        // An edge into the folded node becomes a terminal-only rule.
-        nextNonTerminal:
-          edge.to === foldedNode ? null : (names.get(edge.to) ?? null),
-      });
+    for (const rule of productionsOf(node, name, graph, names)) {
+      terminals.add(rule.terminal);
+      productions.push(rule);
     }
   }
 

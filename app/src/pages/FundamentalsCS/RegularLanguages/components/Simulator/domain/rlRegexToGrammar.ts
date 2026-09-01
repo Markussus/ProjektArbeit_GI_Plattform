@@ -1,196 +1,76 @@
-import type { ProductionRule, RegexNode, RegularGrammar } from "./rlTypes";
-import type { SetBuilderLang } from "./rlLanguageSpecParser";
+import type { RegexNode, RegularGrammar } from "./rlTypes";
+import type { ExponentSpec, SetBuilderLang } from "./rlLanguageSpecParser";
 import { emitRightLinearGrammar } from "./rlGrammarNaming";
 
-/**
- * Thompson-style ε-NFA used internally as the bridge between a regex AST
- * and a right-linear regular grammar.
- */
-interface NFA {
-  states: string[];
-  start: string;
-  accept: string;
-  /** transitions[from][symbol] -> set of target states; symbol "" denotes ε. */
-  transitions: Map<string, Map<string, Set<string>>>;
+/** One position in the chain a set-builder pattern is laid out as. */
+interface ChainNode {
+  edges: Array<{ terminal: string; to: ChainNode }>;
 }
 
-function freshNFA(prefix: { value: number }): {
-  start: string;
-  accept: string;
+function makeChainNode(): ChainNode {
+  return { edges: [] };
+}
+
+/** How many times a factor must be repeated at minimum. */
+function mandatoryRepetitions(exponent: ExponentSpec): number {
+  if (exponent.kind === "literal") return exponent.count;
+  if (exponent.kind === "variable") return exponent.lowerBound;
+  return 1;
+}
+
+/** Spell `chars` out as a fresh chain of edges and return the node it ends on. */
+function appendChars(from: ChainNode, chars: string[]): ChainNode {
+  let current = from;
+  for (const terminal of chars) {
+    const next = makeChainNode();
+    current.edges.push({ terminal, to: next });
+    current = next;
+  }
+  return current;
+}
+
+/** Any number of extra repetitions: a loop from `at` back to itself. */
+function appendRepetitionLoop(at: ChainNode, chars: string[]): void {
+  let node = at;
+  chars.forEach((terminal, index) => {
+    const next = index === chars.length - 1 ? at : makeChainNode();
+    node.edges.push({ terminal, to: next });
+    node = next;
+  });
+}
+
+/**
+ * Lay the pattern out as a chain: every mandatory repetition consumes one
+ * symbol and advances, and every variable exponent adds a self-loop at the
+ * position it reached. Returns the chain's start and its accepting end.
+ */
+function buildSetBuilderChain(spec: SetBuilderLang): {
+  start: ChainNode;
+  accept: ChainNode;
 } {
-  const start = `q${prefix.value++}`;
-  const accept = `q${prefix.value++}`;
-  return { start, accept };
-}
+  const start = makeChainNode();
+  let current = start;
 
-function emptyTransitions(): Map<string, Map<string, Set<string>>> {
-  return new Map();
-}
+  for (const factor of spec.pattern) {
+    const chars = [...atomToTerminalString(factor.atom)];
+    // `ε` and empty groups contribute nothing — and a zero-length loop would
+    // never terminate.
+    if (chars.length === 0) continue;
 
-function addTransition(
-  trans: Map<string, Map<string, Set<string>>>,
-  from: string,
-  symbol: string,
-  to: string,
-) {
-  let row = trans.get(from);
-  if (!row) {
-    row = new Map();
-    trans.set(from, row);
-  }
-  let targets = row.get(symbol);
-  if (!targets) {
-    targets = new Set();
-    row.set(symbol, targets);
-  }
-  targets.add(to);
-}
-
-function buildThompsonNFA(ast: RegexNode): NFA {
-  const counter = { value: 0 };
-  const transitions = emptyTransitions();
-  const stateSet = new Set<string>();
-
-  const register = (...ids: string[]) => ids.forEach((id) => stateSet.add(id));
-
-  const build = (node: RegexNode): { start: string; accept: string } => {
-    if (node.kind === "empty") {
-      // L(∅) = {}; we still need start/accept but no path between them.
-      const { start, accept } = freshNFA(counter);
-      register(start, accept);
-      return { start, accept };
+    for (
+      let repeat = 0;
+      repeat < mandatoryRepetitions(factor.exponent);
+      repeat++
+    ) {
+      current = appendChars(current, chars);
     }
-    if (node.kind === "epsilon") {
-      const { start, accept } = freshNFA(counter);
-      register(start, accept);
-      addTransition(transitions, start, "", accept);
-      return { start, accept };
-    }
-    if (node.kind === "symbol") {
-      const { start, accept } = freshNFA(counter);
-      register(start, accept);
-      addTransition(transitions, start, node.value, accept);
-      return { start, accept };
-    }
-    if (node.kind === "concat") {
-      const a = build(node.left);
-      const b = build(node.right);
-      addTransition(transitions, a.accept, "", b.start);
-      return { start: a.start, accept: b.accept };
-    }
-    if (node.kind === "union") {
-      const a = build(node.left);
-      const b = build(node.right);
-      const { start, accept } = freshNFA(counter);
-      register(start, accept);
-      addTransition(transitions, start, "", a.start);
-      addTransition(transitions, start, "", b.start);
-      addTransition(transitions, a.accept, "", accept);
-      addTransition(transitions, b.accept, "", accept);
-      return { start, accept };
-    }
-    // star
-    const inner = build(node.child);
-    const { start, accept } = freshNFA(counter);
-    register(start, accept);
-    addTransition(transitions, start, "", inner.start);
-    addTransition(transitions, start, "", accept);
-    addTransition(transitions, inner.accept, "", inner.start);
-    addTransition(transitions, inner.accept, "", accept);
-    return { start, accept };
-  };
 
-  const { start, accept } = build(ast);
-
-  return {
-    states: [...stateSet],
-    start,
-    accept,
-    transitions,
-  };
-}
-
-function epsilonClosure(nfa: NFA, states: Set<string>): Set<string> {
-  const closure = new Set(states);
-  const stack = [...states];
-  while (stack.length > 0) {
-    const current = stack.pop()!;
-    const eps = nfa.transitions.get(current)?.get("");
-    if (!eps) continue;
-    for (const target of eps) {
-      if (!closure.has(target)) {
-        closure.add(target);
-        stack.push(target);
-      }
-    }
-  }
-  return closure;
-}
-
-/**
- * Convert a regex AST to a right-linear regular grammar.
- *
- * Strategy: build a Thompson ε-NFA, then read it off as a grammar:
- *   - one non-terminal per state
- *   - transition (p, a, q) becomes  Np → a Nq
- *   - if a state's ε-closure contains the NFA's accept state,
- *     mark it as ε-producing
- * The start NFA state's ε-closure is the grammar's start symbol.
- */
-export function regexToGrammar(ast: RegexNode): RegularGrammar {
-  const nfa = buildThompsonNFA(ast);
-
-  const stateName = (q: string) => q.replace("q", "S");
-  const nonTerminals: string[] = nfa.states.map(stateName);
-  const terminals = new Set<string>();
-  const productions: ProductionRule[] = [];
-  const epsilonProducingNonTerminals: string[] = [];
-
-  for (const state of nfa.states) {
-    const closure = epsilonClosure(nfa, new Set([state]));
-    if (closure.has(nfa.accept)) {
-      epsilonProducingNonTerminals.push(stateName(state));
-    }
-    // Aggregate transitions reachable from `state` via ε then one symbol then ε.
-    for (const intermediate of closure) {
-      const row = nfa.transitions.get(intermediate);
-      if (!row) continue;
-      for (const [symbol, targets] of row.entries()) {
-        if (symbol === "") continue;
-        terminals.add(symbol);
-        for (const target of targets) {
-          const reachable = epsilonClosure(nfa, new Set([target]));
-          for (const r of reachable) {
-            productions.push({
-              lhs: stateName(state),
-              terminal: symbol,
-              nextNonTerminal: stateName(r),
-            });
-          }
-        }
-      }
+    if (factor.exponent.kind === "variable") {
+      appendRepetitionLoop(current, chars);
     }
   }
 
-  return {
-    nonTerminals,
-    terminals: [...terminals],
-    startSymbol: stateName(nfa.start),
-    productions: dedupeProductions(productions),
-    epsilonProducingNonTerminals,
-  };
-}
-
-function dedupeProductions(rules: ProductionRule[]): ProductionRule[] {
-  const seen = new Set<string>();
-  const out: ProductionRule[] = [];
-  for (const rule of rules) {
-    const key = `${rule.lhs}->${rule.terminal}${rule.nextNonTerminal ?? "ε"}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(rule);
-  }
-  return out;
+  return { start, accept: current };
 }
 
 /**
@@ -201,58 +81,11 @@ function dedupeProductions(rules: ProductionRule[]): ProductionRule[] {
  * earlier version printed a compact `S -> A c B`, which is a general CFG and
  * therefore not a regular grammar at all; {@link minimizeRightLinearGrammar}
  * now provides the shorter view without leaving Type 3.
- *
- * The pattern is first laid out as a chain of nodes: every mandatory
- * repetition consumes one symbol and advances, and every variable exponent
- * adds a self-loop at the position it reached. Node names are then assigned in
- * chain order (S, A, B, …) and each edge becomes one production.
  */
 export function setBuilderToRightLinearGrammar(
   spec: SetBuilderLang,
 ): RegularGrammar {
-  interface Node {
-    edges: Array<{ terminal: string; to: Node }>;
-  }
-  const makeNode = (): Node => ({ edges: [] });
-
-  const start = makeNode();
-  let current = start;
-
-  for (const factor of spec.pattern) {
-    const chars = [...atomToTerminalString(factor.atom)];
-    // `ε` and empty groups contribute nothing — and a zero-length loop would
-    // never terminate.
-    if (chars.length === 0) continue;
-
-    const exponent = factor.exponent;
-    const mandatory =
-      exponent.kind === "literal"
-        ? exponent.count
-        : exponent.kind === "variable"
-          ? exponent.lowerBound
-          : 1;
-
-    for (let repeat = 0; repeat < mandatory; repeat++) {
-      for (const terminal of chars) {
-        const next = makeNode();
-        current.edges.push({ terminal, to: next });
-        current = next;
-      }
-    }
-
-    if (exponent.kind === "variable") {
-      // Any number of extra repetitions: a loop back to where we are now.
-      const loopStart = current;
-      let node = loopStart;
-      chars.forEach((terminal, index) => {
-        const next = index === chars.length - 1 ? loopStart : makeNode();
-        node.edges.push({ terminal, to: next });
-        node = next;
-      });
-    }
-  }
-
-  const accept = current;
+  const { start, accept } = buildSetBuilderChain(spec);
 
   // A transition into the accepting node folds into a terminal-only rule
   // (`A -> a`) as long as nothing leaves that node — when the last factor has
@@ -260,7 +93,7 @@ export function setBuilderToRightLinearGrammar(
   // becomes ε-producing instead.
   const acceptIsFoldable = accept.edges.length === 0 && accept !== start;
 
-  return emitRightLinearGrammar<Node>({
+  return emitRightLinearGrammar<ChainNode>({
     start,
     edgesOf: (node) => node.edges,
     isAccepting: (node) => node === accept,
@@ -275,22 +108,18 @@ export function setBuilderToRightLinearGrammar(
  */
 const FINAL_NODE = " final";
 
+/** A right-linear grammar seen as a labelled graph over its non-terminals. */
+interface GrammarAutomaton {
+  nodes: string[];
+  edgesOf: Map<string, Array<{ terminal: string; to: string }>>;
+  isAccepting: (node: string) => boolean;
+}
+
 /**
- * Collapse a right-linear grammar to its smallest equivalent right-linear
- * grammar, by merging non-terminals that derive the same set of words.
- *
- * This is a bisimulation quotient: start by separating ε-producing (accepting)
- * non-terminals from the rest, then keep splitting a block whenever two of its
- * members disagree about which block some terminal leads into. Merging what is
- * left over never changes the generated language, and it can only shrink the
- * grammar — a grammar that is already minimal comes back unchanged.
- *
- * The result stays strictly right-linear (`A -> aB | a | ε`), so switching to
- * the simplified view never turns a regular grammar into something else.
+ * Read the grammar off as a graph: terminal-only rules (`A -> a`) point at the
+ * shared {@link FINAL_NODE}, which exists only while some rule needs it.
  */
-export function minimizeRightLinearGrammar(
-  grammar: RegularGrammar,
-): RegularGrammar {
+function toGrammarAutomaton(grammar: RegularGrammar): GrammarAutomaton {
   const epsilonProducers = new Set(grammar.epsilonProducingNonTerminals ?? []);
   const usesFinalNode = grammar.productions.some(
     (rule) => rule.nextNonTerminal === null,
@@ -308,65 +137,116 @@ export function minimizeRightLinearGrammar(
       to: rule.nextNonTerminal ?? FINAL_NODE,
     });
   }
-  const isAccepting = (node: string) =>
-    node === FINAL_NODE || epsilonProducers.has(node);
 
-  // ── Partition refinement ────────────────────────────────────────────────
+  return {
+    nodes,
+    edgesOf,
+    isAccepting: (node) => node === FINAL_NODE || epsilonProducers.has(node),
+  };
+}
+
+/**
+ * Bisimulation quotient by partition refinement: start by separating accepting
+ * nodes from the rest, then keep splitting a block whenever two of its members
+ * disagree about which block some terminal leads into. The result maps every
+ * node to the id of the block it ended up in.
+ */
+function refineIntoBlocks({
+  nodes,
+  edgesOf,
+  isAccepting,
+}: GrammarAutomaton): Map<string, number> {
   let blockOf = new Map<string, number>(
     nodes.map((node) => [node, isAccepting(node) ? 0 : 1]),
   );
+
   for (;;) {
     const signature = (node: string) => {
       const targets = new Set(
         (edgesOf.get(node) ?? []).map(
-          (edge) => `${edge.terminal}${blockOf.get(edge.to)}`,
+          (edge) => `${edge.terminal}${blockOf.get(edge.to)}`,
         ),
       );
-      return `${blockOf.get(node)}${[...targets].sort().join("")}`;
+      return `${blockOf.get(node)}${[...targets].sort().join("")}`;
     };
 
     const idBySignature = new Map<string, number>();
     const next = new Map<string, number>();
     for (const node of nodes) {
       const sig = signature(node);
-      let id = idBySignature.get(sig);
-      if (id === undefined) {
-        id = idBySignature.size;
-        idBySignature.set(sig, id);
-      }
+      const id = idBySignature.get(sig) ?? idBySignature.size;
+      idBySignature.set(sig, id);
       next.set(node, id);
     }
 
-    if (idBySignature.size === new Set(blockOf.values()).size) break;
+    if (idBySignature.size === new Set(blockOf.values()).size) return blockOf;
     blockOf = next;
   }
+}
 
-  // ── Rebuild one non-terminal per block ──────────────────────────────────
+/** The nodes of each block, keyed by block id. */
+function groupByBlock(
+  nodes: string[],
+  blockOf: Map<string, number>,
+): Map<number, string[]> {
   const membersOf = new Map<number, string[]>();
   for (const node of nodes) {
     const block = blockOf.get(node)!;
     membersOf.set(block, [...(membersOf.get(block) ?? []), node]);
   }
+  return membersOf;
+}
+
+/** The union of a block's outgoing edges, deduplicated and terminal-sorted. */
+function mergeBlockEdges(
+  members: string[],
+  { edgesOf }: GrammarAutomaton,
+  blockOf: Map<string, number>,
+): Array<{ terminal: string; to: number }> {
+  const seen = new Set<string>();
+  const edges: Array<{ terminal: string; to: number }> = [];
+
+  for (const member of members) {
+    for (const edge of edgesOf.get(member) ?? []) {
+      const target = blockOf.get(edge.to)!;
+      const key = `${edge.terminal}${target}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      edges.push({ terminal: edge.terminal, to: target });
+    }
+  }
+
+  edges.sort((a, b) =>
+    a.terminal < b.terminal ? -1 : a.terminal > b.terminal ? 1 : 0,
+  );
+  return edges;
+}
+
+/**
+ * Collapse a right-linear grammar to its smallest equivalent right-linear
+ * grammar, by merging non-terminals that derive the same set of words.
+ *
+ * This is a bisimulation quotient: start by separating ε-producing (accepting)
+ * non-terminals from the rest, then keep splitting a block whenever two of its
+ * members disagree about which block some terminal leads into. Merging what is
+ * left over never changes the generated language, and it can only shrink the
+ * grammar — a grammar that is already minimal comes back unchanged.
+ *
+ * The result stays strictly right-linear (`A -> aB | a | ε`), so switching to
+ * the simplified view never turns a regular grammar into something else.
+ */
+export function minimizeRightLinearGrammar(
+  grammar: RegularGrammar,
+): RegularGrammar {
+  const automaton = toGrammarAutomaton(grammar);
+  const blockOf = refineIntoBlocks(automaton);
+  const membersOf = groupByBlock(automaton.nodes, blockOf);
 
   const blockEdges = new Map<number, Array<{ terminal: string; to: number }>>();
   const blockAccepting = new Map<number, boolean>();
   for (const [block, members] of membersOf) {
-    blockAccepting.set(block, members.some(isAccepting));
-    const seen = new Set<string>();
-    const edges: Array<{ terminal: string; to: number }> = [];
-    for (const member of members) {
-      for (const edge of edgesOf.get(member) ?? []) {
-        const target = blockOf.get(edge.to)!;
-        const key = `${edge.terminal}${target}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        edges.push({ terminal: edge.terminal, to: target });
-      }
-    }
-    edges.sort((a, b) =>
-      a.terminal < b.terminal ? -1 : a.terminal > b.terminal ? 1 : 0,
-    );
-    blockEdges.set(block, edges);
+    blockAccepting.set(block, members.some(automaton.isAccepting));
+    blockEdges.set(block, mergeBlockEdges(members, automaton, blockOf));
   }
 
   const startBlock = blockOf.get(grammar.startSymbol)!;

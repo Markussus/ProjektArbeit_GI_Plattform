@@ -15,6 +15,70 @@ export interface EnumerateResult {
 const DEFAULT_MAX_WORDS = 30;
 const DEFAULT_MAX_LEN = 6;
 
+/** One position in the enumeration walk: a state plus the prefix read so far. */
+interface EnumerationFrame {
+  state: string;
+  word: string;
+}
+
+/** Queue every unvisited (state, word) pair one transition away from `frame`. */
+function enqueueSuccessors(
+  fa: FAProgram,
+  frame: EnumerationFrame,
+  seen: Set<string>,
+  queue: EnumerationFrame[],
+): void {
+  const transitions = fa.transitions[frame.state] ?? {};
+  for (const [symbol, targets] of Object.entries(transitions)) {
+    for (const next of targets) {
+      const nextWord = frame.word + symbol;
+      const key = `${next}::${nextWord}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      queue.push({ state: next, word: nextWord });
+    }
+  }
+}
+
+/**
+ * Breadth-first walk over (state, prefix) pairs, collecting the prefix every
+ * time an accept state is reached. Stops as soon as `collectLimit` words are
+ * in hand, so a runaway grammar can never lock up the UI.
+ */
+function collectAcceptedWords(
+  fa: FAProgram,
+  maxLen: number,
+  collectLimit: number,
+): Set<string> {
+  const acceptStates = new Set(fa.acceptStates);
+  const accepted = new Set<string>();
+  // Read with a moving index rather than `shift()`, which is O(queue length).
+  const queue: EnumerationFrame[] = [{ state: fa.startState, word: "" }];
+  // Avoid revisiting (state, word) pairs.
+  const seen = new Set<string>([`${fa.startState}::`]);
+
+  for (let head = 0; head < queue.length; head++) {
+    const frame = queue[head];
+
+    if (acceptStates.has(frame.state)) {
+      accepted.add(frame.word);
+      if (accepted.size >= collectLimit) break;
+    }
+
+    if (frame.word.length < maxLen) {
+      enqueueSuccessors(fa, frame, seen, queue);
+    }
+  }
+
+  return accepted;
+}
+
+/** Shortest first, then alphabetically — the order a reader expects. */
+function byLengthThenAlphabetically(a: string, b: string): number {
+  if (a.length !== b.length) return a.length - b.length;
+  return a.localeCompare(b);
+}
+
 /**
  * Enumerate all words derivable from a regular grammar up to a length cap.
  *
@@ -29,48 +93,15 @@ export function enumerateLanguage(
   const maxLen = opts.maxLen ?? DEFAULT_MAX_LEN;
   const maxWords = opts.maxWords ?? DEFAULT_MAX_WORDS;
 
-  const fa = grammarToAutomaton(grammar);
-  const acceptStates = new Set(fa.acceptStates);
-  const accepted = new Set<string>();
-  // Each entry: [currentState, prefix]
-  type Frame = { state: string; word: string };
-  // Read with a moving index rather than `shift()`, which is O(queue length).
-  const queue: Frame[] = [{ state: fa.startState, word: "" }];
-  let head = 0;
-  // Avoid revisiting (state, word) pairs.
-  const seen = new Set<string>([`${fa.startState}::`]);
-
   // Collect one word beyond the cap: finding it is what proves the output is
   // actually truncated. Hitting the cap exactly means the language ended there.
-  const collectLimit = maxWords + 1;
+  const accepted = collectAcceptedWords(
+    grammarToAutomaton(grammar),
+    maxLen,
+    maxWords + 1,
+  );
 
-  while (head < queue.length && accepted.size < collectLimit) {
-    const { state, word } = queue[head++];
-
-    if (acceptStates.has(state)) {
-      accepted.add(word);
-      if (accepted.size >= collectLimit) break;
-    }
-
-    if (word.length >= maxLen) continue;
-
-    const transitions = fa.transitions[state] ?? {};
-    for (const [symbol, targets] of Object.entries(transitions)) {
-      for (const next of targets) {
-        const nextWord = word + symbol;
-        const key = `${next}::${nextWord}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        queue.push({ state: next, word: nextWord });
-      }
-    }
-  }
-
-  const words = [...accepted].sort((a, b) => {
-    if (a.length !== b.length) return a.length - b.length;
-    return a.localeCompare(b);
-  });
-
+  const words = [...accepted].sort(byLengthThenAlphabetically);
   const truncated = words.length > maxWords;
   return { words: truncated ? words.slice(0, maxWords) : words, truncated };
 }
