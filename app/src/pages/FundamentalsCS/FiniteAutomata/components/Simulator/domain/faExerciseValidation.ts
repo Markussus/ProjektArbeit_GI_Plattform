@@ -40,16 +40,11 @@ function createAcceptor(program: FAProgram): (word: string) => boolean {
   };
 }
 
-/** Run `program` on `word`; return true iff any active state is accepting. */
-export function accepts(program: FAProgram, word: string): boolean {
-  return createAcceptor(program)(word);
-}
-
 /* ────────────────────────────────────────────────────────────
    Test-string enumeration over a shared alphabet
    ──────────────────────────────────────────────────────────── */
 
-export function enumerateWords(alphabet: string[], maxLen: number): string[] {
+function enumerateWords(alphabet: string[], maxLen: number): string[] {
   const words: string[] = [""];
   let frontier: string[] = [""];
   for (let len = 1; len <= maxLen; len++) {

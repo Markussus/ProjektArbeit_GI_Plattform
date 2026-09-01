@@ -20,7 +20,7 @@ export interface FAExample {
 }
 
 // ─── NFA: Contains substring "aba" ──────────────────────────────────────────
-export const exampleContainsAba: FAExample = {
+const exampleContainsAba: FAExample = {
   id: "contains-aba",
   titleKey: "finite-automata.examples.containsAba.title",
   descriptionKey: "finite-automata.examples.containsAba.description",
@@ -43,7 +43,7 @@ export const exampleContainsAba: FAExample = {
 };
 
 // ─── DFA: Lecture Example (00*1) ────────────────────────────────────────────
-export const exampleLecture: FAExample = {
+const exampleLecture: FAExample = {
   id: "lecture-example",
   titleKey: "finite-automata.examples.lecture.title",
   descriptionKey: "finite-automata.examples.lecture.description",
@@ -68,7 +68,7 @@ export const exampleLecture: FAExample = {
 // ─── DFA: Ends with "ab" ───────────────────────────────────────────────────
 // The automaton the simulator used to open with. It lives here now that free
 // mode starts blank, so the worked version is still one click away.
-export const exampleEndsWithAb: FAExample = {
+const exampleEndsWithAb: FAExample = {
   id: "ends-with-ab",
   titleKey: "finite-automata.examples.endsWithAb.title",
   descriptionKey: "finite-automata.examples.endsWithAb.description",
@@ -79,7 +79,7 @@ export const exampleEndsWithAb: FAExample = {
 };
 
 // ─── Grammar → NFA | DFA ────────────────────────────────────────────────────
-export const exampleGrammar: FAExample = {
+const exampleGrammar: FAExample = {
   id: "grammar-example",
   titleKey: "finite-automata.examples.grammar.title",
   descriptionKey: "finite-automata.examples.grammar.description",

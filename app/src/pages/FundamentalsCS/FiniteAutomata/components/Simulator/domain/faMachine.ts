@@ -33,7 +33,7 @@ export function createInitialRuntime(
 /**
  * Can we still step?
  */
-export function canStep(runtime: FARuntime): boolean {
+function canStep(runtime: FARuntime): boolean {
   return !runtime.halted;
 }
 

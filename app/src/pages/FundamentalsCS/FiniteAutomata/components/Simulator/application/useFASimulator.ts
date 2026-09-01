@@ -7,7 +7,7 @@ import type { FAProgram } from "../domain/faTypes";
 import type { FARuntime } from "../domain/faRuntime";
 import { validateFAProgram } from "../domain/faProgramValidation";
 
-export interface FASimulatorConfig {
+interface FASimulatorConfig {
   program: FAProgram;
   inputWord: string[];
 }

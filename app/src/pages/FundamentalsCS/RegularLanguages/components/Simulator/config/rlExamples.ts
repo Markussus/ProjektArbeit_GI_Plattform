@@ -28,7 +28,7 @@ export interface RLExample {
   testWord?: string;
 }
 
-export const exampleGrammarToLanguage: RLExample = {
+const exampleGrammarToLanguage: RLExample = {
   id: "grammar-to-language",
   titleKey: "regular-languages.examples.grammarToLanguage.title",
   descriptionKey: "regular-languages.examples.grammarToLanguage.description",
@@ -42,7 +42,7 @@ export const exampleGrammarToLanguage: RLExample = {
  * The grammar the Grammar → Language converter used to open with. Free mode
  * starts blank now, so it is offered here instead.
  */
-export const exampleGrammarDefault: RLExample = {
+const exampleGrammarDefault: RLExample = {
   id: "grammar-default",
   titleKey: "regular-languages.examples.grammarDefault.title",
   descriptionKey: "regular-languages.examples.grammarDefault.description",
@@ -52,7 +52,7 @@ export const exampleGrammarDefault: RLExample = {
   grammarSource: ["S -> aS | bA", "A -> bA | ε"].join("\n"),
 };
 
-export const exampleLanguageToGrammar: RLExample = {
+const exampleLanguageToGrammar: RLExample = {
   id: "language-to-grammar",
   titleKey: "regular-languages.examples.languageToGrammar.title",
   descriptionKey: "regular-languages.examples.languageToGrammar.description",
@@ -62,7 +62,7 @@ export const exampleLanguageToGrammar: RLExample = {
   languageSource: 'L = {"ab", "abb", "abbb"}',
 };
 
-export const exampleLanguageSetBuilder: RLExample = {
+const exampleLanguageSetBuilder: RLExample = {
   id: "language-set-builder",
   titleKey: "regular-languages.examples.languageSetBuilder.title",
   descriptionKey: "regular-languages.examples.languageSetBuilder.description",
@@ -72,7 +72,7 @@ export const exampleLanguageSetBuilder: RLExample = {
   languageSource: "L = {a^n c b^m | n, m > 0}",
 };
 
-export const exampleRecognizeWord: RLExample = {
+const exampleRecognizeWord: RLExample = {
   id: "recognize-word",
   titleKey: "regular-languages.examples.recognizeWord.title",
   descriptionKey: "regular-languages.examples.recognizeWord.description",
@@ -88,7 +88,7 @@ export const exampleRecognizeWord: RLExample = {
  * Basics" section. They now share the categorised example style: load the given
  * grammar/language into the simulator to reveal the worked result.
  */
-export const exampleLectureGrammar1: RLExample = {
+const exampleLectureGrammar1: RLExample = {
   id: "lecture-g2l-1",
   titleKey: "regular-languages.examples.lectureGrammar1.title",
   descriptionKey: "regular-languages.examples.lectureGrammar1.description",
@@ -98,7 +98,7 @@ export const exampleLectureGrammar1: RLExample = {
   grammarSource: ["S -> 0A", "A -> 0A | 1"].join("\n"),
 };
 
-export const exampleLectureGrammar2: RLExample = {
+const exampleLectureGrammar2: RLExample = {
   id: "lecture-g2l-2",
   titleKey: "regular-languages.examples.lectureGrammar2.title",
   descriptionKey: "regular-languages.examples.lectureGrammar2.description",
@@ -112,7 +112,7 @@ export const exampleLectureGrammar2: RLExample = {
  * The introductory word list for the Language → Grammar converter. The
  * simulator itself opens blank, so this is where learners pick it up.
  */
-export const exampleLanguageDefault: RLExample = {
+const exampleLanguageDefault: RLExample = {
   id: "language-default",
   titleKey: "regular-languages.examples.languageDefault.title",
   descriptionKey: "regular-languages.examples.languageDefault.description",
@@ -122,7 +122,7 @@ export const exampleLanguageDefault: RLExample = {
   languageSource: 'L = {"010", "0010", "00100", ..}',
 };
 
-export const exampleLectureLanguage1: RLExample = {
+const exampleLectureLanguage1: RLExample = {
   id: "lecture-l2g-1",
   titleKey: "regular-languages.examples.lectureLanguage1.title",
   descriptionKey: "regular-languages.examples.lectureLanguage1.description",
