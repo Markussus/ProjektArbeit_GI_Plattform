@@ -14,9 +14,19 @@ import {
   useToggleSet,
 } from "@/components/shared/SimulatorShared";
 import { StepByStepSection } from "./StepByStepSection";
-
-const BASE64_CHARS =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+import {
+  buildEncodingSteps,
+  buildGroupSteps,
+  buildDecodeSteps,
+  buildDecodeByteSteps,
+  encodeBase64,
+  decodeBase64,
+  cleanBase64Input,
+  type EncodingStep,
+  type GroupStep,
+  type DecodeStep,
+  type DecodeByteStep,
+} from "../utils/base64Utils";
 
 interface Base64EncoderProps {
   isExerciseMode?: boolean;
@@ -32,206 +42,22 @@ interface Base64EncoderProps {
   }) => void;
 }
 
-interface EncodingStep {
-  index: number;
-  char: string;
-  ascii: number;
-  hex: string;
-  binary: string;
-}
-
-interface GroupStep {
-  index: number;
-  bits: string;
-  decimal: number;
-  base64Char: string;
-}
-
-interface DecodeStep {
-  index: number;
-  base64Char: string;
-  decimal: number;
-  bits: string;
-}
-
-interface DecodeByteStep {
-  index: number;
-  bits: string;
-  decimal: number;
-  char: string;
-}
-
-export function Base64Encoder({
-  isExerciseMode = false,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialValue = "",
-  initialConverterMode = "encode",
-  expectedAnswer,
-  onChangeState,
-}: Base64EncoderProps) {
-  const { t } = useTranslation();
+function useBase64EncoderState(
+  initialValue: string,
+  initialConverterMode: "encode" | "decode",
+  isExerciseMode: boolean,
+  showSolution: boolean,
+  onChangeState?: Base64EncoderProps["onChangeState"],
+) {
   const [inputValue, setInputValue] = useState(initialValue);
   const [converterMode, setConverterMode] = useState<"encode" | "decode">(
     initialConverterMode,
   );
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
 
   useEffect(() => {
     onChangeState?.({ converterMode, inputValue });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [converterMode, inputValue]);
-
-  const encodingSteps = useMemo((): EncodingStep[] => {
-    if (converterMode !== "encode" || !inputValue) return [];
-    return Array.from(inputValue).map((char, i) => ({
-      index: i,
-      char,
-      ascii: char.charCodeAt(0),
-      hex: char.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"),
-      binary: char.charCodeAt(0).toString(2).padStart(8, "0"),
-    }));
-  }, [inputValue, converterMode]);
-
-  const groupSteps = useMemo((): GroupStep[] => {
-    if (converterMode !== "encode" || !inputValue) return [];
-    const binaryString = Array.from(inputValue)
-      .map((c) => c.charCodeAt(0).toString(2).padStart(8, "0"))
-      .join("");
-    const padded = binaryString.padEnd(
-      Math.ceil(binaryString.length / 6) * 6,
-      "0",
-    );
-    const groups: GroupStep[] = [];
-    for (let i = 0; i < padded.length; i += 6) {
-      const bits = padded.slice(i, i + 6);
-      const decimal = parseInt(bits, 2);
-      groups.push({
-        index: groups.length,
-        bits,
-        decimal,
-        base64Char: BASE64_CHARS[decimal],
-      });
-    }
-    const paddingCount = (4 - (groups.length % 4)) % 4;
-    for (let i = 0; i < paddingCount; i++) {
-      groups.push({
-        index: groups.length,
-        bits: "======",
-        decimal: -1,
-        base64Char: "=",
-      });
-    }
-    return groups;
-  }, [inputValue, converterMode]);
-
-  const decodeSteps = useMemo((): DecodeStep[] => {
-    const clean =
-      converterMode === "decode" && inputValue
-        ? inputValue.replace(/=/g, "")
-        : "";
-    const steps: DecodeStep[] = [];
-    for (const char of clean) {
-      const idx = BASE64_CHARS.indexOf(char);
-      if (idx === -1) break;
-      steps.push({
-        index: steps.length,
-        base64Char: char,
-        decimal: idx,
-        bits: idx.toString(2).padStart(6, "0"),
-      });
-    }
-    return steps;
-  }, [inputValue, converterMode]);
-
-  const decodeByteSteps = useMemo((): DecodeByteStep[] => {
-    const clean =
-      converterMode === "decode" && inputValue
-        ? inputValue.replace(/=/g, "")
-        : "";
-    let binaryString = "";
-    let valid = true;
-    for (const char of clean) {
-      const idx = BASE64_CHARS.indexOf(char);
-      if (idx === -1) {
-        valid = false;
-        break;
-      }
-      binaryString += idx.toString(2).padStart(6, "0");
-    }
-    if (!valid) return [];
-    const steps: DecodeByteStep[] = [];
-    for (let i = 0; i < binaryString.length; i += 8) {
-      const bits = binaryString.slice(i, i + 8);
-      if (bits.length < 8) break;
-      const decimal = parseInt(bits, 2);
-      steps.push({
-        index: steps.length,
-        bits,
-        decimal,
-        char: String.fromCharCode(decimal),
-      });
-    }
-    return steps;
-  }, [inputValue, converterMode]);
-
-  const result = useMemo(() => {
-    if (converterMode === "encode") {
-      if (!inputValue) return "";
-      const binaryString = Array.from(inputValue)
-        .map((c) => c.charCodeAt(0).toString(2).padStart(8, "0"))
-        .join("");
-      const padded = binaryString.padEnd(
-        Math.ceil(binaryString.length / 6) * 6,
-        "0",
-      );
-      let encoded = "";
-      for (let i = 0; i < padded.length; i += 6) {
-        const bits = padded.slice(i, i + 6);
-        encoded += BASE64_CHARS[parseInt(bits, 2)];
-      }
-      const paddingCount = (4 - (encoded.length % 4)) % 4;
-      return encoded + "=".repeat(paddingCount);
-    } else {
-      if (!inputValue) return "";
-      const clean = inputValue.replace(/=/g, "");
-      let binaryString = "";
-      for (const char of clean) {
-        const idx = BASE64_CHARS.indexOf(char);
-        if (idx === -1) return "";
-        binaryString += idx.toString(2).padStart(6, "0");
-      }
-      let decoded = "";
-      for (let i = 0; i < binaryString.length; i += 8) {
-        const byte = binaryString.slice(i, i + 8);
-        if (byte.length < 8) break;
-        decoded += String.fromCharCode(parseInt(byte, 2));
-      }
-      return decoded;
-    }
-  }, [inputValue, converterMode]);
-
-  const expectedResults = useMemo(() => {
-    if (converterMode === "encode") {
-      return [result];
-    } else {
-      return [result];
-    }
-  }, [result, converterMode]);
-
-  const inputMode: ValidationInputMode =
-    converterMode === "encode" ? "base64" : "text";
-
-  const inputLabel =
-    converterMode === "encode"
-      ? t("encoding.simulator.inputText")
-      : t("encoding.simulator.inputBase64");
-
-  const resultLabel =
-    converterMode === "encode"
-      ? t("encoding.simulator.base64Result")
-      : t("encoding.simulator.decodedResult");
 
   const handleInputChange = (v: string) => {
     if (isExerciseMode && !showSolution) return;
@@ -247,6 +73,361 @@ export function Base64Encoder({
     setConverterMode(mode);
     setInputValue("");
   };
+
+  return {
+    inputValue,
+    converterMode,
+    handleInputChange,
+    handleModeChange,
+  };
+}
+
+interface EncodeResultPanelProps {
+  encodingSteps: EncodingStep[];
+  groupSteps: GroupStep[];
+  result: string;
+  expanded: Set<string>;
+  toggle: (key: string) => void;
+}
+
+function EncodeResultPanel({
+  encodingSteps,
+  groupSteps,
+  result,
+  expanded,
+  toggle,
+}: EncodeResultPanelProps) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-4">
+      <StepByStepToggle open={expanded.has("0")} onToggle={() => toggle("0")} />
+
+      {expanded.has("0") && (
+        <div className="space-y-2">
+          <h4 className="text-foreground text-sm font-medium">
+            {t("encoding.simulator.step1CharToAscii")}
+          </h4>
+          {encodingSteps.map((step) => (
+            <CollapsibleStep
+              key={step.index}
+              isOpen={expanded.has(`char-${step.index}`)}
+              onToggle={() => toggle(`char-${step.index}`)}
+              header={
+                <span className="font-mono text-sm">
+                  '{step.char}' → {step.ascii} ({step.hex}) → {step.binary}
+                </span>
+              }
+            >
+              <div className="space-y-1 text-sm">
+                <p>
+                  {t("encoding.simulator.charLabel")}:{" "}
+                  <code className="font-mono">{step.char}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.asciiLabel")}:{" "}
+                  <code className="font-mono">{step.ascii}</code>
+                  <span className="text-muted-foreground ml-2">
+                    (Hex: <code className="font-mono">{step.hex}</code>)
+                  </span>
+                </p>
+                <p>
+                  {t("encoding.simulator.binaryLabel")}:{" "}
+                  <code className="font-mono">{step.binary}</code>
+                </p>
+              </div>
+            </CollapsibleStep>
+          ))}
+        </div>
+      )}
+
+      <StepByStepSection
+        open={expanded.has("1")}
+        onToggle={() => toggle("1")}
+        title={t("encoding.simulator.step2GroupBits")}
+      >
+        <div className="space-y-2">
+          <div>
+            <p className="text-muted-foreground mb-1 text-xs">
+              {t("encoding.simulator.asciiHexLabel")}:
+            </p>
+            <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+              {encodingSteps.map((s) => s.hex).join(" ")}
+            </div>
+          </div>
+          <div>
+            <p className="text-muted-foreground mb-1 text-xs">
+              {t("encoding.simulator.binaryConcatLabel")}:
+            </p>
+            <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+              {encodingSteps.map((s) => s.binary).join("")}
+            </div>
+          </div>
+        </div>
+      </StepByStepSection>
+
+      <StepByStepToggle open={expanded.has("2")} onToggle={() => toggle("2")} />
+
+      {expanded.has("2") && (
+        <div className="space-y-2">
+          <h4 className="text-foreground text-sm font-medium">
+            {t("encoding.simulator.step3Base64Lookup")}
+          </h4>
+          {groupSteps.map((step) => (
+            <CollapsibleStep
+              key={step.index}
+              isOpen={expanded.has(`group-${step.index}`)}
+              onToggle={() => toggle(`group-${step.index}`)}
+              header={
+                <span className="font-mono text-sm">
+                  {step.bits} → {step.base64Char}
+                </span>
+              }
+            >
+              <div className="space-y-1 text-sm">
+                <p>
+                  {t("encoding.simulator.bitsLabel")}:{" "}
+                  <code className="font-mono">{step.bits}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.decimalLabel")}:{" "}
+                  <code className="font-mono">
+                    {step.decimal >= 0 ? step.decimal : "padding"}
+                  </code>
+                </p>
+                <p>
+                  {t("encoding.simulator.base64CharLabel")}:{" "}
+                  <code className="font-mono">{step.base64Char}</code>
+                </p>
+              </div>
+            </CollapsibleStep>
+          ))}
+        </div>
+      )}
+
+      {result && (
+        <div className="bg-primary/10 mt-4 rounded-lg p-4">
+          <p className="text-sm font-medium">
+            {t("encoding.simulator.finalResult")}
+          </p>
+          <code className="text-primary mt-1 block font-mono text-lg break-all">
+            {result}
+          </code>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface DecodeResultPanelProps {
+  decodeSteps: DecodeStep[];
+  decodeByteSteps: DecodeByteStep[];
+  result: string;
+  expanded: Set<string>;
+  toggle: (key: string) => void;
+}
+
+function DecodeResultPanel({
+  decodeSteps,
+  decodeByteSteps,
+  result,
+  expanded,
+  toggle,
+}: DecodeResultPanelProps) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-4">
+      <StepByStepToggle open={expanded.has("0")} onToggle={() => toggle("0")} />
+
+      {expanded.has("0") && (
+        <div className="space-y-2">
+          <h4 className="text-foreground text-sm font-medium">
+            {t("encoding.simulator.decodeStep1Lookup")}
+          </h4>
+          {decodeSteps.map((step) => (
+            <CollapsibleStep
+              key={step.index}
+              isOpen={expanded.has(`decode-${step.index}`)}
+              onToggle={() => toggle(`decode-${step.index}`)}
+              header={
+                <span className="font-mono text-sm">
+                  {step.base64Char} → {step.decimal} → {step.bits}
+                </span>
+              }
+            >
+              <div className="space-y-1 text-sm">
+                <p>
+                  {t("encoding.simulator.base64CharLabel")}:{" "}
+                  <code className="font-mono">{step.base64Char}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.decimalLabel")}:{" "}
+                  <code className="font-mono">{step.decimal}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.bitsLabel")}:{" "}
+                  <code className="font-mono">{step.bits}</code>
+                </p>
+              </div>
+            </CollapsibleStep>
+          ))}
+        </div>
+      )}
+
+      <StepByStepSection
+        open={expanded.has("1")}
+        onToggle={() => toggle("1")}
+        title={t("encoding.simulator.decodeStep2ConcatBits")}
+      >
+        <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
+          {decodeSteps.map((s) => s.bits).join("")}
+        </div>
+      </StepByStepSection>
+
+      <StepByStepToggle open={expanded.has("2")} onToggle={() => toggle("2")} />
+
+      {expanded.has("2") && (
+        <div className="space-y-2">
+          <h4 className="text-foreground text-sm font-medium">
+            {t("encoding.simulator.decodeStep3ToChars")}
+          </h4>
+          {decodeByteSteps.map((step) => (
+            <CollapsibleStep
+              key={step.index}
+              isOpen={expanded.has(`byte-${step.index}`)}
+              onToggle={() => toggle(`byte-${step.index}`)}
+              header={
+                <span className="font-mono text-sm">
+                  {step.bits} → '{step.char}'
+                </span>
+              }
+            >
+              <div className="space-y-1 text-sm">
+                <p>
+                  {t("encoding.simulator.bitsLabel")}:{" "}
+                  <code className="font-mono">{step.bits}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.decimalLabel")}:{" "}
+                  <code className="font-mono">{step.decimal}</code>
+                </p>
+                <p>
+                  {t("encoding.simulator.charLabel")}:{" "}
+                  <code className="font-mono">{step.char}</code>
+                </p>
+              </div>
+            </CollapsibleStep>
+          ))}
+        </div>
+      )}
+
+      <DecodeWarningAndFinalResult result={result} />
+    </div>
+  );
+}
+
+interface DecodeWarningAndFinalResultProps {
+  result: string;
+}
+
+function DecodeWarningAndFinalResult({
+  result,
+}: DecodeWarningAndFinalResultProps) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {!result && (
+        <WarningBanner
+          variant="warning"
+          title={t(
+            "encoding.simulator.invalidBase64Title",
+            "Invalid Base64 Input",
+          )}
+        >
+          {t(
+            "encoding.simulator.invalidBase64Desc",
+            "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
+          )}
+        </WarningBanner>
+      )}
+
+      {result && (
+        <div className="bg-primary/10 mt-4 rounded-lg p-4">
+          <p className="text-sm font-medium">
+            {t("encoding.simulator.finalResult")}
+          </p>
+          <code className="text-primary mt-1 block font-mono text-lg break-all">
+            {result}
+          </code>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function Base64Encoder({
+  isExerciseMode = false,
+  showSolution = true,
+  onShowSolution,
+  onExitExercise,
+  initialValue = "",
+  initialConverterMode = "encode",
+  expectedAnswer,
+  onChangeState,
+}: Base64EncoderProps) {
+  const { t } = useTranslation();
+  const { inputValue, converterMode, handleInputChange, handleModeChange } =
+    useBase64EncoderState(
+      initialValue,
+      initialConverterMode,
+      isExerciseMode,
+      showSolution,
+      onChangeState,
+    );
+  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
+
+  const encodingSteps = useMemo(() => {
+    if (converterMode !== "encode" || !inputValue) return [];
+    return buildEncodingSteps(inputValue);
+  }, [inputValue, converterMode]);
+
+  const groupSteps = useMemo(() => {
+    if (converterMode !== "encode" || !inputValue) return [];
+    const binaryString = Array.from(inputValue)
+      .map((c) => c.charCodeAt(0).toString(2).padStart(8, "0"))
+      .join("");
+    return buildGroupSteps(binaryString);
+  }, [inputValue, converterMode]);
+
+  const decodeSteps = useMemo(() => {
+    if (converterMode !== "decode" || !inputValue) return [];
+    return buildDecodeSteps(cleanBase64Input(inputValue));
+  }, [inputValue, converterMode]);
+
+  const decodeByteSteps = useMemo(() => {
+    if (converterMode !== "decode" || !inputValue) return [];
+    return buildDecodeByteSteps(cleanBase64Input(inputValue)).steps;
+  }, [inputValue, converterMode]);
+
+  const result = useMemo(() => {
+    if (!inputValue) return "";
+    if (converterMode === "encode") return encodeBase64(inputValue);
+    return decodeBase64(inputValue) ?? "";
+  }, [inputValue, converterMode]);
+
+  const expectedResults = useMemo(() => [result], [result]);
+
+  const inputMode: ValidationInputMode =
+    converterMode === "encode" ? "base64" : "text";
+
+  const inputLabel =
+    converterMode === "encode"
+      ? t("encoding.simulator.inputText")
+      : t("encoding.simulator.inputBase64");
+
+  const resultLabel =
+    converterMode === "encode"
+      ? t("encoding.simulator.base64Result")
+      : t("encoding.simulator.decodedResult");
 
   return (
     <SimulatorLayout
@@ -326,250 +507,23 @@ export function Base64Encoder({
             )}
 
             {inputValue && converterMode === "encode" && (
-              <div className="space-y-4">
-                <StepByStepToggle
-                  open={expanded.has("0")}
-                  onToggle={() => toggle("0")}
-                />
-
-                {expanded.has("0") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.step1CharToAscii")}
-                    </h4>
-                    {encodingSteps.map((step) => (
-                      <CollapsibleStep
-                        key={step.index}
-                        isOpen={expanded.has(`char-${step.index}`)}
-                        onToggle={() => toggle(`char-${step.index}`)}
-                        header={
-                          <span className="font-mono text-sm">
-                            '{step.char}' → {step.ascii} ({step.hex}) →{" "}
-                            {step.binary}
-                          </span>
-                        }
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            {t("encoding.simulator.charLabel")}:{" "}
-                            <code className="font-mono">{step.char}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.asciiLabel")}:{" "}
-                            <code className="font-mono">{step.ascii}</code>
-                            <span className="text-muted-foreground ml-2">
-                              (Hex:{" "}
-                              <code className="font-mono">{step.hex}</code>)
-                            </span>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.binaryLabel")}:{" "}
-                            <code className="font-mono">{step.binary}</code>
-                          </p>
-                        </div>
-                      </CollapsibleStep>
-                    ))}
-                  </div>
-                )}
-
-                <StepByStepSection
-                  open={expanded.has("1")}
-                  onToggle={() => toggle("1")}
-                  title={t("encoding.simulator.step2GroupBits")}
-                >
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-muted-foreground mb-1 text-xs">
-                        {t("encoding.simulator.asciiHexLabel")}:
-                      </p>
-                      <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                        {encodingSteps.map((s) => s.hex).join(" ")}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground mb-1 text-xs">
-                        {t("encoding.simulator.binaryConcatLabel")}:
-                      </p>
-                      <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                        {encodingSteps.map((s) => s.binary).join("")}
-                      </div>
-                    </div>
-                  </div>
-                </StepByStepSection>
-
-                <StepByStepToggle
-                  open={expanded.has("2")}
-                  onToggle={() => toggle("2")}
-                />
-
-                {expanded.has("2") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.step3Base64Lookup")}
-                    </h4>
-                    {groupSteps.map((step) => (
-                      <CollapsibleStep
-                        key={step.index}
-                        isOpen={expanded.has(`group-${step.index}`)}
-                        onToggle={() => toggle(`group-${step.index}`)}
-                        header={
-                          <span className="font-mono text-sm">
-                            {step.bits} → {step.base64Char}
-                          </span>
-                        }
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            {t("encoding.simulator.bitsLabel")}:{" "}
-                            <code className="font-mono">{step.bits}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.decimalLabel")}:{" "}
-                            <code className="font-mono">
-                              {step.decimal >= 0 ? step.decimal : "padding"}
-                            </code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.base64CharLabel")}:{" "}
-                            <code className="font-mono">{step.base64Char}</code>
-                          </p>
-                        </div>
-                      </CollapsibleStep>
-                    ))}
-                  </div>
-                )}
-
-                {result && (
-                  <div className="bg-primary/10 mt-4 rounded-lg p-4">
-                    <p className="text-sm font-medium">
-                      {t("encoding.simulator.finalResult")}
-                    </p>
-                    <code className="text-primary mt-1 block font-mono text-lg break-all">
-                      {result}
-                    </code>
-                  </div>
-                )}
-              </div>
+              <EncodeResultPanel
+                encodingSteps={encodingSteps}
+                groupSteps={groupSteps}
+                result={result}
+                expanded={expanded}
+                toggle={toggle}
+              />
             )}
 
             {inputValue && converterMode === "decode" && (
-              <div className="space-y-4">
-                <StepByStepToggle
-                  open={expanded.has("0")}
-                  onToggle={() => toggle("0")}
-                />
-
-                {expanded.has("0") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.decodeStep1Lookup")}
-                    </h4>
-                    {decodeSteps.map((step) => (
-                      <CollapsibleStep
-                        key={step.index}
-                        isOpen={expanded.has(`decode-${step.index}`)}
-                        onToggle={() => toggle(`decode-${step.index}`)}
-                        header={
-                          <span className="font-mono text-sm">
-                            {step.base64Char} → {step.decimal} → {step.bits}
-                          </span>
-                        }
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            {t("encoding.simulator.base64CharLabel")}:{" "}
-                            <code className="font-mono">{step.base64Char}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.decimalLabel")}:{" "}
-                            <code className="font-mono">{step.decimal}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.bitsLabel")}:{" "}
-                            <code className="font-mono">{step.bits}</code>
-                          </p>
-                        </div>
-                      </CollapsibleStep>
-                    ))}
-                  </div>
-                )}
-
-                <StepByStepSection
-                  open={expanded.has("1")}
-                  onToggle={() => toggle("1")}
-                  title={t("encoding.simulator.decodeStep2ConcatBits")}
-                >
-                  <div className="bg-muted/30 rounded-lg p-3 font-mono text-xs break-all">
-                    {decodeSteps.map((s) => s.bits).join("")}
-                  </div>
-                </StepByStepSection>
-
-                <StepByStepToggle
-                  open={expanded.has("2")}
-                  onToggle={() => toggle("2")}
-                />
-
-                {expanded.has("2") && (
-                  <div className="space-y-2">
-                    <h4 className="text-foreground text-sm font-medium">
-                      {t("encoding.simulator.decodeStep3ToChars")}
-                    </h4>
-                    {decodeByteSteps.map((step) => (
-                      <CollapsibleStep
-                        key={step.index}
-                        isOpen={expanded.has(`byte-${step.index}`)}
-                        onToggle={() => toggle(`byte-${step.index}`)}
-                        header={
-                          <span className="font-mono text-sm">
-                            {step.bits} → '{step.char}'
-                          </span>
-                        }
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p>
-                            {t("encoding.simulator.bitsLabel")}:{" "}
-                            <code className="font-mono">{step.bits}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.decimalLabel")}:{" "}
-                            <code className="font-mono">{step.decimal}</code>
-                          </p>
-                          <p>
-                            {t("encoding.simulator.charLabel")}:{" "}
-                            <code className="font-mono">{step.char}</code>
-                          </p>
-                        </div>
-                      </CollapsibleStep>
-                    ))}
-                  </div>
-                )}
-
-                {inputValue.trim().length > 0 && !result && (
-                  <WarningBanner
-                    variant="warning"
-                    title={t(
-                      "encoding.simulator.invalidBase64Title",
-                      "Invalid Base64 Input",
-                    )}
-                  >
-                    {t(
-                      "encoding.simulator.invalidBase64Desc",
-                      "The input contains invalid Base64 characters. Use only A-Z, a-z, 0-9, +, / and = for padding.",
-                    )}
-                  </WarningBanner>
-                )}
-
-                {result && (
-                  <div className="bg-primary/10 mt-4 rounded-lg p-4">
-                    <p className="text-sm font-medium">
-                      {t("encoding.simulator.finalResult")}
-                    </p>
-                    <code className="text-primary mt-1 block font-mono text-lg break-all">
-                      {result}
-                    </code>
-                  </div>
-                )}
-              </div>
+              <DecodeResultPanel
+                decodeSteps={decodeSteps}
+                decodeByteSteps={decodeByteSteps}
+                result={result}
+                expanded={expanded}
+                toggle={toggle}
+              />
             )}
           </div>
         )

@@ -1,5 +1,6 @@
 import { FileText, Binary } from "lucide-react";
 import type { ExerciseDefinition, DescriptionParams } from "@/types/exercise";
+import { bytesToBinary, bytesToHex } from "./encodingFormatUtils";
 
 const PRINTABLE_ASCII =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:',.<>?/`~ ";
@@ -63,10 +64,6 @@ function getUtf8Bytes(codePoint: number): number[] {
     0x80 | ((codePoint >> 6) & 0x3f),
     0x80 | (codePoint & 0x3f),
   ];
-}
-
-function bytesToBinary(bytes: number[]): string {
-  return bytes.map((b) => b.toString(2).padStart(8, "0")).join(" ");
 }
 
 export type EncodingExerciseType =
@@ -252,10 +249,7 @@ function generateUtf8Encode4Byte(): ExerciseDefWithAnswer {
 function generateUtf8DecodeEasy(): ExerciseDefWithAnswer {
   const codePoint = randInt(0x0000, 0x007f);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const hexBytes = bytes
-    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-    .join(" ");
+  const hexBytes = bytesToHex(getUtf8Bytes(codePoint));
   return {
     titleKey: "encoding.ex_utf8_decode_easy",
     descriptionKey: "encoding.ex_utf8_decode_easy_desc",
@@ -269,10 +263,7 @@ function generateUtf8DecodeEasy(): ExerciseDefWithAnswer {
 function generateUtf8DecodeMedium(): ExerciseDefWithAnswer {
   const codePoint = randInt(0x0080, 0x07ff);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const hexBytes = bytes
-    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-    .join(" ");
+  const hexBytes = bytesToHex(getUtf8Bytes(codePoint));
   return {
     titleKey: "encoding.ex_utf8_decode_medium",
     descriptionKey: "encoding.ex_utf8_decode_medium_desc",
@@ -286,10 +277,7 @@ function generateUtf8DecodeMedium(): ExerciseDefWithAnswer {
 function generateUtf8DecodeHard(): ExerciseDefWithAnswer {
   const codePoint = randInt(0x0800, 0xd7ff);
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const hexBytes = bytes
-    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-    .join(" ");
+  const hexBytes = bytesToHex(getUtf8Bytes(codePoint));
   return {
     titleKey: "encoding.ex_utf8_decode_hard",
     descriptionKey: "encoding.ex_utf8_decode_hard_desc",
@@ -304,10 +292,7 @@ function generateUtf8Decode4Byte(): ExerciseDefWithAnswer {
   const char = EMOJI_CHARS[randInt(0, EMOJI_CHARS.length - 1)];
   const codePoint = char.codePointAt(0)!;
   const hex = codePoint.toString(16).toUpperCase().padStart(4, "0");
-  const bytes = getUtf8Bytes(codePoint);
-  const hexBytes = bytes
-    .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-    .join(" ");
+  const hexBytes = bytesToHex(getUtf8Bytes(codePoint));
   return {
     titleKey: "encoding.ex_utf8_decode_4byte",
     descriptionKey: "encoding.ex_utf8_decode_4byte_desc",
