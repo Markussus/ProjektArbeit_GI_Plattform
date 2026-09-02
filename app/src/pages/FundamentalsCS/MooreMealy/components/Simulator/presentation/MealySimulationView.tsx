@@ -113,7 +113,7 @@ export function MealySimulationView(props: Props) {
             />
           </div>
         </div>
-        <div className="grid grid-rows-2 gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           <SymbolSequence
             title={t("moore-mealy.sim.inputWord")}
             symbols={program.inputWord}
@@ -176,15 +176,15 @@ function SymbolSequence({
 }) {
   const { t } = useTranslation();
   return (
-    <section data-testid={testId} className="space-y-1">
+    <section data-testid={testId} className="min-w-0 space-y-1">
       <h3 className="text-sm font-semibold">{title}</h3>
-      <div className="border-border bg-card flex min-h-12 items-center gap-2 overflow-x-auto rounded-lg border p-2">
+      <div className="border-border bg-card flex min-h-12 min-w-0 flex-wrap items-center gap-2 rounded-lg border p-2">
         {symbols.length ? (
           symbols.map((symbol, index) => (
             <span
               key={`${symbol}-${index}`}
               className={cn(
-                "border-border bg-background rounded-md border px-3 py-1.5 font-mono",
+                "border-border bg-background max-w-full min-w-0 rounded-md border px-3 py-1.5 font-mono break-all whitespace-normal",
                 index < activeIndex && "bg-muted text-muted-foreground",
                 index === activeIndex &&
                   "border-brand bg-brand/10 text-brand border-2 font-semibold",

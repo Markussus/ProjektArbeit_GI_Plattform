@@ -137,6 +137,136 @@ describe("MooreMealy Presentation & Container Components", () => {
     expect(screen.getByTestId("mealy-simulation-view")).toBeInTheDocument();
   });
 
+  it("renders MooreSimulationView with flex-wrap and break-all for long and multiple input/output symbols", () => {
+    const longInputSymbol = "VERY_LONG_INPUT_SYMBOL_1234567890_OVERFLOW_TEST";
+    const longOutputSymbol = "VERY_LONG_OUTPUT_SYMBOL_0987654321_OVERFLOW_TEST";
+    const programWithLongSymbols = {
+      ...defaultMooreProgram,
+      inputSymbols: [longInputSymbol, "0", "1"],
+      transitions: {
+        ...defaultMooreProgram.transitions,
+        [longInputSymbol]: defaultMooreProgram.transitions["0"],
+      },
+      inputWord: [
+        longInputSymbol,
+        "1",
+        "0",
+        "1",
+        "0",
+        "1",
+        "0",
+        longInputSymbol,
+      ],
+    };
+    const runtime: MooreRuntime = {
+      currentState: defaultMooreProgram.initialState,
+      inputPosition: 0,
+      outputSymbols: [longOutputSymbol, "OUT_1", "OUT_2", longOutputSymbol],
+      stepCount: 0,
+      halted: false,
+      transitionHistory: [],
+    };
+    render(
+      <MooreSimulationView
+        program={programWithLongSymbols}
+        runtime={runtime}
+        status="idle"
+        speed={1}
+        error={null}
+        onEdit={vi.fn()}
+        onPlay={vi.fn()}
+        onPause={vi.fn()}
+        onStep={vi.fn()}
+        onStepBack={vi.fn()}
+        onReset={vi.fn()}
+        onSpeedChange={vi.fn()}
+      />,
+    );
+
+    const inputSection = screen.getByTestId("moore-runtime-input");
+    const outputSection = screen.getByTestId("moore-runtime-output");
+    expect(inputSection).toHaveClass("min-w-0");
+    expect(outputSection).toHaveClass("min-w-0");
+
+    const inputList = inputSection.querySelector("div");
+    expect(inputList).toHaveClass("flex-wrap");
+    expect(inputList).toHaveClass("min-w-0");
+
+    const outputList = outputSection.querySelector("div");
+    expect(outputList).toHaveClass("flex-wrap");
+    expect(outputList).toHaveClass("min-w-0");
+
+    const inputTokens = inputSection.querySelectorAll("span.font-mono");
+    expect(inputTokens[0]).toHaveClass("break-all");
+    expect(inputTokens[0]).toHaveClass("max-w-full");
+
+    const outputTokens = outputSection.querySelectorAll("span.font-mono");
+    expect(outputTokens[0]).toHaveClass("break-all");
+    expect(outputTokens[0]).toHaveClass("max-w-full");
+  });
+
+  it("renders MealySimulationView with flex-wrap and break-all for long and multiple input/output symbols", () => {
+    const longInputSymbol = "LONG_MEALY_INPUT_XYZ_1234567890";
+    const longOutputSymbol = "LONG_MEALY_OUTPUT_ABC_0987654321";
+    const programWithLongSymbols = {
+      ...defaultMealyProgram,
+      inputSymbols: [longInputSymbol, "0"],
+      transitions: {
+        ...defaultMealyProgram.transitions,
+        [longInputSymbol]: defaultMealyProgram.transitions["0"],
+      },
+      outputs: {
+        ...defaultMealyProgram.outputs,
+        [longInputSymbol]: defaultMealyProgram.outputs["0"],
+      },
+      inputWord: [longInputSymbol, "0", longInputSymbol],
+    };
+    const runtime: MealyRuntime = {
+      currentState: defaultMealyProgram.initialState,
+      inputPosition: 0,
+      outputSymbols: [longOutputSymbol, "OUT", longOutputSymbol],
+      stepCount: 0,
+      halted: false,
+      transitionHistory: [],
+    };
+    render(
+      <MealySimulationView
+        program={programWithLongSymbols}
+        runtime={runtime}
+        status="idle"
+        speed={1}
+        error={null}
+        onPlay={vi.fn()}
+        onPause={vi.fn()}
+        onStep={vi.fn()}
+        onStepBack={vi.fn()}
+        onReset={vi.fn()}
+        onSpeedChange={vi.fn()}
+      />,
+    );
+
+    const inputSection = screen.getByTestId("mealy-runtime-input");
+    const outputSection = screen.getByTestId("mealy-runtime-output");
+    expect(inputSection).toHaveClass("min-w-0");
+    expect(outputSection).toHaveClass("min-w-0");
+
+    const inputList = inputSection.querySelector("div");
+    expect(inputList).toHaveClass("flex-wrap");
+    expect(inputList).toHaveClass("min-w-0");
+
+    const outputList = outputSection.querySelector("div");
+    expect(outputList).toHaveClass("flex-wrap");
+    expect(outputList).toHaveClass("min-w-0");
+
+    const inputTokens = inputSection.querySelectorAll("span.font-mono");
+    expect(inputTokens[0]).toHaveClass("break-all");
+    expect(inputTokens[0]).toHaveClass("max-w-full");
+
+    const outputTokens = outputSection.querySelectorAll("span.font-mono");
+    expect(outputTokens[0]).toHaveClass("break-all");
+    expect(outputTokens[0]).toHaveClass("max-w-full");
+  });
+
   it("renders AutomataConversionView and switches tabs", () => {
     const conversion = buildMooreConversion(defaultMooreProgram);
     render(

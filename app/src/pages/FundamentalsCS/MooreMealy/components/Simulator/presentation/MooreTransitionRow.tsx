@@ -90,17 +90,6 @@ export function MooreTransitionRow({
           >
             {formatInternalNumber(inputIndex, program.representation)}
           </span>
-          <button
-            type="button"
-            onClick={() => onRemoveInputSymbol(inputSymbol)}
-            aria-label={t("moore-mealy.sim.removeInput", {
-              symbol: inputSymbol,
-            })}
-            data-testid={`moore-remove-input-symbol-${inputIndex}`}
-            className="text-muted-foreground hover:text-destructive rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
         </div>
       </td>
       {program.states.map((state, stateIndex) => {
@@ -124,7 +113,22 @@ export function MooreTransitionRow({
           />
         );
       })}
-      <td aria-hidden="true" />
+      <td className="w-12 p-1 text-center align-middle">
+        <button
+          type="button"
+          onClick={() => onRemoveInputSymbol(inputSymbol)}
+          aria-label={t("moore-mealy.sim.removeInput", {
+            symbol: inputSymbol,
+          })}
+          data-testid={`moore-remove-input-symbol-${inputIndex}`}
+          className="text-muted-foreground hover:text-destructive mx-auto flex items-center justify-center rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          title={t("moore-mealy.sim.removeInput", {
+            symbol: inputSymbol,
+          })}
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      </td>
     </tr>
   );
 }

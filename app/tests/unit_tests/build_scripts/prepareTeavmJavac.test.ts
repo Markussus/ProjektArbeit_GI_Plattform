@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   COMPILER_ARTIFACT_BASE_URL,
   COMPILER_ARTIFACTS,
-} from "../../../scripts/teavm-javac-artifacts.mjs";
+} from "../../../src/pages/Programming1/Java/pins_compiler/teavm-javac-artifacts.mjs";
 import {
   calculateFileSha256,
   cleanObsoleteStampFiles,
