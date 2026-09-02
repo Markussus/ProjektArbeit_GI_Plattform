@@ -39,6 +39,10 @@ export function resolveAutomataSimulationContext({
   const mealyExerciseScenario =
     exerciseScenario?.machineType === "mealy" ? exerciseScenario : null;
 
+  const lockedMachineType: MachineType | null =
+    exerciseScenario?.machineType ??
+    (isMooreExample ? "moore" : isMealyExample ? "mealy" : null);
+
   return {
     isMooreExample,
     isMealyExample,
@@ -48,6 +52,8 @@ export function resolveAutomataSimulationContext({
       mooreExerciseScenario?.starterProgram ??
       (isMooreExample ? defaultMooreProgram : undefined),
     storageEnabled: !isMooreExample && !isMealyExample,
-    activeMachineType: exerciseScenario?.machineType ?? machineType,
+    activeMachineType: lockedMachineType ?? machineType,
+    isMachineTypeLocked: lockedMachineType !== null,
+    lockedMachineType,
   };
 }

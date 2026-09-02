@@ -224,4 +224,40 @@ describe("SimulationTab solution actions", () => {
       "true",
     );
   });
+
+  it("locks tab switching when an example is selected", () => {
+    render(
+      <SimulationTab
+        {...commonProps}
+        selectedExercise={null}
+        selectedItem={{
+          id: MOORE_EXAMPLE_ID,
+          kind: "example",
+          title: "Moore example",
+          description: "Example machine",
+        }}
+      />,
+    );
+
+    const mealyTab = screen.getByTestId("moore-machine-tab-mealy");
+    expect(mealyTab).toBeDisabled();
+    expect(screen.getByTestId("mock-moore-simulator")).toHaveAttribute(
+      "data-transfer-active",
+      "true",
+    );
+    expect(screen.getByTestId("mock-mealy-simulator")).toHaveAttribute(
+      "data-transfer-active",
+      "false",
+    );
+
+    fireEvent.click(mealyTab);
+    expect(screen.getByTestId("mock-moore-simulator")).toHaveAttribute(
+      "data-transfer-active",
+      "true",
+    );
+    expect(screen.getByTestId("mock-mealy-simulator")).toHaveAttribute(
+      "data-transfer-active",
+      "false",
+    );
+  });
 });

@@ -56,12 +56,51 @@ export function JavaEditorPanel({
     syncActiveMarkers();
     editor.onDidChangeModel(syncActiveMarkers);
 
-    const editorNode = editor.getDomNode();
-    const pasteListener = createPasteLimitListener(editor, setLimitReason);
+    const editorNode = editor.getDomNode?.();
 
+    const updateScrollOptions = (enabled: boolean) => {
+      editor.updateOptions?.({
+        scrollbar: {
+          alwaysConsumeMouseWheel: false,
+          handleMouseWheel: enabled,
+        },
+      });
+    };
+
+    // Scroll editor when mouse hovers over it, and pass wheel events to page when hitting top/bottom edges
+    const isInitiallyHovered = Boolean(editorNode?.matches?.(":hover"));
+    updateScrollOptions(isInitiallyHovered);
+
+    const handleMouseEnter = () => {
+      updateScrollOptions(true);
+    };
+
+    const handleMouseLeave = () => {
+      updateScrollOptions(false);
+    };
+
+    editorNode?.addEventListener("mouseenter", handleMouseEnter);
+    editorNode?.addEventListener("mouseleave", handleMouseLeave);
+
+    const focusListener = editor.onDidFocusEditorWidget?.(() => {
+      updateScrollOptions(true);
+    });
+
+    const blurListener = editor.onDidBlurEditorWidget?.(() => {
+      if (!editorNode?.matches?.(":hover")) {
+        updateScrollOptions(false);
+      }
+    });
+
+    const pasteListener = createPasteLimitListener(editor, setLimitReason);
     editorNode?.addEventListener("paste", pasteListener, true);
-    editor.onDidDispose(() => {
+
+    editor.onDidDispose?.(() => {
+      editorNode?.removeEventListener("mouseenter", handleMouseEnter);
+      editorNode?.removeEventListener("mouseleave", handleMouseLeave);
       editorNode?.removeEventListener("paste", pasteListener, true);
+      focusListener?.dispose?.();
+      blurListener?.dispose?.();
     });
   };
 
@@ -97,7 +136,7 @@ export function JavaEditorPanel({
 
       <div
         data-testid="java-editor-container"
-        className="ring-foreground/10 overflow-hidden rounded-xl ring-1"
+        className="ring-foreground/10 relative overflow-hidden overscroll-auto rounded-xl ring-1"
       >
         <Suspense
           fallback={
@@ -120,6 +159,10 @@ export function JavaEditorPanel({
               padding: { top: 16, bottom: 16 },
               roundedSelection: true,
               scrollBeyondLastLine: false,
+              scrollbar: {
+                alwaysConsumeMouseWheel: false,
+                handleMouseWheel: false,
+              },
               tabSize: 2,
               wordWrap: "on",
             }}

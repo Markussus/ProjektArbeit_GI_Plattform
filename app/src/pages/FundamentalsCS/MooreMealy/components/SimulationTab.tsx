@@ -223,7 +223,11 @@ function AutomataSimulationBody({
       <div className="mx-auto w-full max-w-[100rem] md:pr-24">
         <InlineTabNavigation
           activeTab={simulationContext.activeMachineType}
-          onTabChange={onMachineTypeChange}
+          onTabChange={
+            simulationContext.isMachineTypeLocked
+              ? () => {}
+              : onMachineTypeChange
+          }
           ariaLabel={t("moore-mealy.sim.machineType")}
           className="w-full"
           tabs={[
@@ -231,11 +235,17 @@ function AutomataSimulationBody({
               id: "moore",
               label: t("moore-mealy.sim.mooreTab"),
               testId: "moore-machine-tab-moore",
+              disabled:
+                simulationContext.isMachineTypeLocked &&
+                simulationContext.activeMachineType !== "moore",
             },
             {
               id: "mealy",
               label: t("moore-mealy.sim.mealyTab"),
               testId: "moore-machine-tab-mealy",
+              disabled:
+                simulationContext.isMachineTypeLocked &&
+                simulationContext.activeMachineType !== "mealy",
             },
           ]}
         />

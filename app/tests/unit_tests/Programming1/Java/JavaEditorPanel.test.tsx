@@ -17,6 +17,14 @@ vi.mock("@/hooks/useTheme", () => ({
   }),
 }));
 
+const monacoMock = vi.hoisted(() => ({
+  lastOptions: null as Record<string, unknown> | null,
+  updateOptionsSpy: vi.fn(),
+  focusCallback: null as (() => void) | null,
+  blurCallback: null as (() => void) | null,
+  editorDomNode: null as HTMLDivElement | null,
+}));
+
 vi.mock("@monaco-editor/react", () => {
   return {
     __esModule: true,
@@ -24,11 +32,14 @@ vi.mock("@monaco-editor/react", () => {
       value,
       onChange,
       onMount,
+      options,
     }: {
       value?: string;
       onChange?: (value?: string) => void;
       onMount?: (editor: unknown, monaco: unknown) => void;
+      options?: Record<string, unknown>;
     }) => {
+      monacoMock.lastOptions = options ?? null;
       return (
         <div data-testid="mock-monaco-editor">
           <textarea
@@ -40,12 +51,24 @@ vi.mock("@monaco-editor/react", () => {
             type="button"
             data-testid="mount-button"
             onClick={() => {
+              const domNode = document.createElement("div");
+              monacoMock.editorDomNode = domNode;
               const mockEditor = {
                 getModel: () => ({}),
                 onDidChangeModel: vi.fn(),
-                getDomNode: () => document.createElement("div"),
+                getDomNode: () => domNode,
                 onDidDispose: vi.fn(),
                 trigger: vi.fn(),
+                hasWidgetFocus: () => false,
+                updateOptions: monacoMock.updateOptionsSpy,
+                onDidFocusEditorWidget: (cb: () => void) => {
+                  monacoMock.focusCallback = cb;
+                  return { dispose: vi.fn() };
+                },
+                onDidBlurEditorWidget: (cb: () => void) => {
+                  monacoMock.blurCallback = cb;
+                  return { dispose: vi.fn() };
+                },
               };
               const mockMonaco = {
                 MarkerSeverity: { Error: 8, Warning: 4, Info: 2 },
@@ -65,6 +88,10 @@ vi.mock("@monaco-editor/react", () => {
 describe("JavaEditorPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    monacoMock.lastOptions = null;
+    monacoMock.focusCallback = null;
+    monacoMock.blurCallback = null;
+    monacoMock.editorDomNode = null;
   });
 
   it("renders editor panel with filename and Monaco container", () => {
@@ -81,6 +108,80 @@ describe("JavaEditorPanel", () => {
     expect(screen.getByTestId("java-editor-panel")).toBeInTheDocument();
     expect(screen.getByText("Main.java")).toBeInTheDocument();
     expect(screen.getByTestId("java-editor-container")).toBeInTheDocument();
+  });
+
+  it("configures scrollbar behavior and dynamically updates on mouseenter/mouseleave and focus/blur", () => {
+    render(
+      <JavaEditorPanel
+        code="public class Main {}"
+        fileName="Main.java"
+        isFocused={false}
+        onCodeChange={vi.fn()}
+        issues={[]}
+      />,
+    );
+
+    expect(monacoMock.lastOptions?.scrollbar).toEqual({
+      alwaysConsumeMouseWheel: false,
+      handleMouseWheel: false,
+    });
+
+    const mountButton = screen.getByTestId("mount-button");
+    act(() => {
+      mountButton.click();
+    });
+
+    // When initially mounted without hover
+    expect(monacoMock.updateOptionsSpy).toHaveBeenCalledWith({
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        handleMouseWheel: false,
+      },
+    });
+
+    // Simulate mouseenter over editor
+    act(() => {
+      monacoMock.editorDomNode?.dispatchEvent(new MouseEvent("mouseenter"));
+    });
+    expect(monacoMock.updateOptionsSpy).toHaveBeenLastCalledWith({
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        handleMouseWheel: true,
+      },
+    });
+
+    // Simulate mouseleave
+    act(() => {
+      monacoMock.editorDomNode?.dispatchEvent(new MouseEvent("mouseleave"));
+    });
+    expect(monacoMock.updateOptionsSpy).toHaveBeenLastCalledWith({
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        handleMouseWheel: false,
+      },
+    });
+
+    // Simulate focus
+    act(() => {
+      monacoMock.focusCallback?.();
+    });
+    expect(monacoMock.updateOptionsSpy).toHaveBeenLastCalledWith({
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        handleMouseWheel: true,
+      },
+    });
+
+    // Simulate blur
+    act(() => {
+      monacoMock.blurCallback?.();
+    });
+    expect(monacoMock.updateOptionsSpy).toHaveBeenLastCalledWith({
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        handleMouseWheel: false,
+      },
+    });
   });
 
   it("calls onCodeChange when valid code is typed", async () => {

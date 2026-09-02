@@ -100,6 +100,8 @@
 
 - Den **Mülleimer / Löschen-Button** so gestalten bzw. platzieren wie bei der Turingmaschine: in der letzten Spalte.
   - Behoben (in rechter Spalte platziert, roter Hover-Effekt beibehalten)
+- Das Wechseln zwischen Moore und Mealy bei Aufgaben und Beispielen sperren, damit die Bearbeitung im richtigen Typ verbleibt.
+  - Behoben (Umschalt-Tab bei Beispielen und Aufgaben deaktiviert und gelockt)
 
 ---
 
@@ -131,13 +133,14 @@
 ### Feedback
 
 - Das Scrollen im Editor verhält sich teilweise ungewöhnlich.
+  - Behoben (Mausrad-Scrollen im Monaco-Editor bei aktivem Hover/Fokus aktiviert; kein Abfangen beim Durchscrollen außerhalb des Editors; Weiterleitung des Scrollens an die Seite an den oberen/unteren Rändern via `alwaysConsumeMouseWheel: false`)
 - Idee: Zeilen sperren, die bei Aufgaben nicht bearbeitet werden dürfen.
-- Ist gut wenn man kein Java installiert hat und kurz mal bissl üben will für Prog1 oder so und geht auch auf dem Ipad
-  - **Bewertung von Markus:** Sehr gute Idee. Wird ergänzt werden
+  - **Bewertung von Markus:** Sehr gute Idee. Konzept (Lösung B mit Sentinel/Marker-Muster und Cursor-Constraint) geprüft und ausgearbeitet; wird für Aufgaben ergänzt (Details siehe [bug_findings.md](./bug_findings.md)).
 
 ### Von Markus zusätzlich gesehen
 
-- Nach `Strg + F` ist das `X` zum Schließen teilweise nicht klickbar.
+- Nach `Strg + F` ist das `X` zum Schließen teilweise nicht per Klick erreichbar / klickbar.
+  - **Status:** Bekannter Monaco Editor Upstream-Bug (Issue #5208). Der beim Hovern generierte Tooltip fängt Klick-Events auf den Schließen-Button ab. Ein globaler CSS-Override (`pointer-events: none`) wurde verworfen, da er andere interaktive Monaco-Tooltips und Features einschränken würde. Das Schließen via `Escape` funktioniert nativ und verlässlich. Ausführliche technische Analyse siehe [bug_findings.md](./bug_findings.md).
 
 ---
 
@@ -150,13 +153,14 @@
 - `qS` eindeutig als Stop-Zustand kennzeichnen.
 - Dropdown für Zustände bei endlichen Automaten ergänzen.
 - Kontrast bei der disjunktiven Normalform erhöhen.
-- Scroll-Verhalten im Java-Editor prüfen.
-- Fehler beim Schließen von `Strg + F` im Java-Editor beheben.
+- Scroll-Verhalten im Java-Editor prüfen (behoben: Hover-Scrollen + Ränder an Hauptseite weiterleiten).
+- Fehler beim Schließen von `Strg + F` im Java-Editor (bekannter Monaco-Upstream-Bug dokumentiert; `Escape` nutzen; siehe [bug_findings.md](./bug_findings.md)).
 
 ## Priorität: Konsistenz
 
 - Professionellere Statussymbole im Stapeltest verwenden.
 - Löschen-Button bei Moore/Mealy analog zur Turingmaschine gestalten (behoben).
+- Automatentyp-Wechsel bei Moore/Mealy-Beispielen und -Aufgaben sperren (behoben).
 
 ## Priorität: Dokumentation & Lernunterstützung
 
