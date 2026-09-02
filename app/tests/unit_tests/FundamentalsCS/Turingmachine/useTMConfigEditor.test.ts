@@ -289,6 +289,53 @@ describe("useTMConfigEditor", () => {
     expect(result.current.displayRows[2][1]).toBe("(q₁, 0, L)");
   });
 
+  it("normalizes lowercase movement directions to uppercase in draft and display", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    act(() => {
+      result.current.handleCellChange(0, 1, "(qS, _, n)");
+    });
+    act(() => {
+      result.current.handleCellBlur(0, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toBeNull();
+    expect(result.current.draft.transitions._?.q0).toEqual({
+      nextState: "qS",
+      writeSymbol: "_",
+      movement: "N",
+    });
+    expect(result.current.displayRows[0][1]).toBe("(qS, _, N)");
+
+    act(() => {
+      result.current.handleCellChange(1, 1, "(q1, 1, r)");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.draft.transitions["0"]?.q0).toEqual({
+      nextState: "q1",
+      writeSymbol: "1",
+      movement: "R",
+    });
+    expect(result.current.displayRows[1][1]).toBe("(q₁, 1, R)");
+
+    act(() => {
+      result.current.handleCellChange(2, 2, "(qS, 0, l)");
+    });
+    act(() => {
+      result.current.handleCellBlur(2, 2);
+    });
+
+    expect(result.current.draft.transitions["1"]?.q1).toEqual({
+      nextState: "qS",
+      writeSymbol: "0",
+      movement: "L",
+    });
+    expect(result.current.displayRows[2][2]).toBe("(qS, 0, L)");
+  });
+
   // Tests header, row, and column removal handlers, including ignored indices that should not mutate the draft.
   it("renames and removes entities through table-oriented handlers", () => {
     const { result } = renderHook(() => useTMConfigEditor(createProgram()));

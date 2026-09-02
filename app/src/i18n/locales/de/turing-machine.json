@@ -77,8 +77,8 @@
     },
     "transitionTable": {
       "transitionTable": "Übergangstabelle",
-      "transitionFormat": "Format:",
-      "transitionExample": " z. B. (q1, 0, R)"
+      "transitionHintLine1": "Format: (Next State, Write Symbol, Movement) z. B. (q1, 0, R)",
+      "transitionHintLine2": "Erlaubte Richtungen (L, N, R); Eingabe für das Blank-Symbol (<>)"
     },
     "editing": {
       "cannotRemoveBlank": "Das Blanksymbol kann nicht entfernt werden.",

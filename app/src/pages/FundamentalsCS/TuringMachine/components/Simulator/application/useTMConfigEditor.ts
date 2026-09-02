@@ -484,7 +484,7 @@ function isSamePosition(
 
 function parseTransition(cellValue: string): TMTransition | null {
   const match = cellValue.match(
-    /^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNR])\s*\)\s*$/,
+    /^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNRlnr])\s*\)\s*$/,
   );
 
   if (!match) {
@@ -499,6 +499,6 @@ function parseTransition(cellValue: string): TMTransition | null {
   return {
     nextState: normalizeTMStateName(match[1]).trim(),
     writeSymbol,
-    movement: match[3].trim() as HeadMovement,
+    movement: match[3].trim().toUpperCase() as HeadMovement,
   };
 }

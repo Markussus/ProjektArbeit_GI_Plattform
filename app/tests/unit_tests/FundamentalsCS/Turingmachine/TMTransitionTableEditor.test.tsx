@@ -50,6 +50,16 @@ describe("TMTransitionTableEditor", () => {
     expect(
       screen.getByTestId("tm-transition-table-header"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "turing-machine.config.transitionTable.transitionHintLine1",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "turing-machine.config.transitionTable.transitionHintLine2",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("respects disabled prop", () => {
