@@ -2,34 +2,18 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import "./arithmeticTestSetup.tsx";
 import { Addition } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Addition.tsx";
 import {
   changeBinaryInput,
+  expectDefaultsTo,
+  expectInitializedValues,
   expectInputsLocked,
   expectValidationResult,
   getInputs,
   renderArithmeticExercise,
   setupArithmeticTests,
 } from "./arithmeticTestSetup.tsx";
-import { vi } from "vitest";
-
-vi.mock("react-i18next", async () => {
-  const { mockReactI18next } = await import("./arithmeticTestSetup");
-  return mockReactI18next();
-});
-vi.mock("@/components/shared/SimulatorShared", async () => {
-  const { mockSimulatorShared } =
-    await import("../../../shared/simulatorSharedMock");
-  return mockSimulatorShared();
-});
-vi.mock(
-  "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
-  async () => {
-    const { mockExerciseValidationPanel } =
-      await import("./arithmeticTestSetup");
-    return mockExerciseValidationPanel();
-  },
-);
 
 setupArithmeticTests();
 
@@ -41,10 +25,7 @@ describe("Addition", () => {
     });
 
     it("defaults to 01100101 and 00111100", () => {
-      render(<Addition renderModeSelector={null} />);
-      const inputs = getInputs();
-      expect(inputs[0].value).toBe("01100101");
-      expect(inputs[1].value).toBe("00111100");
+      expectDefaultsTo(Addition, "01100101", "00111100");
     });
   });
 
@@ -77,16 +58,7 @@ describe("Addition", () => {
 
   describe("when initialized with values", () => {
     it("sets initial operand A and B", () => {
-      render(
-        <Addition
-          initialA="10101010"
-          initialB="01010101"
-          renderModeSelector={null}
-        />,
-      );
-      const inputs = getInputs();
-      expect(inputs[0].value).toBe("10101010");
-      expect(inputs[1].value).toBe("01010101");
+      expectInitializedValues(Addition, "10101010", "01010101");
     });
   });
 

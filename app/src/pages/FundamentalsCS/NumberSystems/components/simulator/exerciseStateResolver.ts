@@ -14,6 +14,96 @@ const randInt = (min: number, max: number): number =>
 /** Converts a decimal number to a binary string. */
 const decToBin = (n: number): string => n.toString(2);
 
+function buildRandomBinaryString(length: number): string {
+  return Array.from({ length }, () => (Math.random() < 0.5 ? "1" : "0")).join(
+    "",
+  );
+}
+
+type RandomInitFlag =
+  | "randomDecToBin"
+  | "randomBinToHexOct"
+  | "randomOctToHex"
+  | "randomHexToBin"
+  | "randomBinAdd"
+  | "randomAddSub"
+  | "randomMult"
+  | "randomFloatToBin"
+  | "randomIeeeEncode"
+  | "randomIeeeDecode";
+
+function createRandomInitGenerators(
+  base: ExerciseStateInit,
+): Record<RandomInitFlag, () => ExerciseStateInit> {
+  return {
+    randomDecToBin: () => ({
+      ...base,
+      initialValue: randInt(1, 63).toString(),
+    }),
+    randomBinToHexOct: () => ({
+      ...base,
+      initialTargetBase: Math.random() > 0.5 ? "hex" : "oct",
+      initialValue: buildRandomBinaryString(8),
+    }),
+    randomOctToHex: () => ({
+      ...base,
+      initialValue: randInt(64, 511).toString(8).padStart(3, "0"),
+    }),
+    randomHexToBin: () => ({
+      ...base,
+      initialValue: randInt(16, 255)
+        .toString(16)
+        .toUpperCase()
+        .padStart(2, "0"),
+    }),
+    randomBinAdd: () => ({
+      ...base,
+      initialSubMode: "addition" as ArithmeticModeType,
+      initialValueA: decToBin(randInt(10, 100)),
+      initialValueB: decToBin(randInt(10, 100)),
+    }),
+    randomAddSub: () => {
+      const subMode: ArithmeticModeType =
+        Math.random() > 0.5 ? "addition" : "subtraction";
+      return {
+        ...base,
+        initialSubMode: subMode,
+        initialValueA: decToBin(randInt(10, 100)).padStart(8, "0"),
+        initialValueB: decToBin(randInt(10, 100)).padStart(8, "0"),
+      };
+    },
+    randomMult: () => ({
+      ...base,
+      initialSubMode: "multiplication" as ArithmeticModeType,
+      initialValueA: decToBin(randInt(8, 15)),
+      initialValueB: decToBin(randInt(16, 31)),
+    }),
+    randomFloatToBin: () => {
+      const wholes = randInt(-20, 20);
+      const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
+      return {
+        ...base,
+        initialValue: (wholes + fracs[randInt(0, fracs.length - 1)]).toString(),
+      };
+    },
+    randomIeeeEncode: () => ({
+      ...base,
+      initialConverterMode: "decToIeee",
+      initialValue: (Math.random() * 200 - 100).toFixed(4),
+    }),
+    randomIeeeDecode: () => {
+      const sign = Math.random() < 0.5 ? "1" : "0";
+      const exp = randInt(1, 254).toString(2).padStart(8, "0");
+      const mant = buildRandomBinaryString(23);
+      return {
+        ...base,
+        initialConverterMode: "ieeeToDec",
+        initialValue: sign + exp + mant,
+      };
+    },
+  };
+}
+
 /**
  * Resolves randomized initial values based on the exercise type.
  * Flags are read from `exerciseStateConfig`.
@@ -29,103 +119,13 @@ export function resolveRandomInit(
     initialConverterMode: config.initialConverterMode,
   };
 
-  // --- Integers mode: random values for different bases ---
-  if (config.randomDecToBin) {
-    return {
-      ...base,
-      initialValue: randInt(1, 63).toString(),
-    };
+  const generators = createRandomInitGenerators(base);
+  for (const [flag, generator] of Object.entries(generators)) {
+    if ((config as unknown as Record<string, unknown>)[flag] === true) {
+      return generator();
+    }
   }
 
-  if (config.randomBinToHexOct) {
-    return {
-      ...base,
-      initialTargetBase: Math.random() > 0.5 ? "hex" : "oct",
-      initialValue: Array.from({ length: 8 }, () =>
-        Math.random() < 0.5 ? "1" : "0",
-      ).join(""),
-    };
-  }
-
-  if (config.randomOctToHex) {
-    return {
-      ...base,
-      initialValue: randInt(64, 511).toString(8).padStart(3, "0"),
-    };
-  }
-
-  if (config.randomHexToBin) {
-    return {
-      ...base,
-      initialValue: randInt(16, 255)
-        .toString(16)
-        .toUpperCase()
-        .padStart(2, "0"),
-    };
-  }
-
-  // --- Arithmetic mode: random operands ---
-  if (config.randomBinAdd) {
-    return {
-      ...base,
-      initialSubMode: "addition" as ArithmeticModeType,
-      initialValueA: decToBin(randInt(10, 100)),
-      initialValueB: decToBin(randInt(10, 100)),
-    };
-  }
-
-  if (config.randomAddSub) {
-    const subMode: ArithmeticModeType =
-      Math.random() > 0.5 ? "addition" : "subtraction";
-    return {
-      ...base,
-      initialSubMode: subMode,
-      initialValueA: decToBin(randInt(10, 100)).padStart(8, "0"),
-      initialValueB: decToBin(randInt(10, 100)).padStart(8, "0"),
-    };
-  }
-
-  if (config.randomMult) {
-    return {
-      ...base,
-      initialSubMode: "multiplication" as ArithmeticModeType,
-      initialValueA: decToBin(randInt(8, 15)),
-      initialValueB: decToBin(randInt(16, 31)),
-    };
-  }
-
-  // --- Fractional / IEEE mode: random floating-point values ---
-  if (config.randomFloatToBin) {
-    const wholes = randInt(-20, 20);
-    const fracs = [0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875];
-    return {
-      ...base,
-      initialValue: (wholes + fracs[randInt(0, fracs.length - 1)]).toString(),
-    };
-  }
-
-  if (config.randomIeeeEncode) {
-    return {
-      ...base,
-      initialConverterMode: "decToIeee",
-      initialValue: (Math.random() * 200 - 100).toFixed(4),
-    };
-  }
-
-  if (config.randomIeeeDecode) {
-    const sign = Math.random() < 0.5 ? "1" : "0";
-    const exp = randInt(1, 254).toString(2).padStart(8, "0");
-    const mant = Array.from({ length: 23 }, () =>
-      Math.random() < 0.5 ? "1" : "0",
-    ).join("");
-    return {
-      ...base,
-      initialConverterMode: "ieeeToDec",
-      initialValue: sign + exp + mant,
-    };
-  }
-
-  // No random flags: return base configuration as-is
   return config;
 }
 
@@ -191,6 +191,31 @@ export interface ResolvedExerciseInitialState {
   initialConverterMode: "decToIeee" | "ieeeToDec";
 }
 
+function buildResolvedState(
+  init: Partial<ExerciseStateInit>,
+  isExerciseMode: boolean,
+): ResolvedExerciseInitialState {
+  return {
+    isExerciseMode,
+    showSolution: !isExerciseMode,
+    activeMode: init.mode ?? defaultExerciseState.mode,
+    initialValue: init.initialValue ?? defaultExerciseState.initialValue ?? "",
+    initialBase: init.initialBase ?? defaultExerciseState.initialBase ?? "dec",
+    initialTargetBase:
+      init.initialTargetBase ?? defaultExerciseState.initialTargetBase ?? "bin",
+    initialValueA:
+      init.initialValueA ?? defaultExerciseState.initialValueA ?? "",
+    initialValueB:
+      init.initialValueB ?? defaultExerciseState.initialValueB ?? "",
+    initialSubMode:
+      init.initialSubMode ?? defaultExerciseState.initialSubMode ?? "addition",
+    initialConverterMode:
+      init.initialConverterMode ??
+      defaultExerciseState.initialConverterMode ??
+      "decToIeee",
+  };
+}
+
 /**
  * Resolves the complete initial state for the simulator when a
  * selected exercise changes. Exported so it can be unit-tested.
@@ -199,19 +224,7 @@ export function resolveExerciseInitialState(
   selectedExercise: TopicItem | null | undefined,
 ): ResolvedExerciseInitialState {
   if (!selectedExercise) {
-    return {
-      isExerciseMode: false,
-      showSolution: true,
-      activeMode: defaultExerciseState.mode,
-      initialValue: defaultExerciseState.initialValue ?? "",
-      initialBase: defaultExerciseState.initialBase ?? "dec",
-      initialTargetBase: defaultExerciseState.initialTargetBase ?? "bin",
-      initialValueA: defaultExerciseState.initialValueA ?? "",
-      initialValueB: defaultExerciseState.initialValueB ?? "",
-      initialSubMode: defaultExerciseState.initialSubMode ?? "addition",
-      initialConverterMode:
-        defaultExerciseState.initialConverterMode ?? "decToIeee",
-    };
+    return buildResolvedState(defaultExerciseState, false);
   }
 
   const isExample = selectedExercise.id.includes(".example");
@@ -220,16 +233,5 @@ export function resolveExerciseInitialState(
     ? resolveRandomInit(config)
     : { mode: getInitialActiveMode(selectedExercise.id) };
 
-  return {
-    isExerciseMode: !isExample,
-    showSolution: isExample,
-    activeMode: init.mode,
-    initialValue: init.initialValue ?? "",
-    initialBase: init.initialBase ?? "dec",
-    initialTargetBase: init.initialTargetBase ?? "bin",
-    initialValueA: init.initialValueA ?? "",
-    initialValueB: init.initialValueB ?? "",
-    initialSubMode: init.initialSubMode ?? "addition",
-    initialConverterMode: init.initialConverterMode ?? "decToIeee",
-  };
+  return buildResolvedState(init, !isExample);
 }

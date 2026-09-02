@@ -5,29 +5,9 @@ import { TopicCategorySection } from "@/components/shared/TopicCategorySection/T
 import { numberSystemsExamples } from "../examples";
 import type { Example } from "@/types/exercise";
 import type { ModuleExamplesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import type { ExerciseDefinition } from "@/types/exercise";
+import { getExampleGroup } from "./getExampleGroup";
 
 const exampleGroupOrder = ["lecture", "07"] as const;
-
-type ExampleGroup = (typeof exampleGroupOrder)[number];
-
-function getExampleGroup(
-  examples: ExerciseDefinition[],
-): Record<ExampleGroup, ExerciseDefinition[]> {
-  const groups: Record<string, ExerciseDefinition[]> = {};
-  for (const ex of examples) {
-    const match = ex.titleKey.match(/example_u(\d{2})/);
-    if (match) {
-      const group = match[1];
-      const targetGroup = ["03", "04", "05", "06"].includes(group)
-        ? "lecture"
-        : group;
-      if (!groups[targetGroup]) groups[targetGroup] = [];
-      groups[targetGroup].push(ex);
-    }
-  }
-  return groups as Record<ExampleGroup, ExerciseDefinition[]>;
-}
 
 export function ExamplesTab({
   onOpenExampleInSimulation,

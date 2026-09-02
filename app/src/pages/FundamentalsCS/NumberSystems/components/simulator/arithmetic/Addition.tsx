@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { BaseArithmeticProps } from "./types";
 import {
@@ -10,22 +9,22 @@ import {
   WarningBanner,
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
-import { useBinaryOperands } from "./useBinaryOperands";
 import { addBinary8Bit, getStepExplanation } from "./binaryArithmetic";
 import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
+import {
+  useArithmeticExercise,
+  type ArithmeticExerciseState,
+} from "./useArithmeticExercise";
 
-export function Addition({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialA,
-  initialB,
-  onChangeValues,
-  renderModeSelector,
-}: BaseArithmeticProps) {
-  const { t } = useTranslation("translation");
+export function Addition(props: BaseArithmeticProps) {
+  const state = useArithmeticExercise(props, {
+    defaultA: "01100101",
+    defaultB: "00111100",
+    maxLengthA: 8,
+    maxLengthB: 8,
+  });
   const {
+    t,
     valA,
     valB,
     locked,
@@ -35,17 +34,10 @@ export function Addition({
     setShowStepByStep,
     expanded,
     toggle,
-  } = useBinaryOperands({
-    defaultA: "01100101",
-    defaultB: "00111100",
-    maxLengthA: 8,
-    maxLengthB: 8,
-    initialA,
-    initialB,
-    isExerciseMode,
-    showSolution,
-    onChangeValues,
-  });
+    onShowSolution,
+    onExitExercise,
+    renderModeSelector,
+  } = state satisfies ArithmeticExerciseState;
 
   const { padA, padB, sum, carries, overflow, carryOut, bitSteps } = useMemo(
     () => addBinary8Bit(valA, valB, (step) => getStepExplanation(step, t)),

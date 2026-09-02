@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Info, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -12,22 +12,12 @@ import {
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
 import { useBinaryOperand } from "./useBinaryOperand";
-
-interface ShiftStep {
-  step: number;
-  binary: string;
-  description: string;
-  highlightedBit: number | null;
-  newBit: string | null;
-}
-
-interface ShiftCalculation {
-  resultStr: string;
-  decimalBefore: number;
-  decimalAfter: number;
-  explanation: string;
-  shiftSteps: ShiftStep[];
-}
+import {
+  useLeftShiftCalculation,
+  useRightShiftCalculation,
+  type ShiftCalculation,
+  type ShiftStep,
+} from "./useShiftCalculation";
 
 function useShiftCalculation(
   valA: string,
@@ -35,141 +25,9 @@ function useShiftCalculation(
   direction: "left" | "right",
   t: TFunction<"translation", undefined>,
 ): ShiftCalculation {
-  return useMemo(() => {
-    if (!valA)
-      return {
-        resultStr: "",
-        decimalBefore: 0,
-        decimalAfter: 0,
-        explanation: "",
-        shiftSteps: [],
-      };
-
-    const beforeDec = parseInt(valA, 2);
-    let afterDec = 0;
-    let resStr: string;
-    let expl = "";
-    const steps: ShiftStep[] = [];
-
-    if (direction === "left") {
-      resStr = valA + "0".repeat(shiftAmount);
-      afterDec = beforeDec * Math.pow(2, shiftAmount);
-      expl = t("number-systems.simulator.arithmetic.shifting.shiftLeftExpl");
-
-      steps.push({
-        step: 0,
-        binary: valA,
-        description: t(
-          "number-systems.simulator.arithmetic.shifting.stepOriginal",
-          { val: valA },
-        ),
-        highlightedBit: null,
-        newBit: null,
-      });
-
-      for (let i = 0; i < Math.min(shiftAmount, 4); i++) {
-        const currentResult = valA + "0".repeat(i + 1);
-        steps.push({
-          step: i + 1,
-          binary: currentResult,
-          description: t(
-            "number-systems.simulator.arithmetic.shifting.stepLeftShift",
-            { count: i + 1 },
-          ),
-          highlightedBit: valA.length + i,
-          newBit: "0",
-        });
-      }
-
-      if (shiftAmount > 4) {
-        steps.push({
-          step: 5,
-          binary: valA + "0".repeat(shiftAmount),
-          description: t(
-            "number-systems.simulator.arithmetic.shifting.stepLeftComplete",
-            { count: shiftAmount },
-          ),
-          highlightedBit: null,
-          newBit: null,
-        });
-      }
-    } else {
-      if (shiftAmount >= valA.length) {
-        resStr = "0";
-        steps.push({
-          step: 0,
-          binary: valA,
-          description: t(
-            "number-systems.simulator.arithmetic.shifting.stepOriginal",
-            { val: valA },
-          ),
-          highlightedBit: null,
-          newBit: null,
-        });
-        steps.push({
-          step: 1,
-          binary: "0",
-          description: t(
-            "number-systems.simulator.arithmetic.shifting.stepRightZero",
-            { count: shiftAmount },
-          ),
-          highlightedBit: null,
-          newBit: null,
-        });
-      } else {
-        resStr = valA.slice(0, valA.length - shiftAmount);
-        afterDec = Math.floor(beforeDec / Math.pow(2, shiftAmount));
-        expl = t("number-systems.simulator.arithmetic.shifting.shiftRightExpl");
-
-        steps.push({
-          step: 0,
-          binary: valA,
-          description: t(
-            "number-systems.simulator.arithmetic.shifting.stepOriginal",
-            { val: valA },
-          ),
-          highlightedBit: null,
-          newBit: null,
-        });
-
-        for (let i = 0; i < Math.min(shiftAmount, 4); i++) {
-          const bit = valA[valA.length - 1 - i];
-          const remaining = valA.slice(0, valA.length - i - 1);
-          steps.push({
-            step: i + 1,
-            binary: remaining + "X".repeat(i + 1),
-            description: t(
-              "number-systems.simulator.arithmetic.shifting.stepRightShift",
-              { bit },
-            ),
-            highlightedBit: valA.length - 1 - i,
-            newBit: null,
-          });
-        }
-
-        if (shiftAmount > 4) {
-          steps.push({
-            step: 5,
-            binary: valA.slice(0, valA.length - shiftAmount),
-            description: t(
-              "number-systems.simulator.arithmetic.shifting.stepRightComplete",
-              { count: shiftAmount },
-            ),
-            highlightedBit: null,
-            newBit: null,
-          });
-        }
-      }
-    }
-
-    return {
-      resultStr: resStr || "0",
-      decimalBefore: beforeDec,
-      decimalAfter: afterDec,
-      explanation: expl,
-      shiftSteps: steps,
-    };
-  }, [valA, shiftAmount, direction, t]);
+  const left = useLeftShiftCalculation(valA, shiftAmount, t);
+  const right = useRightShiftCalculation(valA, shiftAmount, t);
+  return direction === "left" ? left : right;
 }
 
 function ShiftDirectionSelector({
@@ -216,7 +74,7 @@ function ShiftStepVisualization({
   return (
     <>
       <div className="font-mono text-lg tracking-widest">
-        {step.binary.split("").map((char, charIdx) => (
+        {step.binary.split("").map((char: string, charIdx: number) => (
           <span
             key={charIdx}
             className={`inline-block w-6 text-center ${

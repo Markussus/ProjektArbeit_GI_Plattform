@@ -2,26 +2,13 @@
 
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import "./arithmeticTestSetup.tsx";
 import { Shifting } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Shifting.tsx";
-import { expectValidationResult, getInput } from "./arithmeticTestSetup.tsx";
-
-vi.mock("react-i18next", async () => {
-  const { mockReactI18next } = await import("./arithmeticTestSetup");
-  return mockReactI18next();
-});
-vi.mock("@/components/shared/SimulatorShared", async () => {
-  const { mockSimulatorShared } =
-    await import("../../../shared/simulatorSharedMock");
-  return mockSimulatorShared();
-});
-vi.mock(
-  "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
-  async () => {
-    const { mockExerciseValidationPanel } =
-      await import("./arithmeticTestSetup");
-    return mockExerciseValidationPanel();
-  },
-);
+import {
+  expectInputLocked,
+  expectValidationResult,
+  getInput,
+} from "./arithmeticTestSetup.tsx";
 
 describe("Shifting", () => {
   afterEach(() => {
@@ -46,7 +33,7 @@ describe("Shifting", () => {
           renderModeSelector={null}
         />,
       );
-      expect(getInput().hasAttribute("readonly")).toBe(true);
+      expectInputLocked();
     });
 
     it("shows validation panel with expected shift result", () => {
