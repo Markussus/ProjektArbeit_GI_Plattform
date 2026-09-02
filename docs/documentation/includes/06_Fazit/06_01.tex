@@ -1,26 +1,38 @@
 \subNsection{1}{Zusammenfassung der Projektergebnisse}{Alle}
 
 \textbf{Kristian Popov}: Mein Schwerpunkt im Projekt lag auf den Themen
-\emph{Endliche Automaten} und \emph{Reguläre Sprachen}. Für Endliche Automaten
-habe ich eine interaktive Umgebung umgesetzt, in der deterministische und
-nichtdeterministische Automaten erstellt und Eingabewörter schrittweise ausgeführt
-werden können. Übergangstabelle und Zustandsdiagramm zeigen dabei denselben Ablauf,
-sodass die formale Definition und ihre grafische Darstellung miteinander verbunden
-werden. Ein Stapeltest prüft mehrere Wörter auf einmal und macht dadurch sichtbar, ob
-ein Automat die beabsichtigte Sprache erkennt und nicht nur das gerade ausprobierte
-Wort. Ergänzt wird das Thema durch Beispiele, Übungen mit Rückmeldung und die
-Umwandlung rechtslinearer Grammatiken in Automaten.
+\emph{Endliche Automaten} und \emph{Reguläre Sprachen}. Für die Endlichen
+Automaten habe ich eine Umgebung umgesetzt, in der Studierende deterministische
+und nichtdeterministische Automaten definieren und Wörter Schritt für Schritt
+simulieren können. Beide Automatentypen verwenden dabei eine gemeinsame
+Ausführungslogik. Ergänzt wird das Thema durch einen Schrittverlauf, einen
+Stapeltest, Beispiele, Übungen mit automatischer Rückmeldung und die Umwandlung
+rechtslinearer Grammatiken in Automaten.
 
-Im Thema Reguläre Sprachen stehen drei Arbeitsweisen zur Verfügung: Studierende können
-die von einer Grammatik erzeugten Wörter aufzählen, aus einer Sprachbeschreibung eine
-passende Grammatik erzeugen und einzelne Wörter auf ihre Zugehörigkeit zur Sprache
-prüfen. Bei der Wortprüfung wird neben dem Ergebnis auch dessen Grund angezeigt.
-Übungen ermöglichen auch hier eine direkte Überprüfung der eigenen Lösung. In beiden
-Themen lassen sich Automaten, Grammatiken und Sprachbeschreibungen über die gemeinsame
-Import- und Exportfunktion der Plattform weitergeben. Bei beiden Themen war mir wichtig,
-die Fachlogik klar von der Benutzeroberfläche zu trennen. Dadurch konnten gemeinsame
-Grammatik- und Automatenfunktionen wiederverwendet werden, während die einzelnen
-Funktionen testbar und übersichtlich blieben.
+Das Thema \emph{Reguläre Sprachen} ermöglicht die Aufzählung von Wörtern, die
+Erzeugung einer Grammatik aus einer Sprachbeschreibung und die Prüfung einzelner
+Wörter, bei der neben dem Ergebnis auch dessen Grund angezeigt wird.
+Sprachbeschreibungen können als Aufzählung oder in Mengenschreibweise angegeben
+werden. Beschreibungen, die keine reguläre Sprache ergeben, etwa gekoppelte Längen
+wie \verb|a^n b^n|, werden mit einer eigenen Meldung abgelehnt; obere Schranken
+sind zwar regulär, lassen sich aber klarer als Aufzählung angeben und bleiben
+deshalb ebenfalls ausgeschlossen. Die erzeugten Grammatiken bleiben strikt
+rechtslinear und beide Umwandlungsrichtungen sind als Übungen verfügbar.
+
+Bei beiden Themen war mir wichtig, nicht nur Ergebnisse zu zeigen, sondern auch
+den Weg dorthin. Übergangstabelle und Zustandsdiagramm sind an denselben
+Simulationsschritt gebunden, und der Stapeltest macht sichtbar, ob ein Automat die
+beabsichtigte Sprache erkennt und nicht nur das gerade ausprobierte Wort. Die
+Übungskontrolle vergleicht das Verhalten statt der Struktur einer Lösung und gibt
+bei Fehlern konkrete Gegenbeispiele aus.
+
+Zusätzlich habe ich das Zustandsdiagramm der Endlichen Automaten auf die
+gemeinsame Graphkomponente umgestellt, die auch die Moore- und Mealy-Automaten
+verwenden, und die Automaten- und Grammatikfunktionen von der Oberfläche getrennt
+gehalten. Dadurch konnten die \emph{Regulären Sprachen} sie unverändert
+weiterverwenden. Automaten, Grammatiken und Sprachbeschreibungen lassen sich über
+die gemeinsame Import- und Exportfunktion weitergeben, und der Bearbeitungsstand
+einer Übung bleibt beim Wechsel erhalten.
 
 \textbf{Duy Tan Pham}: Mein fachlicher Schwerpunkt lag auf dem Themenbereich
 \emph{Disjunktive Normalform}. Dort können Studierende boolesche Ausdrücke und
