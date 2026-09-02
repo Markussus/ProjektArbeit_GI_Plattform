@@ -185,9 +185,6 @@ test.describe("Encoding page", () => {
     const freeStorageValue = await page
       .getByTestId(appTestIds.headerTransferInput)
       .inputValue();
-    await page.evaluate((value) => {
-      localStorage.setItem("TrainingCenterStorage", JSON.stringify([value]));
-    }, freeStorageValue);
 
     await page.getByTestId(appTestIds.tabExamples).click();
     await page
@@ -197,6 +194,28 @@ test.describe("Encoding page", () => {
       .getByTestId("example-card-encoding.example_base64_2-open")
       .click();
     await page.getByTestId("base64-input").fill("changed example");
+
+    // Re-insert the free simulator entry after the example's autosave has
+    // written its state, so the reset can be tested for not deleting other
+    // storage entries regardless of autosave timing.
+    await page.evaluate((value) => {
+      const entries = JSON.parse(
+        localStorage.getItem("TrainingCenterStorage") ?? "[]",
+      );
+      if (!Array.isArray(entries)) {
+        localStorage.setItem("TrainingCenterStorage", JSON.stringify([value]));
+        return;
+      }
+      const filtered = entries.filter(
+        (entry: unknown) =>
+          typeof entry !== "string" || !entry.startsWith(value.slice(0, 3)),
+      );
+      localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify([...filtered, value]),
+      );
+    }, freeStorageValue);
+
     await page.getByTestId("simulation-reset").click();
 
     await expect(page.getByTestId("base64-input")).toHaveValue("THWS");
