@@ -77,8 +77,8 @@
     },
     "transitionTable": {
       "transitionTable": "Transition Table",
-      "transitionFormat": "Format:",
-      "transitionExample": " e.g., (q1, 0, R)"
+      "transitionHintLine1": "Format: (Next State, Write Symbol, Movement) e.g., (q1, 0, R)",
+      "transitionHintLine2": "Allowed directions (L, N, R); input for the blank symbol (<>)"
     },
     "editing": {
       "cannotRemoveBlank": "The blank symbol cannot be removed.",

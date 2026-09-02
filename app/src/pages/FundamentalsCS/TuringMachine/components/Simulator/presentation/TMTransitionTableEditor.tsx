@@ -50,9 +50,10 @@ export function TMTransitionTableEditor({
           {t("turing-machine.config.transitionTable.transitionTable")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("turing-machine.config.transitionTable.transitionFormat")}{" "}
-          <code>(Next State, Write Symbol, Movement)</code>
-          {t("turing-machine.config.transitionTable.transitionExample")}
+          {t("turing-machine.config.transitionTable.transitionHintLine1")}
+        </p>
+        <p className="text-muted-foreground text-sm">
+          {t("turing-machine.config.transitionTable.transitionHintLine2")}
         </p>
       </div>
 
