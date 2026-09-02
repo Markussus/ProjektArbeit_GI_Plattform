@@ -3,7 +3,7 @@ import path from "path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import { DEPLOYMENT_BASE_URL } from "./deployment.config";
+import { DEPLOYMENT_BASE_URL } from "./deployment.config.ts";
 
 function normalizeDeploymentBaseUrl(value: string) {
   const base = value.trim();
