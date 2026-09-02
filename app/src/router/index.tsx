@@ -20,6 +20,16 @@ function getRouterBasename() {
 
 const routerBasename = getRouterBasename();
 
+function getRouterBasename() {
+  const baseUrl = import.meta.env.BASE_URL;
+
+  // Vite also allows a full URL as `base`; React Router only wants its pathname.
+  const pathname = new URL(baseUrl || "/", window.location.origin).pathname;
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
+const routerBasename = getRouterBasename();
+
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
