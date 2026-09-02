@@ -3,13 +3,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Base64Encoder } from "@/pages/FundamentalsCS/Encoding/simulator/Base64Encoder.tsx";
-
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
-  }),
-}));
+import "../../shared/mockReactI18next";
 
 vi.mock("@/components/shared/SimulatorShared", async () => {
   const { mockSimulatorShared } =

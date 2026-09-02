@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { BaseArithmeticProps } from "./types";
 import {
@@ -9,8 +8,11 @@ import {
   CollapsibleStep,
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
-import { useBinaryOperands } from "./useBinaryOperands";
 import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
+import {
+  useArithmeticExercise,
+  type ArithmeticExerciseState,
+} from "./useArithmeticExercise";
 
 interface MultiplicationStep {
   bitIndex: number;
@@ -22,18 +24,15 @@ interface MultiplicationStep {
   explanation: string;
 }
 
-export function Multiplication({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialA,
-  initialB,
-  onChangeValues,
-  renderModeSelector,
-}: BaseArithmeticProps) {
-  const { t } = useTranslation("translation");
+export function Multiplication(props: BaseArithmeticProps) {
+  const state = useArithmeticExercise(props, {
+    defaultA: "1101",
+    defaultB: "101",
+    maxLengthA: 8,
+    maxLengthB: 8,
+  });
   const {
+    t,
     valA,
     valB,
     locked,
@@ -43,17 +42,10 @@ export function Multiplication({
     setShowStepByStep,
     expanded,
     toggle,
-  } = useBinaryOperands({
-    defaultA: "1101",
-    defaultB: "101",
-    maxLengthA: 8,
-    maxLengthB: 8,
-    initialA,
-    initialB,
-    isExerciseMode,
-    showSolution,
-    onChangeValues,
-  });
+    onShowSolution,
+    onExitExercise,
+    renderModeSelector,
+  } = state satisfies ArithmeticExerciseState;
 
   const { steps, finalSum, finalSumDec, partialSums } = useMemo(() => {
     if (!valA || !valB)

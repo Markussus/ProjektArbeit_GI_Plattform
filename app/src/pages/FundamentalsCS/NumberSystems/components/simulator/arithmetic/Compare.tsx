@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Search } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { BaseArithmeticProps } from "./types";
 import {
@@ -9,10 +8,12 @@ import {
   CollapsibleStep,
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
-import { useBinaryOperands } from "./useBinaryOperands";
 import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
-
 import type { TFunction } from "i18next";
+import {
+  useArithmeticExercise,
+  type ArithmeticExerciseState,
+} from "./useArithmeticExercise";
 
 type CompareT = TFunction<"translation", undefined>;
 
@@ -325,18 +326,15 @@ function CompareStepByStep({
   );
 }
 
-export function Compare({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialA,
-  initialB,
-  onChangeValues,
-  renderModeSelector,
-}: BaseArithmeticProps) {
-  const { t } = useTranslation("translation");
+export function Compare(props: BaseArithmeticProps) {
+  const state = useArithmeticExercise(props, {
+    defaultA: "10110",
+    defaultB: "10011",
+    maxLengthA: 16,
+    maxLengthB: 16,
+  });
   const {
+    t,
     valA,
     valB,
     locked,
@@ -346,17 +344,10 @@ export function Compare({
     setShowStepByStep,
     expanded,
     toggle,
-  } = useBinaryOperands({
-    defaultA: "10110",
-    defaultB: "10011",
-    maxLengthA: 16,
-    maxLengthB: 16,
-    initialA,
-    initialB,
-    isExerciseMode,
-    showSolution,
-    onChangeValues,
-  });
+    onShowSolution,
+    onExitExercise,
+    renderModeSelector,
+  } = state satisfies ArithmeticExerciseState;
 
   const { padA, padB, diffIndex, result, compareSteps } = useCompareResult(
     valA,

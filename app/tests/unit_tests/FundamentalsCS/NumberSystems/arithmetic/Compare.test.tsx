@@ -2,34 +2,18 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import "./arithmeticTestSetup.tsx";
 import { Compare } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/arithmetic/Compare.tsx";
 import {
   changeBinaryInput,
+  expectDefaultsTo,
+  expectInitializedValues,
   expectInputsLocked,
   expectValidationResult,
   getInputs,
   renderArithmeticExercise,
   setupArithmeticTests,
 } from "./arithmeticTestSetup.tsx";
-import { vi } from "vitest";
-
-vi.mock("react-i18next", async () => {
-  const { mockReactI18next } = await import("./arithmeticTestSetup");
-  return mockReactI18next();
-});
-vi.mock("@/components/shared/SimulatorShared", async () => {
-  const { mockSimulatorShared } =
-    await import("../../../shared/simulatorSharedMock");
-  return mockSimulatorShared();
-});
-vi.mock(
-  "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
-  async () => {
-    const { mockExerciseValidationPanel } =
-      await import("./arithmeticTestSetup");
-    return mockExerciseValidationPanel();
-  },
-);
 
 setupArithmeticTests();
 
@@ -41,10 +25,7 @@ describe("Compare", () => {
     });
 
     it("defaults to 10110 and 10011", () => {
-      render(<Compare renderModeSelector={null} />);
-      const inputs = getInputs();
-      expect(inputs[0].value).toBe("10110");
-      expect(inputs[1].value).toBe("10011");
+      expectDefaultsTo(Compare, "10110", "10011");
     });
   });
 
@@ -119,16 +100,7 @@ describe("Compare", () => {
 
   describe("when initialized with values", () => {
     it("sets initial operand A and B", () => {
-      render(
-        <Compare
-          initialA="10101010"
-          initialB="01010101"
-          renderModeSelector={null}
-        />,
-      );
-      const inputs = getInputs();
-      expect(inputs[0].value).toBe("10101010");
-      expect(inputs[1].value).toBe("01010101");
+      expectInitializedValues(Compare, "10101010", "01010101");
     });
   });
 });

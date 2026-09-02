@@ -10,32 +10,24 @@ export interface BitStep {
   explanation?: string;
 }
 
+const STEP_EXPLANATION_KEYS = {
+  "000": "number-systems.simulator.arithmetic.addition.step0",
+  "100": "number-systems.simulator.arithmetic.addition.step1",
+  "010": "number-systems.simulator.arithmetic.addition.step2",
+  "001": "number-systems.simulator.arithmetic.addition.step3",
+  "110": "number-systems.simulator.arithmetic.addition.step4",
+  "101": "number-systems.simulator.arithmetic.addition.step5",
+  "011": "number-systems.simulator.arithmetic.addition.step6",
+  "111": "number-systems.simulator.arithmetic.addition.step7",
+} as const;
+
 export function getStepExplanation(
   step: BitStep,
-  t: TFunction<"translation">,
+  t: TFunction<"translation", undefined>,
 ): string {
-  if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 0) {
-    return t("number-systems.simulator.arithmetic.addition.step0");
-  }
-  if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 0) {
-    return t("number-systems.simulator.arithmetic.addition.step1");
-  }
-  if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 0) {
-    return t("number-systems.simulator.arithmetic.addition.step2");
-  }
-  if (step.bitA === 0 && step.bitB === 0 && step.carryIn === 1) {
-    return t("number-systems.simulator.arithmetic.addition.step3");
-  }
-  if (step.bitA === 1 && step.bitB === 1 && step.carryIn === 0) {
-    return t("number-systems.simulator.arithmetic.addition.step4");
-  }
-  if (step.bitA === 1 && step.bitB === 0 && step.carryIn === 1) {
-    return t("number-systems.simulator.arithmetic.addition.step5");
-  }
-  if (step.bitA === 0 && step.bitB === 1 && step.carryIn === 1) {
-    return t("number-systems.simulator.arithmetic.addition.step6");
-  }
-  return t("number-systems.simulator.arithmetic.addition.step7");
+  const lookupKey =
+    `${step.bitA}${step.bitB}${step.carryIn}` as keyof typeof STEP_EXPLANATION_KEYS;
+  return t(STEP_EXPLANATION_KEYS[lookupKey]);
 }
 
 export interface AddBinary8BitResult {

@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { BaseArithmeticProps } from "./types";
 import {
@@ -9,8 +8,11 @@ import {
   CollapsibleStep,
   ResultSectionHeader,
 } from "@/components/shared/SimulatorShared";
-import { useBinaryOperands } from "./useBinaryOperands";
 import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
+import {
+  useArithmeticExercise,
+  type ArithmeticExerciseState,
+} from "./useArithmeticExercise";
 
 interface DivisionStep {
   step: number;
@@ -23,18 +25,15 @@ interface DivisionStep {
   explanation: string;
 }
 
-export function Division({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialA,
-  initialB,
-  onChangeValues,
-  renderModeSelector,
-}: BaseArithmeticProps) {
-  const { t } = useTranslation("translation");
+export function Division(props: BaseArithmeticProps) {
+  const state = useArithmeticExercise(props, {
+    defaultA: "11010",
+    defaultB: "101",
+    maxLengthA: 12,
+    maxLengthB: 8,
+  });
   const {
+    t,
     valA,
     valB,
     locked,
@@ -44,17 +43,10 @@ export function Division({
     setShowStepByStep,
     expanded,
     toggle,
-  } = useBinaryOperands({
-    defaultA: "11010",
-    defaultB: "101",
-    maxLengthA: 12,
-    maxLengthB: 8,
-    initialA,
-    initialB,
-    isExerciseMode,
-    showSolution,
-    onChangeValues,
-  });
+    onShowSolution,
+    onExitExercise,
+    renderModeSelector,
+  } = state satisfies ArithmeticExerciseState;
 
   const { steps, quotient, remainder, isZeroDiv } = useMemo(() => {
     if (!valA || !valB)
