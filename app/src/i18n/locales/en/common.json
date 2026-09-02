@@ -59,7 +59,7 @@
     "label": "Legal",
     "title": "Third-party notices",
     "description": "Licensing and source information for bundled compiler components and related dependencies.",
-    "summary": "This application includes a browser-based Java compiler built from teavm-javac. The compiler module includes OpenJDK javac, licensed under GNU GPLv2 with the Classpath Exception, and TeaVM components licensed under Apache License 2.0. No OpenJDK source files were modified. Exact source and build information is available in the project’s third-party notices."
+    "summary": "This application uses a browser-based Java compiler based on teavm-javac. We use the official, SHA-256 verified WebAssembly compiler artifacts from TeaVM. The compiler module includes OpenJDK javac under GNU GPLv2 with the Classpath Exception and TeaVM components under Apache License 2.0. No OpenJDK source files were modified."
   },
   "exercise": {
     "label": "Exercise {{index}}",
