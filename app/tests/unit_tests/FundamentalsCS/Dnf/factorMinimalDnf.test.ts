@@ -38,13 +38,12 @@ describe("factorMinimalDnf", () => {
   it("keeps the minimal DNF unchanged when no literal is shared", () => {
     // XOR-equivalence over 3 vars: each minterm has different polarities,
     // no literal appears in both groups — greedy factoring is a no-op.
-    const table = generateTruthTable(
-      parse("(a ∧ ¬b ∧ ¬c) ∨ (¬a ∧ b ∧ ¬c) ∨ (¬a ∧ ¬b ∧ c) ∨ (a ∧ b ∧ c)"),
-    );
+    const table = generateTruthTable(parse("(¬a ∧ ¬b ∧ ¬c) ∨ (a ∧ b ∧ c)"));
 
+    const minimal = computeMinimalDnf(table);
     const factored = factor(table);
 
-    expect(countExpressionLiterals(factored)).toBe(12);
+    expect(countExpressionLiterals(factored)).toBe(minimal.literalCount);
     expectEquivalent(factored, table);
   });
 
