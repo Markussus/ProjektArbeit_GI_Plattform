@@ -84,8 +84,7 @@ test.describe("Moore and Mealy simulation tab", () => {
   });
 
   test("keeps Mealy outputs attached to transition cells", async ({ page }) => {
-    await openMooreSimulator(page);
-    await page.getByTestId("moore-machine-tab-mealy").click();
+    await openMealySimulator(page);
 
     await expect(
       page.getByTestId("mealy-config-view").locator("thead th").first(),
@@ -207,13 +206,23 @@ test.describe("Moore and Mealy simulation tab", () => {
   test("shows separate Moore and Mealy sub-tabs without losing the Moore editor", async ({
     page,
   }) => {
-    await openMooreSimulator(page);
+    await openEmptySimulator(page);
 
     await page.getByTestId("moore-machine-tab-mealy").click();
     await expect(page.getByTestId("mealy-config-view")).toBeVisible();
 
     await page.getByTestId("moore-machine-tab-moore").click();
     await expect(page.getByTestId("moore-config-view")).toBeVisible();
+  });
+
+  test("locks machine type sub-tabs when an example is loaded", async ({
+    page,
+  }) => {
+    await openMooreSimulator(page);
+    await expect(page.getByTestId("moore-machine-tab-mealy")).toBeDisabled();
+
+    await openMealySimulator(page);
+    await expect(page.getByTestId("moore-machine-tab-moore")).toBeDisabled();
   });
 
   test("starts both machines empty and resets the active machine", async ({

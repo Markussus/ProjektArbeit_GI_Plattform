@@ -197,7 +197,7 @@ export const EncoderSimulator = forwardRef<
     identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
     value: simulatorState,
     codec: encTransferCodec,
-    enabled: isStorageReady && !isExerciseMode,
+    enabled: isStorageReady && !selectedExercise,
     intervalMs: 500,
   });
 
