@@ -119,23 +119,60 @@ export async function readResolvedTheme(page: Page) {
   );
 }
 
+/**
+ * Reads the clipboard, reporting a rejection as "not readable yet" instead of
+ * throwing. `navigator.clipboard.readText()` rejects while the document is not
+ * focused, which happens when many workers share the machine; letting that
+ * escape would fail the poll on the first attempt rather than retrying.
+ */
+function readClipboard(page: Page): Promise<string> {
+  return page.evaluate(async () => {
+    try {
+      return await navigator.clipboard.readText();
+    } catch {
+      return "";
+    }
+  });
+}
+
 export async function exportActiveSimulator(page: Page) {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  // Clipboard access needs the page focused, which parallel workers can steal.
+  await page.bringToFront();
   await page.evaluate(() => navigator.clipboard.writeText(""));
   await page.getByTestId(appTestIds.headerTransferExport).click();
-  await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-    .not.toBe("");
-  return page.evaluate(() => navigator.clipboard.readText());
+  await expect.poll(() => readClipboard(page)).not.toBe("");
+  return readClipboard(page);
 }
 
 export async function importFromHeader(page: Page, transferValue: string) {
   const input = page.getByTestId(appTestIds.headerTransferInput);
   await expect(input).toBeEditable({ timeout: 6_000 });
   await input.fill(transferValue);
+
+  // The import navigates with the value in the router's location state, and
+  // ModuleTopicPage clears that state once it has remounted the simulator. That
+  // clearing is the real "import finished" signal, so wait for a navigation to
+  // have happened AND its import state to be consumed. A fixed delay used to
+  // stand in for this and could expire early on a loaded machine.
+  const historyIndexBefore = await page.evaluate(
+    () => (window.history.state?.idx as number | undefined) ?? 0,
+  );
+
   await page.getByTestId(appTestIds.headerTransferImport).click();
   await expect(input).toHaveValue("");
-  // Same-route imports remount the active simulator after the header click.
-  // Wait for that route-state effect before interacting with its new controls.
-  await page.waitForTimeout(100);
+
+  await page.waitForFunction(
+    (indexBefore) => {
+      const state = window.history.state as {
+        idx?: number;
+        usr?: { trainingCenterImport?: unknown };
+      } | null;
+      return (
+        (state?.idx ?? 0) > indexBefore && !state?.usr?.trainingCenterImport
+      );
+    },
+    historyIndexBefore,
+    { timeout: 10_000 },
+  );
 }
