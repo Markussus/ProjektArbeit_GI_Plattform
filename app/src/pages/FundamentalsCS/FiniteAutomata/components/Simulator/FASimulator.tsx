@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -9,15 +8,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { Play, Settings, Sparkles } from "lucide-react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  exportAndStoreTrainingCenterValue,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
+import { exportAndStoreTrainingCenterValue } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -68,16 +60,10 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
-  const storageIdentifier = createTrainingCenterIdentifier(
-    TOPIC_STORAGE_IDS.finiteAutomata,
-    SIMULATOR_TASK_STORAGE_ID,
-  );
-
-  // A seeded exercise or example takes priority over the saved draft, so there
-  // is nothing to restore and the autosave slot is ready straight away.
-  const [isStorageReady, setIsStorageReady] = useState(() =>
-    Boolean(exercise || example),
-  );
+  // Examples are pristine demonstrations, so they are the one scenario that
+  // neither restores nor saves — every other topic draws the line in the same
+  // place.
+  const isStorageEnabled = !example;
 
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
@@ -100,46 +86,18 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     [pauseSimulation, resetEditorToProgram],
   );
 
-  // In free mode (no exercise/example), restore saved automaton from storage.
-  const hasInitializedStorage = useRef(false);
-  useEffect(() => {
-    if (hasInitializedStorage.current || exercise || example) {
-      return;
-    }
-    hasInitializedStorage.current = true;
-
-    let isCancelled = false;
-    void loadTrainingCenterValue(storageIdentifier, faProgramTransferCodec)
-      .then((storedProgram) => {
-        if (!isCancelled && storedProgram) {
-          handleImportProgram(storedProgram);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!isCancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [exercise, example, handleImportProgram, storageIdentifier]);
-
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: isEditMode ? editor.draft : program,
-    codec: faProgramTransferCodec,
-  });
-
-  // Autosave free mode only (not exercises/examples)
-  useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: editor.draft,
-    codec: faProgramTransferCodec,
-    enabled: isStorageReady && !exercise && !example,
-  });
+  // Each exercise gets its own slot, so work on one never overwrites another;
+  // the free simulator keeps the topic's default slot.
+  const { identifier: storageIdentifier, clear: clearStoredState } =
+    useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.finiteAutomata,
+      taskStorageId: exercise?.storageId,
+      codec: faProgramTransferCodec,
+      value: editor.draft,
+      transferValue: isEditMode ? editor.draft : program,
+      onRestore: handleImportProgram,
+      enabled: isStorageEnabled,
+    });
 
   const handleStartSimulation = () => {
     const result = editor.applyProgram();
@@ -147,7 +105,7 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     setProgram(result.program);
     setIsEditMode(false);
     scrollWorkspaceIntoView();
-    if (!exercise && !example) {
+    if (isStorageEnabled) {
       void exportAndStoreTrainingCenterValue(
         storageIdentifier,
         result.program,
@@ -166,24 +124,14 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     simulation.pause();
     const resetProgram = cloneJson(initialProgram);
 
-    if (!exercise && !example) {
-      trainingCenterStorage.delete(storageIdentifier);
-    }
+    clearStoredState();
 
     setProgram(resetProgram);
     editor.resetToProgram(resetProgram);
     setInputWord(initialInputWord);
     setIsEditMode(true);
     setEditorMode("manual");
-  }, [
-    initialProgram,
-    initialInputWord,
-    exercise,
-    example,
-    editor,
-    simulation,
-    storageIdentifier,
-  ]);
+  }, [initialProgram, initialInputWord, clearStoredState, editor, simulation]);
 
   const loadSolution = useCallback(() => {
     if (!exercise) return;

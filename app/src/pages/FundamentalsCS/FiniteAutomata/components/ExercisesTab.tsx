@@ -7,12 +7,12 @@ import {
 } from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
-  SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import type { Exercise } from "@/types/exercise";
 import {
+  allFAExercises,
   faExercises,
   faGrammarToAutomatonExercises,
 } from "../exercises/faExerciseDefinitions";
@@ -24,13 +24,17 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
     props.onOpenExerciseInSimulation(exercise);
   };
 
+  // Clears every exercise's saved draft, and only those — the free simulator
+  // keeps its own slot, which this control doesn't claim to touch.
   const handleResetAllExercises = () => {
-    trainingCenterStorage.delete(
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.finiteAutomata,
-        SIMULATOR_TASK_STORAGE_ID,
-      ),
-    );
+    for (const exercise of allFAExercises) {
+      trainingCenterStorage.delete(
+        createTrainingCenterIdentifier(
+          TOPIC_STORAGE_IDS.finiteAutomata,
+          exercise.storageId,
+        ),
+      );
+    }
   };
 
   // Two kinds of task: build an automaton for a described language, or build
