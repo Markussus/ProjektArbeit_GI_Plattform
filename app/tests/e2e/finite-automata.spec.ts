@@ -320,3 +320,71 @@ test.describe("Finite Automata — Examples tab", () => {
     await expect(content).toBeVisible();
   });
 });
+
+/**
+ * Per-exercise Training Center persistence, matching what the Turing Machine
+ * and Moore/Mealy specs assert for their topics.
+ */
+const ENDS_WITH_01 = "finite-automata.exercisesTab.endsWith01.title";
+const ENDS_WITH_00 = "finite-automata.exercisesTab.endsWith00.title";
+
+async function openFAExercise(page: Page, titleKey: string) {
+  await page.getByTestId("tab-button-exercises").click();
+  await page.getByTestId(`exercise-card-${titleKey}`).click();
+  await page.getByTestId(`exercise-card-${titleKey}-open`).click();
+  await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
+}
+
+test.describe("Finite Automata — exercise persistence", () => {
+  test("restores an exercise draft and keeps it out of other slots", async ({
+    page,
+  }) => {
+    await gotoFAPage(page);
+
+    await openFAExercise(page, ENDS_WITH_01);
+    await page.getByLabel("δ(S0, 0)").fill("S0");
+    // Applying the program writes the slot straight away; autosave alone only
+    // runs on its interval or when the simulator unmounts.
+    await page.getByTestId("fa-start-simulation").click();
+    await expect
+      .poll(() =>
+        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
+      )
+      .not.toBeNull();
+
+    // Leaving and returning must bring the work back.
+    await page.getByTestId("tab-button-overview").click();
+    await openFAExercise(page, ENDS_WITH_01);
+    await expect(page.getByLabel("δ(S0, 0)")).toHaveValue("S0");
+
+    // A different exercise must not inherit it — the whole point of one slot
+    // per exercise.
+    await page.getByTestId("tab-button-overview").click();
+    await openFAExercise(page, ENDS_WITH_00);
+    await expect(page.getByLabel("δ(S0, 0)")).toHaveValue("");
+  });
+
+  test("resets all FA exercises while preserving the free simulator", async ({
+    page,
+  }) => {
+    await gotoFAPage(page);
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify(["ABAexercise-0", "ABBexercise-1", "AB_free-simulator"]),
+      );
+    });
+
+    await page.getByTestId("tab-button-exercises").click();
+    await page.getByTestId("fa-reset-all-exercises").click();
+    await page.getByTestId("fa-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AB_free-simulator"]);
+  });
+});
