@@ -7,7 +7,9 @@ import {
   TOPIC_STORAGE_IDS,
 } from "@/data/moduleCatalogData";
 import { dnfExercises } from "@/pages/FundamentalsCS/Dnf/exercises";
+import { allFAExercises } from "@/pages/FundamentalsCS/FiniteAutomata/exercises/faExerciseDefinitions";
 import { mooreExerciseScenarios } from "@/pages/FundamentalsCS/MooreMealy/exercises";
+import { rlExercises } from "@/pages/FundamentalsCS/RegularLanguages/exercises/rlExerciseDefinitions";
 import { numberSystemsExercises } from "@/pages/FundamentalsCS/NumberSystems/exercises";
 import { turingMachineExercises } from "@/pages/FundamentalsCS/TuringMachine/scenarios";
 import { javaProgrammingExercises } from "@/pages/Programming1/Java/exercises";
@@ -106,6 +108,17 @@ function findExerciseDefinitionByStorageId(
         turingMachineExercises.find(
           (exercise) => exercise.storageId === taskStorageId,
         )?.definition ?? null
+      );
+    case TOPIC_STORAGE_IDS.finiteAutomata:
+      return (
+        allFAExercises.find(
+          (exercise) => exercise.storageId === taskStorageId,
+        ) ?? null
+      );
+    case TOPIC_STORAGE_IDS.regularLanguages:
+      return (
+        rlExercises.find((exercise) => exercise.storageId === taskStorageId) ??
+        null
       );
     case TOPIC_STORAGE_IDS.numberSystems:
       return numberSystemsExercises[taskStorageId] ?? null;
