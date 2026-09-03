@@ -8,7 +8,7 @@ https://github.com/openjdk/jdk25u
 Revision:
 6c48f4ed707bf0b15f9b6098de30db8aae6fa40f
 
-Downloaded during build from:
+Upstream source archive used by teavm-javac:
 https://github.com/openjdk/jdk25u/archive/6c48f4ed707bf0b15f9b6098de30db8aae6fa40f.zip
 
 Components:

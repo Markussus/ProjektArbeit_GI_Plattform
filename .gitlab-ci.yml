@@ -48,8 +48,10 @@ java_compiler:
     - npm ci --cache .npm --prefer-offline
     - npm run prepare:java-compiler
     - test -f public/java/compiler/compiler.wasm
+    - test -f public/java/compiler/compiler.wasm-runtime.js
+    - test -f public/java/compiler/compile-classlib-teavm.bin
+    - test -f public/java/compiler/runtime-classlib-teavm.bin
     - test -f public/java/compiler/worker.js
-    - test -f public/java/compiler/.teavm-javac-commit
   artifacts:
     expire_in: 1 week
     paths:

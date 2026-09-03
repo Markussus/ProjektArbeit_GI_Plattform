@@ -174,7 +174,7 @@ describe("Simulator Presentation & Components", () => {
       const onTransitionChange = vi.fn();
       const onAddState = vi.fn();
 
-      render(
+      const { container } = render(
         <table>
           <tbody>
             <MooreTransitionRow
@@ -192,11 +192,16 @@ describe("Simulator Presentation & Components", () => {
       );
 
       expect(screen.getByTestId("moore-input-symbol-0")).toBeInTheDocument();
-      expect(
-        screen.getByTestId("moore-remove-input-symbol-0"),
-      ).toBeInTheDocument();
+      const removeBtn = screen.getByTestId("moore-remove-input-symbol-0");
+      expect(removeBtn).toBeInTheDocument();
 
-      fireEvent.click(screen.getByTestId("moore-remove-input-symbol-0"));
+      // Check that the delete button is placed in the rightmost column (last td)
+      const cells = container.querySelectorAll("tr td");
+      const lastCell = cells[cells.length - 1];
+      expect(lastCell).toContainElement(removeBtn);
+      expect(removeBtn.className).toContain("hover:text-destructive");
+
+      fireEvent.click(removeBtn);
       expect(onRemoveInputSymbol).toHaveBeenCalledWith("0");
     });
   });
