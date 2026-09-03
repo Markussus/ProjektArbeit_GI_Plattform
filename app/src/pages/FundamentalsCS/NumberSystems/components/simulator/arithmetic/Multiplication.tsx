@@ -1,16 +1,18 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Info } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { ExerciseValidationPanel } from "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel";
 import type { BaseArithmeticProps } from "./types";
 import {
   SimulatorLayout,
-  BinaryInput,
   StepByStepToggle,
   CollapsibleStep,
   ResultSectionHeader,
-  useToggleSet,
 } from "@/components/shared/SimulatorShared";
+import { ArithmeticInputPanel } from "./ArithmeticInputPanel";
+import {
+  useArithmeticExercise,
+  type ArithmeticExerciseState,
+} from "./useArithmeticExercise";
 
 interface MultiplicationStep {
   bitIndex: number;
@@ -22,42 +24,28 @@ interface MultiplicationStep {
   explanation: string;
 }
 
-export function Multiplication({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialA,
-  initialB,
-  onChangeValues,
-  renderModeSelector,
-}: BaseArithmeticProps) {
-  const { t } = useTranslation("translation");
-  const [valA, setValA] = useState(initialA || "1101");
-  const [valB, setValB] = useState(initialB || "101");
-  const [showStepByStep, setShowStepByStep] = useState(false);
-  const { expanded, toggle } = useToggleSet(["0", "1", "2"]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (initialA) setValA(initialA);
-    if (initialB) setValB(initialB);
-  }, [initialA, initialB]);
-
-  useEffect(() => {
-    onChangeValues?.(valA, valB);
-  }, [valA, valB, onChangeValues]);
-
-  const locked = !!isExerciseMode && !showSolution;
-
-  const handleInputA = (val: string) => {
-    if (locked) return;
-    setValA(val.replace(/[^01]/g, "").slice(0, 8));
-  };
-  const handleInputB = (val: string) => {
-    if (locked) return;
-    setValB(val.replace(/[^01]/g, "").slice(0, 8));
-  };
+export function Multiplication(props: BaseArithmeticProps) {
+  const state = useArithmeticExercise(props, {
+    defaultA: "1101",
+    defaultB: "101",
+    maxLengthA: 8,
+    maxLengthB: 8,
+  });
+  const {
+    t,
+    valA,
+    valB,
+    locked,
+    handleInputA,
+    handleInputB,
+    showStepByStep,
+    setShowStepByStep,
+    expanded,
+    toggle,
+    onShowSolution,
+    onExitExercise,
+    renderModeSelector,
+  } = state satisfies ArithmeticExerciseState;
 
   const { steps, finalSum, finalSumDec, partialSums } = useMemo(() => {
     if (!valA || !valB)
@@ -93,14 +81,14 @@ export function Multiplication({
         decimalProduct: bit === "1" ? parseInt(valA, 2) * Math.pow(2, i) : 0,
         explanation:
           bit === "1"
-            ? t("simulator.arithmetic.multiplication.stepDesc", {
+            ? t("number-systems.simulator.arithmetic.multiplication.stepDesc", {
                 n: i,
                 bit: bit,
                 val: valA,
                 shift: i,
                 result: termStr,
               })
-            : t("simulator.arithmetic.multiplication.skipZero", {
+            : t("number-systems.simulator.arithmetic.multiplication.skipZero", {
                 n: i,
                 bit: bit,
               }),
@@ -118,31 +106,24 @@ export function Multiplication({
   return (
     <SimulatorLayout
       inputPanel={
-        <>
-          <div>
-            <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-semibold">
-              {t("simulator.arithmetic.common.operands")}
-            </h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {t("simulator.arithmetic.multiplication.desc")}
-            </p>
-          </div>
-          <div className="space-y-4">
-            {renderModeSelector}
-            <BinaryInput
-              label={t("simulator.arithmetic.multiplication.multiplier")}
-              value={valA}
-              onChange={handleInputA}
-              locked={locked}
-            />
-            <BinaryInput
-              label={t("simulator.arithmetic.multiplication.multiplicand")}
-              value={valB}
-              onChange={handleInputB}
-              locked={locked}
-            />
-          </div>
-        </>
+        <ArithmeticInputPanel
+          titleKey="number-systems.simulator.arithmetic.common.operands"
+          descKey="number-systems.simulator.arithmetic.multiplication.desc"
+          renderModeSelector={renderModeSelector}
+          locked={locked}
+          operandA={{
+            value: valA,
+            onChange: handleInputA,
+            labelKey:
+              "number-systems.simulator.arithmetic.multiplication.multiplier",
+          }}
+          operandB={{
+            value: valB,
+            onChange: handleInputB,
+            labelKey:
+              "number-systems.simulator.arithmetic.multiplication.multiplicand",
+          }}
+        />
       }
       resultPanel={
         locked ? (
@@ -157,7 +138,9 @@ export function Multiplication({
           <div className="space-y-6">
             <ResultSectionHeader
               icon={<Info className="text-primary h-5 w-5" />}
-              title={t("simulator.arithmetic.common.stepsResult")}
+              title={t(
+                "number-systems.simulator.arithmetic.common.stepsResult",
+              )}
             />
 
             {valA && valB ? (
@@ -170,7 +153,9 @@ export function Multiplication({
                 {showStepByStep && steps.length > 0 && (
                   <div className="mb-6 space-y-3">
                     <div className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                      {t("simulator.arithmetic.multiplication.stepByStepTitle")}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.stepByStepTitle",
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -183,7 +168,7 @@ export function Multiplication({
                             <>
                               <span className="text-muted-foreground w-16 text-xs font-bold">
                                 {t(
-                                  "simulator.arithmetic.multiplication.stepN",
+                                  "number-systems.simulator.arithmetic.multiplication.stepN",
                                   { n: step.bitIndex },
                                 )}
                               </span>
@@ -196,7 +181,7 @@ export function Multiplication({
                                 {step.isZero ? (
                                   <span className="text-muted-foreground">
                                     {t(
-                                      "simulator.arithmetic.multiplication.skipShort",
+                                      "number-systems.simulator.arithmetic.multiplication.skipShort",
                                     )}
                                   </span>
                                 ) : (
@@ -230,7 +215,7 @@ export function Multiplication({
                       <p className="text-foreground text-sm">
                         <strong>
                           {t(
-                            "simulator.arithmetic.multiplication.partialProducts",
+                            "number-systems.simulator.arithmetic.multiplication.partialProducts",
                           )}
                           :
                         </strong>
@@ -270,15 +255,20 @@ export function Multiplication({
                       <span className="text-primary font-bold">{finalSum}</span>
                     </div>
                     <div className="text-muted-foreground mt-4 text-right font-sans text-xs tracking-normal">
-                      {t("simulator.arithmetic.multiplication.inDecimal")}:{" "}
-                      {parseInt(valA, 2)} × {parseInt(valB, 2)} = {finalSumDec}
+                      {t(
+                        "number-systems.simulator.arithmetic.multiplication.inDecimal",
+                      )}
+                      : {parseInt(valA, 2)} × {parseInt(valB, 2)} ={" "}
+                      {finalSumDec}
                     </div>
                   </div>
                 </div>
               </>
             ) : (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                {t("simulator.arithmetic.common.enterValidOperands")}
+                {t(
+                  "number-systems.simulator.arithmetic.common.enterValidOperands",
+                )}
               </p>
             )}
           </div>

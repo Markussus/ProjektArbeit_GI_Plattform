@@ -36,7 +36,7 @@ export type LanguageSpec = EnumerationLang | SetBuilderLang;
 
 /**
  * A parse failure as a translatable code plus its interpolation values.
- * The matching strings live under `rl.languageErrors.*`.
+ * The matching strings live under `regular-languages.languageErrors.*`.
  */
 export interface LanguageParseIssue {
   code:
@@ -60,8 +60,8 @@ export type ParseLanguageResult =
   | { ok: false; error: string; issue: LanguageParseIssue };
 
 /** Translation key for a language-spec issue, for use with i18next's `t()`. */
-export function languageIssueKey(issue: LanguageParseIssue): string {
-  return `rl.languageErrors.${issue.code}`;
+function languageIssueKey(issue: LanguageParseIssue): string {
+  return `regular-languages.languageErrors.${issue.code}`;
 }
 
 /** Render a language-spec issue in the active language. */
@@ -163,25 +163,35 @@ export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
 
 /* ── Enumeration form ──────────────────────────────────────────────── */
 
+/** Strip one matching pair of surrounding quotes, if the item has them. */
+function unquoteItem(item: string): string {
+  const quoted =
+    (item.startsWith('"') && item.endsWith('"')) ||
+    (item.startsWith("'") && item.endsWith("'"));
+  return quoted && item.length >= 2 ? item.slice(1, -1) : item;
+}
+
+/** `..` / `...` stands for "and so on", not for a word. */
+function isContinuationMarker(item: string): boolean {
+  return /^\.{2,}$/.test(item);
+}
+
 function parseEnumerationBody(body: string): ParseLanguageResult {
-  const items = splitTopLevelCommas(body);
   const words: string[] = [];
   let sawContinuation = false;
-  for (const itemRaw of items) {
-    let item = itemRaw.trim();
-    if (item.length === 0) continue;
-    if (
-      (item.startsWith('"') && item.endsWith('"') && item.length >= 2) ||
-      (item.startsWith("'") && item.endsWith("'") && item.length >= 2)
-    ) {
-      item = item.slice(1, -1);
-    }
-    if (/^\.{2,}$/.test(item)) {
+
+  for (const rawItem of splitTopLevelCommas(body)) {
+    const trimmed = rawItem.trim();
+    // Skips the gap an empty item leaves, e.g. after a trailing comma.
+    if (trimmed.length === 0) continue;
+
+    const item = unquoteItem(trimmed);
+    if (isContinuationMarker(item)) {
       sawContinuation = true;
       continue;
     }
-    if (item === "ε" || item === "epsilon") item = "";
-    words.push(item);
+
+    words.push(item === "ε" || item === "epsilon" ? "" : item);
   }
 
   // A trailing `..` / `...` marker signals "this is a pattern" — try to
@@ -307,91 +317,137 @@ function buildInferredSetBuilder(input: {
 
 /* ── Set-builder form ──────────────────────────────────────────────── */
 
+/**
+ * A variable exponent inside a group, as in `(a^n)b`, makes the group's atom a
+ * repetition rather than a fixed word. The grammar builder walks atoms symbol
+ * by symbol and has nothing to walk here, so reject it with a message instead
+ * of letting it throw out of the render.
+ */
+function rejectNestedRepetitions(factors: PatternFactor[]): void {
+  for (const factor of factors) {
+    if (!isFixedWordAtom(factor.atom)) {
+      fail(
+        "nestedRepetition",
+        `'${factor.rawText}' repeats inside a group. Write the repetition once, e.g. 'a^n b' instead of '(a^n)b'.`,
+        { factor: factor.rawText },
+      );
+    }
+  }
+}
+
+/**
+ * The same variable in two factors correlates their lengths (a^n b^n), which
+ * is not a regular language — reject rather than silently drop it.
+ */
+function rejectReusedVariables(factors: PatternFactor[]): void {
+  const usage = new Map<string, number>();
+  for (const factor of factors) {
+    if (factor.exponent.kind === "variable") {
+      const { name } = factor.exponent;
+      usage.set(name, (usage.get(name) ?? 0) + 1);
+    }
+  }
+
+  for (const [name, count] of usage) {
+    if (count > 1) {
+      fail(
+        "variableReused",
+        `Variable '${name}' is used in more than one factor. That describes a non-regular language (like a^n b^n) and cannot be expressed as a regular grammar.`,
+        { name },
+      );
+    }
+  }
+}
+
+/**
+ * Fold the constraint groups into per-variable bounds. Variables introduced in
+ * the pattern but left unconstrained default to ≥ 0.
+ */
+function collectVariableBounds(
+  constraintsText: string,
+  factors: PatternFactor[],
+): { lowerBound: Map<string, number>; exactCount: Map<string, number> } {
+  const lowerBound = new Map<string, number>();
+  const exactCount = new Map<string, number>();
+
+  for (const group of parseConstraintsText(constraintsText)) {
+    for (const name of group.vars) {
+      const prev = lowerBound.get(name) ?? 0;
+      lowerBound.set(name, Math.max(prev, group.lowerBound));
+      if (group.exact !== null) exactCount.set(name, group.exact);
+    }
+  }
+
+  for (const factor of factors) {
+    if (
+      factor.exponent.kind === "variable" &&
+      !lowerBound.has(factor.exponent.name)
+    ) {
+      lowerBound.set(factor.exponent.name, 0);
+    }
+  }
+
+  return { lowerBound, exactCount };
+}
+
+/**
+ * `n = k` pins the exponent to exactly k, so the factor stops being variable —
+ * `{a^n | n = 3}` is the finite {aaa}, not a^3 a*. Every other bound only
+ * raises the variable's lower bound.
+ */
+function applyVariableBounds(
+  factors: PatternFactor[],
+  lowerBound: Map<string, number>,
+  exactCount: Map<string, number>,
+): void {
+  for (const factor of factors) {
+    if (factor.exponent.kind !== "variable") continue;
+    const exact = exactCount.get(factor.exponent.name);
+    if (exact !== undefined) {
+      factor.exponent = { kind: "literal", count: exact };
+      continue;
+    }
+    factor.exponent.lowerBound = lowerBound.get(factor.exponent.name) ?? 0;
+  }
+}
+
+/** The bounds in the order their variables first appear in the pattern. */
+function orderedVariableBounds(
+  factors: PatternFactor[],
+  lowerBound: Map<string, number>,
+): VariableBound[] {
+  const bounds: VariableBound[] = [];
+  for (const factor of factors) {
+    if (factor.exponent.kind !== "variable") continue;
+    const { name } = factor.exponent;
+    if (!bounds.some((b) => b.name === name)) {
+      bounds.push({ name, lowerBound: lowerBound.get(name) ?? 0 });
+    }
+  }
+  return bounds;
+}
+
 function parseSetBuilderBody(
   patternText: string,
   constraintsText: string,
 ): ParseLanguageResult {
   try {
     const factors = parsePatternText(patternText);
+    rejectNestedRepetitions(factors);
+    rejectReusedVariables(factors);
 
-    // A variable exponent inside a group, as in `(a^n)b`, makes the group's
-    // atom a repetition rather than a fixed word. The grammar builder walks
-    // atoms symbol by symbol and has nothing to walk here, so reject it with a
-    // message instead of letting it throw out of the render.
-    for (const factor of factors) {
-      if (!isFixedWordAtom(factor.atom)) {
-        fail(
-          "nestedRepetition",
-          `'${factor.rawText}' repeats inside a group. Write the repetition once, e.g. 'a^n b' instead of '(a^n)b'.`,
-          { factor: factor.rawText },
-        );
-      }
-    }
-
-    // The same variable in two factors correlates their lengths (a^n b^n),
-    // which is not a regular language — reject rather than silently drop it.
-    const usage = new Map<string, number>();
-    for (const f of factors) {
-      if (f.exponent.kind === "variable") {
-        usage.set(f.exponent.name, (usage.get(f.exponent.name) ?? 0) + 1);
-      }
-    }
-    for (const [name, count] of usage) {
-      if (count > 1) {
-        fail(
-          "variableReused",
-          `Variable '${name}' is used in more than one factor. That describes a non-regular language (like a^n b^n) and cannot be expressed as a regular grammar.`,
-          { name },
-        );
-      }
-    }
-
-    const constraintGroups = parseConstraintsText(constraintsText);
-    const lowerBound = new Map<string, number>();
-    const exactCount = new Map<string, number>();
-    for (const group of constraintGroups) {
-      for (const v of group.vars) {
-        const prev = lowerBound.get(v) ?? 0;
-        lowerBound.set(v, Math.max(prev, group.lowerBound));
-        if (group.exact !== null) exactCount.set(v, group.exact);
-      }
-    }
-    // Variables introduced in the pattern but unconstrained default to ≥ 0.
-    for (const f of factors) {
-      if (f.exponent.kind === "variable" && !lowerBound.has(f.exponent.name)) {
-        lowerBound.set(f.exponent.name, 0);
-      }
-    }
-    // Apply bounds to the factors. `n = k` pins the exponent to exactly k, so
-    // the factor stops being variable — `{a^n | n = 3}` is the finite {aaa},
-    // not a^3 a*.
-    for (const f of factors) {
-      if (f.exponent.kind !== "variable") continue;
-      const exact = exactCount.get(f.exponent.name);
-      if (exact !== undefined) {
-        f.exponent = { kind: "literal", count: exact };
-        continue;
-      }
-      f.exponent.lowerBound = lowerBound.get(f.exponent.name) ?? 0;
-    }
-
-    const variableBounds: VariableBound[] = [];
-    // Preserve the order variables first appear in the pattern.
-    for (const f of factors) {
-      if (f.exponent.kind === "variable") {
-        const name = f.exponent.name;
-        if (!variableBounds.some((b) => b.name === name)) {
-          variableBounds.push({ name, lowerBound: lowerBound.get(name) ?? 0 });
-        }
-      }
-    }
+    const { lowerBound, exactCount } = collectVariableBounds(
+      constraintsText,
+      factors,
+    );
+    applyVariableBounds(factors, lowerBound, exactCount);
 
     return {
       ok: true,
       spec: {
         kind: "setBuilder",
         pattern: factors,
-        variableBounds,
+        variableBounds: orderedVariableBounds(factors, lowerBound),
       },
     };
   } catch (e) {
@@ -413,6 +469,102 @@ function parsePatternText(text: string): PatternFactor[] {
   return result.factors;
 }
 
+/** Characters that only separate factors and carry no meaning of their own. */
+function isPatternFiller(c: string): boolean {
+  return c === " " || c === "\t" || c === "·" || c === "⋅";
+}
+
+/**
+ * One atom of a pattern: a parenthesised group, ε, or a single symbol.
+ * Returns the atom together with the index just past it.
+ */
+function parseAtom(
+  source: string,
+  startIdx: number,
+): { atom: RegexNode; atomText: string; endIdx: number } {
+  const c = source[startIdx];
+
+  if (c === "(") {
+    const sub = parsePattern(source, startIdx + 1);
+    if (source[sub.endIdx] !== ")") {
+      fail(
+        "missingGroupClose",
+        `Missing ')' to close group starting before position ${startIdx + 1}.`,
+        { position: String(startIdx + 1) },
+      );
+    }
+    return {
+      atom: patternToRegex(sub.factors),
+      atomText: `(${sub.factors.map((f) => f.rawText).join("")})`,
+      endIdx: sub.endIdx + 1,
+    };
+  }
+
+  if (c === "ε" || c === "λ") {
+    return { atom: { kind: "epsilon" }, atomText: "ε", endIdx: startIdx + 1 };
+  }
+
+  if (isSymbolChar(c)) {
+    return {
+      atom: { kind: "symbol", value: c },
+      atomText: c,
+      endIdx: startIdx + 1,
+    };
+  }
+
+  fail(
+    "patternUnexpectedChar",
+    `Unexpected character '${c}' in pattern at position ${startIdx}.`,
+    { char: c, position: String(startIdx) },
+  );
+}
+
+/**
+ * The optional `^…` suffix of a factor: a literal count (`a^2`) or a variable
+ * (`a^n`). An atom with no caret keeps the `none` exponent.
+ */
+function parseExponent(
+  source: string,
+  startIdx: number,
+): { exponent: ExponentSpec; rawSuffix: string; endIdx: number } {
+  if (source[startIdx] !== "^") {
+    return { exponent: { kind: "none" }, rawSuffix: "", endIdx: startIdx };
+  }
+
+  let i = startIdx + 1;
+  const next = source[i];
+  if (next === undefined) {
+    fail("trailingCaret", "Trailing '^' without exponent.");
+  }
+
+  if (/[0-9]/.test(next)) {
+    let digits = "";
+    while (i < source.length && /[0-9]/.test(source[i])) {
+      digits += source[i];
+      i++;
+    }
+    return {
+      exponent: { kind: "literal", count: parseInt(digits, 10) },
+      rawSuffix: `^${digits}`,
+      endIdx: i,
+    };
+  }
+
+  if (/[A-Za-z]/.test(next)) {
+    return {
+      exponent: { kind: "variable", name: next, lowerBound: 0 },
+      rawSuffix: `^${next}`,
+      endIdx: i + 1,
+    };
+  }
+
+  fail(
+    "badExponent",
+    `Expected a variable letter or an integer after '^' at position ${i}.`,
+    { position: String(i) },
+  );
+}
+
 function parsePattern(
   source: string,
   startIdx: number,
@@ -420,81 +572,21 @@ function parsePattern(
   let i = startIdx;
   const factors: PatternFactor[] = [];
 
-  while (i < source.length) {
-    const c = source[i];
-    if (c === " " || c === "\t" || c === "·" || c === "⋅") {
+  while (i < source.length && source[i] !== ")") {
+    if (isPatternFiller(source[i])) {
       i++;
       continue;
     }
-    if (c === ")") break;
 
-    let atom: RegexNode;
-    let atomText: string;
-
-    if (c === "(") {
-      i++;
-      const sub = parsePattern(source, i);
-      if (source[sub.endIdx] !== ")") {
-        fail(
-          "missingGroupClose",
-          `Missing ')' to close group starting before position ${i}.`,
-          { position: String(i) },
-        );
-      }
-      atom = patternToRegex(sub.factors);
-      atomText = `(${sub.factors.map((f) => f.rawText).join("")})`;
-      i = sub.endIdx + 1;
-    } else if (c === "ε" || c === "λ") {
-      atom = { kind: "epsilon" };
-      atomText = "ε";
-      i++;
-    } else if (isSymbolChar(c)) {
-      atom = { kind: "symbol", value: c };
-      atomText = c;
-      i++;
-    } else {
-      fail(
-        "patternUnexpectedChar",
-        `Unexpected character '${c}' in pattern at position ${i}.`,
-        { char: c, position: String(i) },
-      );
-    }
-
-    let exponent: ExponentSpec = { kind: "none" };
-    let rawSuffix = "";
-    if (source[i] === "^") {
-      i++;
-      rawSuffix = "^";
-      const next = source[i];
-      if (next === undefined) {
-        fail("trailingCaret", "Trailing '^' without exponent.");
-      }
-      if (/[0-9]/.test(next)) {
-        let numStr = "";
-        while (i < source.length && /[0-9]/.test(source[i])) {
-          numStr += source[i];
-          i++;
-        }
-        exponent = { kind: "literal", count: parseInt(numStr, 10) };
-        rawSuffix += numStr;
-      } else if (/[A-Za-z]/.test(next)) {
-        exponent = { kind: "variable", name: next, lowerBound: 0 };
-        rawSuffix += next;
-        i++;
-      } else {
-        fail(
-          "badExponent",
-          `Expected a variable letter or an integer after '^' at position ${i}.`,
-          { position: String(i) },
-        );
-      }
-    }
+    const { atom, atomText, endIdx } = parseAtom(source, i);
+    const exponent = parseExponent(source, endIdx);
+    i = exponent.endIdx;
 
     factors.push({
       atom,
       atomText,
-      exponent,
-      rawText: atomText + rawSuffix,
+      exponent: exponent.exponent,
+      rawText: atomText + exponent.rawSuffix,
     });
   }
 
@@ -603,11 +695,13 @@ function parseConstraintsText(text: string): ConstraintGroup[] {
   return groups;
 }
 
-function computeBound(text: string): {
-  lowerBound: number;
-  exact: number | null;
-} {
-  // Normalise so the simple split works on `n>0` and `n >= 1` alike.
+/** ℕ and ℕ0 both say "≥ 0", which is already the default lower bound. */
+const NATURAL_NUMBER_SETS = new Set(["N", "ℕ", "N0", "ℕ0"]);
+const LOWER_BOUND_OPERATORS = new Set([">", ">=", "≥", "="]);
+const UPPER_BOUND_OPERATORS = new Set(["<", "<=", "≤"]);
+
+/** Normalise so the simple split works on `n>0` and `n >= 1` alike. */
+function tokenizeConstraint(text: string): string[] {
   const normalised = text
     .replace(/∈/g, " ∈ ")
     .replace(/\bin\b/gi, " in ")
@@ -615,82 +709,108 @@ function computeBound(text: string): {
     .replace(/\s+/g, " ")
     .trim();
 
-  const tokens = normalised.length === 0 ? [] : normalised.split(" ");
-  let lb = 0;
+  return normalised.length === 0 ? [] : normalised.split(" ");
+}
+
+/** `n ∈ ℕ` only restates the default bound; any other set is rejected. */
+function assertNaturalNumberSet(op: string, operand: string | undefined): void {
+  if (operand !== undefined && NATURAL_NUMBER_SETS.has(operand)) return;
+
+  fail(
+    "expectedNaturals",
+    `Expected ℕ (or N) after '${op}', got '${operand ?? "end of input"}'.`,
+    { op, got: operand ?? "end of input" },
+  );
+}
+
+/** The bound one comparison imposes. `>` is strict, `=` pins the value. */
+function readComparison(
+  op: string,
+  operand: string | undefined,
+): { lowerBound: number; exact: number | null } {
+  if (operand === undefined || !/^\d+$/.test(operand)) {
+    fail("expectedInteger", `Expected an integer after '${op}'.`, { op });
+  }
+
+  const value = parseInt(operand, 10);
+  return {
+    lowerBound: op === ">" ? value + 1 : value,
+    exact: op === "=" ? value : null,
+  };
+}
+
+/**
+ * Fold one variable's constraint text into a lower bound and, for `n = k`, the
+ * exact value. Every accepted token comes with an operand, so the scan always
+ * advances in pairs.
+ */
+function computeBound(text: string): {
+  lowerBound: number;
+  exact: number | null;
+} {
+  const tokens = tokenizeConstraint(text);
+  let lowerBound = 0;
   let exact: number | null = null;
-  let i = 0;
-  while (i < tokens.length) {
-    const t = tokens[i];
-    if (t === "in" || t === "∈") {
-      const next = tokens[i + 1];
-      // ℕ and ℕ0 both say "≥ 0", which is already the default lower bound.
-      if (next === "N" || next === "ℕ" || next === "N0" || next === "ℕ0") {
-        i += 2;
-        continue;
-      }
-      fail(
-        "expectedNaturals",
-        `Expected ℕ (or N) after '${t}', got '${next ?? "end of input"}'.`,
-        { op: t, got: next ?? "end of input" },
-      );
-    }
-    if (t === ">" || t === ">=" || t === "≥" || t === "=") {
-      const numStr = tokens[i + 1];
-      if (numStr === undefined || !/^\d+$/.test(numStr)) {
-        fail("expectedInteger", `Expected an integer after '${t}'.`, { op: t });
-      }
-      const num = parseInt(numStr, 10);
-      // `=` pins the exponent exactly; the others only raise the lower bound.
-      if (t === "=") exact = num;
-      const opLb = t === ">" ? num + 1 : num;
-      if (opLb > lb) lb = opLb;
-      i += 2;
+
+  for (let i = 0; i < tokens.length; i += 2) {
+    const token = tokens[i];
+    const operand = tokens[i + 1];
+
+    if (token === "in" || token === "∈") {
+      assertNaturalNumberSet(token, operand);
       continue;
     }
-    if (t === "<" || t === "<=" || t === "≤") {
+
+    if (LOWER_BOUND_OPERATORS.has(token)) {
+      const bound = readComparison(token, operand);
+      if (bound.exact !== null) exact = bound.exact;
+      if (bound.lowerBound > lowerBound) lowerBound = bound.lowerBound;
+      continue;
+    }
+
+    if (UPPER_BOUND_OPERATORS.has(token)) {
       fail(
         "upperBound",
-        `Upper bounds ('${t}') are not supported — they would make the language finite. Use enumeration instead.`,
-        { op: t },
+        `Upper bounds ('${token}') are not supported — they would make the language finite. Use enumeration instead.`,
+        { op: token },
       );
     }
-    fail("unexpectedToken", `Unexpected token '${t}' in constraint.`, {
-      token: t,
+
+    fail("unexpectedToken", `Unexpected token '${token}' in constraint.`, {
+      token,
     });
   }
 
-  return { lowerBound: lb, exact };
+  return { lowerBound, exact };
 }
 
 /* ── Shared helpers ────────────────────────────────────────────────── */
 
-function findTopLevelBar(body: string): number {
-  let depth = 0;
-  let inQuote: string | null = null;
-  for (let i = 0; i < body.length; i++) {
-    const c = body[i];
-    if (inQuote) {
-      if (c === inQuote) inQuote = null;
-      continue;
-    }
-    if (c === '"' || c === "'") {
-      inQuote = c;
-      continue;
-    }
-    if (c === "(") depth++;
-    else if (c === ")") depth--;
-    else if (c === "|" && depth === 0) return i;
-  }
-  return -1;
+/** +1 for an opening bracket, -1 for a closing one, 0 for anything else. */
+function bracketDelta(c: string, openers: string, closers: string): number {
+  if (openers.includes(c)) return 1;
+  if (closers.includes(c)) return -1;
+  return 0;
 }
 
-function splitTopLevelCommas(s: string): string[] {
-  const parts: string[] = [];
+/**
+ * Walk `s` and hand `visit` every character that sits at bracket depth 0 and
+ * outside any quoted run; returning `true` stops the walk. Both the constraint
+ * bar search and the comma split need exactly this, and neither should have to
+ * re-implement the quote and bracket bookkeeping.
+ */
+function forEachTopLevelChar(
+  s: string,
+  openers: string,
+  closers: string,
+  visit: (char: string, index: number) => boolean | void,
+): void {
   let depth = 0;
   let inQuote: string | null = null;
-  let start = 0;
+
   for (let i = 0; i < s.length; i++) {
     const c = s[i];
+
     if (inQuote) {
       if (c === inQuote) inQuote = null;
       continue;
@@ -699,19 +819,38 @@ function splitTopLevelCommas(s: string): string[] {
       inQuote = c;
       continue;
     }
-    if (c === "(" || c === "{") depth++;
-    else if (c === ")" || c === "}") depth--;
-    else if (c === "," && depth === 0) {
-      parts.push(s.slice(start, i));
-      start = i + 1;
+
+    const delta = bracketDelta(c, openers, closers);
+    if (delta !== 0) {
+      depth += delta;
+      continue;
     }
+    if (depth === 0 && visit(c, i) === true) return;
   }
-  parts.push(s.slice(start));
-  return parts;
 }
 
-/** Format an enumeration back as canonical text for an editor seed. */
-export function formatEnumerationSource(words: string[]): string {
-  const items = words.map((w) => (w === "" ? "ε" : `"${w}"`));
-  return `L = {${items.join(", ")}}`;
+/** Index of the `|` that separates pattern from constraints, or -1. */
+function findTopLevelBar(body: string): number {
+  let barIndex = -1;
+  forEachTopLevelChar(body, "(", ")", (c, i) => {
+    if (c !== "|") return;
+    barIndex = i;
+    return true;
+  });
+  return barIndex;
+}
+
+/** Split on commas that belong to the list itself, not to a nested item. */
+function splitTopLevelCommas(s: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+
+  forEachTopLevelChar(s, "({", ")}", (c, i) => {
+    if (c !== ",") return;
+    parts.push(s.slice(start, i));
+    start = i + 1;
+  });
+
+  parts.push(s.slice(start));
+  return parts;
 }

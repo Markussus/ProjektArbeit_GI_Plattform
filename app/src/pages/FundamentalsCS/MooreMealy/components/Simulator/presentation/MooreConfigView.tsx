@@ -7,7 +7,7 @@ import type {
   InternalRepresentation,
   MooreProgram,
 } from "../domain/mooreTypes";
-import { MooreInputBuilder } from "./MooreInputBuilder";
+import { AutomataInputBuilder } from "./AutomataInputBuilder";
 import { MooreTransitionTable } from "./MooreTransitionTable";
 
 export interface MooreConfigViewProps {
@@ -26,6 +26,11 @@ export interface MooreConfigViewProps {
   onAddInputSymbol: () => void;
   onRemoveInputSymbol: (symbol: string) => void;
   onOutputSymbolChange: (state: string, symbol: string) => void;
+  onOutputSymbolCreate: (state: string, symbol: string) => void;
+  onOutputSymbolRename?: (
+    previousSymbol: string,
+    nextSymbol: string,
+  ) => boolean;
   onOutputCodeChange: (state: string, code: number) => void;
 }
 
@@ -41,6 +46,8 @@ export function MooreConfigView({
   onAddInputSymbol,
   onRemoveInputSymbol,
   onOutputSymbolChange,
+  onOutputSymbolCreate,
+  onOutputSymbolRename,
   onOutputCodeChange,
 }: MooreConfigViewProps) {
   const { t } = useTranslation();
@@ -62,11 +69,11 @@ export function MooreConfigView({
   const representationOptions = [
     {
       value: "decimal" as const,
-      label: t("moore.sim.decimal"),
+      label: t("moore-mealy.sim.decimal"),
     },
     {
       value: "binary" as const,
-      label: t("moore.sim.binary"),
+      label: t("moore-mealy.sim.binary"),
     },
   ];
   const outputAlphabet = useMemo(() => {
@@ -84,9 +91,11 @@ export function MooreConfigView({
   return (
     <div data-testid="moore-config-view" className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">{t("moore.sim.configureTitle")}</h2>
+        <h2 className="text-lg font-bold">
+          {t("moore-mealy.sim.configureTitle")}
+        </h2>
         <p className="text-muted-foreground text-sm">
-          {t("moore.sim.configureHelp")}
+          {t("moore-mealy.sim.configureHelp")}
         </p>
       </div>
 
@@ -96,13 +105,13 @@ export function MooreConfigView({
           className="bg-destructive/10 text-destructive rounded-lg border border-current/20 p-3 text-sm"
         >
           {issues
-            .map((issue) => t(`moore.sim.validation.${issue}` as never))
+            .map((issue) => t(`moore-mealy.sim.validation.${issue}` as never))
             .join(" ")}
         </div>
       )}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_15rem]">
-        <MooreInputBuilder
+        <AutomataInputBuilder
           inputSymbols={program.inputSymbols}
           inputWord={program.inputWord}
           onChange={(inputWord) => onChange({ ...program, inputWord })}
@@ -110,7 +119,7 @@ export function MooreConfigView({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.representation")}
+              {t("moore-mealy.sim.representation")}
             </label>
             <DropdownSelect<InternalRepresentation>
               value={program.representation}
@@ -118,7 +127,7 @@ export function MooreConfigView({
               onChange={(representation) =>
                 onChange({ ...program, representation })
               }
-              ariaLabel={t("moore.sim.representation")}
+              ariaLabel={t("moore-mealy.sim.representation")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-representation-select"
@@ -127,7 +136,7 @@ export function MooreConfigView({
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold">
-              {t("moore.sim.startState")}
+              {t("moore-mealy.sim.startState")}
             </label>
             <DropdownSelect
               value={program.initialState}
@@ -135,7 +144,7 @@ export function MooreConfigView({
               onChange={(initialState) =>
                 onChange({ ...program, initialState })
               }
-              ariaLabel={t("moore.sim.startState")}
+              ariaLabel={t("moore-mealy.sim.startState")}
               triggerClassName="h-11 w-full px-3"
               menuClassName="right-0 left-0"
               triggerTestId="moore-start-state-select"
@@ -155,19 +164,19 @@ export function MooreConfigView({
           onRemoveState={onRemoveState}
           onAddInputSymbol={onAddInputSymbol}
           onRemoveInputSymbol={onRemoveInputSymbol}
-          outputControls={{
-            getOutput: (_inputSymbol, state) => program.outputs[state],
-            onSymbolChange: (_inputSymbol, state, symbol) =>
-              onOutputSymbolChange(state, symbol),
-            onCodeChange: (_inputSymbol, state, code) =>
-              onOutputCodeChange(state, code),
-            testIdPrefix: "moore-transition-output",
+          mooreOutputControls={{
+            outputs: program.outputs,
+            outputAlphabet,
+            onSymbolChange: onOutputSymbolChange,
+            onSymbolCreate: onOutputSymbolCreate,
+            onSymbolRename: onOutputSymbolRename,
+            onCodeChange: onOutputCodeChange,
           }}
         />
         <div className="space-y-4">
           <SymbolSetPanel
-            title={t("moore.sim.states")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.states")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             testId="moore-state-set"
             items={program.states.map((state, index) => ({
               key: state,
@@ -182,8 +191,8 @@ export function MooreConfigView({
             }))}
           />
           <SymbolSetPanel
-            title={t("moore.sim.outputAlphabet")}
-            emptyText={t("moore.sim.noSymbols")}
+            title={t("moore-mealy.sim.outputAlphabet")}
+            emptyText={t("moore-mealy.sim.noSymbols")}
             testId="moore-output-alphabet"
             items={outputAlphabet.map((output) => ({
               key: output.symbol,

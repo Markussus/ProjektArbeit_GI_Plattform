@@ -98,24 +98,6 @@ vi.mock(
   }),
 );
 
-vi.mock("@/components/shared/ConfirmDialog/ConfirmDialog", () => ({
-  ConfirmDialog: (props: {
-    isOpen: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }) =>
-    props.isOpen ? (
-      <div data-testid="mock-confirm-dialog">
-        <button data-testid="mock-confirm" onClick={props.onConfirm}>
-          confirm
-        </button>
-        <button data-testid="mock-cancel" onClick={props.onCancel}>
-          cancel
-        </button>
-      </div>
-    ) : null,
-}));
-
 function createExercise(
   id: string,
   title: string,
@@ -192,7 +174,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -212,7 +194,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_binAdd",
+            "number-systems.ex_u03_binAdd",
             "Binär Addition",
             "Binary addition",
           )}
@@ -229,7 +211,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u04_binToHexOct",
+            "number-systems.ex_u04_binToHexOct",
             "Binär zu Hex/Oktal",
             "Binary to hex/octal",
           )}
@@ -246,7 +228,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u05_ieeeEncode",
+            "number-systems.ex_u05_ieeeEncode",
             "IEEE754 Encodieren",
             "IEEE754 encode",
           )}
@@ -263,7 +245,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u05_ieeeDecode",
+            "number-systems.ex_u05_ieeeDecode",
             "IEEE754 Decodieren",
             "IEEE754 decode",
           )}
@@ -280,7 +262,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u06_mult",
+            "number-systems.ex_u06_mult",
             "Binär Multiplikation",
             "Binary multiplication",
           )}
@@ -294,12 +276,112 @@ describe("Simulator", () => {
     });
   });
 
+  describe("fallback mode mapping for unknown exercise IDs", () => {
+    it("maps ids containing floatToBin to fractional mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_floatToBin_task",
+            "Fractional fallback",
+            "Fractional fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u05_1 or example_u05_2 to fractional mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u05_1_unknown",
+            "Fractional example fallback",
+            "Fractional example fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing ieee to ieee754 mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_ieee_task",
+            "IEEE fallback",
+            "IEEE fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-ieee-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u05_3, example_u05_4 or example_u07_5 to ieee754 mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u05_3_unknown",
+            "IEEE example fallback",
+            "IEEE example fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-ieee-converter")).toBeTruthy();
+    });
+
+    it("maps ids containing Add, Sub, mult, example_u06, example_u03_2, example_u07_2 or example_u07_4 to arithmetic mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.some_Add_task",
+            "Arithmetic fallback",
+            "Arithmetic fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-arithmetic-mode")).toBeTruthy();
+    });
+
+    it("maps ids containing example_u07_3 to negative mode", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.example_u07_3_unknown",
+            "Negative fallback",
+            "Negative fallback",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-negative-numbers")).toBeTruthy();
+    });
+
+    it("defaults to integers mode when no known pattern matches", () => {
+      render(
+        <Simulator
+          selectedExercise={createExercise(
+            "number-systems.unknown_task",
+            "Unknown",
+            "Unknown",
+          )}
+        />,
+      );
+
+      expect(screen.getByTestId("mock-integer-converter")).toBeTruthy();
+    });
+  });
+
   describe("when an example is selected", () => {
     it("sets showSolution to true for examples", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.example_u03_1",
+            "number-systems.example_u03_1",
             "Beispiel Umrechnung",
             "Example conversion",
           )}
@@ -315,7 +397,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.example_u03_1",
+            "number-systems.example_u03_1",
             "Beispiel Umrechnung",
             "Example conversion",
           )}
@@ -335,12 +417,12 @@ describe("Simulator", () => {
   });
 
   describe("when in exercise mode without solution shown", () => {
-    it("shows confirm dialog when switching tabs", () => {
+    it("exits exercise and switches tab immediately", () => {
       const onExitExercise = vi.fn();
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}
@@ -357,47 +439,8 @@ describe("Simulator", () => {
 
       fireEvent.click(screen.getByTestId("ns-tab-fractional"));
 
-      expect(screen.getByTestId("mock-confirm-dialog")).toBeTruthy();
-    });
-
-    it("exits exercise and switches tab on confirm", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <Simulator
-          selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
-            "Dezimal zu Binär",
-            "Convert decimal to binary",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("ns-tab-fractional"));
-      fireEvent.click(screen.getByTestId("mock-confirm"));
-
       expect(onExitExercise).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("mock-fractional-converter")).toBeTruthy();
-    });
-
-    it("stays on current tab when cancel is clicked", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <Simulator
-          selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
-            "Dezimal zu Binär",
-            "Convert decimal to binary",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("ns-tab-fractional"));
-      fireEvent.click(screen.getByTestId("mock-cancel"));
-
-      expect(onExitExercise).not.toHaveBeenCalled();
-      expect(screen.getByTestId("mock-integer-converter")).toBeTruthy();
     });
   });
 
@@ -407,7 +450,7 @@ describe("Simulator", () => {
       render(
         <Simulator
           selectedExercise={createExercise(
-            "number.ex_u03_decToBin",
+            "number-systems.ex_u03_decToBin",
             "Dezimal zu Binär",
             "Convert decimal to binary",
           )}

@@ -3,109 +3,13 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { UTF8Encoder } from "@/pages/FundamentalsCS/Encoding/simulator/UTF8Encoder.tsx";
+import "../../shared/mockReactI18next";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
-  }),
-}));
-
-vi.mock("@/components/shared/SimulatorShared", () => ({
-  SimulatorLayout: ({
-    inputPanel,
-    resultPanel,
-  }: {
-    inputPanel: React.ReactNode;
-    resultPanel: React.ReactNode;
-  }) => (
-    <div data-testid="mock-simulator-layout">
-      <div data-testid="mock-input-panel">{inputPanel}</div>
-      <div data-testid="mock-result-panel">{resultPanel}</div>
-    </div>
-  ),
-  BinaryInput: ({
-    value,
-    onChange,
-    locked,
-    "data-testid": testId,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    locked: boolean;
-    "data-testid"?: string;
-  }) => (
-    <input
-      data-testid={testId ?? "mock-binary-input"}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      readOnly={locked}
-    />
-  ),
-  ModeToggle: ({
-    value,
-    onChange,
-    options,
-    disabled,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    options: { value: string; label: string }[];
-    disabled?: boolean;
-  }) => (
-    <div>
-      {options.map((option) => (
-        <button
-          key={option.value}
-          data-testid={`mode-toggle-${option.value}`}
-          data-active={value === option.value}
-          onClick={() => onChange(option.value)}
-          disabled={disabled}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  ),
-  StepByStepToggle: ({ onToggle }: { open: boolean; onToggle: () => void }) => (
-    <button data-testid="mock-step-toggle" onClick={onToggle}>
-      toggle
-    </button>
-  ),
-  CollapsibleStep: ({
-    header,
-    children,
-    isOpen,
-  }: {
-    header: React.ReactNode;
-    children: React.ReactNode;
-    isOpen: boolean;
-  }) => (
-    <div data-testid="mock-collapsible-step" data-open={isOpen}>
-      <div data-testid="mock-step-header">{header}</div>
-      {children}
-    </div>
-  ),
-  WarningBanner: ({
-    title,
-    children,
-  }: {
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <div data-testid="mock-warning-banner">
-      <span>{title}</span>
-      <span>{children}</span>
-    </div>
-  ),
-  ResultSectionHeader: ({ title }: { title: string }) => (
-    <div data-testid="mock-result-header">{title}</div>
-  ),
-  useToggleSet: (initial: string[]) => ({
-    expanded: new Set(initial),
-    toggle: vi.fn(),
-  }),
-}));
+vi.mock("@/components/shared/SimulatorShared", async () => {
+  const { mockSimulatorShared } =
+    await import("../../shared/simulatorSharedMock");
+  return mockSimulatorShared({ includeModeToggle: true });
+});
 
 vi.mock(
   "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",

@@ -40,7 +40,7 @@ export interface ParseGrammarFailure {
 export type ParseGrammarResult = ParseGrammarSuccess | ParseGrammarFailure;
 
 /** Translation key for a parse issue, for use with i18next's `t()`. */
-export function grammarIssueKey(issue: GrammarParseIssue): string {
+function grammarIssueKey(issue: GrammarParseIssue): string {
   return `grammar.errors.${issue.code}`;
 }
 
@@ -151,52 +151,61 @@ function extractSimpleProductions(source: string): string[] {
     .filter((l) => l.length > 0 && !l.startsWith("#"));
 }
 
+/** A `key: value` header line, lower-cased key and trimmed value. */
+function parseHeaderLine(
+  trimmed: string,
+): { key: string; value: string } | null {
+  const match = /^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)$/.exec(trimmed);
+  if (!match) return null;
+  return { key: match[1].toLowerCase(), value: match[2].trim() };
+}
+
+/** `type:` is the one header whose value is constrained. */
+function assertGrammarType(value: string): void {
+  if (value.toLowerCase() !== "grammar") {
+    fail(
+      "unsupportedType",
+      `Unsupported type '${value}'. Only 'type: grammar' is supported.`,
+      { type: value },
+    );
+  }
+}
+
+/**
+ * Read the structured format: a `type: grammar` header, then a `productions:`
+ * block whose lines are the rules. Any other key ends the block it follows.
+ */
 function extractStructuredProductions(source: string): string[] {
-  const lines = source.split(/\r?\n/);
   const productionLines: string[] = [];
   let sawType = false;
   let inProductionsBlock = false;
 
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
-    if (trimmed.length === 0 || trimmed.startsWith("#")) continue;
+  source.split(/\r?\n/).forEach((line, index) => {
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || trimmed.startsWith("#")) return;
 
-    const keyMatch = /^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)$/.exec(trimmed);
-    if (keyMatch) {
-      const key = keyMatch[1].toLowerCase();
-      const value = keyMatch[2].trim();
-      if (key === "type") {
+    const header = parseHeaderLine(trimmed);
+    if (header) {
+      inProductionsBlock = header.key === "productions";
+      if (header.key === "type") {
+        assertGrammarType(header.value);
         sawType = true;
-        if (value.toLowerCase() !== "grammar") {
-          fail(
-            "unsupportedType",
-            `Unsupported type '${value}'. Only 'type: grammar' is supported.`,
-            { type: value },
-          );
-        }
-        inProductionsBlock = false;
-        continue;
+      } else if (inProductionsBlock && header.value.length > 0) {
+        // `productions: S -> aS` puts the first rule on the header line.
+        productionLines.push(header.value);
       }
-      if (key === "productions") {
-        inProductionsBlock = true;
-        if (value.length > 0) productionLines.push(value);
-        continue;
-      }
-      // Unknown key: ignore but exit the productions block.
-      inProductionsBlock = false;
-      continue;
+      return;
     }
 
-    if (inProductionsBlock) {
-      productionLines.push(trimmed);
-    } else {
+    if (!inProductionsBlock) {
       fail(
         "structuredLine",
-        `Line ${i + 1}: expected 'key: value' or production rule`,
-        { line: String(i + 1) },
+        `Line ${index + 1}: expected 'key: value' or production rule`,
+        { line: String(index + 1) },
       );
     }
-  }
+    productionLines.push(trimmed);
+  });
 
   if (!sawType) {
     fail(
@@ -214,28 +223,9 @@ interface SplitLine {
   raw: string;
 }
 
-/**
- * Build a right-linear grammar from production lines.
- *
- * Every alternative on a right-hand side must be one of
- *   - `ε` (or the word `epsilon`), standing alone;
- *   - a single terminal symbol,      e.g. `A -> a`;
- *   - a terminal plus a non-terminal, e.g. `A -> aB`.
- *
- * Terminals and non-terminals may share a name (`A -> AA` reads "terminal A
- * followed by non-terminal A"), so the split cannot be decided from the
- * characters alone. The left-hand sides are the ground truth: a symbol is a
- * non-terminal exactly when some rule defines it. That is why this runs in two
- * passes — it also lets rules reference non-terminals defined further down.
- */
-function buildGrammarFromProductions(
-  productionLines: string[],
-): RegularGrammar {
-  // ── Pass 1: collect the declared non-terminals ──────────────────────────
-  const declared = new Set<string>();
-  const lines: SplitLine[] = [];
-
-  for (const line of productionLines) {
+/** Pass 1: split each line into its left-hand side and its alternatives. */
+function splitProductionLines(productionLines: string[]): SplitLine[] {
+  return productionLines.map((line) => {
     const arrowMatch = line.match(/^(\S+)\s*(?:->|→)\s*(.+)$/);
     if (!arrowMatch) {
       fail(
@@ -244,16 +234,94 @@ function buildGrammarFromProductions(
         { line },
       );
     }
-    const lhs = arrowMatch[1];
-    declared.add(lhs);
-    lines.push({
-      lhs,
+
+    return {
+      lhs: arrowMatch[1],
       alternatives: arrowMatch[2].split("|").map((s) => s.trim()),
       raw: line,
-    });
+    };
+  });
+}
+
+/** What one right-hand-side alternative means, once it has been validated. */
+type Alternative =
+  | { kind: "epsilon" }
+  | { kind: "rule"; terminal: string; nextNonTerminal: string | null };
+
+/**
+ * Read one alternative, rejecting everything that is not right-linear.
+ *
+ * Terminals and non-terminals may share a name (`A -> AA` reads "terminal A
+ * followed by non-terminal A"), so the split cannot be decided from the
+ * characters alone — `declared` is the ground truth.
+ */
+function classifyAlternative(
+  alt: string,
+  raw: string,
+  declared: Set<string>,
+): Alternative {
+  if (alt.length === 0) {
+    fail("emptyAlternative", `Empty alternative in '${raw}'`, { line: raw });
   }
 
-  // ── Pass 2: split each alternative into terminal + optional non-terminal ─
+  if (alt === "ε" || alt === "epsilon") {
+    return { kind: "epsilon" };
+  }
+
+  if (alt.includes("ε") || /(^|[^a-z])epsilon([^a-z]|$)/i.test(alt)) {
+    fail(
+      "epsilonNotAlone",
+      `ε must stand alone as an alternative (got '${alt}' in '${raw}')`,
+      { alternative: alt, line: raw },
+    );
+  }
+
+  // `A -> B`: a bare non-terminal is a unit production, not right-linear.
+  if (declared.has(alt)) {
+    fail(
+      "unitProduction",
+      `'${alt}' in '${raw}' is only a non-terminal. A right-linear rule needs a terminal first, e.g. 'aB'.`,
+      { alternative: alt, line: raw },
+    );
+  }
+
+  const terminal = alt[0];
+  const rest = alt.slice(1);
+  if (rest.length === 0) {
+    return { kind: "rule", terminal, nextNonTerminal: null };
+  }
+
+  // Anything after the terminal has to be a non-terminal with its own rule.
+  // This is what catches `S -> ab` (two terminals) and `S -> aSb` (not
+  // right-linear) instead of inventing a bogus non-terminal.
+  if (!declared.has(rest)) {
+    fail(
+      "undefinedNonTerminal",
+      `'${alt}' in '${raw}' is not right-linear: '${rest}' has no rule of its own. Write a single terminal ('A -> a') or a terminal followed by a defined non-terminal ('A -> aB').`,
+      { alternative: alt, rest, line: raw },
+    );
+  }
+
+  return { kind: "rule", terminal, nextNonTerminal: rest };
+}
+
+/**
+ * Build a right-linear grammar from production lines.
+ *
+ * Every alternative on a right-hand side must be one of
+ *   - `ε` (or the word `epsilon`), standing alone;
+ *   - a single terminal symbol,      e.g. `A -> a`;
+ *   - a terminal plus a non-terminal, e.g. `A -> aB`.
+ *
+ * This runs in two passes: the left-hand sides are collected first, so a rule
+ * may reference a non-terminal that is only defined further down.
+ */
+function buildGrammarFromProductions(
+  productionLines: string[],
+): RegularGrammar {
+  const lines = splitProductionLines(productionLines);
+  const declared = new Set(lines.map((line) => line.lhs));
+
   const productions: ProductionRule[] = [];
   const nonTerminals = new Set<string>(declared);
   const terminals = new Set<string>();
@@ -261,55 +329,21 @@ function buildGrammarFromProductions(
 
   for (const { lhs, alternatives, raw } of lines) {
     for (const alt of alternatives) {
-      if (alt.length === 0) {
-        fail("emptyAlternative", `Empty alternative in '${raw}'`, {
-          line: raw,
-        });
-      }
-      if (alt === "ε" || alt === "epsilon") {
+      const parsed = classifyAlternative(alt, raw, declared);
+      if (parsed.kind === "epsilon") {
         epsilonProducers.add(lhs);
         continue;
       }
-      if (alt.includes("ε") || /(^|[^a-z])epsilon([^a-z]|$)/i.test(alt)) {
-        fail(
-          "epsilonNotAlone",
-          `ε must stand alone as an alternative (got '${alt}' in '${raw}')`,
-          { alternative: alt, line: raw },
-        );
+
+      terminals.add(parsed.terminal);
+      if (parsed.nextNonTerminal !== null) {
+        nonTerminals.add(parsed.nextNonTerminal);
       }
-
-      // `A -> B`: a bare non-terminal is a unit production, not right-linear.
-      if (declared.has(alt)) {
-        fail(
-          "unitProduction",
-          `'${alt}' in '${raw}' is only a non-terminal. A right-linear rule needs a terminal first, e.g. 'aB'.`,
-          { alternative: alt, line: raw },
-        );
-      }
-
-      const terminal = alt[0];
-      const rest = alt.slice(1);
-
-      if (rest.length === 0) {
-        terminals.add(terminal);
-        productions.push({ lhs, terminal, nextNonTerminal: null });
-        continue;
-      }
-
-      // Anything after the terminal has to be a non-terminal with its own
-      // rule. This is what catches `S -> ab` (two terminals) and `S -> aSb`
-      // (not right-linear) instead of inventing a bogus non-terminal.
-      if (!declared.has(rest)) {
-        fail(
-          "undefinedNonTerminal",
-          `'${alt}' in '${raw}' is not right-linear: '${rest}' has no rule of its own. Write a single terminal ('A -> a') or a terminal followed by a defined non-terminal ('A -> aB').`,
-          { alternative: alt, rest, line: raw },
-        );
-      }
-
-      terminals.add(terminal);
-      nonTerminals.add(rest);
-      productions.push({ lhs, terminal, nextNonTerminal: rest });
+      productions.push({
+        lhs,
+        terminal: parsed.terminal,
+        nextNonTerminal: parsed.nextNonTerminal,
+      });
     }
   }
 

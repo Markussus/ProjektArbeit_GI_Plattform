@@ -1,16 +1,20 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { exportActiveSimulator } from "./support/app-shell";
 
 const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
-const ERASE_TAPE_EXERCISE_ID = "tm.exercises.exerciseEraseTape";
-const INVERT_BINARY_WORD_EXERCISE_ID = "tm.exercises.exerciseInvertBinaryWord";
-const UNARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseUnaryIncrement";
-const BINARY_INCREMENT_EXERCISE_ID = "tm.exercises.exerciseBinaryIncrement";
-const ADD_BINARY_EXERCISE_ID = "tm.exercises.exerciseAddBinary";
-const CHECK_REGEX_EXERCISE_ID = "tm.exercises.exerciseCheckRegex";
-const BIT_FLIP_EXAMPLE_ID = "tm.examples.example1";
-const UNARY_INCREMENT_EXAMPLE_ID = "tm.examples.example2";
-const BINARY_INCREMENT_EXAMPLE_ID = "tm.examples.example3";
-const ADD_BINARY_EXAMPLE_ID = "tm.examples.example4";
+const ERASE_TAPE_EXERCISE_ID = "turing-machine.exercises.exerciseEraseTape";
+const INVERT_BINARY_WORD_EXERCISE_ID =
+  "turing-machine.exercises.exerciseInvertBinaryWord";
+const UNARY_INCREMENT_EXERCISE_ID =
+  "turing-machine.exercises.exerciseUnaryIncrement";
+const BINARY_INCREMENT_EXERCISE_ID =
+  "turing-machine.exercises.exerciseBinaryIncrement";
+const ADD_BINARY_EXERCISE_ID = "turing-machine.exercises.exerciseAddBinary";
+const CHECK_REGEX_EXERCISE_ID = "turing-machine.exercises.exerciseCheckRegex";
+const BIT_FLIP_EXAMPLE_ID = "turing-machine.examples.example1";
+const UNARY_INCREMENT_EXAMPLE_ID = "turing-machine.examples.example2";
+const BINARY_INCREMENT_EXAMPLE_ID = "turing-machine.examples.example3";
+const ADD_BINARY_EXAMPLE_ID = "turing-machine.examples.example4";
 const BLANK_SYMBOL = "\u25ca";
 const Q1_SUBSCRIPT = "q\u2081";
 
@@ -144,13 +148,13 @@ function solutionRowsByValidHaltState(
 }
 
 test.describe("Turing Machine page", () => {
-  // Tests the tab navigation and the static overview/examples content that frames the topic page.
+  // Tests the tab navigation and the video overview that frames the topic page.
   test("shows the topic overview and switches between the top-level tabs", async ({
     page,
   }) => {
     await gotoTuringMachinePage(page);
 
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
 
     await page.getByTestId("tab-button-examples").click();
     await expect(page.getByTestId("tm-examples-tab")).toBeVisible();
@@ -159,7 +163,7 @@ test.describe("Turing Machine page", () => {
     ).toBeVisible();
 
     await page.getByTestId("tab-button-overview").click();
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
   });
 
   // Tests exercise selection, opening an exercise in the simulator, and the simulation focus toggle workflow.
@@ -200,7 +204,7 @@ test.describe("Turing Machine page", () => {
 
     await page.getByTestId("tab-button-overview").click();
     await expect(page.getByTestId("module-tab-exit-confirm")).toHaveCount(0);
-    await expect(page.getByTestId("tm-overview-summary")).toBeVisible();
+    await expect(page.getByTestId("tm-tutorial-video")).toBeVisible();
   });
 
   test("always reloads examples from their built-in program without storing changes", async ({
@@ -210,20 +214,19 @@ test.describe("Turing Machine page", () => {
     await openSimulationTab(page);
 
     await page.getByTestId("tm-initial-tape-input").fill("11111");
-    await page.getByTestId("tm-transfer-export").click();
-    const storedFreeSimulation = await page.evaluate(() =>
-      window.localStorage.getItem("TrainingCenterStorage"),
-    );
+    await exportActiveSimulator(page);
 
     await openExampleInSimulation(page, BIT_FLIP_EXAMPLE_ID);
     await expect(page.getByTestId("tm-initial-tape-input")).toHaveValue(
       "101001",
     );
+    const storedFreeSimulation = await page.evaluate(() =>
+      window.localStorage.getItem("TrainingCenterStorage"),
+    );
 
     await page.getByTestId("tm-initial-tape-input").fill("000");
-    await page.getByTestId("tm-transfer-export").click();
-    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
-      /^[A-Za-z0-9_-]+$/,
+    await expect(exportActiveSimulator(page)).resolves.toMatch(
+      /^AA[A-Za-z0-9_-]+$/,
     );
 
     await switchTab(page, "overview");
@@ -270,8 +273,7 @@ test.describe("Turing Machine page", () => {
     await openExerciseInSimulation(page, ERASE_TAPE_EXERCISE_ID);
 
     await page.getByTestId("tm-initial-tape-input").fill("101");
-    await page.getByTestId("tm-transfer-export").click();
-    await expect(page.getByTestId("tm-transfer-input")).toHaveValue(
+    await expect(exportActiveSimulator(page)).resolves.toMatch(
       /^AAG[A-Za-z0-9_-]+$/,
     );
 

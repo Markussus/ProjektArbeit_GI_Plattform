@@ -6,8 +6,7 @@ import { buildDnfWalkthroughTransferValue } from "./dnfWalkthroughSeed";
 import type { DnfWalkthroughExample } from "../examples/walkthroughExamples";
 
 export type DnfSimulatorMode =
-  | "expression_to_truth_table"
-  | "truth_table_to_dnf";
+  "expression_to_truth_table" | "truth_table_to_dnf";
 
 interface DnfResetValueInput {
   hasSelectedExercise: boolean;

@@ -1,5 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { appTestIds } from "../../support/app-shell";
+
+async function openSimulatorTab(page: Page, tabTestId: string) {
+  await page.getByTestId(appTestIds.tabSimulation).click();
+  await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
+  await page.getByTestId(tabTestId).click();
+}
 
 test.describe("Number Systems page", () => {
   test.beforeEach(async ({ page }) => {
@@ -20,20 +26,26 @@ test.describe("Number Systems page", () => {
     await test.step("The exercises tab exposes the Number Systems exercise list", async () => {
       await page.getByTestId(appTestIds.tabExercises).click();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u03_decToBin-select"),
+        page.getByTestId("exercise-card-number-systems.ex_u03_decToBin-select"),
       ).toBeVisible();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u06_mult-select"),
+        page.getByTestId("exercise-card-number-systems.ex_u06_mult-select"),
       ).toBeVisible();
     });
 
     await test.step("The examples tab shows grouped examples", async () => {
       await page.getByTestId(appTestIds.tabExamples).click();
       await expect(
-        page.getByTestId("example-card-number.example_u03_1-select"),
+        page.getByTestId("number-systems-examples-section-lecture"),
       ).toBeVisible();
       await expect(
-        page.getByTestId("example-card-number.example_u06_2-select"),
+        page.getByTestId("number-systems-examples-section-07"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("example-card-number-systems.example_u03_1-select"),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("example-card-number-systems.example_u06_2-select"),
       ).toBeVisible();
     });
 
@@ -53,16 +65,18 @@ test.describe("Number Systems page", () => {
 
     await test.step("Selecting an exercise should expand its details", async () => {
       await page
-        .getByTestId("exercise-card-number.ex_u04_binToHexOct-select")
+        .getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-select")
         .click();
       await expect(
-        page.getByTestId("exercise-card-number.ex_u04_binToHexOct-open"),
+        page.getByTestId(
+          "exercise-card-number-systems.ex_u04_binToHexOct-open",
+        ),
       ).toBeVisible();
     });
 
     await test.step("Opening an exercise in simulation should preserve the exercise context", async () => {
       await page
-        .getByTestId("exercise-card-number.ex_u04_binToHexOct-open")
+        .getByTestId("exercise-card-number-systems.ex_u04_binToHexOct-open")
         .click();
       await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
       await expect(
@@ -114,9 +128,7 @@ test.describe("Number Systems page", () => {
   test("fractional converter toggles between decToBin and binToDec", async ({
     page,
   }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsTabFractional).click();
+    await openSimulatorTab(page, appTestIds.nsTabFractional);
 
     await test.step("Default mode is decToBin with result visible", async () => {
       await expect(
@@ -147,9 +159,7 @@ test.describe("Number Systems page", () => {
   test("IEEE754 converter encodes decimal to binary and decodes back", async ({
     page,
   }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsTabIeee754).click();
+    await openSimulatorTab(page, appTestIds.nsTabIeee754);
 
     await test.step("Default mode is decToIeee with result visible", async () => {
       await expect(page.getByTestId(appTestIds.nsIeee754Input)).toBeVisible();
@@ -167,9 +177,7 @@ test.describe("Number Systems page", () => {
   });
 
   test("negative numbers shows three representations", async ({ page }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsNegativeTab).click();
+    await openSimulatorTab(page, appTestIds.nsNegativeTab);
 
     await test.step("Input field and result rows are visible", async () => {
       await expect(
@@ -195,9 +203,7 @@ test.describe("Number Systems page", () => {
   });
 
   test("arithmetic mode selector is visible", async ({ page }) => {
-    await page.getByTestId(appTestIds.tabSimulation).click();
-    await expect(page.getByTestId(appTestIds.nsSimulator)).toBeVisible();
-    await page.getByTestId(appTestIds.nsArithmeticTab).click();
+    await openSimulatorTab(page, appTestIds.nsArithmeticTab);
 
     await test.step("Arithmetic mode dropdown is visible", async () => {
       await expect(
@@ -213,12 +219,14 @@ test.describe("Number Systems page", () => {
 
     await test.step("Select and open example u03_1", async () => {
       await page
-        .getByTestId("example-card-number.example_u03_1-select")
+        .getByTestId("example-card-number-systems.example_u03_1-select")
         .click();
       await expect(
-        page.getByTestId("example-card-number.example_u03_1-open"),
+        page.getByTestId("example-card-number-systems.example_u03_1-open"),
       ).toBeVisible();
-      await page.getByTestId("example-card-number.example_u03_1-open").click();
+      await page
+        .getByTestId("example-card-number-systems.example_u03_1-open")
+        .click();
     });
 
     await test.step("Simulator shows pre-filled decimal value 26", async () => {

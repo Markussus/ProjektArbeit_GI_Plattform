@@ -179,25 +179,43 @@ function renameTapeSymbol(
     nextProgram.blankSymbol = normalizedNextSymbol;
   }
 
-  if (nextProgram.transitions[currentSymbol]) {
-    nextProgram.transitions[normalizedNextSymbol] =
-      nextProgram.transitions[currentSymbol];
-    delete nextProgram.transitions[currentSymbol];
+  renameTransitionReadSymbolKey(
+    nextProgram.transitions,
+    currentSymbol,
+    normalizedNextSymbol,
+  );
+  renameTransitionWriteSymbols(
+    nextProgram.transitions,
+    currentSymbol,
+    normalizedNextSymbol,
+  );
+
+  return withDerivedAlphabets(nextProgram);
+}
+
+function renameTransitionReadSymbolKey(
+  transitions: TMProgram["transitions"],
+  currentSymbol: TapeSymbol,
+  nextSymbol: TapeSymbol,
+): void {
+  if (transitions[currentSymbol]) {
+    transitions[nextSymbol] = transitions[currentSymbol];
+    delete transitions[currentSymbol];
   }
+}
 
-  for (const stateTransitions of Object.values(nextProgram.transitions)) {
+function renameTransitionWriteSymbols(
+  transitions: TMProgram["transitions"],
+  currentSymbol: TapeSymbol,
+  nextSymbol: TapeSymbol,
+): void {
+  for (const stateTransitions of Object.values(transitions)) {
     for (const transition of Object.values(stateTransitions ?? {})) {
-      if (!transition) {
-        continue;
-      }
-
-      if (transition.writeSymbol === currentSymbol) {
-        transition.writeSymbol = normalizedNextSymbol;
+      if (transition && transition.writeSymbol === currentSymbol) {
+        transition.writeSymbol = nextSymbol;
       }
     }
   }
-
-  return withDerivedAlphabets(nextProgram);
 }
 
 function addState(program: TMProgram): TMProgram {
@@ -233,7 +251,21 @@ function removeState(program: TMProgram, stateToRemove: StateName): TMProgram {
     nextProgram.initialState = fallbackState;
   }
 
-  for (const stateTransitions of Object.values(nextProgram.transitions)) {
+  removeAndRedirectStateInTransitions(
+    nextProgram.transitions,
+    stateToRemove,
+    fallbackState,
+  );
+
+  return withDerivedAlphabets(nextProgram);
+}
+
+function removeAndRedirectStateInTransitions(
+  transitions: TMProgram["transitions"],
+  stateToRemove: StateName,
+  fallbackState: StateName,
+): void {
+  for (const stateTransitions of Object.values(transitions)) {
     if (!stateTransitions) {
       continue;
     }
@@ -241,17 +273,11 @@ function removeState(program: TMProgram, stateToRemove: StateName): TMProgram {
     delete stateTransitions[stateToRemove];
 
     for (const transition of Object.values(stateTransitions)) {
-      if (!transition) {
-        continue;
-      }
-
-      if (transition.nextState === stateToRemove) {
+      if (transition && transition.nextState === stateToRemove) {
         transition.nextState = fallbackState;
       }
     }
   }
-
-  return withDerivedAlphabets(nextProgram);
 }
 
 function renameState(
@@ -283,28 +309,36 @@ function renameState(
     nextProgram.initialState = normalizedNextState;
   }
 
-  for (const stateTransitions of Object.values(nextProgram.transitions)) {
+  renameStateInTransitions(
+    nextProgram.transitions,
+    currentState,
+    normalizedNextState,
+  );
+
+  return withDerivedAlphabets(nextProgram);
+}
+
+function renameStateInTransitions(
+  transitions: TMProgram["transitions"],
+  currentState: StateName,
+  nextState: StateName,
+): void {
+  for (const stateTransitions of Object.values(transitions)) {
     if (!stateTransitions) {
       continue;
     }
 
     if (stateTransitions[currentState]) {
-      stateTransitions[normalizedNextState] = stateTransitions[currentState];
+      stateTransitions[nextState] = stateTransitions[currentState];
       delete stateTransitions[currentState];
     }
 
     for (const transition of Object.values(stateTransitions)) {
-      if (!transition) {
-        continue;
-      }
-
-      if (transition.nextState === currentState) {
-        transition.nextState = normalizedNextState;
+      if (transition && transition.nextState === currentState) {
+        transition.nextState = nextState;
       }
     }
   }
-
-  return withDerivedAlphabets(nextProgram);
 }
 
 function updateTransition(

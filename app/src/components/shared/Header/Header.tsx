@@ -4,7 +4,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle/ThemeToggle";
 import { LanguageSelect } from "@/components/shared/LanguageSelect/LanguageSelect";
 import { HeaderTransferBox } from "@/components/shared/Header/HeaderTransferBox";
 import ThwsLogo from "@/assets/THWS.svg";
-import { findModuleByPath } from "@/data/moduleCatalog";
+import { findModuleByPath } from "@/data/moduleCatalogData";
 
 export function Header() {
   const { t } = useTranslation();
@@ -14,29 +14,37 @@ export function Header() {
 
   const headerLabel: string = activeModule
     ? t(activeModule.titleKey)
-    : location.pathname === "/documentation"
-      ? t("documentation.title")
-      : location.pathname === "/help"
-        ? t("help.title")
-        : location.pathname === "/legal"
-          ? t("legal.title")
-          : t("nav.home");
+    : location.pathname === "/info" ||
+        location.pathname === "/help" ||
+        location.pathname === "/legal"
+      ? t("common.info.title")
+      : t("common.nav.home");
 
   return (
-    <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-3 sm:px-6">
+    <header className="border-border bg-background flex h-16 items-center justify-between gap-2 border-b px-2 sm:gap-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-        <Link to="/" className="flex shrink-0 items-center">
-          <img src={ThwsLogo} alt="THWS Logo" className="h-8 w-auto sm:h-9" />
+        <Link
+          to="/"
+          className="flex shrink-0 items-center"
+          aria-label={t("common.nav.home")}
+        >
+          <img
+            src={ThwsLogo}
+            alt="THWS Logo"
+            className="h-8 w-auto shrink-0 sm:h-9"
+          />
         </Link>
 
-        <div className="bg-border hidden h-7 w-px shrink-0 min-[760px]:block" />
+        <div className="bg-border hidden h-7 w-px shrink-0 min-[520px]:block" />
 
-        <span className="text-foreground truncate text-[clamp(0.875rem,2.25vw,1.25rem)] font-bold tracking-tight max-[760px]:hidden">
-          {headerLabel}
-        </span>
+        <div className="hidden min-w-0 items-center min-[520px]:flex">
+          <span className="text-foreground truncate text-sm font-semibold sm:text-base">
+            {headerLabel}
+          </span>
+        </div>
       </div>
 
-      <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 [&>*:not([data-testid='header-transfer-root'])]:shrink-0">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <HeaderTransferBox />
         <LanguageSelect />
         <ThemeToggle />

@@ -14,6 +14,4 @@ export type RegexNode =
   | { kind: "star"; child: RegexNode };
 
 export type SimulationMode =
-  | "grammarToLanguage"
-  | "languageToGrammar"
-  | "recognizeWord";
+  "grammarToLanguage" | "languageToGrammar" | "recognizeWord";

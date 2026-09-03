@@ -31,7 +31,9 @@ export function ExamplesTab({
         className="text-muted-foreground mb-4 flex items-center gap-2"
       >
         <BookOpen className="size-4" />
-        <h3 className="text-sm font-bold">{t("example.currentExamples")}</h3>
+        <h3 className="text-sm font-bold">
+          {t("common.example.currentExamples")}
+        </h3>
       </div>
 
       <div

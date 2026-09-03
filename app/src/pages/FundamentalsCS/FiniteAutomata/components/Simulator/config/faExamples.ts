@@ -1,4 +1,5 @@
 import type { FAProgram } from "../domain/faTypes";
+import { defaultDFAProgram, defaultInputWord } from "./defaultFAProgram";
 
 /** Which on-page section an example belongs to. */
 export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
@@ -19,10 +20,10 @@ export interface FAExample {
 }
 
 // ─── NFA: Contains substring "aba" ──────────────────────────────────────────
-export const exampleContainsAba: FAExample = {
+const exampleContainsAba: FAExample = {
   id: "contains-aba",
-  titleKey: "fa.examples.containsAba.title",
-  descriptionKey: "fa.examples.containsAba.description",
+  titleKey: "finite-automata.examples.containsAba.title",
+  descriptionKey: "finite-automata.examples.containsAba.description",
   type: "NFA",
   category: "nfa",
   program: {
@@ -42,10 +43,10 @@ export const exampleContainsAba: FAExample = {
 };
 
 // ─── DFA: Lecture Example (00*1) ────────────────────────────────────────────
-export const exampleLecture: FAExample = {
+const exampleLecture: FAExample = {
   id: "lecture-example",
-  titleKey: "fa.examples.lecture.title",
-  descriptionKey: "fa.examples.lecture.description",
+  titleKey: "finite-automata.examples.lecture.title",
+  descriptionKey: "finite-automata.examples.lecture.description",
   type: "DFA",
   category: "dfa",
   // Partial DFA: a missing transition rejects, so no trap state is drawn.
@@ -64,11 +65,24 @@ export const exampleLecture: FAExample = {
   inputWord: "001",
 };
 
+// ─── DFA: Ends with "ab" ───────────────────────────────────────────────────
+// The automaton the simulator used to open with. It lives here now that free
+// mode starts blank, so the worked version is still one click away.
+const exampleEndsWithAb: FAExample = {
+  id: "ends-with-ab",
+  titleKey: "finite-automata.examples.endsWithAb.title",
+  descriptionKey: "finite-automata.examples.endsWithAb.description",
+  type: "DFA",
+  category: "dfa",
+  program: defaultDFAProgram,
+  inputWord: defaultInputWord,
+};
+
 // ─── Grammar → NFA | DFA ────────────────────────────────────────────────────
-export const exampleGrammar: FAExample = {
+const exampleGrammar: FAExample = {
   id: "grammar-example",
-  titleKey: "fa.examples.grammar.title",
-  descriptionKey: "fa.examples.grammar.description",
+  titleKey: "finite-automata.examples.grammar.title",
+  descriptionKey: "finite-automata.examples.grammar.description",
   type: "NFA",
   category: "grammarToAutomaton",
   program: {
@@ -89,6 +103,11 @@ export const exampleGrammar: FAExample = {
 /** All predefined examples */
 export const faExamples: FAExample[] = [
   exampleLecture,
+  exampleEndsWithAb,
   exampleGrammar,
   exampleContainsAba,
 ];
+
+export function findFAExample(id: string): FAExample | undefined {
+  return faExamples.find((e) => e.id === id || e.titleKey === id);
+}

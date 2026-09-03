@@ -3,13 +3,14 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IntegerConverter } from "@/pages/FundamentalsCS/NumberSystems/components/simulator/IntegerConverter.tsx";
-
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, fallback?: string) =>
-      typeof fallback === "string" ? fallback : key,
-  }),
-}));
+vi.mock(
+  "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
+  async () => {
+    const { mockExerciseValidationPanelForConverters } =
+      await import("./converterTestSetup");
+    return mockExerciseValidationPanelForConverters();
+  },
+);
 
 vi.mock("@/components/shared/DropdownSelect/DropdownSelect", () => ({
   DropdownSelect: ({
@@ -36,36 +37,6 @@ vi.mock("@/components/shared/DropdownSelect/DropdownSelect", () => ({
     </div>
   ),
 }));
-
-vi.mock(
-  "@/components/shared/ExerciseValidationPanel/ExerciseValidationPanel",
-  () => ({
-    ExerciseValidationPanel: ({
-      expectedResult,
-      onShowSolution,
-      inputMode,
-    }: {
-      expectedResult: string | string[];
-      onShowSolution: () => void;
-      inputMode: string;
-    }) => (
-      <div data-testid="mock-validation-panel">
-        <span data-testid="mock-validation-expected-result">
-          {Array.isArray(expectedResult)
-            ? expectedResult.join(",")
-            : expectedResult}
-        </span>
-        <span data-testid="mock-validation-input-mode">{inputMode}</span>
-        <button
-          data-testid="mock-validation-show-solution"
-          onClick={onShowSolution}
-        >
-          show solution
-        </button>
-      </div>
-    ),
-  }),
-);
 
 describe("IntegerConverter", () => {
   afterEach(() => {

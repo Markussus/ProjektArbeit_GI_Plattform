@@ -1,9 +1,10 @@
 import { expect, type Page } from "@playwright/test";
 
 export const appTestIds = {
-  documentationPage: "documentation-page",
-  helpPage: "help-page",
-  legalPage: "legal-page",
+  infoPage: "info-page",
+  documentationPage: "info-page",
+  helpPage: "info-page",
+  legalPage: "info-page",
   javaCompilerStatus: "java-compiler-status",
   javaCommandOverviewButton: "java-command-overview-button",
   javaCommandOverviewDialog: "java-command-overview-dialog",
@@ -20,10 +21,10 @@ export const appTestIds = {
   javaStopButton: "java-stop-button",
   javaStdinInput: "java-stdin-input",
   javaTimeoutInput: "java-timeout-input",
-  javaTransferExport: "java-transfer-export",
-  javaTransferImport: "java-transfer-import",
-  javaTransferInput: "java-transfer-input",
-  javaTransferStatus: "java-transfer-status",
+  headerTransferExport: "header-transfer-export",
+  headerTransferImport: "header-transfer-import",
+  headerTransferInput: "header-transfer-input",
+  headerTransferStatus: "header-transfer-status",
   languageSelectMenu: "language-select-menu",
   languageSelectTrigger: "language-select-trigger",
   moduleSelectorMenu: "module-selector-menu",
@@ -54,9 +55,10 @@ export const appTestIds = {
   nsValidationVerifyButton: "ns-validation-verify-button",
   nsValidationShowSolutionButton: "ns-validation-show-solution-button",
   sidebar: "sidebar",
-  sidebarDocumentationLink: "sidebar-documentation-link",
-  sidebarHelpLink: "sidebar-help-link",
-  sidebarLegalLink: "sidebar-legal-link",
+  sidebarInfoLink: "sidebar-info-link",
+  sidebarDocumentationLink: "sidebar-info-link",
+  sidebarHelpLink: "sidebar-info-link",
+  sidebarLegalLink: "sidebar-info-link",
   sidebarToggle: "sidebar-toggle",
   simulationSelectedExercise: "simulation-selected-exercise",
   tabExamples: "tab-button-examples",
@@ -69,8 +71,9 @@ export const appTestIds = {
 export const localizedContent = {
   de: {
     appTitle: "THWS - Traingscenter",
-    documentationTitle: "Dokumentation",
-    helpTitle: "Hilfe",
+    infoTitle: "Informationen & Rechtliches",
+    documentationTitle: "Informationen & Rechtliches",
+    helpTitle: "Informationen & Rechtliches",
     homeHeroTitleParts: [
       "Komplexe Systeme meistern",
       "durch interaktives Lernen.",
@@ -79,8 +82,9 @@ export const localizedContent = {
   },
   en: {
     appTitle: "THWS - Traing Center",
-    documentationTitle: "Documentation",
-    helpTitle: "Help",
+    infoTitle: "Information & Legal",
+    documentationTitle: "Information & Legal",
+    helpTitle: "Information & Legal",
     homeHeroTitleParts: [
       "Master Complex Systems",
       "through Interactive Learning.",
@@ -113,4 +117,25 @@ export async function readResolvedTheme(page: Page) {
   return page.evaluate(() =>
     document.documentElement.classList.contains("dark") ? "dark" : "light",
   );
+}
+
+export async function exportActiveSimulator(page: Page) {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate(() => navigator.clipboard.writeText(""));
+  await page.getByTestId(appTestIds.headerTransferExport).click();
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .not.toBe("");
+  return page.evaluate(() => navigator.clipboard.readText());
+}
+
+export async function importFromHeader(page: Page, transferValue: string) {
+  const input = page.getByTestId(appTestIds.headerTransferInput);
+  await expect(input).toBeEditable({ timeout: 6_000 });
+  await input.fill(transferValue);
+  await page.getByTestId(appTestIds.headerTransferImport).click();
+  await expect(input).toHaveValue("");
+  // Same-route imports remount the active simulator after the header click.
+  // Wait for that route-state effect before interacting with its new controls.
+  await page.waitForTimeout(100);
 }

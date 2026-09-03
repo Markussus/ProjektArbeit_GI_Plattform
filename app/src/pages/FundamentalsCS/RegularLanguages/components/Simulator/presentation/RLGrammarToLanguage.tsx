@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { enumerateLanguage } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
@@ -14,9 +14,13 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 
 interface RLGrammarToLanguageProps {
   initialGrammar?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
-const DEFAULT_SOURCE = ["S -> aS | bA", "A -> bA | ε"].join("\n");
+// Free mode opens blank - the worked grammars live in the Examples tab.
+// The input card keeps its placeholder so the notation stays visible.
+const EMPTY_SOURCE = "";
 
 // Documents the right-linear grammar notation, mirroring the "Supported
 // Formats" panel on the Finite Automata page.
@@ -30,9 +34,11 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
 
 export function RLGrammarToLanguage({
   initialGrammar,
+  transferActive = true,
+  resetVersion = 0,
 }: RLGrammarToLanguageProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
+  const [source, setSource] = useState(initialGrammar ?? EMPTY_SOURCE);
   const [maxLen, setMaxLen] = useState(6);
   const [maxWords, setMaxWords] = useState(20);
   const [showFormats, setShowFormats] = useState(false);
@@ -45,12 +51,24 @@ export function RLGrammarToLanguage({
     setSource(initialGrammar);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(EMPTY_SOURCE);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.grammarToLanguage,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlGrammarTransferCodec,
+    enabled: transferActive,
   });
 
   const result = useMemo(() => {
@@ -66,9 +84,10 @@ export function RLGrammarToLanguage({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-grammar-to-language-source"
           value={source}
           onChange={setSource}
-          titleKey="rl.simulator.grammarInput"
+          titleKey="regular-languages.simulator.grammarInput"
           titleFallback="Grammar"
         >
           {/* Supported grammar formats (mirrors the Language → Grammar panel) */}
@@ -86,12 +105,18 @@ export function RLGrammarToLanguage({
                   !showFormats && "-rotate-90",
                 )}
               />
-              {t("fa.grammar.supportedFormats", "Supported Formats")}
+              {t(
+                "finite-automata.grammar.supportedFormats",
+                "Supported Formats",
+              )}
             </summary>
             <div className="flex flex-col gap-3 px-3 pb-3">
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                  {t("fa.grammar.format1Label", "Format 1 — simplified")}
+                  {t(
+                    "finite-automata.grammar.format1Label",
+                    "Format 1 — simplified",
+                  )}
                 </div>
                 <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
                   {GRAMMAR_SIMPLE_EXAMPLE}
@@ -99,7 +124,10 @@ export function RLGrammarToLanguage({
               </div>
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-                  {t("fa.grammar.format2Label", "Format 2 — structured")}
+                  {t(
+                    "finite-automata.grammar.format2Label",
+                    "Format 2 — structured",
+                  )}
                 </div>
                 <pre className="bg-background/60 text-foreground/90 overflow-x-auto rounded border px-3 py-2 font-mono text-[12px] leading-relaxed">
                   {GRAMMAR_STRUCTURED_EXAMPLE}
@@ -107,7 +135,7 @@ export function RLGrammarToLanguage({
               </div>
               <p className="text-muted-foreground text-xs">
                 {t(
-                  "fa.grammar.epsilonHint",
+                  "finite-automata.grammar.epsilonHint",
                   "To insert the empty string symbol (ε), you can either copy and paste it or type the word 'epsilon'.",
                 )}
               </p>
@@ -116,15 +144,18 @@ export function RLGrammarToLanguage({
         </RLGrammarInputCard>
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
           <ArrowRight className="text-primary h-4 w-4" />
-          {t("rl.simulator.languageOutput", "Enumerated Language")}
+          {t(
+            "regular-languages.simulator.languageOutput",
+            "Enumerated Language",
+          )}
         </h4>
 
         <div className="grid grid-cols-2 gap-3">
           <label className="text-muted-foreground flex flex-col gap-1 text-xs">
-            {t("rl.simulator.maxLen", "Max word length")}
+            {t("regular-languages.simulator.maxLen", "Max word length")}
             <input
               type="number"
               min={0}
@@ -139,7 +170,7 @@ export function RLGrammarToLanguage({
             />
           </label>
           <label className="text-muted-foreground flex flex-col gap-1 text-xs">
-            {t("rl.simulator.maxWords", "Max number of words")}
+            {t("regular-languages.simulator.maxWords", "Max number of words")}
             <input
               type="number"
               min={1}
@@ -161,7 +192,7 @@ export function RLGrammarToLanguage({
               {result.words.length === 0 ? (
                 <span className="text-muted-foreground">
                   {t(
-                    "rl.simulator.noWords",
+                    "regular-languages.simulator.noWords",
                     "No words derivable within the limits.",
                   )}
                 </span>
@@ -170,7 +201,7 @@ export function RLGrammarToLanguage({
                   {result.words.map((w) => (
                     <span
                       key={w || "ε"}
-                      className="bg-background ring-foreground/10 rounded-md px-2 py-0.5 text-xs ring-1"
+                      className="border-border bg-background rounded-md border px-2 py-0.5 text-xs"
                     >
                       {w === "" ? "ε" : w}
                     </span>
@@ -181,11 +212,11 @@ export function RLGrammarToLanguage({
             <p className="text-muted-foreground text-xs">
               {result.truncated
                 ? t(
-                    "rl.simulator.truncatedNote",
+                    "regular-languages.simulator.truncatedNote",
                     "Output truncated by the word count cap. Increase the limit to see more.",
                   )
                 : t(
-                    "rl.simulator.completeNote",
+                    "regular-languages.simulator.completeNote",
                     "All derivable words within the chosen length cap are shown.",
                   )}
             </p>
@@ -193,20 +224,12 @@ export function RLGrammarToLanguage({
         ) : (
           <p className="text-muted-foreground text-sm">
             {t(
-              "rl.simulator.grammarInvalid",
+              "regular-languages.simulator.grammarInvalid",
               "Enter a valid right-linear grammar.",
             )}
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

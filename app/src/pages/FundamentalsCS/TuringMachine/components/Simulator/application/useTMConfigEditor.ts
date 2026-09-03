@@ -28,9 +28,7 @@ export interface TMTablePosition {
 }
 
 export type TMEditorCellIssueCode =
-  | "symbol_single_char"
-  | "symbol_duplicate"
-  | "transition_invalid";
+  "symbol_single_char" | "symbol_duplicate" | "transition_invalid";
 
 export interface TMEditorCellIssue {
   code: TMEditorCellIssueCode;
@@ -38,8 +36,7 @@ export interface TMEditorCellIssue {
 }
 
 export type ApplyTMProgramResult =
-  | { ok: true; program: TMProgram }
-  | { ok: false };
+  { ok: true; program: TMProgram } | { ok: false };
 
 export interface UseTMConfigEditorResult {
   draft: TMProgram;
@@ -175,8 +172,12 @@ export function useTMConfigEditor(
   const handleCellBlur = useCallback(
     (rowIndex: number, colIndex: number) => {
       const draftKey = getCellKey(rowIndex, colIndex);
-      const value =
-        cellDrafts[draftKey] ?? committedRows[rowIndex]?.[colIndex] ?? "";
+      const value = resolveCellDraftValue(
+        cellDrafts,
+        committedRows,
+        rowIndex,
+        colIndex,
+      );
       const issue = validateTransitionTableCell(
         draft,
         orderedTapeAlphabet,
@@ -191,7 +192,7 @@ export function useTMConfigEditor(
       }
 
       const currentValue = committedRows[rowIndex]?.[colIndex] ?? "";
-      if (value !== currentValue) {
+      if (shouldCommitCellChange(value, currentValue)) {
         commitCellChange(
           dispatchEditorAction,
           orderedTapeAlphabet,
@@ -369,6 +370,23 @@ export function useTMConfigEditor(
   };
 }
 
+function resolveCellDraftValue(
+  cellDrafts: Record<string, string>,
+  committedRows: string[][],
+  rowIndex: number,
+  colIndex: number,
+): string {
+  const draftKey = getCellKey(rowIndex, colIndex);
+  return cellDrafts[draftKey] ?? committedRows[rowIndex]?.[colIndex] ?? "";
+}
+
+function shouldCommitCellChange(
+  draftValue: string,
+  committedValue: string | undefined,
+): boolean {
+  return draftValue !== (committedValue ?? "");
+}
+
 function commitCellChange(
   dispatch: (action: TMEditorAction) => void,
   orderedTapeAlphabet: string[],
@@ -466,7 +484,7 @@ function isSamePosition(
 
 function parseTransition(cellValue: string): TMTransition | null {
   const match = cellValue.match(
-    /^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNR])\s*\)\s*$/,
+    /^\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([LNRlnr])\s*\)\s*$/,
   );
 
   if (!match) {
@@ -481,6 +499,6 @@ function parseTransition(cellValue: string): TMTransition | null {
   return {
     nextState: normalizeTMStateName(match[1]).trim(),
     writeSymbol,
-    movement: match[3].trim() as HeadMovement,
+    movement: match[3].trim().toUpperCase() as HeadMovement,
   };
 }

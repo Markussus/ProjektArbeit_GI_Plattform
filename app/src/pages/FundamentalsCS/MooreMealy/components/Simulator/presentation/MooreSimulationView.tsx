@@ -1,10 +1,15 @@
-import { useLayoutEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SimulatorControls } from "@/components/shared/SimulatorControls/SimulatorControls";
 import { StateMachineGraph } from "@/components/shared/StateMachineGraph";
+import { TableView } from "@/components/shared/TableVisual/TableView";
 import type { SimulationStatus } from "@/hooks/useSimulationEngine";
 import { cn } from "@/lib/utils";
-import { useDragScroll } from "@/hooks/useDragScroll";
+import {
+  buildMooreTableHeaders,
+  buildMooreTableRows,
+  getActiveMooreTransitionCell,
+} from "../adapters/automataTableAdapter";
 import type { MooreProgram, MooreRuntime } from "../domain/mooreTypes";
 
 interface MooreSimulationViewProps {
@@ -30,6 +35,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
     nextInput !== undefined
       ? program.transitions[nextInput]?.[runtime.currentState]
       : undefined;
+
   const graphNodes = useMemo(
     () =>
       program.states.map((state) => ({
@@ -42,6 +48,7 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
       })),
     [nextState, program, runtime.currentState],
   );
+
   const graphEdges = useMemo(
     () =>
       program.inputSymbols.flatMap((inputSymbol) =>
@@ -55,9 +62,27 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
     [nextInput, program, runtime.currentState],
   );
 
+  const tableHeaders = useMemo(
+    () =>
+      buildMooreTableHeaders(
+        program.states,
+        t("moore-mealy.sim.event", "Event"),
+      ),
+    [program.states, t],
+  );
+
+  const tableRows = useMemo(() => buildMooreTableRows(program), [program]);
+
+  const activeCell = useMemo(
+    () => getActiveMooreTransitionCell(program, runtime),
+    [program, runtime],
+  );
+
   return (
     <div data-testid="moore-simulation-view" className="space-y-5">
-      <h2 className="text-lg font-bold">{t("moore.sim.simulationTitle")}</h2>
+      <h2 className="text-lg font-bold">
+        {t("moore-mealy.sim.simulationTitle")}
+      </h2>
 
       <div className="grid gap-3 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="space-y-3">
@@ -75,34 +100,34 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
           />
           <div className="border-border bg-card space-y-2 rounded-xl border p-3">
             <StatusRow
-              label={t("moore.sim.currentState")}
+              label={t("moore-mealy.sim.currentState")}
               value={runtime.currentState}
             />
             <StatusRow
-              label={t("moore.sim.progress")}
+              label={t("moore-mealy.sim.progress")}
               value={`${runtime.inputPosition} / ${program.inputWord.length}`}
             />
             <StatusRow
-              label={t("moore.sim.status")}
+              label={t("moore-mealy.sim.status")}
               value={
                 props.error
-                  ? t("moore.sim.error")
+                  ? t("moore-mealy.sim.error")
                   : runtime.halted
-                    ? t("moore.sim.finished")
-                    : t("moore.sim.ready")
+                    ? t("moore-mealy.sim.finished")
+                    : t("moore-mealy.sim.ready")
               }
             />
           </div>
         </div>
-        <div className="grid grid-rows-2 gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           <SymbolSequence
-            title={t("moore.sim.inputWord")}
+            title={t("moore-mealy.sim.inputWord")}
             symbols={program.inputWord}
             activeIndex={runtime.inputPosition}
             testId="moore-runtime-input"
           />
           <SymbolSequence
-            title={t("moore.sim.outputWord")}
+            title={t("moore-mealy.sim.outputWord")}
             symbols={runtime.outputSymbols}
             activeIndex={runtime.outputSymbols.length - 1}
             testId="moore-runtime-output"
@@ -114,119 +139,23 @@ export function MooreSimulationView(props: MooreSimulationViewProps) {
       <StateMachineGraph
         nodes={graphNodes}
         edges={graphEdges}
-        ariaLabel={t("moore.sim.diagram")}
+        ariaLabel={t("moore-mealy.sim.diagram")}
         testId="moore-state-diagram"
         className="w-full"
         compact
       />
 
-      <MooreRuntimeTable
-        program={program}
-        currentState={runtime.currentState}
-        nextInput={nextInput}
-        nextState={nextState}
+      <TableView
+        testIdPrefix="moore-runtime-transition-table"
+        headers={tableHeaders}
+        rows={tableRows}
+        activeCell={activeCell}
+        className="w-full"
+        tableClassName="w-full table-auto"
+        firstColumnWidthClassName=""
+        dataColumnWidthClassName=""
+        disableActiveCellAutoScroll
       />
-    </div>
-  );
-}
-
-function MooreRuntimeTable({
-  program,
-  currentState,
-  nextInput,
-  nextState,
-}: {
-  program: MooreProgram;
-  currentState: string;
-  nextInput?: string;
-  nextState?: string;
-}) {
-  const { t } = useTranslation();
-  const currentCol = program.states.indexOf(currentState);
-  const nextCol = nextState ? program.states.indexOf(nextState) : -1;
-  const currentRow = nextInput ? program.inputSymbols.indexOf(nextInput) : -1;
-  const { setElementRef, onMouseDown, isDragging, scrollElementIntoView } =
-    useDragScroll<HTMLDivElement>();
-
-  useLayoutEffect(() => {
-    if (currentRow < 0 || currentCol < 0) {
-      return;
-    }
-    const cell = document.querySelector<HTMLElement>(
-      `[data-testid="moore-runtime-cell-${currentRow}-${currentCol}"]`,
-    );
-    scrollElementIntoView(cell);
-  }, [currentCol, currentRow, nextState, scrollElementIntoView]);
-
-  return (
-    <div
-      ref={setElementRef}
-      onMouseDown={onMouseDown}
-      data-testid="moore-runtime-table-scroll"
-      className={cn(
-        "border-border max-h-64 overflow-auto rounded-xl border select-none",
-        isDragging ? "cursor-grabbing" : "cursor-grab",
-      )}
-    >
-      <table
-        data-testid="moore-runtime-transition-table"
-        className="w-full min-w-max border-collapse text-center text-sm"
-      >
-        <thead>
-          <tr className="bg-muted/50 border-b">
-            <th className="border-r p-2">{t("moore.sim.event")}</th>
-            {program.states.map((state, index) => (
-              <th
-                key={state}
-                className={cn(
-                  "min-w-28 border-r p-2 last:border-r-0",
-                  index === currentCol && "bg-brand/25 text-brand",
-                  index === nextCol && index !== currentCol && "bg-brand/10",
-                )}
-              >
-                {state}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {program.inputSymbols.map((symbol) => {
-            const isCurrentRow = symbol === nextInput;
-            return (
-              <tr key={symbol} className="border-b last:border-b-0">
-                <th
-                  className={cn(
-                    "border-r p-2 font-mono",
-                    isCurrentRow && "bg-brand/25 text-brand",
-                  )}
-                >
-                  {symbol}
-                </th>
-                {program.states.map((state, index) => {
-                  const target = program.transitions[symbol][state];
-                  const isSource = isCurrentRow && index === currentCol;
-                  const isResult = isSource && target === nextState;
-                  return (
-                    <td
-                      key={state}
-                      data-testid={`moore-runtime-cell-${program.inputSymbols.indexOf(symbol)}-${index}`}
-                      className={cn(
-                        "border-r p-2 font-mono last:border-r-0",
-                        index === nextCol && "bg-brand/5",
-                        isSource && "bg-brand/25 text-brand font-bold",
-                        isResult &&
-                          "outline-brand bg-brand/15 outline-2 -outline-offset-4 outline-dashed",
-                      )}
-                    >
-                      {target}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
     </div>
   );
 }
@@ -255,15 +184,15 @@ function SymbolSequence({
 }) {
   const { t } = useTranslation();
   return (
-    <section data-testid={testId} className="space-y-1">
+    <section data-testid={testId} className="min-w-0 space-y-1">
       <h3 className="text-sm font-semibold">{title}</h3>
-      <div className="border-border bg-card flex min-h-12 items-center gap-2 overflow-x-auto rounded-lg border p-2">
+      <div className="border-border bg-card flex min-h-12 min-w-0 flex-wrap items-center gap-2 rounded-lg border p-2">
         {symbols.length ? (
           symbols.map((symbol, index) => (
             <span
               key={`${symbol}-${index}`}
               className={cn(
-                "border-border bg-background rounded-md border px-3 py-1.5 font-mono",
+                "border-border bg-background max-w-full min-w-0 rounded-md border px-3 py-1.5 font-mono break-all whitespace-normal",
                 index < activeIndex && "bg-muted text-muted-foreground",
                 index === activeIndex &&
                   "border-brand bg-brand/10 text-brand border-2 font-semibold",
@@ -274,7 +203,7 @@ function SymbolSequence({
           ))
         ) : showEmptyWord ? (
           <span className="text-muted-foreground text-sm italic">
-            {t("moore.sim.emptyWord")}
+            {t("moore-mealy.sim.emptyWord")}
           </span>
         ) : null}
       </div>

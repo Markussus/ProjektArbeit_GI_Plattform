@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, Layers3, Sparkles } from "lucide-react";
-import { learningModules } from "@/data/moduleCatalog";
+import { learningModules } from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 export function ModuleSelector() {
@@ -12,7 +12,7 @@ export function ModuleSelector() {
   return (
     <div className="relative mx-auto w-full max-w-2xl">
       <p className="text-muted-foreground mb-3 text-center text-xs font-bold tracking-[0.2em] uppercase">
-        {t("home.selectModule")}
+        {t("common.home.selectModule")}
       </p>
 
       <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
@@ -25,7 +25,7 @@ export function ModuleSelector() {
           <div className="flex items-center gap-3">
             <Layers3 className="text-muted-foreground size-4" />
             <span className="text-foreground text-base font-semibold">
-              {t("home.exploreModules")}
+              {t("common.home.exploreModules")}
             </span>
           </div>
 
@@ -71,10 +71,10 @@ export function ModuleSelector() {
                 <Sparkles className="text-muted-foreground size-4" />
                 <div>
                   <p className="text-foreground text-base font-semibold">
-                    {t("modules.moreComingSoon")}
+                    {t("common.modules.moreComingSoon")}
                   </p>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {t("modules.moreComingSoonDescription")}
+                    {t("common.modules.moreComingSoonDescription")}
                   </p>
                 </div>
               </div>

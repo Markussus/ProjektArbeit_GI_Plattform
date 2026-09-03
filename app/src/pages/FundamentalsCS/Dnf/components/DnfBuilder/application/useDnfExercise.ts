@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { formatBooleanExpressionForDisplay } from "../domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "../domain/booleanExpression";
 import { normalizeBooleanOperatorAliases } from "../domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
@@ -185,7 +185,7 @@ function deriveRestoredFeedback(
 
   // Only restore the "solved" state for a genuinely correct attempt, so an
   // imported or auto-loaded session keeps the simplification step unlocked
-  // without ever revealing the solution for an unsolved attempt.
+  // without ever revealing the solution for an unsolved attempt correlation.
   const result = checkDnfExerciseAttempt(
     analysis.truthTable,
     attempt.truthTableAnswers,

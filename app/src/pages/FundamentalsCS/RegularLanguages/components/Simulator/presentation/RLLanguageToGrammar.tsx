@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   formatLanguageIssue,
   parseLanguageSpec,
@@ -23,15 +23,18 @@ import {
   RL_STORAGE_TASK_IDS,
   useRLPersistedSource,
 } from "../useRLPersistedSource";
-import { useRLSimulatorStore } from "../../../store/rlSimulatorStore";
 
 interface RLLanguageToGrammarProps {
   initialSource?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
-// Kept short enough to sit on one line in the textarea; three words are still
-// enough for the parser to infer the pattern 0ⁿ 1 0ᵐ from the trailing "..".
-const DEFAULT_SOURCE = 'L = {"010", "0010", "00100", ..}';
+// Free mode opens blank - the worked languages live in the Examples tab,
+// where this word list stays available as its own example. It doubles as the
+// textarea placeholder so the expected notation is still visible.
+const EMPTY_SOURCE = "";
+const SOURCE_PLACEHOLDER = 'L = {"010", "0010", "00100", ..}';
 
 // Documents the language definition syntax in the "Supported Formats" panel.
 const LANGUAGE_ENUMERATION_EXAMPLE = 'L = {"010", "0010", "00100", ..}';
@@ -50,9 +53,11 @@ type ConversionResult =
 
 export function RLLanguageToGrammar({
   initialSource,
+  transferActive = true,
+  resetVersion = 0,
 }: RLLanguageToGrammarProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialSource ?? DEFAULT_SOURCE);
+  const [source, setSource] = useState(initialSource ?? EMPTY_SOURCE);
   const [showFormats, setShowFormats] = useState(false);
   // Detailed = one non-terminal per prefix; Simplified = minimal merged grammar.
   const [simplified, setSimplified] = useState(false);
@@ -65,23 +70,25 @@ export function RLLanguageToGrammar({
     setSource(initialSource);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(EMPTY_SOURCE);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.languageToGrammar,
     codec: rlLanguageTransferCodec,
     source,
     setSource,
     hasSeed: initialSource !== undefined,
   });
-
-  // Publish the current language so the lifted exercise "Check solution" action
-  // can validate it; clear it when this mode unmounts.
-  const setStudentLanguageSource = useRLSimulatorStore(
-    (s) => s.setStudentLanguageSource,
-  );
-  useEffect(() => {
-    setStudentLanguageSource(source);
-    return () => setStudentLanguageSource(null);
-  }, [source, setStudentLanguageSource]);
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlLanguageTransferCodec,
+    enabled: transferActive,
+  });
 
   const result: ConversionResult = useMemo(() => {
     const parsed = parseLanguageSpec(source);
@@ -126,16 +133,20 @@ export function RLLanguageToGrammar({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
-        <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+        <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-            {t("rl.simulator.languageDefinition", "Language Definition")}
+            {t(
+              "regular-languages.simulator.languageDefinition",
+              "Language Definition",
+            )}
           </h4>
 
           <textarea
+            data-testid="rl-language-to-grammar-source"
             value={source}
             onChange={(e) => setSource(e.target.value)}
             spellCheck={false}
-            placeholder={DEFAULT_SOURCE}
+            placeholder={SOURCE_PLACEHOLDER}
             className="border-input bg-background focus:ring-primary min-h-[120px] w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
           />
 
@@ -154,13 +165,16 @@ export function RLLanguageToGrammar({
                   !showFormats && "-rotate-90",
                 )}
               />
-              {t("rl.simulator.supportedFormats", "Supported formats")}
+              {t(
+                "regular-languages.simulator.supportedFormats",
+                "Supported formats",
+              )}
             </summary>
             <div className="flex flex-col gap-3 px-3 pb-3">
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
                   {t(
-                    "rl.simulator.supportedFormatsExtensional",
+                    "regular-languages.simulator.supportedFormatsExtensional",
                     "Extensional / Set Format:",
                   )}
                 </div>
@@ -171,7 +185,7 @@ export function RLLanguageToGrammar({
               <div>
                 <div className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
                   {t(
-                    "rl.simulator.supportedFormatsIntensional",
+                    "regular-languages.simulator.supportedFormatsIntensional",
                     "Intensional / Formal Format:",
                   )}
                 </div>
@@ -191,16 +205,22 @@ export function RLLanguageToGrammar({
         </div>
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
             <ArrowRight className="text-primary h-4 w-4" />
-            {t("rl.simulator.grammarOutput", "Resulting Grammar")}
+            {t(
+              "regular-languages.simulator.grammarOutput",
+              "Resulting Grammar",
+            )}
           </h4>
           <div
             className="bg-muted/60 inline-flex rounded-lg p-0.5"
             role="group"
-            aria-label={t("rl.simulator.grammarMode.label", "Grammar style")}
+            aria-label={t(
+              "regular-languages.simulator.grammarMode.label",
+              "Grammar style",
+            )}
           >
             <button
               type="button"
@@ -214,7 +234,10 @@ export function RLLanguageToGrammar({
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {t("rl.simulator.grammarMode.detailed", "Detailed")}
+              {t(
+                "regular-languages.simulator.grammarMode.detailed",
+                "Detailed",
+              )}
             </button>
             <button
               type="button"
@@ -228,7 +251,10 @@ export function RLLanguageToGrammar({
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {t("rl.simulator.grammarMode.simplified", "Simplified")}
+              {t(
+                "regular-languages.simulator.grammarMode.simplified",
+                "Simplified",
+              )}
             </button>
           </div>
         </div>
@@ -255,20 +281,12 @@ export function RLLanguageToGrammar({
         ) : (
           <p className="text-muted-foreground text-sm">
             {t(
-              "rl.simulator.languageInvalid",
+              "regular-languages.simulator.languageInvalid",
               "Enter a valid language definition to derive a grammar.",
             )}
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-language-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

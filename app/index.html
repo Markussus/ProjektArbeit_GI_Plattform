@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trainings Center</title>
 
+    <link
+      rel="preload"
+      href="/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <script>
       (() => {
         try {
@@ -39,6 +47,19 @@
             resolvedTheme === "dark",
           );
           document.documentElement.style.colorScheme = resolvedTheme;
+
+          // Apply persisted font before React mounts
+          const fontRaw = localStorage.getItem("font-storage");
+          if (fontRaw) {
+            const parsedFont = JSON.parse(fontRaw);
+            if (parsedFont?.state?.font === "geist") {
+              document.documentElement.dataset.font = "geist";
+            } else {
+              document.documentElement.dataset.font = "inter";
+            }
+          } else {
+            document.documentElement.dataset.font = "inter";
+          }
         } catch {
           // ignore
         }

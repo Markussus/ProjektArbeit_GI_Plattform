@@ -1,3 +1,43 @@
 \subNsection{1}{Abgleich mit dem Lastenheft}{Kristian Popov}
 
-Wurden die Qualitätsziele (Performance, Usability, Barrierefreiheit durch Dark Mode und i18n) erreicht?
+Der im Lastenheft festgelegte fachliche Umfang wurde umgesetzt und im Verlauf des
+Projekts erweitert: Zu den ursprünglich vorgesehenen Themen kamen die regulären
+Sprachen und die Kodierungsverfahren hinzu, mit Programmieren~1 außerdem ein
+zweiter Lernbereich.
+Die Erweiterungen wurden mit dem Auftraggeber abgestimmt und in die bestehende
+Plattform integriert (siehe Abschnitt~\ref{5_4_DI}).
+
+Die didaktische Kernanforderung, nicht nur Ergebnisse, sondern auch Zwischenschritte
+sichtbar zu machen, wurde in allen Themen berücksichtigt: Simulationen lassen sich
+schrittweise ausführen, anhalten und zurücksetzen, und die Übungen geben begründete
+Rückmeldungen statt einer reinen Ja-Nein-Aussage.
+Auch der Betrieb ohne Backend ist umgesetzt, da Aufgabenstände im lokalen Speicher
+des Browsers liegen und Aufgaben über Import und Export ausgetauscht werden.
+
+Die geforderte Erweiterbarkeit hat sich im Projektverlauf bewährt: Neue Themen wurden
+über den zentralen Modulkatalog registriert, ohne Navigation oder Routing der bestehenden
+Bereiche umbauen zu müssen, während das Unified UI-Konzept Aufbau, Tabs und
+Rückmeldungen über die Themen hinweg wiedererkennbar hält.
+Dasselbe Prinzip trägt die Mehrsprachigkeit: Die Oberfläche ist vollständig
+übersetzt, und eine weitere Sprache wird über den zentralen Sprachkatalog und ein
+zusätzliches Verzeichnis mit Übersetzungsdateien ergänzt, ohne die Themen selbst
+anzupassen.
+Das Farbschema folgt wahlweise der Systemeinstellung oder einer manuellen Auswahl.
+
+Die Qualitätsziele des Lastenhefts werden in der \gls{ci}-Pipeline bei jedem Merge
+Request automatisch überprüft (siehe Abschnitt~\ref{5_1_QS}).
+Sie reicht über sieben aufeinander aufbauende Stufen von der Prüfung der
+Werkzeugversionen und dem Bau des Java-Compilers über Formatierung, Lint,
+Unit-Tests und Build bis zu den \gls{e2e}-Tests und der abschließenden
+Lighthouse-Messung; nur bei durchgehend erfolgreichem Lauf ist ein Merge möglich.
+Für das Qualitätsziel Performance schlägt die letzte Stufe fehl, sobald der Median
+des \gls{lcp} je Themenseite 1,25 Sekunden überschreitet.
+Dass die Themenseiten einzeln nachgeladen werden, hält die je Aufruf übertragene
+Datenmenge klein.
+Ergänzend sichert die Pipeline die Herkunft der Abhängigkeiten ab, indem sie deren
+Signaturen prüft und nur Paketversionen mit einem Mindestalter von sieben Tagen
+zulässt.
+
+Insgesamt wurden die Anforderungen des Lastenhefts damit weitgehend umgesetzt.
+Offen bleiben eine systematische Usability-Erhebung mit Studierenden, eine Prüfung
+der Barrierefreiheit und Messungen für kleine Bildschirme.

@@ -12,9 +12,7 @@ import type { SimulationMode } from "../domain/rlTypes";
  * word list and a compact pattern) live under `languageToGrammar`.
  */
 export type RLExampleCategory =
-  | "grammarToLanguage"
-  | "languageToGrammar"
-  | "recognizeWord";
+  "grammarToLanguage" | "languageToGrammar" | "recognizeWord";
 
 export interface RLExample {
   id: string;
@@ -30,45 +28,59 @@ export interface RLExample {
   testWord?: string;
 }
 
-export const exampleGrammarToLanguage: RLExample = {
+const exampleGrammarToLanguage: RLExample = {
   id: "grammar-to-language",
-  titleKey: "rl.examples.grammarToLanguage.title",
-  descriptionKey: "rl.examples.grammarToLanguage.description",
+  titleKey: "regular-languages.examples.grammarToLanguage.title",
+  descriptionKey: "regular-languages.examples.grammarToLanguage.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
 };
 
-export const exampleLanguageToGrammar: RLExample = {
+/**
+ * The grammar the Grammar → Language converter used to open with. Free mode
+ * starts blank now, so it is offered here instead.
+ */
+const exampleGrammarDefault: RLExample = {
+  id: "grammar-default",
+  titleKey: "regular-languages.examples.grammarDefault.title",
+  descriptionKey: "regular-languages.examples.grammarDefault.description",
+  mode: "grammarToLanguage",
+  category: "grammarToLanguage",
+  icon: ListOrdered,
+  grammarSource: ["S -> aS | bA", "A -> bA | ε"].join("\n"),
+};
+
+const exampleLanguageToGrammar: RLExample = {
   id: "language-to-grammar",
-  titleKey: "rl.examples.languageToGrammar.title",
-  descriptionKey: "rl.examples.languageToGrammar.description",
+  titleKey: "regular-languages.examples.languageToGrammar.title",
+  descriptionKey: "regular-languages.examples.languageToGrammar.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
   languageSource: 'L = {"ab", "abb", "abbb"}',
 };
 
-export const exampleLanguageSetBuilder: RLExample = {
+const exampleLanguageSetBuilder: RLExample = {
   id: "language-set-builder",
-  titleKey: "rl.examples.languageSetBuilder.title",
-  descriptionKey: "rl.examples.languageSetBuilder.description",
+  titleKey: "regular-languages.examples.languageSetBuilder.title",
+  descriptionKey: "regular-languages.examples.languageSetBuilder.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
   languageSource: "L = {a^n c b^m | n, m > 0}",
 };
 
-export const exampleRecognizeWord: RLExample = {
+const exampleRecognizeWord: RLExample = {
   id: "recognize-word",
-  titleKey: "rl.examples.recognizeWord.title",
-  descriptionKey: "rl.examples.recognizeWord.description",
+  titleKey: "regular-languages.examples.recognizeWord.title",
+  descriptionKey: "regular-languages.examples.recognizeWord.description",
   mode: "recognizeWord",
   category: "recognizeWord",
   icon: SearchCheck,
   grammarSource: ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n"),
-  testWord: "001",
+  testWord: "001, 010, 1, 00",
 };
 
 /**
@@ -76,20 +88,20 @@ export const exampleRecognizeWord: RLExample = {
  * Basics" section. They now share the categorised example style: load the given
  * grammar/language into the simulator to reveal the worked result.
  */
-export const exampleLectureGrammar1: RLExample = {
+const exampleLectureGrammar1: RLExample = {
   id: "lecture-g2l-1",
-  titleKey: "rl.examples.lectureGrammar1.title",
-  descriptionKey: "rl.examples.lectureGrammar1.description",
+  titleKey: "regular-languages.examples.lectureGrammar1.title",
+  descriptionKey: "regular-languages.examples.lectureGrammar1.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
   grammarSource: ["S -> 0A", "A -> 0A | 1"].join("\n"),
 };
 
-export const exampleLectureGrammar2: RLExample = {
+const exampleLectureGrammar2: RLExample = {
   id: "lecture-g2l-2",
-  titleKey: "rl.examples.lectureGrammar2.title",
-  descriptionKey: "rl.examples.lectureGrammar2.description",
+  titleKey: "regular-languages.examples.lectureGrammar2.title",
+  descriptionKey: "regular-languages.examples.lectureGrammar2.description",
   mode: "grammarToLanguage",
   category: "grammarToLanguage",
   icon: ListOrdered,
@@ -97,23 +109,23 @@ export const exampleLectureGrammar2: RLExample = {
 };
 
 /**
- * The word list shown by default in the Language → Grammar simulator, exposed
- * here so learners can reopen it from the Examples tab.
+ * The introductory word list for the Language → Grammar converter. The
+ * simulator itself opens blank, so this is where learners pick it up.
  */
-export const exampleLanguageDefault: RLExample = {
+const exampleLanguageDefault: RLExample = {
   id: "language-default",
-  titleKey: "rl.examples.languageDefault.title",
-  descriptionKey: "rl.examples.languageDefault.description",
+  titleKey: "regular-languages.examples.languageDefault.title",
+  descriptionKey: "regular-languages.examples.languageDefault.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
   languageSource: 'L = {"010", "0010", "00100", ..}',
 };
 
-export const exampleLectureLanguage1: RLExample = {
+const exampleLectureLanguage1: RLExample = {
   id: "lecture-l2g-1",
-  titleKey: "rl.examples.lectureLanguage1.title",
-  descriptionKey: "rl.examples.lectureLanguage1.description",
+  titleKey: "regular-languages.examples.lectureLanguage1.title",
+  descriptionKey: "regular-languages.examples.lectureLanguage1.description",
   mode: "languageToGrammar",
   category: "languageToGrammar",
   icon: FileText,
@@ -122,6 +134,7 @@ export const exampleLectureLanguage1: RLExample = {
 
 export const rlExamples: RLExample[] = [
   exampleGrammarToLanguage,
+  exampleGrammarDefault,
   exampleLectureGrammar1,
   exampleLectureGrammar2,
   exampleLanguageToGrammar,
@@ -130,3 +143,7 @@ export const rlExamples: RLExample[] = [
   exampleLectureLanguage1,
   exampleRecognizeWord,
 ];
+
+export function findRLExample(id: string): RLExample | undefined {
+  return rlExamples.find((e) => e.id === id || e.titleKey === id);
+}

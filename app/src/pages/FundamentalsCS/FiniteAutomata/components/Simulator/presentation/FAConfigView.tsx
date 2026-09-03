@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DropdownSelect } from "@/components/shared/DropdownSelect/DropdownSelect";
 import type { UseFAConfigEditorResult } from "../application/useFAConfigEditor";
 import type { FAProgramIssueCode } from "../domain/faProgramValidation";
 import { FATransitionTableEditor } from "./FATransitionTableEditor";
@@ -46,43 +47,63 @@ export interface FAConfigViewProps {
 export function FAConfigView({ editor }: FAConfigViewProps) {
   const { t } = useTranslation();
 
+  const typeOptions = useMemo(
+    () => [
+      { value: "DFA" as const, label: "DFA" },
+      { value: "NFA" as const, label: "NFA" },
+    ],
+    [],
+  );
+
+  const startStateOptions = useMemo(
+    () =>
+      editor.draft.states.map((s) => ({
+        value: s,
+        label: <span className="font-mono">{s}</span>,
+      })),
+    [editor.draft.states],
+  );
+
   const issueMessages = editor.validationIssues
     .map((issue) => translateIssue(issue.code))
     .join("\n");
 
   function translateIssue(code: FAProgramIssueCode): string {
     const map: Record<FAProgramIssueCode, string> = {
-      states_empty: t("fa.validation.statesEmpty", "States must not be empty."),
+      states_empty: t(
+        "finite-automata.validation.statesEmpty",
+        "States must not be empty.",
+      ),
       start_state_missing: t(
-        "fa.validation.startStateMissing",
+        "finite-automata.validation.startStateMissing",
         "Start state is not in the state set.",
       ),
       accept_states_reference_invalid: t(
-        "fa.validation.acceptStatesInvalid",
+        "finite-automata.validation.acceptStatesInvalid",
         "An accept state is not in the state set.",
       ),
       alphabet_empty: t(
-        "fa.validation.alphabetEmpty",
+        "finite-automata.validation.alphabetEmpty",
         "Alphabet must not be empty.",
       ),
       transition_source_invalid: t(
-        "fa.validation.transitionSourceInvalid",
+        "finite-automata.validation.transitionSourceInvalid",
         "A transition source state is invalid.",
       ),
       transition_target_invalid: t(
-        "fa.validation.transitionTargetInvalid",
+        "finite-automata.validation.transitionTargetInvalid",
         "A transition target state is invalid.",
       ),
       transition_symbol_invalid: t(
-        "fa.validation.transitionSymbolInvalid",
+        "finite-automata.validation.transitionSymbolInvalid",
         "A transition symbol is not in the alphabet.",
       ),
       dfa_nondeterministic: t(
-        "fa.validation.dfaNondeterministic",
+        "finite-automata.validation.dfaNondeterministic",
         "DFA has nondeterministic transitions.",
       ),
       dfa_epsilon_transition: t(
-        "fa.validation.dfaEpsilon",
+        "finite-automata.validation.dfaEpsilon",
         "DFA must not have ε-transitions.",
       ),
     };
@@ -96,7 +117,7 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
   return (
     <div className="flex flex-col gap-6">
       <h2 className="text-lg font-bold">
-        {t("fa.config.title", "Automaton Configuration")}
+        {t("finite-automata.config.title", "Automaton Configuration")}
       </h2>
 
       {issueMessages && (
@@ -108,23 +129,26 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Automaton Type */}
         <div className="flex flex-col gap-1">
-          <label className={labelClass}>{t("fa.config.type", "Type")}</label>
-          <select
+          <label className={labelClass}>
+            {t("finite-automata.config.type", "Type")}
+          </label>
+          <DropdownSelect<"DFA" | "NFA">
             value={editor.draft.type}
-            onChange={(e) =>
-              editor.setAutomatonType(e.target.value as "DFA" | "NFA")
-            }
-            className={inputClass}
-          >
-            <option value="DFA">DFA</option>
-            <option value="NFA">NFA</option>
-          </select>
+            options={typeOptions}
+            onChange={(val) => editor.setAutomatonType(val)}
+            ariaLabel={t("finite-automata.config.type", "Type")}
+            triggerClassName="w-full h-[38px] px-3 py-2 text-sm"
+            menuClassName="right-0 left-0"
+            triggerTestId="fa-type-select"
+            menuTestId="fa-type-menu"
+            optionTestIdPrefix="fa-type-option"
+          />
         </div>
 
         {/* Alphabet */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.alphabet", "Alphabet (comma-separated)")}
+            {t("finite-automata.config.alphabet", "Alphabet (comma-separated)")}
           </label>
           <ArrayInput
             value={editor.draft.alphabet}
@@ -137,26 +161,29 @@ export function FAConfigView({ editor }: FAConfigViewProps) {
         {/* Start State */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.startState", "Start State")}
+            {t("finite-automata.config.startState", "Start State")}
           </label>
-          <select
+          <DropdownSelect<string>
             value={editor.draft.startState}
-            onChange={(e) => editor.setStartState(e.target.value)}
-            className={inputClass}
-          >
-            {editor.draft.states.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            options={startStateOptions}
+            onChange={(val) => editor.setStartState(val)}
+            ariaLabel={t("finite-automata.config.startState", "Start State")}
+            triggerClassName="w-full h-[38px] px-3 py-2 text-sm"
+            menuClassName="right-0 left-0"
+            triggerTestId="fa-start-state-select"
+            menuTestId="fa-start-state-menu"
+            optionTestIdPrefix="fa-start-state-option"
+          />
         </div>
 
         {/* Accept States — sits beside Start State so the 2×2 grid has no
             empty cell. */}
         <div className="flex flex-col gap-1">
           <label className={labelClass}>
-            {t("fa.config.acceptStates", "Accept States (comma-separated)")}
+            {t(
+              "finite-automata.config.acceptStates",
+              "Accept States (comma-separated)",
+            )}
           </label>
           <ArrayInput
             value={editor.draft.acceptStates}

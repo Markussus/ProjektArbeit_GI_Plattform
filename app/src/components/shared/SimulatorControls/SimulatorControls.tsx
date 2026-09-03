@@ -54,7 +54,7 @@ export function SimulatorControls({
   };
 
   const buttonClasses = cn(
-    "flex items-center justify-center p-2 rounded-md transition-colors",
+    "flex size-9 shrink-0 items-center justify-center rounded-md transition-colors",
     "bg-background border border-input hover:bg-accent hover:text-accent-foreground",
     "disabled:opacity-50 disabled:cursor-not-allowed",
   );
@@ -72,10 +72,10 @@ export function SimulatorControls({
           onClick={onReset}
           data-testid={testIdPrefix ? `${testIdPrefix}-reset` : undefined}
           className={buttonClasses}
-          title={t("simulation.controls.reset", "Reset")}
-          aria-label={t("simulation.controls.reset", "Reset")}
+          title={t("common.simulation.controls.reset", "Reset")}
+          aria-label={t("common.simulation.controls.reset", "Reset")}
         >
-          <RotateCcw className="h-5 w-5" />
+          <RotateCcw className="size-4" />
         </button>
 
         <button
@@ -83,10 +83,10 @@ export function SimulatorControls({
           disabled={isPlaying}
           data-testid={testIdPrefix ? `${testIdPrefix}-step-back` : undefined}
           className={buttonClasses}
-          title={t("simulation.controls.stepBack", "Step backward")}
-          aria-label={t("simulation.controls.stepBack", "Step backward")}
+          title={t("common.simulation.controls.stepBack", "Step backward")}
+          aria-label={t("common.simulation.controls.stepBack", "Step backward")}
         >
-          <StepBack className="h-5 w-5" />
+          <StepBack className="size-4" />
         </button>
 
         {isPlaying ? (
@@ -97,10 +97,10 @@ export function SimulatorControls({
               buttonClasses,
               "bg-brand text-brand-foreground hover:opacity-90",
             )}
-            title={t("simulation.controls.pause", "Pause")}
-            aria-label={t("simulation.controls.pause", "Pause")}
+            title={t("common.simulation.controls.pause", "Pause")}
+            aria-label={t("common.simulation.controls.pause", "Pause")}
           >
-            <Pause className="h-5 w-5 fill-current" />
+            <Pause className="size-4 fill-current" />
           </button>
         ) : (
           <button
@@ -111,10 +111,10 @@ export function SimulatorControls({
               buttonClasses,
               "bg-brand text-brand-foreground hover:opacity-90",
             )}
-            title={t("simulation.controls.play", "Play")}
-            aria-label={t("simulation.controls.play", "Play")}
+            title={t("common.simulation.controls.play", "Play")}
+            aria-label={t("common.simulation.controls.play", "Play")}
           >
-            <Play className="h-5 w-5 fill-current" />
+            <Play className="size-4 fill-current" />
           </button>
         )}
 
@@ -123,16 +123,16 @@ export function SimulatorControls({
           disabled={isPlaying || isError}
           data-testid={testIdPrefix ? `${testIdPrefix}-step` : undefined}
           className={buttonClasses}
-          title={t("simulation.controls.step", "Step forward")}
-          aria-label={t("simulation.controls.step", "Step forward")}
+          title={t("common.simulation.controls.step", "Step forward")}
+          aria-label={t("common.simulation.controls.step", "Step forward")}
         >
-          <StepForward className="h-5 w-5" />
+          <StepForward className="size-4" />
         </button>
       </div>
 
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium whitespace-nowrap opacity-75">
-          {t("simulation.controls.speed", "Speed")}:
+          {t("common.simulation.controls.speed", "Speed")}:
         </span>
         <input
           type="range"
@@ -147,7 +147,7 @@ export function SimulatorControls({
             "[&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-background [&::-webkit-slider-thumb]:mt-[-4px] [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2",
             "[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-background [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2",
           )}
-          aria-label={t("simulation.controls.speed", "Speed")}
+          aria-label={t("common.simulation.controls.speed", "Speed")}
           data-testid={testIdPrefix ? `${testIdPrefix}-speed` : undefined}
         />
       </div>

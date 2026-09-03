@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
 import { getJavaScenario } from "../exercises";
+import { JavaSolutionCheckDialog } from "./JavaSolutionCheckDialog";
+import type { JavaValidationRunResult } from "./Simulator/domain/javaValidationRunner";
 import {
   JavaSimulator,
   type JavaSimulatorHandle,
-  type JavaValidationRunResult,
 } from "./Simulator/JavaSimulator";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
@@ -17,11 +17,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
   const [checkResult, setCheckResult] =
     useState<JavaValidationRunResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const scenario = useMemo(() => {
-    if (!props.selectedItem) {
-      return null;
-    }
 
+  const scenario = useMemo(() => {
+    if (!props.selectedItem) return null;
     return getJavaScenario(props.selectedItem.id);
   }, [props.selectedItem]);
 
@@ -33,30 +31,17 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     [],
   );
 
-  const handleLoadSolution = () => {
-    simulatorRef.current?.loadSolution();
-  };
-
-  const handleReset = () => {
-    setCheckResult(null);
-    simulatorRef.current?.resetStoredState();
-  };
-
   const handleCheckSolution = async () => {
     if (
       !simulatorRef.current ||
       !isSimulatorReady ||
-      !scenario ||
-      scenario.kind !== "exercise"
+      scenario?.kind !== "exercise"
     ) {
       return;
     }
-
     setIsChecking(true);
-
     try {
-      const result = await simulatorRef.current.checkSolution();
-      setCheckResult(result);
+      setCheckResult(await simulatorRef.current.checkSolution());
     } finally {
       setIsChecking(false);
     }
@@ -67,12 +52,12 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       <>
         <button
           type="button"
-          onClick={handleLoadSolution}
+          onClick={() => simulatorRef.current?.loadSolution()}
           disabled={!isSimulatorReady}
           data-testid="java-load-solution"
           className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {t("java.actions.loadSolution")}
+          {t("java-programming.actions.loadSolution")}
         </button>
         <button
           type="button"
@@ -82,21 +67,11 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isChecking
-            ? t("java.actions.checkingSolution")
-            : t("java.actions.checkSolution")}
+            ? t("java-programming.actions.checkingSolution")
+            : t("java-programming.actions.checkSolution")}
         </button>
       </>
     ) : null;
-
-  const resultRows = checkResult
-    ? checkResult.rows.map((row) => [
-        row.passed ? t("java.validation.pass") : t("java.validation.fail"),
-        row.id,
-        formatOutput(row.output, t("java.validation.emptyOutput")),
-        formatOutput(row.expectedOutput, t("java.validation.emptyOutput")),
-        row.phase,
-      ])
-    : [];
 
   return (
     <>
@@ -104,8 +79,11 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.java"
-        onReset={handleReset}
+        emptyStateTextKey="common.simulation.emptyStates.java"
+        onReset={() => {
+          setCheckResult(null);
+          simulatorRef.current?.resetStoredState();
+        }}
         resetDisabled={!isSimulatorReady}
         overlayControls
       >
@@ -118,31 +96,10 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         />
       </TopicSimulationTab>
 
-      <SolutionCheckDialog
-        open={checkResult !== null}
-        title={t("java.validation.popupTitle")}
+      <JavaSolutionCheckDialog
+        checkResult={checkResult}
         onClose={() => setCheckResult(null)}
-        testId="java-solution-check-dialog"
-        error={checkResult?.error}
-        errorTestId="java-solution-check-error"
-        tableTestIdPrefix="java-solution-check-table"
-        headers={[
-          t("java.validation.table.passed"),
-          t("java.validation.table.case"),
-          t("java.validation.table.output"),
-          t("java.validation.table.expectedOutput"),
-          t("java.validation.table.phase"),
-        ]}
-        rows={resultRows}
-        getRowTestAttributes={(rowIndex) => ({
-          "data-passed": String(checkResult?.rows[rowIndex]?.passed),
-        })}
       />
     </>
   );
-}
-
-function formatOutput(output: string, emptyOutput: string) {
-  const normalized = output.replace(/\r\n/g, "\n").trimEnd();
-  return normalized === "" ? emptyOutput : normalized;
 }

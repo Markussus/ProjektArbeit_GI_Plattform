@@ -34,15 +34,70 @@ import {
   type TableViewProps,
 } from "./TableView.logic";
 
-export {
-  DEFAULT_DATA_COLUMN_WIDTH_CLASS,
-  DEFAULT_FIRST_COLUMN_WIDTH_CLASS,
-} from "./TableView.logic";
-export type {
-  TableEditMode,
-  TablePosition,
-  TableViewProps,
-} from "./TableView.logic";
+export type { TablePosition, TableViewProps } from "./TableView.logic";
+
+interface BodyCellContentProps {
+  canEdit: boolean;
+  value: string;
+  disabled: boolean;
+  isInvalid: boolean;
+  columnLabel: string;
+  inputAriaLabel: string;
+  testIdPrefix?: string;
+  rowIndex: number;
+  colIndex: number;
+  onCellChange?: (rowIndex: number, colIndex: number, value: string) => void;
+  onCellBlur?: (rowIndex: number, colIndex: number) => void;
+}
+
+function BodyCellContent({
+  canEdit,
+  value,
+  disabled,
+  isInvalid,
+  columnLabel,
+  inputAriaLabel,
+  testIdPrefix,
+  rowIndex,
+  colIndex,
+  onCellChange,
+  onCellBlur,
+}: BodyCellContentProps) {
+  if (canEdit) {
+    return (
+      <input
+        value={value}
+        onChange={(e) => onCellChange?.(rowIndex, colIndex, e.target.value)}
+        onBlur={() => onCellBlur?.(rowIndex, colIndex)}
+        disabled={disabled}
+        aria-invalid={isInvalid || undefined}
+        aria-label={inputAriaLabel}
+        data-testid={
+          testIdPrefix
+            ? `${testIdPrefix}-cell-input-${rowIndex + 1}-${colIndex + 1}`
+            : undefined
+        }
+        className={cn(CELL_INPUT_CLASS, isInvalid && CELL_INPUT_INVALID_CLASS)}
+        autoComplete="off"
+        spellCheck="false"
+      />
+    );
+  }
+
+  return (
+    <div
+      aria-label={columnLabel}
+      data-testid={
+        testIdPrefix
+          ? `${testIdPrefix}-cell-value-${rowIndex + 1}-${colIndex + 1}`
+          : undefined
+      }
+      className={READ_ONLY_CELL_CLASS}
+    >
+      {value}
+    </div>
+  );
+}
 
 export function TableView({
   headers,
@@ -105,30 +160,34 @@ export function TableView({
   const hasTrailingActionColumn = showRemoveRowControl || showAddColumnControl;
   const contentColSpan = maxCols + (hasTrailingActionColumn ? 1 : 0);
   const labels = {
-    table: t("simulation.table.label", "Table view"),
-    empty: t("simulation.table.empty", "Table is empty"),
-    addRow: t("simulation.table.addRow", "Add new row"),
-    addColumn: t("simulation.table.addColumn", "Add column"),
-    removeColumn: t("simulation.table.removeColumn", "Remove column"),
-    removeRow: t("simulation.table.removeRow", "Remove row"),
-    columnActions: t("simulation.table.columnActions", "Column actions"),
-    rowActions: t("simulation.table.rowActions", "Row actions"),
+    table: t("common.simulation.table.label", "Table view"),
+    empty: t("common.simulation.table.empty", "Table is empty"),
+    addRow: t("common.simulation.table.addRow", "Add new row"),
+    addColumn: t("common.simulation.table.addColumn", "Add column"),
+    removeColumn: t("common.simulation.table.removeColumn", "Remove column"),
+    removeRow: t("common.simulation.table.removeRow", "Remove row"),
+    columnActions: t("common.simulation.table.columnActions", "Column actions"),
+    rowActions: t("common.simulation.table.rowActions", "Row actions"),
   };
 
   const getColumnLabel = (header: string, colIndex: number) =>
     header ||
-    t("simulation.table.columnHeader", "Column {{index}}", {
+    t("common.simulation.table.columnHeader", "Column {{index}}", {
       index: colIndex + 1,
     });
 
   const getHeaderInputAriaLabel = (colIndex: number) =>
-    t("simulation.table.editColumnHeader", "Edit column {{index}} header", {
-      index: colIndex + 1,
-    });
+    t(
+      "common.simulation.table.editColumnHeader",
+      "Edit column {{index}} header",
+      {
+        index: colIndex + 1,
+      },
+    );
 
   const getCellInputAriaLabel = (rowIndex: number, colIndex: number) =>
     t(
-      "simulation.table.editCell",
+      "common.simulation.table.editCell",
       "Edit cell in row {{row}}, column {{column}}",
       {
         row: rowIndex + 1,
@@ -263,7 +322,7 @@ export function TableView({
             onClick={() => onRemoveRow?.(rowIndex)}
             disabled={disableRemoveRow}
             aria-label={t(
-              "simulation.table.removeRowWithIndex",
+              "common.simulation.table.removeRowWithIndex",
               "Remove row {{index}}",
               { index: rowIndex + 1 },
             )}
@@ -323,39 +382,19 @@ export function TableView({
           cellState.isInvalid && BODY_CELL_INVALID_CLASS,
         )}
       >
-        {cellState.canEdit ? (
-          <input
-            value={cellState.value}
-            onChange={(e) => onCellChange?.(rowIndex, colIndex, e.target.value)}
-            onBlur={() => onCellBlur?.(rowIndex, colIndex)}
-            disabled={cellState.disabled}
-            aria-invalid={cellState.isInvalid || undefined}
-            aria-label={getCellInputAriaLabel(rowIndex, colIndex)}
-            data-testid={
-              testIdPrefix
-                ? `${testIdPrefix}-cell-input-${rowIndex + 1}-${colIndex + 1}`
-                : undefined
-            }
-            className={cn(
-              CELL_INPUT_CLASS,
-              cellState.isInvalid && CELL_INPUT_INVALID_CLASS,
-            )}
-            autoComplete="off"
-            spellCheck="false"
-          />
-        ) : (
-          <div
-            aria-label={columnLabel}
-            data-testid={
-              testIdPrefix
-                ? `${testIdPrefix}-cell-value-${rowIndex + 1}-${colIndex + 1}`
-                : undefined
-            }
-            className={READ_ONLY_CELL_CLASS}
-          >
-            {cellState.value}
-          </div>
-        )}
+        <BodyCellContent
+          canEdit={cellState.canEdit}
+          value={cellState.value}
+          disabled={cellState.disabled}
+          isInvalid={cellState.isInvalid}
+          columnLabel={columnLabel}
+          inputAriaLabel={getCellInputAriaLabel(rowIndex, colIndex)}
+          testIdPrefix={testIdPrefix}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
+          onCellChange={onCellChange}
+          onCellBlur={onCellBlur}
+        />
       </td>
     );
   };

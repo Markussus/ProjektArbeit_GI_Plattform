@@ -1,0 +1,58 @@
+% ---------------------------------------------------------------------------
+% Fachmodul Zahlensysteme (Enrico Ebert)
+%
+% Inhaltlich abgeleitet aus Abschnitt 4.4 der Dokumentation
+% (includes/04_Designentscheidungen/04_04.tex).
+%
+% Die Kurznotizen stehen in \note{...}. Sie sind standardmäßig unsichtbar.
+% Zum Anzeigen in presentation.tex vor \begin{document} ergänzen:
+%     \setbeameroption{show notes}
+% oder für einen zweiten Bildschirm:
+%     \setbeameroption{show notes on second screen=right}
+% ---------------------------------------------------------------------------
+
+\addsectionframe{Fachmodul: Zahlensysteme}
+
+% ---------------------------------------------------------------------------
+\begin{itemframe}{Zahlensysteme konfigurieren}
+  \item Fünf Modi: \textit{Integers}, \textit{Negative}, \textit{Fractional}, \textit{IEEE-754} und \textit{Arithmetik} -- Übung oder Beispiel ordnet sich automatisch dem passenden Modus zu
+  \item Eingaben je nach Basis mit Regex-Filtern validiert, Bitlänge explizit begrenzt
+  \item Negative Zahlen in fester 8-Bit-Breite (Wertebereich $-128$ bis $127$, abgestimmt auf die Vorlesung)
+  \item Berechnungen durchgängig mit \texttt{BigInt} statt \texttt{Number}: keine Rundungsfehler bei großen Zahlen
+  \item 10 Übungen und 36 vorlesungsbegleitende Beispiele mit automatischer Rückmeldung
+\end{itemframe}
+\note{%
+  Einstieg: Das Modul deckt den Zahlenbereich der Vorlesung ab -- von der Basisumrechnung
+  bis zur Gleitkommadarstellung.
+  Die BigInt-Entscheidung kurz begründen: Number verliert ab 2\textasciicircum53 an Präzision.
+  Überleitung: "Wie läuft so eine Simulation konkret ab?"
+}
+
+% ---------------------------------------------------------------------------
+\begin{contentsframe}{Schrittausführung}
+\centering
+\vspace{3mm}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[node distance=15mm and 11mm]
+  \node[diagramnode, minimum width=3.4cm, font=\normalsize] (select) {Modus + Eingabe\\wählen};
+  \node[diagramnode, right=of select, minimum width=3.4cm, font=\normalsize] (validate) {Eingabe\\validieren};
+  \node[diagramnode, right=of validate, minimum width=4.2cm, font=\normalsize] (steps) {Schritt-Objekte\\mit \texttt{BigInt}\\erzeugen};
+  \node[diagramnode, right=of steps, minimum width=3.4cm, font=\normalsize] (render) {Rechengitter\\anzeigen};
+  \node[diagramnode, below=20mm of validate, minimum width=3.4cm, font=\normalsize] (error) {Fehlermeldung\\mit Hinweis};
+  \node[diagramnode, below=20mm of render, minimum width=3.4cm, font=\normalsize] (overflow) {Overflow-\\Warnbanner};
+
+  \draw[diagramarrow] (select) -- (validate);
+  \draw[diagramarrow] (validate) -- node[above, font=\small, text=black] {gültig} (steps);
+  \draw[diagramarrow] (steps) -- (render);
+  \draw[diagramarrow] (validate) -- node[left, font=\small, text=black] {ungültig} (error);
+  \draw[diagramarrow] (render) -- (overflow);
+  \draw[diagramarrow] (error.west) -| node[pos=0.25, below, font=\small, text=black] {korrigiert} (select.south);
+\end{tikzpicture}%
+}
+\end{contentsframe}
+\note{%
+  Hier zählt der Ablauf in der App, nicht das Rechenverfahren selbst.
+  Jede Stufe ist einzeln aufklappbar und mit i18n-Schlüsseln verknüpft --
+  dadurch bleibt die Erklärung bei Sprachwechsel konsistent.
+  Beim Überlauf: das Banner warnt nur, korrigiert aber nicht -- bewusste didaktische Entscheidung.
+}

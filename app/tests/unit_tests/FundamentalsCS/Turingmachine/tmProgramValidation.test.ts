@@ -1,31 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { TMProgram } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgram";
 import {
   isTMProgramValid,
   validateTMProgram,
 } from "@/pages/FundamentalsCS/TuringMachine/components/Simulator/domain/tmProgramValidation";
-
-function createProgram(overrides: Partial<TMProgram> = {}): TMProgram {
-  return {
-    states: ["q0", "q1", "halt"],
-    inputAlphabet: ["0", "1"],
-    tapeAlphabet: ["0", "1", "_"],
-    blankSymbol: "_",
-    initialState: "q0",
-    haltStates: ["halt"],
-    transitions: {
-      "0": {
-        q0: { nextState: "q1", writeSymbol: "1", movement: "R" },
-      },
-      "1": {
-        q1: { nextState: "halt", writeSymbol: "0", movement: "N" },
-      },
-    },
-    initialTape: ["0", "1"],
-    ...overrides,
-  };
-}
+import { createTestProgram as createProgram } from "./fixtures/defaultTMProgram";
 
 describe("tmProgramValidation", () => {
   describe("validateTMProgram", () => {
@@ -251,6 +230,61 @@ describe("tmProgramValidation", () => {
           },
         ]),
       );
+    });
+
+    it("handles sparse or undefined transition table buckets cleanly", () => {
+      const issues = validateTMProgram(
+        createProgram({
+          transitions: {
+            "0": {
+              q0: undefined,
+            },
+            "1": undefined,
+          },
+        }),
+      );
+
+      expect(issues).toEqual([]);
+    });
+
+    it("reports multiple simultaneous issues on a single transition cell", () => {
+      const issues = validateTMProgram(
+        createProgram({
+          transitions: {
+            "0": {
+              ghostState: {
+                nextState: "phantomNext",
+                writeSymbol: "invalidWrite",
+                movement: "R",
+              },
+            },
+          },
+        }),
+      );
+
+      expect(issues).toContainEqual({
+        code: "transition_state_missing",
+        path: "transitions.0.ghostState",
+        params: { state: "ghostState", symbol: "0" },
+      });
+      expect(issues).toContainEqual({
+        code: "transition_next_state_missing",
+        path: "transitions.0.ghostState.nextState",
+        params: {
+          state: "ghostState",
+          symbol: "0",
+          nextState: "phantomNext",
+        },
+      });
+      expect(issues).toContainEqual({
+        code: "transition_write_symbol_invalid",
+        path: "transitions.0.ghostState.writeSymbol",
+        params: {
+          state: "ghostState",
+          symbol: "0",
+          writeSymbol: "invalidWrite",
+        },
+      });
     });
 
     // Tests the derived-alphabet edge case showing that omitted blank and transition symbols are treated as present by validation.

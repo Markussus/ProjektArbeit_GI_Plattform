@@ -47,12 +47,13 @@ export function TMTransitionTableEditor({
         className="mb-2 min-h-[3.5rem]"
       >
         <h3 className="text-md font-semibold">
-          {t("tm.config.transitionTable.transitionTable")}
+          {t("turing-machine.config.transitionTable.transitionTable")}
         </h3>
         <p className="text-muted-foreground text-sm">
-          {t("tm.config.transitionTable.transitionFormat")}{" "}
-          <code>(Next State, Write Symbol, Movement)</code>
-          {t("tm.config.transitionTable.transitionExample")}
+          {t("turing-machine.config.transitionTable.transitionHintLine1")}
+        </p>
+        <p className="text-muted-foreground text-sm">
+          {t("turing-machine.config.transitionTable.transitionHintLine2")}
         </p>
       </div>
 

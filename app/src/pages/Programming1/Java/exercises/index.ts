@@ -27,6 +27,7 @@ interface JavaScenarioBase {
   descriptionKey: TranslationKey;
   fileName: string;
   code: string;
+  defaultStdin?: string;
 }
 
 export interface JavaExerciseScenario extends JavaScenarioBase {
@@ -51,72 +52,60 @@ const exerciseDifficultyOrder: Record<ExerciseDifficulty, number> = {
   hard: 2,
 };
 
-const defaultStarterCode = `public class Main {
-  public static void main(String[] args) {
-    System.out.println("Start coding in Java!");
-  }
-}
-`;
+const defaultStarterCode = `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Start coding in Java!");\n  }\n}\n`;
 
 export const javaProgrammingExamples: JavaExampleScenario[] = [
   {
     kind: "example",
-    id: "java.example1Title",
-    titleKey: "java.example1Title",
-    descriptionKey: "java.example1Text",
+    id: "java-programming.example1Title",
+    titleKey: "java-programming.example1Title",
+    descriptionKey: "java-programming.example1Text",
     fileName: "Main.java",
-    code: `public class Main {
-  public static void main(String[] args) {
-    System.out.println("Hello World");
-  }
-}
-`,
+    code: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello World");\n  }\n}\n`,
     definition: {
-      titleKey: "java.example1Title",
-      descriptionKey: "java.example1Text",
+      titleKey: "java-programming.example1Title",
+      descriptionKey: "java-programming.example1Text",
       icon: BookOpen,
     },
   },
   {
     kind: "example",
-    id: "java.example2Title",
-    titleKey: "java.example2Title",
-    descriptionKey: "java.example2Text",
+    id: "java-programming.example2Title",
+    titleKey: "java-programming.example2Title",
+    descriptionKey: "java-programming.example2Text",
     fileName: "Main.java",
-    code: `public class Main {
-  public static void main(String[] args) {
-    for (int i = 0; i < 5; i++) {
-      System.out.println("Hello World");
-    }
-  }
-}
-`,
+    code: `public class Main {\n  public static void main(String[] args) {\n    for (int i = 0; i < 5; i++) {\n      System.out.println("Hello World");\n    }\n  }\n}\n`,
     definition: {
-      titleKey: "java.example2Title",
-      descriptionKey: "java.example2Text",
+      titleKey: "java-programming.example2Title",
+      descriptionKey: "java-programming.example2Text",
       icon: Repeat,
     },
   },
   {
     kind: "example",
-    id: "java.example3Title",
-    titleKey: "java.example3Title",
-    descriptionKey: "java.example3Text",
+    id: "java-programming.example3Title",
+    titleKey: "java-programming.example3Title",
+    descriptionKey: "java-programming.example3Text",
     fileName: "Main.java",
-    code: `import java.util.Arrays;
-
-public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {5, 2, 9, 1, 4};
-    Arrays.sort(numbers);
-    System.out.println(Arrays.toString(numbers));
-  }
-}
-`,
+    code: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n    Arrays.sort(numbers);\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
     definition: {
-      titleKey: "java.example3Title",
-      descriptionKey: "java.example3Text",
+      titleKey: "java-programming.example3Title",
+      descriptionKey: "java-programming.example3Text",
       icon: Code2,
+    },
+  },
+  {
+    kind: "example",
+    id: "java-programming.example4Title",
+    titleKey: "java-programming.example4Title",
+    descriptionKey: "java-programming.example4Text",
+    fileName: "Main.java",
+    defaultStdin: "Ada Lovelace\n21\n",
+    code: `import java.util.Scanner;\n\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    String name = scanner.nextLine();\n    int age = scanner.nextInt();\n\n    System.out.println("Hallo " + name + "! In 10 Jahren bist du " + (age + 10) + " Jahre alt.");\n  }\n}\n`,
+    definition: {
+      titleKey: "java-programming.example4Title",
+      descriptionKey: "java-programming.example4Text",
+      icon: TerminalSquare,
     },
   },
 ];
@@ -125,63 +114,36 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
   [
     {
       kind: "exercise",
-      id: "java.exercise1",
+      id: "java-programming.exercise1",
       storageId: 0,
-      titleKey: "java.exercise1",
-      descriptionKey: "java.exercise1Desc",
+      titleKey: "java-programming.exercise1",
+      descriptionKey: "java-programming.exercise1Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    // TODO: print Hello World once
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    System.out.println("Hello World");
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    // TODO: print Hello World once\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello World");\n  }\n}\n`,
       validationCases: [
         {
           id: "hello-world",
           expectedStdout: "Hello World\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    // TODO: print Hello World once
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    // TODO: print Hello World once\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise1",
-        descriptionKey: "java.exercise1Desc",
+        titleKey: "java-programming.exercise1",
+        descriptionKey: "java-programming.exercise1Desc",
         difficulty: "easy",
         icon: TerminalSquare,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise2",
+      id: "java-programming.exercise2",
       storageId: 1,
-      titleKey: "java.exercise2",
-      descriptionKey: "java.exercise2Desc",
+      titleKey: "java-programming.exercise2",
+      descriptionKey: "java-programming.exercise2Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    // TODO: print Hello World five times with a loop
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    for (int i = 0; i < 5; i++) {
-      System.out.println("Hello World");
-    }
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    // TODO: print Hello World five times with a loop\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    for (int i = 0; i < 5; i++) {\n      System.out.println("Hello World");\n    }\n  }\n}\n`,
       validationCases: [
         {
           id: "five-lines",
@@ -189,45 +151,23 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
             "Hello World\nHello World\nHello World\nHello World\nHello World\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    // TODO: print Hello World five times with a loop
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    // TODO: print Hello World five times with a loop\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise2",
-        descriptionKey: "java.exercise2Desc",
+        titleKey: "java-programming.exercise2",
+        descriptionKey: "java-programming.exercise2Desc",
         difficulty: "easy",
         icon: Repeat,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise3",
+      id: "java-programming.exercise3",
       storageId: 2,
-      titleKey: "java.exercise3",
-      descriptionKey: "java.exercise3Desc",
+      titleKey: "java-programming.exercise3",
+      descriptionKey: "java-programming.exercise3Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    int firstNumber = 7;
-    int secondNumber = 5;
-
-    // TODO: store the sum in a variable and print it
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    int firstNumber = 7;
-    int secondNumber = 5;
-    int sum = firstNumber + secondNumber;
-
-    System.out.println(sum);
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    int firstNumber = 7;\n    int secondNumber = 5;\n\n    // TODO: store the sum in a variable and print it\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int firstNumber = 7;\n    int secondNumber = 5;\n    int sum = firstNumber + secondNumber;\n\n    System.out.println(sum);\n  }\n}\n`,
       validationCases: [
         {
           id: "sum-default",
@@ -242,54 +182,23 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
           expectedStdout: "42\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    int firstNumber = 7;
-    int secondNumber = 5;
-    int sum = 0;
-
-    // TODO: calculate the sum of both numbers
-    System.out.println(sum);
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    int firstNumber = 7;\n    int secondNumber = 5;\n    int sum = 0;\n\n    // TODO: calculate the sum of both numbers\n    System.out.println(sum);\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise3",
-        descriptionKey: "java.exercise3Desc",
+        titleKey: "java-programming.exercise3",
+        descriptionKey: "java-programming.exercise3Desc",
         difficulty: "easy",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise4",
+      id: "java-programming.exercise4",
       storageId: 3,
-      titleKey: "java.exercise4",
-      descriptionKey: "java.exercise4Desc",
+      titleKey: "java-programming.exercise4",
+      descriptionKey: "java-programming.exercise4Desc",
       fileName: "Main.java",
-      starterCode: `import java.util.Arrays;
-
-public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {5, 2, 9, 1, 4};
-
-    // TODO: sort the array in ascending order
-
-    System.out.println(Arrays.toString(numbers));
-  }
-}
-`,
-      solutionCode: `import java.util.Arrays;
-
-public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {5, 2, 9, 1, 4};
-    Arrays.sort(numbers);
-
-    System.out.println(Arrays.toString(numbers));
-  }
-}
-`,
+      starterCode: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n\n    // TODO: sort the array in ascending order\n\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
+      solutionCode: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n    Arrays.sort(numbers);\n\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
       validationCases: [
         {
           id: "sort-default-array",
@@ -305,57 +214,23 @@ public class Main {
           expectedStdout: "[-1, 0, 7, 7, 42]\n",
         },
       ],
-      code: `import java.util.Arrays;
-
-public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {5, 2, 9, 1, 4};
-
-    // TODO: sort the array in ascending order
-    System.out.println(Arrays.toString(numbers));
-  }
-}
-`,
+      code: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n\n    // TODO: sort the array in ascending order\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise4",
-        descriptionKey: "java.exercise4Desc",
+        titleKey: "java-programming.exercise4",
+        descriptionKey: "java-programming.exercise4Desc",
         difficulty: "medium",
         icon: ArrowDownWideNarrow,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise5",
+      id: "java-programming.exercise5",
       storageId: 4,
-      titleKey: "java.exercise5",
-      descriptionKey: "java.exercise5Desc",
+      titleKey: "java-programming.exercise5",
+      descriptionKey: "java-programming.exercise5Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {3, 8, 1, 6, 9};
-    int max = numbers[0];
-
-    // TODO: find the largest value in the array
-
-    System.out.println(max);
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {3, 8, 1, 6, 9};
-    int max = numbers[0];
-
-    for (int number : numbers) {
-      if (number > max) {
-        max = number;
-      }
-    }
-
-    System.out.println(max);
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    // TODO: find the largest value in the array\n\n    System.out.println(max);\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    for (int number : numbers) {\n      if (number > max) {\n        max = number;\n      }\n    }\n\n    System.out.println(max);\n  }\n}\n`,
       validationCases: [
         {
           id: "max-default-array",
@@ -371,52 +246,24 @@ public class Main {
           expectedStdout: "-2\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    int[] numbers = {3, 8, 1, 6, 9};
-    int max = numbers[0];
-
-    // TODO: find the largest value
-    System.out.println(max);
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    // TODO: find the largest value\n    System.out.println(max);\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise5",
-        descriptionKey: "java.exercise5Desc",
+        titleKey: "java-programming.exercise5",
+        descriptionKey: "java-programming.exercise5Desc",
         difficulty: "medium",
         icon: ListOrdered,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise6",
+      id: "java-programming.exercise6",
       storageId: 5,
-      titleKey: "java.exercise6",
-      descriptionKey: "java.exercise6Desc",
+      titleKey: "java-programming.exercise6",
+      descriptionKey: "java-programming.exercise6Desc",
       fileName: "Main.java",
-      starterCode: `import java.util.Scanner;
-
-public class Main {
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    String text = scanner.nextLine();
-
-    // TODO: print the text in uppercase
-  }
-}
-`,
-      solutionCode: `import java.util.Scanner;
-
-public class Main {
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    String text = scanner.nextLine();
-
-    System.out.println(text.toUpperCase());
-  }
-}
-`,
+      defaultStdin: "hello java\n",
+      starterCode: `import java.util.Scanner;\n\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    String text = scanner.nextLine();\n\n    // TODO: print the text in uppercase\n  }\n}\n`,
+      solutionCode: `import java.util.Scanner;\n\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    String text = scanner.nextLine();\n\n    System.out.println(text.toUpperCase());\n  }\n}\n`,
       validationCases: [
         {
           id: "uppercase-hello",
@@ -429,52 +276,23 @@ public class Main {
           expectedStdout: "BROWSER COMPILER\n",
         },
       ],
-      code: `import java.util.Scanner;
-
-public class Main {
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    String text = scanner.nextLine();
-
-    // TODO: print the text in uppercase
-  }
-}
-`,
+      code: `import java.util.Scanner;\n\npublic class Main {\n  public static void main(String[] args) {\n    Scanner scanner = new Scanner(System.in);\n    String text = scanner.nextLine();\n\n    // TODO: print the text in uppercase\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise6",
-        descriptionKey: "java.exercise6Desc",
+        titleKey: "java-programming.exercise6",
+        descriptionKey: "java-programming.exercise6Desc",
         difficulty: "medium",
         icon: TerminalSquare,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise7",
+      id: "java-programming.exercise7",
       storageId: 6,
-      titleKey: "java.exercise7",
-      descriptionKey: "java.exercise7Desc",
+      titleKey: "java-programming.exercise7",
+      descriptionKey: "java-programming.exercise7Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    System.out.println(square(6));
-  }
-
-  static int square(int value) {
-    // TODO: return value multiplied by itself
-    return 0;
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    System.out.println(square(6));
-  }
-
-  static int square(int value) {
-    return value * value;
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    System.out.println(square(6));\n  }\n\n  static int square(int value) {\n    // TODO: return value multiplied by itself\n    return 0;\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    System.out.println(square(6));\n  }\n\n  static int square(int value) {\n    return value * value;\n  }\n}\n`,
       validationCases: [
         {
           id: "square-default",
@@ -490,73 +308,23 @@ public class Main {
           expectedStdout: "144\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    System.out.println(square(6));
-  }
-
-  static int square(int value) {
-    // TODO: return value multiplied by itself
-    return 0;
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    System.out.println(square(6));\n  }\n\n  static int square(int value) {\n    // TODO: return value multiplied by itself\n    return 0;\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise7",
-        descriptionKey: "java.exercise7Desc",
+        titleKey: "java-programming.exercise7",
+        descriptionKey: "java-programming.exercise7Desc",
         difficulty: "medium",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise8",
+      id: "java-programming.exercise8",
       storageId: 7,
-      titleKey: "java.exercise8",
-      descriptionKey: "java.exercise8Desc",
+      titleKey: "java-programming.exercise8",
+      descriptionKey: "java-programming.exercise8Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    Student student = new Student("Ada", 21);
-    System.out.println(student.describe());
-  }
-}
-
-class Student {
-  String name;
-  int age;
-
-  Student(String name, int age) {
-    // TODO: store both constructor arguments
-  }
-
-  String describe() {
-    // TODO: return "Ada is 21"
-    return "";
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    Student student = new Student("Ada", 21);
-    System.out.println(student.describe());
-  }
-}
-
-class Student {
-  String name;
-  int age;
-
-  Student(String name, int age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  String describe() {
-    return name + " is " + age;
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    Student student = new Student("Ada", 21);\n    System.out.println(student.describe());\n  }\n}\n\nclass Student {\n  String name;\n  int age;\n\n  Student(String name, int age) {\n    // TODO: store both constructor arguments\n  }\n\n  String describe() {\n    // TODO: return "Ada is 21"\n    return "";\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    Student student = new Student("Ada", 21);\n    System.out.println(student.describe());\n  }\n}\n\nclass Student {\n  String name;\n  int age;\n\n  Student(String name, int age) {\n    this.name = name;\n    this.age = age;\n  }\n\n  String describe() {\n    return name + " is " + age;\n  }\n}\n`,
       validationCases: [
         {
           id: "student-default",
@@ -572,72 +340,23 @@ class Student {
           expectedStdout: "Grace is 30\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    Student student = new Student("Ada", 21);
-    System.out.println(student.describe());
-  }
-}
-
-class Student {
-  String name;
-  int age;
-
-  Student(String name, int age) {
-    // TODO: store both constructor arguments
-  }
-
-  String describe() {
-    // TODO: return "Ada is 21"
-    return "";
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    Student student = new Student("Ada", 21);\n    System.out.println(student.describe());\n  }\n}\n\nclass Student {\n  String name;\n  int age;\n\n  Student(String name, int age) {\n    // TODO: store both constructor arguments\n  }\n\n  String describe() {\n    // TODO: return "Ada is 21"\n    return "";\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise8",
-        descriptionKey: "java.exercise8Desc",
+        titleKey: "java-programming.exercise8",
+        descriptionKey: "java-programming.exercise8Desc",
         difficulty: "medium",
         icon: Code2,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise9",
+      id: "java-programming.exercise9",
       storageId: 8,
-      titleKey: "java.exercise9",
-      descriptionKey: "java.exercise9Desc",
+      titleKey: "java-programming.exercise9",
+      descriptionKey: "java-programming.exercise9Desc",
       fileName: "Main.java",
-      starterCode: `import java.util.ArrayList;
-import java.util.Collections;
-
-public class Main {
-  public static void main(String[] args) {
-    ArrayList<Integer> numbers = new ArrayList<>();
-    numbers.add(4);
-    numbers.add(1);
-    numbers.add(4);
-    numbers.add(2);
-
-    // TODO: sort the list and print it
-  }
-}
-`,
-      solutionCode: `import java.util.ArrayList;
-import java.util.Collections;
-
-public class Main {
-  public static void main(String[] args) {
-    ArrayList<Integer> numbers = new ArrayList<>();
-    numbers.add(4);
-    numbers.add(1);
-    numbers.add(4);
-    numbers.add(2);
-
-    Collections.sort(numbers);
-    System.out.println(numbers);
-  }
-}
-`,
+      starterCode: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
+      solutionCode: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    Collections.sort(numbers);\n    System.out.println(numbers);\n  }\n}\n`,
       validationCases: [
         {
           id: "list-default",
@@ -653,64 +372,23 @@ public class Main {
           expectedStdout: "[-1, 3, 3, 9]\n",
         },
       ],
-      code: `import java.util.ArrayList;
-import java.util.Collections;
-
-public class Main {
-  public static void main(String[] args) {
-    ArrayList<Integer> numbers = new ArrayList<>();
-    numbers.add(4);
-    numbers.add(1);
-    numbers.add(4);
-    numbers.add(2);
-
-    // TODO: sort the list and print it
-  }
-}
-`,
+      code: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise9",
-        descriptionKey: "java.exercise9Desc",
+        titleKey: "java-programming.exercise9",
+        descriptionKey: "java-programming.exercise9Desc",
         difficulty: "medium",
         icon: ListOrdered,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise10",
+      id: "java-programming.exercise10",
       storageId: 9,
-      titleKey: "java.exercise10",
-      descriptionKey: "java.exercise10Desc",
+      titleKey: "java-programming.exercise10",
+      descriptionKey: "java-programming.exercise10Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    int limit = 15;
-
-    for (int number = 1; number <= limit; number++) {
-      // TODO: print Fizz for multiples of 3, Buzz for multiples
-      // of 5, FizzBuzz for both, otherwise the number
-    }
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    int limit = 15;
-
-    for (int number = 1; number <= limit; number++) {
-      if (number % 15 == 0) {
-        System.out.println("FizzBuzz");
-      } else if (number % 3 == 0) {
-        System.out.println("Fizz");
-      } else if (number % 5 == 0) {
-        System.out.println("Buzz");
-      } else {
-        System.out.println(number);
-      }
-    }
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    int limit = 15;\n\n    for (int number = 1; number <= limit; number++) {\n      // TODO: print Fizz for multiples of 3, Buzz for multiples\n      // of 5, FizzBuzz for both, otherwise the number\n    }\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int limit = 15;\n\n    for (int number = 1; number <= limit; number++) {\n      if (number % 15 == 0) {\n        System.out.println("FizzBuzz");\n      } else if (number % 3 == 0) {\n        System.out.println("Fizz");\n      } else if (number % 5 == 0) {\n        System.out.println("Buzz");\n      } else {\n        System.out.println(number);\n      }\n    }\n  }\n}\n`,
       validationCases: [
         {
           id: "fizzbuzz-fifteen",
@@ -724,64 +402,23 @@ public class Main {
           expectedStdout: "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    int limit = 15;
-
-    for (int number = 1; number <= limit; number++) {
-      // TODO: implement FizzBuzz
-    }
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    int limit = 15;\n\n    for (int number = 1; number <= limit; number++) {\n      // TODO: implement FizzBuzz\n    }\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise10",
-        descriptionKey: "java.exercise10Desc",
+        titleKey: "java-programming.exercise10",
+        descriptionKey: "java-programming.exercise10Desc",
         difficulty: "easy",
         icon: Repeat,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise11",
+      id: "java-programming.exercise11",
       storageId: 10,
-      titleKey: "java.exercise11",
-      descriptionKey: "java.exercise11Desc",
+      titleKey: "java-programming.exercise11",
+      descriptionKey: "java-programming.exercise11Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    String text = "lagerregal";
-    System.out.println(isPalindrome(text));
-  }
-
-  static boolean isPalindrome(String text) {
-    // TODO: compare characters from both ends
-    return false;
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    String text = "lagerregal";
-    System.out.println(isPalindrome(text));
-  }
-
-  static boolean isPalindrome(String text) {
-    int left = 0;
-    int right = text.length() - 1;
-
-    while (left < right) {
-      if (text.charAt(left) != text.charAt(right)) {
-        return false;
-      }
-      left++;
-      right--;
-    }
-
-    return true;
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    String text = "lagerregal";\n    System.out.println(isPalindrome(text));\n  }\n\n  static boolean isPalindrome(String text) {\n    // TODO: compare characters from both ends\n    return false;\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    String text = "lagerregal";\n    System.out.println(isPalindrome(text));\n  }\n\n  static boolean isPalindrome(String text) {\n    int left = 0;\n    int right = text.length() - 1;\n\n    while (left < right) {\n      if (text.charAt(left) != text.charAt(right)) {\n        return false;\n      }\n      left++;\n      right--;\n    }\n\n    return true;\n  }\n}\n`,
       validationCases: [
         {
           id: "palindrome-true",
@@ -806,68 +443,23 @@ public class Main {
           expectedStdout: "true\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    String text = "lagerregal";
-    System.out.println(isPalindrome(text));
-  }
-
-  static boolean isPalindrome(String text) {
-    // TODO: implement the palindrome check
-    return false;
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    String text = "lagerregal";\n    System.out.println(isPalindrome(text));\n  }\n\n  static boolean isPalindrome(String text) {\n    // TODO: implement the palindrome check\n    return false;\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise11",
-        descriptionKey: "java.exercise11Desc",
+        titleKey: "java-programming.exercise11",
+        descriptionKey: "java-programming.exercise11Desc",
         difficulty: "medium",
         icon: Code2,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise12",
+      id: "java-programming.exercise12",
       storageId: 11,
-      titleKey: "java.exercise12",
-      descriptionKey: "java.exercise12Desc",
+      titleKey: "java-programming.exercise12",
+      descriptionKey: "java-programming.exercise12Desc",
       fileName: "Main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    int[][] matrix = {
-      {3, 1, 4},
-      {1, 5, 9},
-      {2, 6, 5}
-    };
-
-    // TODO: print the sum of every row and then the main diagonal sum
-  }
-}
-`,
-      solutionCode: `public class Main {
-  public static void main(String[] args) {
-    int[][] matrix = {
-      {3, 1, 4},
-      {1, 5, 9},
-      {2, 6, 5}
-    };
-
-    for (int row = 0; row < matrix.length; row++) {
-      int rowSum = 0;
-      for (int column = 0; column < matrix[row].length; column++) {
-        rowSum += matrix[row][column];
-      }
-      System.out.println(rowSum);
-    }
-
-    int diagonalSum = 0;
-    for (int index = 0; index < matrix.length; index++) {
-      diagonalSum += matrix[index][index];
-    }
-    System.out.println(diagonalSum);
-  }
-}
-`,
+      starterCode: `public class Main {\n  public static void main(String[] args) {\n    int[][] matrix = {\n      {3, 1, 4},\n      {1, 5, 9},\n      {2, 6, 5}\n    };\n\n    // TODO: print the sum of every row and then the main diagonal sum\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int[][] matrix = {\n      {3, 1, 4},\n      {1, 5, 9},\n      {2, 6, 5}\n    };\n\n    for (int row = 0; row < matrix.length; row++) {\n      int rowSum = 0;\n      for (int column = 0; column < matrix[row].length; column++) {\n        rowSum += matrix[row][column];\n      }\n      System.out.println(rowSum);\n    }\n\n    int diagonalSum = 0;\n    for (int index = 0; index < matrix.length; index++) {\n      diagonalSum += matrix[index][index];\n    }\n    System.out.println(diagonalSum);\n  }\n}\n`,
       validationCases: [
         {
           id: "matrix-default",
@@ -878,121 +470,28 @@ public class Main {
           sourceTransform: (sourceCode) =>
             sourceCode.replace(
               /int\[\]\[\]\s+matrix\s*=\s*\{[\s\S]*?\n\s*\};/,
-              `int[][] matrix = {
-      {1, 2, 3},
-      {4, 5, 6},
-      {7, 8, 9}
-    };`,
+              `int[][] matrix = {\n      {1, 2, 3},\n      {4, 5, 6},\n      {7, 8, 9}\n    };`,
             ),
           expectedStdout: "6\n15\n24\n15\n",
         },
       ],
-      code: `public class Main {
-  public static void main(String[] args) {
-    int[][] matrix = {
-      {3, 1, 4},
-      {1, 5, 9},
-      {2, 6, 5}
-    };
-
-    // TODO: calculate row sums and the diagonal sum
-  }
-}
-`,
+      code: `public class Main {\n  public static void main(String[] args) {\n    int[][] matrix = {\n      {3, 1, 4},\n      {1, 5, 9},\n      {2, 6, 5}\n    };\n\n    // TODO: calculate row sums and the diagonal sum\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise12",
-        descriptionKey: "java.exercise12Desc",
+        titleKey: "java-programming.exercise12",
+        descriptionKey: "java-programming.exercise12Desc",
         difficulty: "hard",
         icon: Calculator,
       },
     },
     {
       kind: "exercise",
-      id: "java.exercise13",
+      id: "java-programming.exercise13",
       storageId: 12,
-      titleKey: "java.exercise13",
-      descriptionKey: "java.exercise13Desc",
+      titleKey: "java-programming.exercise13",
+      descriptionKey: "java-programming.exercise13Desc",
       fileName: "Main.java",
-      starterCode: `import java.util.ArrayList;
-
-public class Main {
-  public static void main(String[] args) {
-    ShoppingCart cart = new ShoppingCart();
-    cart.addPrice(499);
-    cart.addPrice(1299);
-    cart.addPrice(401);
-
-    System.out.println(cart.getItemCount());
-    System.out.println(cart.getTotalCents());
-    System.out.println(cart.getMostExpensiveCents());
-  }
-}
-
-class ShoppingCart {
-  private ArrayList<Integer> prices = new ArrayList<>();
-
-  void addPrice(int cents) {
-    // TODO: add the price
-  }
-
-  int getItemCount() {
-    return 0;
-  }
-
-  int getTotalCents() {
-    return 0;
-  }
-
-  int getMostExpensiveCents() {
-    return 0;
-  }
-}
-`,
-      solutionCode: `import java.util.ArrayList;
-
-public class Main {
-  public static void main(String[] args) {
-    ShoppingCart cart = new ShoppingCart();
-    cart.addPrice(499);
-    cart.addPrice(1299);
-    cart.addPrice(401);
-
-    System.out.println(cart.getItemCount());
-    System.out.println(cart.getTotalCents());
-    System.out.println(cart.getMostExpensiveCents());
-  }
-}
-
-class ShoppingCart {
-  private ArrayList<Integer> prices = new ArrayList<>();
-
-  void addPrice(int cents) {
-    prices.add(cents);
-  }
-
-  int getItemCount() {
-    return prices.size();
-  }
-
-  int getTotalCents() {
-    int total = 0;
-    for (int price : prices) {
-      total += price;
-    }
-    return total;
-  }
-
-  int getMostExpensiveCents() {
-    int mostExpensive = 0;
-    for (int price : prices) {
-      if (price > mostExpensive) {
-        mostExpensive = price;
-      }
-    }
-    return mostExpensive;
-  }
-}
-`,
+      starterCode: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ShoppingCart cart = new ShoppingCart();\n    cart.addPrice(499);\n    cart.addPrice(1299);\n    cart.addPrice(401);\n\n    System.out.println(cart.getItemCount());\n    System.out.println(cart.getTotalCents());\n    System.out.println(cart.getMostExpensiveCents());\n  }\n}\n\nclass ShoppingCart {\n  private ArrayList<Integer> prices = new ArrayList<>();\n\n  void addPrice(int cents) {\n    // TODO: add the price\n  }\n\n  int getItemCount() {\n    return 0;\n  }\n\n  int getTotalCents() {\n    return 0;\n  }\n\n  int getMostExpensiveCents() {\n    return 0;\n  }\n}\n`,
+      solutionCode: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ShoppingCart cart = new ShoppingCart();\n    cart.addPrice(499);\n    cart.addPrice(1299);\n    cart.addPrice(401);\n\n    System.out.println(cart.getItemCount());\n    System.out.println(cart.getTotalCents());\n    System.out.println(cart.getMostExpensiveCents());\n  }\n}\n\nclass ShoppingCart {\n  private ArrayList<Integer> prices = new ArrayList<>();\n\n  void addPrice(int cents) {\n    prices.add(cents);\n  }\n\n  int getItemCount() {\n    return prices.size();\n  }\n\n  int getTotalCents() {\n    int total = 0;\n    for (int price : prices) {\n      total += price;\n    }\n    return total;\n  }\n\n  int getMostExpensiveCents() {\n    int mostExpensive = 0;\n    for (int price : prices) {\n      if (price > mostExpensive) {\n        mostExpensive = price;\n      }\n    }\n    return mostExpensive;\n  }\n}\n`,
       validationCases: [
         {
           id: "cart-default",
@@ -1008,44 +507,10 @@ class ShoppingCart {
           expectedStdout: "3\n2000\n1000\n",
         },
       ],
-      code: `import java.util.ArrayList;
-
-public class Main {
-  public static void main(String[] args) {
-    ShoppingCart cart = new ShoppingCart();
-    cart.addPrice(499);
-    cart.addPrice(1299);
-    cart.addPrice(401);
-
-    System.out.println(cart.getItemCount());
-    System.out.println(cart.getTotalCents());
-    System.out.println(cart.getMostExpensiveCents());
-  }
-}
-
-class ShoppingCart {
-  private ArrayList<Integer> prices = new ArrayList<>();
-
-  void addPrice(int cents) {
-    // TODO
-  }
-
-  int getItemCount() {
-    return 0;
-  }
-
-  int getTotalCents() {
-    return 0;
-  }
-
-  int getMostExpensiveCents() {
-    return 0;
-  }
-}
-`,
+      code: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ShoppingCart cart = new ShoppingCart();\n    cart.addPrice(499);\n    cart.addPrice(1299);\n    cart.addPrice(401);\n\n    System.out.println(cart.getItemCount());\n    System.out.println(cart.getTotalCents());\n    System.out.println(cart.getMostExpensiveCents());\n  }\n}\n\nclass ShoppingCart {\n  private ArrayList<Integer> prices = new ArrayList<>();\n\n  void addPrice(int cents) {\n    // TODO\n  }\n\n  int getItemCount() {\n    return 0;\n  }\n\n  int getTotalCents() {\n    return 0;\n  }\n\n  int getMostExpensiveCents() {\n    return 0;\n  }\n}\n`,
       definition: {
-        titleKey: "java.exercise13",
-        descriptionKey: "java.exercise13Desc",
+        titleKey: "java-programming.exercise13",
+        descriptionKey: "java-programming.exercise13Desc",
         difficulty: "hard",
         icon: ListOrdered,
       },
@@ -1055,9 +520,6 @@ class ShoppingCart {
 
 export const javaProgrammingExerciseDefinitions: ExerciseDefinition[] =
   javaProgrammingExercises.map((exercise) => exercise.definition);
-
-export const javaProgrammingExampleDefinitions: ExampleDefinition[] =
-  javaProgrammingExamples.map((example) => example.definition);
 
 const scenarioById = new Map<TranslationKey, JavaScenario>(
   [...javaProgrammingExercises, ...javaProgrammingExamples].map((scenario) => [
@@ -1082,6 +544,10 @@ export function getJavaStarterCode(itemId?: string | null) {
   }
 
   return defaultStarterCode;
+}
+
+export function getJavaDefaultStdin(itemId?: string | null): string {
+  return getJavaScenario(itemId)?.defaultStdin ?? "";
 }
 
 export function getJavaFileName(itemId?: string | null) {

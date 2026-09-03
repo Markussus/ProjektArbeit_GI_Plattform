@@ -1,0 +1,236 @@
+{
+  "topic": {
+    "title": "Endliche Automaten",
+    "description": "Studieren Sie deterministische und nicht-deterministische endliche Automaten. Erstellen Sie DFAs und NFAs, konvertieren Sie reguläre Grammatiken und durchlaufen Sie Eingabewörter Schritt für Schritt.",
+    "tutorialVideo": "Demo-Video zu endlichen Automaten"
+  },
+  "editor": {
+    "manual": "Manueller Editor",
+    "grammar": "Aus Grammatik"
+  },
+  "config": {
+    "title": "Automaten-Konfiguration",
+    "type": "Typ",
+    "alphabet": "Alphabet (kommagetrennt)",
+    "startState": "Startzustand",
+    "acceptStates": "Akzeptierende Zustände (kommagetrennt)",
+    "addEpsilon": "ε-Übergänge hinzufügen",
+    "addState": "Zustand hinzufügen",
+    "removeState": "Zustand {{state}} entfernen",
+    "transitionTable": "Übergangstabelle",
+    "inputWord": "Eingabewort",
+    "inputWordHelp": "Jedes Zeichen wird als ein Eingabesymbol behandelt.",
+    "apply": "Simulation starten"
+  },
+  "exercisesTab": {
+    "status": {
+      "notStarted": "Nicht begonnen",
+      "inProgress": "In Bearbeitung",
+      "completed": "Abgeschlossen"
+    },
+    "endsWith01": {
+      "title": "Wörter, die mit \"01\" enden",
+      "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit \"01\" enden.",
+      "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole \"0\" gefolgt von \"1\" sind (z. B. \"01\", \"101\", \"1001\"). Wörter, die anders enden, müssen abgelehnt werden."
+    },
+    "endsWith00": {
+      "title": "Wörter, die mit \"00\" enden",
+      "goal": "Bauen Sie einen DFA, der binäre Wörter akzeptiert, die mit zwei Nullen enden.",
+      "description": "Entwerfen Sie einen DFA über {0, 1}, der genau die Wörter akzeptiert, deren letzte beiden Symbole Nullen sind (z. B. \"00\", \"100\", \"1100\"). Einzelne Nullen oder Wörter, die mit 1 enden, müssen abgelehnt werden."
+    },
+    "evenOnes": {
+      "title": "Gerade Anzahl von 1en",
+      "goal": "Akzeptieren Sie binäre Wörter mit einer geraden Anzahl von 1en (einschließlich null).",
+      "description": "Entwerfen Sie einen DFA, der die Parität der bisher gesehenen 1en verfolgt. Das leere Wort soll akzeptiert werden (Null ist gerade)."
+    },
+    "noConsecOnes": {
+      "title": "Keine zwei aufeinanderfolgenden 1en",
+      "goal": "Akzeptieren Sie binäre Wörter, die nie \"11\" als Teilwort enthalten.",
+      "description": "Entwerfen Sie einen DFA, der jedes Wort ablehnt, in dem zwei 1en direkt nebeneinander stehen. Wörter wie \"0\", \"01\", \"010\" werden akzeptiert; \"11\", \"0110\" abgelehnt."
+    },
+    "divBy3": {
+      "title": "Binärzahlen teilbar durch 3",
+      "goal": "Akzeptieren Sie binäre Wörter, deren Dezimalwert durch 3 teilbar ist.",
+      "description": "Bauen Sie einen DFA, der den laufenden Rest des Binärwerts modulo 3 verfolgt. Akzeptieren Sie die Zustände, die Rest 0 repräsentieren."
+    },
+    "grammarTwoOnesZeros": {
+      "title": "Automat aus Grammatik: 11 0ⁿ",
+      "goal": "Bauen Sie einen DFA für die Sprache L = { 11 0ⁿ | n ≥ 0 }: zwei Einsen, gefolgt von beliebig vielen Nullen.",
+      "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die die unten stehende rechtslineare Grammatik ableitet, und prüfen Sie anschließend, ob das Wort „11001“ zur Sprache gehört."
+    },
+    "grammarOnes": {
+      "title": "Automat aus Grammatik: 1 0ⁿ 1",
+      "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+      "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
+    },
+    "grammar0011": {
+      "title": "Automat aus Grammatik: (0011)(0011)*",
+      "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+      "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
+    },
+    "grammarOnesZero": {
+      "title": "Automat aus Grammatik: 1ⁿ 0",
+      "goal": "Bauen Sie einen DFA für die von der untenstehenden Grammatik erzeugte Sprache.",
+      "description": "Konstruieren Sie einen DFA, der genau die Wörter akzeptiert, die diese rechtslineare Grammatik ableitet. Jedes Nichtterminal wird zu einem Zustand; die ε-Produktion kennzeichnet einen akzeptierenden Zustand."
+    },
+    "categories": {
+      "languageToAutomaton": {
+        "title": "Sprache → Automat",
+        "description": "Bauen Sie einen Automaten, der genau die beschriebene Wortmenge akzeptiert."
+      },
+      "grammarToAutomaton": {
+        "title": "Grammatik → Automat",
+        "description": "Jede rechtslineare Grammatik definiert eine Sprache. Bauen Sie den DFA zu der in der Aufgabe gezeigten Grammatik."
+      }
+    }
+  },
+  "exerciseWorkspace": {
+    "check": "Lösung prüfen",
+    "showSolution": "Lösung laden",
+    "structuralFail": "Ihr Automat ist noch nicht gültig",
+    "structuralHint": "Beheben Sie die markierten Konfigurationsprobleme, bevor wir mit der Lösung vergleichen können.",
+    "passed": "Alle Tests bestanden!",
+    "passedDetail": "{{n}} von {{total}} Testwörtern korrekt akzeptiert/abgelehnt.",
+    "failed": "Entspricht nicht der erwarteten Sprache",
+    "failedDetail": "{{passed}} von {{total}} Testwörtern stimmten überein, {{failed}} nicht.",
+    "counterexample": "Gegenbeispiel:",
+    "expected": "erwartet",
+    "got": "erhalten",
+    "accept": "akzeptieren",
+    "reject": "ablehnen",
+    "unbuiltTitle": "Bauen Sie zuerst Ihren Automaten",
+    "unbuiltBody": "Fügen Sie Zustände, Übergänge und mindestens einen Endzustand hinzu und klicken Sie dann erneut auf „Lösung prüfen“.",
+    "grammarLabel": "Grammatik",
+    "grammarEpsilonNote": "ε steht für das leere Wort und kennzeichnet einen akzeptierenden (End-)Zustand."
+  },
+  "examples": {
+    "containsAba": {
+      "title": "Enthält Teilwort \"aba\"",
+      "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus."
+    },
+    "lecture": {
+      "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
+      "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da für die letzte „0“ in S2 kein Übergang definiert ist. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."
+    },
+    "endsWithAb": {
+      "title": "Endet auf „ab“",
+      "description": "Ein DFA über {a, b}, der genau die Wörter akzeptiert, die auf „ab“ enden — der Automat, mit dem der Simulator früher startete. „aab“ wird akzeptiert, „aba“ abgelehnt."
+    },
+    "grammar": {
+      "title": "Grammatik → Automat",
+      "description": "Die rechtslineare Grammatik G = {S → 0S | 0A, A → 1A | 1} wird in einen NFA und anschließend über die Teilmengenkonstruktion in einen minimalen DFA umgewandelt. Beide akzeptieren die Sprache L = {0ⁿ 1ᵐ | n,m ≥ 1}."
+    },
+    "categories": {
+      "dfa": {
+        "title": "Deterministische Automaten (DFA)",
+        "description": "Verfolgen Sie einen einzelnen Lauf: genau ein Übergang pro Zustand und Symbol."
+      },
+      "nfa": {
+        "title": "Nichtdeterministische Automaten (NFA)",
+        "description": "Mehrere Zustände können gleichzeitig aktiv sein — das Wort wird akzeptiert, wenn irgendein Pfad einen Endzustand erreicht."
+      },
+      "grammarToAutomaton": {
+        "title": "Grammatik → Automat",
+        "description": "Überführen Sie eine rechtslineare Grammatik in einen Automaten und vergleichen Sie den NFA mit einem äquivalenten DFA."
+      }
+    }
+  },
+  "batch": {
+    "title": "Stapeltest",
+    "placeholder": "Wörter eingeben, z.B.: \n101\n100\n11100",
+    "runAll": "Alle testen",
+    "clear": "Leeren",
+    "total": "gesamt",
+    "steps": "Schritte"
+  },
+  "grammar": {
+    "title": "Reguläre Grammatik → Automat",
+    "intro": "Geben Sie eine rechtslineare Grammatik ein. Das erste Nichtterminal links wird zum Startsymbol; Nichtterminale und Terminale werden aus den Produktionen abgeleitet.",
+    "productions": "Grammatik",
+    "productionsHint": "Eine Produktion pro Zeile. Zwei Formate werden unterstützt (automatische Erkennung).",
+    "convert": "In Automat umwandeln",
+    "loadExample": "Beispiel laden",
+    "supportedFormats": "Unterstützte Formate",
+    "format1Label": "Format 1 — vereinfacht",
+    "format2Label": "Format 2 — strukturiert",
+    "detectedFormat": "Erkanntes Format",
+    "format": {
+      "simple": "Vereinfacht",
+      "structured": "Strukturiert"
+    },
+    "parseError": "Grammatik noch nicht parsebar",
+    "epsilonHint": "Um das Symbol für das leere Wort (ε) einzufügen, können Sie es entweder kopieren und einfügen oder das Wort 'epsilon' tippen.",
+    "grammar_epsilon_lhs_invalid": "Eine ε-Produktion verweist auf ein Nichtterminal, das nicht in der Nichtterminalmenge enthalten ist.",
+    "grammar_no_nonterminals": "Die Grammatik hat keine Nichtterminale.",
+    "grammar_no_terminals": "Die Grammatik hat keine Terminalsymbole.",
+    "grammar_start_invalid": "Das Startsymbol gehört nicht zu den Nichtterminalen der Grammatik.",
+    "grammar_lhs_invalid": "Die linke Seite einer Regel gehört nicht zu den Nichtterminalen der Grammatik.",
+    "grammar_terminal_invalid": "Eine Regel verwendet ein Terminal, das nicht im Alphabet enthalten ist.",
+    "grammar_rhs_nonterminal_invalid": "Eine Regel verweist auf ein Nichtterminal, das die Grammatik nicht definiert.",
+    "errors": {
+      "noProductions": "Keine Produktionsregeln gefunden. Fügen Sie mindestens eine Regel hinzu, z. B. 'S -> 0S | 1A'.",
+      "missingArrow": "Die Produktion '{{line}}' ist nicht lesbar. Erwartet wird die Form 'LHS -> RHS'.",
+      "emptyAlternative": "In '{{line}}' steht eine leere Alternative.",
+      "epsilonNotAlone": "ε muss als Alternative allein stehen — gefunden wurde '{{alternative}}' in '{{line}}'.",
+      "unitProduction": "'{{alternative}}' in '{{line}}' ist nur ein Nichtterminal. Eine rechtslineare Regel braucht zuerst ein Terminal, z. B. 'aB'.",
+      "undefinedNonTerminal": "'{{alternative}}' in '{{line}}' ist nicht rechtslinear: '{{rest}}' hat keine eigene Regel. Schreiben Sie ein einzelnes Terminal ('A -> a') oder ein Terminal gefolgt von einem definierten Nichtterminal ('A -> aB').",
+      "unsupportedType": "Nicht unterstützter Typ '{{type}}'. Nur 'type: grammar' wird unterstützt.",
+      "structuredLine": "Zeile {{line}}: erwartet wird 'key: value' oder eine Produktionsregel.",
+      "structuredMissingType": "Das strukturierte Format benötigt eine 'type: grammar'-Kopfzeile."
+    }
+  },
+  "sim": {
+    "emptyWord": "Leeres Wort (ε)",
+    "inputWord": "Eingabewort",
+    "title": "Simulation",
+    "edit": "Konfiguration bearbeiten",
+    "stepHistory": "Schrittprotokoll",
+    "stepOf": "Schritt {{current}} von {{total}}",
+    "status": {
+      "label": "Status",
+      "error": "Fehler",
+      "running": "Läuft",
+      "accepted": "Akzeptiert ✓",
+      "rejected": "Abgelehnt ✗",
+      "halted": "Gestoppt",
+      "type": "Typ",
+      "step": "Schritt",
+      "activeStates": "Aktive Zustände",
+      "position": "Position"
+    },
+    "explanation": {
+      "reading": "Lese Symbol '{{symbol}}' an Position {{pos}}. Aktive Zustände: {{states}}",
+      "processing": "Verarbeitung...",
+      "accepted": "Das Wort wird akzeptiert. Die finalen Zustände {{states}} enthalten einen Akzeptanzzustand.",
+      "rejectedDead": "Das Wort wird abgelehnt. Keine erreichbaren Zustände (Sackgasse).",
+      "rejected": "Das Wort wird abgelehnt. Die finalen Zustände {{states}} enthalten keinen Akzeptanzzustand."
+    },
+    "inputWordLength": "{{count}} Symbole",
+    "stepStart": "Start",
+    "stepTooltip": "Schritt {{step}} · {{count}} Zustand/Zustände",
+    "stepTooltipUnreached": "Schritt {{step}} (noch nicht erreicht)"
+  },
+  "validation": {
+    "statesEmpty": "Zustände dürfen nicht leer sein.",
+    "startStateMissing": "Der Startzustand ist nicht in der Zustandsmenge.",
+    "acceptStatesInvalid": "Ein Akzeptanzzustand ist nicht in der Zustandsmenge.",
+    "alphabetEmpty": "Das Alphabet darf nicht leer sein.",
+    "transitionSourceInvalid": "Ein Übergangsquellzustand ist ungültig.",
+    "transitionTargetInvalid": "Ein Übergangszielzustand ist ungültig.",
+    "transitionSymbolInvalid": "Ein Übergangssymbol ist nicht im Alphabet.",
+    "dfaNondeterministic": "Der DFA hat nichtdeterministische Übergänge.",
+    "dfaEpsilon": "Ein DFA darf keine ε-Übergänge haben."
+  },
+  "diagram": {
+    "title": "Zustandsdiagramm",
+    "violations_one": "{{count}} DFA-Verletzung",
+    "violations_other": "{{count}} DFA-Verletzungen",
+    "violationEpsilon": "Zustand {{state}} hat einen ε-Übergang — in einem DFA nicht erlaubt.",
+    "violationNondeterministic": "Zustand {{state}} geht bei Symbol „{{symbol}}“ nach {{targets}} — das verletzt den DFA-Determinismus.",
+    "start": "Start",
+    "usageHint": "Knoten ziehen zum Verschieben · Fläche ziehen zum Schwenken · scrollen zum Zoomen",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "resetView": "Ansicht zurücksetzen"
+  }
+}

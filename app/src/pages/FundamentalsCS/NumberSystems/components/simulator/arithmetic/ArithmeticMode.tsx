@@ -12,6 +12,7 @@ import type {
   ArithmeticModeState,
   ArithmeticModeType,
 } from "../nsTransferCodec";
+import type { BaseArithmeticProps } from "./types";
 
 interface ArithmeticModeProps {
   isExerciseMode?: boolean;
@@ -25,18 +26,27 @@ interface ArithmeticModeProps {
   onChangeState?: (state: ArithmeticModeState) => void;
 }
 
-export function ArithmeticMode({
-  isExerciseMode,
-  showSolution = true,
-  onShowSolution,
-  onExitExercise,
-  initialMode = "addition",
-  initialValueA,
-  initialValueB,
-  initialState,
-  onChangeState,
-}: ArithmeticModeProps) {
-  const { t } = useTranslation("translation");
+const MODE_COMPONENTS: Record<
+  ArithmeticModeType,
+  React.ComponentType<BaseArithmeticProps>
+> = {
+  addition: Addition,
+  subtraction: Subtraction,
+  multiplication: Multiplication,
+  division: Division,
+  shifting: Shifting,
+  compare: Compare,
+};
+
+function useArithmeticModeState(
+  initialMode: ArithmeticModeType,
+  initialValueA: string,
+  initialValueB: string,
+  initialState: ArithmeticModeState | undefined,
+  isExerciseMode: boolean | undefined,
+  showSolution: boolean | undefined,
+  onChangeState: ((state: ArithmeticModeState) => void) | undefined,
+) {
   const locked = !!isExerciseMode && !showSolution;
   const [activeSubMode, setActiveSubMode] = useState<ArithmeticModeType>(
     locked ? initialMode : (initialState?.activeSubMode ?? initialMode),
@@ -62,120 +72,104 @@ export function ArithmeticMode({
     setValB(b);
   };
 
+  return {
+    activeSubMode,
+    setActiveSubMode,
+    valA,
+    valB,
+    handleChangeValues,
+    locked,
+  };
+}
+
+export function ArithmeticMode({
+  isExerciseMode,
+  showSolution = true,
+  onShowSolution,
+  onExitExercise,
+  initialMode = "addition",
+  initialValueA,
+  initialValueB,
+  initialState,
+  onChangeState,
+}: ArithmeticModeProps) {
+  const { t } = useTranslation("translation");
+  const {
+    activeSubMode,
+    setActiveSubMode,
+    valA,
+    valB,
+    handleChangeValues,
+    locked,
+  } = useArithmeticModeState(
+    initialMode,
+    initialValueA || "",
+    initialValueB || "",
+    initialState,
+    isExerciseMode,
+    showSolution,
+    onChangeState,
+  );
+
   const modeSelector = (
     <div>
       <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-        {t("simulator.arithmetic.selectMode")}
+        {t("number-systems.simulator.arithmetic.selectMode")}
       </label>
       <DropdownSelect
         value={activeSubMode}
         options={[
           {
             value: "addition",
-            label: t("simulator.arithmetic.modes.addition"),
+            label: t("number-systems.simulator.arithmetic.modes.addition"),
           },
           {
             value: "subtraction",
-            label: t("simulator.arithmetic.modes.subtraction"),
+            label: t("number-systems.simulator.arithmetic.modes.subtraction"),
           },
           {
             value: "multiplication",
-            label: t("simulator.arithmetic.modes.multiplication"),
+            label: t(
+              "number-systems.simulator.arithmetic.modes.multiplication",
+            ),
           },
           {
             value: "division",
-            label: t("simulator.arithmetic.modes.division"),
+            label: t("number-systems.simulator.arithmetic.modes.division"),
           },
           {
             value: "shifting",
-            label: t("simulator.arithmetic.modes.shifting"),
+            label: t("number-systems.simulator.arithmetic.modes.shifting"),
           },
-          { value: "compare", label: t("simulator.arithmetic.modes.compare") },
+          {
+            value: "compare",
+            label: t("number-systems.simulator.arithmetic.modes.compare"),
+          },
         ]}
         onChange={(val) => setActiveSubMode(val as ArithmeticModeType)}
-        ariaLabel={t("simulator.arithmetic.selectMode")}
-        disabled={!!isExerciseMode && !showSolution}
+        ariaLabel={t("number-systems.simulator.arithmetic.selectMode")}
+        disabled={locked}
         triggerClassName="w-full px-3 py-2 text-sm font-normal"
         menuClassName="w-full"
       />
     </div>
   );
 
+  const ActiveComponent = MODE_COMPONENTS[activeSubMode];
+
   return (
     <div className="space-y-6">
-      {/* Render Active Operation Component */}
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-        {activeSubMode === "addition" && (
-          <Addition
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "subtraction" && (
-          <Subtraction
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "multiplication" && (
-          <Multiplication
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "division" && (
-          <Division
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "shifting" && (
-          <Shifting
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
-        {activeSubMode === "compare" && (
-          <Compare
-            isExerciseMode={isExerciseMode}
-            showSolution={showSolution}
-            onShowSolution={onShowSolution}
-            onExitExercise={onExitExercise}
-            initialA={valA}
-            initialB={valB}
-            onChangeValues={handleChangeValues}
-            renderModeSelector={modeSelector}
-          />
-        )}
+        <ActiveComponent
+          isExerciseMode={isExerciseMode}
+          showSolution={showSolution}
+          onShowSolution={onShowSolution}
+          onExitExercise={onExitExercise}
+          initialA={valA}
+          initialB={valB}
+          onChangeValues={handleChangeValues}
+          renderModeSelector={modeSelector}
+        />
       </div>
     </div>
   );

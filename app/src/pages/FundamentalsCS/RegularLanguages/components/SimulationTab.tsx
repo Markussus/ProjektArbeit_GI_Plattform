@@ -1,108 +1,55 @@
-import { useEffect, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
-import {
-  checkGrammarEnumerationExercise,
-  checkLanguageToGrammarExercise,
-  G2L_EXERCISE_ENUMERATION,
-  type RLCheckResult,
-} from "./Simulator/domain/rlSolutionChecker";
-import { enumerateLanguage } from "./Simulator/domain/rlLanguageOps";
-import { parseGrammar } from "./Simulator/domain/rlGrammarValidation";
+import type { RLCheckResult } from "./Simulator/domain/rlSolutionChecker";
 import { findRLExercise } from "../exercises/rlExerciseDefinitions";
-import { useRLSimulatorStore } from "../store/rlSimulatorStore";
-import { RLSimulator } from "./Simulator/RLSimulator";
+import { findRLExample } from "./Simulator/config/rlExamples";
+import { RLSimulator, type RLSimulatorHandle } from "./Simulator/RLSimulator";
+import { RLCheckSummary } from "./RLCheckSummary";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
-  const setActiveExercise = useRLSimulatorStore((s) => s.setActiveExercise);
-  const revealEnumeration = useRLSimulatorStore((s) => s.revealEnumeration);
-  const revealGrammar = useRLSimulatorStore((s) => s.revealGrammar);
+  const simulatorRef = useRef<RLSimulatorHandle>(null);
 
-  // The opened exercise (if any) drives the action buttons. Examples still flow
-  // through the shared "Selected example" card with no actions.
-  const activeExercise = props.selectedExercise
-    ? findRLExercise(props.selectedExercise.id)
-    : undefined;
+  const activeExercise = useMemo(
+    () =>
+      props.selectedExercise ? findRLExercise(props.selectedExercise.id) : null,
+    [props.selectedExercise],
+  );
+
+  const activeExample = useMemo(
+    () => (props.selectedItem ? findRLExample(props.selectedItem.id) : null),
+    [props.selectedItem],
+  );
 
   const [checkResult, setCheckResult] = useState<RLCheckResult | null>(null);
-  // Revealing the solution overwrites the learner's draft, so it asks first.
-  const [confirmLoadSolution, setConfirmLoadSolution] = useState(false);
 
-  // Keep the store flag in sync with what is actually displayed.
-  useEffect(() => {
-    setActiveExercise(activeExercise?.id ?? null);
-  }, [activeExercise?.id, setActiveExercise]);
-
-  // Each exercise type gets its own reveal/check path: Grammar → Language keeps
-  // the grammar fixed and asks for the language; Language → Grammar keeps the
-  // language fixed and asks for a grammar.
   const isGrammarExercise = activeExercise?.mode === "grammarToLanguage";
   const isLanguageExercise = activeExercise?.mode === "languageToGrammar";
-
-  // Reveal: Grammar → Language drops the enumerated words into the learner's
-  // list; Language → Grammar drops the reference grammar into the editor.
-  const handleLoadSolution = () => {
-    setConfirmLoadSolution(false);
-    if (!activeExercise) {
-      return;
-    }
-    if (isGrammarExercise) {
-      const parsed = parseGrammar(activeExercise.seed.grammarSource ?? "");
-      if (!parsed.ok || !parsed.grammar) {
-        return;
-      }
-      const { words } = enumerateLanguage(
-        parsed.grammar,
-        G2L_EXERCISE_ENUMERATION,
-      );
-      revealEnumeration(words.map((w) => (w === "" ? "ε" : w)).join(", "));
-      return;
-    }
-    if (isLanguageExercise && activeExercise.referenceGrammar) {
-      revealGrammar(activeExercise.referenceGrammar);
-    }
-  };
-
-  // Auto-checking applies to both guided exercise types.
   const canCheck = isGrammarExercise || isLanguageExercise;
 
+  const handleLoadSolution = () => {
+    simulatorRef.current?.loadSolution();
+  };
+
   const handleCheckSolution = () => {
-    if (!activeExercise) {
-      return;
+    const result = simulatorRef.current?.checkSolution();
+    if (result) {
+      setCheckResult(result);
     }
-    const studentSource =
-      useRLSimulatorStore.getState().exerciseDrafts[activeExercise.id] ?? "";
-    if (isGrammarExercise) {
-      setCheckResult(
-        checkGrammarEnumerationExercise(
-          studentSource,
-          activeExercise.seed.grammarSource ?? "",
-        ),
-      );
-      return;
-    }
-    setCheckResult(
-      checkLanguageToGrammarExercise(
-        studentSource,
-        activeExercise.seed.languageSource ?? "",
-        activeExercise.rejectWords ?? [],
-      ),
-    );
   };
 
   const headerActions = activeExercise ? (
     <>
       <button
         type="button"
-        onClick={() => setConfirmLoadSolution(true)}
+        onClick={handleLoadSolution}
         data-testid="rl-load-solution"
         className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium"
       >
-        {t("rl.exerciseWorkspace.showSolution", "Load solution")}
+        {t("regular-languages.exerciseWorkspace.showSolution", "Load solution")}
       </button>
       {canCheck && (
         <button
@@ -111,7 +58,7 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
           data-testid="rl-check-solution"
           className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90"
         >
-          {t("rl.exerciseWorkspace.check", "Check Solution")}
+          {t("regular-languages.exerciseWorkspace.check", "Check Solution")}
         </button>
       )}
     </>
@@ -123,19 +70,30 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.regularLanguages"
+        emptyStateTextKey="common.simulation.emptyStates.regularLanguages"
+        onReset={() => {
+          setCheckResult(null);
+          simulatorRef.current?.resetStoredState();
+        }}
       >
-        <RLSimulator onExitExercise={props.onExitExercise} />
+        <RLSimulator
+          key={activeExercise?.id ?? activeExample?.id ?? "__rl-free-mode__"}
+          ref={simulatorRef}
+          exercise={activeExercise}
+          example={activeExample}
+          onExitExercise={props.onExitExercise}
+          importedTaskStorageId={props.importedTaskStorageId}
+        />
       </TopicSimulationTab>
 
       <SolutionCheckDialog
         open={checkResult !== null}
-        title={t("rl.exerciseWorkspace.check", "Check Solution")}
+        title={t("regular-languages.exerciseWorkspace.check", "Check Solution")}
         onClose={() => setCheckResult(null)}
         testId="rl-solution-check-dialog"
         summary={
           checkResult && (
-            <CheckSummary
+            <RLCheckSummary
               result={checkResult}
               isGrammarExercise={isGrammarExercise}
             />
@@ -145,87 +103,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         headers={[]}
         rows={[]}
       />
-
-      <ConfirmDialog
-        isOpen={confirmLoadSolution}
-        title={t("rl.exerciseWorkspace.confirmTitle")}
-        description={t("rl.exerciseWorkspace.confirmBody")}
-        confirmLabel={t("rl.exerciseWorkspace.confirmYes")}
-        cancelLabel={t("rl.exerciseWorkspace.confirmNo")}
-        onConfirm={handleLoadSolution}
-        onCancel={() => setConfirmLoadSolution(false)}
-        variant="warning"
-        testId="rl-load-solution-confirm"
-      />
     </>
-  );
-}
-
-function formatWords(words: string[]): string {
-  return words.map((word) => (word === "" ? "ε" : word)).join(", ");
-}
-
-function CheckSummary({
-  result,
-  isGrammarExercise,
-}: {
-  result: RLCheckResult;
-  isGrammarExercise: boolean;
-}) {
-  const { t } = useTranslation();
-
-  if (result.status === "invalid") {
-    const messageKey =
-      result.reason === "studentParse"
-        ? "rl.exerciseWorkspace.checkInvalidGrammar"
-        : result.reason === "reference"
-          ? "rl.exerciseWorkspace.checkUnavailable"
-          : "rl.exerciseWorkspace.checkEmpty";
-    return <p className="text-muted-foreground text-sm">{t(messageKey)}</p>;
-  }
-
-  if (result.status === "match") {
-    return (
-      <div>
-        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-          {t("rl.exerciseWorkspace.checkMatch")}
-        </p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "rl.exerciseWorkspace.checkMatchDetailG2L"
-              : "rl.exerciseWorkspace.checkMatchDetailL2G",
-          )}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <p className="text-destructive text-sm font-semibold">
-        {t("rl.exerciseWorkspace.checkMismatch")}
-      </p>
-      {result.wrong.length > 0 && (
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "rl.exerciseWorkspace.checkWrongG2L"
-              : "rl.exerciseWorkspace.checkWrongL2G",
-            { words: formatWords(result.wrong) },
-          )}
-        </p>
-      )}
-      {result.missing.length > 0 && (
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t(
-            isGrammarExercise
-              ? "rl.exerciseWorkspace.checkMissingG2L"
-              : "rl.exerciseWorkspace.checkMissingL2G",
-            { words: formatWords(result.missing) },
-          )}
-        </p>
-      )}
-    </div>
   );
 }

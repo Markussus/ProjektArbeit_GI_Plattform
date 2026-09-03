@@ -5,13 +5,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
 import { TabNavigation } from "@/components/shared/TabNavigation/TabNavigation";
 import { useExerciseTabs, type ModuleTabId } from "@/hooks/useExerciseTabs";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import {
   createTrainingCenterExerciseFromImport,
   resolveTrainingCenterImportForPath,
   type TrainingCenterImportRouteState,
 } from "@/lib/trainingCenter/trainingCenterImportNavigation";
+import { trainingCenterStorage } from "@/lib/trainingCenter";
 import { useUiStore } from "@/store/uiStore";
 import type { Example, Exercise, TopicItem } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
@@ -35,6 +35,7 @@ export interface ModuleSimulationTabProps {
   onToggleFocus: () => void;
   onExitExercise?: () => void;
   onExitExample?: () => void;
+  importedTaskStorageId?: number;
 }
 
 interface ModuleTopicPageProps {
@@ -46,7 +47,6 @@ interface ModuleTopicPageProps {
   simulationTab: ComponentType<ModuleSimulationTabProps>;
   tabs?: ModuleTabId[];
   testId?: string;
-  confirmExerciseTabExit?: boolean;
   clearSimulationSelectionOnTabExit?: boolean;
 }
 
@@ -59,7 +59,6 @@ export function ModuleTopicPage({
   simulationTab: SimulationTab,
   tabs,
   testId,
-  confirmExerciseTabExit = true,
   clearSimulationSelectionOnTabExit = false,
 }: ModuleTopicPageProps) {
   const { t } = useTranslation();
@@ -67,11 +66,12 @@ export function ModuleTopicPage({
   const navigate = useNavigate();
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const [isSimulationFocused, setIsSimulationFocused] = useState(false);
+  const [simulationImport, setSimulationImport] = useState({
+    revision: 0,
+    taskStorageId: undefined as number | undefined,
+  });
   const consumedImportValueRef = useRef<string | null>(null);
-
-  const [showTabExitConfirm, setShowTabExitConfirm] = useState(false);
-  const [pendingTab, setPendingTab] = useState<ModuleTabId | null>(null);
-
+  const isMountedRef = useRef(true);
   const {
     activeTab,
     setActiveTab,
@@ -89,10 +89,22 @@ export function ModuleTopicPage({
   } = useExerciseTabs();
 
   useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const routeState = location.state as TrainingCenterImportRouteState | null;
     const storageValue = routeState?.trainingCenterImport?.storageValue;
 
-    if (!storageValue || consumedImportValueRef.current === storageValue) {
+    if (!storageValue) {
+      consumedImportValueRef.current = null;
+      return;
+    }
+
+    if (consumedImportValueRef.current === storageValue) {
       return;
     }
 
@@ -105,17 +117,38 @@ export function ModuleTopicPage({
       return;
     }
 
-    consumedImportValueRef.current = storageValue;
     const exercise = createTrainingCenterExerciseFromImport(parsed, t);
-
-    if (exercise) {
-      openInSimulation(exercise);
-    } else {
+    const importTimeoutId = window.setTimeout(() => {
+      consumedImportValueRef.current = storageValue;
+      // Unmount the previous simulator first. Its auto-save cleanup must finish
+      // before the imported value becomes authoritative on a same-route import.
       clearSimulationSelection();
-      setActiveTab("simulation");
-    }
+      setActiveTab("overview");
 
-    navigate(location.pathname, { replace: true, state: null });
+      window.setTimeout(() => {
+        if (!isMountedRef.current) {
+          return;
+        }
+
+        trainingCenterStorage.store(storageValue);
+        setSimulationImport((current) => ({
+          revision: current.revision + 1,
+          taskStorageId: parsed.taskStorageId,
+        }));
+
+        if (exercise) {
+          openInSimulation(exercise);
+        } else {
+          setActiveTab("simulation");
+        }
+
+        navigate(location.pathname, { replace: true, state: null });
+      }, 0);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(importTimeoutId);
+    };
   }, [
     clearSimulationSelection,
     location.pathname,
@@ -143,26 +176,6 @@ export function ModuleTopicPage({
   };
 
   const handleTabChange = (tab: ModuleTabId) => {
-    const exerciseIsActive =
-      !!simulationExercise && !simulationExercise.id.includes(".example");
-
-    if (confirmExerciseTabExit && exerciseIsActive && tab !== activeTab) {
-      setPendingTab(tab);
-      setShowTabExitConfirm(true);
-      return;
-    }
-
-    if (
-      confirmExerciseTabExit &&
-      exerciseIsActive &&
-      tab === activeTab &&
-      tab === "simulation"
-    ) {
-      setPendingTab(null);
-      setShowTabExitConfirm(true);
-      return;
-    }
-
     applyTabChange(tab);
   };
 
@@ -180,14 +193,6 @@ export function ModuleTopicPage({
       // Leaving the simulation tab should always restore the regular page layout.
       setIsSimulationFocused(false);
     }
-  };
-
-  const handleTabExitConfirm = () => {
-    setShowTabExitConfirm(false);
-    clearSimulationExercise();
-    const target = pendingTab ?? activeTab;
-    setPendingTab(null);
-    applyTabChange(target);
   };
 
   const renderActiveTab = () => {
@@ -218,6 +223,7 @@ export function ModuleTopicPage({
     if (activeTab === "simulation") {
       return (
         <SimulationTab
+          key={`simulation-import-${simulationImport.revision}`}
           selectedExercise={simulationExercise}
           selectedItem={simulationItem}
           isFocused={isSimulationFocused}
@@ -228,6 +234,7 @@ export function ModuleTopicPage({
               ? clearSimulationItem
               : undefined
           }
+          importedTaskStorageId={simulationImport.taskStorageId}
         />
       );
     }
@@ -254,20 +261,6 @@ export function ModuleTopicPage({
       />
 
       {renderActiveTab()}
-
-      <ConfirmDialog
-        isOpen={showTabExitConfirm}
-        title={t("simulator.validation.exitTabTitle")}
-        description={t("simulator.validation.exitTabDesc")}
-        confirmLabel={t("simulator.validation.exitTabConfirm")}
-        onConfirm={handleTabExitConfirm}
-        onCancel={() => {
-          setShowTabExitConfirm(false);
-          setPendingTab(null);
-        }}
-        variant="warning"
-        testId="module-tab-exit-confirm"
-      />
     </div>
   );
 }

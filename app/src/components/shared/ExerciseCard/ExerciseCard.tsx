@@ -26,6 +26,65 @@ const difficultyBorderColors = {
   hard: "border-l-red-500",
 };
 
+function formatExerciseDescription(
+  rawDescription: string,
+  params?: TopicItem["descriptionParams"],
+): string {
+  if (!params) {
+    return rawDescription;
+  }
+  return Object.entries(params).reduce(
+    (desc, [key, value]) => desc.replace(`{{${key}}}`, String(value)),
+    rawDescription,
+  );
+}
+
+interface ExerciseCardDetailsProps {
+  detailsId: string;
+  itemDescription: string;
+  openLabel: string;
+  onOpen?: () => void;
+  testIdPrefix?: string;
+}
+
+function ExerciseCardDetails({
+  detailsId,
+  itemDescription,
+  openLabel,
+  onOpen,
+  testIdPrefix,
+}: ExerciseCardDetailsProps) {
+  return (
+    <div
+      id={detailsId}
+      data-testid={testIdPrefix ? `${testIdPrefix}-details` : undefined}
+      className="border-border bg-muted/20 border-t px-4 py-4"
+    >
+      <div className="pl-14">
+        <p
+          data-testid={testIdPrefix ? `${testIdPrefix}-description` : undefined}
+          className="text-muted-foreground text-sm leading-relaxed"
+        >
+          {itemDescription}
+        </p>
+
+        {onOpen && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={onOpen}
+              data-testid={testIdPrefix ? `${testIdPrefix}-open` : undefined}
+              className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {openLabel}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ExerciseCard({
   item,
   index,
@@ -42,21 +101,19 @@ export function ExerciseCard({
   const rawDescription = item.descriptionKey
     ? t(item.descriptionKey, item.descriptionParams || {})
     : item.description;
-  const itemDescription = item.descriptionParams
-    ? Object.entries(item.descriptionParams).reduce(
-        (desc, [key, value]) => desc.replace(`{{${key}}}`, String(value)),
-        rawDescription,
-      )
-    : rawDescription;
+  const itemDescription = formatExerciseDescription(
+    rawDescription,
+    item.descriptionParams,
+  );
   const itemLabel =
     label ??
     (item.kind === "example"
-      ? t("example.label", { index: index + 1 })
-      : t("exercise.label", { index: index + 1 }));
+      ? t("common.example.label", { index: index + 1 })
+      : t("common.exercise.label", { index: index + 1 }));
   const openLabel =
     item.kind === "example"
-      ? t("example.openInSimulation")
-      : t("exercise.openInSimulation");
+      ? t("common.example.openInSimulation")
+      : t("common.exercise.openInSimulation");
 
   return (
     <div
@@ -99,7 +156,8 @@ export function ExerciseCard({
                 difficultyTextColors[item.difficulty],
               )}
             >
-              {t("exercise.difficulty")}: {t(`difficulty.${item.difficulty}`)}
+              {t("common.exercise.difficulty")}:{" "}
+              {t(`common.difficulty.${item.difficulty}`)}
             </p>
           )}
         </div>
@@ -112,37 +170,13 @@ export function ExerciseCard({
       </button>
 
       {isSelected && (
-        <div
-          id={detailsId}
-          data-testid={testIdPrefix ? `${testIdPrefix}-details` : undefined}
-          className="border-border bg-muted/20 border-t px-4 py-4"
-        >
-          <div className="pl-14">
-            <p
-              data-testid={
-                testIdPrefix ? `${testIdPrefix}-description` : undefined
-              }
-              className="text-muted-foreground text-sm leading-relaxed"
-            >
-              {itemDescription}
-            </p>
-
-            {onOpen && (
-              <div className="mt-4">
-                <button
-                  type="button"
-                  onClick={onOpen}
-                  data-testid={
-                    testIdPrefix ? `${testIdPrefix}-open` : undefined
-                  }
-                  className="bg-brand text-brand-foreground focus-visible:ring-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
-                >
-                  {openLabel}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <ExerciseCardDetails
+          detailsId={detailsId}
+          itemDescription={itemDescription}
+          openLabel={openLabel}
+          onOpen={onOpen}
+          testIdPrefix={testIdPrefix}
+        />
       )}
     </div>
   );

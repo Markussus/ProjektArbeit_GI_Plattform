@@ -6,15 +6,17 @@ import {
   useMemo,
   useRef,
   useState,
+  type ForwardedRef,
+  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import type { TFunction } from "i18next";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   exportAndStoreTrainingCenterValue,
   loadTrainingCenterValue,
   trainingCenterStorage,
@@ -55,34 +57,11 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
     );
     const [program, setProgram] = useState<TMProgram>(() => scenarioProgram);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [isStorageReady, setIsStorageReady] = useState(false);
     const simulationBoundaryRef = useRef<HTMLDivElement | null>(null);
     const editor = useTMConfigEditor(program);
     const simulation = useTMSimulator(program);
     const resetEditorToProgram = editor.resetToProgram;
     const pauseSimulation = simulation.pause;
-    const isExerciseScenario = scenario?.kind === "exercise";
-    const isStorageEnabled = scenario?.kind !== "example";
-    const storageIdentifier = useMemo(
-      () =>
-        createTrainingCenterIdentifier(
-          TOPIC_STORAGE_IDS.turingMachine,
-          scenario?.kind === "exercise"
-            ? scenario.storageId
-            : SIMULATOR_TASK_STORAGE_ID,
-        ),
-      [scenario],
-    );
-    const storageTransferCodec = useMemo(
-      () =>
-        isStorageEnabled
-          ? createTrainingCenterTransferCodec(
-              storageIdentifier,
-              tmProgramTransferCodec,
-            )
-          : tmProgramTransferCodec,
-      [isStorageEnabled, storageIdentifier],
-    );
 
     const handleImportProgram = useCallback(
       (nextProgram: TMProgram) => {
@@ -94,37 +73,10 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
       [pauseSimulation, resetEditorToProgram],
     );
 
-    useEffect(() => {
-      let isCancelled = false;
-      setIsStorageReady(false);
-
-      if (!isStorageEnabled) {
-        return;
-      }
-
-      void loadTrainingCenterValue(storageIdentifier, tmProgramTransferCodec)
-        .then((storedProgram) => {
-          if (!isCancelled && storedProgram) {
-            handleImportProgram(storedProgram);
-          }
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          if (!isCancelled) {
-            setIsStorageReady(true);
-          }
-        });
-
-      return () => {
-        isCancelled = true;
-      };
-    }, [handleImportProgram, isStorageEnabled, storageIdentifier]);
-
-    useTrainingCenterAutoSave({
-      identifier: storageIdentifier,
-      value: editor.draft,
-      codec: tmProgramTransferCodec,
-      enabled: isStorageEnabled && isStorageReady,
+    const { isStorageEnabled, storageIdentifier } = useTMSimulatorStorage({
+      scenario,
+      draft: editor.draft,
+      onImportProgram: handleImportProgram,
     });
 
     const handleApplyProgram = () => {
@@ -135,13 +87,7 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
 
       setProgram(result.program);
       setIsEditMode(false);
-      if (isStorageEnabled) {
-        void exportAndStoreTrainingCenterValue(
-          storageIdentifier,
-          result.program,
-          tmProgramTransferCodec,
-        );
-      }
+      saveProgramToStorage(storageIdentifier, result.program, isStorageEnabled);
     };
 
     const handleEditProgram = () => {
@@ -150,102 +96,31 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
       setIsEditMode(true);
     };
 
-    useImperativeHandle(
+    useTMSimulatorImperativeHandle({
       ref,
-      () => ({
-        resetStoredState: () => {
-          if (isStorageEnabled) {
-            trainingCenterStorage.delete(storageIdentifier);
-          }
-
-          const resetProgram = cloneJson(getScenarioProgram(scenario));
-          simulation.pause();
-          setProgram(resetProgram);
-          editor.resetToProgram(resetProgram);
-          setIsEditMode(true);
-        },
-        loadSolution: () => {
-          if (!isExerciseScenario) {
-            return;
-          }
-
-          const solutionProgram = cloneJson(
-            (scenario as TuringMachineExerciseScenario).solutionProgram,
-          );
-
-          simulation.pause();
-          setProgram(solutionProgram);
-          editor.resetToProgram(solutionProgram);
-          setIsEditMode(true);
-        },
-        checkSolution: async () => {
-          if (!isExerciseScenario) {
-            return {
-              rows: [],
-              error: t("tm.validation.summary.exampleCheckUnavailable"),
-            };
-          }
-
-          const validationProgramResult = resolveProgramForValidation(
-            isEditMode,
-            program,
-            editor.applyProgram,
-          );
-
-          if (!validationProgramResult.ok) {
-            return {
-              rows: [],
-              error: t("tm.validation.summary.checkInvalidProgram"),
-            };
-          }
-
-          return runTMValidation(
-            validationProgramResult.program,
-            (scenario as TuringMachineExerciseScenario).validationCases,
-          );
-        },
-      }),
-      [
-        editor,
-        isEditMode,
-        isExerciseScenario,
-        isStorageEnabled,
-        program,
-        scenario,
-        simulation,
-        storageIdentifier,
-        t,
-      ],
-    );
+      scenario,
+      isStorageEnabled,
+      storageIdentifier,
+      program,
+      isEditMode,
+      editor,
+      simulation,
+      setProgram,
+      setIsEditMode,
+      t,
+    });
 
     return (
-      <div
-        data-testid="tm-simulator"
-        data-mode={isEditMode ? "edit" : "simulation"}
-        data-scenario-id={scenario?.id ?? ""}
-        className={cn(
-          "mx-auto flex w-full flex-col gap-6 p-4",
-          isEditMode ? "max-w-none" : "max-w-7xl",
-        )}
+      <TMSimulatorLayout
+        isEditMode={isEditMode}
+        scenarioId={scenario ? scenario.id : ""}
       >
         {isEditMode ? (
-          <div className="flex flex-col gap-4">
-            <TMConfigView editor={editor} />
-            <SimulatorStringTransferBox
-              value={editor.draft}
-              codec={storageTransferCodec}
-              onLoad={handleImportProgram}
-              testIdPrefix="tm-transfer"
-            />
-            <button
-              onClick={handleApplyProgram}
-              disabled={editor.hasBlockingCellIssue}
-              data-testid="tm-start-simulation"
-              className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {t("tm.config.general.apply")}
-            </button>
-          </div>
+          <TMEditorSection
+            editor={editor}
+            onApply={handleApplyProgram}
+            applyLabel={t("turing-machine.config.general.apply")}
+          />
         ) : (
           <TMSimulationView
             program={program}
@@ -263,10 +138,237 @@ export const TMSimulator = forwardRef<TMSimulatorHandle, TMSimulatorProps>(
             onSpeedChange={simulation.setSpeed}
           />
         )}
-      </div>
+      </TMSimulatorLayout>
     );
   },
 );
+
+function TMSimulatorLayout({
+  isEditMode,
+  scenarioId,
+  children,
+}: {
+  isEditMode: boolean;
+  scenarioId: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      data-testid="tm-simulator"
+      data-mode={isEditMode ? "edit" : "simulation"}
+      data-scenario-id={scenarioId}
+      className={cn(
+        "mx-auto flex w-full flex-col gap-6 p-4",
+        isEditMode ? "max-w-none" : "max-w-7xl",
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface TMEditorSectionProps {
+  editor: ReturnType<typeof useTMConfigEditor>;
+  onApply: () => void;
+  applyLabel: string;
+}
+
+function TMEditorSection({
+  editor,
+  onApply,
+  applyLabel,
+}: TMEditorSectionProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <TMConfigView editor={editor} />
+      <button
+        onClick={onApply}
+        disabled={editor.hasBlockingCellIssue}
+        data-testid="tm-start-simulation"
+        className="bg-brand text-brand-foreground self-center rounded-md px-4 py-2 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {applyLabel}
+      </button>
+    </div>
+  );
+}
+
+function saveProgramToStorage(
+  storageIdentifier: string,
+  program: TMProgram,
+  enabled: boolean,
+): void {
+  if (enabled) {
+    void exportAndStoreTrainingCenterValue(
+      storageIdentifier,
+      program,
+      tmProgramTransferCodec,
+    );
+  }
+}
+
+function useTMSimulatorStorage({
+  scenario,
+  draft,
+  onImportProgram,
+}: {
+  scenario: TuringMachineScenario | null;
+  draft: TMProgram;
+  onImportProgram: (nextProgram: TMProgram) => void;
+}) {
+  const isStorageEnabled = scenario?.kind !== "example";
+  const [isStorageReady, setIsStorageReady] = useState(false);
+  const storageIdentifier = useMemo(
+    () =>
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.turingMachine,
+        scenario?.kind === "exercise"
+          ? scenario.storageId
+          : SIMULATOR_TASK_STORAGE_ID,
+      ),
+    [scenario],
+  );
+
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: draft,
+    codec: tmProgramTransferCodec,
+  });
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!isStorageEnabled) {
+      return;
+    }
+
+    void loadTrainingCenterValue(storageIdentifier, tmProgramTransferCodec)
+      .then((storedProgram) => {
+        if (!isCancelled && storedProgram) {
+          onImportProgram(storedProgram);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!isCancelled) {
+          setIsStorageReady(true);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isStorageEnabled, onImportProgram, storageIdentifier]);
+
+  useTrainingCenterAutoSave({
+    identifier: storageIdentifier,
+    value: draft,
+    codec: tmProgramTransferCodec,
+    enabled: isStorageEnabled && isStorageReady,
+  });
+
+  return { isStorageEnabled, storageIdentifier };
+}
+
+function useTMSimulatorImperativeHandle({
+  ref,
+  scenario,
+  isStorageEnabled,
+  storageIdentifier,
+  program,
+  isEditMode,
+  editor,
+  simulation,
+  setProgram,
+  setIsEditMode,
+  t,
+}: {
+  ref: ForwardedRef<TMSimulatorHandle>;
+  scenario: TuringMachineScenario | null;
+  isStorageEnabled: boolean;
+  storageIdentifier: string;
+  program: TMProgram;
+  isEditMode: boolean;
+  editor: ReturnType<typeof useTMConfigEditor>;
+  simulation: ReturnType<typeof useTMSimulator>;
+  setProgram: (program: TMProgram) => void;
+  setIsEditMode: (isEdit: boolean) => void;
+  t: TFunction;
+}) {
+  const isExerciseScenario = scenario?.kind === "exercise";
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetStoredState: () => {
+        if (isStorageEnabled) {
+          trainingCenterStorage.delete(storageIdentifier);
+        }
+
+        const resetProgram = cloneJson(getScenarioProgram(scenario));
+        simulation.pause();
+        setProgram(resetProgram);
+        editor.resetToProgram(resetProgram);
+        setIsEditMode(true);
+      },
+      loadSolution: () => {
+        if (!isExerciseScenario) {
+          return;
+        }
+
+        const solutionProgram = cloneJson(
+          (scenario as TuringMachineExerciseScenario).solutionProgram,
+        );
+
+        simulation.pause();
+        setProgram(solutionProgram);
+        editor.resetToProgram(solutionProgram);
+        setIsEditMode(true);
+      },
+      checkSolution: async () => {
+        if (!isExerciseScenario) {
+          return {
+            rows: [],
+            error: t(
+              "turing-machine.validation.summary.exampleCheckUnavailable",
+            ),
+          };
+        }
+
+        const validationProgramResult = resolveProgramForValidation(
+          isEditMode,
+          program,
+          editor.applyProgram,
+        );
+
+        if (!validationProgramResult.ok) {
+          return {
+            rows: [],
+            error: t("turing-machine.validation.summary.checkInvalidProgram"),
+          };
+        }
+
+        return runTMValidation(
+          validationProgramResult.program,
+          (scenario as TuringMachineExerciseScenario).validationCases,
+        );
+      },
+    }),
+    [
+      editor,
+      isEditMode,
+      isExerciseScenario,
+      isStorageEnabled,
+      program,
+      scenario,
+      setIsEditMode,
+      setProgram,
+      simulation,
+      storageIdentifier,
+      t,
+    ],
+  );
+}
 
 function resolveProgramForValidation(
   isEditMode: boolean,

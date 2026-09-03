@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { useState } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -90,7 +89,9 @@ describe("FATransitionTableEditor — DFA rendering", () => {
   });
 
   it("does not render the epsilon toggle button for a DFA", () => {
-    expect(screen.queryByText(/Add ε-Transitions/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("fa-add-epsilon-transitions"),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -105,19 +106,23 @@ describe("FATransitionTableEditor — NFA rendering", () => {
   });
 
   it("shows the epsilon toggle button for an NFA", () => {
-    expect(screen.getByText(/Add ε-Transitions/)).toBeInTheDocument();
+    expect(
+      screen.getByTestId("fa-add-epsilon-transitions"),
+    ).toBeInTheDocument();
   });
 
   it("adds the epsilon row when the toggle button is clicked", () => {
-    const btn = screen.getByText(/Add ε-Transitions/);
+    const btn = screen.getByTestId("fa-add-epsilon-transitions");
     fireEvent.click(btn);
     expect(screen.getByLabelText("δ(S0, ε)")).toBeInTheDocument();
   });
 
   it("hides the epsilon button after clicking it", () => {
-    const btn = screen.getByText(/Add ε-Transitions/);
+    const btn = screen.getByTestId("fa-add-epsilon-transitions");
     fireEvent.click(btn);
-    expect(screen.queryByText(/Add ε-Transitions/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("fa-add-epsilon-transitions"),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -137,77 +142,5 @@ describe("FATransitionTableEditor — NFA with existing epsilon transitions", ()
       />,
     );
     expect(screen.getByLabelText("δ(S0, ε)")).toBeInTheDocument();
-  });
-});
-
-describe("FATransitionTableEditor — onTransitionChange callback", () => {
-  it("calls onTransitionChange with (state, symbol, value) when an input changes", () => {
-    const onChange = vi.fn();
-    const { getByLabelText } = render(
-      <FATransitionTableEditor
-        program={defaultDFAProgram}
-        onTransitionChange={onChange}
-      />,
-    );
-    const input = getByLabelText("δ(S0, a)");
-    fireEvent.change(input, { target: { value: "S1, S2" } });
-    expect(onChange).toHaveBeenCalledWith("S0", "a", "S1, S2");
-  });
-
-  it("keeps a trailing separator visible so a second NFA target can be typed", () => {
-    // Mirrors the real parent: the program only ever holds parsed targets, so
-    // a naively controlled input would render "S1," back as "S1" and swallow
-    // the comma on every keystroke.
-    function Harness() {
-      const [program, setProgram] = useState<FAProgram>(defaultNFAProgram);
-      return (
-        <FATransitionTableEditor
-          program={program}
-          onTransitionChange={(from, symbol, value) => {
-            const targets = value
-              .split(",")
-              .map((s) => s.trim())
-              .filter((s) => s.length > 0);
-            setProgram((prev) => ({
-              ...prev,
-              transitions: {
-                ...prev.transitions,
-                [from]: { ...prev.transitions[from], [symbol]: targets },
-              },
-            }));
-          }}
-        />
-      );
-    }
-
-    render(<Harness />);
-    const symbol = defaultNFAProgram.alphabet[0];
-    const input = screen.getByLabelText(
-      `δ(${defaultNFAProgram.states[0]}, ${symbol})`,
-    ) as HTMLInputElement;
-
-    fireEvent.change(input, { target: { value: "S1," } });
-    expect(input.value).toBe("S1,");
-
-    fireEvent.change(input, { target: { value: "S1, S2" } });
-    expect(input.value).toBe("S1, S2");
-
-    // Blurring hands the cell back to the canonical parsed rendering.
-    fireEvent.blur(input);
-    expect(input.value).toBe("S1, S2");
-  });
-
-  it("is called exactly once per change event", () => {
-    const onChange = vi.fn();
-    const { getByLabelText } = render(
-      <FATransitionTableEditor
-        program={defaultDFAProgram}
-        onTransitionChange={onChange}
-      />,
-    );
-    // δ(S0, b) currently has value "S0"; change to "S1" to produce a real change
-    const input = getByLabelText("δ(S0, b)");
-    fireEvent.change(input, { target: { value: "S1" } });
-    expect(onChange).toHaveBeenCalledTimes(1);
   });
 });

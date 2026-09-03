@@ -1,16 +1,32 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { List, Minus, Plus, RotateCcw, WrapText } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSvgZoomPan } from "@/hooks/useSvgZoomPan";
 import { Tooltip } from "@/components/shared/Tooltip";
+import {
+  createCircularLayout,
+  createDirectedEdgeGeometry,
+  createSelfLoopGeometry,
+  type Point,
+} from "./stateMachineGraphGeometry";
 
 export interface StateMachineGraphNode {
   id: string;
   label: string;
   output?: string;
   isStart?: boolean;
+  isAccept?: boolean;
   isActive?: boolean;
   isPreview?: boolean;
+  isViolation?: boolean;
 }
 
 export interface StateMachineGraphEdge {
@@ -18,6 +34,7 @@ export interface StateMachineGraphEdge {
   to: string;
   label: string;
   isActive?: boolean;
+  isViolation?: boolean;
 }
 
 export interface StateMachineGraphProps {
@@ -28,9 +45,8 @@ export interface StateMachineGraphProps {
   testId?: string;
   compact?: boolean;
   defaultLabelLayout?: "wrapped" | "list";
+  nodeRadius?: number;
 }
-
-const NODE_RADIUS = 42;
 
 export function StateMachineGraph({
   nodes,
@@ -40,8 +56,24 @@ export function StateMachineGraph({
   testId,
   compact = false,
   defaultLabelLayout = "wrapped",
+  nodeRadius: customNodeRadius,
 }: StateMachineGraphProps) {
-  const layout = useMemo(() => createCircularLayout(nodes), [nodes]);
+  const { t } = useTranslation();
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-state-machine-arrow`;
+  const activeArrowMarkerId = `${markerPrefix}-state-machine-arrow-active`;
+  const violationArrowMarkerId = `${markerPrefix}-state-machine-arrow-violation`;
+
+  const hasOutputs = useMemo(
+    () => nodes.some((node) => node.output !== undefined),
+    [nodes],
+  );
+  const nodeRadius = customNodeRadius ?? (hasOutputs ? 36 : 30);
+
+  const layout = useMemo(
+    () => createCircularLayout(nodes, nodeRadius),
+    [nodes, nodeRadius],
+  );
   const groupedEdges = useMemo(() => groupEdges(edges), [edges]);
   const [nodePositions, setNodePositions] = useState<Map<string, Point>>(
     () => new Map(),
@@ -74,9 +106,9 @@ export function StateMachineGraph({
     const activeNodeChanged = previousActiveNodeIdRef.current !== activeNodeId;
     previousActiveNodeIdRef.current = activeNodeId;
     if (activePosition && activeNodeChanged) {
-      ensurePointVisible(activePosition.x, activePosition.y, NODE_RADIUS);
+      ensurePointVisible(activePosition.x, activePosition.y, nodeRadius);
     }
-  }, [activeNodeId, activePosition, ensurePointVisible]);
+  }, [activeNodeId, activePosition, ensurePointVisible, nodeRadius]);
 
   useEffect(() => {
     if (!draggedNodeId) {
@@ -111,7 +143,7 @@ export function StateMachineGraph({
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("mouseup", handleUp);
     };
-  }, [draggedNodeId, layout.height, layout.width]);
+  }, [draggedNodeId]);
 
   const resetGraph = () => {
     setNodePositions(new Map());
@@ -144,7 +176,7 @@ export function StateMachineGraph({
       >
         <defs>
           <marker
-            id="state-machine-arrow"
+            id={arrowMarkerId}
             markerWidth="10"
             markerHeight="8"
             refX="9"
@@ -155,7 +187,7 @@ export function StateMachineGraph({
             <path d="M 0 0 L 10 4 L 0 8 z" className="fill-muted-foreground" />
           </marker>
           <marker
-            id="state-machine-arrow-active"
+            id={activeArrowMarkerId}
             markerWidth="10"
             markerHeight="8"
             refX="9"
@@ -164,6 +196,17 @@ export function StateMachineGraph({
             markerUnits="userSpaceOnUse"
           >
             <path d="M 0 0 L 10 4 L 0 8 z" className="fill-brand" />
+          </marker>
+          <marker
+            id={violationArrowMarkerId}
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M 0 0 L 10 4 L 0 8 z" className="fill-destructive" />
           </marker>
         </defs>
 
@@ -181,7 +224,12 @@ export function StateMachineGraph({
               y={from.y}
               label={edge.label}
               active={edge.isActive}
+              isViolation={edge.isViolation}
               labelLayout={labelLayout}
+              arrowMarkerId={arrowMarkerId}
+              activeArrowMarkerId={activeArrowMarkerId}
+              violationArrowMarkerId={violationArrowMarkerId}
+              nodeRadius={nodeRadius}
             />
           ) : (
             <DirectedEdge
@@ -190,121 +238,42 @@ export function StateMachineGraph({
               to={to}
               label={edge.label}
               active={edge.isActive}
+              isViolation={edge.isViolation}
               labelLayout={labelLayout}
-              offset={
-                groupedEdges.some(
-                  (candidate) =>
-                    candidate.from === edge.to && candidate.to === edge.from,
-                )
-                  ? edge.from.localeCompare(edge.to) < 0
-                    ? 18
-                    : -18
-                  : 0
-              }
+              arrowMarkerId={arrowMarkerId}
+              activeArrowMarkerId={activeArrowMarkerId}
+              violationArrowMarkerId={violationArrowMarkerId}
+              nodeRadius={nodeRadius}
+              isBidirectional={groupedEdges.some(
+                (candidate) =>
+                  candidate.from === edge.to && candidate.to === edge.from,
+              )}
             />
           );
         })}
 
         {nodes.map((node) => {
           const position = positions.get(node.id);
-          if (!position) {
-            return null;
-          }
-
-          return (
-            <g
+          return position ? (
+            <StateNode
               key={node.id}
-              data-testid={`state-machine-node-${node.id}`}
-              onMouseDown={(event) => {
-                if (event.button !== 0) {
-                  return;
-                }
-                event.preventDefault();
-                event.stopPropagation();
-                setDraggedNodeId(node.id);
-              }}
-              className={
-                draggedNodeId === node.id ? "cursor-grabbing" : "cursor-grab"
-              }
-            >
-              {node.isStart && (
-                <>
-                  <line
-                    x1={position.x - NODE_RADIUS - 48}
-                    y1={position.y}
-                    x2={position.x - NODE_RADIUS - 7}
-                    y2={position.y}
-                    className="stroke-muted-foreground"
-                    strokeWidth="2"
-                    markerEnd="url(#state-machine-arrow)"
-                  />
-                  <text
-                    x={position.x - NODE_RADIUS - 52}
-                    y={position.y - 7}
-                    textAnchor="end"
-                    className="fill-muted-foreground text-[11px]"
-                  >
-                    start
-                  </text>
-                </>
-              )}
-              <circle
-                cx={position.x}
-                cy={position.y}
-                r={NODE_RADIUS}
-                className={cn(
-                  "fill-card stroke-border transition-colors",
-                  node.isActive && "fill-brand/15 stroke-brand",
-                  node.isPreview && "fill-brand/5 stroke-brand",
-                )}
-                strokeWidth={node.isActive || node.isPreview ? 4 : 2}
-                strokeDasharray={node.isPreview ? "8 6" : undefined}
-              />
-              <text
-                x={position.x}
-                y={position.y - (node.output ? 13 : 0)}
-                textAnchor="middle"
-                className={cn(
-                  "fill-foreground text-[13px] font-semibold",
-                  node.isActive && "fill-brand",
-                  node.isPreview && "fill-brand",
-                )}
-              >
-                {node.label}
-              </text>
-              {node.output !== undefined && (
-                <>
-                  <line
-                    x1={position.x - NODE_RADIUS + 5}
-                    y1={position.y}
-                    x2={position.x + NODE_RADIUS - 5}
-                    y2={position.y}
-                    className={cn(
-                      "stroke-border",
-                      (node.isActive || node.isPreview) && "stroke-brand",
-                    )}
-                    strokeWidth="1.5"
-                  />
-                  <text
-                    x={position.x}
-                    y={position.y + 21}
-                    textAnchor="middle"
-                    className="fill-muted-foreground text-[12px]"
-                  >
-                    {node.output}
-                  </text>
-                </>
-              )}
-            </g>
-          );
+              node={node}
+              position={position}
+              nodeRadius={nodeRadius}
+              arrowMarkerId={arrowMarkerId}
+              startLabel={t("moore-mealy.graph.start", "Start")}
+              isDragged={draggedNodeId === node.id}
+              onDragStart={setDraggedNodeId}
+            />
+          ) : null;
         })}
       </svg>
       <div className="absolute top-3 right-3 flex gap-1" data-no-pan>
         <GraphButton
           label={
             labelLayout === "wrapped"
-              ? "Show transition symbols as a vertical list"
-              : "Show transition symbols comma-separated"
+              ? t("moore-mealy.graph.showAsList")
+              : t("moore-mealy.graph.showWrapped")
           }
           testId={testId ? `${testId}-label-layout-toggle` : undefined}
           onClick={() =>
@@ -320,21 +289,21 @@ export function StateMachineGraph({
           )}
         </GraphButton>
         <GraphButton
-          label="Zoom out"
+          label={t("moore-mealy.graph.zoomOut")}
           testId={testId ? `${testId}-zoom-out` : undefined}
           onClick={zoomOut}
         >
           <Minus className="size-4" />
         </GraphButton>
         <GraphButton
-          label="Reset view"
+          label={t("moore-mealy.graph.resetView")}
           testId={testId ? `${testId}-reset-view` : undefined}
           onClick={resetGraph}
         >
           <RotateCcw className="size-4" />
         </GraphButton>
         <GraphButton
-          label="Zoom in"
+          label={t("moore-mealy.graph.zoomIn")}
           testId={testId ? `${testId}-zoom-in` : undefined}
           onClick={zoomIn}
         >
@@ -344,7 +313,7 @@ export function StateMachineGraph({
       <button
         type="button"
         onClick={resetGraph}
-        aria-label="Reset zoom to 100%"
+        aria-label={t("moore-mealy.graph.resetZoom")}
         data-testid={testId ? `${testId}-zoom-percent-reset` : undefined}
         className="bg-background/85 text-muted-foreground hover:text-foreground absolute right-3 bottom-3 rounded border px-2 py-1 text-xs"
       >
@@ -366,7 +335,7 @@ function GraphButton({
   children: React.ReactNode;
 }) {
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} side="bottom">
       <button
         type="button"
         aria-label={label}
@@ -380,45 +349,263 @@ function GraphButton({
   );
 }
 
-interface Point {
-  x: number;
-  y: number;
+function getNodeStatusStyle(node: StateMachineGraphNode) {
+  if (node.isViolation) {
+    return {
+      circle: "fill-destructive/15 stroke-destructive",
+      text: "fill-destructive",
+      strokeWidth: 3.5,
+    };
+  }
+  if (node.isActive) {
+    return {
+      circle: "fill-brand/15 stroke-brand",
+      text: "fill-brand",
+      strokeWidth: 3.5,
+    };
+  }
+  if (node.isPreview) {
+    return {
+      circle: "fill-brand/5 stroke-brand",
+      text: "fill-brand",
+      strokeWidth: 3.5,
+    };
+  }
+  return {
+    circle: "",
+    text: "",
+    strokeWidth: 2,
+  };
 }
 
-function createCircularLayout(nodes: StateMachineGraphNode[]) {
-  const width = Math.max(520, nodes.length * 150);
-  const height = Math.max(360, Math.min(620, nodes.length * 100));
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radius =
-    nodes.length <= 1 ? 0 : Math.min(width, height) / 2 - NODE_RADIUS - 54;
-  const positions = new Map<string, Point>();
+function getStateNodeVisuals(node: StateMachineGraphNode) {
+  const style = getNodeStatusStyle(node);
+  return {
+    circleClass: cn("fill-card stroke-border transition-colors", style.circle),
+    textClass: cn(
+      "fill-foreground text-[13px] font-semibold select-none",
+      style.text,
+    ),
+    strokeWidth: style.strokeWidth,
+    dashArray: node.isPreview ? "8 6" : undefined,
+    textYOffset: node.output ? 9 : -4,
+  };
+}
 
-  nodes.forEach((node, index) => {
-    const angle =
-      nodes.length === 2
-        ? index === 0
-          ? Math.PI
-          : 0
-        : -Math.PI / 2 + (index * Math.PI * 2) / Math.max(nodes.length, 1);
-    positions.set(node.id, {
-      x: centerX + Math.cos(angle) * radius,
-      y: centerY + Math.sin(angle) * radius,
-    });
-  });
+function StateNode({
+  node,
+  position,
+  nodeRadius,
+  arrowMarkerId,
+  startLabel,
+  isDragged,
+  onDragStart,
+}: {
+  node: StateMachineGraphNode;
+  position: Point;
+  nodeRadius: number;
+  arrowMarkerId: string;
+  startLabel: string;
+  isDragged: boolean;
+  onDragStart: (nodeId: string) => void;
+}) {
+  const handleMouseDown = (event: React.MouseEvent<SVGGElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onDragStart(node.id);
+  };
 
-  return { width, height, positions };
+  const visuals = getStateNodeVisuals(node);
+
+  return (
+    <g
+      data-testid={`state-machine-node-${node.id}`}
+      onMouseDown={handleMouseDown}
+      className={isDragged ? "cursor-grabbing" : "cursor-grab"}
+    >
+      <StateStartIndicator
+        visible={Boolean(node.isStart)}
+        position={position}
+        nodeRadius={nodeRadius}
+        arrowMarkerId={arrowMarkerId}
+        label={startLabel}
+      />
+      <StateAcceptRing
+        visible={Boolean(node.isAccept)}
+        position={position}
+        nodeRadius={nodeRadius}
+        active={Boolean(node.isActive)}
+        violation={Boolean(node.isViolation)}
+      />
+      <circle
+        cx={position.x}
+        cy={position.y}
+        r={nodeRadius}
+        className={visuals.circleClass}
+        strokeWidth={visuals.strokeWidth}
+        strokeDasharray={visuals.dashArray}
+      />
+      <text
+        x={position.x}
+        y={position.y - visuals.textYOffset}
+        textAnchor="middle"
+        className={visuals.textClass}
+      >
+        {node.label}
+      </text>
+      <StateViolationIndicator
+        visible={Boolean(node.isViolation)}
+        position={position}
+        nodeRadius={nodeRadius}
+      />
+      <StateOutput
+        output={node.output}
+        position={position}
+        nodeRadius={nodeRadius}
+        highlighted={Boolean(node.isActive || node.isPreview)}
+      />
+    </g>
+  );
+}
+
+function StateStartIndicator({
+  visible,
+  position,
+  nodeRadius,
+  arrowMarkerId,
+  label,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+  arrowMarkerId: string;
+  label: string;
+}) {
+  if (!visible) return null;
+  return (
+    <>
+      <line
+        x1={position.x - nodeRadius - 40}
+        y1={position.y}
+        x2={position.x - nodeRadius - 5}
+        y2={position.y}
+        className="stroke-muted-foreground"
+        strokeWidth="2"
+        markerEnd={`url(#${arrowMarkerId})`}
+      />
+      <text
+        x={position.x - nodeRadius - 44}
+        y={position.y - 5}
+        textAnchor="end"
+        className="fill-muted-foreground text-[11px] font-medium"
+      >
+        {label}
+      </text>
+    </>
+  );
+}
+
+function StateAcceptRing({
+  visible,
+  position,
+  nodeRadius,
+  active,
+  violation,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+  active: boolean;
+  violation: boolean;
+}) {
+  if (!visible) return null;
+  return (
+    <circle
+      cx={position.x}
+      cy={position.y}
+      r={nodeRadius + 6}
+      className={cn(
+        "stroke-border fill-none transition-colors",
+        active && "stroke-brand",
+        violation && "stroke-destructive",
+      )}
+      strokeWidth={active ? 2.5 : 1.5}
+    />
+  );
+}
+
+function StateViolationIndicator({
+  visible,
+  position,
+  nodeRadius,
+}: {
+  visible: boolean;
+  position: Point;
+  nodeRadius: number;
+}) {
+  if (!visible) return null;
+  const x = position.x + nodeRadius * 0.7;
+  const y = position.y - nodeRadius * 0.7;
+  return (
+    <g>
+      <circle cx={x} cy={y} r={7.5} className="fill-destructive" />
+      <text
+        x={x}
+        y={y + 3.5}
+        textAnchor="middle"
+        className="fill-destructive-foreground text-[10px] font-extrabold"
+      >
+        !
+      </text>
+    </g>
+  );
+}
+
+function StateOutput({
+  output,
+  position,
+  nodeRadius,
+  highlighted,
+}: {
+  output?: string;
+  position: Point;
+  nodeRadius: number;
+  highlighted: boolean;
+}) {
+  if (output === undefined) return null;
+  return (
+    <>
+      <line
+        x1={position.x - nodeRadius + 4}
+        y1={position.y}
+        x2={position.x + nodeRadius - 4}
+        y2={position.y}
+        className={cn("stroke-border", highlighted && "stroke-brand")}
+        strokeWidth="1.5"
+      />
+      <text
+        x={position.x}
+        y={position.y + 19}
+        textAnchor="middle"
+        className="fill-muted-foreground text-[12px]"
+      >
+        {output}
+      </text>
+    </>
+  );
 }
 
 function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
   const grouped = new Map<string, StateMachineGraphEdge>();
 
   for (const edge of edges) {
-    const key = `${edge.from}\u0000${edge.to}`;
+    const key = `${edge.from}\0${edge.to}`;
     const existing = grouped.get(key);
     if (existing) {
       existing.label = `${existing.label}, ${edge.label}`;
       existing.isActive ||= edge.isActive;
+      existing.isViolation ||= edge.isViolation;
     } else {
       grouped.set(key, { ...edge });
     }
@@ -427,57 +614,106 @@ function groupEdges(edges: StateMachineGraphEdge[]): StateMachineGraphEdge[] {
   return [...grouped.values()];
 }
 
+function getEdgeVisualProps({
+  active,
+  isViolation,
+  arrowMarkerId,
+  activeArrowMarkerId,
+  violationArrowMarkerId,
+}: {
+  active?: boolean;
+  isViolation?: boolean;
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+}) {
+  if (active) {
+    return {
+      edgeColorClass: "stroke-brand",
+      markerId: activeArrowMarkerId,
+      strokeWidth: 3.5,
+    };
+  }
+  if (isViolation) {
+    return {
+      edgeColorClass: "stroke-destructive",
+      markerId: violationArrowMarkerId,
+      strokeWidth: 2.5,
+    };
+  }
+  return {
+    edgeColorClass: "stroke-muted-foreground",
+    markerId: arrowMarkerId,
+    strokeWidth: 1.75,
+  };
+}
+
 function DirectedEdge({
   from,
   to,
   label,
   active,
-  offset = 0,
+  isViolation,
+  isBidirectional = false,
   labelLayout,
+  arrowMarkerId,
+  activeArrowMarkerId,
+  violationArrowMarkerId,
+  nodeRadius,
 }: {
   from: Point;
   to: Point;
   label: string;
   active?: boolean;
-  offset?: number;
+  isViolation?: boolean;
+  isBidirectional?: boolean;
   labelLayout: "wrapped" | "list";
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+  nodeRadius: number;
 }) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const distance = Math.hypot(dx, dy) || 1;
-  const unitX = dx / distance;
-  const unitY = dy / distance;
-  const start = {
-    x: from.x + unitX * NODE_RADIUS - unitY * offset,
-    y: from.y + unitY * NODE_RADIUS + unitX * offset,
-  };
-  const end = {
-    x: to.x - unitX * (NODE_RADIUS + 8) - unitY * offset,
-    y: to.y - unitY * (NODE_RADIUS + 8) + unitX * offset,
-  };
-  const labelX = (start.x + end.x) / 2 - unitY * 14;
-  const labelY = (start.y + end.y) / 2 + unitX * 14;
+  const { edgeColorClass, markerId, strokeWidth } = getEdgeVisualProps({
+    active,
+    isViolation,
+    arrowMarkerId,
+    activeArrowMarkerId,
+    violationArrowMarkerId,
+  });
+  const geometry = createDirectedEdgeGeometry(
+    from,
+    to,
+    nodeRadius,
+    isBidirectional,
+  );
 
   return (
     <g>
-      <line
-        x1={start.x}
-        y1={start.y}
-        x2={end.x}
-        y2={end.y}
-        className={active ? "stroke-brand" : "stroke-muted-foreground"}
-        strokeWidth={active ? 4 : 2}
-        markerEnd={
-          active
-            ? "url(#state-machine-arrow-active)"
-            : "url(#state-machine-arrow)"
-        }
-      />
+      {geometry.control ? (
+        <path
+          d={`M ${geometry.start.x} ${geometry.start.y} Q ${geometry.control.x} ${geometry.control.y} ${geometry.end.x} ${geometry.end.y}`}
+          fill="none"
+          className={edgeColorClass}
+          strokeWidth={strokeWidth}
+          markerEnd={`url(#${markerId})`}
+        />
+      ) : (
+        <line
+          x1={geometry.start.x}
+          y1={geometry.start.y}
+          x2={geometry.end.x}
+          y2={geometry.end.y}
+          className={edgeColorClass}
+          strokeWidth={strokeWidth}
+          markerEnd={`url(#${markerId})`}
+        />
+      )}
       <EdgeLabel
-        x={labelX}
-        y={labelY}
+        x={geometry.label.x}
+        y={geometry.label.y}
         label={label}
         active={active}
+        isViolation={isViolation}
         layout={labelLayout}
       />
     </g>
@@ -489,34 +725,48 @@ function SelfLoop({
   y,
   label,
   active,
+  isViolation,
   labelLayout,
+  arrowMarkerId,
+  activeArrowMarkerId,
+  violationArrowMarkerId,
+  nodeRadius,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  isViolation?: boolean;
   labelLayout: "wrapped" | "list";
+  arrowMarkerId: string;
+  activeArrowMarkerId: string;
+  violationArrowMarkerId: string;
+  nodeRadius: number;
 }) {
-  const path = `M ${x - 22} ${y - 36} C ${x - 58} ${y - 92}, ${x + 58} ${y - 92}, ${x + 22} ${y - 36}`;
+  const geometry = createSelfLoopGeometry({ x, y }, nodeRadius);
+  const { edgeColorClass, markerId, strokeWidth } = getEdgeVisualProps({
+    active,
+    isViolation,
+    arrowMarkerId,
+    activeArrowMarkerId,
+    violationArrowMarkerId,
+  });
 
   return (
     <g>
       <path
-        d={path}
+        d={geometry.path}
         fill="none"
-        className={active ? "stroke-brand" : "stroke-muted-foreground"}
-        strokeWidth={active ? 4 : 2}
-        markerEnd={
-          active
-            ? "url(#state-machine-arrow-active)"
-            : "url(#state-machine-arrow)"
-        }
+        className={edgeColorClass}
+        strokeWidth={strokeWidth}
+        markerEnd={`url(#${markerId})`}
       />
       <EdgeLabel
-        x={x}
-        y={y - 84}
+        x={geometry.label.x}
+        y={geometry.label.y}
         label={label}
         active={active}
+        isViolation={isViolation}
         layout={labelLayout}
       />
     </g>
@@ -528,19 +778,27 @@ function EdgeLabel({
   y,
   label,
   active,
+  isViolation,
   layout,
 }: {
   x: number;
   y: number;
   label: string;
   active?: boolean;
+  isViolation?: boolean;
   layout: "wrapped" | "list";
 }) {
   const labels = label.split(", ");
   const lines =
     layout === "list" ? labels : wrapCommaSeparatedLabels(labels, 24);
-  const width = Math.max(30, ...lines.map((line) => line.length * 7 + 14));
-  const height = Math.max(24, lines.length * 18 + 8);
+  const width = Math.max(28, ...lines.map((line) => line.length * 7 + 12));
+  const height = Math.max(22, lines.length * 16 + 6);
+
+  const rectBgClass = active
+    ? "fill-brand/15 stroke-brand"
+    : isViolation
+      ? "fill-destructive/15 stroke-destructive"
+      : "fill-card stroke-border";
 
   return (
     <g>
@@ -549,20 +807,19 @@ function EdgeLabel({
         y={y - height / 2}
         width={width}
         height={height}
-        rx={6}
-        className={
-          active ? "fill-brand/15 stroke-brand" : "fill-card stroke-border"
-        }
+        rx={5}
+        className={rectBgClass}
       />
       {lines.map((line, index) => (
         <text
           key={`${line}-${index}`}
           x={x}
-          y={y - ((lines.length - 1) * 18) / 2 + index * 18 + 4}
+          y={y - ((lines.length - 1) * 16) / 2 + index * 16 + 4}
           textAnchor="middle"
           className={cn(
-            "fill-foreground text-[12px] font-semibold",
+            "fill-foreground text-[11.5px] font-semibold select-none",
             active && "fill-brand",
+            isViolation && "fill-destructive",
           )}
         >
           {line}

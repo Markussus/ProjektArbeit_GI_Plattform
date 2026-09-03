@@ -1,23 +1,24 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent,
-} from "react";
+import { useId, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, Plus, Search } from "lucide-react";
+import { Check, ChevronDown, Pencil, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  useSearchableCreatableSelectState,
+  type SearchableCreatableSelectState,
+} from "./useSearchableCreatableSelectState";
 
 export interface SearchableCreatableSelectProps {
   value: string;
-  options: string[];
+  options?: string[];
   onChange: (value: string) => void;
   onCreate?: (value: string) => void;
+  onRename?: (previousValue: string, nextValue: string) => void;
   ariaLabel: string;
-  createLabel: string;
+  createLabel: (value: string) => string;
+  renameLabel?: (previousValue: string, nextValue: string) => string;
+  emptyCreateLabel: string;
   notFoundLabel: string;
+  searchPlaceholder: string;
   disabled?: boolean;
   testId?: string;
   className?: string;
@@ -26,168 +27,32 @@ export interface SearchableCreatableSelectProps {
 
 export function SearchableCreatableSelect({
   value,
-  options,
+  options = [],
   onChange,
   onCreate,
+  onRename,
   ariaLabel,
   createLabel,
+  renameLabel,
+  emptyCreateLabel,
   notFoundLabel,
+  searchPlaceholder,
   disabled = false,
   testId,
   className,
   style,
 }: SearchableCreatableSelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [menuPosition, setMenuPosition] = useState({
-    left: 0,
-    top: 0,
-    maxHeight: 224,
+  const instanceId = useId();
+  const selectState = useSearchableCreatableSelectState({
+    value,
+    options,
+    onChange,
+    onCreate,
+    onRename,
+    disabled,
+    instanceId,
   });
-  const normalizedQuery = query.trim();
-  const matchingOptions = useMemo(
-    () =>
-      options.filter((option) =>
-        option.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
-      ),
-    [options, query],
-  );
-  const canCreate =
-    Boolean(onCreate) &&
-    normalizedQuery.length > 0 &&
-    !options.some(
-      (option) =>
-        option.toLocaleLowerCase() === normalizedQuery.toLocaleLowerCase(),
-    );
-
-  useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
-      if (
-        !containerRef.current?.contains(event.target as Node) &&
-        !menuRef.current?.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        setQuery("");
-      }
-    };
-
-    const handleEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-        setQuery("");
-      }
-    };
-
-    window.addEventListener("pointerdown", handlePointerDown);
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (rect) {
-        const menuWidth = 256;
-        const gap = 4;
-        const viewportPadding = 8;
-        const availableBelow = window.innerHeight - rect.bottom - gap;
-        const availableAbove = rect.top - gap;
-        const openAbove =
-          availableBelow < 280 && availableAbove > availableBelow;
-        const maxHeight = Math.max(
-          120,
-          Math.min(280, openAbove ? availableAbove : availableBelow),
-        );
-        setMenuPosition({
-          left: Math.min(
-            Math.max(viewportPadding, rect.left),
-            window.innerWidth - menuWidth - viewportPadding,
-          ),
-          top: openAbove
-            ? Math.max(viewportPadding, rect.top - maxHeight - gap)
-            : rect.bottom + gap,
-          maxHeight,
-        });
-      }
-      setActiveIndex(0);
-      inputRef.current?.focus();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    const close = () => {
-      setIsOpen(false);
-      setQuery("");
-    };
-    window.addEventListener("wheel", close, { capture: true });
-    window.addEventListener("touchmove", close, { capture: true });
-    window.addEventListener("resize", close);
-    return () => {
-      window.removeEventListener("wheel", close, true);
-      window.removeEventListener("touchmove", close, true);
-      window.removeEventListener("resize", close);
-    };
-  }, [isOpen]);
-
-  const selectValue = (nextValue: string) => {
-    onChange(nextValue);
-    setIsOpen(false);
-    setQuery("");
-  };
-
-  const createValue = () => {
-    if (!canCreate) {
-      return;
-    }
-
-    onCreate?.(normalizedQuery);
-    setIsOpen(false);
-    setQuery("");
-  };
-
-  const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const itemCount = matchingOptions.length + (canCreate ? 1 : 0);
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      if (itemCount === 0) {
-        return;
-      }
-      setActiveIndex((current) => {
-        const direction = event.key === "ArrowDown" ? 1 : -1;
-        const next = (current + direction + itemCount) % itemCount;
-        window.setTimeout(() =>
-          optionRefs.current[next]?.scrollIntoView({
-            block: "nearest",
-          }),
-        );
-        return next;
-      });
-      return;
-    }
-    if (event.key !== "Enter") {
-      return;
-    }
-
-    event.preventDefault();
-    if (activeIndex < matchingOptions.length) {
-      selectValue(matchingOptions[activeIndex]);
-      return;
-    }
-
-    createValue();
-  };
+  const { isOpen, containerRef, triggerRef, openMenu, closeMenu } = selectState;
 
   return (
     <div
@@ -196,8 +61,17 @@ export function SearchableCreatableSelect({
       className={cn("relative min-w-32", className)}
     >
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => !disabled && setIsOpen((current) => !current)}
+        onClick={() => {
+          if (!disabled) {
+            if (isOpen) {
+              closeMenu();
+            } else {
+              openMenu();
+            }
+          }
+        }}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -218,96 +92,326 @@ export function SearchableCreatableSelect({
       {isOpen &&
         !disabled &&
         createPortal(
-          <div
-            ref={menuRef}
-            role="listbox"
-            aria-label={ariaLabel}
-            style={{
-              left: menuPosition.left,
-              top: menuPosition.top,
-              maxHeight: menuPosition.maxHeight,
-            }}
-            className="bg-popover text-popover-foreground border-border fixed z-[100] flex w-64 flex-col overflow-hidden rounded-lg border p-1 shadow-xl"
-          >
-            <div className="border-border relative border-b p-1 pb-2">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                aria-label={`${ariaLabel} search`}
-                data-testid={testId ? `${testId}-search` : undefined}
-                className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
-                autoComplete="off"
-                spellCheck={false}
-              />
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto py-1">
-              {matchingOptions.map((option, index) => (
-                <button
-                  ref={(element) => {
-                    optionRefs.current[index] = element;
-                  }}
-                  key={option}
-                  type="button"
-                  role="option"
-                  data-testid={
-                    testId ? `${testId}-option-${option}` : undefined
-                  }
-                  aria-selected={option === value}
-                  onPointerDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    selectValue(option);
-                  }}
-                  className={cn(
-                    "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
-                    (option === value || index === activeIndex) && "bg-muted",
-                  )}
-                >
-                  <span className="truncate">{option}</span>
-                  {option === value && (
-                    <Check className="text-brand size-4 shrink-0" />
-                  )}
-                </button>
-              ))}
-
-              {matchingOptions.length === 0 && !canCreate && (
-                <p className="text-muted-foreground px-3 py-2 text-sm">
-                  {notFoundLabel}
-                </p>
-              )}
-
-              {canCreate && (
-                <button
-                  ref={(element) => {
-                    optionRefs.current[matchingOptions.length] = element;
-                  }}
-                  type="button"
-                  onPointerDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    createValue();
-                  }}
-                  data-testid={testId ? `${testId}-create` : undefined}
-                  className={cn(
-                    "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
-                    activeIndex === matchingOptions.length && "bg-muted",
-                  )}
-                >
-                  <Plus className="text-brand size-4 shrink-0" />
-                  <span className="text-muted-foreground">{createLabel}</span>
-                  <span className="truncate font-mono font-semibold">
-                    {normalizedQuery}
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>,
+          <SearchableSelectMenu
+            state={selectState}
+            value={value}
+            ariaLabel={ariaLabel}
+            createLabel={createLabel}
+            renameLabel={renameLabel}
+            emptyCreateLabel={emptyCreateLabel}
+            notFoundLabel={notFoundLabel}
+            searchPlaceholder={searchPlaceholder}
+            showCreateAction={Boolean(onCreate)}
+            testId={testId}
+          />,
           document.body,
         )}
+    </div>
+  );
+}
+
+interface SearchableSearchInputProps {
+  inputRef: RefObject<HTMLInputElement | null>;
+  query: string;
+  setQuery: (query: string) => void;
+  setActiveIndex: (index: number) => void;
+  handleInputKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  ariaLabel: string;
+  searchPlaceholder: string;
+  testId?: string;
+}
+
+function SearchableSearchInput({
+  inputRef,
+  query,
+  setQuery,
+  setActiveIndex,
+  handleInputKeyDown,
+  ariaLabel,
+  searchPlaceholder,
+  testId,
+}: SearchableSearchInputProps) {
+  return (
+    <div className="border-border relative border-b p-1 pb-2">
+      <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-[60%]" />
+      <input
+        ref={inputRef}
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setActiveIndex(0);
+        }}
+        onKeyDown={handleInputKeyDown}
+        aria-label={`${ariaLabel} search`}
+        placeholder={searchPlaceholder}
+        data-testid={testId ? `${testId}-search` : undefined}
+        className="border-input bg-background h-9 w-full rounded-md border pr-2 pl-9 text-sm outline-none focus:ring-1"
+        autoComplete="off"
+        spellCheck={false}
+      />
+    </div>
+  );
+}
+
+interface SearchableOptionListProps {
+  matchingOptions: string[];
+  value: string;
+  activeIndex: number;
+  notFoundLabel: string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  selectValue: (value: string) => void;
+}
+
+function SearchableOptionList({
+  matchingOptions,
+  value,
+  activeIndex,
+  notFoundLabel,
+  testId,
+  setOptionRef,
+  selectValue,
+}: SearchableOptionListProps) {
+  return (
+    <div
+      data-testid={testId ? `${testId}-options` : undefined}
+      className="max-h-[180px] min-h-0 overflow-y-auto py-1"
+    >
+      {matchingOptions.map((option, index) => (
+        <button
+          ref={(element) => setOptionRef(index, element)}
+          key={option}
+          type="button"
+          role="option"
+          data-testid={testId ? `${testId}-option-${option}` : undefined}
+          aria-selected={option === value}
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            selectValue(option);
+          }}
+          className={cn(
+            "hover:bg-muted flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm",
+            (option === value || index === activeIndex) && "bg-muted",
+          )}
+        >
+          <span className="truncate">{option}</span>
+          {option === value && <Check className="text-brand size-4 shrink-0" />}
+        </button>
+      ))}
+      {matchingOptions.length === 0 && (
+        <p className="text-muted-foreground px-3 py-2 text-sm">
+          {notFoundLabel}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface SearchableCreateButtonProps {
+  canCreate: boolean;
+  createActionIndex: number;
+  activeIndex: number;
+  normalizedQuery: string;
+  createLabel: (value: string) => string;
+  emptyCreateLabel: string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  executeCreate: (value: string) => void;
+}
+
+function SearchableCreateButton({
+  canCreate,
+  createActionIndex,
+  activeIndex,
+  normalizedQuery,
+  createLabel,
+  emptyCreateLabel,
+  testId,
+  setOptionRef,
+  executeCreate,
+}: SearchableCreateButtonProps) {
+  return (
+    <button
+      ref={(element) => {
+        if (createActionIndex >= 0) {
+          setOptionRef(createActionIndex, element);
+        }
+      }}
+      type="button"
+      disabled={!canCreate}
+      onPointerDown={(event) => {
+        if (!canCreate) return;
+        event.preventDefault();
+        event.stopPropagation();
+        executeCreate(normalizedQuery);
+      }}
+      data-testid={testId ? `${testId}-create` : undefined}
+      className={cn(
+        "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50",
+        canCreate && activeIndex === createActionIndex && "bg-muted",
+      )}
+    >
+      <Plus className="text-brand size-4 shrink-0" />
+      <span className="truncate">
+        {normalizedQuery ? createLabel(normalizedQuery) : emptyCreateLabel}
+      </span>
+    </button>
+  );
+}
+
+interface SearchableRenameButtonProps {
+  renameActionIndex: number;
+  activeIndex: number;
+  value: string;
+  normalizedQuery: string;
+  renameLabel?: (previousValue: string, nextValue: string) => string;
+  testId?: string;
+  setOptionRef: (index: number, element: HTMLButtonElement | null) => void;
+  executeRename: (value: string) => void;
+}
+
+function SearchableRenameButton({
+  renameActionIndex,
+  activeIndex,
+  value,
+  normalizedQuery,
+  renameLabel,
+  testId,
+  setOptionRef,
+  executeRename,
+}: SearchableRenameButtonProps) {
+  return (
+    <button
+      ref={(element) => {
+        if (renameActionIndex >= 0) {
+          setOptionRef(renameActionIndex, element);
+        }
+      }}
+      type="button"
+      onPointerDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        executeRename(normalizedQuery);
+      }}
+      data-testid={testId ? `${testId}-rename` : undefined}
+      className={cn(
+        "hover:bg-muted text-foreground flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
+        activeIndex === renameActionIndex && "bg-muted",
+      )}
+    >
+      <Pencil className="text-brand size-4 shrink-0" />
+      <span className="truncate">
+        {renameLabel
+          ? renameLabel(value, normalizedQuery)
+          : `"${value}" in "${normalizedQuery}" umbenennen`}
+      </span>
+    </button>
+  );
+}
+
+function SearchableSelectMenu({
+  state,
+  value,
+  ariaLabel,
+  createLabel,
+  renameLabel,
+  emptyCreateLabel,
+  notFoundLabel,
+  searchPlaceholder,
+  showCreateAction,
+  testId,
+}: {
+  state: SearchableCreatableSelectState;
+  value: string;
+  ariaLabel: string;
+  createLabel: (value: string) => string;
+  renameLabel?: (previousValue: string, nextValue: string) => string;
+  emptyCreateLabel: string;
+  notFoundLabel: string;
+  searchPlaceholder: string;
+  showCreateAction: boolean;
+  testId?: string;
+}) {
+  const {
+    query,
+    setQuery,
+    activeIndex,
+    setActiveIndex,
+    menuPosition,
+    normalizedQuery,
+    matchingOptions,
+    canCreate,
+    canRename,
+    createActionIndex,
+    renameActionIndex,
+    menuRef,
+    inputRef,
+    setOptionRef,
+    selectValue,
+    executeCreate,
+    executeRename,
+    handleInputKeyDown,
+  } = state;
+
+  return (
+    <div
+      ref={menuRef}
+      role="listbox"
+      aria-label={ariaLabel}
+      style={menuPosition}
+      className="bg-popover text-popover-foreground border-border fixed z-[100] flex w-64 flex-col overflow-hidden rounded-lg border p-1 shadow-xl"
+    >
+      <SearchableSearchInput
+        inputRef={inputRef}
+        query={query}
+        setQuery={setQuery}
+        setActiveIndex={setActiveIndex}
+        handleInputKeyDown={handleInputKeyDown}
+        ariaLabel={ariaLabel}
+        searchPlaceholder={searchPlaceholder}
+        testId={testId}
+      />
+
+      <SearchableOptionList
+        matchingOptions={matchingOptions}
+        value={value}
+        activeIndex={activeIndex}
+        notFoundLabel={notFoundLabel}
+        testId={testId}
+        setOptionRef={setOptionRef}
+        selectValue={selectValue}
+      />
+
+      {(showCreateAction || canRename) && (
+        <div className="border-border flex flex-col gap-0.5 border-t pt-1">
+          {showCreateAction && (
+            <SearchableCreateButton
+              canCreate={canCreate}
+              createActionIndex={createActionIndex}
+              activeIndex={activeIndex}
+              normalizedQuery={normalizedQuery}
+              createLabel={createLabel}
+              emptyCreateLabel={emptyCreateLabel}
+              testId={testId}
+              setOptionRef={setOptionRef}
+              executeCreate={executeCreate}
+            />
+          )}
+          {canRename && (
+            <SearchableRenameButton
+              renameActionIndex={renameActionIndex}
+              activeIndex={activeIndex}
+              value={value}
+              normalizedQuery={normalizedQuery}
+              renameLabel={renameLabel}
+              testId={testId}
+              setOptionRef={setOptionRef}
+              executeRename={executeRename}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

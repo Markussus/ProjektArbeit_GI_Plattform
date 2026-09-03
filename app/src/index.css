@@ -2,12 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: "Geist Variable", sans-serif;
+  --font-sans: var(--font-family-base, "Inter Variable", sans-serif);
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -77,6 +78,7 @@
 }
 
 :root {
+  --font-family-base: "Inter Variable", sans-serif;
   color-scheme: light;
 
   /* Base colors */
@@ -157,11 +159,11 @@
   --nav-active-fg: oklch(0.2 0 0);
 
   /* Finite Automata accent palette — light theme */
-  --fa-bg: #f4f6fb;
-  --fa-surface: #ffffff;
-  --fa-surface-raised: #fafbff;
-  --fa-border: rgba(15, 23, 42, 0.12);
-  --fa-border-subtle: rgba(15, 23, 42, 0.06);
+  --fa-bg: transparent;
+  --fa-surface: var(--card);
+  --fa-surface-raised: var(--muted);
+  --fa-border: var(--border);
+  --fa-border-subtle: var(--border);
 
   --fa-cyan: #0891b2;
   --fa-cyan-dim: rgba(8, 145, 178, 0.14);
@@ -173,12 +175,20 @@
   --fa-red-dim: rgba(220, 38, 38, 0.12);
   --fa-amber: #d97706;
 
-  --fa-text: #1e293b;
-  --fa-text-dim: #64748b;
-  --fa-text-bright: #0f172a;
+  --fa-text: var(--foreground);
+  --fa-text-dim: var(--muted-foreground);
+  --fa-text-bright: var(--foreground);
 
-  --fa-node-fill: #eef2ff;
-  --fa-node-stroke: rgba(99, 102, 241, 0.4);
+  --fa-node-fill: var(--card);
+  --fa-node-stroke: var(--border);
+}
+
+html[data-font="inter"] {
+  --font-family-base: "Inter Variable", sans-serif;
+}
+
+html[data-font="geist"] {
+  --font-family-base: "Geist Variable", sans-serif;
 }
 
 .dark {
@@ -260,11 +270,11 @@
   --nav-active-fg: oklch(0.985 0 0);
 
   /* Finite Automata accent palette — dark theme */
-  --fa-bg: #0a0a0a;
-  --fa-surface: #141414;
-  --fa-surface-raised: #1a1a1a;
-  --fa-border: rgba(255, 255, 255, 0.08);
-  --fa-border-subtle: rgba(255, 255, 255, 0.04);
+  --fa-bg: transparent;
+  --fa-surface: var(--card);
+  --fa-surface-raised: var(--muted);
+  --fa-border: var(--border);
+  --fa-border-subtle: var(--border);
 
   --fa-cyan: #00e5ff;
   --fa-cyan-dim: rgba(0, 229, 255, 0.15);
@@ -276,12 +286,12 @@
   --fa-red-dim: rgba(255, 82, 82, 0.15);
   --fa-amber: #ffd740;
 
-  --fa-text: #e0e0e0;
-  --fa-text-dim: #888888;
-  --fa-text-bright: #ffffff;
+  --fa-text: var(--foreground);
+  --fa-text-dim: var(--muted-foreground);
+  --fa-text-bright: var(--foreground);
 
-  --fa-node-fill: var(--fa-surface);
-  --fa-node-stroke: var(--fa-border);
+  --fa-node-fill: var(--card);
+  --fa-node-stroke: var(--border);
 }
 
 @layer base {

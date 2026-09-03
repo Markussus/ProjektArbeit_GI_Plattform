@@ -54,6 +54,44 @@ describe("Moore program transfer codec", () => {
     expect(imported.transitions["110"].WAIT).toBeUndefined();
   });
 
+  it("round-trips the empty one-state editor program", async () => {
+    const oneStateProgram: MooreProgram = {
+      states: ["ONLY"],
+      inputSymbols: [],
+      transitions: {},
+      outputs: { ONLY: { symbol: "IDLE", code: 0 } },
+      initialState: "ONLY",
+      inputWord: [],
+      representation: "decimal",
+    };
+
+    const exported =
+      await mooreProgramTransferCodec.exportValue(oneStateProgram);
+
+    await expect(
+      mooreProgramTransferCodec.importValue(exported),
+    ).resolves.toEqual(oneStateProgram);
+  });
+
+  it("round-trips repeated input for one state and one input symbol", async () => {
+    const oneValueProgram: MooreProgram = {
+      states: ["ONLY"],
+      inputSymbols: ["tick"],
+      transitions: { tick: { ONLY: "ONLY" } },
+      outputs: { ONLY: { symbol: "ACTIVE", code: 1 } },
+      initialState: "ONLY",
+      inputWord: ["tick", "tick"],
+      representation: "binary",
+    };
+
+    const exported =
+      await mooreProgramTransferCodec.exportValue(oneValueProgram);
+
+    await expect(
+      mooreProgramTransferCodec.importValue(exported),
+    ).resolves.toEqual(oneValueProgram);
+  });
+
   it("rejects malformed payloads", async () => {
     await expect(
       mooreProgramTransferCodec.importValue("not.valid"),

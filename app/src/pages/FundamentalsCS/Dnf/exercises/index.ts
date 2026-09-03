@@ -18,8 +18,7 @@ interface DnfTruthTableExerciseDefinition extends ExerciseDefinition {
 }
 
 export type DnfExerciseDefinition =
-  | DnfExpressionExerciseDefinition
-  | DnfTruthTableExerciseDefinition;
+  DnfExpressionExerciseDefinition | DnfTruthTableExerciseDefinition;
 
 export const dnfExercises: DnfExerciseDefinition[] = [
   {

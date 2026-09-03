@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
 
 export interface LogicGateDiagramProps {
   expression: BooleanExpression | null;
   outputName: string;
+  ariaLabel: string;
   variables: string[];
   unavailableText: string;
   binaryGates?: boolean;
@@ -28,6 +29,7 @@ interface SelectedConnection {
 export function LogicGateDiagram({
   expression,
   outputName,
+  ariaLabel,
   variables,
   unavailableText,
   binaryGates = true,
@@ -37,6 +39,9 @@ export function LogicGateDiagram({
     () => (expression ? buildDiagram(expression, binaryGates) : null),
     [binaryGates, expression],
   );
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-logic-arrow`;
+  const selectedArrowMarkerId = `${markerPrefix}-logic-arrow-selected`;
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [selectedConnection, setSelectedConnection] =
     useState<SelectedConnection | null>(null);
@@ -79,14 +84,14 @@ export function LogicGateDiagram({
       <svg
         data-testid={`${testIdPrefix}-gate-diagram`}
         role="img"
-        aria-label={`${outputName} logic gate diagram`}
+        aria-label={ariaLabel}
         viewBox={`0 0 ${width} ${height}`}
         style={{ width, height }}
         className="block max-w-none"
       >
         <defs>
           <marker
-            id="logic-arrow"
+            id={arrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -96,7 +101,7 @@ export function LogicGateDiagram({
             <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
           </marker>
           <marker
-            id="logic-arrow-selected"
+            id={selectedArrowMarkerId}
             markerWidth="8"
             markerHeight="6"
             refX="7"
@@ -158,8 +163,8 @@ export function LogicGateDiagram({
                   strokeWidth={selected ? 4 : 2}
                   markerEnd={
                     selected
-                      ? "url(#logic-arrow-selected)"
-                      : "url(#logic-arrow)"
+                      ? `url(#${selectedArrowMarkerId})`
+                      : `url(#${arrowMarkerId})`
                   }
                 />
               </g>
@@ -207,8 +212,8 @@ export function LogicGateDiagram({
               markerEnd={
                 selectedConnection?.sourceId === diagram.rootId &&
                 selectedConnection.targetId === "output"
-                  ? "url(#logic-arrow-selected)"
-                  : "url(#logic-arrow)"
+                  ? `url(#${selectedArrowMarkerId})`
+                  : `url(#${arrowMarkerId})`
               }
             />
             <circle
@@ -308,50 +313,69 @@ function createCompactPositions(
   return positions;
 }
 
-function GateNode({
-  node,
-  testIdPrefix,
-  x,
-  y,
-  selected,
-  onSelect,
-}: {
+interface GateNodeProps {
   node: DiagramNode;
   testIdPrefix: string;
   x: number;
   y: number;
   selected: boolean;
   onSelect: () => void;
-}) {
-  if (node.kind === "input" || node.kind === "constant") {
-    return (
-      <g
-        data-testid={`${testIdPrefix}-node-${node.id}`}
-        onClick={onSelect}
-        className="cursor-pointer"
-      >
-        <circle
-          cx={x}
-          cy={y}
-          r={selected ? 9 : 6}
-          className={selected ? "fill-brand" : "fill-foreground"}
-        />
-        <text
-          x={x - 14}
-          y={y + 5}
-          textAnchor="end"
-          className={cn(
-            "fill-foreground font-mono text-sm font-semibold",
-            selected && "fill-brand",
-          )}
-        >
-          {node.label}
-        </text>
-      </g>
-    );
-  }
+}
 
+function TerminalGateNode({
+  node,
+  testIdPrefix,
+  x,
+  y,
+  selected,
+  onSelect,
+}: GateNodeProps) {
+  return (
+    <g
+      data-testid={`${testIdPrefix}-node-${node.id}`}
+      onClick={onSelect}
+      className="cursor-pointer"
+    >
+      <circle
+        cx={x}
+        cy={y}
+        r={selected ? 9 : 6}
+        className={selected ? "fill-brand" : "fill-foreground"}
+      />
+      <text
+        x={x - 14}
+        y={y + 5}
+        textAnchor="end"
+        className={cn(
+          "fill-foreground font-mono text-sm font-semibold",
+          selected && "fill-brand",
+        )}
+      >
+        {node.label}
+      </text>
+    </g>
+  );
+}
+
+function getGateSymbol(kind: DiagramNode["kind"]): string {
+  if (kind === "and") return "&";
+  if (kind === "or") return "≥1";
+  return "1";
+}
+
+function OperatorGateNode({
+  node,
+  testIdPrefix,
+  x,
+  y,
+  selected,
+  onSelect,
+}: GateNodeProps) {
   const gateHeight = Math.max(56, node.children.length * 16 + 20);
+  const gateClass = selected
+    ? "fill-brand/15 stroke-brand"
+    : "fill-card stroke-foreground";
+  const strokeWidth = selected ? 4 : 2;
 
   return (
     <g
@@ -365,12 +389,8 @@ function GateNode({
         width="84"
         height={gateHeight}
         rx="5"
-        className={
-          selected
-            ? "fill-brand/15 stroke-brand"
-            : "fill-card stroke-foreground"
-        }
-        strokeWidth={selected ? 4 : 2}
+        className={gateClass}
+        strokeWidth={strokeWidth}
       />
       <text
         x={x}
@@ -378,23 +398,26 @@ function GateNode({
         textAnchor="middle"
         className="fill-foreground text-lg font-bold"
       >
-        {node.kind === "and" ? "&" : node.kind === "or" ? "≥1" : "1"}
+        {getGateSymbol(node.kind)}
       </text>
       {node.kind === "not" && (
         <circle
           cx={x + 48}
           cy={y}
           r="6"
-          className={
-            selected
-              ? "fill-brand/15 stroke-brand"
-              : "fill-card stroke-foreground"
-          }
-          strokeWidth={selected ? 4 : 2}
+          className={gateClass}
+          strokeWidth={strokeWidth}
         />
       )}
     </g>
   );
+}
+
+function GateNode(props: GateNodeProps) {
+  if (props.node.kind === "input" || props.node.kind === "constant") {
+    return <TerminalGateNode {...props} />;
+  }
+  return <OperatorGateNode {...props} />;
 }
 
 function buildDiagram(expression: BooleanExpression, binaryGates: boolean) {

@@ -16,7 +16,7 @@ export interface TMValidationRunResult {
   error: string | null;
 }
 
-export const MAX_VALIDATION_STEPS = 1000;
+const MAX_VALIDATION_STEPS = 1000;
 
 export function runTMValidation(
   program: TMProgram,

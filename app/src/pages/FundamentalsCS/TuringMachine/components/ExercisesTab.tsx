@@ -1,7 +1,7 @@
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
 import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,
@@ -32,8 +32,8 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
       testIdPrefix="tm-exercise-card"
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
           testId="tm-reset-all-exercises"
         />

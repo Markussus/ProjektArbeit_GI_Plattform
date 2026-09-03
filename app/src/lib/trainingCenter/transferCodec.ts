@@ -8,7 +8,7 @@ import type { BitReader, BitWriter } from "./bitStream";
  */
 
 /** Upper bound on any length read from a payload, before allocating for it. */
-export const MAX_COLLECTION_SIZE = 1_000_000;
+const MAX_COLLECTION_SIZE = 1_000_000;
 
 /** Reject a length that is negative, fractional, or implausibly large. */
 export function assertCollectionSize(
@@ -33,13 +33,13 @@ export function assertIdInRange(
 }
 
 /** How a payload stores its symbol alphabet. */
-export const SymbolMode = {
+const SymbolMode = {
   /** One bit per registry entry — cheapest when every symbol is well known. */
   Registry: 0,
   /** Length-prefixed UTF-8 per symbol — the fallback for everything else. */
   RawUtf8: 1,
 } as const;
-export type SymbolMode = (typeof SymbolMode)[keyof typeof SymbolMode];
+type SymbolMode = (typeof SymbolMode)[keyof typeof SymbolMode];
 
 export interface SymbolDictionaryOptions {
   /**
@@ -61,6 +61,59 @@ export interface SymbolDictionaryCodec {
   order(symbols: string[], mode: SymbolMode): string[];
   write(writer: BitWriter, symbols: string[], mode: SymbolMode): void;
   read(reader: BitReader, mode: number, expectedCount: number): string[];
+}
+
+function readRegistrySymbols(
+  reader: BitReader,
+  registry: readonly string[],
+  expectedCount: number,
+  payloadError: string,
+): string[] {
+  const symbols: string[] = [];
+  for (const symbol of registry) {
+    if (reader.readBit() === 1) {
+      symbols.push(symbol);
+    }
+  }
+  if (symbols.length !== expectedCount) {
+    throw new Error(payloadError);
+  }
+  return symbols;
+}
+
+function readRawUtf8Symbols(
+  reader: BitReader,
+  expectedCount: number,
+  payloadError: string,
+  isReserved?: (symbol: string) => boolean,
+): string[] {
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  const symbols: string[] = [];
+
+  for (let symbolId = 0; symbolId < expectedCount; symbolId++) {
+    const byteLength = reader.readVarUint();
+    assertCollectionSize(byteLength, payloadError);
+    if (byteLength === 0) {
+      throw new Error(payloadError);
+    }
+
+    const bytes = Uint8Array.from({ length: byteLength }, () =>
+      reader.readBits(8),
+    );
+    const symbol = decoder.decode(bytes);
+
+    if (
+      Array.from(symbol).length !== 1 ||
+      symbols.includes(symbol) ||
+      isReserved?.(symbol)
+    ) {
+      throw new Error(payloadError);
+    }
+
+    symbols.push(symbol);
+  }
+
+  return symbols;
 }
 
 /**
@@ -111,50 +164,24 @@ export function createSymbolDictionaryCodec({
 
     read(reader, mode, expectedCount) {
       if (mode === SymbolMode.Registry) {
-        const symbols: string[] = [];
-        for (const symbol of registry) {
-          if (reader.readBit() === 1) {
-            symbols.push(symbol);
-          }
-        }
-        if (symbols.length !== expectedCount) {
-          throw new Error(payloadError);
-        }
-        return symbols;
+        return readRegistrySymbols(
+          reader,
+          registry,
+          expectedCount,
+          payloadError,
+        );
       }
 
       if (mode !== SymbolMode.RawUtf8) {
         throw new Error(payloadError);
       }
 
-      const decoder = new TextDecoder("utf-8", { fatal: true });
-      const symbols: string[] = [];
-
-      for (let symbolId = 0; symbolId < expectedCount; symbolId++) {
-        const byteLength = reader.readVarUint();
-        assertCollectionSize(byteLength, payloadError);
-        if (byteLength === 0) {
-          throw new Error(payloadError);
-        }
-
-        const bytes = Uint8Array.from({ length: byteLength }, () =>
-          reader.readBits(8),
-        );
-        const symbol = decoder.decode(bytes);
-
-        // Symbols are single characters, distinct, and never reserved.
-        if (
-          Array.from(symbol).length !== 1 ||
-          symbols.includes(symbol) ||
-          isReserved?.(symbol)
-        ) {
-          throw new Error(payloadError);
-        }
-
-        symbols.push(symbol);
-      }
-
-      return symbols;
+      return readRawUtf8Symbols(
+        reader,
+        expectedCount,
+        payloadError,
+        isReserved,
+      );
     },
   };
 }

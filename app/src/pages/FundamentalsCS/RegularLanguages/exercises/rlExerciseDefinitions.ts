@@ -10,9 +10,7 @@ import type { SimulationMode } from "../components/Simulator/domain/rlTypes";
  * simulator in language-to-grammar mode like `languageToGrammar`.
  */
 export type RLExerciseCategory =
-  | "grammarToLanguage"
-  | "languageToGrammar"
-  | "applied";
+  "grammarToLanguage" | "languageToGrammar" | "applied";
 
 export interface RLExerciseDefinition extends ExerciseDefinition {
   id: string;
@@ -80,9 +78,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 1: Grammar → Language ───────────────────────────────────────────
   {
     id: "g2l-finite-binary",
-    titleKey: "rl.exercises.g2lFiniteBinary.title",
-    descriptionKey: "rl.exercises.g2lFiniteBinary.description",
-    goalKey: "rl.exercises.g2lFiniteBinary.goal",
+    titleKey: "regular-languages.exercises.g2lFiniteBinary.title",
+    descriptionKey: "regular-languages.exercises.g2lFiniteBinary.description",
+    goalKey: "regular-languages.exercises.g2lFiniteBinary.goal",
     difficulty: "easy",
     icon: ListOrdered,
     category: "grammarToLanguage",
@@ -96,9 +94,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-trailing-zero",
-    titleKey: "rl.exercises.g2lTrailingZero.title",
-    descriptionKey: "rl.exercises.g2lTrailingZero.description",
-    goalKey: "rl.exercises.g2lTrailingZero.goal",
+    titleKey: "regular-languages.exercises.g2lTrailingZero.title",
+    descriptionKey: "regular-languages.exercises.g2lTrailingZero.description",
+    goalKey: "regular-languages.exercises.g2lTrailingZero.goal",
     difficulty: "easy",
     icon: ListOrdered,
     category: "grammarToLanguage",
@@ -110,9 +108,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-epsilon-loop",
-    titleKey: "rl.exercises.g2lEpsilonLoop.title",
-    descriptionKey: "rl.exercises.g2lEpsilonLoop.description",
-    goalKey: "rl.exercises.g2lEpsilonLoop.goal",
+    titleKey: "regular-languages.exercises.g2lEpsilonLoop.title",
+    descriptionKey: "regular-languages.exercises.g2lEpsilonLoop.description",
+    goalKey: "regular-languages.exercises.g2lEpsilonLoop.goal",
     difficulty: "medium",
     icon: ListOrdered,
     category: "grammarToLanguage",
@@ -126,9 +124,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-grouped",
-    titleKey: "rl.exercises.g2lGrouped.title",
-    descriptionKey: "rl.exercises.g2lGrouped.description",
-    goalKey: "rl.exercises.g2lGrouped.goal",
+    titleKey: "regular-languages.exercises.g2lGrouped.title",
+    descriptionKey: "regular-languages.exercises.g2lGrouped.description",
+    goalKey: "regular-languages.exercises.g2lGrouped.goal",
     difficulty: "medium",
     icon: ListOrdered,
     category: "grammarToLanguage",
@@ -146,9 +144,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 2: Language → Grammar ───────────────────────────────────────────
   {
     id: "l2g-zero-ones-zero",
-    titleKey: "rl.exercises.l2gZeroOnesZero.title",
-    descriptionKey: "rl.exercises.l2gZeroOnesZero.description",
-    goalKey: "rl.exercises.l2gZeroOnesZero.goal",
+    titleKey: "regular-languages.exercises.l2gZeroOnesZero.title",
+    descriptionKey: "regular-languages.exercises.l2gZeroOnesZero.description",
+    goalKey: "regular-languages.exercises.l2gZeroOnesZero.goal",
     difficulty: "medium",
     icon: FileText,
     category: "languageToGrammar",
@@ -160,9 +158,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-four-words",
-    titleKey: "rl.exercises.l2gFourWords.title",
-    descriptionKey: "rl.exercises.l2gFourWords.description",
-    goalKey: "rl.exercises.l2gFourWords.goal",
+    titleKey: "regular-languages.exercises.l2gFourWords.title",
+    descriptionKey: "regular-languages.exercises.l2gFourWords.description",
+    goalKey: "regular-languages.exercises.l2gFourWords.goal",
     difficulty: "medium",
     icon: FileText,
     category: "languageToGrammar",
@@ -179,9 +177,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-nested-zeros",
-    titleKey: "rl.exercises.l2gNestedZeros.title",
-    descriptionKey: "rl.exercises.l2gNestedZeros.description",
-    goalKey: "rl.exercises.l2gNestedZeros.goal",
+    titleKey: "regular-languages.exercises.l2gNestedZeros.title",
+    descriptionKey: "regular-languages.exercises.l2gNestedZeros.description",
+    goalKey: "regular-languages.exercises.l2gNestedZeros.goal",
     difficulty: "hard",
     icon: FileText,
     category: "languageToGrammar",
@@ -203,9 +201,9 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 3: Applied grammars ─────────────────────────────────────────────
   {
     id: "applied-integers",
-    titleKey: "rl.exercises.appliedIntegers.title",
-    descriptionKey: "rl.exercises.appliedIntegers.description",
-    goalKey: "rl.exercises.appliedIntegers.goal",
+    titleKey: "regular-languages.exercises.appliedIntegers.title",
+    descriptionKey: "regular-languages.exercises.appliedIntegers.description",
+    goalKey: "regular-languages.exercises.appliedIntegers.goal",
     difficulty: "hard",
     icon: Code,
     category: "applied",
@@ -217,9 +215,10 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "applied-identifiers",
-    titleKey: "rl.exercises.appliedIdentifiers.title",
-    descriptionKey: "rl.exercises.appliedIdentifiers.description",
-    goalKey: "rl.exercises.appliedIdentifiers.goal",
+    titleKey: "regular-languages.exercises.appliedIdentifiers.title",
+    descriptionKey:
+      "regular-languages.exercises.appliedIdentifiers.description",
+    goalKey: "regular-languages.exercises.appliedIdentifiers.goal",
     difficulty: "hard",
     icon: Code,
     category: "applied",

@@ -7,13 +7,10 @@ import {
 } from "./quineMcCluskey";
 import type { TruthTable } from "./truthTable";
 
-export const MAX_EXACT_OPTIMAL_VARIABLES = 4;
+const MAX_EXACT_OPTIMAL_VARIABLES = 4;
 
 export type SmallestExpressionSource =
-  | "constant"
-  | "minimal_dnf"
-  | "factored_dnf"
-  | "exact";
+  "constant" | "minimal_dnf" | "factored_dnf" | "exact";
 
 export interface SmallestBooleanExpression {
   expression: BooleanExpression;
@@ -158,54 +155,146 @@ function findCheaperExactExpression(
   const levels: number[][] = [];
 
   const state: SearchState = { best, backPointers, fullMask };
-  const setImprovement = (
-    mask: number,
-    cost: number,
-    backPointer: BackPointer,
-  ): BooleanExpression | null => {
-    best[mask] = cost;
-    backPointers[mask] = backPointer;
-    levels[cost] ??= [];
-    levels[cost].push(mask);
-
-    return mask === targetMask
-      ? reconstructExpression(targetMask, table.variables, state)
-      : null;
-  };
-
   best[0] = 0;
   best[fullMask] = 0;
 
+  const directHit = seedLiteralMasks(
+    variableCount,
+    state,
+    targetMask,
+    table.variables,
+    levels,
+  );
+  if (directHit) {
+    return directHit;
+  }
+
+  return searchBinaryCombinations(
+    strictUpperBound,
+    state,
+    targetMask,
+    table.variables,
+    levels,
+  );
+}
+
+function recordImprovement(
+  mask: number,
+  cost: number,
+  backPointer: BackPointer,
+  state: SearchState,
+  targetMask: number,
+  variables: string[],
+  levels: number[][],
+): BooleanExpression | null {
+  state.best[mask] = cost;
+  state.backPointers[mask] = backPointer;
+  levels[cost] ??= [];
+  levels[cost].push(mask);
+
+  return mask === targetMask
+    ? reconstructExpression(targetMask, variables, state)
+    : null;
+}
+
+function seedLiteralMasks(
+  variableCount: number,
+  state: SearchState,
+  targetMask: number,
+  variables: string[],
+  levels: number[][],
+): { expression: BooleanExpression; literalCount: number } | null {
   for (
     let variableIndex = 0;
     variableIndex < variableCount;
     variableIndex += 1
   ) {
     const positiveMask = variableFunctionMask(variableIndex, variableCount);
-    if (1 < best[positiveMask]) {
-      const expression = setImprovement(positiveMask, 1, {
-        kind: "literal",
-        variableIndex,
-        negated: false,
-      });
+    if (1 < state.best[positiveMask]) {
+      const expression = recordImprovement(
+        positiveMask,
+        1,
+        { kind: "literal", variableIndex, negated: false },
+        state,
+        targetMask,
+        variables,
+        levels,
+      );
       if (expression) {
         return { expression, literalCount: 1 };
       }
     }
 
-    const negatedMask = fullMask ^ positiveMask;
-    if (1 < best[negatedMask]) {
-      const expression = setImprovement(negatedMask, 1, {
-        kind: "literal",
-        variableIndex,
-        negated: true,
-      });
+    const negatedMask = state.fullMask ^ positiveMask;
+    if (1 < state.best[negatedMask]) {
+      const expression = recordImprovement(
+        negatedMask,
+        1,
+        { kind: "literal", variableIndex, negated: true },
+        state,
+        targetMask,
+        variables,
+        levels,
+      );
       if (expression) {
         return { expression, literalCount: 1 };
       }
     }
   }
+  return null;
+}
 
+function evaluateMaskCombination(
+  leftMask: number,
+  rightMask: number,
+  cost: number,
+  state: SearchState,
+  targetMask: number,
+  variables: string[],
+  levels: number[][],
+): BooleanExpression | null {
+  const andMask = leftMask & rightMask;
+  if (cost < state.best[andMask]) {
+    const expression = recordImprovement(
+      andMask,
+      cost,
+      { kind: "binary", operator: "and", leftMask, rightMask },
+      state,
+      targetMask,
+      variables,
+      levels,
+    );
+    if (expression) {
+      return expression;
+    }
+  }
+
+  const orMask = leftMask | rightMask;
+  if (cost < state.best[orMask]) {
+    const expression = recordImprovement(
+      orMask,
+      cost,
+      { kind: "binary", operator: "or", leftMask, rightMask },
+      state,
+      targetMask,
+      variables,
+      levels,
+    );
+    if (expression) {
+      return expression;
+    }
+  }
+
+  return null;
+}
+
+function searchBinaryCombinations(
+  strictUpperBound: number,
+  state: SearchState,
+  targetMask: number,
+  variables: string[],
+  levels: number[][],
+): { expression: BooleanExpression; literalCount: number } | null {
   for (let cost = 2; cost < strictUpperBound; cost += 1) {
     for (let leftCost = 1; leftCost <= Math.floor(cost / 2); leftCost += 1) {
       const rightCost = cost - leftCost;
@@ -222,36 +311,22 @@ function findCheaperExactExpression(
           rightIndex += 1
         ) {
           const rightMask = rightLevel[rightIndex];
-          const andMask = leftMask & rightMask;
-          if (cost < best[andMask]) {
-            const expression = setImprovement(andMask, cost, {
-              kind: "binary",
-              operator: "and",
-              leftMask,
-              rightMask,
-            });
-            if (expression) {
-              return { expression, literalCount: cost };
-            }
-          }
-
-          const orMask = leftMask | rightMask;
-          if (cost < best[orMask]) {
-            const expression = setImprovement(orMask, cost, {
-              kind: "binary",
-              operator: "or",
-              leftMask,
-              rightMask,
-            });
-            if (expression) {
-              return { expression, literalCount: cost };
-            }
+          const hit = evaluateMaskCombination(
+            leftMask,
+            rightMask,
+            cost,
+            state,
+            targetMask,
+            variables,
+            levels,
+          );
+          if (hit) {
+            return { expression: hit, literalCount: cost };
           }
         }
       }
     }
   }
-
   return null;
 }
 

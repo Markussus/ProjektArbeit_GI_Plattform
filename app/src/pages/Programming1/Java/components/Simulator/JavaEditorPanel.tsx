@@ -8,17 +8,18 @@ import {
 } from "react";
 import type { OnMount } from "@monaco-editor/react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
 import { useTheme } from "@/hooks/useTheme";
-import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import type { JavaExecutionIssue } from "./domain/javaExecution";
 import {
   getJavaEditorLimitReason,
   JAVA_EDITOR_MAX_CHARACTERS,
   JAVA_EDITOR_MAX_LINES,
-  wouldPasteExceedJavaEditorLimit,
   type JavaEditorLimitReason,
 } from "./domain/javaEditorLimits";
+import {
+  createPasteLimitListener,
+  syncMonacoMarkers,
+} from "./domain/javaEditorMarkers";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 
@@ -27,8 +28,6 @@ export interface JavaEditorPanelProps {
   fileName: string;
   isFocused: boolean;
   onCodeChange: (nextCode: string) => void;
-  onImportCode: (nextCode: string) => void;
-  transferCodec: ISimulatorTransferCodec<string>;
   issues: JavaExecutionIssue[];
 }
 
@@ -37,8 +36,6 @@ export function JavaEditorPanel({
   fileName,
   isFocused,
   onCodeChange,
-  onImportCode,
-  transferCodec,
   issues,
 }: JavaEditorPanelProps) {
   const { t } = useTranslation();
@@ -48,76 +45,68 @@ export function JavaEditorPanel({
   const [limitReason, setLimitReason] = useState<JavaEditorLimitReason | null>(
     null,
   );
-  const syncMarkers = useCallback(() => {
-    const editor = editorRef.current;
-    const monaco = monacoRef.current;
-    const model = editor?.getModel();
 
-    if (!model || !monaco) {
-      return;
-    }
-
-    monaco.editor.setModelMarkers(
-      model,
-      "java",
-      issues
-        .filter((issue) => issue.line)
-        .map((issue) => ({
-          startLineNumber: issue.line ?? 1,
-          startColumn: issue.column ?? 1,
-          endLineNumber: issue.line ?? 1,
-          endColumn: Math.max((issue.column ?? 1) + 1, 2),
-          message: issue.message,
-          severity:
-            issue.severity === "error"
-              ? monaco.MarkerSeverity.Error
-              : issue.severity === "warning"
-                ? monaco.MarkerSeverity.Warning
-                : monaco.MarkerSeverity.Info,
-        })),
-    );
+  const syncActiveMarkers = useCallback(() => {
+    syncMonacoMarkers(editorRef.current, monacoRef.current, issues);
   }, [issues]);
+
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    syncMarkers();
-    editor.onDidChangeModel(syncMarkers);
+    syncActiveMarkers();
+    editor.onDidChangeModel(syncActiveMarkers);
 
-    const editorNode = editor.getDomNode();
-    const pasteListener = (event: ClipboardEvent) => {
-      const model = editor.getModel();
-      const selection = editor.getSelection();
-      const pastedText = event.clipboardData?.getData("text/plain");
+    const editorNode = editor.getDomNode?.();
 
-      if (!model || !selection || pastedText === undefined) {
-        return;
-      }
-
-      const reason = wouldPasteExceedJavaEditorLimit({
-        currentCharacterCount: model.getValueLength(),
-        currentLineCount: model.getLineCount(),
-        selectedCharacterCount: model.getValueLengthInRange(selection),
-        selectedLineBreakCount:
-          selection.endLineNumber - selection.startLineNumber,
-        pastedText,
+    const updateScrollOptions = (enabled: boolean) => {
+      editor.updateOptions?.({
+        scrollbar: {
+          alwaysConsumeMouseWheel: false,
+          handleMouseWheel: enabled,
+        },
       });
-
-      if (reason) {
-        event.preventDefault();
-        event.stopPropagation();
-        setLimitReason(reason);
-      }
     };
 
+    // Scroll editor when mouse hovers over it, and pass wheel events to page when hitting top/bottom edges
+    const isInitiallyHovered = Boolean(editorNode?.matches?.(":hover"));
+    updateScrollOptions(isInitiallyHovered);
+
+    const handleMouseEnter = () => {
+      updateScrollOptions(true);
+    };
+
+    const handleMouseLeave = () => {
+      updateScrollOptions(false);
+    };
+
+    editorNode?.addEventListener("mouseenter", handleMouseEnter);
+    editorNode?.addEventListener("mouseleave", handleMouseLeave);
+
+    const focusListener = editor.onDidFocusEditorWidget?.(() => {
+      updateScrollOptions(true);
+    });
+
+    const blurListener = editor.onDidBlurEditorWidget?.(() => {
+      if (!editorNode?.matches?.(":hover")) {
+        updateScrollOptions(false);
+      }
+    });
+
+    const pasteListener = createPasteLimitListener(editor, setLimitReason);
     editorNode?.addEventListener("paste", pasteListener, true);
-    editor.onDidDispose(() => {
+
+    editor.onDidDispose?.(() => {
+      editorNode?.removeEventListener("mouseenter", handleMouseEnter);
+      editorNode?.removeEventListener("mouseleave", handleMouseLeave);
       editorNode?.removeEventListener("paste", pasteListener, true);
+      focusListener?.dispose?.();
+      blurListener?.dispose?.();
     });
   };
 
   useEffect(() => {
-    syncMarkers();
-  }, [syncMarkers]);
+    syncActiveMarkers();
+  }, [syncActiveMarkers]);
 
   const handleEditorCodeChange = useCallback(
     (nextCode: string) => {
@@ -139,7 +128,7 @@ export function JavaEditorPanel({
       <div className="pr-24">
         <div>
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.editorLabel")}
+            {t("java-programming.editorLabel")}
           </p>
           <p className="text-foreground mt-1 text-sm font-medium">{fileName}</p>
         </div>
@@ -147,12 +136,12 @@ export function JavaEditorPanel({
 
       <div
         data-testid="java-editor-container"
-        className="ring-foreground/10 overflow-hidden rounded-xl ring-1"
+        className="ring-foreground/10 relative overflow-hidden overscroll-auto rounded-xl ring-1"
       >
         <Suspense
           fallback={
             <div className="bg-card text-muted-foreground flex h-[28rem] items-center justify-center p-4 text-sm">
-              {t("java.editorLoading")}
+              {t("java-programming.editorLoading")}
             </div>
           }
         >
@@ -170,6 +159,10 @@ export function JavaEditorPanel({
               padding: { top: 16, bottom: 16 },
               roundedSelection: true,
               scrollBeyondLastLine: false,
+              scrollbar: {
+                alwaysConsumeMouseWheel: false,
+                handleMouseWheel: false,
+              },
               tabSize: 2,
               wordWrap: "on",
             }}
@@ -184,8 +177,8 @@ export function JavaEditorPanel({
         >
           {t(
             limitReason === "lines"
-              ? "java.editorLimit.lines"
-              : "java.editorLimit.characters",
+              ? "java-programming.editorLimit.lines"
+              : "java-programming.editorLimit.characters",
             {
               maxLines: JAVA_EDITOR_MAX_LINES.toLocaleString(),
               maxCharacters: JAVA_EDITOR_MAX_CHARACTERS.toLocaleString(),
@@ -193,22 +186,6 @@ export function JavaEditorPanel({
           )}
         </p>
       )}
-
-      <SimulatorStringTransferBox
-        value={code}
-        codec={transferCodec}
-        onLoad={(nextCode) => {
-          const reason = getJavaEditorLimitReason(nextCode);
-          if (reason) {
-            setLimitReason(reason);
-            throw new Error("java_editor_limit_exceeded");
-          }
-
-          setLimitReason(null);
-          onImportCode(nextCode);
-        }}
-        testIdPrefix="java-transfer"
-      />
     </div>
   );
 }

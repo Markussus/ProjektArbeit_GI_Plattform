@@ -9,17 +9,18 @@ import {
 import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   SIMULATOR_TASK_STORAGE_ID,
   createTrainingCenterIdentifier,
-  createTrainingCenterTransferCodec,
   loadTrainingCenterValue,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
+  getJavaDefaultStdin,
   getJavaFileName,
   getJavaScenario,
   getJavaStarterCode,
@@ -30,19 +31,12 @@ import { JavaCommandOverview } from "./JavaCommandOverview";
 import { JavaConsolePanel } from "./JavaConsolePanel";
 import { JavaEditorPanel } from "./JavaEditorPanel";
 import { javaCodeTransferCodec } from "./domain/javaCodeTransfer";
+import {
+  type JavaValidationRunResult,
+  runExerciseValidation,
+} from "./domain/javaValidationRunner";
 
-export interface JavaValidationRunRow {
-  id: string;
-  passed: boolean;
-  output: string;
-  expectedOutput: string;
-  phase: string;
-}
-
-export interface JavaValidationRunResult {
-  rows: JavaValidationRunRow[];
-  error?: string;
-}
+export type { JavaValidationRunResult };
 
 export interface JavaSimulatorHandle {
   loadSolution: () => void;
@@ -50,7 +44,7 @@ export interface JavaSimulatorHandle {
   resetStoredState: () => void;
 }
 
-export interface JavaSimulatorProps {
+interface JavaSimulatorProps {
   selectedExercise: Exercise | null;
   selectedItem?: TopicItem | null;
   isFocused: boolean;
@@ -87,7 +81,9 @@ const JavaSimulatorSession = forwardRef<
   const isStorageEnabled = scenario?.kind !== "example";
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
   const [isStorageReady, setIsStorageReady] = useState(false);
-  const [standardInput, setStandardInput] = useState("");
+  const [standardInput, setStandardInput] = useState(() =>
+    getJavaDefaultStdin(itemId),
+  );
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [isCommandOverviewOpen, setIsCommandOverviewOpen] = useState(false);
   const { snapshot, preload, run, runAsync, stop, reset } =
@@ -108,16 +104,11 @@ const JavaSimulatorSession = forwardRef<
       ),
     [exerciseScenario?.storageId],
   );
-  const storageTransferCodec = useMemo(
-    () =>
-      isStorageEnabled
-        ? createTrainingCenterTransferCodec(
-            storageIdentifier,
-            javaCodeTransferCodec,
-          )
-        : javaCodeTransferCodec,
-    [isStorageEnabled, storageIdentifier],
-  );
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: code,
+    codec: javaCodeTransferCodec,
+  });
 
   useEffect(() => {
     preload();
@@ -177,14 +168,6 @@ const JavaSimulatorSession = forwardRef<
     timeoutSeconds,
   ]);
 
-  const handleImportCode = useCallback(
-    (nextCode: string) => {
-      setCode(nextCode);
-      reset();
-    },
-    [reset],
-  );
-
   useImperativeHandle(
     ref,
     () => ({
@@ -194,7 +177,7 @@ const JavaSimulatorSession = forwardRef<
         }
 
         setCode(getJavaStarterCode(itemId));
-        setStandardInput("");
+        setStandardInput(getJavaDefaultStdin(itemId));
         setTimeoutSeconds(60);
         reset();
       },
@@ -206,40 +189,17 @@ const JavaSimulatorSession = forwardRef<
         setCode(exerciseScenario.solutionCode);
         reset();
       },
-      checkSolution: async () => {
-        if (!exerciseScenario) {
-          return {
-            rows: [],
-            error: t("java.validation.exampleCheckUnavailable"),
-          };
-        }
-
-        const rows: JavaValidationRunRow[] = [];
-
-        for (const validationCase of exerciseScenario.validationCases) {
-          const source = validationCase.sourceTransform?.(code) ?? code;
-          const result = await runAsync({
-            source,
-            exerciseId: exerciseScenario.id,
-            timeoutMs: timeoutSeconds * 1000,
-            stdin: validationCase.stdin ?? standardInput,
-          });
-          const output = result.stdout.join("");
-
-          rows.push({
-            id: validationCase.id,
-            passed:
-              result.phase === "done" &&
-              normalizeOutput(output) ===
-                normalizeOutput(validationCase.expectedStdout),
-            output,
-            expectedOutput: validationCase.expectedStdout,
-            phase: result.phase,
-          });
-        }
-
-        return { rows };
-      },
+      checkSolution: () =>
+        runExerciseValidation({
+          exerciseScenario,
+          code,
+          standardInput,
+          timeoutSeconds,
+          runAsync,
+          exampleCheckUnavailableError: t(
+            "java-programming.validation.exampleCheckUnavailable",
+          ),
+        }),
     }),
     [
       code,
@@ -262,33 +222,36 @@ const JavaSimulatorSession = forwardRef<
         fileName={fileName}
         isFocused={isFocused}
         onCodeChange={setCode}
-        onImportCode={handleImportCode}
-        transferCodec={storageTransferCodec}
         issues={snapshot.issues}
       />
 
       <div className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm">
         <label className="block space-y-2">
-          <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.stdin.label")}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
+              {t("java-programming.stdin.label")}
+            </span>
+            <span className="text-muted-foreground font-mono text-xs">
+              Scanner (System.in)
+            </span>
+          </div>
           <textarea
             value={standardInput}
             onChange={(event) => setStandardInput(event.target.value)}
             data-testid="java-stdin-input"
-            placeholder={t("java.stdin.placeholder")}
+            placeholder={t("java-programming.stdin.placeholder")}
             className="border-input bg-background min-h-24 w-full rounded-md border px-3 py-2 font-mono text-sm"
           />
         </label>
         <p className="text-muted-foreground mt-2 text-xs">
-          {t("java.stdin.help")}
+          {t("java-programming.stdin.help")}
         </p>
       </div>
 
       <div className="bg-card text-card-foreground flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm">
         <div className="space-y-2">
           <p className="text-muted-foreground text-xs font-bold tracking-[0.18em] uppercase">
-            {t("java.compilerLabel")}
+            {t("java-programming.compilerLabel")}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <JavaCompilerStatusBadge
@@ -296,7 +259,9 @@ const JavaSimulatorSession = forwardRef<
               testId="java-compiler-status"
             />
             <p className="text-muted-foreground text-sm">
-              {t(`java.compilerStatusText.${snapshot.compilerStatus}`)}
+              {t(
+                `java-programming.compilerStatusText.${snapshot.compilerStatus}`,
+              )}
             </p>
           </div>
         </div>
@@ -309,11 +274,11 @@ const JavaSimulatorSession = forwardRef<
             className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
           >
             <ListChecks className="size-4" />
-            {t("java.commandOverview.button")}
+            {t("java-programming.commandOverview.button")}
           </button>
 
           <label className="flex items-center gap-3 text-sm font-medium">
-            <span>{t("java.timeoutLabel")}</span>
+            <span>{t("java-programming.timeoutLabel")}</span>
             <input
               type="number"
               min={1}
@@ -332,7 +297,7 @@ const JavaSimulatorSession = forwardRef<
               className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
             />
             <span className="text-muted-foreground">
-              {t("java.timeoutUnit")}
+              {t("java-programming.timeoutUnit")}
             </span>
           </label>
         </div>
@@ -346,15 +311,15 @@ const JavaSimulatorSession = forwardRef<
       <ExecutionControls
         phase={snapshot.phase}
         onRun={handleRun}
-        onStop={stop}
+        onStop={() => stop()}
         canRun={canRun}
         canStop={canStop}
         runLabel={
           snapshot.compilerStatus !== "ready"
-            ? t("java.runWhileLoading")
-            : t("simulation.controls.play", "Run")
+            ? t("java-programming.runWhileLoading")
+            : t("common.simulation.controls.play", "Run")
         }
-        stopLabel={t("simulation.controls.stop", "Stop")}
+        stopLabel={t("common.simulation.controls.stop", "Stop")}
         runTestId="java-run-button"
         stopTestId="java-stop-button"
         phaseTestId="java-execution-phase"
@@ -364,7 +329,3 @@ const JavaSimulatorSession = forwardRef<
     </div>
   );
 });
-
-function normalizeOutput(output: string) {
-  return output.replace(/\r\n/g, "\n").trimEnd();
-}

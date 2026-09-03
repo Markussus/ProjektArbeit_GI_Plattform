@@ -1,5 +1,5 @@
 import { ModuleOverviewPage } from "@/components/shared/ModuleOverviewPage/ModuleOverviewPage";
 
-export function FundamentalsCSPage() {
+export default function FundamentalsCSPage() {
   return <ModuleOverviewPage moduleId="fundamentals-cs" />;
 }

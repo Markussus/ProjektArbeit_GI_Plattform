@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useJavaExecution } from "../../../../../src/pages/Programming1/Java/components/Simulator/application/useJavaExecution";
 import type {
   JavaExecutionArtifacts,
@@ -43,6 +43,10 @@ describe("useJavaExecution", () => {
     vi.stubGlobal("Worker", MockWorker);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe("when a Java execution is started", () => {
     it("tracks preload, stdout, and completion state from the worker lifecycle", async () => {
       const { result } = renderHook(() => useJavaExecution());
@@ -66,7 +70,7 @@ describe("useJavaExecution", () => {
       act(() => {
         result.current.run({
           source: 'System.out.println("Hello");',
-          exerciseId: "java.exercise1",
+          exerciseId: "java-programming.exercise1",
           timeoutMs: 60_000,
         });
       });
@@ -167,6 +171,81 @@ describe("useJavaExecution", () => {
         expect(MockWorker.instances).toHaveLength(2);
       });
     });
+  });
+
+  describe("when execution exceeds its configured timeout", () => {
+    it("terminates the worker and reports a timeout diagnostic", () => {
+      vi.useFakeTimers();
+      const { result } = renderHook(() => useJavaExecution());
+
+      act(() => {
+        result.current.run({
+          source:
+            "public class Main { public static void main(String[] args) { while (true) {} } }",
+          timeoutMs: 1_000,
+        });
+      });
+
+      const worker = MockWorker.instances[0];
+      act(() => {
+        vi.advanceTimersByTime(1_000);
+      });
+
+      expect(worker.terminated).toBe(true);
+      expect(result.current.snapshot.phase).toBe("timeout");
+      expect(result.current.snapshot.lastErrorCategory).toBe("timeout");
+      expect(result.current.snapshot.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: "execution_timeout" }),
+        ]),
+      );
+    });
+  });
+
+  describe("when compilation or execution fails", () => {
+    it.each([
+      ["javac", "javac_diagnostic"],
+      ["runtime", "wasm_runtime_failed"],
+    ] as const)(
+      "preserves the %s error category and diagnostic",
+      async (errorCategory, code) => {
+        const { result } = renderHook(() => useJavaExecution());
+
+        act(() => {
+          result.current.run({ source: "class Main {}", timeoutMs: 60_000 });
+        });
+
+        const worker = MockWorker.instances[0];
+        const executeMessage = worker.postedMessages[0] as {
+          requestId: string;
+        };
+        act(() => {
+          worker.emit({
+            type: "error",
+            requestId: executeMessage.requestId,
+            errorCategory,
+            message: `${errorCategory} failed`,
+            diagnostics: [
+              {
+                code,
+                stage: errorCategory,
+                severity: "error",
+                message: `${errorCategory} failed`,
+              },
+            ],
+          });
+        });
+
+        await waitFor(() => {
+          expect(result.current.snapshot.phase).toBe("error");
+        });
+        expect(result.current.snapshot.lastErrorCategory).toBe(errorCategory);
+        expect(result.current.snapshot.issues[0]?.code).toBe(code);
+        expect(result.current.snapshot.stderr.join("")).toContain(
+          `${errorCategory} failed`,
+        );
+      },
+    );
   });
 
   describe("when the execution state is reset", () => {

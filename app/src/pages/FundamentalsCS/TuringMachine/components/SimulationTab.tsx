@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { ModuleSimulationTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { SolutionCheckDialog } from "@/components/shared/SolutionCheckDialog";
 import { TopicSimulationTab } from "@/components/shared/TopicSimulationTab/TopicSimulationTab";
@@ -7,28 +8,24 @@ import {
   TMSimulator,
   type TMSimulatorHandle,
 } from "./Simulator/TMSimulator.tsx";
-import type { TMValidationRunResult } from "./Simulator/application/tmSolutionChecker";
-import { getTuringMachineScenario } from "../scenarios";
+import type {
+  TMValidationResultRow,
+  TMValidationRunResult,
+} from "./Simulator/application/tmSolutionChecker";
+import {
+  getTuringMachineScenario,
+  type TuringMachineScenario,
+} from "../scenarios";
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
-  const { t } = useTranslation();
   const simulatorRef = useRef<TMSimulatorHandle | null>(null);
   const [isSimulatorReady, setIsSimulatorReady] = useState(false);
   const [checkResult, setCheckResult] = useState<TMValidationRunResult | null>(
     null,
   );
   const [isChecking, setIsChecking] = useState(false);
-  const scenario = useMemo(() => {
-    if (!props.selectedItem) {
-      return null;
-    }
-
-    return getTuringMachineScenario(props.selectedItem.id);
-  }, [props.selectedItem]);
-
-  const handleLoadSolution = () => {
-    simulatorRef.current?.loadSolution();
-  };
+  const scenario = useScenario(props.selectedItem);
+  const isExercise = isExerciseScenario(scenario);
 
   const handleReset = () => {
     setCheckResult(null);
@@ -37,70 +34,32 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
 
   const handleSimulatorRef = useCallback((handle: TMSimulatorHandle | null) => {
     simulatorRef.current = handle;
-    setIsSimulatorReady(handle !== null);
+    setIsSimulatorReady(Boolean(handle));
   }, []);
 
   const handleCheckSolution = async () => {
-    if (
-      !simulatorRef.current ||
-      !isSimulatorReady ||
-      !scenario ||
-      scenario.kind !== "exercise"
-    ) {
+    const simulator = simulatorRef.current;
+    if (!simulator) {
       return;
     }
 
     setIsChecking(true);
-
     try {
-      const result = await simulatorRef.current.checkSolution();
+      const result = await simulator.checkSolution();
       setCheckResult(result);
     } finally {
       setIsChecking(false);
     }
   };
 
-  const headerActions =
-    scenario?.kind === "exercise" ? (
-      <>
-        <button
-          type="button"
-          onClick={handleLoadSolution}
-          disabled={!isSimulatorReady}
-          data-testid="tm-load-solution"
-          className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {t("tm.actions.loadSolution")}
-        </button>
-        <button
-          type="button"
-          onClick={handleCheckSolution}
-          disabled={isChecking || !isSimulatorReady}
-          data-testid="tm-check-solution"
-          className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isChecking
-            ? t("tm.actions.checkingSolution")
-            : t("tm.actions.checkSolution")}
-        </button>
-      </>
-    ) : null;
-
-  const resultRows = checkResult
-    ? checkResult.rows.map((row) => [
-        row.passed
-          ? t("tm.validation.summary.pass")
-          : t("tm.validation.summary.fail"),
-        row.input === "" ? t("tm.validation.summary.emptyWord") : row.input,
-        row.output === "" ? t("tm.validation.summary.emptyWord") : row.output,
-        row.expectedOutput === ""
-          ? t("tm.validation.summary.emptyWord")
-          : row.expectedOutput,
-        row.endedInValidHaltState
-          ? t("tm.sim.status.yes")
-          : t("tm.sim.status.no"),
-      ])
-    : [];
+  const headerActions = isExercise ? (
+    <ExerciseHeaderActions
+      isSimulatorReady={isSimulatorReady}
+      isChecking={isChecking}
+      onLoadSolution={() => simulatorRef.current?.loadSolution()}
+      onCheckSolution={handleCheckSolution}
+    />
+  ) : null;
 
   return (
     <>
@@ -108,41 +67,148 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         {...props}
         selectedItem={props.selectedItem}
         selectedItemActions={headerActions}
-        emptyStateTextKey="simulation.emptyStates.turing"
+        emptyStateTextKey="common.simulation.emptyStates.turing"
         onReset={handleReset}
         resetDisabled={!isSimulatorReady}
       >
         <TMSimulator
-          key={scenario?.id ?? "__turing-free-mode__"}
+          key={getScenarioKey(scenario)}
           ref={handleSimulatorRef}
           scenario={scenario}
         />
       </TopicSimulationTab>
 
-      <SolutionCheckDialog
-        open={checkResult !== null}
-        title={t("tm.validation.summary.popupTitle")}
+      <SimulationCheckResultDialog
+        checkResult={checkResult}
         onClose={() => setCheckResult(null)}
-        testId="tm-solution-check-dialog"
-        error={checkResult?.error}
-        errorTestId="tm-solution-check-error"
-        tableTestIdPrefix="tm-solution-check-table"
-        headers={[
-          t("tm.validation.table.passed"),
-          t("tm.validation.table.input"),
-          t("tm.validation.table.output"),
-          t("tm.validation.table.expectedOutput"),
-          t("tm.validation.table.validHaltState"),
-        ]}
-        rows={resultRows}
-        getRowTestAttributes={(rowIndex) => ({
-          "data-passed": String(checkResult?.rows[rowIndex]?.passed),
-          "data-valid-halt-state": String(
-            checkResult?.rows[rowIndex]?.endedInValidHaltState,
-          ),
-        })}
-        dataColumnWidthClassName="w-[11.5rem] max-w-[12rem]"
       />
     </>
   );
+}
+
+function useScenario(selectedItem: ModuleSimulationTabProps["selectedItem"]) {
+  return useMemo(() => {
+    if (!selectedItem) {
+      return null;
+    }
+    return getTuringMachineScenario(selectedItem.id);
+  }, [selectedItem]);
+}
+
+function isExerciseScenario(scenario: TuringMachineScenario | null): boolean {
+  return scenario !== null && scenario.kind === "exercise";
+}
+
+function getScenarioKey(scenario: TuringMachineScenario | null): string {
+  return scenario?.id ?? "__turing-free-mode__";
+}
+
+interface ExerciseHeaderActionsProps {
+  isSimulatorReady: boolean;
+  isChecking: boolean;
+  onLoadSolution: () => void;
+  onCheckSolution: () => void;
+}
+
+function ExerciseHeaderActions({
+  isSimulatorReady,
+  isChecking,
+  onLoadSolution,
+  onCheckSolution,
+}: ExerciseHeaderActionsProps) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={onLoadSolution}
+        disabled={!isSimulatorReady}
+        data-testid="tm-load-solution"
+        className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {t("turing-machine.actions.loadSolution")}
+      </button>
+      <button
+        type="button"
+        onClick={onCheckSolution}
+        disabled={isChecking || !isSimulatorReady}
+        data-testid="tm-check-solution"
+        className="bg-brand text-brand-foreground inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isChecking
+          ? t("turing-machine.actions.checkingSolution")
+          : t("turing-machine.actions.checkSolution")}
+      </button>
+    </>
+  );
+}
+
+interface SimulationCheckResultDialogProps {
+  checkResult: TMValidationRunResult | null;
+  onClose: () => void;
+}
+
+function SimulationCheckResultDialog({
+  checkResult,
+  onClose,
+}: SimulationCheckResultDialogProps) {
+  const { t } = useTranslation();
+  const resultRows = useMemo(() => {
+    if (!checkResult) {
+      return [];
+    }
+    return checkResult.rows.map((row) => buildValidationRowCells(row, t));
+  }, [checkResult, t]);
+
+  return (
+    <SolutionCheckDialog
+      open={checkResult !== null}
+      title={t("turing-machine.validation.summary.popupTitle")}
+      onClose={onClose}
+      testId="tm-solution-check-dialog"
+      error={checkResult?.error}
+      errorTestId="tm-solution-check-error"
+      tableTestIdPrefix="tm-solution-check-table"
+      headers={[
+        t("turing-machine.validation.table.passed"),
+        t("turing-machine.validation.table.input"),
+        t("turing-machine.validation.table.output"),
+        t("turing-machine.validation.table.expectedOutput"),
+        t("turing-machine.validation.table.validHaltState"),
+      ]}
+      rows={resultRows}
+      getRowTestAttributes={(rowIndex) => ({
+        "data-passed": String(checkResult?.rows[rowIndex]?.passed),
+        "data-valid-halt-state": String(
+          checkResult?.rows[rowIndex]?.endedInValidHaltState,
+        ),
+      })}
+      dataColumnWidthClassName="w-[11.5rem] max-w-[12rem] max-w-full"
+    />
+  );
+}
+
+function buildValidationRowCells(
+  row: TMValidationResultRow,
+  t: TFunction,
+): string[] {
+  const emptyWord = t("turing-machine.validation.summary.emptyWord");
+  const formatWord = (word: string) => (word === "" ? emptyWord : word);
+
+  return [
+    t(
+      row.passed
+        ? "turing-machine.validation.summary.pass"
+        : "turing-machine.validation.summary.fail",
+    ),
+    formatWord(row.input),
+    formatWord(row.output),
+    formatWord(row.expectedOutput),
+    t(
+      row.endedInValidHaltState
+        ? "turing-machine.sim.status.yes"
+        : "turing-machine.sim.status.no",
+    ),
+  ];
 }

@@ -63,6 +63,27 @@ describe("computeSmallestBooleanExpression", () => {
     expect(result.literalCount).toBe(0);
     expect(result.expression).toEqual({ type: "constant", value: true });
   });
+
+  it("handles single variable expressions and negations directly", () => {
+    const posTable = generateTruthTable(parse("a"), ["a", "b"]);
+    const posResult = computeSmallestBooleanExpression(posTable);
+    expect(posResult.exact).toBe(true);
+    expect(posResult.literalCount).toBe(1);
+    expectEquivalent(posResult.expression, posTable);
+
+    const negTable = generateTruthTable(parse("!a"), ["a", "b"]);
+    const negResult = computeSmallestBooleanExpression(negTable);
+    expect(negResult.exact).toBe(true);
+    expect(negResult.literalCount).toBe(1);
+    expectEquivalent(negResult.expression, negTable);
+  });
+
+  it("uses cached result for same truth table reference", () => {
+    const table = generateTruthTable(parse("a & b"));
+    const first = computeSmallestBooleanExpression(table);
+    const second = computeSmallestBooleanExpression(table);
+    expect(first).toBe(second);
+  });
 });
 
 function parse(source: string): BooleanExpression {

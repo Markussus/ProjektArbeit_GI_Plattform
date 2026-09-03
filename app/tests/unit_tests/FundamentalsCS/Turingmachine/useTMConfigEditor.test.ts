@@ -158,6 +158,29 @@ describe("useTMConfigEditor", () => {
     expect(result.current.displayRows[1][0]).toBe("x");
   });
 
+  it("handles duplicate symbol edits and blank row blurring on handleCellBlur", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    // Blurring on blank symbol (row 0, col 0) produces no issue
+    act(() => {
+      result.current.handleCellBlur(0, 0);
+    });
+    expect(result.current.blockingCellIssue).toBeNull();
+
+    // Renaming '0' (row 1) to already existing symbol '1'
+    act(() => {
+      result.current.handleCellChange(1, 0, "1");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 0);
+    });
+
+    expect(result.current.blockingCellIssue).toEqual({
+      code: "symbol_duplicate",
+      position: { row: 1, col: 0 },
+    });
+  });
+
   // Tests transition-cell validation, including the invalid-format edge case and subsequent successful commit to the program.
   it("validates and commits transition cell edits", () => {
     const { result } = renderHook(() => useTMConfigEditor(createProgram()));
@@ -190,6 +213,63 @@ describe("useTMConfigEditor", () => {
     expect(result.current.displayRows[0][2]).toBe("(q₁, 1, R)");
   });
 
+  it("clears transitions when blurring an empty or whitespace string", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    // Cell (1, 1) has transition: (q1, 1, R)
+    act(() => {
+      result.current.handleCellChange(1, 1, "   ");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toBeNull();
+    expect(result.current.draft.transitions["0"]?.q0).toBeUndefined();
+    expect(result.current.displayRows[1][1]).toBe("");
+  });
+
+  it("rejects transition cells with invalid movements or multi-character write symbols", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    // Invalid movement direction "X"
+    act(() => {
+      result.current.handleCellChange(1, 1, "(q1, 0, X)");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toEqual({
+      code: "transition_invalid",
+      position: { row: 1, col: 1 },
+    });
+
+    // Invalid multi-character write symbol "00"
+    act(() => {
+      result.current.handleCellChange(1, 1, "(q1, 00, R)");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toEqual({
+      code: "transition_invalid",
+      position: { row: 1, col: 1 },
+    });
+  });
+
+  it("leaves draft untouched on blur when cell value is unchanged", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    const prevDraft = result.current.draft;
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.draft).toBe(prevDraft);
+  });
+
   it("normalizes copied transition cells with subscript state names", () => {
     const { result } = renderHook(() => useTMConfigEditor(createProgram()));
 
@@ -207,6 +287,53 @@ describe("useTMConfigEditor", () => {
       movement: "L",
     });
     expect(result.current.displayRows[2][1]).toBe("(q₁, 0, L)");
+  });
+
+  it("normalizes lowercase movement directions to uppercase in draft and display", () => {
+    const { result } = renderHook(() => useTMConfigEditor(createProgram()));
+
+    act(() => {
+      result.current.handleCellChange(0, 1, "(qS, _, n)");
+    });
+    act(() => {
+      result.current.handleCellBlur(0, 1);
+    });
+
+    expect(result.current.blockingCellIssue).toBeNull();
+    expect(result.current.draft.transitions._?.q0).toEqual({
+      nextState: "qS",
+      writeSymbol: "_",
+      movement: "N",
+    });
+    expect(result.current.displayRows[0][1]).toBe("(qS, _, N)");
+
+    act(() => {
+      result.current.handleCellChange(1, 1, "(q1, 1, r)");
+    });
+    act(() => {
+      result.current.handleCellBlur(1, 1);
+    });
+
+    expect(result.current.draft.transitions["0"]?.q0).toEqual({
+      nextState: "q1",
+      writeSymbol: "1",
+      movement: "R",
+    });
+    expect(result.current.displayRows[1][1]).toBe("(q₁, 1, R)");
+
+    act(() => {
+      result.current.handleCellChange(2, 2, "(qS, 0, l)");
+    });
+    act(() => {
+      result.current.handleCellBlur(2, 2);
+    });
+
+    expect(result.current.draft.transitions["1"]?.q1).toEqual({
+      nextState: "qS",
+      writeSymbol: "0",
+      movement: "L",
+    });
+    expect(result.current.displayRows[2][2]).toBe("(qS, 0, L)");
   });
 
   // Tests header, row, and column removal handlers, including ignored indices that should not mutate the draft.

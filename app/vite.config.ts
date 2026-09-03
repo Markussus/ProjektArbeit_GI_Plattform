@@ -4,6 +4,16 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
+const VENDOR_PACKAGES = ["react-dom", "react-router-dom", "/react/"];
+const UI_PACKAGES = ["motion", "lucide-react"];
+
+function getChunkForModule(id: string): string | undefined {
+  if (!id.includes("node_modules")) return undefined;
+  if (VENDOR_PACKAGES.some((pkg) => id.includes(pkg))) return "vendor";
+  if (UI_PACKAGES.some((pkg) => id.includes(pkg))) return "ui";
+  return undefined;
+}
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   optimizeDeps: {
@@ -11,7 +21,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   test: {
@@ -19,5 +29,20 @@ export default defineConfig({
     environment: "node",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.d.ts", "src/main.tsx"],
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          return getChunkForModule(id);
+        },
+      },
+    },
   },
 });

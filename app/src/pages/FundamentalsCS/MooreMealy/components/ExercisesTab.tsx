@@ -1,19 +1,41 @@
 import type { ModuleExercisesTabProps } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
 import { InlineResetControl } from "@/components/shared/InlineResetControl";
-import { TopicExercisesTab } from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
-import { TOPIC_STORAGE_IDS } from "@/data/moduleCatalog";
+import {
+  TopicExercisesTab,
+  type TopicExerciseGroup,
+} from "@/components/shared/TopicExercisesTab/TopicExercisesTab";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   createTrainingCenterIdentifier,
   trainingCenterStorage,
 } from "@/lib/trainingCenter";
 import { useTranslation } from "react-i18next";
-import { mooreExerciseScenarios, mooreMealyExercises } from "../exercises";
+import {
+  automataExerciseScenarios,
+  mealyExercises,
+  mooreExercises,
+} from "../exercises";
+
+const EXERCISE_GROUPS: TopicExerciseGroup[] = [
+  {
+    id: "moore",
+    titleKey: "moore-mealy.groups.moore.title",
+    descriptionKey: "moore-mealy.groups.moore.exercisesDescription",
+    exercises: mooreExercises,
+  },
+  {
+    id: "mealy",
+    titleKey: "moore-mealy.groups.mealy.title",
+    descriptionKey: "moore-mealy.groups.mealy.exercisesDescription",
+    exercises: mealyExercises,
+  },
+];
 
 export function ExercisesTab(props: ModuleExercisesTabProps) {
   const { t } = useTranslation();
 
   const handleResetAllExercises = () => {
-    for (const exercise of mooreExerciseScenarios) {
+    for (const exercise of automataExerciseScenarios) {
       trainingCenterStorage.delete(
         createTrainingCenterIdentifier(
           TOPIC_STORAGE_IDS.mooreMealy,
@@ -26,15 +48,15 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
   return (
     <TopicExercisesTab
       {...props}
-      exercises={mooreMealyExercises}
-      testId="moore-exercises-tab"
-      testIdPrefix="moore-exercise-card"
+      groups={EXERCISE_GROUPS}
+      testId="moore-mealy-exercises-tab"
+      testIdPrefix="automata-exercise-card"
       headerAction={
         <InlineResetControl
-          label={t("trainingCenter.resetAllExercises")}
-          confirmationText={t("trainingCenter.confirmResetAllExercises")}
+          label={t("common.trainingCenter.resetAllExercises")}
+          confirmationText={t("common.trainingCenter.confirmResetAllExercises")}
           onConfirm={handleResetAllExercises}
-          testId="moore-reset-all-exercises"
+          testId="automata-reset-all-exercises"
         />
       }
     />

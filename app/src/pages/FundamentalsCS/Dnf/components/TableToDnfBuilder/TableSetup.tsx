@@ -14,7 +14,6 @@ interface TableSetupProps {
   truthTable: TruthTable;
   variableCount: number;
   resultValues: boolean[];
-  transferControl?: ReactNode;
   onVariableCountChange: (value: number) => void;
   onResultValuesChange: (values: boolean[]) => void;
   onResultChange: (rowIndex: number, value: boolean) => void;
@@ -25,7 +24,6 @@ export function TableSetup({
   truthTable,
   variableCount,
   resultValues,
-  transferControl,
   onVariableCountChange,
   onResultValuesChange,
   onResultChange,
@@ -131,6 +129,7 @@ export function TableSetup({
       <div>
         <button
           type="button"
+          data-testid="dnf-commit-table"
           onClick={onCommit}
           className="bg-brand text-brand-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
         >
@@ -138,8 +137,6 @@ export function TableSetup({
           {t("dnf.simulator.commitTable")}
         </button>
       </div>
-
-      {transferControl}
     </div>
   );
 }

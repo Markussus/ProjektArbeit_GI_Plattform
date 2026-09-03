@@ -11,8 +11,7 @@ export interface DnfTerm {
 }
 
 export type DnfExpression =
-  | { type: "constant"; value: boolean }
-  | { type: "terms"; terms: DnfTerm[] };
+  { type: "constant"; value: boolean } | { type: "terms"; terms: DnfTerm[] };
 
 export interface DnfDerivation {
   dnf: DnfExpression;

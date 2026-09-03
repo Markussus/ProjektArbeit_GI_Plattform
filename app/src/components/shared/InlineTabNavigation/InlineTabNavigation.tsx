@@ -4,9 +4,10 @@ export interface InlineTabItem<T extends string> {
   id: T;
   label: React.ReactNode;
   testId?: string;
+  disabled?: boolean;
 }
 
-interface InlineTabNavigationProps<T extends string> {
+export interface InlineTabNavigationProps<T extends string> {
   activeTab: T;
   tabs: InlineTabItem<T>[];
   onTabChange: (tab: T) => void;
@@ -33,13 +34,17 @@ export function InlineTabNavigation<T extends string>({
           type="button"
           role="tab"
           aria-selected={activeTab === tab.id}
-          onClick={() => onTabChange(tab.id)}
+          aria-disabled={tab.disabled}
+          disabled={tab.disabled}
+          onClick={() => !tab.disabled && onTabChange(tab.id)}
           data-testid={tab.testId}
           className={cn(
-            "relative px-4 py-2.5 text-sm font-medium",
+            "relative px-4 py-2.5 text-sm font-medium transition-colors",
             activeTab === tab.id
               ? "text-tab-active"
-              : "text-muted-foreground hover:text-foreground",
+              : tab.disabled
+                ? "text-muted-foreground/40 cursor-not-allowed"
+                : "text-muted-foreground hover:text-foreground",
           )}
         >
           {tab.label}

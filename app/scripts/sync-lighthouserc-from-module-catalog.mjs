@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -6,6 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 
+const moduleCatalogDataFile = path.join(
+  appRoot,
+  "src",
+  "data",
+  "moduleCatalogData.ts",
+);
 const moduleCatalogFile = path.join(
   appRoot,
   "src",
@@ -15,11 +21,14 @@ const moduleCatalogFile = path.join(
 const outputFile = path.join(appRoot, "lighthouserc.json");
 
 const baseUrl = process.env.LHCI_BASE_URL ?? "http://127.0.0.1:4173";
-const staticPaths = ["/", "/documentation", "/help", "/__lhci-not-found__"];
+const staticPaths = ["/", "/info", "/__lhci-not-found__"];
 const pathPattern = /path:\s*["'`]([^"'`]+)["'`]/g;
 
 function collectModuleCatalogPaths() {
-  const source = readFileSync(moduleCatalogFile, "utf8");
+  const targetFile = existsSync(moduleCatalogDataFile)
+    ? moduleCatalogDataFile
+    : moduleCatalogFile;
+  const source = readFileSync(targetFile, "utf8");
   return Array.from(source.matchAll(pathPattern), (match) => match[1]);
 }
 
@@ -67,5 +76,5 @@ const config = {
 writeFileSync(outputFile, `${JSON.stringify(config, null, 2)}\n`, "utf8");
 
 console.log(
-  `Synced lighthouserc.json with ${urls.length} URLs from moduleCatalog.tsx.`,
+  `Synced lighthouserc.json with ${urls.length} URLs from moduleCatalog.`,
 );

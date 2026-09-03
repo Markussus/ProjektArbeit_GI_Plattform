@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   evaluateBooleanExpression,
+  formatBooleanExpressionForDisplay,
   type BooleanExpression,
 } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
-import { formatBooleanExpressionForDisplay } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpressionFormat";
 import { parseBooleanExpression } from "../../../../src/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfParser";
 import {
   countExpressionLiterals,
@@ -47,18 +47,16 @@ describe("factorMinimalDnf", () => {
     expectEquivalent(factored, table);
   });
 
-  it("factors recursively across nested shared literals", () => {
-    // (a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)
-    //   → factor a out of the first two terms
-    //   → then factor b out of the resulting inner OR
-    //   → result has shape (a ∧ b ∧ (c ∨ d)) ∨ (e ∧ f) with 5 literals.
+  it("factors nested common literals across multiple terms", () => {
+    // f = (a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (a ∧ e) — optimal factoring is
+    // a ∧ ((b ∧ (c ∨ d)) ∨ e), dropping from 8 literals down to 5.
     const table = generateTruthTable(
-      parse("(a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (e ∧ f)"),
+      parse("(a ∧ b ∧ c) ∨ (a ∧ b ∧ d) ∨ (a ∧ e)"),
     );
 
     const factored = factor(table);
 
-    expect(countExpressionLiterals(factored)).toBeLessThan(8);
+    expect(countExpressionLiterals(factored)).toBe(5);
     expectEquivalent(factored, table);
   });
 

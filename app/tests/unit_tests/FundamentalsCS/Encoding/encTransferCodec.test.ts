@@ -1,8 +1,6 @@
 import { describe, expect, test } from "vitest";
-import {
-  encTransferCodec,
-  EncoderState,
-} from "../../../../src/pages/FundamentalsCS/Encoding/simulator/encTransferCodec";
+import { encTransferCodec } from "@/pages/FundamentalsCS/Encoding/simulator/encTransferCodec.ts";
+import type { EncoderState } from "@/pages/FundamentalsCS/Encoding/simulator/encTransferCodec.ts";
 
 describe("encTransferCodec", () => {
   describe("exportValue", () => {
@@ -54,26 +52,14 @@ describe("encTransferCodec", () => {
       });
     });
 
-    test("handles garbage prefixes cleanly", async () => {
-      const result = await encTransferCodec.importValue(
-        "GARBAGEdjF8YnxlfEhlbGxv",
+    test("rejects obsolete JSON and prefixed payloads", async () => {
+      const jsonPayload = btoa(JSON.stringify({ activeMode: "base64" }));
+      await expect(encTransferCodec.importValue(jsonPayload)).rejects.toThrow(
+        "Failed to import encoding state",
       );
-      expect(result).toEqual({
-        activeMode: "base64",
-        base64: { converterMode: "encode", inputValue: "Hello" },
-      });
-    });
-
-    test("falls back to parsing JSON correctly", async () => {
-      const stateObj: EncoderState = {
-        activeMode: "base64",
-        base64: { converterMode: "encode", inputValue: "Test" },
-      };
-      const jsonStr = JSON.stringify(stateObj);
-      const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
-
-      const result = await encTransferCodec.importValue(base64Str);
-      expect(result).toEqual(stateObj);
+      await expect(
+        encTransferCodec.importValue("GARBAGEdjF8YnxlfEhlbGxv"),
+      ).rejects.toThrow("Failed to import encoding state");
     });
 
     test("throws error for invalid string", async () => {

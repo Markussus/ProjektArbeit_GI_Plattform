@@ -3,7 +3,7 @@ import { EPSILON } from "../domain/faTypes";
 import type { FARuntime } from "../domain/faRuntime";
 
 /** True when any state has an ε-transition. */
-export function hasEpsilonTransitions(program: FAProgram): boolean {
+function hasEpsilonTransitions(program: FAProgram): boolean {
   return Object.values(program.transitions).some(
     (row) => (row[EPSILON]?.length ?? 0) > 0,
   );

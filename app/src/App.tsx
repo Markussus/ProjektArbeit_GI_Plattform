@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     // Route content is translated inside the router tree, but the document
     // title must still be synchronized manually when the language changes.
-    document.title = t("app.title");
+    document.title = t("common.app.title");
   }, [t, i18n.language]);
 
   return <RouterProvider router={router} />;

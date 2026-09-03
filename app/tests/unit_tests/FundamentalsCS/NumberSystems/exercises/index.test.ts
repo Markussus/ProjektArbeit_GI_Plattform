@@ -9,7 +9,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u03_decToBin as easy difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u03_decToBin",
+        (ex) => ex.titleKey === "number-systems.ex_u03_decToBin",
       );
 
       expect(exercise).toBeDefined();
@@ -18,7 +18,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u03_binAdd as medium difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u03_binAdd",
+        (ex) => ex.titleKey === "number-systems.ex_u03_binAdd",
       );
 
       expect(exercise).toBeDefined();
@@ -27,7 +27,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u04_binToHexOct as easy difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u04_binToHexOct",
+        (ex) => ex.titleKey === "number-systems.ex_u04_binToHexOct",
       );
 
       expect(exercise).toBeDefined();
@@ -36,7 +36,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u04_octToHex as medium difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u04_octToHex",
+        (ex) => ex.titleKey === "number-systems.ex_u04_octToHex",
       );
 
       expect(exercise).toBeDefined();
@@ -45,7 +45,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u04_hexToBin as easy difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u04_hexToBin",
+        (ex) => ex.titleKey === "number-systems.ex_u04_hexToBin",
       );
 
       expect(exercise).toBeDefined();
@@ -54,7 +54,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u05_floatToBin as medium difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u05_floatToBin",
+        (ex) => ex.titleKey === "number-systems.ex_u05_floatToBin",
       );
 
       expect(exercise).toBeDefined();
@@ -63,7 +63,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u05_ieeeEncode as hard difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u05_ieeeEncode",
+        (ex) => ex.titleKey === "number-systems.ex_u05_ieeeEncode",
       );
 
       expect(exercise).toBeDefined();
@@ -72,7 +72,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u05_ieeeDecode as hard difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u05_ieeeDecode",
+        (ex) => ex.titleKey === "number-systems.ex_u05_ieeeDecode",
       );
 
       expect(exercise).toBeDefined();
@@ -81,7 +81,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u06_addSub as medium difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u06_addSub",
+        (ex) => ex.titleKey === "number-systems.ex_u06_addSub",
       );
 
       expect(exercise).toBeDefined();
@@ -90,7 +90,7 @@ describe("Number Systems exercises", () => {
 
     it("defines ex_u06_mult as hard difficulty", () => {
       const exercise = numberSystemsExercises.find(
-        (ex) => ex.titleKey === "number.ex_u06_mult",
+        (ex) => ex.titleKey === "number-systems.ex_u06_mult",
       );
 
       expect(exercise).toBeDefined();

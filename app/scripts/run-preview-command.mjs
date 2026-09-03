@@ -161,6 +161,21 @@ function terminateChild(child) {
   child.kill("SIGTERM");
 }
 
+async function executeTask(task, taskEnv) {
+  if ("steps" in task) {
+    for (const [command, args] of task.steps) {
+      const exitCode = await runStep(command, args, taskEnv);
+      if (exitCode !== 0) {
+        return exitCode;
+      }
+    }
+    return 0;
+  }
+
+  const [command, args] = task.command;
+  return await runStep(command, args, taskEnv);
+}
+
 async function main() {
   const taskName = getTaskName();
   const task = taskName ? tasks[taskName] : null;
@@ -189,20 +204,7 @@ async function main() {
       ...task.env(baseUrl),
     };
 
-    if ("steps" in task) {
-      for (const [command, args] of task.steps) {
-        const exitCode = await runStep(command, args, taskEnv);
-
-        if (exitCode !== 0) {
-          return exitCode;
-        }
-      }
-
-      return 0;
-    }
-
-    const [command, args] = task.command;
-    return await runStep(command, args, taskEnv);
+    return await executeTask(task, taskEnv);
   } finally {
     terminateChild(preview);
   }

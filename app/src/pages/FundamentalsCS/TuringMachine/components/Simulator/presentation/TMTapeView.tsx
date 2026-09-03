@@ -1,24 +1,21 @@
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type RefObject,
-} from "react";
+import { useMemo, useRef, useState, type RefObject } from "react";
 import { ArrowDown } from "lucide-react";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import { cn } from "@/lib/utils";
 import {
   buildTapeCells,
   DEFAULT_HEAD_WINDOW_RADIUS,
-  getResponsiveWindowRadius,
   getTapeContentRange,
   getTapeRenderRange,
   getTapeTransitionDurationMs,
   resolveTapeViewport,
-  shouldAnimateTapeShift,
-} from "./tmTapeViewLogic.ts";
+} from "./tmTapeViewLogic";
+import {
+  useTapeAutoCenter,
+  useTapeHeadTracking,
+  useTapeResponsiveRadius,
+  useTapeShiftAnimation,
+} from "./hooks/useTapeAnimation";
 
 export interface TMTapeViewProps {
   tape: Record<number, string>;
@@ -43,25 +40,34 @@ export function TMTapeView({
   className,
   cellClassName,
 }: TMTapeViewProps) {
+  // 1. Refs
   const headIndicatorRef = useRef<HTMLDivElement | null>(null);
   const tapeViewportRef = useRef<HTMLDivElement | null>(null);
   const tapeScrollerRef = useRef<HTMLDivElement | null>(null);
   const tapeTrackRef = useRef<HTMLDivElement | null>(null);
   const focusedCellRef = useRef<HTMLDivElement | null>(null);
-  const previousStartIndexRef = useRef<number | null>(null);
-  const previousWindowRadiusRef = useRef<number | null>(null);
-  const previousAutoCenterKeyRef = useRef<string | null>(null);
-  const tapeShiftFrameRef = useRef<number | null>(null);
-  const headIndicatorFrameRef = useRef<number | null>(null);
+
   const dragScroll = useDragScroll<HTMLDivElement>();
   const setTapeScrollerRef = (element: HTMLDivElement | null) => {
     tapeScrollerRef.current = element;
     dragScroll.setElementRef(element);
   };
-  const [viewportWidth, setViewportWidth] = useState<number | null>(null);
+
+  // 2. Base state & duration logic
   const maxWindowRadius = Math.max(windowRadius, 0);
   const [responsiveWindowRadius, setResponsiveWindowRadius] =
     useState(maxWindowRadius);
+  const transitionDurationMs = getTapeTransitionDurationMs(stepDurationMs);
+
+  const transitionStyle = useMemo(
+    () => ({
+      transitionDuration: `${transitionDurationMs}ms`,
+    }),
+    [transitionDurationMs],
+  );
+  const headIndicatorStyle = useMemo(() => ({ transitionDuration: "0ms" }), []);
+
+  // 3. Resolve Viewport & Tape Ranges
   const {
     effectiveWindowRadius,
     minIndex: startIndex,
@@ -76,10 +82,12 @@ export function TMTapeView({
       ),
     [headPosition, headWindowRadius, responsiveWindowRadius, windowRadius],
   );
+
   const contentRange = useMemo(
     () => getTapeContentRange(tape, blankSymbol, headPosition),
     [blankSymbol, headPosition, tape],
   );
+
   const tapeRange = useMemo(
     () =>
       getTapeRenderRange({
@@ -90,102 +98,6 @@ export function TMTapeView({
       }),
     [contentRange, effectiveWindowRadius, endIndex, startIndex],
   );
-  const autoCenterKey = `${headPosition}:${tapeRange.minIndex}:${tapeRange.maxIndex}`;
-  const transitionDurationMs = getTapeTransitionDurationMs(stepDurationMs);
-  const transitionStyle = useMemo(
-    () => ({
-      transitionDuration: `${transitionDurationMs}ms`,
-    }),
-    [transitionDurationMs],
-  );
-  const headIndicatorStyle = useMemo(() => ({ transitionDuration: "0ms" }), []);
-  const updateHeadIndicatorPosition = useCallback(() => {
-    const headIndicator = headIndicatorRef.current;
-    const focusedCell = focusedCellRef.current;
-    const tapeScroller = tapeScrollerRef.current;
-
-    if (!headIndicator || !focusedCell || !tapeScroller) {
-      if (headIndicator) {
-        headIndicator.style.opacity = "0";
-      }
-
-      return;
-    }
-
-    const positioningParent =
-      headIndicator.offsetParent instanceof HTMLElement
-        ? headIndicator.offsetParent
-        : tapeScroller;
-    const viewportRect = positioningParent.getBoundingClientRect();
-    const focusedCellRect = focusedCell.getBoundingClientRect();
-    const focusedCellCenterPx =
-      focusedCellRect.left - viewportRect.left + focusedCellRect.width / 2;
-
-    headIndicator.style.opacity = "1";
-    headIndicator.style.transform = `translateX(${focusedCellCenterPx}px) translateX(-50%)`;
-  }, []);
-  const stopHeadIndicatorTracking = useCallback(() => {
-    if (headIndicatorFrameRef.current !== null) {
-      window.cancelAnimationFrame(headIndicatorFrameRef.current);
-      headIndicatorFrameRef.current = null;
-    }
-  }, []);
-  const trackHeadIndicatorDuringAnimation = useCallback(
-    (durationMs: number) => {
-      stopHeadIndicatorTracking();
-
-      const updateUntil = performance.now() + Math.max(durationMs, 0) + 80;
-
-      const update = () => {
-        updateHeadIndicatorPosition();
-
-        if (performance.now() < updateUntil) {
-          headIndicatorFrameRef.current = window.requestAnimationFrame(update);
-          return;
-        }
-
-        headIndicatorFrameRef.current = null;
-      };
-
-      update();
-    },
-    [stopHeadIndicatorTracking, updateHeadIndicatorPosition],
-  );
-
-  useLayoutEffect(() => {
-    return stopHeadIndicatorTracking;
-  }, [stopHeadIndicatorTracking]);
-
-  useLayoutEffect(() => {
-    const observedElement =
-      responsiveBoundaryRef?.current ?? tapeViewportRef.current;
-    if (!observedElement) {
-      return;
-    }
-
-    const updateViewportWidth = () => {
-      const computedStyle = window.getComputedStyle(observedElement);
-      const horizontalPaddingPx =
-        Number.parseFloat(computedStyle.paddingLeft) +
-        Number.parseFloat(computedStyle.paddingRight);
-
-      setViewportWidth(
-        Math.max(0, observedElement.clientWidth - horizontalPaddingPx),
-      );
-    };
-
-    updateViewportWidth();
-
-    const resizeObserver = new ResizeObserver(() => {
-      updateViewportWidth();
-    });
-
-    resizeObserver.observe(observedElement);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [responsiveBoundaryRef]);
 
   const cells = useMemo(
     () =>
@@ -199,160 +111,46 @@ export function TMTapeView({
     [blankSymbol, headPosition, tapeRange, tape],
   );
 
-  useLayoutEffect(() => {
-    updateHeadIndicatorPosition();
-  }, [cells, updateHeadIndicatorPosition]);
+  const autoCenterKey = `${headPosition}:${tapeRange.minIndex}:${tapeRange.maxIndex}`;
 
-  useLayoutEffect(() => {
-    const tapeScroller = tapeScrollerRef.current;
-    const focusedCell = focusedCellRef.current;
-    if (!tapeScroller || !focusedCell) {
-      previousAutoCenterKeyRef.current = autoCenterKey;
-      return;
-    }
+  // 4. Side Effects / Animation Hooks
+  useTapeResponsiveRadius({
+    responsiveBoundaryRef,
+    tapeViewportRef,
+    tapeTrackRef,
+    cells,
+    effectiveWindowRadius,
+    maxWindowRadius,
+    setResponsiveWindowRadius,
+  });
 
-    if (previousAutoCenterKeyRef.current === autoCenterKey) {
-      return;
-    }
-    previousAutoCenterKeyRef.current = autoCenterKey;
-
-    const scrollerRect = tapeScroller.getBoundingClientRect();
-    const focusedCellRect = focusedCell.getBoundingClientRect();
-    const focusedCellCenterPx =
-      focusedCellRect.left - scrollerRect.left + focusedCellRect.width / 2;
-    const targetScrollLeft =
-      tapeScroller.scrollLeft +
-      focusedCellCenterPx -
-      tapeScroller.clientWidth / 2;
-
-    tapeScroller.scrollTo({
-      left: Math.max(0, targetScrollLeft),
-      behavior: transitionDurationMs > 0 ? "smooth" : "auto",
+  const { updateHeadIndicatorPosition, trackHeadIndicatorDuringAnimation } =
+    useTapeHeadTracking({
+      headIndicatorRef,
+      focusedCellRef,
+      tapeScrollerRef,
+      cells,
     });
-    trackHeadIndicatorDuringAnimation(transitionDurationMs);
-  }, [
+
+  useTapeAutoCenter({
+    tapeScrollerRef,
+    focusedCellRef,
     autoCenterKey,
     headPosition,
-    trackHeadIndicatorDuringAnimation,
     transitionDurationMs,
-  ]);
-
-  useLayoutEffect(() => {
-    const tapeTrack = tapeTrackRef.current;
-    if (!tapeTrack || viewportWidth === null) {
-      return;
-    }
-
-    const totalCells = tapeTrack.children.length;
-    const firstCell = tapeTrack.children.item(0) as HTMLElement | null;
-    const secondCell = tapeTrack.children.item(1) as HTMLElement | null;
-    if (!firstCell) {
-      return;
-    }
-
-    const cellWidthPx = firstCell.offsetWidth;
-    const cellPitchPx = secondCell
-      ? secondCell.offsetLeft - firstCell.offsetLeft
-      : cellWidthPx;
-    const baseWidthPx =
-      tapeTrack.offsetWidth -
-      cellWidthPx -
-      Math.max(0, totalCells - 1) * cellPitchPx;
-    const nextRadius = getResponsiveWindowRadius({
-      viewportWidth,
-      baseWidthPx,
-      cellWidthPx,
-      cellPitchPx,
-      maxWindowRadius,
-    });
-
-    if (nextRadius !== effectiveWindowRadius) {
-      setResponsiveWindowRadius(nextRadius);
-    }
-  }, [effectiveWindowRadius, maxWindowRadius, viewportWidth, cells]);
-
-  useLayoutEffect(() => {
-    const tapeTrack = tapeTrackRef.current;
-    if (!tapeTrack) {
-      previousStartIndexRef.current = tapeRange.minIndex;
-      previousWindowRadiusRef.current = effectiveWindowRadius;
-      return;
-    }
-
-    if (previousStartIndexRef.current === null) {
-      previousStartIndexRef.current = tapeRange.minIndex;
-      previousWindowRadiusRef.current = effectiveWindowRadius;
-      tapeTrack.style.transitionDuration = "0ms";
-      tapeTrack.style.transform = "translateX(0px)";
-      return;
-    }
-
-    const previousWindowRadius = previousWindowRadiusRef.current;
-    previousWindowRadiusRef.current = effectiveWindowRadius;
-    if (
-      previousWindowRadius !== null &&
-      previousWindowRadius !== effectiveWindowRadius
-    ) {
-      previousStartIndexRef.current = tapeRange.minIndex;
-      tapeTrack.style.transitionDuration = "0ms";
-      tapeTrack.style.transform = "translateX(0px)";
-      return;
-    }
-
-    const previousStartIndex = previousStartIndexRef.current;
-    const shiftedCells = tapeRange.minIndex - previousStartIndex;
-    previousStartIndexRef.current = tapeRange.minIndex;
-
-    if (!shouldAnimateTapeShift(shiftedCells, transitionDurationMs)) {
-      tapeTrack.style.transitionDuration = "0ms";
-      tapeTrack.style.transform = "translateX(0px)";
-      return;
-    }
-
-    const firstCell = tapeTrack.children.item(0) as HTMLElement | null;
-    const secondCell = tapeTrack.children.item(1) as HTMLElement | null;
-    if (!firstCell || !secondCell) {
-      tapeTrack.style.transitionDuration = "0ms";
-      tapeTrack.style.transform = "translateX(0px)";
-      return;
-    }
-
-    const cellPitchPx = secondCell.offsetLeft - firstCell.offsetLeft;
-    if (cellPitchPx <= 0) {
-      tapeTrack.style.transitionDuration = "0ms";
-      tapeTrack.style.transform = "translateX(0px)";
-      return;
-    }
-
-    tapeTrack.style.transitionDuration = "0ms";
-    tapeTrack.style.transform = `translateX(${shiftedCells * cellPitchPx}px)`;
-    updateHeadIndicatorPosition();
-
-    if (tapeShiftFrameRef.current !== null) {
-      window.cancelAnimationFrame(tapeShiftFrameRef.current);
-    }
-
-    tapeShiftFrameRef.current = window.requestAnimationFrame(() => {
-      tapeTrack.style.transitionDuration = `${transitionDurationMs}ms`;
-      tapeTrack.style.transform = "translateX(0px)";
-      trackHeadIndicatorDuringAnimation(transitionDurationMs);
-      tapeShiftFrameRef.current = null;
-    });
-
-    return () => {
-      if (tapeShiftFrameRef.current !== null) {
-        window.cancelAnimationFrame(tapeShiftFrameRef.current);
-        tapeShiftFrameRef.current = null;
-      }
-    };
-  }, [
-    effectiveWindowRadius,
-    tapeRange.minIndex,
     trackHeadIndicatorDuringAnimation,
+  });
+
+  useTapeShiftAnimation({
+    tapeTrackRef,
+    tapeRangeMinIndex: tapeRange.minIndex,
+    effectiveWindowRadius,
     transitionDurationMs,
     updateHeadIndicatorPosition,
-  ]);
+    trackHeadIndicatorDuringAnimation,
+  });
 
+  // 5. Render
   return (
     <div
       ref={tapeViewportRef}
@@ -379,7 +177,7 @@ export function TMTapeView({
             onMouseDown={dragScroll.onMouseDown}
             onScroll={updateHeadIndicatorPosition}
             className={cn(
-              "w-full overflow-x-auto overflow-y-hidden pt-2 pb-3 [scrollbar-width:thin]",
+              "w-full [scrollbar-width:thin] overflow-x-auto overflow-y-hidden pt-2 pb-3",
               "[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent",
               dragScroll.isDragging ? "cursor-grabbing" : "cursor-grab",
             )}

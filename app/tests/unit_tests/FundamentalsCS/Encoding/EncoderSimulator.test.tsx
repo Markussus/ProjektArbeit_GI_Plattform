@@ -3,11 +3,13 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EncoderSimulator } from "@/pages/FundamentalsCS/Encoding/simulator/EncoderSimulator";
-import type { TopicItem } from "@/types/exercise";
+import type { Exercise, TopicItem } from "@/types/exercise";
+import { FileText } from "lucide-react";
 import type {
   GeneratedExercise,
   EncodingExerciseType,
 } from "@/pages/FundamentalsCS/Encoding/utils/exerciseGenerator";
+import type { MouseEventHandler } from "react";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -16,10 +18,26 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
+interface MockBase64Props {
+  isExerciseMode?: boolean;
+  showSolution?: boolean;
+  initialValue?: string;
+  initialConverterMode?: string;
+  onShowSolution?: () => void;
+  onExitExercise?: () => void;
+}
+
+interface MockUtf8Props {
+  isExerciseMode?: boolean;
+  initialValue?: string;
+  initialConverterMode?: string;
+  onExitExercise?: () => void;
+}
+
 vi.mock(
   "../../../../src/pages/FundamentalsCS/Encoding/simulator/Base64Encoder",
   () => ({
-    Base64Encoder: (props: Record<string, unknown>) => (
+    Base64Encoder: (props: MockBase64Props) => (
       <div data-testid="mock-base64-encoder">
         <div data-testid="mock-base64-is-exercise">
           {String(props.isExerciseMode)}
@@ -35,13 +53,13 @@ vi.mock(
         </div>
         <button
           data-testid="mock-base64-show-solution-button"
-          onClick={props.onShowSolution}
+          onClick={props.onShowSolution as MouseEventHandler<HTMLButtonElement>}
         >
           show solution
         </button>
         <button
           data-testid="mock-base64-exit-exercise-button"
-          onClick={props.onExitExercise}
+          onClick={props.onExitExercise as MouseEventHandler<HTMLButtonElement>}
         >
           exit exercise
         </button>
@@ -53,7 +71,7 @@ vi.mock(
 vi.mock(
   "../../../../src/pages/FundamentalsCS/Encoding/simulator/UTF8Encoder",
   () => ({
-    UTF8Encoder: (props: Record<string, unknown>) => (
+    UTF8Encoder: (props: MockUtf8Props) => (
       <div data-testid="mock-utf8-encoder">
         <div data-testid="mock-utf8-is-exercise">
           {String(props.isExerciseMode)}
@@ -66,7 +84,7 @@ vi.mock(
         </div>
         <button
           data-testid="mock-utf8-exit-exercise-button"
-          onClick={props.onExitExercise}
+          onClick={props.onExitExercise as MouseEventHandler<HTMLButtonElement>}
         >
           exit exercise
         </button>
@@ -75,59 +93,40 @@ vi.mock(
   }),
 );
 
-vi.mock("@/components/shared/ConfirmDialog/ConfirmDialog", () => ({
-  ConfirmDialog: (props: {
-    isOpen: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }) =>
-    props.isOpen ? (
-      <div data-testid="mock-confirm-dialog">
-        <button data-testid="mock-confirm" onClick={props.onConfirm}>
-          confirm
-        </button>
-        <button data-testid="mock-cancel" onClick={props.onCancel}>
-          cancel
-        </button>
-      </div>
-    ) : null,
-}));
-
-vi.mock(
-  "@/components/shared/SimulatorStringTransferBox/SimulatorStringTransferBox",
-  () => ({
-    SimulatorStringTransferBox: () => (
-      <div data-testid="mock-transfer-box"></div>
-    ),
-  }),
-);
+const mockIcon = FileText;
 
 function createGeneratedExercise(
   mode: "base64" | "utf8",
   converterMode: "encode" | "decode",
   initialValue: string,
-): TopicItem {
+): GeneratedExercise & Exercise {
   return {
-    id: `encoding.ex_generated_${mode}_${converterMode}`,
-    titleKey: "some_title",
-    descriptionKey: "some_desc",
+    id: `encoding.ex_generated_${mode}_${converterMode}` as never,
+    titleKey: "encoding.ex_base64_encode_easy",
+    descriptionKey: "encoding.ex_base64_encode_easy_desc",
+    title: "Generated exercise title",
+    description: "Generated exercise description",
     difficulty: "easy",
-    icon: { name: "FileText" } as never,
+    icon: mockIcon,
+    kind: "exercise",
     exerciseType: `${mode}_${converterMode}_easy` as EncodingExerciseType,
     mode,
     converterMode,
     initialValue,
     answer: "some_answer",
-  } as unknown as GeneratedExercise;
+  };
 }
 
 function createExample(id: string): TopicItem {
   return {
-    id,
-    titleKey: "some_title",
-    descriptionKey: "some_desc",
+    id: id as never,
+    titleKey: "encoding.ex_base64_encode_easy",
+    descriptionKey: "encoding.ex_base64_encode_easy_desc",
+    title: "Example title",
+    description: "Example description",
     difficulty: "easy",
-    icon: { name: "FileText" } as never,
+    icon: mockIcon,
+    kind: "exercise",
   };
 }
 
@@ -231,7 +230,7 @@ describe("EncoderSimulator", () => {
   });
 
   describe("when in exercise mode without solution shown", () => {
-    it("shows confirm dialog when switching tabs", () => {
+    it("exits exercise and switches tab immediately", () => {
       const onExitExercise = vi.fn();
       render(
         <EncoderSimulator
@@ -245,47 +244,9 @@ describe("EncoderSimulator", () => {
       );
 
       fireEvent.click(screen.getByTestId("encoding-tab-utf8"));
-      expect(screen.getByTestId("mock-confirm-dialog")).toBeTruthy();
-    });
-
-    it("exits exercise and switches tab on confirm", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <EncoderSimulator
-          selectedExercise={createGeneratedExercise(
-            "base64",
-            "encode",
-            "Hello",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("encoding-tab-utf8"));
-      fireEvent.click(screen.getByTestId("mock-confirm"));
 
       expect(onExitExercise).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("mock-utf8-encoder")).toBeTruthy();
-    });
-
-    it("stays on current tab when cancel is clicked", () => {
-      const onExitExercise = vi.fn();
-      render(
-        <EncoderSimulator
-          selectedExercise={createGeneratedExercise(
-            "base64",
-            "encode",
-            "Hello",
-          )}
-          onExitExercise={onExitExercise}
-        />,
-      );
-
-      fireEvent.click(screen.getByTestId("encoding-tab-utf8"));
-      fireEvent.click(screen.getByTestId("mock-cancel"));
-
-      expect(onExitExercise).not.toHaveBeenCalled();
-      expect(screen.getByTestId("mock-base64-encoder")).toBeTruthy();
     });
   });
 

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import type { TranslationKey } from "@/types/i18n";
 import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
@@ -16,10 +16,14 @@ import { RLGrammarInputCard } from "./RLGrammarInputCard";
 interface RLWordRecognizerProps {
   initialGrammar?: string;
   initialWord?: string;
+  transferActive?: boolean;
+  resetVersion?: number;
 }
 
-const DEFAULT_SOURCE = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
-const DEFAULT_WORD = "001, 010, 1, 00";
+// Free mode opens blank - the worked grammar and its test words live in the
+// Examples tab. Both fields keep their placeholders.
+const EMPTY_SOURCE = "";
+const EMPTY_WORD = "";
 
 interface PerWordResult {
   word: string;
@@ -31,10 +35,12 @@ interface PerWordResult {
 export function RLWordRecognizer({
   initialGrammar,
   initialWord,
+  transferActive = true,
+  resetVersion = 0,
 }: RLWordRecognizerProps) {
   const { t } = useTranslation();
-  const [source, setSource] = useState(initialGrammar ?? DEFAULT_SOURCE);
-  const [word, setWord] = useState(initialWord ?? DEFAULT_WORD);
+  const [source, setSource] = useState(initialGrammar ?? EMPTY_SOURCE);
+  const [word, setWord] = useState(initialWord ?? EMPTY_WORD);
 
   // Adopt freshly seeded inputs (from an example/exercise) without remounting,
   // so the values persist after the store clears the pending scenario.
@@ -49,12 +55,25 @@ export function RLWordRecognizer({
     setWord(initialWord);
   }
 
-  const storageTransferCodec = useRLPersistedSource({
+  const [appliedResetVersion, setAppliedResetVersion] = useState(resetVersion);
+  if (resetVersion !== appliedResetVersion) {
+    setAppliedResetVersion(resetVersion);
+    setSource(EMPTY_SOURCE);
+    setWord(EMPTY_WORD);
+  }
+
+  const storageIdentifier = useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.recognizeWord,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: source,
+    codec: rlGrammarTransferCodec,
+    enabled: transferActive,
   });
 
   const evaluation = useMemo<
@@ -82,30 +101,31 @@ export function RLWordRecognizer({
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
         <RLGrammarInputCard
+          testId="rl-word-recognizer-source"
           value={source}
           onChange={setSource}
-          titleKey="rl.simulator.grammarInput"
+          titleKey="regular-languages.simulator.grammarInput"
           titleFallback="Grammar"
         />
       </div>
 
-      <div className="bg-card ring-foreground/10 flex flex-col gap-3 rounded-xl p-5 ring-1">
+      <div className="border-border bg-card flex flex-col gap-3 rounded-xl border p-5">
         <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
-          {t("rl.simulator.testWord", "Words to Test")}
+          {t("regular-languages.simulator.testWord", "Words to Test")}
         </h4>
         <input
           type="text"
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder={t(
-            "rl.simulator.testWordPlaceholder",
+            "regular-languages.simulator.testWordPlaceholder",
             "Comma-separated words; empty = ε",
           )}
           className="border-input bg-background focus:ring-primary w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
         />
         <p className="text-muted-foreground text-xs">
           {t(
-            "rl.simulator.testWordHelp",
+            "regular-languages.simulator.testWordHelp",
             "Separate multiple words with commas. Each character is treated as one terminal symbol; whitespace around commas is ignored.",
           )}
         </p>
@@ -116,7 +136,7 @@ export function RLWordRecognizer({
               <li
                 key={`${r.word}-${idx}`}
                 className={cn(
-                  "ring-foreground/10 flex items-start gap-2 rounded-md px-3 py-2 text-sm ring-1",
+                  "border-border flex items-start gap-2 rounded-md border px-3 py-2 text-sm",
                   r.accepted
                     ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                     : "bg-rose-500/10 text-rose-700 dark:text-rose-400",
@@ -133,7 +153,7 @@ export function RLWordRecognizer({
                   </span>
                   <span className="text-foreground/70 text-xs">
                     {t(
-                      `rl.simulator.reason.${r.reasonCode}` as TranslationKey,
+                      `regular-languages.simulator.reason.${r.reasonCode}` as TranslationKey,
                       { states: r.states },
                     )}
                   </span>
@@ -144,20 +164,12 @@ export function RLWordRecognizer({
         ) : (
           <p className="text-muted-foreground text-sm">
             {t(
-              "rl.simulator.grammarInvalid",
+              "regular-languages.simulator.grammarInvalid",
               "Enter a valid right-linear grammar.",
             )}
           </p>
         )}
       </div>
-
-      <SimulatorStringTransferBox
-        value={source}
-        codec={storageTransferCodec}
-        onLoad={setSource}
-        testIdPrefix="rl-transfer"
-        className="lg:col-span-2"
-      />
     </div>
   );
 }

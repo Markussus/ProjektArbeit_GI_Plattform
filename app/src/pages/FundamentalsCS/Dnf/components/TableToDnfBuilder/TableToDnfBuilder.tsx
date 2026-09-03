@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lightbulb, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SimulatorStringTransferBox } from "@/components/shared/SimulatorStringTransferBox";
+import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
 import { useDnfSimplification } from "../DnfBuilder/application/useDnfSimplification";
-import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpressionFormat";
+import { formatBooleanExpressionForDisplay } from "../DnfBuilder/domain/booleanExpression";
 import { normalizeBooleanOperatorAliases } from "../DnfBuilder/domain/booleanSyntax";
 import {
   checkDnfExerciseAttempt,
@@ -35,7 +34,6 @@ interface TableToDnfBuilderProps {
   storageIdentifier: string;
   storageEnabled: boolean;
   storageReady: boolean;
-  transferCodec: ISimulatorTransferCodec<DnfTruthTableTransferDraft>;
   onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
   onUserChange?: () => void;
   seedInitialFeedback?: boolean;
@@ -46,7 +44,6 @@ export function TableToDnfBuilder({
   storageIdentifier,
   storageEnabled,
   storageReady,
-  transferCodec,
   onTransferValueChange,
   onUserChange,
   seedInitialFeedback = false,
@@ -124,6 +121,11 @@ export function TableToDnfBuilder({
     value: transferValue,
     codec: dnfTruthTableTransferCodec,
     enabled: storageEnabled && storageReady,
+  });
+  useActiveSimulatorTransfer({
+    identifier: storageIdentifier,
+    value: transferValue,
+    codec: dnfTruthTableTransferCodec,
   });
 
   useEffect(() => {
@@ -214,18 +216,6 @@ export function TableToDnfBuilder({
     setSolutionLoadedVersion((current) => current + 1);
   };
 
-  const handleImportTable = (value: DnfTruthTableTransferDraft) => {
-    onUserChange?.();
-    setVariableCount(value.variableCount);
-    setResultValues([...value.resultValues]);
-    setCommitted(value.committed);
-    setDnfAnswer(normalizeBooleanOperatorAliases(value.dnfAnswer));
-    simplification.setAnswer(value.simplificationAnswer);
-    setFeedback(null);
-    setShowSolution(false);
-    setShowFullTable(false);
-  };
-
   if (analysis.status !== "valid") {
     return null;
   }
@@ -250,14 +240,6 @@ export function TableToDnfBuilder({
         truthTable={analysis.truthTable}
         variableCount={variableCount}
         resultValues={resultValues}
-        transferControl={
-          <SimulatorStringTransferBox
-            value={transferValue}
-            codec={transferCodec}
-            onLoad={handleImportTable}
-            testIdPrefix="dnf-table-transfer"
-          />
-        }
         onVariableCountChange={updateVariableCount}
         onResultValuesChange={(values) => {
           onUserChange?.();
@@ -324,13 +306,6 @@ export function TableToDnfBuilder({
         initiallyOpenSimplification={
           seedInitialFeedback || solutionLoadedVersion > 0
         }
-      />
-
-      <SimulatorStringTransferBox
-        value={transferValue}
-        codec={transferCodec}
-        onLoad={handleImportTable}
-        testIdPrefix="dnf-table-transfer"
       />
     </div>
   );

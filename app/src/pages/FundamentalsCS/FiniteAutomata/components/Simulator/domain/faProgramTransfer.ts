@@ -104,17 +104,56 @@ function countReadableSymbols(symbolCount: number, isNFA: boolean): number {
   return symbolCount + (isNFA ? 1 : 0);
 }
 
-function normalizeProgram(program: FAProgram): NormalizedProgram {
-  const isNFA = program.type === "NFA";
+/**
+ * The compact format assumes a well-formed program: at least one state, a start
+ * state that exists, and no duplicate states or symbols.
+ */
+function canNormalize(program: FAProgram): boolean {
+  return (
+    program.states.length > 0 &&
+    program.states.includes(program.startState) &&
+    new Set(program.states).size === program.states.length &&
+    new Set(program.alphabet).size === program.alphabet.length
+  );
+}
 
-  if (
-    program.states.length === 0 ||
-    !program.states.includes(program.startState) ||
-    new Set(program.states).size !== program.states.length ||
-    new Set(program.alphabet).size !== program.alphabet.length
-  ) {
+/**
+ * Flatten the transition table into the row-major cell list the bitstream
+ * writes. Rows with no transitions at all are skipped entirely — the row mask
+ * records which ones made it into the payload.
+ */
+function buildTransitionRows(
+  program: FAProgram,
+  orderedStates: string[],
+  stateIds: Map<string, number>,
+  symbols: string[],
+  isNFA: boolean,
+): { readableSymbolIds: number[]; transitionCells: number[][] } {
+  const readableSymbolIds: number[] = [];
+  const transitionCells: number[][] = [];
+  const readableSymbolCount = countReadableSymbols(symbols.length, isNFA);
+
+  for (let symbolId = 0; symbolId < readableSymbolCount; symbolId++) {
+    const symbol = symbolId < symbols.length ? symbols[symbolId] : EPSILON;
+    const rowCells = orderedStates.map((state) =>
+      collectCellTargets(program.transitions[state]?.[symbol], stateIds),
+    );
+
+    if (rowCells.some((targets) => targets.length > 0)) {
+      readableSymbolIds.push(symbolId);
+      transitionCells.push(...rowCells);
+    }
+  }
+
+  return { readableSymbolIds, transitionCells };
+}
+
+function normalizeProgram(program: FAProgram): NormalizedProgram {
+  if (!canNormalize(program)) {
     throw new Error(PROGRAM_INVALID);
   }
+
+  const isNFA = program.type === "NFA";
 
   // State ID 0 is always the start state; the rest keep declaration order.
   const orderedStates = [
@@ -126,39 +165,20 @@ function normalizeProgram(program: FAProgram): NormalizedProgram {
   const symbolMode = symbolDictionary.chooseMode(program.alphabet);
   const symbols = symbolDictionary.order(program.alphabet, symbolMode);
   const acceptStates = new Set(program.acceptStates);
-  const acceptMask = orderedStates.map((state) => acceptStates.has(state));
 
-  const readableSymbolCount = countReadableSymbols(symbols.length, isNFA);
-  const readableSymbolIds: number[] = [];
-  const transitionCells: number[][] = [];
-
-  for (let symbolId = 0; symbolId < readableSymbolCount; symbolId++) {
-    const symbol = symbolId < symbols.length ? symbols[symbolId] : EPSILON;
-    const rowCells: number[][] = [];
-    let rowHasTransition = false;
-
-    for (const state of orderedStates) {
-      const targets = collectCellTargets(
-        program.transitions[state]?.[symbol],
-        stateIds,
-      );
-      rowHasTransition ||= targets.length > 0;
-      rowCells.push(targets);
-    }
-
-    // Rows with no transitions at all are skipped entirely — the row mask
-    // written above records which ones made it into the payload.
-    if (rowHasTransition) {
-      readableSymbolIds.push(symbolId);
-      transitionCells.push(...rowCells);
-    }
-  }
+  const { readableSymbolIds, transitionCells } = buildTransitionRows(
+    program,
+    orderedStates,
+    stateIds,
+    symbols,
+    isNFA,
+  );
 
   return {
     stateCount: orderedStates.length,
     isNFA,
     symbols,
-    acceptMask,
+    acceptMask: orderedStates.map((state) => acceptStates.has(state)),
     readableSymbolIds,
     transitionCells,
   };
@@ -233,14 +253,22 @@ function restoreImportedProgram(serializedProgram: string): FAProgram {
   }
 }
 
-function decodeProgram(serializedProgram: string): FAProgram {
-  const reader = BitReader.fromBase64Url(serializedProgram, PAYLOAD_INVALID);
+/** Everything the payload states before its transition table begins. */
+interface TransferHeader {
+  stateCount: number;
+  symbolCount: number;
+  isNFA: boolean;
+  isSparse: boolean;
+  acceptMask: boolean[];
+  symbols: string[];
+}
+
+function readTransferHeader(reader: BitReader): TransferHeader {
   const stateCount = reader.readVarUint();
   const symbolCount = reader.readVarUint();
 
   assertCollectionSize(stateCount, PAYLOAD_INVALID);
   assertCollectionSize(symbolCount, PAYLOAD_INVALID);
-
   if (stateCount < 1) {
     throw new Error(PAYLOAD_INVALID);
   }
@@ -260,9 +288,27 @@ function decodeProgram(serializedProgram: string): FAProgram {
     { length: stateCount },
     () => reader.readBit() === 1,
   );
-  const symbols = symbolDictionary.read(reader, symbolMode, symbolCount);
 
-  const readableSymbolCount = countReadableSymbols(symbolCount, isNFA);
+  return {
+    stateCount,
+    symbolCount,
+    isNFA,
+    isSparse: transitionMode === TransitionMode.Sparse,
+    acceptMask,
+    symbols: symbolDictionary.read(reader, symbolMode, symbolCount),
+  };
+}
+
+/** The bitmask saying which symbol rows made it into the payload. */
+function readReadableSymbolIds(
+  reader: BitReader,
+  header: TransferHeader,
+): number[] {
+  const readableSymbolCount = countReadableSymbols(
+    header.symbolCount,
+    header.isNFA,
+  );
+
   const readableSymbolIds: number[] = [];
   for (let symbolId = 0; symbolId < readableSymbolCount; symbolId++) {
     if (reader.readBit() === 1) {
@@ -270,25 +316,33 @@ function decodeProgram(serializedProgram: string): FAProgram {
     }
   }
 
-  const possibleCellCount = readableSymbolIds.length * stateCount;
   assertCollectionSize(
-    possibleCellCount,
+    readableSymbolIds.length * header.stateCount,
     PAYLOAD_INVALID,
     MAX_TRANSITION_CELLS,
   );
 
-  const states = createCanonicalStateNames(stateCount);
+  return readableSymbolIds;
+}
+
+/** Rebuild the transition table row by row, in the order it was written. */
+function readTransitions(
+  reader: BitReader,
+  header: TransferHeader,
+  readableSymbolIds: number[],
+  states: string[],
+): FATransitionMap {
   const transitions: FATransitionMap = {};
   for (const state of states) {
     transitions[state] = {};
   }
 
-  const isSparse = transitionMode === TransitionMode.Sparse;
   for (const symbolId of readableSymbolIds) {
-    const symbol = symbolId < symbolCount ? symbols[symbolId] : EPSILON;
+    const symbol =
+      symbolId < header.symbolCount ? header.symbols[symbolId] : EPSILON;
 
-    for (let stateId = 0; stateId < stateCount; stateId++) {
-      const targets = readCell(reader, isSparse, stateCount);
+    for (let stateId = 0; stateId < header.stateCount; stateId++) {
+      const targets = readCell(reader, header.isSparse, header.stateCount);
       if (targets.length > 0) {
         transitions[states[stateId]][symbol] = targets.map(
           (targetId) => states[targetId],
@@ -297,15 +351,31 @@ function decodeProgram(serializedProgram: string): FAProgram {
     }
   }
 
+  return transitions;
+}
+
+function decodeProgram(serializedProgram: string): FAProgram {
+  const reader = BitReader.fromBase64Url(serializedProgram, PAYLOAD_INVALID);
+  const header = readTransferHeader(reader);
+  const readableSymbolIds = readReadableSymbolIds(reader, header);
+
+  const states = createCanonicalStateNames(header.stateCount);
+  const transitions = readTransitions(
+    reader,
+    header,
+    readableSymbolIds,
+    states,
+  );
+
   reader.assertOnlyPaddingRemains();
 
   const program: FAProgram = {
-    type: (isNFA ? "NFA" : "DFA") satisfies AutomatonType,
+    type: (header.isNFA ? "NFA" : "DFA") satisfies AutomatonType,
     states,
-    alphabet: symbols,
+    alphabet: header.symbols,
     transitions,
     startState: states[0],
-    acceptStates: states.filter((_, stateId) => acceptMask[stateId]),
+    acceptStates: states.filter((_, stateId) => header.acceptMask[stateId]),
   };
 
   if (!isFAProgramValid(program)) {
