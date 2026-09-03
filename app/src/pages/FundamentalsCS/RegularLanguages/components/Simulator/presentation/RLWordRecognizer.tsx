@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import type { TranslationKey } from "@/types/i18n";
 import { recognizeWords } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
@@ -62,18 +61,13 @@ export function RLWordRecognizer({
     setWord(EMPTY_WORD);
   }
 
-  const storageIdentifier = useRLPersistedSource({
+  useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.recognizeWord,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
-  });
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: source,
-    codec: rlGrammarTransferCodec,
-    enabled: transferActive,
+    transferActive,
   });
 
   const evaluation = useMemo<
