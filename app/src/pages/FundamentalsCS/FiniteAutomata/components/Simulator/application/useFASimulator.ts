@@ -27,10 +27,11 @@ export function useFASimulator(program: FAProgram, inputWord: string) {
 
   const jumpToStep = useCallback(
     (stepIndex: number) => {
-      simulator.jumpToStep(stepIndex);
-      engine.forceStateRefresh();
+      engine.executeAction((sim) => {
+        (sim as FiniteAutomatonSimulator).jumpToStep(stepIndex);
+      });
     },
-    [simulator, engine],
+    [engine],
   );
 
   return {

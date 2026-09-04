@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import type { ISimulator } from "../types/simulator";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ISimulator } from "@/types/simulator";
 
 export type SimulationStatus = "IDLE" | "RUNNING" | "PAUSED" | "ERROR";
 
@@ -8,10 +8,8 @@ export function useSimulationEngine<TConfig, TState>(
   initialConfig: TConfig,
 ) {
   const [status, setStatus] = useState<SimulationStatus>("IDLE");
-  const [speed, setSpeed] = useState<number>(1000); // ms per step
+  const [speed, setSpeed] = useState<number>(1000);
   const [error, setError] = useState<Error | null>(null);
-
-  // Initialize the simulator with the configuration and get the first state
   const [currentState, setCurrentState] = useState<TState>(() => {
     simulator.initialize(initialConfig);
     return simulator.getCurrentState();
@@ -19,17 +17,19 @@ export function useSimulationEngine<TConfig, TState>(
 
   const timerRef = useRef<number | null>(null);
 
-  // Wrapper for a single simulation step definition
   const handleStep = useCallback(() => {
-    try {
-      if (simulator.isFinished()) {
-        setStatus("IDLE");
-        return;
+    if (simulator.isFinished()) {
+      setStatus("IDLE");
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-
+      return;
+    }
+    try {
       simulator.step();
       setCurrentState(simulator.getCurrentState());
-
+      setError(null);
       if (simulator.isFinished()) {
         setStatus("IDLE");
         if (timerRef.current !== null) {
@@ -47,32 +47,33 @@ export function useSimulationEngine<TConfig, TState>(
     }
   }, [simulator]);
 
-  // Wrapper for stepping back (if implemented by the simulator instance)
   const handleStepBack = useCallback(() => {
     try {
       simulator.stepBack();
       setCurrentState(simulator.getCurrentState());
-      if (status === "ERROR") {
-        setStatus("PAUSED");
-        setError(null);
-      }
+      setStatus("PAUSED");
+      setError(null);
     } catch (err) {
       setStatus("ERROR");
       setError(err instanceof Error ? err : new Error(String(err)));
     }
-  }, [simulator, status]);
+  }, [simulator]);
 
   const play = useCallback(() => {
-    if (status === "RUNNING" || status === "ERROR" || simulator.isFinished())
-      return;
+    if (status === "RUNNING" || simulator.isFinished()) return;
     setStatus("RUNNING");
+    setError(null);
   }, [status, simulator]);
 
   const pause = useCallback(() => {
-    setStatus((currentStatus) =>
-      currentStatus === "RUNNING" ? "PAUSED" : currentStatus,
-    );
-  }, []);
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (status === "RUNNING") {
+      setStatus("PAUSED");
+    }
+  }, [status]);
 
   const reset = useCallback(
     (newConfig?: TConfig) => {
@@ -80,7 +81,6 @@ export function useSimulationEngine<TConfig, TState>(
         window.clearInterval(timerRef.current);
         timerRef.current = null;
       }
-
       try {
         if (newConfig) {
           simulator.initialize(newConfig);
@@ -101,11 +101,7 @@ export function useSimulationEngine<TConfig, TState>(
   useEffect(() => {
     if (status === "RUNNING") {
       timerRef.current = window.setInterval(handleStep, speed);
-    } else if (timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
     }
-
     return () => {
       if (timerRef.current !== null) {
         window.clearInterval(timerRef.current);
@@ -114,20 +110,27 @@ export function useSimulationEngine<TConfig, TState>(
   }, [status, speed, handleStep]);
 
   /**
-   * TODO: NEEDS TO BE REMOVED !!!!!!!!!!!!! @Kristian
-   * Re-read the simulator's current state and sync it to React state.
-   * Used when the simulator was mutated externally (e.g. jumpToStep).
+   * Executes an action on the simulator within the engine's lifecycle,
+   * safely pausing any running timer, syncing the state, and catching errors.
    */
-  const forceStateRefresh = useCallback(() => {
-    try {
-      setCurrentState(simulator.getCurrentState());
-      setStatus(simulator.isFinished() ? "IDLE" : "PAUSED");
-      setError(null);
-    } catch (err) {
-      setStatus("ERROR");
-      setError(err instanceof Error ? err : new Error(String(err)));
-    }
-  }, [simulator]);
+  const executeAction = useCallback(
+    (action: (sim: ISimulator<TConfig, TState>) => void) => {
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      try {
+        action(simulator);
+        setCurrentState(simulator.getCurrentState());
+        setStatus(simulator.isFinished() ? "IDLE" : "PAUSED");
+        setError(null);
+      } catch (err) {
+        setStatus("ERROR");
+        setError(err instanceof Error ? err : new Error(String(err)));
+      }
+    },
+    [simulator],
+  );
 
   return {
     status,
@@ -140,6 +143,6 @@ export function useSimulationEngine<TConfig, TState>(
     stepBack: handleStepBack,
     reset,
     setSpeed,
-    forceStateRefresh,
+    executeAction,
   };
 }
