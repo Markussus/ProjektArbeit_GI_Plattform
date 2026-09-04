@@ -43,6 +43,8 @@ export interface UseTrainingCenterPersistenceOptions<TValue> {
    * header transfer box.
    */
   transferEnabled?: boolean;
+  /** Override the shared autosave interval when a simulator needs it. */
+  intervalMs?: number;
 }
 
 export interface TrainingCenterPersistence {
@@ -78,6 +80,7 @@ export function useTrainingCenterPersistence<TValue>({
   restoreOnMount = true,
   transferValue,
   transferEnabled = true,
+  intervalMs,
 }: UseTrainingCenterPersistenceOptions<TValue>): TrainingCenterPersistence {
   const identifier = useMemo(
     () => createTrainingCenterIdentifier(topicStorageId, taskStorageId),
@@ -148,6 +151,7 @@ export function useTrainingCenterPersistence<TValue>({
     value,
     codec,
     enabled: enabled && isReady,
+    intervalMs,
   });
 
   const clear = useCallback(() => {

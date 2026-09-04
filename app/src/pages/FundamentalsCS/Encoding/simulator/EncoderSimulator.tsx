@@ -12,20 +12,10 @@ import { UTF8Encoder } from "./UTF8Encoder";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
 import type { GeneratedExercise } from "../utils/exerciseGenerator";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import {
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { encTransferCodec } from "./encTransferCodec";
 import type { EncoderState } from "./encTransferCodec";
-
-const ENCODING_SIMULATOR_TASK_STORAGE_ID = createTrainingCenterIdentifier(
-  TOPIC_STORAGE_IDS.encoding,
-);
 
 type EncoderMode = "base64" | "utf8";
 
@@ -122,9 +112,12 @@ export const EncoderSimulator = forwardRef<
   const [simulatorState, setSimulatorState] = useState<EncoderState>(() => {
     return {
       activeMode: "base64",
+      base64: {
+        inputValue: "",
+        converterMode: "encode",
+      },
     };
   });
-  const [isStorageReady, setIsStorageReady] = useState(false);
   const [loadVersion, setLoadVersion] = useState(0);
 
   const activeMode = simulatorState.activeMode;
@@ -145,61 +138,43 @@ export const EncoderSimulator = forwardRef<
   >("encode");
   const [expectedAnswer, setExpectedAnswer] = useState<string>("");
 
-  useEffect(() => {
-    let active = true;
+  const restoreSimulatorState = useCallback((stored: EncoderState) => {
+    setSimulatorState(stored);
+    setLoadVersion((version) => version + 1);
 
-    async function initStorage() {
-      if (selectedExercise) {
-        setIsStorageReady(true);
-        return;
-      }
-
-      try {
-        const stored = await loadTrainingCenterValue(
-          ENCODING_SIMULATOR_TASK_STORAGE_ID,
-          encTransferCodec,
-        );
-
-        if (active && stored) {
-          setSimulatorState(stored);
-          setLoadVersion((v) => v + 1);
-
-          if (stored.activeMode === "base64" && stored.base64) {
-            setInitialValue(stored.base64.inputValue);
-            setInitialConverterMode(stored.base64.converterMode);
-          } else if (stored.activeMode === "utf8" && stored.utf8) {
-            setInitialValue(stored.utf8.inputValue);
-            setInitialConverterMode(stored.utf8.converterMode);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load initial storage state:", err);
-      } finally {
-        if (active) {
-          setIsStorageReady(true);
-        }
-      }
+    const activeState = stored[stored.activeMode];
+    if (activeState) {
+      setInitialValue(activeState.inputValue);
+      setInitialConverterMode(activeState.converterMode);
     }
-    initStorage();
+  }, []);
 
-    return () => {
-      active = false;
-    };
-  }, [selectedExercise]);
+  const { clear: clearStoredState, isReady: isStorageReady } =
+    useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.encoding,
+      codec: encTransferCodec,
+      value: simulatorState,
+      onRestore: restoreSimulatorState,
+      enabled: !selectedExercise,
+      intervalMs: 500,
+    });
 
-  useActiveSimulatorTransfer({
-    identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
-    value: simulatorState,
-    codec: encTransferCodec,
-  });
+  const handleEncoderStateChange = useCallback(
+    (mode: EncoderMode, state: NonNullable<EncoderState[EncoderMode]>) => {
+      setSimulatorState((previous) => {
+        const previousModeState = previous[mode];
+        if (
+          previousModeState?.inputValue === state.inputValue &&
+          previousModeState.converterMode === state.converterMode
+        ) {
+          return previous;
+        }
 
-  useTrainingCenterAutoSave({
-    identifier: ENCODING_SIMULATOR_TASK_STORAGE_ID,
-    value: simulatorState,
-    codec: encTransferCodec,
-    enabled: isStorageReady && !selectedExercise,
-    intervalMs: 500,
-  });
+        return { ...previous, [mode]: { ...state } };
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (selectedExercise) {
@@ -251,14 +226,17 @@ export const EncoderSimulator = forwardRef<
       return;
     }
 
-    trainingCenterStorage.delete(ENCODING_SIMULATOR_TASK_STORAGE_ID);
+    clearStoredState();
 
-    setSimulatorState({ activeMode: "base64" });
+    setSimulatorState({
+      activeMode: "base64",
+      base64: { inputValue: "", converterMode: "encode" },
+    });
     setInitialValue("");
     setInitialConverterMode("encode");
     setExpectedAnswer("");
     setLoadVersion((v) => v + 1);
-  }, [selectedExercise]);
+  }, [clearStoredState, selectedExercise]);
 
   useImperativeHandle(
     ref,
@@ -312,12 +290,7 @@ export const EncoderSimulator = forwardRef<
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
             expectedAnswer={expectedAnswer || undefined}
-            onChangeState={(state) => {
-              setSimulatorState((prev) => ({
-                ...prev,
-                base64: { ...state },
-              }));
-            }}
+            onChangeState={(state) => handleEncoderStateChange("base64", state)}
           />
         )}
         {activeMode === "utf8" && (
@@ -330,12 +303,7 @@ export const EncoderSimulator = forwardRef<
             initialValue={initialValue}
             initialConverterMode={initialConverterMode}
             expectedAnswer={expectedAnswer || undefined}
-            onChangeState={(state) => {
-              setSimulatorState((prev) => ({
-                ...prev,
-                utf8: { ...state },
-              }));
-            }}
+            onChangeState={(state) => handleEncoderStateChange("utf8", state)}
           />
         )}
       </div>

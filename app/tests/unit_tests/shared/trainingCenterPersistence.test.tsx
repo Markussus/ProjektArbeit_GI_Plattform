@@ -34,12 +34,16 @@ interface DraftEditorProps {
   taskStorageId?: number;
   initialDraft?: string;
   enabled?: boolean;
+  intervalMs?: number;
+  restoreOnMount?: boolean;
 }
 
 function DraftEditor({
   taskStorageId,
   initialDraft = "",
   enabled = true,
+  intervalMs,
+  restoreOnMount = true,
 }: DraftEditorProps) {
   const [draft, setDraft] = useState(initialDraft);
   const { isReady } = useTrainingCenterPersistence({
@@ -49,6 +53,8 @@ function DraftEditor({
     value: draft,
     onRestore: setDraft,
     enabled,
+    intervalMs,
+    restoreOnMount,
   });
 
   return (
@@ -195,6 +201,33 @@ describe("useTrainingCenterPersistence", () => {
     await act(async () => finishRestore?.());
 
     expect(view.getByTestId("act").textContent).toBe("typed just now");
+  });
+
+  it("uses a caller-specific autosave interval", async () => {
+    vi.useFakeTimers();
+
+    try {
+      render(
+        <DraftEditor
+          taskStorageId={3}
+          initialDraft="save quickly"
+          intervalMs={25}
+          restoreOnMount={false}
+        />,
+      );
+
+      await act(async () => {
+        vi.advanceTimersByTime(24);
+      });
+      expect(trainingCenterStorage.load(slot(3))).toBe("");
+
+      await act(async () => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(trainingCenterStorage.load(slot(3))).not.toBe("");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("clears only its own slot", async () => {
