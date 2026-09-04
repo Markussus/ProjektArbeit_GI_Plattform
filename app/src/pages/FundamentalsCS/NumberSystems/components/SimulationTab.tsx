@@ -24,6 +24,9 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
       resetDisabled={!isSimulatorReady}
     >
       <Simulator
+        key={
+          props.selectedExercise?.id ?? props.selectedItem?.id ?? "free-mode"
+        }
         ref={handleSimulatorRef}
         selectedExercise={props.selectedExercise ?? props.selectedItem}
         onExitExercise={props.onExitExercise}
