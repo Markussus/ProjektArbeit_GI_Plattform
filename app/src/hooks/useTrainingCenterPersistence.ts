@@ -10,48 +10,53 @@ import {
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 
 export interface UseTrainingCenterPersistenceOptions<TValue> {
-  /** One of {@link TOPIC_STORAGE_IDS}. */
+  /** Topic identifier from `TOPIC_STORAGE_IDS`. */
   topicStorageId: number;
   /**
-   * The exercise's own `storageId`, so each task keeps its own slot. Omit for
-   * the free simulator, which lands on {@link SIMULATOR_TASK_STORAGE_ID}.
+   * Task slot. Defaults to `SIMULATOR_TASK_STORAGE_ID` (the free simulator).
+   * For exercises pass the exercise's `storageId`.
    */
   taskStorageId?: number;
+  /** Codec used to serialize/deserialize this simulator's state. */
   codec: ISimulatorTransferCodec<TValue>;
-  /** The live draft: autosaved, and exported by the header transfer box. */
+  /** Current state to persist on autosave ticks. */
   value: TValue;
-  /** Adopt the draft restored on mount. */
+  /** Called when a stored draft for this slot has been restored. */
   onRestore: (restored: TValue) => void;
   /**
-   * False for read-only scenarios — examples are pristine demonstrations
-   * everywhere in the app, so they neither restore nor autosave.
+   * Turn persistence on or off. Defaults to true. Setting this to false skips
+   * restoring on mount and stops autosaving (useful for non-persisted walkthroughs).
    */
   enabled?: boolean;
   /**
-   * False when the caller already has a value that outranks the stored one — a
-   * seeded example grammar, say. Autosave still runs; only the read is skipped.
+   * Whether to attempt restoring a stored value when mounting. Defaults to true.
+   * Disabling this is useful when the caller wants to handle restoring itself
+   * (e.g. before initial state is populated).
    */
   restoreOnMount?: boolean;
   /**
-   * What the transfer box exports, when that differs from the autosaved draft
-   * (the FA simulator exports the applied program while simulating).
+   * The value registered with the header transfer box for export/import.
+   * Defaults to `value`. Provide this when the wire format differs from the
+   * saved draft (e.g. when export should only run on committed states).
    */
   transferValue?: TValue;
-  /**
-   * False for a slot that is mounted but not on screen. The RL simulator keeps
-   * all three mode panels mounted, and only the visible one should own the
-   * header transfer box.
-   */
+  /** Whether the simulator should register with the header transfer box. */
   transferEnabled?: boolean;
   /** Override the shared autosave interval when a simulator needs it. */
   intervalMs?: number;
+  /**
+   * Whether autosaving is enabled when the hook is ready. Defaults to true.
+   * Useful when an untouched or reset state should not immediately write to storage.
+   */
+  autoSaveEnabled?: boolean;
 }
 
 export interface TrainingCenterPersistence {
-  /** Identifier of the slot this draft occupies. */
+  /** The full slot identifier (`{topic}{task}`). */
   identifier: string;
   /**
-   * Whether the restore attempt has settled. Autosave waits for it, so a slow
+   * Whether the initial restore check has completed. Components can use this
+   * to delay autosaving until the stored value has been loaded, so the first
    * read can't be overwritten by the initial value.
    */
   isReady: boolean;
@@ -64,7 +69,7 @@ export interface TrainingCenterPersistence {
 /**
  * The Training Center persistence every topic needs: one storage slot per task,
  * restored on mount, autosaved while editing, and registered with the header
- * transfer box for export/import.
+ * transfer box for export/import directions.
  *
  * Topics previously hand-rolled these four steps, which is how Finite Automata
  * ended up sharing a single slot across all its exercises and Regular Languages
@@ -81,6 +86,7 @@ export function useTrainingCenterPersistence<TValue>({
   transferValue,
   transferEnabled = true,
   intervalMs,
+  autoSaveEnabled = true,
 }: UseTrainingCenterPersistenceOptions<TValue>): TrainingCenterPersistence {
   const identifier = useMemo(
     () => createTrainingCenterIdentifier(topicStorageId, taskStorageId),
@@ -150,7 +156,7 @@ export function useTrainingCenterPersistence<TValue>({
     identifier,
     value,
     codec,
-    enabled: enabled && isReady,
+    enabled: enabled && isReady && autoSaveEnabled,
     intervalMs,
   });
 

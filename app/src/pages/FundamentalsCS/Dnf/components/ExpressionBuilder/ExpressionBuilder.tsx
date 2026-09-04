@@ -8,8 +8,6 @@ import {
 } from "react";
 import { Eraser, Lightbulb, Pencil, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfSource } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
@@ -26,7 +24,6 @@ import {
 import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
 import {
   createDnfAttemptDraft,
-  dnfExpressionTransferCodec,
   type DnfAttemptTransferDraft,
   type DnfExpressionTransferDraft,
 } from "../DnfBuilder/domain/dnfTransfer";
@@ -40,9 +37,6 @@ import {
 
 interface ExpressionBuilderProps {
   initialValue?: DnfExpressionTransferDraft;
-  storageIdentifier: string;
-  storageEnabled: boolean;
-  storageReady: boolean;
   onTransferValueChange?: (value: DnfExpressionTransferDraft) => void;
   onUserChange?: () => void;
   seedInitialFeedback?: boolean;
@@ -50,9 +44,6 @@ interface ExpressionBuilderProps {
 
 export function ExpressionBuilder({
   initialValue,
-  storageIdentifier,
-  storageEnabled,
-  storageReady,
   onTransferValueChange,
   onUserChange,
   seedInitialFeedback = false,
@@ -76,18 +67,6 @@ export function ExpressionBuilder({
     }),
     [attempt, committedSource, inputValue],
   );
-
-  useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: transferValue,
-    codec: dnfExpressionTransferCodec,
-    enabled: storageEnabled && storageReady,
-  });
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: transferValue,
-    codec: dnfExpressionTransferCodec,
-  });
 
   useEffect(() => {
     onTransferValueChange?.(transferValue);
