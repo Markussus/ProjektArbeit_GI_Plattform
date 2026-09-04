@@ -1,7 +1,6 @@
 import {
   forwardRef,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -9,14 +8,8 @@ import {
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
+import { SIMULATOR_TASK_STORAGE_ID } from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import type { MealyExerciseScenario } from "../../exercises";
 import {
@@ -95,28 +88,12 @@ export const MealySimulator = forwardRef<
   const [mode, setMode] = useState<
     "edit" | "simulation" | "conversion" | "logic"
   >("edit");
-  const [storageReady, setStorageReady] = useState(false);
   const simulation = useMealySimulator(committed);
 
   const conversion = useMemo(
     () => (issues.length ? null : buildMealyConversion(program)),
     [issues.length, program],
   );
-  const identifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.mooreMealy,
-        scenario?.storageId ?? MEALY_SIMULATOR_TASK_STORAGE_ID,
-      ),
-    [scenario?.storageId],
-  );
-  useActiveSimulatorTransfer({
-    identifier,
-    value: program,
-    codec: mealyProgramTransferCodec,
-    enabled: transferActive,
-  });
-
   const loadProgram = useCallback(
     (value: MealyProgram) => {
       setProgram(normalizeMealyProgram(value));
@@ -125,38 +102,21 @@ export const MealySimulator = forwardRef<
     [setProgram],
   );
 
-  useEffect(() => {
-    if (!effectiveStorageEnabled) {
-      setStorageReady(true);
-      return;
-    }
-    let cancelled = false;
-    void loadTrainingCenterValue(identifier, mealyProgramTransferCodec)
-      .then((value) => {
-        if (!cancelled && value) loadProgram(value);
-      })
-      .finally(() => {
-        if (!cancelled) setStorageReady(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [identifier, loadProgram, effectiveStorageEnabled]);
-
-  useTrainingCenterAutoSave({
-    identifier,
-    value: program,
+  const { clear: clearStoredProgram } = useTrainingCenterPersistence({
+    topicStorageId: TOPIC_STORAGE_IDS.mooreMealy,
+    taskStorageId: scenario?.storageId ?? MEALY_SIMULATOR_TASK_STORAGE_ID,
     codec: mealyProgramTransferCodec,
-    enabled: effectiveStorageEnabled && storageReady,
+    value: program,
+    onRestore: loadProgram,
+    enabled: effectiveStorageEnabled,
+    transferEnabled: transferActive,
   });
 
   useImperativeHandle(
     ref,
     () => ({
       resetStoredState() {
-        if (effectiveStorageEnabled) {
-          trainingCenterStorage.delete(identifier);
-        }
+        clearStoredProgram();
         simulation.pause();
         const resetProgram = cloneJson(scenarioProgram);
         setProgram(resetProgram);
@@ -182,14 +142,13 @@ export const MealySimulator = forwardRef<
       },
     }),
     [
-      identifier,
+      clearStoredProgram,
       loadProgram,
       program,
       scenario,
       scenarioProgram,
       setProgram,
       simulation,
-      effectiveStorageEnabled,
       t,
     ],
   );

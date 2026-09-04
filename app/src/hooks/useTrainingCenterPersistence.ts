@@ -120,7 +120,7 @@ export function useTrainingCenterPersistence<TValue>({
           currentValueRef.current,
           pristineValueRef.current,
         );
-        if (!isCancelled && isUntouched && restored) {
+        if (!isCancelled && isUntouched && restored !== null) {
           onRestoreRef.current(restored);
         }
       })

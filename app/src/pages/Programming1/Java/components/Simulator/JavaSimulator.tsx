@@ -10,14 +10,7 @@ import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
   getJavaDefaultStdin,
@@ -80,7 +73,6 @@ const JavaSimulatorSession = forwardRef<
   const exerciseScenario = scenario?.kind === "exercise" ? scenario : null;
   const isStorageEnabled = scenario?.kind !== "example";
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
-  const [isStorageReady, setIsStorageReady] = useState(false);
   const [standardInput, setStandardInput] = useState(() =>
     getJavaDefaultStdin(itemId),
   );
@@ -96,57 +88,26 @@ const JavaSimulatorSession = forwardRef<
     snapshot.phase === "running";
   const canRun = snapshot.compilerStatus === "ready" && !isBusy;
   const canStop = isBusy || snapshot.compilerStatus === "loading";
-  const storageIdentifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.javaProgramming,
-        exerciseScenario?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
-      ),
-    [exerciseScenario?.storageId],
-  );
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: code,
-    codec: javaCodeTransferCodec,
-  });
-
   useEffect(() => {
     preload();
   }, [preload]);
 
-  useEffect(() => {
-    let isCancelled = false;
-    setIsStorageReady(false);
-
-    if (!isStorageEnabled) {
-      return;
-    }
-
-    void loadTrainingCenterValue(storageIdentifier, javaCodeTransferCodec)
-      .then((storedCode) => {
-        if (!isCancelled && storedCode !== null) {
-          setCode(storedCode);
-          reset();
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!isCancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isStorageEnabled, reset, storageIdentifier]);
-
-  const saveCode = useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: code,
-    codec: javaCodeTransferCodec,
-    enabled: isStorageEnabled && isStorageReady,
-  });
+  const restoreCode = useCallback(
+    (storedCode: string) => {
+      setCode(storedCode);
+      reset();
+    },
+    [reset],
+  );
+  const { clear: clearStoredCode, save: saveCode } =
+    useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.javaProgramming,
+      taskStorageId: exerciseScenario?.storageId,
+      codec: javaCodeTransferCodec,
+      value: code,
+      onRestore: restoreCode,
+      enabled: isStorageEnabled,
+    });
 
   const handleRun = useCallback(() => {
     if (isStorageEnabled) {
@@ -172,9 +133,7 @@ const JavaSimulatorSession = forwardRef<
     ref,
     () => ({
       resetStoredState: () => {
-        if (isStorageEnabled) {
-          trainingCenterStorage.delete(storageIdentifier);
-        }
+        clearStoredCode();
 
         setCode(getJavaStarterCode(itemId));
         setStandardInput(getJavaDefaultStdin(itemId));
@@ -203,13 +162,12 @@ const JavaSimulatorSession = forwardRef<
     }),
     [
       code,
+      clearStoredCode,
       exerciseScenario,
-      isStorageEnabled,
       itemId,
       reset,
       runAsync,
       standardInput,
-      storageIdentifier,
       t,
       timeoutSeconds,
     ],

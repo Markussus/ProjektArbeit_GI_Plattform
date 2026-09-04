@@ -1,7 +1,6 @@
 import {
   forwardRef,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -9,18 +8,11 @@ import {
 import { CircuitBoard, Pencil, Play, TableProperties } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import {
   buildMooreConversion,
   type AutomataConversion,
 } from "./domain/automataConversion";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
 import { cloneJson } from "@/lib/utils";
 import { useMooreSimulator } from "./application/useMooreSimulator";
 import { useMooreProgramEditor } from "./application/useMooreProgramEditor";
@@ -96,7 +88,6 @@ export const MooreSimulator = forwardRef<
   const [mode, setMode] = useState<
     "edit" | "simulation" | "conversion" | "logic"
   >("edit");
-  const [isStorageReady, setIsStorageReady] = useState(false);
   const simulation = useMooreSimulator(committedProgram);
   const isStorageEnabled = !isExample;
   const pauseSimulation = simulation.pause;
@@ -105,21 +96,6 @@ export const MooreSimulator = forwardRef<
     () => (issues.length === 0 ? buildMooreConversion(program) : null),
     [issues.length, program],
   );
-  const storageIdentifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.mooreMealy,
-        scenario?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
-      ),
-    [scenario?.storageId],
-  );
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: program,
-    codec: mooreProgramTransferCodec,
-    enabled: transferActive,
-  });
-
   const loadProgram = useCallback(
     (nextProgram: MooreProgram) => {
       pauseSimulation();
@@ -129,45 +105,21 @@ export const MooreSimulator = forwardRef<
     [pauseSimulation, setProgram],
   );
 
-  useEffect(() => {
-    setIsStorageReady(false);
-    if (!isStorageEnabled) {
-      setIsStorageReady(true);
-      return;
-    }
-    let cancelled = false;
-    void loadTrainingCenterValue(storageIdentifier, mooreProgramTransferCodec)
-      .then((storedProgram) => {
-        if (!cancelled && storedProgram) {
-          loadProgram(storedProgram);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!cancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isStorageEnabled, loadProgram, storageIdentifier]);
-
-  useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: program,
+  const { clear: clearStoredProgram } = useTrainingCenterPersistence({
+    topicStorageId: TOPIC_STORAGE_IDS.mooreMealy,
+    taskStorageId: scenario?.storageId,
     codec: mooreProgramTransferCodec,
-    enabled: isStorageEnabled && isStorageReady,
+    value: program,
+    onRestore: loadProgram,
+    enabled: isStorageEnabled,
+    transferEnabled: transferActive,
   });
 
   useImperativeHandle(
     ref,
     () => ({
       resetStoredState() {
-        if (isStorageEnabled) {
-          trainingCenterStorage.delete(storageIdentifier);
-        }
+        clearStoredProgram();
         pauseSimulation();
         const resetProgram = cloneJson(scenarioProgram);
         setProgram(resetProgram);
@@ -194,14 +146,13 @@ export const MooreSimulator = forwardRef<
       },
     }),
     [
-      isStorageEnabled,
+      clearStoredProgram,
       loadProgram,
       pauseSimulation,
       program,
       scenario,
       scenarioProgram,
       setProgram,
-      storageIdentifier,
       t,
     ],
   );
