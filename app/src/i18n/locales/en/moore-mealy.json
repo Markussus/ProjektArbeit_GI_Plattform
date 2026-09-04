@@ -191,6 +191,6 @@
     "diagram": "Logic gate diagram for {{output}}",
     "binaryGates": "Use only two-input gates",
     "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",
-    "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT. Falstad export: TODO."
+    "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT."
   }
 }
