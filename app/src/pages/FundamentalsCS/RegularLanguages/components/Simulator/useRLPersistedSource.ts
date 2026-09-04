@@ -1,22 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback } from "react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import {
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
+import { SIMULATOR_TASK_STORAGE_ID } from "@/lib/trainingCenter";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 
 /**
  * Dedicated Training Center task slots for the Regular Languages simulator
  * modes. Each mode keeps its own source so switching modes doesn't clobber the
- * other's saved work. RL exercises don't persist per-task progress, so these
- * task ids never collide with exercise slots within the topic.
+ * other's saved work.
+ *
+ * They sit at the top of the task range because the low ids belong to the
+ * exercises, which are numbered from 0 like every other topic's. The default
+ * mode takes {@link SIMULATOR_TASK_STORAGE_ID}, so a shared free-mode grammar
+ * imports as "the simulator" rather than as a task.
  */
 export const RL_STORAGE_TASK_IDS = {
-  grammarToLanguage: 0,
-  languageToGrammar: 1,
-  recognizeWord: 2,
+  grammarToLanguage: SIMULATOR_TASK_STORAGE_ID,
+  languageToGrammar: SIMULATOR_TASK_STORAGE_ID - 1,
+  recognizeWord: SIMULATOR_TASK_STORAGE_ID - 2,
 } as const;
 
 interface UseRLPersistedSourceOptions {
@@ -29,18 +30,17 @@ interface UseRLPersistedSourceOptions {
   /** Adopt a restored source on mount. */
   setSource: (value: string) => void;
   /**
-   * Whether an example/exercise seeded this mode. A seed takes priority over a
+   * Whether an example seeded this mode. A seed takes priority over a
    * previously saved source, so the restore is skipped when one is present.
    */
   hasSeed: boolean;
+  /** Whether this mode's panel is the visible one. */
+  transferActive?: boolean;
 }
 
 /**
- * Persists a single RL simulator source to local storage using the same
- * Training Center mechanism as the Turing Machine module: restore on mount,
- * autosave while editing, and wrap the codec so the export/import box writes
- * through to storage. Returns the identifier used by the active global
- * simulator transfer registration.
+ * Persists one free-mode Regular Languages source through the shared Training
+ * Center persistence every topic uses. Returns the identifier of its slot.
  */
 export function useRLPersistedSource({
   taskStorageId,
@@ -48,55 +48,21 @@ export function useRLPersistedSource({
   source,
   setSource,
   hasSeed,
+  transferActive = true,
 }: UseRLPersistedSourceOptions): string {
-  const identifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.regularLanguages,
-        taskStorageId,
-      ),
-    [taskStorageId],
+  const handleRestore = useCallback(
+    (restored: string) => setSource(restored),
+    [setSource],
   );
-  // A seed (from an example/exercise) takes priority over a saved source, so
-  // storage is considered ready immediately in that case.
-  const [isStorageReady, setIsStorageReady] = useState(hasSeed);
-  const hasInitialized = useRef(false);
 
-  useEffect(() => {
-    if (hasInitialized.current) {
-      return;
-    }
-    hasInitialized.current = true;
-
-    // A seeded source is already in place; don't restore over it.
-    if (hasSeed) {
-      return;
-    }
-
-    let isCancelled = false;
-    void loadTrainingCenterValue(identifier, codec)
-      .then((storedSource) => {
-        if (!isCancelled && storedSource) {
-          setSource(storedSource);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!isCancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [codec, hasSeed, identifier, setSource]);
-
-  useTrainingCenterAutoSave({
-    identifier,
-    value: source,
+  const { identifier } = useTrainingCenterPersistence({
+    topicStorageId: TOPIC_STORAGE_IDS.regularLanguages,
+    taskStorageId,
     codec,
-    enabled: isStorageReady,
+    value: source,
+    onRestore: handleRestore,
+    restoreOnMount: !hasSeed,
+    transferEnabled: transferActive,
   });
 
   return identifier;

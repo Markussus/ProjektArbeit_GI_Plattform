@@ -3,6 +3,7 @@ import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FAProgram } from "../domain/faTypes";
 import { EPSILON } from "../domain/faTypes";
+import { canonicalizeTargetStates } from "../domain/faStateNames";
 import { buildTransitionTableSymbols } from "../adapters/faTableAdapter";
 
 interface FATransitionTableEditorProps {
@@ -121,7 +122,21 @@ export function FATransitionTableEditor({
                           setEditedCell({ key: cellKey, text: e.target.value });
                           onTransitionChange(state, symbol, e.target.value);
                         }}
-                        onBlur={() => setEditedCell(null)}
+                        onBlur={() => {
+                          // Leaving the cell is where the raw text gives way to
+                          // the canonical form, so it is also where a target
+                          // typed in the wrong case snaps onto the real state.
+                          if (editedCell?.key === cellKey) {
+                            const canonical = canonicalizeTargetStates(
+                              editedCell.text,
+                              program.states,
+                            );
+                            if (canonical !== editedCell.text) {
+                              onTransitionChange(state, symbol, canonical);
+                            }
+                          }
+                          setEditedCell(null);
+                        }}
                         className={inputClass}
                         placeholder="–"
                         aria-label={`δ(${state}, ${symbol})`}

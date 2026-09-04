@@ -14,6 +14,13 @@ export type RLExerciseCategory =
 
 export interface RLExerciseDefinition extends ExerciseDefinition {
   id: string;
+  /**
+   * Training Center task slot, unique within the Regular Languages topic, so
+   * each exercise keeps its own saved draft. The free simulator's three modes
+   * sit at the top of the range (see `RL_STORAGE_TASK_IDS`), leaving the low
+   * ids to exercises.
+   */
+  storageId: number;
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   /** One-line statement of what to achieve, shown in the workspace panel. */
@@ -78,6 +85,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 1: Grammar → Language ───────────────────────────────────────────
   {
     id: "g2l-finite-binary",
+    storageId: 0,
     titleKey: "regular-languages.exercises.g2lFiniteBinary.title",
     descriptionKey: "regular-languages.exercises.g2lFiniteBinary.description",
     goalKey: "regular-languages.exercises.g2lFiniteBinary.goal",
@@ -94,6 +102,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-trailing-zero",
+    storageId: 1,
     titleKey: "regular-languages.exercises.g2lTrailingZero.title",
     descriptionKey: "regular-languages.exercises.g2lTrailingZero.description",
     goalKey: "regular-languages.exercises.g2lTrailingZero.goal",
@@ -108,6 +117,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-epsilon-loop",
+    storageId: 2,
     titleKey: "regular-languages.exercises.g2lEpsilonLoop.title",
     descriptionKey: "regular-languages.exercises.g2lEpsilonLoop.description",
     goalKey: "regular-languages.exercises.g2lEpsilonLoop.goal",
@@ -124,6 +134,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-grouped",
+    storageId: 3,
     titleKey: "regular-languages.exercises.g2lGrouped.title",
     descriptionKey: "regular-languages.exercises.g2lGrouped.description",
     goalKey: "regular-languages.exercises.g2lGrouped.goal",
@@ -144,6 +155,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 2: Language → Grammar ───────────────────────────────────────────
   {
     id: "l2g-zero-ones-zero",
+    storageId: 4,
     titleKey: "regular-languages.exercises.l2gZeroOnesZero.title",
     descriptionKey: "regular-languages.exercises.l2gZeroOnesZero.description",
     goalKey: "regular-languages.exercises.l2gZeroOnesZero.goal",
@@ -158,6 +170,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-four-words",
+    storageId: 5,
     titleKey: "regular-languages.exercises.l2gFourWords.title",
     descriptionKey: "regular-languages.exercises.l2gFourWords.description",
     goalKey: "regular-languages.exercises.l2gFourWords.goal",
@@ -177,6 +190,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-nested-zeros",
+    storageId: 6,
     titleKey: "regular-languages.exercises.l2gNestedZeros.title",
     descriptionKey: "regular-languages.exercises.l2gNestedZeros.description",
     goalKey: "regular-languages.exercises.l2gNestedZeros.goal",
@@ -201,6 +215,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 3: Applied grammars ─────────────────────────────────────────────
   {
     id: "applied-integers",
+    storageId: 7,
     titleKey: "regular-languages.exercises.appliedIntegers.title",
     descriptionKey: "regular-languages.exercises.appliedIntegers.description",
     goalKey: "regular-languages.exercises.appliedIntegers.goal",
@@ -215,6 +230,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "applied-identifiers",
+    storageId: 8,
     titleKey: "regular-languages.exercises.appliedIdentifiers.title",
     descriptionKey:
       "regular-languages.exercises.appliedIdentifiers.description",

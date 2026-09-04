@@ -15,7 +15,6 @@ import {
   rlExercises,
   type RLExerciseCategory,
 } from "../exercises/rlExerciseDefinitions";
-import { RL_STORAGE_TASK_IDS } from "./Simulator/useRLPersistedSource";
 
 const CATEGORY_ORDER: RLExerciseCategory[] = [
   "grammarToLanguage",
@@ -30,12 +29,14 @@ export function ExercisesTab(props: ModuleExercisesTabProps) {
     props.onOpenExerciseInSimulation(exercise);
   };
 
+  // Clears every exercise's saved draft, and only those — the free simulator's
+  // three mode slots keep their work, which this control doesn't claim to touch.
   const handleResetAllExercises = () => {
-    for (const taskStorageId of Object.values(RL_STORAGE_TASK_IDS)) {
+    for (const exercise of rlExercises) {
       trainingCenterStorage.delete(
         createTrainingCenterIdentifier(
           TOPIC_STORAGE_IDS.regularLanguages,
-          taskStorageId,
+          exercise.storageId,
         ),
       );
     }

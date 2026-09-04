@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import {
   formatLanguageIssue,
   parseLanguageSpec,
@@ -76,18 +75,13 @@ export function RLLanguageToGrammar({
     setSource(EMPTY_SOURCE);
   }
 
-  const storageIdentifier = useRLPersistedSource({
+  useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.languageToGrammar,
     codec: rlLanguageTransferCodec,
     source,
     setSource,
     hasSeed: initialSource !== undefined,
-  });
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: source,
-    codec: rlLanguageTransferCodec,
-    enabled: transferActive,
+    transferActive,
   });
 
   const result: ConversionResult = useMemo(() => {

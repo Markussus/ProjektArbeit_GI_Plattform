@@ -7,8 +7,16 @@ import { FAConfigView } from "@/pages/FundamentalsCS/FiniteAutomata/components/S
 import { FATransitionTableEditor } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/presentation/FATransitionTableEditor";
 import { useFAConfigEditor } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/application/useFAConfigEditor";
 import { defaultDFAProgram } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/config/defaultFAProgram";
-import { faExercises } from "@/pages/FundamentalsCS/FiniteAutomata/exercises/faExerciseDefinitions";
-import { trainingCenterStorage } from "@/lib/trainingCenter";
+import {
+  allFAExercises,
+  faExercises,
+} from "@/pages/FundamentalsCS/FiniteAutomata/exercises/faExerciseDefinitions";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
+import {
+  SIMULATOR_TASK_STORAGE_ID,
+  createTrainingCenterIdentifier,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -49,7 +57,7 @@ describe("FiniteAutomata ExercisesTab — handlers", () => {
     );
   });
 
-  it("deletes the stored simulator task when all exercises are reset", () => {
+  it("deletes every exercise's stored draft when all exercises are reset", () => {
     const remove = vi.spyOn(trainingCenterStorage, "delete");
     render(
       <ExercisesTab
@@ -63,7 +71,37 @@ describe("FiniteAutomata ExercisesTab — handlers", () => {
     // The control asks for confirmation before it deletes anything.
     fireEvent.click(screen.getByTestId("fa-reset-all-exercises-confirm"));
 
-    expect(remove).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledTimes(allFAExercises.length);
+    for (const exercise of allFAExercises) {
+      expect(remove).toHaveBeenCalledWith(
+        createTrainingCenterIdentifier(
+          TOPIC_STORAGE_IDS.finiteAutomata,
+          exercise.storageId,
+        ),
+      );
+    }
+    remove.mockRestore();
+  });
+
+  it("leaves the free simulator's own draft alone", () => {
+    const remove = vi.spyOn(trainingCenterStorage, "delete");
+    render(
+      <ExercisesTab
+        selectedExercise={null}
+        onSelectExercise={vi.fn()}
+        onOpenExerciseInSimulation={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("fa-reset-all-exercises"));
+    fireEvent.click(screen.getByTestId("fa-reset-all-exercises-confirm"));
+
+    expect(remove).not.toHaveBeenCalledWith(
+      createTrainingCenterIdentifier(
+        TOPIC_STORAGE_IDS.finiteAutomata,
+        SIMULATOR_TASK_STORAGE_ID,
+      ),
+    );
     remove.mockRestore();
   });
 });
