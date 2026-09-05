@@ -1,106 +1,90 @@
 % ---------------------------------------------------------------------------
 % Fachmodul Endliche Automaten (Kristian Popov)
-%
-% Inhaltlich abgeleitet aus Abschnitt 4.2 der Dokumentation.
-%
-% Der ausformulierte Sprechtext liegt in:
-%     docs/presentation/Sprechtext_Automaten_Sprachen.md
-%
-% Die Kurznotizen stehen in \note{...}. Sie sind standardmäßig unsichtbar.
-% Zum Anzeigen in presentation.tex vor \begin{document} ergänzen:
-%     \setbeameroption{show notes}
-% oder für einen zweiten Bildschirm:
-%     \setbeameroption{show notes on second screen=right}
 % ---------------------------------------------------------------------------
 
 \addsectionframe{Fachmodul: Endliche Automaten}
 
 % ---------------------------------------------------------------------------
 \begin{itemframe}{Endliche Automaten -- Überblick}
-  \item Studierende definieren den Automaten selbst: \textbf{Typ (DFA/NFA)}, Alphabet, Start- und Endzustände, Übergänge und Testwort.
-  \item Alternativ entsteht der Automat aus einer \textbf{rechtslinearen Grammatik}.
-  \item Der Ablauf ist nicht nur in der \textbf{Übergangstabelle} zu sehen, sondern gleichzeitig im \textbf{Zustandsdiagramm} -- der Weg des Wortes bleibt leicht zu verfolgen.
-  \item \textbf{Stapeltest}: viele Wörter auf einmal prüfen -- erkennt der Automat die beabsichtigte Sprache?
-  \item \textbf{Schritt-Historie}: vorwärts, rückwärts und zurück zu einem früheren Schritt.
-  \item Übungen geben eine automatische Rückmeldung mit \textbf{Gegenbeispiel}.
+  \item \textbf{DFA} und \textbf{NFA} selbst definieren
+  \item \textbf{Rechtslineare Grammatik} $\rightarrow$ \textbf{Automat}
+  \item Zwei Sichten: \textbf{Übergangstabelle} und \textbf{Zustandsdiagramm}
+  \item \textbf{Stapeltest} für mehrere Wörter gleichzeitig
+  \item \textbf{Schritt-Historie}: vorwärts, rückwärts, zu einem früheren Schritt
+  \item \textbf{Übungen} mit Rückmeldung: korrekt, falsch, Gegenbeispiel
 \end{itemframe}
-\note{%
-  Das ist die Funktionsseite: was Studierende damit machen koennen.
-  Reihenfolge beim Sprechen: selbst definieren -> oder aus Grammatik -> Tabelle UND Diagramm
-  -> Stapeltest -> Schritt-Historie -> Uebungen mit Gegenbeispiel.
-  Ueberleitung: "So sieht es von aussen aus. Auf der naechsten Folie zeige ich, was bei einem
-  einzelnen Schritt darunter passiert."
-}
 
 % ---------------------------------------------------------------------------
-\begin{fullframe}{Ein Simulationsschritt -- unter der Haube}
-  \vspace{-5mm}
+\begin{fullframe}{Simulationsschritt}
   \begin{center}
+  \resizebox{0.98\textwidth}{!}{%
     \begin{tikzpicture}[
         >=Stealth,
         stepbox/.style={draw=thwsblue, very thick, rounded corners=3pt, fill=thwsblue!5,
                         minimum width=32mm, minimum height=10mm, align=center, font=\small},
+        exitbox/.style={draw=thwsblue!55, thick, rounded corners=3pt, fill=white,
+                        minimum width=36mm, minimum height=9mm, align=center,
+                        font=\scriptsize, text=thwsblue},
         histbox/.style={draw=thwsorange, very thick, rounded corners=4pt, fill=thwsorange!8,
-                        minimum width=48mm, minimum height=10mm, align=center, font=\small},
+                        minimum width=62mm, minimum height=12mm, align=center, font=\small},
         viewbox/.style={draw=thwspetrol, very thick, rounded corners=3pt, fill=thwspetrol!8,
-                        minimum width=40mm, minimum height=10mm, align=center, font=\small},
-        note/.style   ={font=\scriptsize\itshape, text=black!70, align=right}
+                        minimum width=40mm, minimum height=10mm, align=center, font=\small}
       ]
 
-      % --- die drei Schritte des Kerns
-      \node[stepbox] (in)   at (-4.4, 1.9) {aktive Zustände\\+ nächstes Symbol};
-      \node[stepbox] (look) at ( 0.0, 1.9) {Übergänge\\nachschlagen};
-      \node[stepbox] (out)  at ( 4.4, 1.9) {neue aktive\\Zustände};
+      % --- (1) der Kern: immer dieselbe Schleife
+      \node[stepbox] (in)   at (-4.9, 2.4) {aktive Zustände\\+ nächstes Symbol};
+      \node[stepbox] (look) at ( 0.0, 2.4) {Übergänge\\nachschlagen};
+      \node[stepbox] (out)  at ( 4.9, 2.4) {neue aktive\\Zustände};
 
       \draw[->, very thick, thwsblue] (in)   -- (look);
       \draw[->, very thick, thwsblue] (look) -- (out);
 
-      % --- Rueckkopplung: das naechste Zeichen
-      \draw[->, thick, thwsblue!70] (out.north) -- ++(0, 0.5)
-        -- node[font=\scriptsize, above, text=thwsblue] {nächstes Zeichen} ($(in.north)+(0, 0.5)$)
+      \draw[->, thick, thwsblue!70] (out.north) -- ++(0, 0.6)
+        -- node[font=\scriptsize, above, text=thwsblue] {nächstes Zeichen} ($(in.north)+(0, 0.6)$)
         -- (in.north);
 
-      % --- der Schritt wird angehaengt, nicht ueberschrieben
-      \node[histbox] (hist) at (0, 0.35) {Schritt wird an die \textbf{Historie} angehängt};
-      \draw[->, very thick, thwsorange] (out.south) -- ++(0,-0.42) -| (hist.east);
+      % --- (2) wie ein Lauf endet: eigene Kaesten mit Pfeil statt freier Text
+      \node[exitbox] (dead) at (0.0, 0.85) {kein Übergang:\\Wort abgelehnt};
+      \node[exitbox] (fin)  at (4.9, 0.85) {Wort zu Ende:\\Endzustand aktiv?};
 
-      \node[note, anchor=east] at (-3.25, 0.35)
-        {der vorherige Schritt\\bleibt unverändert};
+      \draw[->, thick, thwsblue!55] (look.south) -- (dead.north);
+      \draw[->, thick, thwsblue!55] (out.south)  -- (fin.north);
 
-      % --- eine Quelle, zwei Sichten
-      \node[viewbox] (tab)  at (-2.7, -1.5) {Übergangstabelle\\{\scriptsize markierte Zelle}};
-      \node[viewbox] (diag) at ( 2.7, -1.5) {Zustandsdiagramm\\{\scriptsize markierte Kante}};
+      % --- (3) der Schritt wird angehaengt, nicht ueberschrieben
+      \node[histbox] (hist) at (0, -1.05)
+        {Schritt wird an die \textbf{Historie} angehängt\\[0.4ex]
+         {\scriptsize der vorherige Schritt bleibt unverändert}};
+
+      \draw[->, very thick, thwsorange] (out.east) -- ++(1.25, 0) |- (hist.east);
+
+      % --- (4) eine Quelle, zwei Sichten
+      \node[viewbox] (tab)  at (-3.0, -2.95) {Übergangstabelle\\{\scriptsize markierte Zelle}};
+      \node[viewbox] (diag) at ( 3.0, -2.95) {Zustandsdiagramm\\{\scriptsize markierte Kante}};
 
       \draw[->, very thick, thwspetrol] (hist.south) -- (tab.north);
       \draw[->, very thick, thwspetrol] (hist.south) -- (diag.north);
 
-      \node[font=\scriptsize, text=thwspetrol, fill=white, inner sep=0.5mm] at (0, -0.62)
+      \node[font=\scriptsize, text=thwspetrol, fill=white, inner sep=0.6mm] at (0, -2.1)
         {beide lesen denselben Schritt};
-    \end{tikzpicture}
+    \end{tikzpicture}%
+  }
   \end{center}
 
-  \vspace{-1mm}
-  \begin{center}
-    \begin{tikzpicture}
-      \node[draw=thwsorange, very thick, rounded corners=3pt, fill=thwsorange!8,
-            inner xsep=4mm, inner ysep=1.6mm, font=\footnotesize, align=left,
-            text width=0.9\textwidth]
-        {\textbf{DFA:} ein aktiver Zustand, \textbf{NFA:} mehrere -- derselbe Ablauf, kein
-         \texttt{if (typ ={}={}= 'DFA')}.\\[0.4mm]
-         Der Typ steuert nur die \textbf{Validierung}: doppelte Übergänge sind beim DFA ein Fehler.};
-    \end{tikzpicture}
-  \end{center}
 \end{fullframe}
 \note{%
   Die "Wie funktioniert das darunter"-Folie. Am Diagramm entlangsprechen, von oben nach unten.
   (1) Oben der Kern: aktive Zustaende + Symbol, Uebergaenge nachschlagen, neue aktive Zustaende.
       Danach das naechste Zeichen -- immer dieselbe Schleife.
-  (2) Mitte: der Schritt wird angehaengt, nicht ueberschrieben. Deshalb waren Schritt zurueck
+  (2) Die zwei Kaesten darunter: fehlt der Uebergang, ist das Wort sofort abgelehnt -- deshalb
+      braucht kein mitgelieferter Automat einen Fangzustand. Ist das Wort zu Ende, entscheidet,
+      ob ein aktiver Zustand Endzustand ist.
+  (3) Mitte: der Schritt wird angehaengt, nicht ueberschrieben. Deshalb waren Schritt zurueck
       und der Sprung zu einem frueheren Schritt kein eigenes Feature mehr.
-  (3) Unten: Tabelle und Diagramm lesen denselben Schritt -- keine zweite Zustandsverwaltung,
+  (4) Unten: Tabelle und Diagramm lesen denselben Schritt -- keine zweite Zustandsverwaltung,
       also koennen die beiden Sichten nicht auseinanderlaufen.
-  (4) Kasten: DFA war zuerst da, NFA kam spaeter. Es gibt trotzdem nur einen Ablauf -- der Typ
-      geht ausschliesslich in die Validierung.
+  (5) Frei gesprochen, steht nicht mehr auf der Folie: DFA war zuerst da, NFA kam spaeter.
+      Es gibt trotzdem nur einen Ablauf -- beim DFA ist genau ein Zustand aktiv, beim NFA
+      mehrere. Der Typ geht nur in Validierung und Eingabemaske.
   Rueckfrage "Warum dann ueberhaupt DFA und NFA unterscheiden?" -- didaktisch: Determinismus-
   verstoesse sollen gemeldet werden.
   Wenn Zeit bleibt: Determinismusverstoesse werden direkt an der Kante im Diagramm markiert.
