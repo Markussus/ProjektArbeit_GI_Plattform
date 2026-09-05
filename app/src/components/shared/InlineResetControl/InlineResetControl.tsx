@@ -27,6 +27,7 @@ export function InlineResetControl({
         type="button"
         onClick={() => setIsConfirming(true)}
         data-testid={testId}
+        aria-label={label}
         className={cn(
           "border-border bg-background text-foreground hover:bg-muted focus-visible:ring-ring inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:outline-none",
           className,
