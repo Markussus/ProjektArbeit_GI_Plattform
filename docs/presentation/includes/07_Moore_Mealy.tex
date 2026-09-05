@@ -1,6 +1,78 @@
 \addsectionframe{Fachmodul: Moore Mealy}
 
 % ---------------------------------------------------------------------------
-\begin{itemframe}{Moore Mealy -- Überblick}
-  \item Meine Erklärung
-\end{itemframe}
+
+\begin{contentsframe}{Interaktive Simulator Darstellung}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+        \includegraphics[width=\linewidth]{includes/moore_mealy.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+    \begin{itemize}
+        \item Automaten frei konfigurieren
+        \item Eingaben Schritt für Schritt simulierbar
+        \item Aktueller Zustand und Übergang direkt sichtbar
+        \item Vor- und Zurückspringen in der Simulation
+    \end{itemize}
+    \end{column}
+  \end{columns}
+\end{contentsframe}
+
+
+
+
+\begin{contentsframe}{Automat analysieren \& Schaltung darstellen}
+\vspace{-1em}
+
+\begin{columns}[T,onlytextwidth]
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Überführungsfunktion}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Zustandsübergänge übersichtlich darstellen
+            \item Ausgabe abhängig von Moore bzw. Mealy
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Wahrheitstabelle}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Zustände und Eingaben binär codieren
+            \item Boolesche Funktionen automatisch ableiten
+            \item DNF minimieren
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Logikgatter}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Funktionen als Schaltung visualisieren
+            \item Gatterdarstellung
+            \item Verbindung von Automat und Hardware
+        \end{itemize}
+    \end{column}
+
+\end{columns}
+
+\vspace{1.8em}
+
+\centering
+\small
+\textbf{$\rightarrow$ logische bzw. hardwareseitige Umsetzung sichtbar machen}
+
+\end{contentsframe}
