@@ -1,19 +1,28 @@
 % ---------------------------------------------------------------------------
 % Fachmodul Reguläre Sprachen (Kristian Popov)
-%
-% Inhaltlich abgeleitet aus Abschnitt 4.3 der Dokumentation.
-%
-% Der ausformulierte Sprechtext liegt in:
-%     docs/presentation/Sprechtext_Automaten_Sprachen.md
-%
-% Die Kurznotizen stehen in \note{...}. Sie sind standardmäßig unsichtbar.
-% Zum Anzeigen in presentation.tex vor \begin{document} ergänzen:
-%     \setbeameroption{show notes}
-% oder für einen zweiten Bildschirm:
-%     \setbeameroption{show notes on second screen=right}
 % ---------------------------------------------------------------------------
 
 \addsectionframe{Fachmodul: Reguläre Sprachen}
+
+% ---------------------------------------------------------------------------
+\begin{itemframe}{Reguläre Sprachen -- Überblick}
+  \item \textbf{Rechtslineare Grammatik} selbst definieren.
+  \item Drei Modi: \textbf{Aufzählung}, \textbf{Erzeugung}, \textbf{Worterkennung}
+  \item Sprache als \textbf{Wortliste} oder in \textbf{Mengenschreibweise}: $\{a^n b \mid n \geq 1\}$
+  \item Erzeugte Grammatik \textbf{ausführlich} oder \textbf{vereinfacht}
+  \item \textbf{Worterkennung} für mehrere Wörter -- mit Begründung statt nur ja/nein
+  \item \textbf{Übungen} mit Rückmeldung: fehlende und falsche Wörter
+\end{itemframe}
+\note{%
+  Einstiegsfolie des zweiten Themas, parallel zum Überblick bei den Automaten.
+  Nur benennen, was die Studierenden tun können -- die Begründungen kommen auf den
+  folgenden Folien.
+  Die drei Modi heißen in der Oberfläche "Grammatik -> Sprache", "Sprache -> Grammatik"
+  und "Wort erkennen"; die nächste Folie vertieft sie.
+  Ausführlich/Vereinfacht: ein Nichtterminal pro Präfix gegenüber zusammengefassten
+  Nichtterminalen mit denselben Fortsetzungen -- rechtslinear bleiben beide.
+  Überleitung: "Diese drei Arbeitsweisen im Zusammenhang."
+}
 
 % ---------------------------------------------------------------------------
 \begin{fullframe}{Reguläre Sprachen -- drei Arbeitsweisen}
@@ -81,84 +90,4 @@
   dass das Werkzeug die Theorie ernst nimmt.
   Mögliche Rückfrage: "Warum keine oberen Schranken?" -- Antwort: endlich, also regulär, aber die
   Aufzählung ist die klarere Schreibweise; die Eingabesprache bleibt kleiner.
-}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Übungsprüfung: Verhalten statt Struktur}
-  \begin{center}
-    \begin{tikzpicture}[
-        >=Stealth,
-        aut/.style={draw=thwsblue, very thick, rounded corners=3pt, fill=thwsblue!5,
-                    minimum width=34mm, minimum height=14mm, align=center, font=\small},
-        test/.style={draw=thwsorange, very thick, rounded corners=3pt, fill=thwsorange!8,
-                     minimum width=40mm, minimum height=14mm, align=center, font=\small},
-        ok/.style={font=\footnotesize, thwspetrol}
-      ]
-      \node[aut]                    (stud) {Lösung der\\Studierenden};
-      \node[aut, below=8mm of stud] (ref)  {Referenzlösung};
-      \node[test, right=26mm of $(stud)!0.5!(ref)$] (words)
-        {alle Wörter über dem\\gemeinsamen Alphabet\\{\scriptsize bis zur festgelegten Länge}};
-
-      \draw[->, very thick, thwsblue] (stud.east) -- (words.west);
-      \draw[->, very thick, thwsblue] (ref.east)  -- (words.west);
-
-      \node[align=left, font=\footnotesize, right=6mm of words, text width=46mm]
-        {gleiche Entscheidung für jedes Wort? \\[1mm]
-         \textcolor{thwspetrol}{\textbf{ja}} $\Rightarrow$ bestanden \\
-         \textcolor{red!65!black}{\textbf{nein}} $\Rightarrow$ erstes abweichendes Wort als Gegenbeispiel};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{1mm}
-  \footnotesize
-  Ein \textbf{Strukturvergleich} würde korrekte Lösungen ablehnen, die nur anders aufgebaut sind.
-  Die begrenzte Wortmenge ist bewusst eine \textbf{didaktische Rückmeldung} und kein formaler
-  Äquivalenznachweis. Strukturelle Mängel werden vorrangig gemeldet -- sie sind meist die eigentliche Ursache.
-\end{fullframe}
-\note{%
-  Wichtig: das ist eine bewusste Grenze, kein Mangel. Offen sagen, dass es kein Äquivalenzbeweis ist.
-  Der Standardwert für die Wortlänge ist vier; einzelne Aufgaben setzen ihn höher.
-  Das Gegenbeispiel ist der didaktische Mehrwert gegenüber einem blossen "falsch".
-}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Wiederverwendung statt Duplikat}
-  \begin{center}
-    \begin{tikzpicture}[
-        >=Stealth,
-        mod/.style={draw=thwsblue, very thick, rounded corners=3pt, fill=thwsblue!5,
-                    minimum width=44mm, minimum height=9mm, font=\small\ttfamily},
-        rl/.style={draw=thwspetrol, very thick, rounded corners=3pt, fill=thwspetrol!8,
-                   minimum width=44mm, minimum height=9mm, font=\small\ttfamily},
-        hd/.style={font=\footnotesize\bfseries}
-      ]
-      \node[hd] (h1) {Reguläre Sprachen};
-      \node[rl, below=3mm of h1]  (r1) {rlLanguageOps};
-      \node[rl, below=2mm of r1]  (r2) {rlGrammarValidation};
-
-      \node[hd, right=34mm of h1] (h2) {Endliche Automaten};
-      \node[mod, below=3mm of h2] (m1) {faMachine};
-      \node[mod, below=2mm of m1] (m2) {faGrammarConversion};
-      \node[mod, below=2mm of m2] (m3) {faGrammarParsing};
-
-      \draw[->, very thick, thwsorange] (r1.east) -- (m1.west);
-      \draw[->, very thick, thwsorange] (r1.east) -- (m2.west);
-      \draw[->, very thick, thwsorange] (r2.east) -- (m3.west);
-
-      \node[font=\scriptsize\itshape, gray, below=4mm of m3, align=center]
-        {Abhängigkeit nur in eine Richtung -- kein Zyklus};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{-3mm}
-  \footnotesize
-  Das Verzeichnis \texttt{domain} hat \textbf{keine Abhängigkeit zu React} und bleibt ohne
-  gerenderte Oberfläche testbar. Die Aufzählung führt eine Grammatik über denselben
-  Automatenkern aus wie die Simulation -- eine eigene Ableitungslogik hätte zwei
-  Implementierungen desselben Verhaltens erfordert.
-\end{fullframe}
-\note{%
-  Abschluss des Blocks: die Trennung Fachlogik/Oberfläche hat sich konkret ausgezahlt.
-  Guter Anknüpfungspunkt für Fragen zu Tests -- die Domain-Logik ist ohne UI testbar,
-  darauf lässt sich der Testteil der Präsentation aufbauen.
 }
