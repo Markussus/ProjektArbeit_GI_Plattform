@@ -27,7 +27,9 @@ export function CollapsibleStep({
       className={`border-border/40 overflow-hidden rounded-lg border ${className}`}
     >
       <button
+        type="button"
         onClick={onToggle}
+        aria-expanded={isOpen}
         data-testid={testId ? `${testId}-toggle` : undefined}
         className="bg-background hover:bg-muted/50 flex w-full items-center justify-between p-3"
       >

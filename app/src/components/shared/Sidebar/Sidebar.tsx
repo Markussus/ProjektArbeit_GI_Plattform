@@ -97,9 +97,14 @@ interface SidebarTopicItemProps {
 function SidebarTopicItem({ topic, collapsed }: SidebarTopicItemProps) {
   const { t } = useTranslation();
   const Icon = topic.icon;
+  const label = t(topic.titleKey);
 
   return (
-    <NavLink to={topic.path}>
+    <NavLink
+      to={topic.path}
+      aria-label={label}
+      title={collapsed ? label : undefined}
+    >
       {({ isActive }) => (
         <div
           className={cn(
@@ -114,9 +119,7 @@ function SidebarTopicItem({ topic, collapsed }: SidebarTopicItemProps) {
             <Icon className={cn("size-4", getAccentClasses(topic.accent))} />
           </div>
 
-          {!collapsed && (
-            <span className="leading-none">{t(topic.titleKey)}</span>
-          )}
+          {!collapsed && <span className="leading-none">{label}</span>}
         </div>
       )}
     </NavLink>
@@ -157,12 +160,15 @@ interface SidebarInfoLinkProps {
 
 function SidebarInfoLink({ collapsed }: SidebarInfoLinkProps) {
   const { t } = useTranslation();
+  const infoLabel = t("common.sidebar.info");
 
   return (
     <div className="border-border shrink-0 space-y-1 border-t px-2 py-3">
       <Link
         to="/info"
         data-testid="sidebar-info-link"
+        aria-label={infoLabel}
+        title={infoLabel}
         className={cn(
           "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
           collapsed ? "justify-center" : "gap-3",
@@ -171,9 +177,7 @@ function SidebarInfoLink({ collapsed }: SidebarInfoLinkProps) {
         <div className="flex size-5 shrink-0 items-center justify-center">
           <HelpCircle className="size-4" />
         </div>
-        {!collapsed && (
-          <span className="leading-none">{t("common.sidebar.info")}</span>
-        )}
+        {!collapsed && <span className="leading-none">{infoLabel}</span>}
       </Link>
     </div>
   );

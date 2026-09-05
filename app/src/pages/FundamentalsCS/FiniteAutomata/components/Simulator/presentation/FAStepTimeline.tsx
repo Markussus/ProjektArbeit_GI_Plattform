@@ -51,49 +51,52 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
         className="flex flex-1 items-center overflow-x-auto pb-1"
         style={{ scrollbarWidth: "thin" }}
       >
-        {slots.map((step, i) => (
-          <Fragment key={step.index}>
-            {/* Connector leading into this dot — grows to fill spare width. */}
-            {i > 0 && (
-              <div
-                aria-hidden
-                className={cn(
-                  "mx-1 h-0.5 min-w-2 flex-1 rounded-sm transition-colors",
-                  step.isReached ? "bg-brand/40" : "bg-border",
-                )}
-              />
-            )}
-            <button
-              type="button"
-              data-active={step.isCurrent}
-              disabled={!step.isReached}
-              onClick={() => step.isReached && onJumpToStep(step.index)}
-              title={
-                step.isReached
-                  ? t("finite-automata.sim.stepTooltip", {
-                      step: step.index,
-                      count: step.stateCount,
-                    })
-                  : t("finite-automata.sim.stepTooltipUnreached", {
-                      step: step.index,
-                    })
-              }
-              className={cn(
-                "flex shrink-0 items-center justify-center rounded-full font-mono transition-all",
-                step.isCurrent &&
-                  "border-brand bg-brand/10 text-brand size-9 border-2 text-xs font-bold shadow-sm",
-                !step.isCurrent &&
-                  step.isReached &&
-                  "border-border bg-background text-foreground hover:bg-muted size-7 cursor-pointer border text-[11px] font-semibold",
-                !step.isCurrent &&
-                  !step.isReached &&
-                  "border-border bg-muted/20 text-muted-foreground size-7 cursor-default border text-[11px] font-semibold opacity-40",
+        {slots.map((step, i) => {
+          const stepTooltip = step.isReached
+            ? t("finite-automata.sim.stepTooltip", {
+                step: step.index,
+                count: step.stateCount,
+              })
+            : t("finite-automata.sim.stepTooltipUnreached", {
+                step: step.index,
+              });
+
+          return (
+            <Fragment key={step.index}>
+              {/* Connector leading into this dot — grows to fill spare width. */}
+              {i > 0 && (
+                <div
+                  aria-hidden
+                  className={cn(
+                    "mx-1 h-0.5 min-w-2 flex-1 rounded-sm transition-colors",
+                    step.isReached ? "bg-brand/40" : "bg-border",
+                  )}
+                />
               )}
-            >
-              {step.label}
-            </button>
-          </Fragment>
-        ))}
+              <button
+                type="button"
+                data-active={step.isCurrent}
+                disabled={!step.isReached}
+                onClick={() => step.isReached && onJumpToStep(step.index)}
+                title={stepTooltip}
+                aria-label={stepTooltip}
+                className={cn(
+                  "flex shrink-0 items-center justify-center rounded-full font-mono transition-all",
+                  step.isCurrent &&
+                    "border-brand bg-brand/10 text-brand size-9 border-2 text-xs font-bold shadow-sm",
+                  !step.isCurrent &&
+                    step.isReached &&
+                    "border-border bg-background text-foreground hover:bg-muted size-7 cursor-pointer border text-[11px] font-semibold",
+                  !step.isCurrent &&
+                    !step.isReached &&
+                    "border-border bg-muted/20 text-muted-foreground size-7 cursor-default border text-[11px] font-semibold opacity-40",
+                )}
+              >
+                {step.label}
+              </button>
+            </Fragment>
+          );
+        })}
 
         {runtime.halted && (
           <div

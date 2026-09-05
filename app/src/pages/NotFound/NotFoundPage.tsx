@@ -59,6 +59,7 @@ export default function NotFoundPage() {
                 <button
                   type="button"
                   onClick={() => window.history.back()}
+                  aria-label={t("common.notFound.goBack")}
                   className="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold"
                 >
                   <ArrowLeft className="size-4" />
