@@ -1,0 +1,17 @@
+\subNsection{1}{Datenmodellierung und Transfer}{Richard Schröder}
+
+Die Simulatoren trennen die editierbare Konfiguration von den Daten einer laufenden Ausführung. \verb|TMProgram|, \verb|FAProgram|, \verb|MooreProgram| und \verb|MealyProgram| enthalten Zustände, Alphabet, Übergänge und Start- bzw Endzustand. Die Übergänge liegen als verschachtelte \verb|Record|-Strukturen vor, Zustandsnamen und Symbole werden als Zeichenketten gespeichert. Bei Turingmaschinen sowie Moore- und Mealy-Automaten gehört das Eingabewort zum Programm, bei endlichen Automaten zum Laufzeitzustand.
+
+\verb|TMRuntime| speichert aktuellen Zustand, Band, Kopfposition und Haltegrund. \verb|FARuntime| hält die Position im Eingabewort und den Zustandsverlauf. \verb|MooreRuntime| und \verb|MealyRuntime| speichern Zustands- beziehungsweise Übergangsverläufe; bei Mealy-Automaten kommen die ausgegebenen Symbole hinzu. Die Schrittausführung verändert diese fachlichen Werte. Geöffnete Dialoge und Animationen bleiben dagegen als kurzfristige Zustände in den React-Komponenten.
+
+Das DNF-Modul führt Ausdrücke, Wahrheitstabellen und Antworten getrennt. Im Zahlensystem-Simulator bündelt \verb|NumberSystemState| mit \verb|activeMode| die Daten für Ganzzahlen, negative Zahlen, Brüche, IEEE~754 und arithmetische Aufgaben. Der Java-Simulator überträgt den Quelltext als Zeichenkette.
+
+Für den Austausch definiert \verb|ISimulatorTransferCodec<TValue>| die Methoden \verb|exportValue| und \verb|importValue|. Sie erzeugen einen Transfer-String beziehungsweise rekonstruieren daraus den fachlichen Wert. Beide Methoden dürfen direkt oder als \verb|Promise| antworten, weil Formate wie der Java-Codec die asynchronen Browser-APIs \verb|CompressionStream| und \verb|DecompressionStream| verwenden. Local Storage selbst arbeitet synchron.
+
+\verb|SimulatorStringTransferBox| stellt das Eingabefeld und die Aktionen zum Erzeugen, Kopieren und Laden eines Transfer-Strings bereit. Das Training Center speichert den vom fachlichen Codec erzeugten Payload getrennt mit einem Bezeichner im Local Storage. Der Autosave exportiert den aktuellen Wert standardmäßig alle zehn Sekunden und beim Aufräumen des Hooks. Beim Import wird der Bezeichner geprüft, bevor der Wert an den fachlichen Codec gelangt.
+
+Mehrere Codecs schreiben ihre Daten mit \verb|BitWriter| und lesen sie mit \verb|BitReader|. Die Bits werden als Base64URL-Zeichenkette übertragen. Versionsfelder, Größenlimits, \glspl{id} und Füllbits begrenzen und prüfen das Format. Gegenüber einem lesbaren Textformat entstehen kürzere Transfer-Strings; ohne passenden Decoder ist der Inhalt jedoch nicht lesbar.
+
+Der Turingmaschinen-Codec z. B. normalisiert Programme, entfernt nicht verwendete Zustände und Symbole und vergibt numerische \glspl{id}. Für Symbole wählt er zwischen einer festen Registry und UTF-8. Für Übergänge erzeugt er dichte und dünn besetzte Kandidaten, jeweils mit und ohne Dictionary, und exportiert den Kandidaten mit der geringsten Bitlänge. So richtet sich die Länge des Transfer-Strings nach der Struktur des jeweiligen Programms.
+
+Der Java-Codec verwendet direkte Tokens, deflatierte Tokens oder deflatiertes UTF-8 und wählt die kürzeste erzeugte Darstellung. Beim Import prüft er Größenlimits sowie das Token- und UTF-8-Format.

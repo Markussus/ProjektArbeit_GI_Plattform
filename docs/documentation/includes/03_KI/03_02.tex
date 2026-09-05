@@ -1,0 +1,25 @@
+\subNsection{1}{KI-Reflexion}{Richard Schröder}
+
+\subNsection{2}{KI als Co-Developer}{Richard Schröder}
+
+Ich setzte ChatGPT, Codex in WebStorm und Zed sowie lokal über Ollama ausgeführte Modelle für Planung, Implementierung und Code-Reviews ein. Gemini nutzte ich ergänzend für Recherchen und Formulierungsvorschläge. Die Ergebnisse dienten jeweils als Entwurf. Architekturänderungen, bestehende Abhängigkeiten und Tests prüfte ich vor der Übernahme im Projekt.
+
+Mein meistens verwendeter Ablauf bestand aus drei Phasen. In der Planung beschrieb ich den Zielzustand, prüfte den erzeugten Architekturvorschlag und zerlegte ihn in Arbeitspakete. In der Umsetzung bearbeitete ich diese Pakete einzeln und verglich jede Änderung mit dem geplanten Aufbau. Für die unabhängige Prüfung verwendete ich einen neuen Chat und kontrollierte die Befunde anschließend selbst im Code und in den Unit- und \gls{e2e}-Tests.
+
+Bei einem getrennten Code-Review der Turingmaschinenimplementierung fand Codex zwei Fehler, die von den vorhandenen Tests nicht abgedeckt waren. Nach dem Austausch des Anfangsbandes wurde das Eingabealphabet nicht neu abgeleitet. Außerdem akzeptierte die Lösungskontrolle eine passende Ausgabe auch dann, wenn die Maschine wegen eines fehlenden Übergangs statt in einem vorgesehenen Haltezustand stoppte. Ich prüfte beide Befunde, korrigierte die Logik und ergänzte Regressionstests für die beiden Fälle. Der Review fand zudem nicht verwendeten Produktivcode, Code Dopplungen und fehlende direkte Tests der Bandansicht.
+
+\subNsection{2}{Automatisierte Aufgabengenerierung}{Richard Schröder}
+
+Bei den ersten erzeugten Turingmaschinenaufgaben entstanden sowohl ungültige JSON-Ausgaben als auch Maschinen, die sich nicht wie vorgesehen ausführen ließen. Ich gab den Modellen danach gültige Aufgabenobjekte als Beispiele und prüfte jede erzeugte Maschine durch Import und Simulation. Die Aufgaben werden als geprüfte Szenarien in der Anwendung gespeichert.
+
+Für die Übertragung von Aufgaben aus Skript und Übungsblättern verwendete ich bestehende JSON-Beispiele zusammen mit einem Screenshot der jeweiligen Lösung. Diese Eingaben halfen den Modellen, Struktur und Inhalt der Vorlage zuzuordnen. Vor der Aufnahme kontrollierte ich weiterhin das JSON-Format, die Übergänge und die erwarteten Ergebnisse der Validierungsfälle.
+
+\subNsection{2}{Kritische Reflexion}{Richard Schröder}
+
+Für mich stellte der Einsatz von \gls{ki} im Projekt eine erhebliche Unterstützung dar, insbesondere um Entwicklungsaufgaben schneller zu strukturieren, Implementierungen vorzubereiten und alternative Lösungsansätze zu prüfen. Dadurch konnte ich effizienter arbeiten, ohne jeden Entwurf oder jede technische Detailentscheidung vollständig von Grund auf manuell ausarbeiten zu müssen. Den größten Nutzen hatte ich, wenn ich die Anfragen klar eingrenzte und die Ergebnisse anschließend überprüfte.
+
+Eine zentrale Einschränkung bestand für mich darin, dass ich zu große Aufgaben nicht zuverlässig in einem einzigen Schritt bearbeiten konnte. Wenn ich beispielsweise versuchte, den ersten Entwurf der Turingmaschine mit allen Details auf einmal generieren zu lassen, gingen Teile der Anforderungen aus dem Kontext verloren oder wurden fehlerhaft umgesetzt. Daher zerlegte ich komplexe Aufgaben in kleinere Einheiten und bearbeitete sie nacheinander.
+
+Darüber hinaus beobachtete ich gelegentlich, dass \gls{ki}-Systeme einfache Problemstellungen unnötig komplex lösten. In solchen Fällen erhielt ich Vorschläge für umfangreiche Strukturen, zusätzliche Abstraktionen oder technische Umwege, obwohl eine deutlich einfachere Lösung ausgereicht hätte. Deshalb musste ich die vorgeschlagene Architektur und Implementierung immer kontrollieren.
+
+Problematisch war für mich außerdem, dass \gls{ki}-generierte Änderungen nicht immer an der fachlich passenden Stelle vorgenommen wurden. Ich stellte fest, dass allgemeine oder gemeinsam genutzte Komponenten angepasst wurden, obwohl eine lokale Änderung innerhalb des jeweiligen Moduls angemessener gewesen wäre. Solche Änderungen konnten andere Teile des Systems beeinflussen. Mir wurde dadurch klar, dass ich \gls{ki}-Unterstützung nur mit einem guten Verständnis der bestehenden Codebasis einsetzen kann.

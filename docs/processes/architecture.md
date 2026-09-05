@@ -60,6 +60,12 @@ Examples:
 
 These components are shared across multiple topics or routes.
 
+Important routing-related detail:
+
+* shared shells like `ModuleTopicPage` are not lazy-loaded on their own
+* tabs inside a topic page are imported normally by the topic page
+* lazy loading currently happens at page level, not at tab level
+
 ### `data`
 
 This folder contains centralized registration and lookup data.
@@ -74,8 +80,15 @@ It is the single source of truth for:
 * topic metadata
 * route elements
 * navigation lookups
+* lazy-loaded module and topic page elements
 
 Although the registry contains `ReactElement`s, it is still configuration/registration and therefore belongs in `data`, not in a topic page folder.
+
+Current implementation detail:
+
+* module and topic pages are registered as `React.lazy(...)` elements inside `moduleCatalog.tsx`
+* this keeps module/topic registration centralized while still splitting page bundles by route
+* `moduleCatalog.tsx` intentionally has an inline `react-refresh/only-export-components` eslint disable because it mixes config exports with lazy component declarations
 
 ### `pages`
 
@@ -209,6 +222,17 @@ Topic routes are generated from:
 
 This avoids duplicate registration across router, sidebar, header, and module overview pages.
 
+Current lazy-loading behavior:
+
+* `HomePage`, `DocumentationPage`, `HelpPage`, and `NotFoundPage` are lazy-loaded directly in `router/index.tsx`
+* module pages and topic pages are lazy-loaded in `moduleCatalog.tsx`
+* topic tabs are not lazy-loaded
+* `MainLayout` provides the shared `Suspense` boundary for route content
+
+Important constraint:
+
+* if a new top-level route is added directly in `router/index.tsx`, it should follow the same page-level lazy pattern unless there is a strong reason not to
+
 ## Global State
 
 Global state remains intentionally small.
@@ -227,8 +251,10 @@ Recommended workflow:
 1. Create a new module folder like `app/src/pages/<ModuleName>/`.
 2. Create a module landing page like `<ModuleName>Page.tsx` that renders `ModuleOverviewPage`.
 3. Create one folder per topic inside that module folder.
-4. Register the module and all of its topics in `app/src/data/moduleCatalog.tsx`.
-5. Add all required translation keys in both locale files.
+4. Register the module page lazily in `app/src/data/moduleCatalog.tsx`.
+5. Register the module and all of its topics in `app/src/data/moduleCatalog.tsx`.
+6. For each topic, point the `element` field to the lazy-loaded topic page component.
+7. Add all required translation keys in both locale files.
 
 Minimal module page pattern:
 
@@ -244,6 +270,8 @@ Important note:
 
 * the module only becomes visible in home navigation, header, sidebar, and router after it is added to `moduleCatalog.tsx`
 * `router/index.tsx` already consumes `learningRoutes`, so no extra manual route entry is needed there
+* the module page component itself should remain a thin page wrapper; the lazy registration happens in `moduleCatalog.tsx`, not inside the page file
+* when adding the module page to `moduleCatalog.tsx`, follow the existing `const ExamplePage = lazy(async () => ({ default: ... }))` pattern instead of importing the page eagerly
 
 ## How To Add A New Topic
 
@@ -254,8 +282,10 @@ Recommended workflow:
 3. Add `components/ExercisesTab.tsx` and `components/SimulationTab.tsx`.
 4. Add exercise definitions in `exercises/index.ts`.
 5. Create `<Topic>Page.tsx` using the shared `ModuleTopicPage`.
-6. Register the topic in the correct module entry inside `app/src/data/moduleCatalog.tsx`.
-7. Add all required translation keys in both locale files.
+6. Import the tab components normally inside `<Topic>Page.tsx`.
+7. Register the topic page lazily in `app/src/data/moduleCatalog.tsx`.
+8. Register the topic in the correct module entry inside `app/src/data/moduleCatalog.tsx`.
+9. Add all required translation keys in both locale files.
 
 Minimal page pattern:
 
@@ -284,6 +314,20 @@ Important note:
 
 * the topic route, sidebar entry, header/module lookup, and module overview link are all derived from `moduleCatalog.tsx`
 * that means the topic should be registered there exactly once, with the final `path`, `icon`, `accent`, and `element`
+* `OverviewTab`, `ExercisesTab`, `ExamplesTab`, and `SimulationTab` are intentionally imported eagerly by the topic page; do not add per-tab lazy loading unless that architecture decision changes explicitly
+* the topic page itself is the lazy boundary for that topic, not the individual tab files
+
+## Lazy Loading Rules
+
+The current rule set is intentionally simple:
+
+* lazy-load full pages
+* do not lazy-load topic tabs
+* keep `router/index.tsx` responsible for top-level standalone pages
+* keep `moduleCatalog.tsx` responsible for lazy-loaded module and topic pages
+* keep `main.tsx` and `App.tsx` simple; i18n bootstraps normally and is not deferred
+
+This gives route-based splitting without adding extra moving parts inside each topic.
 
 ## Summary
 

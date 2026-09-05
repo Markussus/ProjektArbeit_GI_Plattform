@@ -1,0 +1,240 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{BerichtVorlage}[10.06.2026 Schlanke Vorlage für Berichte]
+
+% --- Notwendige Pakete ---
+\RequirePackage[T1]{fontenc}						% T1-Schriftkodierung für saubere Umlaute, Silbentrennung und PDF-Ausgabe
+\RequirePackage[utf8]{inputenc}						% Erlaubt UTF-8-Eingabe, z. B. direkte Umlaute, bei pdflatex
+\RequirePackage[ngerman]{babel}						% Deutsche Sprache, Silbentrennung und Standardbegriffe
+\RequirePackage[a4paper,margin=20mm]{geometry}		% A4-Papier und Seitenraender von 20 mm
+\RequirePackage{lmodern}							% Latin-Modern-Schriftfamilie als skalierbare Standardschrift
+\RequirePackage{parskip}							% Absatzabstand statt Absatzeinzug
+\RequirePackage{fancyhdr}							% Frei konfigurierbare Kopf- und Fusszeilen
+\RequirePackage[hidelinks,hypertexnames=false]{hyperref}	% Klickbare Links ohne sichtbare Linkrahmen und doppelte Linkanker
+\RequirePackage{xurl}								% Verbessert automatische Zeilenumbrüche in langen URLs
+
+% --- Gliederung bis Ebene 4 (section ... subparagraph) ---
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+% \paragraph und \subparagraph als Block-Ueberschriften statt Run-In
+\makeatletter
+\renewcommand\paragraph{%
+	\@startsection{paragraph}{4}{\z@}%
+		{3.25ex \@plus 1ex \@minus .2ex}%
+		{1.5ex \@plus .2ex}%
+		{\normalfont\normalsize\bfseries}%
+}
+\renewcommand\subparagraph{%
+	\@startsection{subparagraph}{5}{\z@}%
+		{3.25ex \@plus 1ex \@minus .2ex}%
+		{1.5ex \@plus .2ex}%
+		{\normalfont\normalsize\bfseries}%
+}
+\makeatother
+
+% --- Header / Footer: je 3 Spalten, einzeln setzbar ---
+\makeatletter
+\newcommand{\PBV@HeaderLeft}{}
+\newcommand{\PBV@HeaderCenter}{}
+\newcommand{\PBV@HeaderRight}{}
+\newcommand{\PBV@FooterLeft}{}
+\newcommand{\PBV@FooterCenter}{}
+\newcommand{\PBV@FooterRight}{}
+
+\newif\ifPBV@HeaderCenterSet
+\newif\ifPBV@FooterCenterSet
+\PBV@HeaderCenterSetfalse
+\PBV@FooterCenterSetfalse
+
+\newcommand{\setheaderleft}[1]{\gdef\PBV@HeaderLeft{#1}}
+\newcommand{\setheadercenter}[1]{\gdef\PBV@HeaderCenter{#1}\global\PBV@HeaderCenterSettrue}
+\newcommand{\setheaderright}[1]{\gdef\PBV@HeaderRight{#1}}
+\newcommand{\setfooterleft}[1]{\gdef\PBV@FooterLeft{#1}}
+\newcommand{\setfootercenter}[1]{\gdef\PBV@FooterCenter{#1}\global\PBV@FooterCenterSettrue}
+\newcommand{\setfooterright}[1]{\gdef\PBV@FooterRight{#1}}
+
+\newcommand{\theauthor}{\@author}
+\newcommand{\thetitle}{\@title}
+\newcommand{\thedate}{\@date}
+
+\newcommand{\PBV@ThreePartLine}[3]{%
+	\makebox[\headwidth][l]{%
+		\begin{tabular*}{\headwidth}{@{}l@{\extracolsep{\fill}}c r@{}}#1&#2&#3\end{tabular*}%
+	}%
+}
+
+\newcommand{\PBV@ApplyPageStyle}{%
+	\fancyhf{}%
+	\fancyhead[C]{\PBV@ThreePartLine{\PBV@HeaderLeft}{\PBV@HeaderCenter}{\PBV@HeaderRight}}%
+	\fancyfoot[C]{\PBV@ThreePartLine{\PBV@FooterLeft}{\PBV@FooterCenter}{\PBV@FooterRight}}%
+	\setlength{\headheight}{24pt}
+	\renewcommand{\headrulewidth}{0.4pt}%
+	\renewcommand{\footrulewidth}{0pt}%
+}
+
+\fancypagestyle{pbvstyle}{\PBV@ApplyPageStyle}
+\fancypagestyle{plain}{\PBV@ApplyPageStyle}
+
+\AtBeginDocument{%
+	\ifPBV@HeaderCenterSet\else
+		\gdef\PBV@HeaderCenter{\theauthor}%
+	\fi
+	\ifPBV@FooterCenterSet\else
+		\gdef\PBV@FooterCenter{\thepage}%
+	\fi
+	\pagestyle{pbvstyle}%
+}
+\makeatother
+
+% --- Standardtitelseite ---
+
+\renewcommand{\maketitle}{%
+	\begin{center}
+		\vspace*{12em}
+		{\LARGE\bfseries \thetitle \par}
+		\vspace{5em}
+		{\large \theauthor \par}
+		\vspace{1em}
+		{\large \thedate \par}
+	\end{center}
+}
+
+% --- Gliederungsbefehl: Ebene 0..4, optional sternfoermig, optional mit TOC-Eintrag ---
+% Verwendung:
+%	\subNsection{0}{Titel}					-> nummerierte section
+%	\subNsection{1}{Titel}{Zusatz}			-> nummerierte section mit Zusatz in Klammern
+%	\subNsection*{2}{Titel}					-> unnummeriert, nicht im TOC
+%	\subNsection*[toc]{3}{Titel}{Zusatz}	-> unnummeriert, aber im TOC mit Link
+
+\newcommand{\PBVsubNtitle}[2]{%
+	\if\relax\detokenize{#2}\relax
+		#1%
+	\else
+		\texorpdfstring{#1 {\mdseries\small(#2)}}{#1 (#2)}%
+	\fi
+}
+
+\newcommand{\PBVsubNtitleToc}[2]{%
+	\if\relax\detokenize{#2}\relax
+		#1%
+	\else
+		\texorpdfstring{#1 {\mdseries\footnotesize(#2)}}{#1 (#2)}%
+	\fi
+}
+
+\newcommand{\PBVsubNnumbered}[3]{%
+	\ifcase#1
+		\section[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
+	\or
+		\subsection[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
+	\or
+		\subsubsection[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
+	\or
+		\paragraph[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
+	\or
+		\subparagraph[\PBVsubNtitleToc{#2}{#3}]{\PBVsubNtitle{#2}{#3}}%
+	\else
+		\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+	\fi
+}
+
+\newcommand{\PBVsubNstarred}[4]{%
+	\def\PBVtocarg{#3}%
+	\def\PBVtocflag{toc}%
+	\ifx\PBVtocarg\PBVtocflag
+		\phantomsection
+		\ifcase#1
+			\section*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{section}{\PBVsubNtitleToc{#2}{#4}}%
+		\or
+			\subsection*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subsection}{\PBVsubNtitleToc{#2}{#4}}%
+		\or
+			\subsubsection*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subsubsection}{\PBVsubNtitleToc{#2}{#4}}%
+		\or
+			\paragraph*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{paragraph}{\PBVsubNtitleToc{#2}{#4}}%
+		\or
+			\subparagraph*{\PBVsubNtitle{#2}{#4}}\addcontentsline{toc}{subparagraph}{\PBVsubNtitleToc{#2}{#4}}%
+		\else
+			\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+		\fi
+	\else
+		\if\relax\detokenize{#3}\relax
+			\ifcase#1
+				\section*{\PBVsubNtitle{#2}{#4}}%
+			\or
+				\subsection*{\PBVsubNtitle{#2}{#4}}%
+			\or
+				\subsubsection*{\PBVsubNtitle{#2}{#4}}%
+			\or
+				\paragraph*{\PBVsubNtitle{#2}{#4}}%
+			\or
+				\subparagraph*{\PBVsubNtitle{#2}{#4}}%
+			\else
+				\PackageError{berichtvorlage}{Ungueltige Ebene #1}{Erlaubt sind nur die Ebenen 0 bis 4.}%
+			\fi
+		\else
+			\PackageError{berichtvorlage}{Ungueltige Option '#3'}{Erlaubt ist nur [toc] oder keine Option.}%
+		\fi
+	\fi
+}
+
+\makeatletter
+\newcommand{\PBVsubNmaybeextraNumbered}[2]{%
+	\@ifnextchar\bgroup
+		{\PBVsubNnumberedExtra{#1}{#2}}%
+		{\PBVsubNnumbered{#1}{#2}{}}%
+}
+
+\newcommand{\PBVsubNnumberedExtra}[3]{%
+	\PBVsubNnumbered{#1}{#2}{#3}%
+}
+
+\newcommand{\PBVsubNmaybeextraStarred}[3]{%
+	\@ifnextchar\bgroup
+		{\PBVsubNstarredExtra{#1}{#2}{#3}}%
+		{\PBVsubNstarred{#1}{#2}{#3}{}}%
+}
+
+\newcommand{\PBVsubNstarredExtra}[4]{%
+	\PBVsubNstarred{#1}{#2}{#3}{#4}%
+}
+\makeatother
+
+\NewDocumentCommand{\subNsection}{s O{} m m}{%
+	\IfBooleanTF{#1}
+		{\PBVsubNmaybeextraStarred{#3}{#4}{#2}}%
+		{\PBVsubNmaybeextraNumbered{#3}{#4}}%
+}
+
+% --- Dokumentbereiche mit Seitenzahlschema ---
+\newenvironment{Cover}{%
+	\clearpage
+	\pagestyle{empty}%
+	\pagenumbering{gobble}%
+}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+}
+
+\newenvironment{PreContent}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{roman}%
+	\setcounter{page}{1}%
+}{%
+}
+
+\newenvironment{Content}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{arabic}%
+	\setcounter{page}{1}%
+}{%
+}
+
+\newenvironment{PostContent}{%
+	\clearpage
+	\pagestyle{pbvstyle}%
+	\pagenumbering{roman}%
+	\setcounter{page}{1}%
+}{%
+}

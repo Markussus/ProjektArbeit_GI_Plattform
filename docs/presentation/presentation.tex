@@ -1,0 +1,217 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[titlebg=thwsorange,
+authorcolor=black,
+titlecolor=white,
+bc=thwsorange,
+nospeakerspace,
+slidenumber,
+bs=$\bullet$]{thwsbeamertheme}
+
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{ragged2e}
+
+\title{Interaktive Lernplattform\\für\\Grundlagen Informatik}
+\author{M. Nöth, R. Schröder, E. Ebert, D. T. Pham, K. Popov}
+\modulename{Projektarbeit}
+\date{Projektpräsentation}
+
+\tikzset{
+  diagramnode/.style={
+    rounded corners=2mm,
+    fill=thwsgrey,
+    text=black,
+    align=center,
+    inner xsep=5mm,
+    inner ysep=4mm,
+    minimum height=1.15cm,
+    font=\large
+  },
+  diagramarrow/.style={
+    -{Latex[length=3.2mm,width=2.1mm]},
+    draw=thwsorange,
+    line width=1.6pt
+  },
+  diagramdouble/.style={
+    {Latex[length=3.0mm,width=2.0mm]}-{Latex[length=3.0mm,width=2.0mm]},
+    draw=thwsorange,
+    line width=1.6pt
+  }
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\addsectionframe{1. Kontext und Zielbild}
+
+\begin{contentsframe}{Problemstellung}
+\centering
+\vspace{-2mm}
+\resizebox{0.84\textwidth}{!}{%
+\begin{tikzpicture}[node distance=7mm and 7mm]
+  \node[diagramnode, minimum width=3.8cm] (abstract) {Abstrakte, dynamische\\Fachmodelle};
+  \node[diagramnode, below left=of abstract, minimum width=3.5cm] (static) {Statische\\Lehrmaterialien};
+  \node[diagramnode, below right=of abstract, minimum width=3.5cm] (practice) {Wenig interaktives\\Experimentieren};
+  \node[diagramnode, below=9mm of abstract, yshift=-12mm, minimum width=4.3cm] (steps) {Zwischenschritte schwer\\nachvollziehbar};
+  \node[diagramnode, below=6mm of steps, minimum width=4.6cm] (need) {Lernbedarf: sichtbar,\\veränderbar, direktes Feedback};
+
+  \draw[diagramarrow] (abstract) -- (static);
+  \draw[diagramarrow] (abstract) -- (practice);
+  \draw[diagramarrow] (static) -- (steps);
+  \draw[diagramarrow] (practice) -- (steps);
+  \draw[diagramarrow] (steps) -- (need);
+\end{tikzpicture}%
+}
+\end{contentsframe}
+
+\begin{itemframe}{Ziele der Plattform}
+  \item Browserbasierte Lern- und Übungsplattform
+  \item Überblick, Beispiele, Übungen und freie Simulation
+  \item Einheitliche Bedienung, Deutsch/Englisch und Hell/Dunkel
+\end{itemframe}
+
+\addsectionframe{2. Anforderungen und Projektablauf}
+
+\begin{itemframe}{Anforderungen}
+  \item Didaktik
+  \item Bedienung
+  \item Technik
+  \item Qualität
+\end{itemframe}
+
+\begin{itemframe}{Zusammenarbeit und Feedback-Zyklen}
+  \item Agil orientierte, iterative Arbeitsweise
+  \item Wöchentliches Teammeeting
+  \item GitLab, Work Items und Milestones
+  \item Regelmäßiges Auftraggeber-Feedback
+\end{itemframe}
+
+\addsectionframe{3. Lösungsansatz: Architektur und Design}
+
+\begin{itemframe}{Technische Basis}
+  \item React 19 + TypeScript + React Router
+  \item Vite + Tailwind CSS 4 + shadcn/ui
+  \item Zustand + i18next
+  \item Monaco + OpenJDK javac + TeaVM
+\end{itemframe}
+
+\begin{itemframe}{Modulare Plattformarchitektur}
+  \item Fachlich getrennte Topics
+  \item Gemeinsame Shared Components
+  \item \texttt{moduleCatalog.tsx} zur Modulverwaltung
+\end{itemframe}
+
+\begin{itemframe}{Unified UI: wiederkehrendes Design}
+  \item Header, Sidebar und Content
+  \item Überblick, Übungen, Beispiele und Simulation
+  \item Gemeinsame Komponenten
+  \item Fachspezifische Visualisierung in jedem Topic
+\end{itemframe}
+
+\begin{contentsframe}{Simulator-Architektur}
+\centering
+\vspace{1mm}
+\resizebox{0.88\textwidth}{!}{%
+\begin{tikzpicture}[node distance=9mm and 7mm]
+  \node[diagramnode, minimum width=3.3cm, font=\normalsize] (data) {Konfiguration +\\Laufzeitzustand};
+  \node[diagramnode, right=of data, minimum width=4.0cm, font=\normalsize] (iface) {\texttt{ISimulator<TConfig,TState>}\\gemeinsames Interface};
+  \node[diagramnode, right=of iface, minimum width=3.7cm, font=\normalsize] (hook) {\texttt{useSimulationEngine}\\Steuerung + Synchronisation};
+  \node[diagramnode, below=of hook, minimum width=3.7cm, font=\normalsize] (ui) {React-UI\\Play / Pause / Step / Reset};
+  \node[diagramnode, below=of iface, minimum width=4.0cm, font=\normalsize] (impl) {Konkrete Simulatorlogik};
+
+  \draw[diagramarrow] (data) -- (iface);
+  \draw[diagramarrow] (iface) -- (hook);
+  \draw[diagramarrow] (iface) -- (impl);
+  \draw[diagramdouble] (impl) -- (hook);
+  \draw[diagramdouble] (hook) -- (ui);
+\end{tikzpicture}%
+}
+\end{contentsframe}
+
+\begin{itemframe}{Import, Export und lokale Persistenz}
+  \item Gemeinsamer Transfer-Codec
+  \item Kompakte Base64URL-Transferstrings
+  \item Local Storage
+\end{itemframe}
+
+\addsectionframe{4. KI-Einsatz im Projekt}
+
+\begin{itemframe}{KI-Werkzeuge im Projekt}
+  \item Stitch, ChatGPT, Gemini, Claude, Codex, Antigravity und lokale Modelle
+  \item MCP, Graphify und Agent Skills
+\end{itemframe}
+
+\begin{contentsframe}{Arbeitsweise: KI als Co-Developer}
+\centering
+\vspace{2mm}
+\begin{tikzpicture}[node distance=8mm and 11mm]
+  \node[diagramnode, minimum width=3.7cm] (context) {Mensch: Aufgabe +\\Architekturkontext};
+  \node[diagramnode, right=of context, minimum width=3.5cm] (plan) {KI: Analyse\\und Plan};
+  \node[diagramnode, right=of plan, minimum width=3.6cm] (change) {KI: Änderungs-\\vorschlag};
+  \node[diagramnode, below=of change, minimum width=3.6cm] (review) {Mensch: Diff +\\Fachreview};
+  \node[diagramnode, left=of review, minimum width=3.5cm] (tests) {Mensch / KI: Tests +\\Browserprüfung};
+
+  \draw[diagramarrow] (context) -- (plan);
+  \draw[diagramarrow] (plan) -- (change);
+  \draw[diagramarrow] (change) -- (review);
+  \draw[diagramarrow] (review) -- (tests);
+  \draw[diagramarrow] (tests.north) -- (plan.south);
+\end{tikzpicture}
+\end{contentsframe}
+
+\begin{itemframe}{Grenzen und Erkenntnisse beim KI-Einsatz}
+  \item Kontextverlust bei großen Aufgaben $\rightarrow$ \texttt{handover.md}
+  \item Duplikate und toter Code $\rightarrow$ Code Review mit KI
+  \item Nutzen durch kleine, testbare Schritte
+\end{itemframe}
+
+\addsectionframe{5. Qualität und Deployment-Strategie}
+
+\begin{itemframe}{Qualitätssicherung}
+  \item ESLint + Prettier
+  \item Vitest
+  \item Vite Build + Playwright
+  \item Lighthouse + manuelles Review
+\end{itemframe}
+
+\begin{itemframe}{Deployment}
+  \item Statischer Vite-Build
+  \item Browserbetrieb durch lokalen Server
+  \item Online hosting durch Auftraggeber abgelehnt
+\end{itemframe}
+
+\input{includes/01_Turingmaschine.tex}
+\input{includes/02_Endliche_Automaten.tex}
+\input{includes/03_Regulaere_Sprachen.tex}
+\input{includes/04_Zahlensysteme.tex}
+\input{includes/05_Kodierung.tex}
+\input{includes/06_Disjunktive_Normalform.tex}
+\input{includes/07_Moore_Mealy.tex}
+\input{includes/08_Java.tex}
+
+\addsectionframe{6. Interaktive Live-Demo}
+
+\begin{itemframe}{Demo-Ziel: den Lernweg sichtbar machen}
+  \item Eingabe verändern
+  \item Schrittweise ausführen
+  \item Zwischenschritte erklären
+\end{itemframe}
+
+\addsectionframe{7. Ausblick und Fazit}
+
+\begin{itemframe}{Projektergebnisse}
+  \item Modulare Plattformarchitektur
+  \item Gemeinsame Simulatorbasis und Transfer
+  \item Automatisierte Qualitätssicherung
+\end{itemframe}
+
+\begin{itemframe}{Perspektiven und offene Punkte}
+  \item Weitere Lernbereiche und Topics
+  \item mobile Nutzung verbessern
+  \item LMS-Anbindung
+\end{itemframe}
+
+\end{document}

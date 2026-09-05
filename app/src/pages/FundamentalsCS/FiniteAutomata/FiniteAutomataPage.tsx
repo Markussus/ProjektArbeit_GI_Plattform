@@ -7,12 +7,13 @@ import { SimulationTab } from "./components/SimulationTab";
 export function FiniteAutomataPage() {
   return (
     <ModuleTopicPage
-      titleKey="automata.title"
-      descriptionKey="automata.description"
+      titleKey="finite-automata.topic.title"
+      descriptionKey="finite-automata.topic.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      clearSimulationSelectionOnTabExit
     />
   );
 }

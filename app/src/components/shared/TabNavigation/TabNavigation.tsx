@@ -29,6 +29,7 @@ export function TabNavigation({
           key={tab}
           type="button"
           onClick={() => onTabChange(tab)}
+          data-testid={`tab-button-${tab}`}
           className={cn(
             "relative px-4 py-2.5 text-sm font-medium",
             activeTab === tab
@@ -36,7 +37,7 @@ export function TabNavigation({
               : "text-muted-foreground hover:text-foreground",
           )}
         >
-          {t(`tabs.${tab}`)}
+          {t(`common.tabs.${tab}`)}
           {activeTab === tab && (
             <span className="bg-tab-indicator absolute inset-x-0 -bottom-px h-0.5" />
           )}

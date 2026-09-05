@@ -1,0 +1,171 @@
+{
+  "title": "Java-Programmierung",
+  "description": "Arbeiten Sie mit einfachen Java-Grundlagen wie Konsolenausgabe, Schleifen und Arrays. Der Simulationstab stellt dafür direkt einen editierbaren Java-Code-Editor bereit.",
+  "tutorialVideo": "Tutorial-Video",
+  "example1Title": "Einfaches Hello World",
+  "example1Text": "Das kleinste Java-Programm mit einer main-Methode und einer Konsolenausgabe.",
+  "example2Title": "Wiederholte Ausgabe",
+  "example2Text": "Mit einer for-Schleife lassen sich Anweisungen einfach mehrfach ausführen.",
+  "example3Title": "Array sortieren",
+  "example3Text": "Ein Integer-Array kann mit Arrays.sort in aufsteigender Reihenfolge sortiert werden.",
+  "example4Title": "Benutzereingabe mit Scanner",
+  "example4Text": "Werte vorab im Eingabefeld angeben und mit Scanner.nextLine() und Scanner.nextInt() zeilen- und tokenweise einlesen.",
+  "exercise1": "Hello World ausgeben",
+  "exercise1Desc": "Schreiben Sie ein Java-Programm, das Hello World genau einmal in die Konsole ausgibt.",
+  "exercise2": "Hello World fünfmal ausgeben",
+  "exercise2Desc": "Verwenden Sie eine Schleife, um Hello World genau fünfmal in die Konsole zu schreiben.",
+  "exercise3": "Zwei Zahlen addieren",
+  "exercise3Desc": "Addieren Sie zwei Integer-Werte und geben Sie die Summe in der Konsole aus.",
+  "exercise4": "Array sortieren",
+  "exercise4Desc": "Sortieren Sie ein Integer-Array in aufsteigender Reihenfolge und geben Sie es anschließend aus.",
+  "exercise5": "Maximum im Array finden",
+  "exercise5Desc": "Durchlaufen Sie ein Array und finden Sie den größten enthaltenen Wert.",
+  "editorLabel": "Java-Editor",
+  "editorLoading": "Der Monaco-Editor wird geladen...",
+  "editorLimit": {
+    "lines": "Der Java-Editor ist auf {{maxLines}} Zeilen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen.",
+    "characters": "Der Java-Editor ist auf {{maxCharacters}} Zeichen begrenzt. Der eingefügte oder importierte Text wurde nicht übernommen."
+  },
+  "compilerLabel": "Compiler",
+  "timeoutLabel": "Timeout",
+  "timeoutUnit": "Sekunden",
+  "runWhileLoading": "Compiler lädt",
+  "compilerStatus": {
+    "not-loaded": "nicht geladen",
+    "loading": "lädt",
+    "ready": "bereit",
+    "failed": "fehlgeschlagen"
+  },
+  "compilerStatusText": {
+    "not-loaded": "Compiler wurde noch nicht geladen.",
+    "loading": "Java-Compiler wird im Hintergrund geladen...",
+    "ready": "Compiler ist für Java-Kompilierung und Ausführung bereit.",
+    "failed": "Compiler konnte nicht geladen werden. Details stehen unten in der Konsole."
+  },
+  "commandOverview": {
+    "button": "Java-Befehle",
+    "title": "Was geht im Java-Editor?",
+    "summary": "Java {{version}} für kleine Browser-Programme",
+    "limitationsText": "Schreibe ein einzelnes Programm im Stil von Main.java. Du kannst Java-Code ausführen, aber keine Terminalbefehle eingeben.",
+    "commandListTitle": "Kompakte Übersicht",
+    "status": {
+      "supported": "Geht",
+      "limited": "Eingeschränkt",
+      "blocked": "Geht nicht",
+      "not-supported": "Nicht unterstützt",
+      "explained": "Eingeschränkt"
+    },
+    "capabilities": {
+      "programShape": {
+        "title": "Programmeinstieg",
+        "description": "Ein einzelnes Main.java-Programm funktioniert. public class Main und weitere nicht-public Hilfsklassen können in derselben Editor-Datei stehen."
+      },
+      "basics": {
+        "title": "Normale Java-Syntax",
+        "description": "Grundlegende Java-Syntax funktioniert: Variablen, Operatoren, if/else, switch und Methodenaufrufe."
+      },
+      "loops": {
+        "title": "Schleifen und Ablaufsteuerung",
+        "description": "for, while, do/while und for-each funktionieren für Übungen und kleine Algorithmen."
+      },
+      "arraysCollections": {
+        "title": "Arrays, Listen, Maps und Sets",
+        "description": "Arrays und typische java.util-Collections funktionieren: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+      },
+      "objects": {
+        "title": "Eigene Typen",
+        "description": "Eigene Klassen, Konstruktoren, Enums, Records, Interfaces und statische Methoden können in derselben Editor-Datei stehen."
+      },
+      "output": {
+        "title": "Konsolenausgabe",
+        "description": "Ausgaben werden abgefangen und unten als stdout oder stderr angezeigt."
+      },
+      "standardLibrary": {
+        "title": "Teilmenge der Standardbibliothek",
+        "description": "Häufige Bibliotheksklassen aus java.lang, java.util, java.math und einfachem java.time sind verfügbar. Betriebssystemnahe APIs sind nicht verlässlich."
+      },
+      "singleFile": {
+        "title": "Eine Editor-Datei",
+        "description": "Die UI sendet aktuell eine Quelldatei. Packe Hilfsklassen in dieselbe Datei statt ein Mehrdateien-Projekt zu erwarten."
+      },
+      "input": {
+        "title": "Konsoleneingabe (Scanner & System.in)",
+        "description": "So nutzt du die Konsoleneingabe im Browser-Simulator:\n\n1. Initialisierung im Code:\n• Importiere die Scanner-Klasse: import java.util.Scanner;\n• Erstelle das Scanner-Objekt: Scanner sc = new Scanner(System.in);\n\n2. Eingabemethoden:\n• sc.nextLine() liest die nächste vollständige Zeile bis zum Zeilenumbruch (Enter) als String ein.\n• sc.next() liest das nächste einzelne Wort/Token als String ein (getrennt durch Leerzeichen oder neue Zeile).\n• sc.nextInt(), sc.nextDouble(), sc.nextLong(), sc.nextBoolean() lesen das nächste passende Token und wandeln es um.\n\n3. Eingabe im Feld 'Programmeingabe':\n• Leerzeichen / Tabs: Trennen einzelne Werte/Tokens (z. B. '10 20' für zwei sc.nextInt()-Aufrufe in derselben Zeile).\n• Zeilenumbruch (Enter): Trennt zeilenweise Eingaben (z. B. für aufeinanderfolgende sc.nextLine()-Aufrufe).\n• Werte werden vor Programmstart bereitgestellt. Ein interaktives Tippen während der Laufzeit ist im Browser nicht möglich."
+      },
+      "cli": {
+        "title": "Terminalbefehle",
+        "description": "In das Editorfeld gehört Java-Quellcode, keine Befehle. java, javac, jshell, jar, mvn und gradle werden nicht als Terminalkommandos ausgeführt."
+      },
+      "environment": {
+        "title": "Betriebssystemzugriff",
+        "description": "Programme sollten lokale Dateien, Sockets, native Bibliotheken, Prozessstarts und umgebungsabhängige APIs vermeiden, weil WebAssembly in einem Browser-Worker läuft."
+      },
+      "runtimeFeatures": {
+        "title": "Dynamische Laufzeitfeatures",
+        "description": "Reflection-lastiger Code, dynamisches Nachladen von Klassen und echte Java-Threads sind in diesem WebAssembly-Ziel nicht verlässlich."
+      },
+      "stringsMath": {
+        "title": "Strings, Math und große Zahlen",
+        "description": "StringBuilder, String-Methoden, Math-Funktionen sowie BigInteger und BigDecimal funktionieren für typische Konsolenaufgaben."
+      }
+    }
+  },
+  "actions": {
+    "loadSolution": "Lösung laden",
+    "checkSolution": "Lösung prüfen",
+    "checkingSolution": "Prüfung läuft..."
+  },
+  "validation": {
+    "popupTitle": "Lösungsprüfung",
+    "pass": "BESTANDEN",
+    "fail": "FEHLER",
+    "emptyOutput": "<leer>",
+    "exampleCheckUnavailable": "Beispiele benötigen keine Lösungsprüfung.",
+    "table": {
+      "passed": "Bestanden",
+      "case": "Testfall",
+      "output": "Ausgabe",
+      "expectedOutput": "Erwartete Ausgabe",
+      "phase": "Status"
+    }
+  },
+  "exercise6": "Text aus Eingabe großschreiben",
+  "exercise6Desc": "Lesen Sie eine Zeile mit Scanner ein und geben Sie den Text in Großbuchstaben aus.",
+  "exercise7": "Methode schreiben",
+  "exercise7Desc": "Implementieren Sie eine Methode, die eine Zahl quadriert und zurückgibt.",
+  "exercise8": "Einfache Klasse verwenden",
+  "exercise8Desc": "Speichern Sie Konstruktorwerte in einer Klasse und geben Sie eine Beschreibung zurück.",
+  "exercise9": "ArrayList sortieren",
+  "exercise9Desc": "Sortieren Sie eine ArrayList mit Collections.sort und geben Sie die Liste aus.",
+  "exercise10": "FizzBuzz umsetzen",
+  "exercise10Desc": "Kombinieren Sie Schleife, Modulo und Bedingungen, um die klassische FizzBuzz-Ausgabe zu erzeugen.",
+  "exercise11": "Palindrom prüfen",
+  "exercise11Desc": "Implementieren Sie eine Methode, die einen Text von beiden Seiten vergleicht und Palindrome erkennt.",
+  "exercise12": "Matrix auswerten",
+  "exercise12Desc": "Berechnen Sie mit verschachtelten Schleifen alle Zeilensummen und die Summe der Hauptdiagonale.",
+  "exercise13": "Warenkorb modellieren",
+  "exercise13Desc": "Verwalten Sie Preise in einer Klasse mit ArrayList und implementieren Sie Anzahl, Gesamtsumme und Maximum.",
+  "stdin": {
+    "label": "Programmeingabe",
+    "placeholder": "Eingabe für Scanner/System.in, z. B. hello java",
+    "help": "Diese Eingabe wird vor dem Programmstart für einfache Scanner.nextLine()- und Scanner.nextInt()-Deklarationen eingesetzt. Ein interaktiver System.in-Stream ist nicht verfügbar."
+  },
+  "console": {
+    "title": "Konsole",
+    "stdout": "Standardausgabe",
+    "stdoutEmpty": "Die Programmausgabe erscheint hier.",
+    "stderr": "Fehlerausgabe",
+    "stderrEmpty": "Laufzeitfehler erscheinen hier.",
+    "issues": "Diagnosen",
+    "noIssues": "Keine Diagnosen gemeldet.",
+    "issueLocation": "Zeile {{line}}, Spalte {{column}}"
+  },
+  "execution": {
+    "stoppedMessage": "Ausführung durch Benutzer gestoppt.",
+    "timeoutMessage": "Ausführung nach {{seconds}} Sekunden gestoppt."
+  },
+  "timeout": {
+    "warningTitle": "Ausführung wegen Timeout gestoppt",
+    "warningText": "Das Programm lief zu lange oder wartet auf Eingabe. Prüfen Sie Schleifen, Scanner-Aufrufe und das Timeout."
+  }
+}

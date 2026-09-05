@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import { LoadingFallback } from "@/components/shared/LoadingFallback/LoadingFallback";
 import { Header } from "@/components/shared/Header/Header";
 import { Sidebar } from "@/components/shared/Sidebar/Sidebar";
 import { Footer } from "@/components/shared/Footer/Footer";
@@ -15,8 +17,10 @@ export function MainLayout() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
 
-        <main className="bg-background flex-1 overflow-y-auto">
-          <Outlet />
+        <main className="bg-background flex-1 [scrollbar-gutter:stable] overflow-y-auto">
+          <Suspense fallback={<LoadingFallback className="min-h-full" />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 

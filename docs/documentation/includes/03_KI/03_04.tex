@@ -1,0 +1,81 @@
+\subNsection{1}{KI Reflexion}{Duy Tan Pham}
+
+Für meinen Teil, die \gls{dnf}, habe ich durchgehend mit KI-Werkzeugen
+gearbeitet. Codex war das Hauptwerkzeug beim Entwickeln und direkt in VS Code eingebunden.
+Claude habe ich für Analyse, Refactorings sowie für Kontext- und Wissensdokumente genutzt.
+Die KI diente dabei nicht nur als Entwicklungswerkzeug, sondern auch zur Aufarbeitung der
+fachlichen Grundlagen. Das Verfahren von Quine-McCluskey habe ich mir zum Beispiel mit der
+KI erarbeitet, bevor ich es umgesetzt habe.
+
+\subNsection{2}{KI als Co-Developer}{Duy Tan Pham}
+
+Meine Arbeitsweise mit der KI war vor allem dialogisch und nicht befehlend. Statt fertige
+Vorgaben zu machen, habe ich die KI meist zuerst nach einer Einschätzung und einem
+Lösungsansatz gefragt, bevor etwas umgesetzt wurde. Die eigentliche Entscheidung ist dann
+schrittweise im Austausch entstanden. Dieses Nachfragen war zugleich meine Kontrolle. Weil
+ich die Vorschläge hinterfragt habe, bevor ich sie übernahm, blieb die fachliche
+Entscheidung bei mir, und Fehler fielen früher auf.
+
+Neben Lösungsvorschlägen habe ich die KI gezielt nach Kritik am eigenen Code gefragt, etwa
+nach übersehenen Sonderfällen oder unsauberen Stellen. Eine feste Vorgabe
+war dabei die Einheitlichkeit. Der DNF-Bereich sollte den gemeinsamen Gestaltungs- und
+Interaktionsmustern der Lernplattform folgen.
+
+Zusätzlich gab es feste Regeln, die die Arbeit mit der KI absicherten. Vorgegebene Skills
+und Anweisungen legten fest, wie die KI eine Aufgabe angehen und wie genau sie das Ergebnis
+danach prüfen sollte, abhängig davon, wie riskant eine Änderung war. Bei der Arbeit mit
+Claude blockierten außerdem zwei automatische Prüfungen gefährliche Befehle und das
+versehentliche Preisgeben von Zugangsdaten, bevor sie ausgeführt wurden.
+
+\subNsection{2}{Automatisierte Aufgabengenerierung}{Duy Tan Pham}
+
+Ein weiteres Einsatzfeld der KI war das Erstellen von Übungsaufgaben. Den Ausgangspunkt
+bildeten die Aufgaben aus dem Übungsblatt der Vorlesung. Für beide Aufgabenmodi und alle
+Schwierigkeitsstufen reichten diese Vorlagen jedoch nicht aus, sodass weitere Aufgaben
+nötig waren.
+
+Dafür habe ich der KI die bereits vorhandenen Aufgaben als Kontext gegeben. Auf dieser
+Grundlage ließen sich weitere Aufgaben desselben Typs ergänzen, etwa mit anderen Variablen,
+einer anderen Wahrheitstabelle oder einem höheren Schwierigkeitsgrad. Die Aufgaben sind
+anschließend als feste Definitionen im Code hinterlegt und werden nicht erst während der
+Nutzung erzeugt.
+
+Ein wichtiger Punkt war dabei, dass die KI keine Lösung mitliefern musste. Die erwarteten
+Ergebnisse berechnet die DNF-Fachlogik direkt aus den Aufgabendaten. Dadurch kann kein
+separat gepflegter Lösungsschlüssel von der Aufgabe abweichen. Syntax, Schwierigkeitsgrad
+und didaktische Eignung mussten trotzdem geprüft werden. Zu beurteilen blieb außerdem, ob
+sich eine ergänzte Aufgabe ausreichend von den bereits vorhandenen unterschied.
+
+\subNsection{2}{Kritische Reflexion}{Duy Tan Pham}
+
+Die wichtigste Erkenntnis war für mich, dass man sich bei deterministischer
+Informatik-Logik nicht blind auf die KI verlassen kann. Ein Beispiel ist die Minimierung.
+Die damalige Lösung hat die Restüberdeckung greedy gewählt. Erst meine konkrete Nachfrage,
+ob damit die literalminimale DNF übersehen werden kann, führte zur Diagnose und anschließend
+zur exakten Lösung. Ich musste das Korrektheitskriterium also selbst benennen und
+einfordern. Von allein hat die KI es nicht sichergestellt.
+
+Ein zweites Thema war das begrenzte Kontextfenster. In langen Chats ging Kontext verloren,
+deshalb habe ich mir Zusammenfassungen für neue Chats erstellen lassen und wichtige Fakten
+in eigene Wissensdokumente ausgelagert. Um das Repository herum entstand dadurch ein
+lokaler Arbeitsbereich mit Vorlesungsunterlagen, Übungsblättern, Lastenheft,
+Work-Item-Exporten, Videoquellen und ausgewählten Chatprotokollen. Kurze Handoff-Dateien
+und aufgabenspezifische Skills steuerten, welche Quellen ein neuer Agent für eine Aufgabe
+lesen und welche Prüfungen er durchführen sollte. Dadurch musste nicht jeder Chat den
+gesamten Projektverlauf neu einlesen. Die zusätzlichen Dateien waren dabei nur Orientierung
+und Prozessbelege. Technische Aussagen wurden weiterhin am aktuellen Code, an Tests oder an
+Commits geprüft. Mit wachsendem und älterem Kontext nahmen außerdem falsche Annahmen der KI
+zu. Ein neuer Chat mit einer kurzen, aktuellen Zusammenfassung lieferte deshalb oft
+zuverlässigere Antworten als ein sehr langer Verlauf.
+
+Außerdem musste ich auf den Umfang der Anfragen achten. Zu große Aufgaben auf einmal wurden
+unzuverlässig, kleinere Schritte lieferten bessere Ergebnisse. Auch eine Tendenz zu unnötig
+komplexen Lösungen war ein wiederkehrendes Muster. Solche Vorschläge habe ich bewusst wieder
+zurückgenommen, etwa einen unnötigen Refactor der Eingabe-Komponenten.
+
+Ein wiederkehrendes Risiko waren unbelegte technische Annahmen. Angaben zu externen Quellen
+oder zu Eigenschaften einzelner Dateien hat die KI sehr überzeugend formuliert, obwohl sie
+nicht zutrafen. Aufgefallen ist das erst, als ich diese Angaben mit passenden Werkzeugen an
+der Quelle selbst nachgeprüft habe. Eine Aussage wird dabei auch nicht dadurch richtig, dass
+mehrere Modelle sie wiederholen. Für mich kommt es deshalb weniger auf die Wahl des Modells
+an als auf die Prüfung, die man selbst dahinterschaltet.

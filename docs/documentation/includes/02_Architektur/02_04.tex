@@ -1,0 +1,7 @@
+\subNsection{1}{Simulator-Architektur}{Richard Schröder}
+
+Turingmaschinen, endliche Automaten sowie Moore- und Mealy-Automaten verwenden dieselbe Simulationsengine. Ihre Klassen implementieren \verb|ISimulator<TConfig, TState>|. Das Interface umfasst Initialisierung, Schritt, Rückschritt, Reset, Konfiguration, aktuellen Zustand und eine Prüfung ob der Haltezustand erreicht wurde. Es verbindet damit die fachliche Simulationslogik mit der Steuerung, ohne eine konkrete Darstellung vorzuschreiben.
+
+Der Hook \verb|useSimulationEngine| verwaltet Ausführungsstatus, Geschwindigkeit, Browser-Timer und Fehlerbehandlung. Nach einem Schritt übernimmt er den Zustand des Simulators in den React-State. Alle vier Maschinentypen erhalten über den Hook und die gemeinsamen Simulator-Controls Play, Pause, Schritt, Rückschritt, Reset und Geschwindigkeitssteuerung, während ihre Klassen die jeweiligen Zustandsübergänge ausführen.
+
+Ein weiterer Maschinentyp benötigt eine Implementierung des Interfaces, einen modulspezifischen Hook-Aufruf und die Anbindung an eine Laufzeitansicht. Die allgemeine Timerlogik und die vorhandenen Simulator-Controls können dabei unverändert bleiben.

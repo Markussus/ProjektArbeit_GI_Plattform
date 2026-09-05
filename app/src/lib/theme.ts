@@ -2,7 +2,7 @@ import type { Theme } from "@/store/themeStore";
 
 export type ResolvedTheme = "light" | "dark";
 
-export const THEME_STORAGE_KEY = "theme-storage";
+const THEME_STORAGE_KEY = "theme-storage";
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -30,8 +30,17 @@ export function applyResolvedTheme(resolvedTheme: ResolvedTheme) {
   const root = document.documentElement;
   const isDark = resolvedTheme === "dark";
 
+  // Suppress transitions across the document while theme variables flip,
+  // so the switch is instant instead of fading through intermediate colors.
+  root.classList.add("theme-switching");
   root.classList.toggle("dark", isDark);
   root.style.colorScheme = resolvedTheme;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      root.classList.remove("theme-switching");
+    });
+  });
 }
 
 export function applyTheme(theme: Theme) {

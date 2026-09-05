@@ -1,0 +1,17 @@
+\subNsection{1}{Technologiestack}{Richard Schröder}
+
+Die Anwendung ist als Client-Webanwendung ohne eigenes Anwendungsbackend umgesetzt. Simulationen, Java-Kompilierung und Speicherung laufen im Browser. Ein Webserver liefert nur die statischen Build-Artefakte aus; die Anwendung kann deshalb auch lokal bereitgestellt werden. React und TypeScript wurden zu Beginn des Projekts festgelegt, React~19 bildet die Benutzeroberfläche, während TypeScript unter anderem Simulator-Konfigurationen, Laufzeitzustände und Transfer-Codecs typisiert. Der React Router lädt die Komponenten der Seiten und Themen erst beim Aufruf der jeweiligen Route, sodass sie nicht Teil des initial geladenen JavaScript-Bundles sein müssen.
+
+Vite dient als lokaler Entwicklungsserver und erzeugt den statischen Build für das Deployment. Die Unit-Tests werden mit Vitest ausgeführt.
+
+Das Styling basiert auf Tailwind CSS~4, Utility-Klassen und zentralen CSS-Variablen für Farben und weitere Darstellungswerte. Das Projekt enthält die Konfiguration und die Tailwind-Styles von \verb|shadcn/ui|, verwendet aber auch eigene Komponenten unter den Shared Components. Lucide React stellt die Icons als React-Komponenten bereit.
+
+Zustand verwaltet den eingeklappten Zustand der Sidebar, Theme, Schriftart und den aktiven Simulatortransfer. Theme und Schriftart werden im Local Storage gespeichert; der Sidebar-Zustand wird nicht gespeichert. Die fachlichen Zustände der Simulatoren verbleiben in den jeweiligen Hooks und Domänenmodellen. Der globale Zustand bleibt damit auf Werte beschränkt, die mehrere Komponenten benötigen.
+
+Für die \acrlong{i18n} kommen i18next und react-i18next zum Einsatz. Die Anwendung unterstützt Deutsch und Englisch.
+
+Im Java-Bereich ist Monaco als Editor eingebunden. Ein OpenJDK-Compiler kompiliert den Java-Code mit \verb|javac| in einem Web Worker. TeaVM überführt den kompilierten Code anschließend in WebAssembly, das der Browser ausführt.
+
+Fallow prüft den TypeScript-Code auf Dead Code, Duplikate und Code-Health einschließlich Komplexität und großer Funktionen sowie auf Architektur- und Abhängigkeitsprobleme. Die Ergebnisse weisen auf nicht verwendete Bestandteile, Kopien und auffällige Abhängigkeiten hin.
+
+Die Versionsverwaltung erfolgt mit Git. Das zentrale Repository und die automatisierten Abläufe liegen im GitLab der \gls{thws}. GitLab \gls{ci} führt Formatierungs- und Lint-Prüfungen, Unit-Tests, den Build, \gls{e2e}-Tests mit Playwright sowie die Lighthouse-Prüfung aus. Die Umsetzung der Pipeline und des GitLab Runners wird in Kapitel~\ref{5_1_QS} behandelt.

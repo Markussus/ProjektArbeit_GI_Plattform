@@ -7,12 +7,14 @@ import { SimulationTab } from "./components/SimulationTab";
 export function TuringMachinePage() {
   return (
     <ModuleTopicPage
-      titleKey="turing.title"
-      descriptionKey="turing.description"
+      titleKey="turing-machine.topic.title"
+      descriptionKey="turing-machine.topic.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      testId="tm-page"
+      clearSimulationSelectionOnTabExit
     />
   );
 }

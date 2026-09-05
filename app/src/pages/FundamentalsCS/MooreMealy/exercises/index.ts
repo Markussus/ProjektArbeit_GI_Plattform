@@ -1,29 +1,38 @@
-import { ArrowRightLeft, Repeat, ToggleLeft, ToggleRight } from "lucide-react";
-import type { ExerciseDefinition } from "@/types/exercise";
+import type { TranslationKey } from "@/types/i18n";
+import { mealyExercises, mealyExerciseScenarios } from "./mealyExercises";
+import { mooreExercises, mooreExerciseScenarios } from "./mooreExercises";
+import type { AutomataExerciseScenario } from "./exerciseTypes";
 
-export const mooreMealyExercises: ExerciseDefinition[] = [
-  {
-    titleKey: "moore.exercise1",
-    descriptionKey: "moore.exercise1Desc",
-    difficulty: "easy",
-    icon: ToggleLeft,
-  },
-  {
-    titleKey: "moore.exercise2",
-    descriptionKey: "moore.exercise2Desc",
-    difficulty: "medium",
-    icon: ToggleRight,
-  },
-  {
-    titleKey: "moore.exercise3",
-    descriptionKey: "moore.exercise3Desc",
-    difficulty: "medium",
-    icon: ArrowRightLeft,
-  },
-  {
-    titleKey: "moore.exercise4",
-    descriptionKey: "moore.exercise4Desc",
-    difficulty: "hard",
-    icon: Repeat,
-  },
+export type {
+  AutomataExerciseScenario,
+  MealyExerciseScenario,
+  MooreExerciseScenario,
+} from "./exerciseTypes";
+export {
+  mealyExercises,
+  mealyExerciseScenarios,
+  mooreExercises,
+  mooreExerciseScenarios,
+};
+
+export const automataExerciseScenarios: AutomataExerciseScenario[] = [
+  ...mooreExerciseScenarios,
+  ...mealyExerciseScenarios,
 ];
+
+export const mooreMealyExercises = automataExerciseScenarios.map(
+  (scenario) => scenario.definition,
+);
+
+export function getAutomataExerciseScenario(
+  id: TranslationKey,
+): AutomataExerciseScenario | null {
+  return (
+    automataExerciseScenarios.find((scenario) => scenario.id === id) ?? null
+  );
+}
+
+export function getMooreExerciseScenario(id: TranslationKey) {
+  const scenario = getAutomataExerciseScenario(id);
+  return scenario?.machineType === "moore" ? scenario : null;
+}

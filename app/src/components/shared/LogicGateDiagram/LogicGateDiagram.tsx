@@ -1,0 +1,512 @@
+import { useId, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import type { BooleanExpression } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/booleanExpression";
+
+export interface LogicGateDiagramProps {
+  expression: BooleanExpression | null;
+  outputName: string;
+  ariaLabel: string;
+  variables: string[];
+  unavailableText: string;
+  binaryGates?: boolean;
+  testIdPrefix?: string;
+}
+
+interface DiagramNode {
+  id: number;
+  label: string;
+  kind: "input" | "not" | "and" | "or" | "constant";
+  depth: number;
+  order: number;
+  children: number[];
+}
+
+interface SelectedConnection {
+  sourceId: number;
+  targetId: number | "output";
+}
+
+export function LogicGateDiagram({
+  expression,
+  outputName,
+  ariaLabel,
+  variables,
+  unavailableText,
+  binaryGates = true,
+  testIdPrefix = "logic",
+}: LogicGateDiagramProps) {
+  const diagram = useMemo(
+    () => (expression ? buildDiagram(expression, binaryGates) : null),
+    [binaryGates, expression],
+  );
+  const markerPrefix = useId().replaceAll(":", "");
+  const arrowMarkerId = `${markerPrefix}-logic-arrow`;
+  const selectedArrowMarkerId = `${markerPrefix}-logic-arrow-selected`;
+  const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
+  const [selectedConnection, setSelectedConnection] =
+    useState<SelectedConnection | null>(null);
+
+  if (!diagram) {
+    return (
+      <div className="border-border bg-muted/20 rounded-xl border border-dashed p-10 text-center text-sm">
+        {unavailableText}
+      </div>
+    );
+  }
+
+  const depthSpacing = 155;
+  const width = Math.max(680, 240 + diagram.maxDepth * depthSpacing);
+  const height = Math.max(
+    340,
+    Math.max(diagram.leafCount, diagram.maxNodesAtDepth) * 82 + 80,
+  );
+  const positions = createCompactPositions(diagram.nodes, height, depthSpacing);
+
+  const rootPosition = positions.get(diagram.rootId);
+  const outputX = width - 70;
+  const selectNode = (node: DiagramNode) => {
+    if (node.kind === "input" || node.kind === "constant") {
+      const parent = diagram.nodes.find((candidate) =>
+        candidate.children.includes(node.id),
+      );
+      if (parent) {
+        setSelectedNodeId(null);
+        setSelectedConnection({ sourceId: node.id, targetId: parent.id });
+        return;
+      }
+    }
+    setSelectedConnection(null);
+    setSelectedNodeId(node.id);
+  };
+
+  return (
+    <div className="border-border bg-muted/10 overflow-auto rounded-xl border">
+      <svg
+        data-testid={`${testIdPrefix}-gate-diagram`}
+        role="img"
+        aria-label={ariaLabel}
+        viewBox={`0 0 ${width} ${height}`}
+        style={{ width, height }}
+        className="block max-w-none"
+      >
+        <defs>
+          <marker
+            id={arrowMarkerId}
+            markerWidth="8"
+            markerHeight="6"
+            refX="7"
+            refY="3"
+            orient="auto"
+          >
+            <path d="M 0 0 L 8 3 L 0 6 z" className="fill-muted-foreground" />
+          </marker>
+          <marker
+            id={selectedArrowMarkerId}
+            markerWidth="8"
+            markerHeight="6"
+            refX="7"
+            refY="3"
+            orient="auto"
+          >
+            <path d="M 0 0 L 8 3 L 0 6 z" className="fill-brand" />
+          </marker>
+        </defs>
+
+        {diagram.nodes.flatMap((node) => {
+          const target = positions.get(node.id);
+          if (!target) {
+            return [];
+          }
+          return node.children.map((childId, childIndex) => {
+            const source = positions.get(childId);
+            if (!source) {
+              return null;
+            }
+            const selected =
+              selectedConnection?.sourceId === childId &&
+              selectedConnection.targetId === node.id;
+            const sourceX = source.x + 50;
+            const targetX = target.x - 50;
+            const inputSpacing = Math.min(
+              16,
+              48 / Math.max(1, node.children.length - 1),
+            );
+            const targetY =
+              target.y +
+              (childIndex - (node.children.length - 1) / 2) * inputSpacing;
+            const path = `M ${sourceX} ${source.y} L ${targetX} ${targetY}`;
+            return (
+              <g key={`${childId}-${node.id}`}>
+                <path
+                  d={path}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth="16"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelectedNodeId(null);
+                    setSelectedConnection({
+                      sourceId: childId,
+                      targetId: node.id,
+                    });
+                  }}
+                />
+                <path
+                  data-testid={`${testIdPrefix}-wire-${childId}-${node.id}`}
+                  d={path}
+                  fill="none"
+                  pointerEvents="none"
+                  className={cn(
+                    "stroke-muted-foreground",
+                    selected && "stroke-brand",
+                  )}
+                  strokeWidth={selected ? 4 : 2}
+                  markerEnd={
+                    selected
+                      ? `url(#${selectedArrowMarkerId})`
+                      : `url(#${arrowMarkerId})`
+                  }
+                />
+              </g>
+            );
+          });
+        })}
+
+        {rootPosition && (
+          <>
+            <line
+              x1={rootPosition.x + 50}
+              y1={rootPosition.y}
+              x2={outputX}
+              y2={rootPosition.y}
+              stroke="transparent"
+              strokeWidth="16"
+              className="cursor-pointer"
+              onClick={() => {
+                setSelectedNodeId(null);
+                setSelectedConnection({
+                  sourceId: diagram.rootId,
+                  targetId: "output",
+                });
+              }}
+            />
+            <line
+              data-testid={`${testIdPrefix}-wire-${diagram.rootId}-output`}
+              x1={rootPosition.x + 50}
+              y1={rootPosition.y}
+              x2={outputX}
+              y2={rootPosition.y}
+              pointerEvents="none"
+              className={cn(
+                "stroke-muted-foreground",
+                selectedConnection?.sourceId === diagram.rootId &&
+                  selectedConnection.targetId === "output" &&
+                  "stroke-brand",
+              )}
+              strokeWidth={
+                selectedConnection?.sourceId === diagram.rootId &&
+                selectedConnection.targetId === "output"
+                  ? 4
+                  : 2
+              }
+              markerEnd={
+                selectedConnection?.sourceId === diagram.rootId &&
+                selectedConnection.targetId === "output"
+                  ? `url(#${selectedArrowMarkerId})`
+                  : `url(#${arrowMarkerId})`
+              }
+            />
+            <circle
+              cx={outputX + 8}
+              cy={rootPosition.y}
+              r="5"
+              className={cn(
+                "fill-muted-foreground",
+                selectedConnection?.targetId === "output" && "fill-brand",
+              )}
+            />
+            <text
+              x={outputX + 20}
+              y={rootPosition.y + 5}
+              className={cn(
+                "fill-foreground text-sm font-bold",
+                selectedConnection?.targetId === "output" && "fill-brand",
+              )}
+            >
+              {outputName}
+            </text>
+          </>
+        )}
+
+        {diagram.nodes.map((node) => {
+          const position = positions.get(node.id);
+          if (!position) {
+            return null;
+          }
+          return (
+            <GateNode
+              key={node.id}
+              node={node}
+              testIdPrefix={testIdPrefix}
+              x={position.x}
+              y={position.y}
+              selected={
+                selectedNodeId === node.id ||
+                selectedConnection?.sourceId === node.id ||
+                selectedConnection?.targetId === node.id
+              }
+              onSelect={() => selectNode(node)}
+            />
+          );
+        })}
+
+        <text x="20" y="28" className="fill-muted-foreground text-xs">
+          {variables.join(", ")}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function createCompactPositions(
+  nodes: DiagramNode[],
+  height: number,
+  depthSpacing: number,
+) {
+  const positions = new Map<number, { x: number; y: number }>();
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const leaves = nodes
+    .filter((node) => node.children.length === 0)
+    .sort((left, right) => left.order - right.order);
+
+  leaves.forEach((node, index) => {
+    positions.set(node.id, {
+      x: 100,
+      y: ((index + 1) * height) / (leaves.length + 1),
+    });
+  });
+
+  const placeNode = (node: DiagramNode): { x: number; y: number } => {
+    const existing = positions.get(node.id);
+    if (existing) {
+      return existing;
+    }
+    const children = node.children
+      .map((childId) => byId.get(childId))
+      .filter((child): child is DiagramNode => Boolean(child))
+      .map(placeNode);
+    const position = {
+      x: 100 + node.depth * depthSpacing,
+      y:
+        children.reduce((sum, child) => sum + child.y, 0) /
+        Math.max(1, children.length),
+    };
+    positions.set(node.id, position);
+    return position;
+  };
+
+  nodes
+    .slice()
+    .sort((left, right) => left.depth - right.depth)
+    .forEach(placeNode);
+
+  return positions;
+}
+
+interface GateNodeProps {
+  node: DiagramNode;
+  testIdPrefix: string;
+  x: number;
+  y: number;
+  selected: boolean;
+  onSelect: () => void;
+}
+
+function TerminalGateNode({
+  node,
+  testIdPrefix,
+  x,
+  y,
+  selected,
+  onSelect,
+}: GateNodeProps) {
+  return (
+    <g
+      data-testid={`${testIdPrefix}-node-${node.id}`}
+      onClick={onSelect}
+      className="cursor-pointer"
+    >
+      <circle
+        cx={x}
+        cy={y}
+        r={selected ? 9 : 6}
+        className={selected ? "fill-brand" : "fill-foreground"}
+      />
+      <text
+        x={x - 14}
+        y={y + 5}
+        textAnchor="end"
+        className={cn(
+          "fill-foreground font-mono text-sm font-semibold",
+          selected && "fill-brand",
+        )}
+      >
+        {node.label}
+      </text>
+    </g>
+  );
+}
+
+function getGateSymbol(kind: DiagramNode["kind"]): string {
+  if (kind === "and") return "&";
+  if (kind === "or") return "≥1";
+  return "1";
+}
+
+function OperatorGateNode({
+  node,
+  testIdPrefix,
+  x,
+  y,
+  selected,
+  onSelect,
+}: GateNodeProps) {
+  const gateHeight = Math.max(56, node.children.length * 16 + 20);
+  const gateClass = selected
+    ? "fill-brand/15 stroke-brand"
+    : "fill-card stroke-foreground";
+  const strokeWidth = selected ? 4 : 2;
+
+  return (
+    <g
+      data-testid={`${testIdPrefix}-node-${node.id}`}
+      onClick={onSelect}
+      className="cursor-pointer"
+    >
+      <rect
+        x={x - 42}
+        y={y - gateHeight / 2}
+        width="84"
+        height={gateHeight}
+        rx="5"
+        className={gateClass}
+        strokeWidth={strokeWidth}
+      />
+      <text
+        x={x}
+        y={y + 6}
+        textAnchor="middle"
+        className="fill-foreground text-lg font-bold"
+      >
+        {getGateSymbol(node.kind)}
+      </text>
+      {node.kind === "not" && (
+        <circle
+          cx={x + 48}
+          cy={y}
+          r="6"
+          className={gateClass}
+          strokeWidth={strokeWidth}
+        />
+      )}
+    </g>
+  );
+}
+
+function GateNode(props: GateNodeProps) {
+  if (props.node.kind === "input" || props.node.kind === "constant") {
+    return <TerminalGateNode {...props} />;
+  }
+  return <OperatorGateNode {...props} />;
+}
+
+function buildDiagram(expression: BooleanExpression, binaryGates: boolean) {
+  let nextId = 0;
+  let leafOrder = 0;
+  const nodes: DiagramNode[] = [];
+
+  const visit = (node: BooleanExpression): { id: number; depth: number } => {
+    const id = nextId++;
+    if (node.type === "variable") {
+      nodes.push({
+        id,
+        label: node.name,
+        kind: "input",
+        depth: 0,
+        order: leafOrder++,
+        children: [],
+      });
+      return { id, depth: 0 };
+    }
+    if (node.type === "constant") {
+      nodes.push({
+        id,
+        label: node.value ? "1" : "0",
+        kind: "constant",
+        depth: 0,
+        order: leafOrder++,
+        children: [],
+      });
+      return { id, depth: 0 };
+    }
+    if (node.type === "not") {
+      const child = visit(node.operand);
+      nodes.push({
+        id,
+        label: "NOT",
+        kind: "not",
+        depth: child.depth + 1,
+        order: leafOrder++,
+        children: [child.id],
+      });
+      return { id, depth: child.depth + 1 };
+    }
+
+    const operands = binaryGates
+      ? [node.left, node.right]
+      : flattenOperator(node, node.operator);
+    const children = operands.map(visit);
+    const depth = Math.max(...children.map((child) => child.depth)) + 1;
+    nodes.push({
+      id,
+      label: node.operator.toUpperCase(),
+      kind: node.operator,
+      depth,
+      order: leafOrder++,
+      children: children.map((child) => child.id),
+    });
+    return { id, depth };
+  };
+
+  const root = visit(expression);
+  return {
+    nodes,
+    rootId: root.id,
+    maxDepth: root.depth,
+    leafCount: Math.max(
+      1,
+      nodes.filter((node) => node.kind === "input" || node.kind === "constant")
+        .length,
+    ),
+    maxNodesAtDepth: Math.max(
+      1,
+      ...Array.from(
+        { length: root.depth + 1 },
+        (_, depth) => nodes.filter((node) => node.depth === depth).length,
+      ),
+    ),
+  };
+}
+
+function flattenOperator(
+  expression: BooleanExpression,
+  operator: "and" | "or",
+): BooleanExpression[] {
+  if (expression.type !== "binary" || expression.operator !== operator) {
+    return [expression];
+  }
+  return [
+    ...flattenOperator(expression.left, operator),
+    ...flattenOperator(expression.right, operator),
+  ];
+}

@@ -2,7 +2,7 @@ import { ChevronRight, Layers3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/shared/PageIntro/PageIntro";
-import { learningModules, type TopicAccent } from "@/data/moduleCatalog";
+import { learningModules, type TopicAccent } from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 interface ModuleOverviewPageProps {
@@ -30,7 +30,7 @@ export function ModuleOverviewPage({ moduleId }: ModuleOverviewPageProps) {
   return (
     <div className="p-8">
       <PageIntro
-        eyebrow={t("modules.label")}
+        eyebrow={t("common.modules.label")}
         title={t(moduleData.titleKey)}
         description={t(moduleData.descriptionKey)}
       />
@@ -39,7 +39,7 @@ export function ModuleOverviewPage({ moduleId }: ModuleOverviewPageProps) {
         <div className="mb-4 flex items-center gap-3">
           <Layers3 className="text-muted-foreground size-5" />
           <h2 className="text-foreground text-lg font-semibold">
-            {t("modules.topicsTitle")}
+            {t("common.modules.topicsTitle")}
           </h2>
         </div>
 

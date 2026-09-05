@@ -1,7 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { FileText, HelpCircle, Menu } from "lucide-react";
-import { findModuleByPath, type TopicAccent } from "@/data/moduleCatalog";
+import { HelpCircle, Menu } from "lucide-react";
+import {
+  findModuleByPath,
+  type LearningModuleDefinition,
+  type ModuleTopicDefinition,
+  type TopicAccent,
+} from "@/data/moduleCatalogData";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -19,120 +24,196 @@ function getAccentClasses(accent: TopicAccent) {
   }[accent];
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+interface SidebarToggleHeaderProps {
+  onToggle: () => void;
+}
+
+function SidebarToggleHeader({ onToggle }: SidebarToggleHeaderProps) {
   const { t } = useTranslation();
+
+  return (
+    <div className="flex h-14 shrink-0 items-center px-4">
+      <button
+        type="button"
+        onClick={onToggle}
+        data-testid="sidebar-toggle"
+        className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
+        aria-label={t("common.sidebar.toggle")}
+      >
+        <div className="flex size-5 items-center justify-center">
+          <Menu className="size-4" />
+        </div>
+      </button>
+    </div>
+  );
+}
+
+interface SidebarModuleHeaderProps {
+  module: LearningModuleDefinition;
+  isOverview: boolean;
+}
+
+function SidebarModuleHeader({ module, isOverview }: SidebarModuleHeaderProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="shrink-0 px-4 pb-3">
+      <NavLink
+        to={module.path}
+        className={cn(
+          "text-sm font-semibold tracking-wider uppercase",
+          isOverview ? "text-brand" : "text-foreground",
+        )}
+      >
+        {t(module.titleKey)}
+      </NavLink>
+    </div>
+  );
+}
+
+interface SidebarModuleSectionProps {
+  module: LearningModuleDefinition | undefined;
+  isOverview: boolean;
+  collapsed: boolean;
+}
+
+function SidebarModuleSection({
+  module,
+  isOverview,
+  collapsed,
+}: SidebarModuleSectionProps) {
+  if (!module || collapsed) {
+    return null;
+  }
+
+  return <SidebarModuleHeader module={module} isOverview={isOverview} />;
+}
+
+interface SidebarTopicItemProps {
+  topic: ModuleTopicDefinition;
+  collapsed: boolean;
+}
+
+function SidebarTopicItem({ topic, collapsed }: SidebarTopicItemProps) {
+  const { t } = useTranslation();
+  const Icon = topic.icon;
+
+  return (
+    <NavLink to={topic.path}>
+      {({ isActive }) => (
+        <div
+          className={cn(
+            "flex h-11 items-center rounded-md px-3 text-sm font-semibold tracking-wide",
+            isActive
+              ? "bg-nav-active-bg text-nav-active-fg"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            collapsed ? "justify-center" : "gap-3",
+          )}
+        >
+          <div className="flex size-5 shrink-0 items-center justify-center">
+            <Icon className={cn("size-4", getAccentClasses(topic.accent))} />
+          </div>
+
+          {!collapsed && (
+            <span className="leading-none">{t(topic.titleKey)}</span>
+          )}
+        </div>
+      )}
+    </NavLink>
+  );
+}
+
+interface SidebarTopicNavProps {
+  module: LearningModuleDefinition;
+  collapsed: boolean;
+}
+
+function SidebarTopicNav({ module, collapsed }: SidebarTopicNavProps) {
+  return (
+    <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 py-2">
+      {module.topics.map((topic) => (
+        <SidebarTopicItem key={topic.id} topic={topic} collapsed={collapsed} />
+      ))}
+    </nav>
+  );
+}
+
+interface SidebarNavContentProps {
+  module: LearningModuleDefinition | undefined;
+  collapsed: boolean;
+}
+
+function SidebarNavContent({ module, collapsed }: SidebarNavContentProps) {
+  if (!module) {
+    return <div className="flex-1" />;
+  }
+
+  return <SidebarTopicNav module={module} collapsed={collapsed} />;
+}
+
+interface SidebarInfoLinkProps {
+  collapsed: boolean;
+}
+
+function SidebarInfoLink({ collapsed }: SidebarInfoLinkProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="border-border shrink-0 space-y-1 border-t px-2 py-3">
+      <Link
+        to="/info"
+        data-testid="sidebar-info-link"
+        className={cn(
+          "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
+          collapsed ? "justify-center" : "gap-3",
+        )}
+      >
+        <div className="flex size-5 shrink-0 items-center justify-center">
+          <HelpCircle className="size-4" />
+        </div>
+        {!collapsed && (
+          <span className="leading-none">{t("common.sidebar.info")}</span>
+        )}
+      </Link>
+    </div>
+  );
+}
+
+function resolveActiveSidebarState(pathname: string) {
+  const activeModule = findModuleByPath(pathname);
+  const showNav = pathname !== "/" && Boolean(activeModule);
+  return {
+    activeModule: showNav ? activeModule : undefined,
+    isOverview: Boolean(activeModule && pathname === activeModule.path),
+  };
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
-
-  const isHome = location.pathname === "/";
-
-  const activeModule = findModuleByPath(location.pathname);
-
-  const hasModuleNavigation = Boolean(activeModule);
-  const isModuleOverview = activeModule
-    ? location.pathname === activeModule.path
-    : false;
+  const { activeModule, isOverview } = resolveActiveSidebarState(
+    location.pathname,
+  );
 
   return (
     <aside
+      data-testid="sidebar"
+      data-collapsed={String(collapsed)}
       className={cn(
         "border-border bg-background flex h-full flex-col border-r",
         collapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="flex h-14 items-center px-4">
-        <button
-          type="button"
-          onClick={onToggle}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-md"
-          aria-label={t("sidebar.toggle")}
-        >
-          <div className="flex size-5 items-center justify-center">
-            <Menu className="size-4" />
-          </div>
-        </button>
-      </div>
+      <SidebarToggleHeader onToggle={onToggle} />
 
-      {!collapsed && !isHome && hasModuleNavigation && activeModule && (
-        <div className="px-4 pb-3">
-          <NavLink
-            to={activeModule.path}
-            className={cn(
-              "text-sm font-semibold tracking-wider uppercase",
-              isModuleOverview ? "text-brand" : "text-foreground",
-            )}
-          >
-            {t(activeModule.titleKey)}
-          </NavLink>
-        </div>
-      )}
+      <SidebarModuleSection
+        module={activeModule}
+        isOverview={isOverview}
+        collapsed={collapsed}
+      />
 
-      {!isHome && hasModuleNavigation && activeModule ? (
-        <nav className="flex-1 space-y-1 px-2 py-2">
-          {activeModule.topics.map((topic) => {
-            const Icon = topic.icon;
+      <SidebarNavContent module={activeModule} collapsed={collapsed} />
 
-            return (
-              <NavLink key={topic.id} to={topic.path}>
-                {({ isActive }) => (
-                  <div
-                    className={cn(
-                      "flex h-11 items-center rounded-md px-3 text-sm font-semibold tracking-wide",
-                      isActive
-                        ? "bg-nav-active-bg text-nav-active-fg"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      collapsed ? "justify-center" : "gap-3",
-                    )}
-                  >
-                    <div className="flex size-5 shrink-0 items-center justify-center">
-                      <Icon
-                        className={cn("size-4", getAccentClasses(topic.accent))}
-                      />
-                    </div>
-
-                    {!collapsed && (
-                      <span className="leading-none">{t(topic.titleKey)}</span>
-                    )}
-                  </div>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
-      ) : (
-        <div className="flex-1" />
-      )}
-
-      <div className="border-border space-y-1 border-t px-2 py-3">
-        <Link
-          to="/documentation"
-          className={cn(
-            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
-            collapsed ? "justify-center" : "gap-3",
-          )}
-        >
-          <div className="flex size-5 shrink-0 items-center justify-center">
-            <FileText className="size-4" />
-          </div>
-          {!collapsed && (
-            <span className="leading-none">{t("sidebar.documentation")}</span>
-          )}
-        </Link>
-
-        <Link
-          to="/help"
-          className={cn(
-            "text-muted-foreground hover:bg-muted hover:text-foreground flex h-11 items-center rounded-md px-3 text-sm font-medium",
-            collapsed ? "justify-center" : "gap-3",
-          )}
-        >
-          <div className="flex size-5 shrink-0 items-center justify-center">
-            <HelpCircle className="size-4" />
-          </div>
-          {!collapsed && (
-            <span className="leading-none">{t("sidebar.support")}</span>
-          )}
-        </Link>
-      </div>
+      <SidebarInfoLink collapsed={collapsed} />
     </aside>
   );
 }

@@ -1,0 +1,39 @@
+\subNsection{1}{Zahlensysteme}{Enrico Ebert}
+
+Ziel des Moduls ist es, abstrakte Abläufe wie Bit-Transformationen, Komplementbildungen und Arithmetik interaktiv und schrittweise begreifbar zu machen. Im Folgenden werden die wichtigsten architektonischen, visuellen und organisatorischen Entscheidungen der Umsetzung dokumentiert.
+
+\subNsection{2}{Anforderungen und Herausforderungen}{Enrico Ebert}
+
+Die Umsetzung von Zahlensystemen stellte uns vor mehrere Herausforderungen. Zum einen mussten wir die mathematische Korrektheit bei großen Zahlen gewährleisten, zum anderen sollten die Zwischenschritte für Studierende nachvollziehbar sein. Die Umrechnung zwischen verschiedenen Basen, die Darstellung negativer Zahlen im Zweierkomplement und die Erklärung von \gls{ieee754}-Gleitkommazahlen erforderten jeweils unterschiedliche didaktische Ansätze.
+
+\subNsection{2}{Architektur}{Enrico Ebert}
+
+Die Architektur des Simulators unterteilt sich in fünf Modi: \textit{integers}, \textit{negative}, \textit{fractional}, \textit{ieee754} und \textit{arithmetic}. Diese Trennung ermöglichte es uns, jeden Modus unabhängig zu entwickeln und zu testen. Ein zentrales Zustandsobjekt dient dabei als \textit{Single Source of Truth}. Beim Start ordnet eine Hilfsfunktion die ausgewählte Übung oder das Beispiel automatisch dem passenden Modus zu.
+
+Für alle mathematischen Berechnungen verwenden wir JavaScripts \gls{bigint} statt \texttt{Number}. Die Entscheidung für BigInt ergab sich aus der Erfahrung, dass JavaScripts reguläre Number-Typ bei großen Ganzzahlen an Präzision verliert. So vermeiden wir zuverlässig Rundungsfehler und ungewollte Überläufe bei Zahlen jenseits des sicheren Integer-Bereichs.
+
+Eingaben werden je nach Basis mit strengen Regex-Filtern validiert. Wir begrenzen die Bitlänge explizit, um Speicherüberläufe zu verhindern. Bei negativen Zahlen arbeiten wir mit einer festen Breite von 8 Bit, was einen Wertebereich von -128 bis 127 abdeckt. Diese Einschränkung folgt dem Vorlesungsstoff und vereinfacht die didaktische Darstellung.
+
+Ein technischer Kniff kommt bei der \gls{ieee754}-Darstellung zum Einsatz: Um die exakte Bit-Repräsentation einer Gleitkommazahl zu erhalten, schreiben wir sie in ein \texttt{Float32Array} und lesen sie über ein \texttt{Uint32Array} wieder aus. Dieser Ansatz nutzt die nativen Float32-Operationen des Browsers und vermeidet manuelle Bit-Manipulationen. Spezielle Zustände wie \textit{NaN} oder $\pm\text{Infinity}$ fangen wir ab und erklären sie gesondert in Informationskarten.
+
+Die arithmetischen Basisoperationen sind modular in eigenen Pipelines gekapselt. Die Addition nutzt einen Volladdierer, die Multiplikation den Shift-and-Add-Algorithmus. Diese Aufteilung ermöglichte es uns, jeden Operator einzeln zu implementieren und zu testen, bevor sie in den Gesamtsimulator integriert wurden. Jeder Durchlauf generiert strukturierte Schritt-Objekte, die direkt mit den i18n-Schlüsseln für die Lokalisierung verknüpft sind.
+
+\subNsection{2}{UI-Entscheidungen}{Enrico Ebert}
+
+Das Interface ist stark auf die Didaktik ausgerichtet. Wir entschieden uns bewusst für einen Step-by-Step-Ansatz, bei dem die ersten Rechenschritte standardmäßig aufgeklappt sind. Dies erleichtert den Einstieg, da Studierende sofort sehen, wie ein Ergebnis zustande kommt.
+
+Die Darstellung passt sich dem jeweiligen Modus an:
+
+\begin{itemize}
+  \item \textbf{Wandler (Ganz-/Kommazahlen):} Wir nutzen klassische, statische Mathematik-Blöcke, die an Divisionstabellen und Summenformeln aus der Schule erinnern. Die vertraute Darstellung hilft beim Verständnis der Umrechnungslogik.
+  \item \textbf{Arithmetik:} Die Operationen werden als schriftliches Rechengitter nachgebildet. Die Bits für Operanden, Carry und Summe sind farbcodiert, sodass der Informationsfluss visuell erkennbar wird. Bei einem Overflow warnt ein dediziertes Banner, das auf den Überlauf aufmerksam macht.
+  \item \textbf{Negative Zahlen:} Um den Vorlesungsstoff abzubilden, werden Vorzeichen-Betrag, Einer- und Zweierkomplement direkt nebeneinander visualisiert. Interaktive Zeilen steuern die jeweilige Erklärung, sodass Studierende selbst wählen können, welcher Schritt vertieft werden soll.
+  \item \textbf{\gls{ieee754}:} Die 32 Bits sind visuell in Sign, Exponent und Mantisse unterteilt. Informationskarten erklären die Normalisierung und den Bias, was das Verständnis der \gls{ieee754}-Darstellung erleichtert.
+\end{itemize}
+
+\subNsection{2}{Organisation und State Management}{Enrico Ebert}
+
+Die Lerninhalte bestehen aus 10 nach Schwierigkeit sortierten Übungen und 36 vorlesungsbegleitenden Beispielen. Wir haben uns für diese Struktur entschieden, um Studierenden einen klaren Progressionspfad zu bieten. Als ID fungiert der \texttt{titleKey}, wodurch der Lernfortschritt auch bei einem Sprachwechsel im i18n-System erhalten bleibt. Beispiele zeigen sofort die Lösung und fließen nicht in den Fortschritt ein, da sie primär der Erklärung dienen.
+
+Der Anwendungszustand wird alle 10 Sekunden sowie beim Verlassen der Komponente automatisch lokal gesichert. Diese Entscheidung minimiert Datenverluste bei versehentlichen Tab-Schließungen. Übungen und der freie Simulator nutzen dabei getrennte Speicherslots, um Konflikte zu vermeiden.
+

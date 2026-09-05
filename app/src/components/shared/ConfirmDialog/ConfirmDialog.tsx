@@ -1,0 +1,104 @@
+import { useTranslation } from "react-i18next";
+import { AlertTriangle, X } from "lucide-react";
+
+export interface ConfirmDialogProps {
+  /** Whether the dialog is visible */
+  isOpen: boolean;
+  /** Dialog title */
+  title: string;
+  /** Description text */
+  description: string;
+  /** Label of the confirmation button (destructive) */
+  confirmLabel?: string;
+  /** Label of the cancel button */
+  cancelLabel?: string;
+  /** Callback when confirmed */
+  onConfirm: () => void;
+  /** Callback when cancelled */
+  onCancel: () => void;
+  /** Dialog variant, default "warning" */
+  variant?: "warning" | "destructive";
+  testId?: string;
+}
+
+/**
+ * Modal confirmation dialog for destructive actions.
+ * Shows a warning with confirm and cancel buttons.
+ */
+export function ConfirmDialog({
+  isOpen,
+  title,
+  description,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  onCancel,
+  variant = "warning",
+  testId,
+}: ConfirmDialogProps) {
+  const { t } = useTranslation("translation");
+
+  if (!isOpen) return null;
+
+  const isDestructive = variant === "destructive";
+
+  return (
+    <div
+      data-testid={testId}
+      className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 duration-150"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-card border-border/50 animate-in zoom-in-95 relative w-full max-w-sm rounded-xl border p-6 shadow-xl duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onCancel}
+          data-testid={testId ? `${testId}-close` : undefined}
+          className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-md p-1"
+          aria-label={t("common.close")}
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Icon + Heading */}
+        <div className="mb-4 flex items-start gap-3">
+          <div
+            className={`rounded-full p-2 ${isDestructive ? "bg-destructive/10" : "bg-orange-500/10"}`}
+          >
+            <AlertTriangle
+              className={`h-5 w-5 ${isDestructive ? "text-destructive" : "text-orange-500"}`}
+            />
+          </div>
+          <div>
+            <h3 className="text-foreground font-semibold">{title}</h3>
+            <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            data-testid={testId ? `${testId}-cancel` : undefined}
+            className="bg-muted hover:bg-muted/80 text-foreground flex-1 rounded-md px-4 py-2 text-sm font-medium"
+          >
+            {cancelLabel ?? t("common.cancel")}
+          </button>
+          <button
+            onClick={onConfirm}
+            data-testid={testId ? `${testId}-confirm` : undefined}
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium text-white ${
+              isDestructive
+                ? "bg-destructive hover:bg-destructive/90"
+                : "bg-orange-500 hover:bg-orange-600"
+            }`}
+          >
+            {confirmLabel ?? t("common.confirm")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

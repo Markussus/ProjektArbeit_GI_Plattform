@@ -5,13 +5,19 @@ export function HeroSection() {
 
   return (
     <div className="mb-12 text-center">
-      <h1 className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-6xl">
-        {t("home.heroTitle1")}
+      <h1
+        data-testid="home-hero-title"
+        className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-6xl"
+      >
+        {t("common.home.heroTitle1")}
         <br />
-        <span className="text-brand">{t("home.heroTitle2")}</span>
+        <span className="text-brand">{t("common.home.heroTitle2")}</span>
       </h1>
-      <p className="text-muted-foreground mx-auto mt-6 max-w-xl text-base leading-relaxed">
-        {t("home.heroDescription")}
+      <p
+        data-testid="home-hero-description"
+        className="text-muted-foreground mx-auto mt-6 max-w-xl text-base leading-relaxed"
+      >
+        {t("common.home.heroDescription")}
       </p>
     </div>
   );

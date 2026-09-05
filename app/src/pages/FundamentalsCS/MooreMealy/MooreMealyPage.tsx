@@ -7,12 +7,13 @@ import { SimulationTab } from "./components/SimulationTab";
 export function MooreMealyPage() {
   return (
     <ModuleTopicPage
-      titleKey="moore.title"
-      descriptionKey="moore.description"
+      titleKey="moore-mealy.title"
+      descriptionKey="moore-mealy.description"
       overviewTab={OverviewTab}
       exercisesTab={ExercisesTab}
       examplesTab={ExamplesTab}
       simulationTab={SimulationTab}
+      clearSimulationSelectionOnTabExit
     />
   );
 }

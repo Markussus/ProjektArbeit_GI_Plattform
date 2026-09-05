@@ -1,0 +1,60 @@
+\subNsection{1}{Zusammenfassung der Projektergebnisse}{Alle}
+
+\textbf{Kristian Popov}: Mein Schwerpunkt im Projekt lag auf den Themen
+\emph{Endliche Automaten} und \emph{Reguläre Sprachen}. Für die Endlichen
+Automaten habe ich eine Umgebung umgesetzt, in der Studierende deterministische
+und nichtdeterministische Automaten definieren und Wörter Schritt für Schritt
+simulieren können. Beide Automatentypen verwenden dabei eine gemeinsame
+Ausführungslogik. Ergänzt wird das Thema durch einen Schrittverlauf, einen
+Stapeltest, Beispiele, Übungen mit automatischer Rückmeldung und die Umwandlung
+rechtslinearer Grammatiken in Automaten.
+
+Das Thema \emph{Reguläre Sprachen} ermöglicht die Aufzählung von Wörtern, die
+Erzeugung einer Grammatik aus einer Sprachbeschreibung und die Prüfung einzelner
+Wörter, bei der neben dem Ergebnis auch dessen Grund angezeigt wird.
+Sprachbeschreibungen können als Aufzählung oder in Mengenschreibweise angegeben
+werden. Beschreibungen, die keine reguläre Sprache ergeben, etwa gekoppelte Längen
+wie \verb|a^n b^n|, werden mit einer eigenen Meldung abgelehnt; obere Schranken
+sind zwar regulär, lassen sich aber klarer als Aufzählung angeben und bleiben
+deshalb ebenfalls ausgeschlossen. Die erzeugten Grammatiken bleiben strikt
+rechtslinear und beide Umwandlungsrichtungen sind als Übungen verfügbar.
+
+Bei beiden Themen war mir wichtig, nicht nur Ergebnisse zu zeigen, sondern auch
+den Weg dorthin. Übergangstabelle und Zustandsdiagramm sind an denselben
+Simulationsschritt gebunden, und der Stapeltest macht sichtbar, ob ein Automat die
+beabsichtigte Sprache erkennt und nicht nur das gerade ausprobierte Wort. Die
+Übungskontrolle vergleicht das Verhalten statt der Struktur einer Lösung und gibt
+bei Fehlern konkrete Gegenbeispiele aus.
+
+Zusätzlich habe ich das Zustandsdiagramm der Endlichen Automaten auf die
+gemeinsame Graphkomponente umgestellt, die auch die Moore- und Mealy-Automaten
+verwenden, und die Automaten- und Grammatikfunktionen von der Oberfläche getrennt
+gehalten. Dadurch konnten die \emph{Regulären Sprachen} sie unverändert
+weiterverwenden. Automaten, Grammatiken und Sprachbeschreibungen lassen sich über
+die gemeinsame Import- und Exportfunktion weitergeben, und der Bearbeitungsstand
+einer Übung bleibt beim Wechsel erhalten.
+
+\textbf{Duy Tan Pham}: Mein fachlicher Schwerpunkt lag auf dem Themenbereich
+\emph{Disjunktive Normalform}. Dort können Studierende boolesche Ausdrücke und
+Wahrheitstabellen untersuchen, die kanonische DNF schrittweise herleiten und Ausdrücke
+vereinfachen. Beispiele zeigen einen vollständigen Lösungsweg. In den Übungen bearbeiten
+die Lernenden dagegen Wahrheitstabellen oder DNF-Ausdrücke selbst und erhalten eine
+fachlich berechnete Rückmeldung. Dabei werden auch logisch gleichwertige Schreibweisen
+erkannt.
+
+Die Minimierung liefert eine DNF mit minimaler Literalzahl. Zusätzlich kann für bis zu
+vier Variablen eine global kleinste Formel aus UND- und ODER-Verknüpfungen bestimmt
+werden. Die Fachlogik ist von der Benutzeroberfläche getrennt und durch automatisierte
+Tests abgesichert. Der DNF-Bereich nutzt außerdem den gemeinsamen Themenaufbau sowie die
+vorhandenen Funktionen für Import und Export. Dadurch fügt er sich in Bedienung und
+Darstellung in die gesamte Lernplattform ein.
+
+\textbf{Richard Schröder}: Mein fachlicher Schwerpunkt lag auf dem Themenbereich \emph{Turingmaschine}. Dafür habe ich eine interaktive Simulationsumgebung entwickelt, in der Maschinen über eine tabellenbasierte Oberfläche konfiguriert, Eingabebänder definiert und die Einzelschritte vorwärts sowie rückwärts ausgeführt werden können. Die Banddarstellung passt sich an die Bildschirmbreite an und visualisiert die Kopfposition samt Übergangsstatus. Neben einer freien Simulation umfasst das Modul vorgefertigte Beispiele sowie Übungsaufgaben, bei denen erstellte Maschinen gegen mehrere automatisierte Testfälle auf korrekte Bandinhalte und gültige Haltezustände geprüft werden.
+
+Auf Architekturebene habe ich das generische Interface \verb|ISimulator<TConfig, TState>| sowie den zugehörigen Steuerungs-Hook entwickelt, um die mathematische Logik von der \gls{ui} zu trennen und eine einheitliche Basis für alle Simulatoren der Plattform bereitzustellen. Ein weiterer technischer Schwerpunkt war der Transfer-Codec für den Import, Export und die persistente Speicherung: Dafür habe ich ein eigenes, speziell auf Turingmaschinen optimiertes Kompressionsverfahren auf Bitstream-Basis entworfen, das Zustände, Alphabete und Übergangstabellen kompakt als Base64URL-Zeichenkette kodiert.
+
+\textbf{Enrico Ebert}: Mein fachlicher Schwerpunkt lag auf den Themenbereichen \emph{Zahlensysteme} und \emph{Encoding}. Im Bereich Zahlensysteme habe ich Simulatoren für die Umrechnung zwischen verschiedenen Basen, Rechenoperationen mit negativen Zahlen im Zweierkomplement sowie eine detaillierte Visualisierung von \gls{ieee754}-Gleitkommazahlen entwickelt. Die Verwendung von \gls{bigint} stellte die korrekte Verarbeitung großer Zahlen sicher. Die schrittweise Darstellung der Bitrepräsentation ermöglichte es Studierenden, den Normalisierungsprozess und die Gleitkommadarstellung nachzuvollziehen.
+
+Im Encoding-Modul wurden die Transformationen zwischen Text, Codepoints und Byte-Sequenzen für \gls{utf8} und \gls{base64} implementiert. Die visuelle Aufschlüsselung der Bitoperationen, einschließlich der Unterscheidung von Steuerbits und Nutzbits, hilft Studierenden die Funktionsweise dieser allgegenwärtigen Standards zu verstehen. Die programmatische Generierung von Übungsaufgaben bot unbegrenzte Variationsmöglichkeiten ohne statische Aufgabenlisten pflegen zu müssen.
+
+Die Tests für die mathematischen Module wurden auf die Kernfunktionen konzentriert. \gls{bigint}-Operationen und \gls{ieee754}-Bitmanipulationen wurden systematisch mit bekannten Eingabe-Ausgabe-Paaren validiert. Die \gls{utf8}-Dekodierung und \gls{base64}-Transformation wurden durch gezielte Unit-Tests abgesichert. Dies hilft Studierenden, mit verlässlichen Simulationen zu arbeiten, die korrekte Ergebnisse liefern.

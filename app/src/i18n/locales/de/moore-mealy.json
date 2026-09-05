@@ -1,0 +1,196 @@
+{
+  "exercises": {
+    "loadSolution": "Lösung laden",
+    "checkSolution": "Lösung prüfen",
+    "checkingSolution": "Prüfung läuft...",
+    "checkResultTitle": "Prüfergebnis",
+    "checkCorrect": "Alle Testläufe liefern die erwarteten Ausgabefolgen.",
+    "checkIncorrect": "{{passed}} von {{total}} Testläufen liefern die erwartete Ausgabefolge.",
+    "validation": {
+      "exampleCheckUnavailable": "Für dieses Szenario ist keine Lösungsprüfung verfügbar.",
+      "passed": "Bestanden",
+      "input": "Eingabe",
+      "output": "Ausgabe",
+      "expectedOutput": "Erwartete Ausgabe",
+      "pass": "Bestanden",
+      "fail": "Fehlgeschlagen",
+      "emptyInput": "Leere Eingabe (ε)"
+    },
+    "turnstile": {
+      "title": "Drehkreuzsteuerung",
+      "description": "Vervollständige den Moore-Automaten für ein Drehkreuz. COIN gibt das gesperrte Drehkreuz frei, PASS sperrt es nach dem Durchgang wieder. Bestimme die vollständige Übergangstabelle; Zustände, Ereignisse und Ausgaben sind vorgegeben."
+    },
+    "elevator": {
+      "title": "Fahrstuhlsteuerung",
+      "description": "Vervollständige den Moore-Automaten für einen Fahrstuhl mit Erdgeschoss, Obergeschoss und offener oder geschlossener Tür. Fahrbefehle dürfen bei offener Tür den Zustand nicht ändern."
+    },
+    "barrier": {
+      "title": "Schranke zur Tiefgarage",
+      "description": "Modelliere die Schranke mit dauerhaft geöffnetem Gästemodus und Kartenmodus. Eine gültige Karte öffnet die Schranke; nach der Durchfahrt schließt sie wieder."
+    },
+    "vending": {
+      "title": "Getränkeautomat",
+      "description": "Vervollständige den Automaten für 50-Cent- und 1-Euro-Münzen, Guthaben bis 1,50 Euro, Start und Abbrechen. Berücksichtige alle Ereignisse in jedem Zustand."
+    },
+    "wiper": {
+      "title": "Scheibenwischersteuerung",
+      "description": "Modelliere Aus, einmaliges Wischen, Dauerbetrieb und Regensensorbetrieb. Die Ausgabe beschreibt die jeweilige Motoraktion."
+    },
+    "alarm": {
+      "title": "Alarmanlage",
+      "description": "Vervollständige die Zustände Aus, Scharf und Alarm. Der Sensor löst nur im scharfen Zustand Alarm aus; Off beendet auch einen laufenden Alarm."
+    },
+    "cruise": {
+      "title": "Tempomat",
+      "description": "Modelliere einen ausgeschalteten, bereiten und aktiven Tempomat mit On/Off, Set, Bremse, Beschleunigen, Reset, Cancel, Plus und Minus."
+    },
+    "edgeDetector": {
+      "title": "Flankendetektor",
+      "description": "Entwirf einen Mealy-Automaten, der nur beim Wechsel des Eingangssignals von 0 auf 1 einen Impuls RISING_EDGE ausgibt. Bleibt das Signal unverändert oder fällt es auf 0, wird NO_PULSE ausgegeben."
+    },
+    "doorController": {
+      "title": "Türsteuerung mit Aktionsimpulsen",
+      "description": "Modelliere eine verriegelte und eine entriegelte Tür als Mealy-Automaten. CARD erzeugt nur beim Entriegeln einen UNLOCK_PULSE; PASS erzeugt nur beim erneuten Verriegeln einen LOCK_PULSE. Wirkunglose Ereignisse liefern NO_ACTION."
+    },
+    "sequenceDetector": {
+      "title": "Folgendetektor für 01",
+      "description": "Entwirf einen überlappungsfähigen Mealy-Automaten, der für jedes gelesene Bit sofort ausgibt, ob mit diesem Bit die Folge 01 abgeschlossen wurde. Aufeinanderfolgende Nullen müssen als möglicher neuer Folgenanfang erhalten bleiben."
+    },
+    "parityTracker": {
+      "title": "Serielle Paritätsausgabe",
+      "description": "Entwirf einen Mealy-Automaten, der nach jedem eingelesenen Bit die Parität aller bisher gelesenen Einsen ausgibt. Eine 0 erhält die Parität, eine 1 wechselt zwischen EVEN_PARITY und ODD_PARITY."
+    }
+  },
+  "groups": {
+    "moore": {
+      "title": "Moore-Automaten",
+      "examplesDescription": "Zustandsabhängige Ausgaben: Der aktuelle Zustand bestimmt die Ausgabe unabhängig vom gerade gelesenen Eingabesymbol.",
+      "exercisesDescription": "Konstruiere Automaten, deren Ausgaben ausschließlich an Zustände gebunden sind."
+    },
+    "mealy": {
+      "title": "Mealy-Automaten",
+      "examplesDescription": "Übergangsabhängige Ausgaben: Das Beispiel erkennt die Bitfolge 101 einschließlich überlappender Treffer und gibt MATCH_101 genau auf dem abschließenden Übergang aus.",
+      "exercisesDescription": "Konstruiere Automaten mit unmittelbaren, von Zustand und Eingabe abhängigen Ausgaben."
+    }
+  },
+  "examples": {
+    "mooreDefault": "moore.examples.mooreDefault",
+    "mealyDefault": "moore.examples.mealyDefault",
+    "mooreTitle": "Moore-Beispielautomat",
+    "mooreDescription": "Ein Moore-Automat mit vier Zuständen und zwei Eingabesymbolen.",
+    "mealyTitle": "Mealy-Beispielautomat",
+    "mealyDescription": "Ein Mealy-Folgendetektor mit drei Zuständen erkennt die Bitfolge 101 einschließlich Überlappungen. NO_MATCH oder MATCH_101 wird direkt auf jedem Übergang ausgegeben; das Eingabewort enthält zwei Treffer."
+  },
+  "title": "Moore & Mealy Automaten",
+  "description": "Erkunden Sie sequentiellen Schaltungsentwurf mit Moore- und Mealy-Zustandsautomaten. Lernen Sie die Unterschiede und wann welches Modell anzuwenden ist.",
+  "tutorialVideo": "Tutorial-Video",
+  "sim": {
+    "machineType": "Automatentyp",
+    "mooreTab": "Moore-Automat",
+    "mealyTab": "Mealy-Automat",
+    "configureTitle": "Moore-Automat definieren",
+    "configureHelp": "Zustände und Eingabesymbole werden intern entsprechend ihrer Reihenfolge von links nach rechts beziehungsweise von oben nach unten nummeriert.",
+    "transitionTable": "Übergangsfunktion δ",
+    "transitionTableHelp": "Wählen Sie für jede Kombination aus Ereignis und Zustand genau einen Folgezustand.",
+    "event": "Ereignis",
+    "state": "Zustand",
+    "output": "Ausgabe",
+    "internalValue": "Interne Repräsentation",
+    "representation": "Interne Repräsentation",
+    "decimal": "Dezimal",
+    "binary": "Binär",
+    "startState": "Startzustand S₀",
+    "states": "Menge von Zuständen S",
+    "outputAlphabet": "Ausgabealphabet Ω",
+    "inputWord": "Eingabe",
+    "outputWord": "Ausgabe",
+    "inputDropPlaceholder": "Symbole aus dem Eingabealphabet hier ablegen",
+    "inputAlphabetHelp": "Eingabealphabet Σ: Symbole anklicken oder per Drag-and-drop in die Eingabe ziehen.",
+    "noSymbols": "Keine Symbole",
+    "emptyWord": "Leeres Wort (ε)",
+    "addState": "Zustand hinzufügen",
+    "removeState": "Zustand {{state}} entfernen",
+    "renameState": "Zustand {{state}} umbenennen",
+    "addInput": "Neues Eingabesymbol hinzufügen",
+    "removeInput": "Eingabesymbol {{symbol}} entfernen",
+    "renameInput": "Eingabesymbol {{symbol}} umbenennen",
+    "transitionForStateInput": "Übergang für Zustand {{state}} und Eingabe {{input}}",
+    "search": "Suche...",
+    "createState": "Neuen Zustand erstellen",
+    "createNamedState": "+ \"{{value}}\" erstellen",
+    "stateNotFound": "Kein Zustand gefunden",
+    "outputLambda": "Ausgabe λ",
+    "createOutput": "Neues Ausgabesymbol erstellen",
+    "createNamedOutput": "+ \"{{symbol}}\" erstellen",
+    "renameNamedOutput": "\"{{previous}}\" in \"{{next}}\" umbenennen",
+    "outputNotFound": "Kein Ausgabesymbol gefunden",
+    "outputForState": "Ausgabe für Zustand {{state}}",
+    "outputCodeForState": "Interner Ausgabecode für Zustand {{state}}",
+    "symbolOutput": "Ausgabe (Symbol)",
+    "internalOutputCode": "Interne Zahlendarstellung",
+    "removeWordSymbol": "Symbol {{symbol}} an Position {{index}} entfernen",
+    "startSimulation": "Simulation starten",
+    "simulationTitle": "Moore-Simulation",
+    "currentState": "Aktueller Zustand",
+    "progress": "Verarbeitete Symbole",
+    "status": "Status",
+    "ready": "Bereit",
+    "finished": "Beendet",
+    "error": "Fehler",
+    "diagram": "Zustandsübergangsgraph des Moore-Automaten",
+    "validation": {
+      "states_invalid": "Es muss mindestens einen Zustand geben.",
+      "input_symbols_invalid": "Es gibt zu viele Eingabesymbole.",
+      "state_names_invalid": "Zustandsnamen müssen eindeutig und nicht leer sein.",
+      "input_symbol_names_invalid": "Eingabesymbole müssen eindeutig und nicht leer sein.",
+      "initial_state_invalid": "Der Startzustand ist ungültig.",
+      "outputs_invalid": "Jeder Zustand benötigt ein Ausgabezeichen und einen eindeutigen, nichtnegativen Code je Ausgabezeichen.",
+      "transitions_invalid": "Jede Tabellenzelle benötigt einen gültigen Folgezustand.",
+      "input_word_invalid": "Die Eingabe enthält ein Symbol außerhalb des Eingabealphabets."
+    }
+  },
+  "mealy": {
+    "configureTitle": "Mealy-Automat definieren",
+    "simulationTitle": "Mealy-Simulation",
+    "diagram": "Zustandsübergangsgraph des Mealy-Automaten"
+  },
+  "graph": {
+    "start": "Start",
+    "showAsList": "Übergangssymbole untereinander anzeigen",
+    "showWrapped": "Übergangssymbole kommasepariert anzeigen",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "resetView": "Ansicht zurücksetzen",
+    "resetZoom": "Zoom auf 100 % zurücksetzen"
+  },
+  "navigation": {
+    "editDefinition": "Definition bearbeiten",
+    "showSimulator": "Simulator anzeigen",
+    "showConversion": "Überführungsfunktionen anzeigen",
+    "showLogic": "Logikgatter anzeigen"
+  },
+  "conversion": {
+    "open": "In Überführungsfunktionen konvertieren",
+    "title": "Überführungsfunktionen",
+    "transitionTab": "Übergangstabelle",
+    "outputTab": "Ausgabetabelle",
+    "currentState": "Aktueller Zustand",
+    "event": "Ereignis",
+    "nextState": "Folgezustand",
+    "state": "Zustand",
+    "output": "Ausgabe",
+    "canonicalDnf": "Kanonische DNF",
+    "minimalDnf": "Minimierte boolesche Funktion",
+    "minimizationLimit": "Die kanonische DNF wird angezeigt. Die automatische Minimierung ist auf insgesamt 8 Zustands- und Eingabebits begrenzt."
+  },
+  "logic": {
+    "open": "In Logikgatter konvertieren",
+    "title": "Logikgatter",
+    "minimalFunctions": "Minimierte Funktionen",
+    "formulaMode": "Formeldarstellung",
+    "diagram": "Logikgatterdiagramm für {{output}}",
+    "binaryGates": "Nur Gatter mit zwei Eingängen",
+    "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",
+    "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT. Falstad-Export: TODO."
+  }
+}

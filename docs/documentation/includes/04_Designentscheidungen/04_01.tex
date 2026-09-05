@@ -1,0 +1,35 @@
+\subNsection{1}{Turingmaschine}{Richard Schröder}
+
+Der Themenbereich Turingmaschine umfasst eine Übersicht, sieben Beispiele, dreizehn Übungen und eine freie Simulation. Die folgenden Abschnitte begründen die Entscheidungen für Fachmodell, Editor, Laufzeitdarstellung und Überprüfung.
+
+\subNsection{2}{Entscheidungen in der Architektur}{Richard Schröder}
+
+Die Implementierung ist in \verb|domain|, \verb|application|, \verb|presentation| und \verb|adapters| gegliedert. \verb|TMProgram| enthält die editierbare Maschinenkonfiguration mit Zuständen, Alphabeten, Blank-Symbol, Start- und Haltezuständen, Übergängen und Anfangsband. \verb|TMRuntime| hält den aktuellen Zustand, die Kopfposition, den Bandinhalt, den Schrittzähler und die Halteinformation. Gegenüber einem gemeinsamen veränderlichen Modell bleibt die Konfiguration beim Vorwärts- und Rückwärtsschritt unverändert, beim Start muss sie dafür in einen Laufzeitzustand überführt werden.
+
+\verb|TuringMachineSimulator| stellt die Operationen zum Erzeugen des Anfangszustands, Lesen des aktuellen Symbols und Ausführen eines Schritts wie im Interface \verb|ISimulator| gefordert bereit. Die Anwendungsschicht führt eine Historie der Laufzeitzustände für den Rückschritt. Dadurch lassen sich die Zustandsübergänge ohne UI ausführen und prüfen, während die Historie jedoch zusätzlichen Speicher pro Schritt benötigt.
+
+Fehlende Übergänge werden als reguläres Halten und nicht als technischer Fehler behandelt. Ein nicht definierter Übergang erzeugt den Haltegrund \verb|missing_transition|, ein vorgesehener Haltezustand \verb|halt_state|. Dadurch können Lernende unvollständige Übergangstabellen schrittweise bearbeiten und testen. Die Alternative, jeden fehlenden Übergang als Validierungsfehler zu behandeln, würde den Start solcher Zwischenstände verhindern.
+
+Die Lösungskontrolle startet für jeden der Validierungsfälle eine eigene Simulation und verlangt zusätzlich das Ende in einem vorgesehenen Haltezustand. Der Haltezustand ist nötig, weil ein fehlender Übergang in der freien Simulation regulär hält, aber keine gelöste Aufgabe belegt. Neben dem Ergebnis prüft die Ausführung nur bis zu einer Schrittgrenze, damit eine nicht haltende Maschine die Kontrolle nicht unbegrenzt blockiert.
+
+Der Editor verwaltet Zustände, Bandsymbole, Übergänge und Haltezustände in einem Reducer und einem zugehörigen Hook. Beim Umbenennen eines Zustands werden Startzustand, Haltezustände und Zielzustände der Übergänge mitgeführt. Das fachliche Modell speichert die Übergänge als verschachtelte Struktur aus Lesesymbol und Zustand. \verb|tmTableAdapter| überträgt sie erst für die Darstellung in Spalten, Zeilen und die aktive Tabellenzelle. Eine direkte Speicherung im Tabellenformat würde die Domain-Schicht an Zeilen- und Spaltenindizes der UI binden.
+
+Das Eingabealphabet wird aus dem Anfangsband abgeleitet. Das Bandalphabet berücksichtigt das vorhandene Alphabet, das Anfangsband, das Blank-Symbol sowie die Lese- und Schreibsymbole der Übergänge. Gegenüber zwei vollständig manuell gepflegten Alphabeten entfallen doppelte Eingaben.
+
+Für den Transfer wurde eine binäre Kodierung statt einer lesbaren JSON-Darstellung gewählt. Der Turingmaschinen-Codec vergleicht mehrere Darstellungen der Übergangstabelle und übernimmt die kürzeste erzeugte Variante. Die Base64URL-Zeichenkette lässt sich kopieren und im gemeinsamen Training Center speichern, kann aber ohne den passenden Decoder weder gelesen noch bearbeitet werden.
+
+\subNsection{2}{Entscheidungen im UI}{Richard Schröder}
+
+Die Simulation beginnt im Konfigurationsmodus. Dort werden Anfangsband, Startzustand, Übergangstabelle, Haltezustände, Alphabete sowie Import und Export bearbeitet. Erst nach dem Anwenden einer gültigen Konfiguration wechselt die Ansicht in den Laufzeitmodus. Bei einem ungültigen Übergangsformat bleibt die betroffene Tabellenzelle editierbar, weitere Änderungen und der Start der Simulation werden bis zur Korrektur gesperrt.
+
+Die Zeilen der Übergangstabelle stehen für Bandsymbole, die Spalten für Nicht-Haltezustände. Haltezustände erhalten keine editierbaren Übergangsspalten, weil das gewählte Maschinenmodell die Ausführung beim Erreichen eines solchen Zustands beendet. Leere Zellen bilden die erlaubte partielle Übergangsfunktion ab. Das Blank-Symbol erscheint als \(\diamond\), die Tastaturform \verb|<>| wird beim Eingeben in dieses Symbol umgewandelt.
+
+Die Laufzeitansicht zeigt Band, Simulator-Controls, Statuskarte und Übergangstabelle. Die Zahl sichtbarer Bandzellen wird aus der verfügbaren Breite berechnet. Eine Verschiebung wird nur animiert, wenn sich das Fenster um höchstens eine Zelle bewegt und die Schrittdauer über 140 Millisekunden liegt. Die daraus berechnete Animationsdauer ist auf 120 bis 600 Millisekunden begrenzt. Bei schnelleren Schritten oder größeren Sprüngen wird die neue Position ohne Verschiebeanimation dargestellt.
+
+Die gemeinsamen Simulator-Controls bieten Play, Pause, Schritt, Rückschritt, Reset und Geschwindigkeitsregelung. Die Statuskarte nennt Zustand, gelesenes Symbol, Schrittzahl und Haltegrund. Der Tabellenadapter markiert zugleich den Übergang für den aktuellen Zustand und das gelesene Symbol. Übungen ergänzen die Aktionen zum Laden und Prüfen einer Lösung. Der Ergebnisdialog zeigt Eingabe, Ausgabe, erwartete Ausgabe und das Erreichen eines gültigen Haltezustands.
+
+\subNsection{2}{Andere Entscheidungen}{Richard Schröder}
+
+Ein Beispiel enthält ein fertiges Programm. Eine Übung ergänzt Starter- und Lösungsprogramm, Speicher-\gls{id}, Schwierigkeitsgrad und Validierungsfälle. Die dreizehn Übungen verteilen sich auf fünf einfache, vier mittlere und vier schwere Aufgaben. Sieben Beispiele stellen fertige Maschinen bereit. Derselbe Simulator verarbeitet damit freie Konfigurationen, Beispiele und Übungen.
+
+Die Unit-Tests behandeln unter anderem Domain-Logik, Validierung, Transfer, Editor, Tabellenadapter, Banddarstellung und Lösungskontrolle. Die \gls{e2e}-Tests prüfen sichtbare Bedienabläufe, Navigation, Local Storage, Import und Export sowie Fehlervalidierung. \verb|data-testid|-Attribute kennzeichnen die dafür verwendeten UI-Elemente.
