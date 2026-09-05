@@ -15,7 +15,7 @@
           \note{
             \textbf{Person: }
 
-            \textbf{Zeit:  min}
+            \textbf{Zeit: 1 min}
 
             \begin{itemize}
               \item Einstiegsfolie des zweiten Themas, parallel zum Überblick bei den Automaten.
@@ -29,9 +29,6 @@
             \end{itemize}
           }
 \end{itemframe}
-\note{%
-
-}
 
 % ---------------------------------------------------------------------------
 \begin{fullframe}{Reguläre Sprachen -- drei Arbeitsweisen}
@@ -66,7 +63,7 @@
             \note{
               \textbf{Person: }
 
-              \textbf{Zeit:  min}
+              \textbf{Zeit: 1 min}
 
               \begin{itemize}
                 \item Kurz durch die drei Modi gehen, nicht vertiefen.
@@ -74,44 +71,5 @@
                 \item Überleitung zur nächsten Folie: "Nicht jede Eingabe wird akzeptiert -- und das mit Absicht."
               \end{itemize}
             }
-\end{fullframe}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Bewusst abgelehnte Sprachbeschreibungen}
-  \begin{center}
-    \begin{tikzpicture}[
-        bad/.style={draw=red!65!black, very thick, rounded corners=3pt, fill=red!5,
-                    minimum width=52mm, minimum height=13mm, font=\small\ttfamily},
-        why/.style={font=\footnotesize, align=left, text width=58mm}
-      ]
-      \node[bad]                     (a) {L = \{a\^{}n b\^{}n | n > 0\}};
-      \node[why, right=6mm of a]     (aw) {\textbf{nicht regulär} -- dieselbe Variable in zwei
-                                            Faktoren koppelt die Wortlängen aneinander};
-
-      \node[bad, below=9mm of a]     (b) {L = \{a\^{}n | n < 5\}};
-      \node[why, right=6mm of b]     (bw) {\textbf{obere Schranke} -- beschreibt zwar eine endliche
-                                            Sprache, ist als Aufzählung aber klarer};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{1mm}
-  \footnotesize
-  Beide Eingaben ließen sich formal verarbeiten. Sie werden trotzdem mit einer
-  \textbf{eigenen Meldung} zurückgewiesen: Diese Fälle ausdrücklich zu erklären ist lehrreicher,
-  als sie stillschweigend zu verwerfen.
-
-              \note{
-                \textbf{Person: }
-
-                \textbf{Zeit:  min}
-
-                \begin{itemize}
-                  \item Hier ist die didaktische Begründung der Punkt, nicht die Technik.
-                  \item a\^{}n b\^{}n ist das Standardbeispiel für eine nicht-reguläre Sprache -- gut geeignet, um zu zeigen,
-                  \item dass das Werkzeug die Theorie ernst nimmt.
-                  \item Mögliche Rückfrage: "Warum keine oberen Schranken?" -- Antwort: endlich, also regulär, aber die
-                  \item Aufzählung ist die klarere Schreibweise; die Eingabesprache bleibt kleiner.
-                \end{itemize}
-              }
 \end{fullframe}
 
