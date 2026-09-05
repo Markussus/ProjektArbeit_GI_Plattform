@@ -20,14 +20,21 @@
   \item Strenge Decodierung: \textit{Overlong Encodings} werden als Sicherheitsrisiko abgelehnt, nicht druckbare Zeichen erscheinen als Escape-Sequenzen
   \item Übungen dynamisch generiert (easy = ASCII, medium = 2-Byte, hard = 3-Byte-Unicode) -- Fortschritt dabei bewusst nicht persistent
   \item Zustand nur im freien Simulator automatisch gespeichert
+                  \note{
+                    \textbf{Person: }
+
+                    \textbf{Zeit:  min}
+
+                    \begin{itemize}
+                      \item Einstieg: Kodierung kam später dazu, auf Wunsch des Auftraggebers --
+                      \item im Lastenheft war sie nicht vorgesehen.
+                      \item Besonderheit gegenüber anderen Modulen: Übungen sind ephemer und werden
+                      \item nicht dauerhaft gespeichert, der freie Simulator dagegen schon.
+                      \item Überleitung: "Wie sieht die Transformation im Detail aus?"
+                    \end{itemize}
+                  }
 \end{itemframe}
-\note{%
-  Einstieg: Kodierung kam später dazu, auf Wunsch des Auftraggebers --
-  im Lastenheft war sie nicht vorgesehen.
-  Besonderheit gegenüber anderen Modulen: Übungen sind ephemer und werden
-  nicht dauerhaft gespeichert, der freie Simulator dagegen schon.
-  Überleitung: "Wie sieht die Transformation im Detail aus?"
-}
+
 
 % ---------------------------------------------------------------------------
 \begin{contentsframe}{Transformationsschritte}
@@ -61,12 +68,19 @@
 {\footnotesize Jeder Pfeil steht für eine eigene aufklappbare Ansicht --
 Studierende entscheiden selbst, wie tief sie einsteigen.
 Bewusst keine Animationen: die Schritte bleiben statisch und im eigenen Tempo nachvollziehbar.}
-\end{contentsframe}
-\note{%
-  Zwei Pipelines explizit getrennt zeigen: dieselbe didaktische Struktur,
-  aber unterschiedliche fachliche Stufen.
-  Bei UTF-8 die \texttt{Array.from()}-Entscheidung erwähnen: sichere Iteration
-  über Codepoints vermeidet Surrogate-Pair-Fehler bei Emojis.
-  Rückfrage: "Warum keine Animation?" -- weil kontrollierbares Tempo
-  didaktisch mehr bringt als automatisch ablaufende Schritte.
+
+\note{
+  \textbf{Person: }
+
+  \textbf{Zeit:  min}
+
+  \begin{itemize}
+    \item Zwei Pipelines explizit getrennt zeigen: dieselbe didaktische Struktur,
+    \item aber unterschiedliche fachliche Stufen.
+    \item Bei UTF-8 die \texttt{Array.from()}-Entscheidung erwähnen: sichere Iteration
+    \item über Codepoints vermeidet Surrogate-Pair-Fehler bei Emojis.
+    \item Rückfrage: "Warum keine Animation?" -- weil kontrollierbares Tempo
+    \item didaktisch mehr bringt als automatisch ablaufende Schritte.
+  \end{itemize}
 }
+\end{contentsframe}

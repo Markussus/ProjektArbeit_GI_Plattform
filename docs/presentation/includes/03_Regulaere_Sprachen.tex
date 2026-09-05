@@ -12,16 +12,25 @@
   \item Erzeugte Grammatik \textbf{ausführlich} oder \textbf{vereinfacht}
   \item \textbf{Worterkennung} für mehrere Wörter -- mit Begründung statt nur ja/nein
   \item \textbf{Übungen} mit Rückmeldung: fehlende und falsche Wörter
+          \note{
+            \textbf{Person: }
+
+            \textbf{Zeit:  min}
+
+            \begin{itemize}
+              \item Einstiegsfolie des zweiten Themas, parallel zum Überblick bei den Automaten.
+              \item Nur benennen, was die Studierenden tun können -- die Begründungen kommen auf den
+              \item folgenden Folien.
+              \item Die drei Modi heißen in der Oberfläche "Grammatik -> Sprache", "Sprache -> Grammatik"
+              \item und "Wort erkennen"; die nächste Folie vertieft sie.
+              \item Ausführlich/Vereinfacht: ein Nichtterminal pro Präfix gegenüber zusammengefassten
+              \item Nichtterminalen mit denselben Fortsetzungen -- rechtslinear bleiben beide.
+              \item Überleitung: "Diese drei Arbeitsweisen im Zusammenhang."
+            \end{itemize}
+          }
 \end{itemframe}
 \note{%
-  Einstiegsfolie des zweiten Themas, parallel zum Überblick bei den Automaten.
-  Nur benennen, was die Studierenden tun können -- die Begründungen kommen auf den
-  folgenden Folien.
-  Die drei Modi heißen in der Oberfläche "Grammatik -> Sprache", "Sprache -> Grammatik"
-  und "Wort erkennen"; die nächste Folie vertieft sie.
-  Ausführlich/Vereinfacht: ein Nichtterminal pro Präfix gegenüber zusammengefassten
-  Nichtterminalen mit denselben Fortsetzungen -- rechtslinear bleiben beide.
-  Überleitung: "Diese drei Arbeitsweisen im Zusammenhang."
+
 }
 
 % ---------------------------------------------------------------------------
@@ -53,12 +62,19 @@
   \footnotesize
   Alle drei Modi bleiben im Hintergrund erhalten und werden nur ein- oder ausgeblendet --
   dadurch überlebt eine begonnene Eingabe den Moduswechsel.
+
+            \note{
+              \textbf{Person: }
+
+              \textbf{Zeit:  min}
+
+              \begin{itemize}
+                \item Kurz durch die drei Modi gehen, nicht vertiefen.
+                \item Der Satz unten ist eine UI-Entscheidung: Komponenten bleiben gemountet, damit Eingaben nicht verloren gehen.
+                \item Überleitung zur nächsten Folie: "Nicht jede Eingabe wird akzeptiert -- und das mit Absicht."
+              \end{itemize}
+            }
 \end{fullframe}
-\note{%
-  Kurz durch die drei Modi gehen, nicht vertiefen.
-  Der Satz unten ist eine UI-Entscheidung: Komponenten bleiben gemountet, damit Eingaben nicht verloren gehen.
-  Überleitung zur nächsten Folie: "Nicht jede Eingabe wird akzeptiert -- und das mit Absicht."
-}
 
 % ---------------------------------------------------------------------------
 \begin{fullframe}{Bewusst abgelehnte Sprachbeschreibungen}
@@ -83,11 +99,19 @@
   Beide Eingaben ließen sich formal verarbeiten. Sie werden trotzdem mit einer
   \textbf{eigenen Meldung} zurückgewiesen: Diese Fälle ausdrücklich zu erklären ist lehrreicher,
   als sie stillschweigend zu verwerfen.
+
+              \note{
+                \textbf{Person: }
+
+                \textbf{Zeit:  min}
+
+                \begin{itemize}
+                  \item Hier ist die didaktische Begründung der Punkt, nicht die Technik.
+                  \item a\^{}n b\^{}n ist das Standardbeispiel für eine nicht-reguläre Sprache -- gut geeignet, um zu zeigen,
+                  \item dass das Werkzeug die Theorie ernst nimmt.
+                  \item Mögliche Rückfrage: "Warum keine oberen Schranken?" -- Antwort: endlich, also regulär, aber die
+                  \item Aufzählung ist die klarere Schreibweise; die Eingabesprache bleibt kleiner.
+                \end{itemize}
+              }
 \end{fullframe}
-\note{%
-  Hier ist die didaktische Begründung der Punkt, nicht die Technik.
-  a\^{}n b\^{}n ist das Standardbeispiel für eine nicht-reguläre Sprache -- gut geeignet, um zu zeigen,
-  dass das Werkzeug die Theorie ernst nimmt.
-  Mögliche Rückfrage: "Warum keine oberen Schranken?" -- Antwort: endlich, also regulär, aber die
-  Aufzählung ist die klarere Schreibweise; die Eingabesprache bleibt kleiner.
-}
+

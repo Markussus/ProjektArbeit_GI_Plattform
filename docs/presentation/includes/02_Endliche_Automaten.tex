@@ -12,6 +12,17 @@
   \item \textbf{Stapeltest} für mehrere Wörter gleichzeitig
   \item \textbf{Schritt-Historie}: vorwärts, rückwärts, zu einem früheren Schritt
   \item \textbf{Übungen} mit Rückmeldung: korrekt, falsch, Gegenbeispiel
+        \note{
+          \textbf{Person: }
+
+          \textbf{Zeit:  min}
+
+          \begin{itemize}
+            \item test
+            \item test
+            \item test
+          \end{itemize}
+        }
 \end{itemframe}
 
 % ---------------------------------------------------------------------------
@@ -69,23 +80,17 @@
     \end{tikzpicture}%
   }
   \end{center}
+      \note{
+        \textbf{Person: }
 
+        \textbf{Zeit:  min}
+
+        \begin{itemize}
+          \item Aktive Zustände + Symbol bestimmen den nächsten Schritt
+          \item Fehlender Übergang → Wort sofort abgelehnt
+          \item Am Wortende entscheidet der Endzustand
+          \item Simulationsschritte werden gespeichert → Zurückspringen möglich
+          \item Tabelle und Diagramm nutzen denselben Zustand → immer synchron
+        \end{itemize}
+      }
 \end{fullframe}
-\note{%
-  Die "Wie funktioniert das darunter"-Folie. Am Diagramm entlangsprechen, von oben nach unten.
-  (1) Oben der Kern: aktive Zustaende + Symbol, Uebergaenge nachschlagen, neue aktive Zustaende.
-      Danach das naechste Zeichen -- immer dieselbe Schleife.
-  (2) Die zwei Kaesten darunter: fehlt der Uebergang, ist das Wort sofort abgelehnt -- deshalb
-      braucht kein mitgelieferter Automat einen Fangzustand. Ist das Wort zu Ende, entscheidet,
-      ob ein aktiver Zustand Endzustand ist.
-  (3) Mitte: der Schritt wird angehaengt, nicht ueberschrieben. Deshalb waren Schritt zurueck
-      und der Sprung zu einem frueheren Schritt kein eigenes Feature mehr.
-  (4) Unten: Tabelle und Diagramm lesen denselben Schritt -- keine zweite Zustandsverwaltung,
-      also koennen die beiden Sichten nicht auseinanderlaufen.
-  (5) Frei gesprochen, steht nicht mehr auf der Folie: DFA war zuerst da, NFA kam spaeter.
-      Es gibt trotzdem nur einen Ablauf -- beim DFA ist genau ein Zustand aktiv, beim NFA
-      mehrere. Der Typ geht nur in Validierung und Eingabemaske.
-  Rueckfrage "Warum dann ueberhaupt DFA und NFA unterscheiden?" -- didaktisch: Determinismus-
-  verstoesse sollen gemeldet werden.
-  Wenn Zeit bleibt: Determinismusverstoesse werden direkt an der Kante im Diagramm markiert.
-}
