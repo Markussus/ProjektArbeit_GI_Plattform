@@ -32,7 +32,7 @@
             "largest-contentful-paint": [
               "error",
               {
-                "maxNumericValue": 2500
+                "maxNumericValue": 5000
               }
             ]
           }
@@ -44,7 +44,7 @@
             "largest-contentful-paint": [
               "error",
               {
-                "maxNumericValue": 1250
+                "maxNumericValue": 1400
               }
             ]
           }

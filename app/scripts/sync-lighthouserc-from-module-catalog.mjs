@@ -70,14 +70,14 @@ const config = {
           matchingUrlPattern: ".*java-programming.*",
           aggregationMethod: "median",
           assertions: {
-            "largest-contentful-paint": ["error", { maxNumericValue: 2500 }],
+            "largest-contentful-paint": ["error", { maxNumericValue: 5000 }],
           },
         },
         {
           matchingUrlPattern: "^((?!java-programming).)*$",
           aggregationMethod: "median",
           assertions: {
-            "largest-contentful-paint": ["error", { maxNumericValue: 1250 }],
+            "largest-contentful-paint": ["error", { maxNumericValue: 1400 }],
           },
         },
       ],

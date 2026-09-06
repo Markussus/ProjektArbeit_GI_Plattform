@@ -18,6 +18,7 @@ interface VideoPlayerProps {
   tracks?: VideoPlayerTrack[];
   testId?: string;
   controls?: boolean;
+  preload?: "none" | "metadata" | "auto";
 }
 
 export function VideoPlayer({
@@ -27,6 +28,7 @@ export function VideoPlayer({
   tracks = [],
   testId,
   controls = true,
+  preload = "none",
 }: VideoPlayerProps) {
   return (
     <video
@@ -36,7 +38,7 @@ export function VideoPlayer({
         className,
       )}
       controls={controls}
-      preload="auto"
+      preload={preload}
       playsInline
       data-testid={testId}
     >
