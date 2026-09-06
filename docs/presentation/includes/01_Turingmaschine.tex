@@ -15,9 +15,10 @@
         \textbf{Zeit: 1 min}
 
         \begin{itemize}
-          \item test
-          \item test
-          \item test
+          \item \textbf{Tabelle \& Tripel $(q', b, D)$:} Zeilen = Bandsymbole ($\diamond$ für Blank, Eingabe \texttt{<>}), Spalten = Nicht-Haltezustände. Jede Zelle definiert Zielzustand $q'$, Schreibsymbol $b$ und Kopfbewegung $D \in \{L, R, N\}$.
+          \item \textbf{Editor \& Integrität:} $q_0$, Haltezustände $F$ und Startband frei konfigurierbar. Kaskadierender Reducer passt bei Umbenennung oder Löschung alle Zellen und Zustände atomar an.
+          \item \textbf{Automatische Alphabete:} $\Sigma$ aus Startband abgeleitet, $\Gamma$ ergänzt $\diamond$ sowie Tabellensymbole. Verhindert Redundanz und Inkonsistenzen.
+          \item \textbf{Partielle Übergänge:} Leere Zellen führen regulär zum Halt (\texttt{missing\_transition}). Erlaubt schrittweises Testen unfertiger Maschinen.
         \end{itemize}
       }
 \end{itemframe}
@@ -48,9 +49,10 @@
         \textbf{Zeit: 1 min}
 
         \begin{itemize}
-          \item test
-          \item test
-          \item test
+          \item \textbf{Lookup \& Band:} Liest Symbol an Kopfposition (Default $\diamond$). Schlägt $\delta(q, a)$ in Tabelle nach; virtuelles Band expandiert dynamisch (\texttt{Record<number, TapeSymbol>}).
+          \item \textbf{Schrittausführung:} Schreibt $b$, bewegt Kopf ($D \in \{-1, 0, +1\}$), wechselt Zustand auf $q'$ und inkrementiert \texttt{stepCount}.
+          \item \textbf{Zwei Haltepfade:} Zelle leer $\rightarrow$ \texttt{missing\_transition}. Haltezustand erreicht ($q' \in F$) $\rightarrow$ \texttt{halt\_state}. Reine Datenzustände ohne Exceptions.
+          \item \textbf{UI-Synchronisation:} Hebt aktive Tabellenzelle $\delta(q, a)$ hervor; Bandbewegung wird geglättet animiert (120--600\,ms).
         \end{itemize}
       }
 \end{contentsframe}
