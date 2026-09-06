@@ -2,104 +2,89 @@
 
 ## Overview
 
-This project aims to develop a web-based learning and practice platform for the course *“Grundlagen Informatik”*.
-The application focuses on supporting students in understanding complex topics through interactive tools, visualizations, and step-by-step explanations.
+This project provides a modern, web-based learning and practice platform for the courses **"Grundlagen Informatik" (Fundamentals of Computer Science)** and **"Programmieren 1" (Programming 1)** at THWS.
+The application enables students to understand complex theoretical and practical concepts through interactive tools, responsive visualizations, step-by-step simulation, and immediate feedback.
 
-The platform is designed to be modular, extensible, and easy to use, with a consistent user interface across all learning modules.
+The platform is designed to be modular, extensible, and completely client-driven, with a consistent user interface across all learning modules.
 
 ---
 
-## Project Goals
+## Key Highlights & Architectural Features
 
-* Support self-directed learning and practice
-* Provide interactive simulations and visualizations
-* Offer step-by-step explanations for problem solving
-* Ensure a consistent and intuitive user experience
-* Build a modular and extensible system architecture
+* **Zero-Backend Architecture:** 100% Client-Only Single-Page Application (SPA). Zero hosting costs, infinite scalability, and strict Privacy by Design (DSGVO-compliant).
+* **In-Browser Java Compilation & Execution:** Full OpenJDK `javac` compilation and execution directly in the browser via WebAssembly (TeaVM) running inside an isolated Web Worker.
+* **Interactive Simulators:** Turing machines, finite automata (DFA/NFA), Mealy/Moore machines, regular languages, DNF/KV maps, and encoding/Huffman trees.
+* **Behavior-Based Validation:** Exercises test student solutions dynamically with immediate feedback and counterexamples instead of brittle syntax checks.
+* **Comprehensive Testing Suite:** Vitest unit/domain tests, Playwright E2E tests, and automated Lighthouse CI audits.
+* **Portable Offline Releases:** Fully functional offline launcher scripts (`start.cmd`, `start.sh`, `serve.py`) for offline self-study or exam preparation.
 
 ---
 
 ## Repository Structure
 
-The repository is organized to clearly separate application code from documentation and project-related artifacts.
+The repository is structured to separate application source code, scientific documentation, process guides, and deployment tooling:
 
 ```text
 project-root/
-  app/    # Source code of the web application
-  docs/   # Documentation, processes, and project artifacts
+├── app/          # Full web application source code (React 19, TypeScript, Vite 8)
+├── docs/         # Scientific thesis (LaTeX), presentations, and process documentation
+│   ├── documentation/   # Final academic thesis in LaTeX (THWS template)
+│   ├── presentation/    # Slide decks (LaTeX Beamer & PPTX)
+│   └── processes/       # Technical architecture, workflows, and handover guides
+└── deployment/   # Standalone release packager and offline HTTP server
 ```
 
-### app/
-
-Contains all code related to the implementation of the web application, including frontend logic, configuration, and required assets.
-
-### docs/
-
-Contains all non-code project artifacts, such as:
-
-* personal notes and reflections
-* presentation materials
+For detailed architectural justifications of this split, see [`docs/processes/repo-structure.md`](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/repo-structure.md).
 
 ---
 
-## Getting Started
-
-> ⚠️ This section will be completed once the application setup is finalized.
+## Quickstart & Local Development
 
 ### Prerequisites
 
-* Node.js 22.12.0 or newer
-* npm 11.10.0 or newer
+* **Node.js:** `>= 22.12.0` (LTS, see `app/.nvmrc`)
+* **npm:** `>= 11.10.0`
 
-### Installation
+### Installation & First Run
 
 ```bash
+# 1. Switch to the app directory
 cd app
+
+# 2. Install dependencies (respects min-release-age=7 security rule)
 npm ci
+
+# 3. Prepare Java WebAssembly compiler assets (Required once)
+npm run prepare:java-compiler
+
+# 4. Start local development server with HMR
+npm run dev
 ```
 
-The application uses npm's `min-release-age=7` setting. New package versions must be published for at least 7 days before npm may select them during dependency resolution. This reduces exposure to freshly published malicious or compromised package versions.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-New direct dependencies are saved with exact versions by default. CI also verifies npm registry signatures after installation.
+### Essential Commands
 
-### Running the Application
+* `npm test` – Run domain and unit tests with Vitest.
+* `npm run e2e-test` – Run Playwright end-to-end tests against a production build.
+* `npm run build` – Create an optimized production bundle in `app/dist`.
+* `npm run pre:commit:check` – Lint, check formatting, and verify production preview.
+* `npm run pipeline:local` – Execute the complete multi-stage CI pipeline locally.
 
-* To be defined
-
----
-
-## Development Workflow
-
-The project follows a structured Git workflow with the branches:
-
-* `main` – stable, presentation-ready versions
-* `development` – active development branch
-
-Feature branches are created per issue and merged via merge requests with required approvals.
-
-Further details can be found in:
-
-```text
-docs/processes/git-workflow.md
-```
+For detailed developer onboarding, see [`docs/processes/onboarding-dev-guide.md`](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/onboarding-dev-guide.md).
 
 ---
 
-## Documentation
+## Process & Handover Documentation
 
-All relevant documentation is located in the `docs/` directory.
+All detailed architectural and process documentation is centrally maintained in [`docs/processes/`](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/README.md):
 
-Key areas include:
-
-* Process documentation (`docs/processes/`)
-* Personal notes (`docs/personal_notes/`)
-* Presentation materials (`docs/presentation/`)
-
----
-
-## Status
-
-🚧 Project setup and initial planning phase
+* **[Architecture Guide](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/architecture.md):** Clean architecture layers, Web Worker isolation, state management, and lazy loading.
+* **[New Module & Topic Guide](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/new-module-guide.md):** Step-by-step instructions with code templates to add new modules and topics.
+* **[Repository Structure Guide](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/repo-structure.md):** Architectural rationale for monorepo and directory organization.
+* **[Tech Stack Summary](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/tecstack.md):** Full overview of frameworks, libraries, and QA tooling based on `package.json`.
+* **[Git Workflow](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/git-workflow.md):** Branching model, merge request rules, approvals, and conventional commit guidelines.
+* **[Handover & Maintenance Checklist](file:///C:/Projekte/fix_projektarbeit_gi_plattform/docs/processes/handover-checklist.md):** Handover readiness, hosting requirements, media hosting, and extension ideas.
 
 ---
 
@@ -108,22 +93,3 @@ Key areas include:
 MIT License
 
 Copyright (c) 2026 Markus Nöth, Richard Schröder, Enrico Ebert, Duy Tan Pham, Kristian Popov
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-Originally developed by Markus Nöth, Richard Schröder, Enrico Ebert, Duy Tan Pham, Kristian Popov
