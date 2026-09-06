@@ -138,14 +138,37 @@ function ensureWorkingTreeClean() {
     cwd: repositoryRoot,
   });
 
-  if (status) {
+  if (!status) {
+    return;
+  }
+
+  const lines = status
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .filter((line) => line.length > 0);
+
+  // Untracked / unversioned files start with "??"
+  const uncommittedChanges = lines.filter((line) => !line.startsWith("??"));
+  const untrackedFiles = lines.filter((line) => line.startsWith("??"));
+
+  if (untrackedFiles.length > 0) {
+    console.log("Note: Untracked / unversioned files present (ignored for release):");
+    for (const file of untrackedFiles) {
+      console.log(`  ${file}`);
+    }
+    console.log();
+  }
+
+  if (uncommittedChanges.length > 0) {
     console.error();
-    console.error("Uncommitted or untracked changes found:");
+    console.error("Uncommitted changes found in tracked files:");
     console.error();
-    console.error(status);
+    for (const change of uncommittedChanges) {
+      console.error(`  ${change}`);
+    }
 
     throw new Error(
-      "The working tree is not clean. Commit or discard all changes before creating a release.",
+      "The working tree has uncommitted changes in tracked files. Commit or discard all tracked changes before creating a release.",
     );
   }
 }
@@ -154,7 +177,7 @@ function ensureRepositoryIsReleaseReady() {
   printStep("Checking Git repository");
 
   /*
-   * No modified, staged or untracked files are allowed.
+   * No uncommitted changes in tracked files are allowed. Untracked files are permitted.
    */
   ensureWorkingTreeClean();
 

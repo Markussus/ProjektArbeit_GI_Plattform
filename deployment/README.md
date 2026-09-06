@@ -60,7 +60,7 @@ Das Skript `Deployment/create-release.mjs` durchläuft dabei folgende Schritte:
 
 ### Schritt 1: Prüfung von Umgebung und Git-Repository
 1. Validiert das Vorhandensein von `git`, `npm`, `glab` und der Projektstruktur (`App/package.json`, `start.cmd`, `start.sh`, `serve.py`).
-2. Prüft den Arbeitsbaum (`git status --porcelain`). Uncommittete oder ungetrackte Änderungen brechen den Prozess sofort ab.
+2. Prüft den Arbeitsbaum (`git status --porcelain`). Uncommittete Änderungen an getrackten Dateien brechen den Prozess sofort ab (unversionierte / ungetrackte Dateien sind zulässig).
 3. Prüft den Git-Branch. Ein Detached HEAD ist unzulässig.
 4. Holt den aktuellen Stand vom Remote-Repository (`git fetch origin --tags --prune`).
 5. Vergleicht lokalen Commit-Stand mit dem Remote-Branch (`HEAD...@{u}`). Der lokale Stand muss identisch sein (keine ungesendeten Commits, kein Rückstand).
