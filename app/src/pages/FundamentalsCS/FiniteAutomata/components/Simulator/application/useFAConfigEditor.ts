@@ -37,23 +37,35 @@ function findNextStateName(states: string[]): string {
   return `S${index}`;
 }
 
+/**
+ * Parse a comma-separated list into the set it denotes: entries are trimmed,
+ * blanks dropped, and repeats collapsed. Every list this editor parses — states,
+ * accept states, transition targets — is a set, so naming the same entry twice
+ * means exactly what naming it once means.
+ */
 function parseCSV(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+  return [
+    ...new Set(
+      value
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0),
+    ),
+  ];
 }
 
 /**
  * Like {@link parseCSV} but restricts each entry to a single symbol. The
  * alphabet of a DFA/NFA is a set of one-character symbols, so multi-character
  * tokens such as "10", "ab", or "xyz" are rejected rather than added.
+ *
+ * Collapsing repeats here is not only tidiness: the transfer codec refuses to
+ * encode a program whose alphabet lists the same symbol twice, and an autosave
+ * that cannot encode is discarded without a word. An alphabet left as
+ * "0, 1, 1" would therefore cost the learner every later edit to that exercise.
  */
 function parseAlphabetCSV(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => [...s].length === 1);
+  return parseCSV(value).filter((s) => [...s].length === 1);
 }
 
 function pruneTransitions(

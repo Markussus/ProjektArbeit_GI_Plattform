@@ -1,6 +1,7 @@
 import type { TFunction } from "i18next";
 import type { TranslationKey } from "@/types/i18n";
 import type { RegexNode } from "./rlTypes";
+import { resolveEmptyWord } from "./rlLanguageOps";
 
 export type ExponentSpec =
   | { kind: "none" }
@@ -41,6 +42,9 @@ export type LanguageSpec = EnumerationLang | SetBuilderLang;
 export interface LanguageParseIssue {
   code:
     | "empty"
+    | "missingBraces"
+    | "strayQuote"
+    | "wordWhitespace"
     | "variableReused"
     | "patternUnexpectedChar"
     | "missingGroupClose"
@@ -113,12 +117,19 @@ function toFailure(e: unknown): {
 /**
  * Parse a language description in either enumeration or set-builder form.
  *
- * Accepted shapes (the `L = ` / `L_1 = ` prefix and outer braces are optional):
+ * Accepted shapes (the `L = ` / `L_1 = ` prefix is optional, the braces are
+ * not — a set needs its braces, and requiring them keeps a mistyped word like
+ * `cvvvvvvv` from silently reading as the one-word language {cvvvvvvv}):
  *   L = {"010", "0010", "00010"}            // enumeration
  *   {010, 0010, 00010}                       // enumeration (unquoted ok)
  *   L1 = {a^n c b^m | n, m > 0}              // set-builder
  *   {a^n | n in N}                           // set-builder, n ≥ 0
  *   {(ab)^n | n >= 1}                        // groups allowed
+ *
+ * Enumerated words carry no whitespace: a space is not a terminal symbol, so
+ * `{hello world}` is a missing comma rather than an eleven-symbol word. The
+ * quotes around a word are optional, but they come as one matching pair — a
+ * quote left inside the word (`{"hello""World"}`) is a missing comma as well.
  *
  * Set-builder pattern: a sequence of factors. Each factor is either a single
  * symbol, ε, or a parenthesised sub-pattern, optionally followed by `^k` for
@@ -143,9 +154,17 @@ export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
   // Strip optional "L = " / "L_1 = " / "L1 = " prefix.
   source = source.replace(/^L[\w]*\s*=\s*/i, "");
 
-  // Strip outer braces if present.
+  // The braces are what makes the text a set. Without them any typo parses as
+  // a one-word language, so ask for the notation instead of guessing.
   const braced = source.match(/^\{([\s\S]*)\}$/);
-  const body = (braced ? braced[1] : source).trim();
+  if (!braced) {
+    return {
+      ok: false,
+      error: 'Write the language as a set in braces, e.g. L = {"010", "0010"}.',
+      issue: { code: "missingBraces" },
+    };
+  }
+  const body = braced[1].trim();
 
   if (body.length === 0) {
     return { ok: true, spec: { kind: "enumeration", words: [] } };
@@ -191,7 +210,28 @@ function parseEnumerationBody(body: string): ParseLanguageResult {
       continue;
     }
 
-    words.push(item === "ε" || item === "epsilon" ? "" : item);
+    // Both quote styles delimit a word and the notation has no escape for
+    // them, so a quote that survives unquoting can never be a terminal
+    // symbol. `{"hello""World"}` is a missing comma, not a 12-symbol word.
+    if (/["']/.test(item)) {
+      return {
+        ok: false,
+        error: `'${trimmed}' has a stray quote. Quotes surround one whole word — separate words with commas, e.g. L = {"hello", "World"}.`,
+        issue: { code: "strayQuote", params: { item: trimmed } },
+      };
+    }
+
+    // A space is not a terminal symbol — inside a word it means the comma
+    // between two words is missing (quotes don't make it a symbol either).
+    if (/\s/.test(item)) {
+      return {
+        ok: false,
+        error: `The word '${item}' contains a space. Separate words with commas, e.g. L = {"ab", "cd"}.`,
+        issue: { code: "wordWhitespace", params: { word: item } },
+      };
+    }
+
+    words.push(resolveEmptyWord(item));
   }
 
   // A trailing `..` / `...` marker signals "this is a pattern" — try to

@@ -52,7 +52,7 @@ export function RLGrammarEnumerationExercise({
         <p className="text-muted-foreground text-xs leading-relaxed">
           {t(
             "regular-languages.exerciseWorkspace.g2lHelp",
-            "List the words the grammar generates, separated by commas or new lines. Use ε for the empty word, then press Check Solution.",
+            "List the words the grammar generates, separated by commas or new lines. Use ε or epsilon for the empty word, then press Check Solution.",
           )}
         </p>
       </div>

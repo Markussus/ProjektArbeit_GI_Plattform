@@ -19,6 +19,13 @@ export interface UseTrainingCenterPersistenceOptions<TValue> {
   taskStorageId?: number;
   /** Codec used to serialize/deserialize this simulator's state. */
   codec: ISimulatorTransferCodec<TValue>;
+  /**
+   * Codec for the header transfer box, when sharing needs stricter rules than
+   * saving. Defaults to `codec`, which is what a topic wants unless its saved
+   * drafts are deliberately more permissive than the strings it hands out
+   * (see Finite Automata, whose draft may be half-built and unshareable).
+   */
+  transferCodec?: ISimulatorTransferCodec<TValue>;
   /** Current state to persist on autosave ticks. */
   value: TValue;
   /** Called when a stored draft for this slot has been restored. */
@@ -79,6 +86,7 @@ export function useTrainingCenterPersistence<TValue>({
   topicStorageId,
   taskStorageId = SIMULATOR_TASK_STORAGE_ID,
   codec,
+  transferCodec,
   value,
   onRestore,
   enabled = true,
@@ -148,7 +156,7 @@ export function useTrainingCenterPersistence<TValue>({
   useActiveSimulatorTransfer({
     identifier,
     value: transferValue ?? value,
-    codec,
+    codec: transferCodec ?? codec,
     enabled: transferEnabled,
   });
 

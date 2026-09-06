@@ -203,6 +203,31 @@ describe("RLLanguageToGrammar — remaining controls", () => {
     expect(field).toHaveValue('L = {"ab"}');
   });
 
+  it("refuses a mistyped word that is not written as a set", () => {
+    render(<RLLanguageToGrammar />);
+
+    const field = screen.getByTestId("rl-language-to-grammar-source");
+    fireEvent.change(field, { target: { value: "cvvvvvvv" } });
+
+    expect(
+      screen.getByText("regular-languages.languageErrors.missingBraces"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Enter a valid language definition to derive a grammar.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("builds the grammar once the same word is written as a set", () => {
+    render(<RLLanguageToGrammar />);
+
+    const field = screen.getByTestId("rl-language-to-grammar-source");
+    fireEvent.change(field, { target: { value: "L = {cvvvvvvv}" } });
+
+    expect(screen.getByText(/S -> cA1/)).toBeInTheDocument();
+  });
+
   it("opens the supported-formats panel", () => {
     const { container } = render(<RLLanguageToGrammar />);
 

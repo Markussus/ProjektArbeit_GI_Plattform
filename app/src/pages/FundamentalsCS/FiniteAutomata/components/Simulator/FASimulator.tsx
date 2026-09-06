@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { Play, Settings, Sparkles } from "lucide-react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
-import { exportAndStoreTrainingCenterValue } from "@/lib/trainingCenter";
 import { cloneJson, cn } from "@/lib/utils";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -18,6 +17,7 @@ import { emptyFAProgram, emptyInputWord } from "./config/emptyFAProgram";
 import type { FAExample } from "./config/faExamples";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
+import { faProgramDraftCodec } from "./domain/faProgramDraft";
 import {
   validateAgainstSolution,
   type ValidationResult,
@@ -88,11 +88,16 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
 
   // Each exercise gets its own slot, so work on one never overwrites another;
   // the free simulator keeps the topic's default slot.
-  const { identifier: storageIdentifier, clear: clearStoredState } =
+  //
+  // The slot takes the draft codec and the transfer box the compact one: a
+  // half-built automaton has to survive being left, but only a finished one is
+  // worth handing to somebody else.
+  const { clear: clearStoredState, save: saveProgram } =
     useTrainingCenterPersistence({
       topicStorageId: TOPIC_STORAGE_IDS.finiteAutomata,
       taskStorageId: exercise?.storageId,
-      codec: faProgramTransferCodec,
+      codec: faProgramDraftCodec,
+      transferCodec: faProgramTransferCodec,
       value: editor.draft,
       transferValue: isEditMode ? editor.draft : program,
       onRestore: handleImportProgram,
@@ -106,11 +111,7 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     setIsEditMode(false);
     scrollWorkspaceIntoView();
     if (isStorageEnabled) {
-      void exportAndStoreTrainingCenterValue(
-        storageIdentifier,
-        result.program,
-        faProgramTransferCodec,
-      );
+      void saveProgram().catch(() => undefined);
     }
   };
 

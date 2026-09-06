@@ -17,6 +17,18 @@ describe("parseEnumerationInput", () => {
     expect(parseEnumerationInput("ε, 1")).toEqual(["", "1"]);
     expect(parseEnumerationInput("  100 ,, ")).toEqual(["100"]);
   });
+
+  it("reads the word epsilon as the empty word too", () => {
+    expect(parseEnumerationInput("epsilon, 1")).toEqual(["", "1"]);
+    expect(parseEnumerationInput("ε, epsilon")).toEqual(["", ""]);
+  });
+
+  it("takes a word that only contains epsilon literally", () => {
+    expect(parseEnumerationInput("epsilonx, 0epsilon")).toEqual([
+      "epsilonx",
+      "0epsilon",
+    ]);
+  });
 });
 
 describe("checkGrammarEnumerationExercise", () => {

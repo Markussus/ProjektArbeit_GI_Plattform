@@ -34,6 +34,10 @@ function ArrayInput({
         setLocalValue(e.target.value);
         onChange(e.target.value);
       }}
+      // Typing needs the raw text — "0, 1," is a half-typed third symbol, not a
+      // mistake. Once the field is left, it shows the set that was actually
+      // kept, so a repeated entry visibly collapses instead of looking accepted.
+      onBlur={() => setLocalValue(value.join(", "))}
       className={className}
       placeholder={placeholder}
     />
