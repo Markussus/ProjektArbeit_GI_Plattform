@@ -6,11 +6,9 @@ export async function initMonacoOffline(): Promise<void> {
   }
 
   const [monaco, { default: EditorWorker }] = await Promise.all([
-    import("monaco-editor/editor/editor.api.js"),
+    import("monaco-editor"),
     import("monaco-editor/editor/editor.worker.js?worker"),
   ]);
-
-  await import("monaco-editor/languages/definitions/java/register.js");
 
   (
     window as unknown as {
