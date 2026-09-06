@@ -17,6 +17,22 @@ async function openSimulationTab(page: Page) {
   await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
 }
 
+/** The training-center slot as the browser currently holds it. */
+function savedTrainingCenterSlot(page: Page) {
+  return page.evaluate(() => localStorage.getItem("TrainingCenterStorage"));
+}
+
+/**
+ * Apply the program and wait until the draft has reached storage. Applying
+ * writes the slot straight away; autosave alone only runs on its interval or
+ * when the simulator unmounts, so without the poll whatever follows races the
+ * write.
+ */
+async function applyProgramAndAwaitSavedDraft(page: Page) {
+  await page.getByTestId("fa-start-simulation").click();
+  await expect.poll(() => savedTrainingCenterSlot(page)).not.toBeNull();
+}
+
 test.describe("Finite Automata page", () => {
   test("page loads and shows the topic title", async ({ page }) => {
     await gotoFAPage(page);
@@ -168,21 +184,12 @@ test.describe("Finite Automata — editor interactions", () => {
     const transition = page.getByLabel("δ(S0, a)");
     await transition.fill("S0");
     await page.getByPlaceholder("aab").fill("ab");
-    await page.getByTestId("fa-start-simulation").click();
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .not.toBeNull();
+    await applyProgramAndAwaitSavedDraft(page);
 
     await page.getByTestId("simulation-reset").click();
     await expect(page.getByLabel("δ(S0, a)")).toHaveValue("");
     await expect(page.getByPlaceholder("aab")).toHaveValue("");
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .toBeNull();
+    await expect.poll(() => savedTrainingCenterSlot(page)).toBeNull();
     await page.getByTestId("header-transfer-export").click();
     await expect(page.getByTestId("header-transfer-input")).toHaveValue(
       defaultExport,
@@ -288,12 +295,7 @@ test.describe("Finite Automata — opening an example", () => {
     page,
   }) => {
     await openSimulationTab(page);
-    await page.getByTestId("fa-start-simulation").click();
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .not.toBeNull();
+    await applyProgramAndAwaitSavedDraft(page);
 
     await page.getByTestId("tab-button-examples").click();
     await page.getByTestId("fa-example-card-ends-with-ab-select").click();
@@ -343,14 +345,7 @@ test.describe("Finite Automata — exercise persistence", () => {
 
     await openFAExercise(page, ENDS_WITH_01);
     await page.getByLabel("δ(S0, 0)").fill("S0");
-    // Applying the program writes the slot straight away; autosave alone only
-    // runs on its interval or when the simulator unmounts.
-    await page.getByTestId("fa-start-simulation").click();
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .not.toBeNull();
+    await applyProgramAndAwaitSavedDraft(page);
 
     // Leaving and returning must bring the work back.
     await page.getByTestId("tab-button-overview").click();

@@ -6,26 +6,22 @@
 
 % ---------------------------------------------------------------------------
 \begin{itemframe}{Reguläre Sprachen -- Überblick}
-  \item \textbf{Rechtslineare Grammatik} selbst definieren.
+  \item \textbf{Rechtslineare Grammatik} selbst schreiben -- geprüft schon beim Tippen
   \item Drei Modi: \textbf{Aufzählung}, \textbf{Erzeugung}, \textbf{Worterkennung}
-  \item Sprache als \textbf{Wortliste} oder in \textbf{Mengenschreibweise}: $\{a^n b \mid n \geq 1\}$
-  \item Erzeugte Grammatik \textbf{ausführlich} oder \textbf{vereinfacht}
-  \item \textbf{Worterkennung} für mehrere Wörter -- mit Begründung statt nur ja/nein
   \item \textbf{Übungen} mit Rückmeldung: fehlende und falsche Wörter
           \note{
-            \textbf{Person: }
+            \textbf{Person: Kristian}
 
             \textbf{Zeit: 1 min}
 
             \begin{itemize}
-              \item Einstiegsfolie des zweiten Themas, parallel zum Überblick bei den Automaten.
-              \item Nur benennen, was die Studierenden tun können -- die Begründungen kommen auf den
-              \item folgenden Folien.
-              \item Die drei Modi heißen in der Oberfläche "Grammatik -> Sprache", "Sprache -> Grammatik"
-              \item und "Wort erkennen"; die nächste Folie vertieft sie.
-              \item Ausführlich/Vereinfacht: ein Nichtterminal pro Präfix gegenüber zusammengefassten
-              \item Nichtterminalen mit denselben Fortsetzungen -- rechtslinear bleiben beide.
-              \item Überleitung: "Diese drei Arbeitsweisen im Zusammenhang."
+              \item Einstieg zweites Thema, parallel zum Überblick bei den Automaten.
+              \item Grammatik selbst schreiben, eine Produktion pro Zeile. Prüfung beim Tippen.
+              \item Drei Modi nur benennen $\rightarrow$ Details auf der nächsten Folie.
+              \item In der Oberfläche: Grammatik -> Sprache, Sprache -> Grammatik, Wort erkennen.
+              \item \textbf{Übungen}: geprüft wird das Verhalten
+                    $\rightarrow$ fehlende und zu viele Wörter.
+              \item Überleitung: diese drei Arbeitsweisen im Zusammenhang.
             \end{itemize}
           }
 \end{itemframe}
@@ -39,37 +35,40 @@
                     minimum width=30mm, minimum height=12mm, align=center, font=\small},
         res/.style={draw=thwspetrol, very thick, rounded corners=3pt, fill=thwspetrol!8,
                     minimum width=26mm, minimum height=10mm, align=center, font=\small},
-        lbl/.style={font=\scriptsize, thwsorange}
+        lbl/.style={font=\scriptsize, thwsorange},
+        fmt/.style={font=\scriptsize, text=black!60, align=center}
       ]
       \node[box] (gram) {Grammatik\\{\scriptsize rechtslinear}};
       \node[box, right=42mm of gram] (lang) {Sprach-\\beschreibung};
 
+      \node[fmt, above=2.5mm of gram] {erzeugte Grammatik:\\ausführlich oder vereinfacht};
+      \node[fmt, above=2.5mm of lang] {Wortliste oder Mengenschreibweise\\$\{a^n b \mid n \geq 1\}$};
+
       \draw[->, very thick, thwsorange] ([yshift=3mm]gram.east)
-        -- node[lbl, above, align=center] {Aufzählung\\{\scriptsize begrenzt: Länge, Anzahl}} ([yshift=3mm]lang.west);
+        -- node[lbl, above, align=center] {Aufzählung} ([yshift=3mm]lang.west);
       \draw[<-, very thick, thwsorange] ([yshift=-5mm]gram.east)
-        -- node[lbl, below, align=center] {Erzeugung\\{\scriptsize strikt rechtslinear}} ([yshift=-5mm]lang.west);
+        -- node[lbl, below, align=center] {Erzeugung} ([yshift=-5mm]lang.west);
 
       \node[res, below=16mm of gram] (word) {Wort + Grammatik};
       \node[res, right=42mm of word] (verdict) {akzeptiert / abgelehnt\\{\scriptsize mit Begründung}};
       \draw[->, very thick, thwspetrol] (word) -- node[lbl, above, thwspetrol] {Worterkennung} (verdict);
     \end{tikzpicture}
   \end{center}
-
-  \vspace{-1mm}
-  \footnotesize
-  Alle drei Modi bleiben im Hintergrund erhalten und werden nur ein- oder ausgeblendet --
-  dadurch überlebt eine begonnene Eingabe den Moduswechsel.
-
             \note{
-              \textbf{Person: }
+              \textbf{Person: Kristian}
 
               \textbf{Zeit: 1 min}
 
               \begin{itemize}
-                \item Kurz durch die drei Modi gehen, nicht vertiefen.
-                \item Der Satz unten ist eine UI-Entscheidung: Komponenten bleiben gemountet, damit Eingaben nicht verloren gehen.
-                \item Überleitung zur nächsten Folie: "Nicht jede Eingabe wird akzeptiert -- und das mit Absicht."
+                \item \textbf{Aufzählung}: Grammatik $\rightarrow$ Wörter. Begrenzt nach Länge
+                      und Anzahl.
+                \item \textbf{Erzeugung}: Sprache $\rightarrow$ Grammatik.
+                      Strikt rechtslinear, ausführlich oder vereinfacht.
+                \item Eingabeformate der Sprache: Wortliste oder Mengenschreibweise.
+                \item \textbf{Worterkennung}: mehrere Wörter gegen die Grammatik,
+                      mit Begründung statt nur ja/nein.
+                \item Frei sagen, steht nicht auf der Folie: Modi bleiben gemountet
+                      $\rightarrow$ begonnene Eingabe überlebt den Moduswechsel.
               \end{itemize}
             }
 \end{fullframe}
-

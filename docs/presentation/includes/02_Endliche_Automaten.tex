@@ -13,14 +13,18 @@
   \item \textbf{Schritt-Historie}: vorwärts, rückwärts, zu einem früheren Schritt
   \item \textbf{Übungen} mit Rückmeldung: korrekt, falsch, Gegenbeispiel
         \note{
-          \textbf{Person: 1,5 min}
+          \textbf{Person: Kristian}
 
-          \textbf{Zeit:  min}
+          \textbf{Zeit: 1,5 min}
 
           \begin{itemize}
-            \item test
-            \item test
-            \item test
+            \item Automat selbst definieren: Typ, Alphabet, Zustände, Startzustand, Endzustände, Übergänge
+            \item Grammatik $\rightarrow$ Automat: Nichtterminal wird Zustand,
+                  Produktion wird Übergang
+            \item Tabelle und Diagramm gleichzeitig sichtbar und immer synchron
+            \item \textbf{Stapeltest}: viele Wörter auf einmal prüfen
+            \item \textbf{Schritt-Historie}: vor, zurück, zu einem bestimmten Schritt springen
+            \item \textbf{Übungen}: automatisch korrigiert, bei Fehlern ein Gegenbeispiel
           \end{itemize}
         }
 \end{itemframe}
@@ -86,11 +90,15 @@
         \textbf{Zeit: 1 min}
 
         \begin{itemize}
-          \item Aktive Zustände + Symbol bestimmen den nächsten Schritt
-          \item Fehlender Übergang → Wort sofort abgelehnt
-          \item Am Wortende entscheidet der Endzustand
-          \item Simulationsschritte werden gespeichert → Zurückspringen möglich
-          \item Tabelle und Diagramm nutzen denselben Zustand → immer synchron
+          \item \textbf{Aktive Zustände} + \textbf{nächstes Symbol}
+                $\rightarrow$ passende Übergänge nachschlagen.
+          \item Ergebnis: neue aktive Zustände.
+          \item Nächstes Zeichen geht wieder von vorne los.
+          \item Zwei Ausgänge: kein Übergang $\rightarrow$ abgelehnt.
+                Wortende $\rightarrow$ Endzustand entscheidet.
+          \item \textbf{Historie}: jeder Schritt gespeichert
+                $\rightarrow$ vor- und zurückspringen.
+          \item Tabelle und Diagramm zeigen denselben Schritt, immer synchron.
         \end{itemize}
       }
 \end{fullframe}

@@ -257,3 +257,67 @@ describe("parseLanguageSpec — locating the constraint bar", () => {
     });
   });
 });
+
+describe("parseLanguageSpec — set notation is required", () => {
+  it.each([
+    ["a bare word", "cvvvvvvv"],
+    ["a prefix without braces", "L = cvvvvvvv"],
+    ["an unclosed brace", "L = {cvvvvvvv"],
+    ["a set-builder without braces", "a^n c b^m | n, m > 0"],
+    ["text after the closing brace", "L = {ab} cd"],
+  ])("rejects %s", (_case, source) => {
+    expect(issueCode(source)).toBe("missingBraces");
+  });
+
+  it("still reads the same text once it is written as a set", () => {
+    expect(parse("L = {cvvvvvvv}")).toEqual({
+      kind: "enumeration",
+      words: ["cvvvvvvv"],
+    });
+  });
+
+  it("keeps reporting blank input as empty", () => {
+    expect(issueCode("")).toBe("empty");
+    expect(issueCode("   \n ")).toBe("empty");
+  });
+});
+
+describe("parseLanguageSpec — words may not contain whitespace", () => {
+  it.each([
+    ["an unquoted word", "L = {hello world}"],
+    ["a quoted word", `L = {"a b"}`],
+    ["a tab", "L = {a\tb}"],
+  ])("rejects whitespace inside %s", (_case, source) => {
+    expect(issueCode(source)).toBe("wordWhitespace");
+  });
+
+  it("still accepts multi-letter words without whitespace", () => {
+    expect(parse("L = {x, foo, myVar, camelCase, -100}")).toEqual({
+      kind: "enumeration",
+      words: ["x", "foo", "myVar", "camelCase", "-100"],
+    });
+  });
+});
+
+describe("parseLanguageSpec — quotes must wrap a whole word", () => {
+  it.each([
+    ["two quoted words with the comma missing", `L = {"hello""World"}`],
+    ["an unclosed quote", `L = {"hello}`],
+    ["a quote in the middle of a word", `L = {ab"cd}`],
+    ["mismatched quote styles", `L = {'a"}`],
+    ["a trailing quote", `L = {"a""}`],
+  ])("rejects %s", (_case, source) => {
+    expect(issueCode(source)).toBe("strayQuote");
+  });
+
+  it("still strips one matching pair around each word", () => {
+    expect(parse(`L = {"hello", 'World'}`)).toEqual({
+      kind: "enumeration",
+      words: ["hello", "World"],
+    });
+  });
+
+  it("still reads an empty pair of quotes as the empty word", () => {
+    expect(parse(`L = {""}`)).toEqual({ kind: "enumeration", words: [""] });
+  });
+});
