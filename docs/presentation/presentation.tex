@@ -306,9 +306,11 @@ bs=$\bullet$]{thwsbeamertheme}
     \textbf{Zeit: 2 bis 3 min}
 
     \begin{itemize}
-      \item test
-      \item test
-      \item test
+      \item \textbf{Architekturprinzip:} Strikte Trennung von formaler Rechenlogik und UI-Rendering. Fachlogik ist reines TypeScript per Vitest unit-testbar.
+      \item \textbf{Gemeinsames Interface:} \texttt{ISimulator} für alle schrittbasierten Modelle (TM, EA, MM). Methoden: \texttt{initialize}, \texttt{step}, \texttt{stepBack}, \texttt{reset}, \texttt{getCurrentState}, \texttt{isFinished}.
+      \item \textbf{Konkrete Simulatoren} Kapseln mathematische Übergangsfunktion ($\delta$) und Validierung.
+      \item \textbf{Steuerungs-Hook \texttt{useSimulationEngine}:} Schlägt die Brücke zur reaktiven React-Welt. Kapselt Browser-Timer (\texttt{setInterval}), Ausführungsstatus (\texttt{IDLE}, \texttt{RUNNING}, \texttt{PAUSED}, \texttt{ERROR}), Geschwindigkeit (\texttt{speed}) und stoppt automatisch bei \texttt{isFinished}.
+      \item \textbf{Wiederverwendbare UI (\texttt{SimulatorControls}):} Standardisierte Bedienelemente (Play, Pause, Step vor/zurück, Reset, Tempo-Slider) für alle Simulatoren.
     \end{itemize}
   }
 \end{contentsframe}
