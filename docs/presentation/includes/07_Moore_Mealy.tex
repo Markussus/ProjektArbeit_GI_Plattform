@@ -16,13 +16,14 @@
     \end{itemize}
     \end{column}
   \end{columns}
-  \note{
-    \textbf{Person: Markus}
-
-    \textbf{Zeit: 0.75 min}
+    \note{
+    \textbf{Person: Markus} \hfill \textbf{Zeit: 0.75 min}
 
     \begin{itemize}
-      \item
+      \item \textbf{Freie Konfiguration:} Zustände und Übergänge interaktiv modellieren; Umschaltung zwischen Moore- und Mealy-Automat.
+      \item \textbf{Schritt-Simulation:} Zeichenweise Abarbeitung des Eingabeworts mit visueller Kanten- und Zustandshervorhebung.
+      \item \textbf{Zustand \& Ausgabe:} Direkte Ausgabeanzeige: bei Moore am Zustand verankert, bei Mealy an der Kante.
+      \item \textbf{Trace-Historie:} Vor- und Zurückspringen im Simulations-Stack zum gezielten Auffinden von Denkfehlern.
     \end{itemize}
   }
 \end{contentsframe}
@@ -37,13 +38,13 @@
 
     \begin{column}{0.33\textwidth}
         \centering
-        \textbf{Überführungsfunktion}
+        \textbf{Automat \& Übergänge}
 
         \vspace{0.5em}
 
         \raggedright
         \begin{itemize}
-            \item Zustandsübergänge übersichtlich darstellen
+            \item Zustände und Übergänge definieren
             \item Ausgabe abhängig von Moore bzw. Mealy
         \end{itemize}
     \end{column}
@@ -84,12 +85,12 @@
 \small
 \textbf{$\rightarrow$ logische bzw. hardwareseitige Umsetzung sichtbar machen}
 \note{
-  \textbf{Person: Markus}
-
-  \textbf{Zeit: 0.75 min}
+  \textbf{Person: Markus} \hfill \textbf{Zeit: 0.75 min}
 
   \begin{itemize}
-    \item
+    \item \textbf{Automat \& Übergänge:} Modellierung des Automaten mit Zustandsübergängen ($\delta$) und Ausgabe ($\lambda$) nach Vorlesungsstandard.
+    \item \textbf{Wahrheitstabelle:} Binäre Codierung der Zustände ($\lceil\log_2 n\rceil$ Flip-Flop-Bits); automatische Ableitung und Minimierung der DNF.
+    \item \textbf{Logikgatter:} Automatische Generierung des Schaltplans (Gatter + D-Flip-Flops); didaktische Brücke zur Digitaltechnik.
   \end{itemize}
 }
 \end{contentsframe}

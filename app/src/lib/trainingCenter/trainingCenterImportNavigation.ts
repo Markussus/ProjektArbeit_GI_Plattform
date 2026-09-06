@@ -42,6 +42,7 @@ export function resolveTrainingCenterImportTarget(
     throw new Error("training_center_import_empty");
   }
 
+  // 1. Load local storage when only 3 Chars are entered
   const storageValue =
     trimmedValue.length === TRAINING_CENTER_IDENTIFIER_LENGTH
       ? trainingCenterStorage.load(trimmedValue)
@@ -52,6 +53,7 @@ export function resolveTrainingCenterImportTarget(
     throw new Error("training_center_import_not_found");
   }
 
+  // 2. Get Topic and Task Id from the header
   const parsed = parseTrainingCenterStorageValue(storageValue);
   const topic = findTopicByStorageId(parsed.topicStorageId);
 
@@ -59,8 +61,9 @@ export function resolveTrainingCenterImportTarget(
     throw new Error("training_center_import_topic_not_found");
   }
 
+  // 3. Save the data
   trainingCenterStorage.store(storageValue);
-
+  // return the route
   return {
     path: topic.path,
     storageValue,

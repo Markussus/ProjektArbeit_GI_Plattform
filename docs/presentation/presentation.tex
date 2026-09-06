@@ -121,18 +121,17 @@ bs=$\bullet$]{thwsbeamertheme}
       \vspace{1em}
   \item Bedienung: intuitiv, einheitlich und konsistent
       \vspace{1em}
-  \item Technik: modularer Aufbau / Erweiterbarkeit, browserbasiert
+  \item Technik: modularer Aufbau / Erweiterbarkeit, browserbasiert, Teilbarkeit
       \vspace{1em}
   \item Qualität: Wartbarkeit, fachliche Korrektheit und Reproduzierbarkeit, sinnvoller Umgang mit KI
   \note{
-    \textbf{Person: Markus}
-
-    \textbf{Zeit: 2 min}
+    \textbf{Person: Markus} \hfill \textbf{Zeit: 1,5 min}
 
     \begin{itemize}
-      \item test
-      \item test
-      \item test
+      \item \textbf{Didaktik:} Abstrakte GI-Themen (Turing, Automaten, DNF, Zahlensysteme) interaktiv visualisieren; Schritt-Simulation und sofortiges Feedback statt statischer Folien.
+      \item \textbf{Bedienung:} Konsistentes UI/UX (Design-System, einheitliche Navigation, i18n); keine Hürden für Erstsemester (keine Accounts/Installation nötig).
+      \item \textbf{Technik:} 100\% Client-Side SPA im Browser; modular erweiterbar für neue Fächer; Teilbarkeit von Aufgaben und Lösungen via Transferstrings.
+      \item \textbf{Qualität \& KI:} Mathematisch/formale Korrektheit nach Vorlesungsnotation; reproduzierbare Tests (Vitest, Playwright); KI gezielt für Entwicklung/Tests genutzt.
     \end{itemize}
   }
 \end{itemframe}
@@ -148,14 +147,14 @@ bs=$\bullet$]{thwsbeamertheme}
         \vspace{1em}
   \item Regelmäßiges Auftraggeber-Feedback
     \note{
-      \textbf{Person: Markus}
-
-      \textbf{Zeit: 1 bis 2 min}
+      \textbf{Person: Markus} \hfill \textbf{Zeit: 1 bis 2 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item \textbf{Agil \& Iterativ:} Schnelle, lauffähige Prototypen der Kernsimulatoren statt langer isolierter Vorplanung.
+        \item \textbf{Wöchentliche Meetings:} Fester Jour Fixe zur Abstimmung plattformweiter Standards (Transfer-Interface, UI-Komponenten) und Blocker.
+        \item \textbf{GitLab-Organisation:} Transparente Aufgabenverteilung über Work Items, Feature-Branches und Meilensteine.
+        \item \textbf{CI-Pipeline:} Automatisierte Gates (Lint, Typecheck, 1.100+ Tests) sichern Codequalität vor jedem Merge.
+        \item \textbf{Auftraggeber-Feedback:} Kontinuierlicher Abgleich mit Dozenten zur Sicherung von Vorlesungskonformität und didaktischem Mehrwert.
       \end{itemize}
     }
 \end{itemframe}
@@ -315,23 +314,21 @@ bs=$\bullet$]{thwsbeamertheme}
 \end{contentsframe}
 
 \begin{itemframe}{Import, Export und lokale Persistenz}
-  \item Gemeinsamer Transfer-Codec
+  \item Einheitliches Transfer-Codec Interface
           \vspace{1em}
-  \item Kompakte Base64-Transferstrings
+  \item Kompakte Base64URL-Transferstrings (12Bit topicStorageId + 6 Bit taskStorageId + Payload)
           \vspace{1em}
-  \item Local Storage
+  \item Kollisionsfreie lokale Persistenz
     \note{
-      \textbf{Person: Markus}
-
-      \textbf{Zeit: 1 bis 2 min}
+      \textbf{Person: Markus} \hfill \textbf{Zeit: 1,5 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item \textbf{Interface:} \texttt{ISimulatorTransferCodec<TValue>} statt Monolith. Inversion of Control: Simulator meldet Export beim Mount im Zustand-Store an; Header bleibt entkoppelt.
+        \item \textbf{Base64URL:} 3 Zeichen Header (2 Chars Topic-ID, 1 Char Task-ID) fürs Routing. URL-sicher nach RFC 4648 (\texttt{-}/\texttt{\_}, kein Padding \texttt{=}). BitWriter für Automaten, Tokenizer + Deflate für Java.
+        \item \textbf{Local Storage:} Zentraler Key \texttt{"TrainingCenterStorage"}. Kollisionsfrei durch 18-Bit Topic- und Task-Namespacing. Entprelltes Autosave, autom. Restore beim Laden.
       \end{itemize}
     }
-\end{itemframe}
+  \end{itemframe}
 
 \addsectionframe{4. KI-Einsatz im Projekt}
 
@@ -388,17 +385,15 @@ bs=$\bullet$]{thwsbeamertheme}
               \vspace{1em}
   \item Nutzen durch kleine, testbare Schritte
     \note{
-      \textbf{Person: Markus}
-
-      \textbf{Zeit: 2 min}
+      \textbf{Person: Markus} \hfill \textbf{Zeit: 1,5 bis 2 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item \textbf{Kontextverlust:} LLMs verlieren bei langen Tasks den Projektüberblick. Lösung: \texttt{handover.md} sichert Entscheidungen, offenen Stand und Architekturvorgaben über Session-Grenzen hinweg.
+        \item \textbf{Code-Qualität:} KI erfindet oft vorhandene Utilities neu oder erzeugt toten Code. Lösung: Striktes Diff-Review durch Entwickler und gezielte KI-gestützte Refactoring-Prompts.
+        \item \textbf{Arbeitsweise:} Große One-Shot-Prompts scheitern regelmäßig. Maximaler Hebel nur durch atomare, testbare Schritte (Interface $\rightarrow$ Core-Logik $\rightarrow$ Tests $\rightarrow$ UI).
       \end{itemize}
     }
-\end{itemframe}
+  \end{itemframe}
 
 \addsectionframe{5. Qualität und Deployment-Strategie}
 
@@ -426,21 +421,22 @@ bs=$\bullet$]{thwsbeamertheme}
 \begin{itemframe}{Deployment}
   \item Statischer Vite-Build als ZIP ausgeliefert
   \vspace{1em}
+  \item Deployment Skript für automatischen GitLab release
+  \vspace{1em}
   \item Browserbetrieb durch lokalen Server
   \vspace{1em}
   \item Online hosting durch Auftraggeber abgelehnt
     \note{
-      \textbf{Person: Markus}
-
-      \textbf{Zeit: 1 min}
+      \textbf{Person: Markus} \hfill \textbf{Zeit: 1 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item \textbf{Vite-Build:} Vollständig statische Client-SPA (\texttt{dist/}) als ZIP; benötigt keinerlei Server-Runtime oder Datenbank.
+        \item \textbf{GitLab-Release:} CI-Job baut, testet und paketiert bei Tags vollautomatisch; erzeugt versionierte GitLab-Releases.
+        \item \textbf{Lokaler Server vs. file://:} \texttt{file://} blockiert ES-Module, dyn. Chunks und Monaco-Web-Worker (CORS/Origin null). Lokaler Mini-Server liefert zwingend benötigten HTTP-Origin.
+        \item \textbf{Hosting vs. PWA:} Kein zentrales Web-Hosting (keine Serverkosten/Wartung/DSGVO). PWA scheitert offline ohne initiale HTTPS-Domain; lokale ZIP-Verteilung 100\% autark.
       \end{itemize}
     }
-\end{itemframe}
+  \end{itemframe}
 
 \input{includes/01_Turingmaschine.tex}
 \input{includes/02_Endliche_Automaten.tex}

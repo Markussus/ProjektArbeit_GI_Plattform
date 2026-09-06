@@ -7,12 +7,13 @@
   \vspace{2mm}
   \includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{java_diagram.pdf}
   \note{
-    \textbf{Person: Markus}
-
-    \textbf{Zeit: 1 min}
+    \textbf{Person: Markus} \hfill \textbf{Zeit: 1 min}
 
     \begin{itemize}
-      \item
+      \item \textbf{Client-Architektur:} 100\% lokale Ausführung im Browser-Web-Worker; benötigt keinen Backend-Server.
+      \item \textbf{Scanner-Substitution:} Vorbereitete Eingaben (\texttt{stdin}) werden vorab injiziert, da Web-Worker nicht synchron auf Tastatur blockieren können.
+      \item \textbf{TeaVM Pipeline:} Java-Quellcode wird zu Bytecode kompiliert und via TeaVM in WebAssembly (\texttt{app.wasm}) übersetzt.
+      \item \textbf{FFI \& Konsole:} Byteweiser Hook von \texttt{putchar} fängt \texttt{stdout}/\texttt{stderr} ab und flusht alle 50\,ms in die UI.
     \end{itemize}
   }
 \end{contentsframe}
@@ -30,12 +31,12 @@
     \vspace{1em}
     \item \textbf{Für Lernaufgaben ausreichend} -- Code, (Eingaben) und \texttt{stdout}/\texttt{stderr}
     \note{
-      \textbf{Person: Markus }
-
-      \textbf{Zeit: 0.5 min}
+      \textbf{Person: Markus} \hfill \textbf{Zeit: 0.5 min}
 
       \begin{itemize}
-        \item
+        \item \textbf{Zero-Installation:} Kein JDK, kein Gradle, keine Pfade; läuft direkt im Browser (auch auf iPads/Tablets).
+        \item \textbf{Kein Server:} 100\% offlinefähig im ZIP-Paket; keine Serverkosten, kein DSGVO-Risiko.
+        \item \textbf{Sandbox \& Didaktik:} Sicherheitsisolierung (kein Dateisystem/Netzwerk) schützt den Rechner; optimal zugeschnitten auf GI-Programmieraufgaben.
       \end{itemize}
     }
 \end{itemframe}
