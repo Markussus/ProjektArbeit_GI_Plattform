@@ -1,16 +1,18 @@
 export type TeaVmImports = Record<string, Record<string, unknown>>;
 
-interface OutputScheduler {
+export interface OutputScheduler {
   setTimeout(callback: () => void, delay: number): number;
   clearTimeout(timeoutId: number): void;
+  now?(): number;
 }
 
-interface BufferedWorkerOutputOptions {
+export interface BufferedWorkerOutputOptions {
   stream: "stdout" | "stderr";
   requestId: string;
   postMessage: (message: unknown) => void;
-  scheduler: OutputScheduler;
+  scheduler?: OutputScheduler;
   flushDelay?: number;
+  now?: () => number;
 }
 
 export interface BufferedWorkerOutput {
@@ -26,17 +28,33 @@ export function createBufferedWorkerOutput({
   postMessage,
   scheduler,
   flushDelay = 50,
+  now,
 }: BufferedWorkerOutputOptions): BufferedWorkerOutput {
   let output = "";
   let buffer = "";
   let timeoutId: number | undefined;
+  let firstCharTime: number | undefined;
+
+  const getNow =
+    now ??
+    (scheduler?.now
+      ? () => scheduler.now!()
+      : typeof performance !== "undefined" &&
+          typeof performance.now === "function"
+        ? () => performance.now()
+        : () => Date.now());
 
   const flush = () => {
+    if (timeoutId !== undefined && scheduler) {
+      scheduler.clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+    firstCharTime = undefined;
+
     if (buffer) {
       postMessage({ type: stream, requestId, data: buffer });
       buffer = "";
     }
-    timeoutId = undefined;
   };
 
   return {
@@ -44,13 +62,19 @@ export function createBufferedWorkerOutput({
       const nextCharacter = String.fromCharCode(charCode);
       output += nextCharacter;
       buffer += nextCharacter;
-      timeoutId ??= scheduler.setTimeout(flush, flushDelay);
+
+      const currentTime = getNow();
+      if (firstCharTime === undefined) {
+        firstCharTime = currentTime;
+        if (scheduler) {
+          timeoutId = scheduler.setTimeout(flush, flushDelay);
+        }
+      } else if (currentTime - firstCharTime >= flushDelay) {
+        flush();
+      }
     },
     flush,
     dispose() {
-      if (timeoutId !== undefined) {
-        scheduler.clearTimeout(timeoutId);
-      }
       flush();
     },
     getOutput: () => output,
