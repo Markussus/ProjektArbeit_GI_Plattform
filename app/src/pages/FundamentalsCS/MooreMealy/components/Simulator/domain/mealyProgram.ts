@@ -1,5 +1,5 @@
 import { cloneJson } from "@/lib/utils";
-import { hasUniqueNonEmptyValues } from "./programCommon";
+import { hasUniqueNonEmptyValues, MAX_COLLECTION_SIZE } from "./programCommon";
 import {
   renameMealyInputSymbol,
   renameMealyState,
@@ -55,13 +55,24 @@ function hasConsistentOutputCodes(program: MealyProgram): boolean {
 
 export function validateMealyProgram(program: MealyProgram): string[] {
   const issues: string[] = [];
-  if (!program.states.length) issues.push("states_invalid");
-  if (!hasUniqueNonEmptyValues(program.states))
+  if (
+    program.states.length === 0 ||
+    program.states.length > MAX_COLLECTION_SIZE
+  ) {
+    issues.push("states_invalid");
+  }
+  if (program.inputSymbols.length > MAX_COLLECTION_SIZE) {
+    issues.push("input_symbols_invalid");
+  }
+  if (!hasUniqueNonEmptyValues(program.states)) {
     issues.push("state_names_invalid");
-  if (!hasUniqueNonEmptyValues(program.inputSymbols))
+  }
+  if (!hasUniqueNonEmptyValues(program.inputSymbols)) {
     issues.push("input_symbol_names_invalid");
-  if (!program.states.includes(program.initialState))
+  }
+  if (!program.states.includes(program.initialState)) {
     issues.push("initial_state_invalid");
+  }
   if (
     program.inputSymbols.some((input) =>
       program.states.some((state) => {
@@ -69,8 +80,9 @@ export function validateMealyProgram(program: MealyProgram): string[] {
         return !target || !program.states.includes(target);
       }),
     )
-  )
+  ) {
     issues.push("transitions_invalid");
+  }
   if (
     program.inputSymbols.some((input) =>
       program.states.some((state) => {
@@ -83,10 +95,14 @@ export function validateMealyProgram(program: MealyProgram): string[] {
       }),
     ) ||
     !hasConsistentOutputCodes(program)
-  )
+  ) {
     issues.push("outputs_invalid");
-  if (program.inputWord.some((input) => !program.inputSymbols.includes(input)))
+  }
+  if (
+    program.inputWord.some((input) => !program.inputSymbols.includes(input))
+  ) {
     issues.push("input_word_invalid");
+  }
   return [...new Set(issues)];
 }
 
