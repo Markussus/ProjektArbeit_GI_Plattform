@@ -7,6 +7,22 @@ import {
 import type { ProductionRule, RegularGrammar } from "./rlTypes";
 import { NON_TERMINAL_NAMES, emitRightLinearGrammar } from "./rlGrammarNaming";
 
+/**
+ * The spellings that stand for the empty word in learner input — the same two
+ * the grammar parser accepts, so `S -> 0S | epsilon` and the word `epsilon`
+ * mean the same thing.
+ */
+const EMPTY_WORD_NAMES = new Set(["ε", "epsilon"]);
+
+/**
+ * Resolve one word a learner typed: an ε spelling becomes the empty word,
+ * anything else is taken literally (`epsilonx` stays a seven-symbol word).
+ * Every field that reads words shares this, so ε means the same everywhere.
+ */
+export function resolveEmptyWord(word: string): string {
+  return EMPTY_WORD_NAMES.has(word) ? "" : word;
+}
+
 export interface EnumerateResult {
   words: string[];
   truncated: boolean;

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TranslationKey } from "@/types/i18n";
-import { recognizeWords } from "../domain/rlLanguageOps";
+import { recognizeWords, resolveEmptyWord } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
 import {
@@ -23,6 +23,19 @@ interface RLWordRecognizerProps {
 // Examples tab. Both fields keep their placeholders.
 const EMPTY_SOURCE = "";
 const EMPTY_WORD = "";
+
+/**
+ * Split the field into the words to check. An entry that is blank carries no
+ * word at all — a trailing comma or an untouched field asks nothing, and the
+ * empty word has to be named (`ε` / `epsilon`) like any other word.
+ */
+function parseTestWords(source: string): string[] {
+  return source
+    .split(",")
+    .map((piece) => piece.trim())
+    .filter((piece) => piece.length > 0)
+    .map(resolveEmptyWord);
+}
 
 interface PerWordResult {
   word: string;
@@ -77,9 +90,7 @@ export function RLWordRecognizer({
     if (!parsed.ok || !parsed.grammar) return { ok: false };
     const grammar = parsed.grammar;
 
-    // Treat the input as a comma-separated list of test words. A bare
-    // empty piece represents ε (the empty word).
-    const pieces = word.split(",").map((w) => w.trim());
+    const pieces = parseTestWords(word);
     const results = recognizeWords(grammar, pieces).map(
       (outcome, index): PerWordResult => ({
         word: pieces[index],
@@ -113,18 +124,27 @@ export function RLWordRecognizer({
           onChange={(e) => setWord(e.target.value)}
           placeholder={t(
             "regular-languages.simulator.testWordPlaceholder",
-            "Comma-separated words; empty = ε",
+            "Comma-separated words, e.g. 0, 00, ε",
           )}
           className="border-input bg-background focus:ring-primary w-full rounded-md border px-3 py-2 font-mono text-sm focus:ring-2 focus:outline-none"
         />
         <p className="text-muted-foreground text-xs">
           {t(
             "regular-languages.simulator.testWordHelp",
-            "Separate multiple words with commas. Each character is treated as one terminal symbol; whitespace around commas is ignored.",
+            "Separate multiple words with commas. Each character is treated as one terminal symbol; whitespace around commas is ignored. Write ε or epsilon for the empty word.",
           )}
         </p>
 
-        {evaluation.ok ? (
+        {evaluation.ok && evaluation.results.length === 0 && (
+          <p className="text-muted-foreground text-sm">
+            {t(
+              "regular-languages.simulator.testWordEmpty",
+              "Type a word to test. Write ε or epsilon for the empty word.",
+            )}
+          </p>
+        )}
+
+        {evaluation.ok && evaluation.results.length > 0 && (
           <ul className="mt-2 flex flex-col gap-1.5">
             {evaluation.results.map((r, idx) => (
               <li
@@ -155,7 +175,9 @@ export function RLWordRecognizer({
               </li>
             ))}
           </ul>
-        ) : (
+        )}
+
+        {!evaluation.ok && (
           <p className="text-muted-foreground text-sm">
             {t(
               "regular-languages.simulator.grammarInvalid",

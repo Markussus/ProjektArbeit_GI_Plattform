@@ -1,4 +1,8 @@
-import { enumerateLanguage, recognizeWords } from "./rlLanguageOps";
+import {
+  enumerateLanguage,
+  recognizeWords,
+  resolveEmptyWord,
+} from "./rlLanguageOps";
 import { parseGrammar } from "./rlGrammarValidation";
 import { parseLanguageSpec } from "./rlLanguageSpecParser";
 
@@ -10,15 +14,15 @@ export const G2L_EXERCISE_ENUMERATION = { maxLen: 6, maxWords: 12 } as const;
 
 /**
  * Parse a learner's enumeration input: words separated by commas or newlines.
- * "ε" denotes the empty word; surrounding whitespace and empty pieces (e.g. a
- * trailing comma) are ignored.
+ * "ε" and "epsilon" denote the empty word; surrounding whitespace and empty
+ * pieces (e.g. a trailing comma) are ignored.
  */
 export function parseEnumerationInput(source: string): string[] {
   return source
     .split(/[\n,]/)
     .map((piece) => piece.trim())
     .filter((piece) => piece.length > 0)
-    .map((piece) => (piece === "ε" ? "" : piece));
+    .map(resolveEmptyWord);
 }
 
 export type RLCheckStatus = "match" | "mismatch" | "invalid";

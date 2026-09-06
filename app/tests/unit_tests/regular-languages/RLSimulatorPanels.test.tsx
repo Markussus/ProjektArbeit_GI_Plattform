@@ -202,7 +202,7 @@ describe("RLLanguageToGrammar", () => {
 
 describe("RLWordRecognizer", () => {
   function testWordField() {
-    return screen.getByPlaceholderText("Comma-separated words; empty = ε");
+    return screen.getByPlaceholderText("Comma-separated words, e.g. 0, 00, ε");
   }
 
   it("asks for a grammar before it can decide anything", () => {
@@ -229,10 +229,38 @@ describe("RLWordRecognizer", () => {
     expect(screen.getByText("ba")).toBeInTheDocument();
   });
 
-  it("renders an empty piece as ε", () => {
-    render(<RLWordRecognizer initialGrammar={GRAMMAR} initialWord="" />);
+  it("waits for a word instead of judging ε on an empty field", () => {
+    const { container } = render(
+      <RLWordRecognizer initialGrammar={GRAMMAR} initialWord="" />,
+    );
 
-    expect(screen.getByText("ε")).toBeInTheDocument();
+    expect(container.querySelectorAll("li")).toHaveLength(0);
+    expect(
+      screen.getByText(
+        "Type a word to test. Write ε or epsilon for the empty word.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it.each(["ε", "epsilon", " epsilon "])(
+    "tests the empty word when %s is typed",
+    (typed) => {
+      const { container } = render(
+        <RLWordRecognizer initialGrammar={GRAMMAR} initialWord={typed} />,
+      );
+
+      expect(container.querySelectorAll("li")).toHaveLength(1);
+      expect(screen.getByText("ε")).toBeInTheDocument();
+    },
+  );
+
+  it("skips the gap a trailing comma leaves", () => {
+    const { container } = render(
+      <RLWordRecognizer initialGrammar={GRAMMAR} initialWord="b, " />,
+    );
+
+    expect(container.querySelectorAll("li")).toHaveLength(1);
+    expect(screen.getByText("b")).toBeInTheDocument();
   });
 
   it("re-checks when the word is edited", () => {

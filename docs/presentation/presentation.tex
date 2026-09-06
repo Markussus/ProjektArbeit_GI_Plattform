@@ -354,9 +354,15 @@ bs=$\bullet$]{thwsbeamertheme}
       \textbf{Zeit: 1 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item Keine Vorgabe -- jeder hat eigene Tools ausprobiert
+        \item \textbf{Stitch}: UI-Ideen, erste Oberflächen
+        \item \textbf{Übrige Modelle}: je nach Aufgabe - Entwicklung, Planung und Fehlersuche
+        \item \textbf{OpenCode}, lokale Modelle über \textbf{Ollama}: ausprobiert
+        \item \textbf{MCP}: Browser + DevTools, App direkt testen
+        \item \textbf{LSP} (\texttt{typescript-lsp}): KI sieht dieselben Typinformationen wie die IDE
+        \item \textbf{Graphify}: Wissensgraph, keine Neuanalyse pro Session
+          $\rightarrow$ spart Tokens und Zeit
+        \item \textbf{Agent Skills}: Vorgehensweisen für wiederkehrende Aufgaben
       \end{itemize}
     }
 \end{itemframe}
@@ -383,9 +389,14 @@ bs=$\bullet$]{thwsbeamertheme}
     \textbf{Zeit: 2 min}
 
     \begin{itemize}
-      \item test
-      \item test
-      \item test
+      \item Ablauf nicht vorgegeben -- bei allen fünf unabhängig entstanden
+      \item \textbf{Start}: Aufgabe + Architekturkontext (shared statt lokal im Modul)
+      \item \textbf{Plan vor Code}: Missverständnisse früh, nicht erst im Diff
+      \item \textbf{Änderungsvorschlag} $\rightarrow$ \textbf{Review}: Diff fachlich + didaktisch
+      \item Neuer Chat für den Review: Modell bewertet nicht sich selbst
+      \item \textbf{Tests}: Unit + E2E automatisiert (Vitest, Playwright), Browser über MCP
+      \item \textbf{Pfeil zurück}: iterativ, kleine Schritte -- große Aufgaben verlieren Kontext
+      \item \textbf{Schluss}: Entscheidung beim Menschen -- nur Geprüftes wird übernommen
     \end{itemize}
   }
 \end{contentsframe}
@@ -485,15 +496,17 @@ bs=$\bullet$]{thwsbeamertheme}
 
 \begin{itemframe}{Perspektiven und offene Punkte}
   \item Weitere Lernbereiche und Topics
-    \vspace{1em}
-  \item Mobile Nutzung verbessern
-    \vspace{1em}
+    \vspace{0.8em}
+  \item Aufgabenverwaltung und Aufgabenvarianten
+    \vspace{0.8em}
+  \item Mobile Nutzung und Druckexport
+    \vspace{0.8em}
   \item Java Zeilensperrung implementieren
-    \vspace{1em}
-  \item Gamification
-    \vspace{1em}
+    \vspace{0.8em}
   \item Lernstandsverfolgung
-    \vspace{1em}
+    \vspace{0.8em}
+  \item Gamification
+    \vspace{0.8em}
   \item LMS-Anbindung
     \note{
       \textbf{Person: Kristian}
@@ -501,9 +514,14 @@ bs=$\bullet$]{thwsbeamertheme}
       \textbf{Zeit: 2 min}
 
       \begin{itemize}
-        \item test
-        \item test
-        \item test
+        \item Zwei Gruppen in Folienreihenfolge: vier ohne neue Infrastruktur, drei mit Backend.
+        \item \textbf{Lernbereiche}: Modulkatalog trägt Navigation und Routing.
+        \item \textbf{Aufgabenverwaltung}: Lehrende legen an, Varianten aus Vorlage,
+          dazu Quizfragen und Lernkarten.
+        \item \textbf{Mobil}: Tabelle und Diagramm auf kleinen Bildschirmen.
+          \textbf{Java}: Machbarkeit geprüft, Marker grenzen den freien Bereich ab.
+        \item Backend: \textbf{Lernstandsverfolgung} zuerst, Gamification und LMS darauf.
+        \item Ehrlich: bewusst ohne Backend, lokal im Browser, statischer Build.
       \end{itemize}
     }
 \end{itemframe}
