@@ -7,12 +7,31 @@ import {
 import type { MooreProgram } from "./mooreTypes";
 
 export function getNextMooreOutputCode(program: MooreProgram): number {
-  return (
-    Math.max(
-      -1,
-      ...program.states.map((state) => program.outputs[state]?.code ?? -1),
-    ) + 1
-  );
+  const usedCodes = new Set<number>();
+  for (const state of program.states) {
+    const output = program.outputs[state];
+    if (output && Number.isSafeInteger(output.code) && output.code >= 0) {
+      usedCodes.add(output.code);
+    }
+  }
+  let next = 0;
+  while (usedCodes.has(next)) {
+    next++;
+  }
+  return next;
+}
+
+export function findMooreOutputCodeBySymbol(
+  program: MooreProgram,
+  symbol: string,
+): number | undefined {
+  for (const state of program.states) {
+    const output = program.outputs[state];
+    if (output && output.symbol === symbol) {
+      return output.code;
+    }
+  }
+  return undefined;
 }
 
 function remapStateTransitions(
