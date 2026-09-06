@@ -388,9 +388,10 @@ bs=$\bullet$]{thwsbeamertheme}
       \textbf{Person: Markus} \hfill \textbf{Zeit: 1,5 bis 2 min}
 
       \begin{itemize}
-        \item \textbf{Kontextverlust:} LLMs verlieren bei langen Tasks den Projektüberblick. Lösung: \texttt{handover.md} sichert Entscheidungen, offenen Stand und Architekturvorgaben über Session-Grenzen hinweg.
-        \item \textbf{Code-Qualität:} KI erfindet oft vorhandene Utilities neu oder erzeugt toten Code. Lösung: Striktes Diff-Review durch Entwickler und gezielte KI-gestützte Refactoring-Prompts.
-        \item \textbf{Arbeitsweise:} Große One-Shot-Prompts scheitern regelmäßig. Maximaler Hebel nur durch atomare, testbare Schritte (Interface $\rightarrow$ Core-Logik $\rightarrow$ Tests $\rightarrow$ UI).
+        \item \textbf{Kontextverlust:} LLMs verlieren bei längeren Sessions den Faden. Die Datei \texttt{handover.md} hält offene Aufgaben und Architektur-Entscheidungen verbindlich fest.
+        \item \textbf{Code-Qualität:} Modelle bauen gerne eigene Hilfsfunktionen, obwohl es sie im Projekt schon gibt. Manuelle Diff-Reviews und gezielte Refactoring-Prompts verhindern das.
+        \item \textbf{Arbeitsweise:} Ein großer Prompt auf einmal funktioniert fast nie. Zuverlässige Ergebnisse gab es nur in kleinen Schritten von der Schnittstelle bis zu den Tests.
+        \item \textbf{Dokumentation:} Der Dozent wollte viel KI-Nutzung sehen. Wir haben damit eigene Stichpunkte ausformuliert und Texte geglättet, aber jeden Satz selbst geprüft.
       \end{itemize}
     }
   \end{itemframe}
