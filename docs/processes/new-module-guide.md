@@ -1,6 +1,13 @@
 # Leitfaden: Neues Lernmodul & Thema anlegen
 
-Kurzanleitung zur Integration eines neuen Themas (Topic) in die GI-Lernplattform – abgestimmt auf Kapitel~2.2 der Projektdokumentation.
+Dieser Leitfaden beschreibt Schritt für Schritt, wie ein neues Thema (**Topic**) oder ein neuer Fachbereich (**Modul**) in die GI-Lernplattform integriert wird. Die Architektur trennt globale Rahmenstrukturen, deklarative Metadaten und themenspezifische Implementierungen strikt voneinander, sodass Erweiterungen ohne Umbauten am Routing oder an Kernkomponenten möglich sind.
+
+---
+
+## Begriffsabgrenzung: Modul vs. Topic
+
+* **Modul (Fachbereich):** Übergeordnete Lerneinheit (z. B. *Grundlagen Informatik* `/fundamentals-cs` oder *Programmieren 1* `/programming-1`). Ein Modul bündelt mehrere Topics auf einer Übersichtsseite.
+* **Topic (Themenbereich):** Didaktisches Einzelthema (z. B. *Turing-Maschine*, *Moore-/Mealy-Automaten*, *Java-Programmierung*). Jedes Thema nutzt die standardisierte 4-Reiter-Shell (`ModuleTopicPage`).
 
 ---
 
@@ -9,7 +16,7 @@ Kurzanleitung zur Integration eines neuen Themas (Topic) in die GI-Lernplattform
 ```text
 1. Verzeichnis anlegen  -->  2. Speicher-ID  -->  3. Katalogeintrag
                                                           │
-6. Sprachdateien reg.   <--  5. i18n JSONs   <--  4. Lazy-Route
+6. 4 Sprachen reg.      <--  5. 4 i18n JSONs <--  4. Lazy-Route
 ```
 
 ---
@@ -20,11 +27,11 @@ Unter `app/src/pages/<ModuleName>/<TopicName>/` die vier Tab-Komponenten sowie d
 ```text
 app/src/pages/<ModuleName>/<TopicName>/
 ├── components/
-│   ├── OverviewTab.tsx       # Theorie & Erklärungen
-│   ├── ExamplesTab.tsx       # Interaktive Beispiele
-│   ├── ExercisesTab.tsx      # Übungen mit Validierung
-│   └── SimulationTab.tsx     # Simulator-Arbeitsfläche
-└── <TopicName>Page.tsx       # Bindet ModuleTopicPage mit den 4 Tabs ein
+│   ├── OverviewTab.tsx       # Theorie & Begriffserklärungen
+│   ├── ExamplesTab.tsx       # Vorkonfigurierte Lehrbeispiele
+│   ├── ExercisesTab.tsx      # Übungsaufgaben mit Testfällen
+│   └── SimulationTab.tsx     # Interaktiver Simulator / Werkbank
+└── <TopicName>Page.tsx       # Haupteinstiegspunkt via ModuleTopicPage
 ```
 
 Beispiel `<TopicName>Page.tsx`:
@@ -51,7 +58,7 @@ export function MeinThemaPage() {
 ---
 
 ### 2. Speicher-ID vergeben
-In `app/src/data/topicStorageIds.ts` eine eindeutige Zahl im Objekt `TOPIC_STORAGE_IDS` hinterlegen. Diese ID trennt die Speicherstände im `localStorage`:
+In `app/src/data/topicStorageIds.ts` eine eindeutige Zahl im Objekt `TOPIC_STORAGE_IDS` hinterlegen. Diese ID isoliert den Speicherstand des Themas im `localStorage`:
 
 ```typescript
 export const TOPIC_STORAGE_IDS = {
@@ -95,33 +102,51 @@ const topicPageElements: Record<string, React.ReactElement> = {
   "mein-thema": <MeinThemaTopicPage />,
 };
 ```
-*(Die Route wird hierüber automatisch im Router registriert – kein manueller Eintrag in `router/index.tsx` nötig!)*
+*(Das Routen-Array `learningRoutes` wird automatisch aus dem Katalog generiert – kein manueller Eintrag in `router/index.tsx` nötig!)*
 
 ---
 
-### 5. Lokalisierungsdateien anlegen
-Jeweils eine Übersetzungsdatei für Deutsch und Englisch erstellen:
-* `app/src/i18n/locales/de/mein-thema.json`
-* `app/src/i18n/locales/en/mein-thema.json`
+### 5. Lokalisierungsdateien anlegen (4 Sprachen)
+Die Plattform unterstützt vier Sprachen (`de`, `en`, `tr`, `uk`). Unter `app/src/i18n/locales/` für alle vier Sprachen jeweils eine JSON-Datei für das neue Thema erstellen:
+* `app/src/i18n/locales/de/mein-thema.json` (Deutsch)
+* `app/src/i18n/locales/en/mein-thema.json` (Englisch)
+* `app/src/i18n/locales/tr/mein-thema.json` (Türkisch)
+* `app/src/i18n/locales/uk/mein-thema.json` (Ukrainisch)
 
 ---
 
 ### 6. Sprachdateien registrieren
-In `app/src/i18n/index.ts` die beiden JSON-Dateien importieren und in den Objekten `de` und `en` als neuer Namespace einbinden:
+In `app/src/i18n/index.ts` alle vier JSON-Dateien importieren und in den Sprachobjekten `de`, `en`, `tr` und `uk` als neuer Namespace hinterlegen:
 
 ```typescript
 import deMeinThema from "./locales/de/mein-thema.json";
 import enMeinThema from "./locales/en/mein-thema.json";
+import trMeinThema from "./locales/tr/mein-thema.json";
+import ukMeinThema from "./locales/uk/mein-thema.json";
 
-// In de und en eintragen:
-de: { ... deMeinThema, "mein-thema": deMeinThema },
-en: { ... enMeinThema, "mein-thema": enMeinThema },
+// In den jeweiligen Sprachblöcken de, en, tr, uk ergänzen:
+const de = {
+  // ...
+  "mein-thema": deMeinThema,
+};
+const en = {
+  // ...
+  "mein-thema": enMeinThema,
+};
+const tr = {
+  // ...
+  "mein-thema": trMeinThema,
+};
+const uk = {
+  // ...
+  "mein-thema": ukMeinThema,
+};
 ```
 
 ---
 
 ## 7. Abschlussprüfung
-Vor dem Commit den Qualitäts-Check ausführen:
+Vor dem Commit den Qualitäts-Check im Terminal ausführen:
 ```bash
 npm run pre:commit:check
 ```
