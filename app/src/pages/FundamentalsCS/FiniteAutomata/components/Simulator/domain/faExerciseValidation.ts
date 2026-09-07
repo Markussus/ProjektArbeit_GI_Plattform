@@ -39,8 +39,8 @@ function createAcceptor(program: FAProgram): (word: string) => boolean {
 }
 
 /*
-* Test-string enumeration over a shared alphabet
-*/
+ * Test-string enumeration over a shared alphabet
+ */
 function enumerateWords(alphabet: string[], maxLen: number): string[] {
   const words: string[] = [""];
   let frontier: string[] = [""];
@@ -56,8 +56,8 @@ function enumerateWords(alphabet: string[], maxLen: number): string[] {
 }
 
 /*
-* Public API: compare student vs. reference automaton
-*/
+ * Public API: compare student vs. reference automaton
+ */
 export interface TestCase {
   word: string;
   expected: boolean;
