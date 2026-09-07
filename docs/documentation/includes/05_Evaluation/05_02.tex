@@ -31,7 +31,9 @@ Werkzeugversionen und dem Bau des Java-Compilers über Formatierung, Lint,
 Unit-Tests und Build bis zu den \gls{e2e}-Tests und der abschließenden
 Lighthouse-Messung; nur bei durchgehend erfolgreichem Lauf ist ein Merge möglich.
 Für das Qualitätsziel Performance schlägt die letzte Stufe fehl, sobald der Median
-des \gls{lcp} je Themenseite 1,25 Sekunden überschreitet.
+des \gls{lcp} für reguläre Themenseiten 1,5~Sekunden überschreitet; für die
+Java-Programmierumgebung gilt ein Schwellenwert von 5~Sekunden, da Monaco-Editor
+und TeaVM aufgrund ihrer Größe mehr Ladezeit benötigen.
 Dass die Themenseiten einzeln nachgeladen werden, hält die je Aufruf übertragene
 Datenmenge klein.
 Ergänzend sichert die Pipeline die Herkunft der Abhängigkeiten ab, indem sie deren

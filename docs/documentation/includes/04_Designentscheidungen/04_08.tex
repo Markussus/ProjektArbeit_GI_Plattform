@@ -6,7 +6,7 @@ Die Java-Programmierumgebung ist Bestandteil des Moduls \glqq Programmieren~1\gr
 
 Die Umgebung folgt einer mehrschichtigen Architektur aus Präsentation, Orchestrierung und isolierter Ausführungsumgebung:
 \begin{enumerate}
-  \item \textbf{Präsentationsschicht:} Der React-Kontext \verb|JavaExecutionProvider| verwaltet den Gesamtzustand über das Datenobjekt \verb|JavaExecutionSnapshot| (Status, Konsolenausgaben, Compiler-Diagnosen und Fortschrittsanzeige). Der Monaco-Editor~\cite{monacoeditor} (\verb|JavaEditorPanel|) begrenzt die Dateigröße auf 64\,KB (\verb|javaEditorLimits.ts|) und visualisiert Fehlermeldungen direkt im Code.
+  \item \textbf{Präsentationsschicht:} Der React-Kontext \verb|JavaExecutionProvider| verwaltet den Gesamtzustand über das Datenobjekt \verb|JavaExecutionSnapshot| (Status, Konsolenausgaben, Compiler-Diagnosen und Fortschrittsanzeige). Im Monaco-Editor~\cite{monacoeditor} (\verb|JavaEditorPanel|) begrenzt die Anwendung den Quelltext über \verb|javaEditorLimits.ts| auf 500.000~Zeichen und 10.000~Zeilen und somit ca.~500\,kB und visualisiert Fehlermeldungen direkt im Code.
   \item \textbf{Orchestrierungsschicht:} Der Hook \verb|useJavaExecution| steuert den Lebenszyklus des Web Workers (\verb|javaRunner.worker.ts|) über asynchrone Nachrichten mit eindeutigen Request-\glspl{id}. Eine konfigurierbare Laufzeitüberwachung schützt vor Endlosschleifen: Überschreitet ein Programm das Zeitlimit, beendet der Hauptthread den Worker mittels \texttt{worker.\allowbreak{}terminate()} und startet eine neue Instanz. Dadurch bleibt die Benutzeroberfläche stets reaktionsfähig.
   \item \textbf{Compiler- und \gls{wasm}-Laufzeit:} Der Worker lädt OpenJDK-\verb|javac| und den TeaVM-Compiler~\cite{teavm} als statische Assets nach. Nach der Syntax- und Typprüfung durch \verb|javac| übersetzt TeaVM den erzeugten Bytecode in \gls{wasm}, das anschließend in einer isolierten Browser-Sandbox ausgeführt wird.
 \end{enumerate}
@@ -30,8 +30,7 @@ Die Arbeitsoberfläche orientiert sich an vertrauten \glspl{ide} wie Visual Stud
 
 \subNsection{2}{Andere Entscheidungen}{Markus Nöth}
 
-Das Modul enthält vier interaktive Beispielprogramme und fünf strukturierte Übungsaufgaben (u.\,a. Konsolenausgaben, Schleifen, Variablenberechnungen, Sortieralgorithmen und Maximumsuche im Array).
-
+Das Modul enthält vier interaktive Beispielprogramme und 13~strukturierte Übungsaufgaben (u.\,a. Konsolenausgaben, Schleifen, Variablenberechnungen).
 Die Aufgabenprüfung kompiliert den eingegebenen Code und führt ihn gegen definierte Testfälle aus. Bei Aufgaben mit vorgegebenen Variablenbelegungen ersetzt ein regulärer Ausdruck (\verb|sourceTransform|) die Initialisierungswerte im Code durch alternative Testdaten, um die Allgemeingültigkeit der Lösung zu prüfen. Ändert der Lernende jedoch die Bezeichner oder den syntaktischen Aufbau dieser Vorgabezeilen tiefgreifend, greift der Ersetzungsausdruck nicht mehr. In diesem Fall kann die Validierung fehlschlagen, obwohl der geschriebene Algorithmus fachlich korrekt ist.
 
 Für die Speicherung im Local Storage und das Teilen von Lösungen über \gls{url}-Parameter nutzt \verb|javaCodeTransfer.ts| ein zweistufiges Verfahren: Häufige Java-Schlüsselwörter und Sonderzeichen werden über ein Wörterbuch auf Einzelbytes (0x80 bis 0xFF) komprimiert, anschließend mit dem Deflate-Algorithmus verkleinert und als Base64URL kodiert.

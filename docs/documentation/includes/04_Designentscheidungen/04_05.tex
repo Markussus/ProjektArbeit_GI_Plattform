@@ -6,7 +6,7 @@ Das Modul Moore- und Mealy-Automaten vermittelt den Entwurf und die Funktionswei
 
 Die Implementierung beider Automatentypen baut auf dem gemeinsamen Interface \texttt{ISimulator\allowbreak<TConfig,\allowbreak{}TState>} der Plattform auf. Die mathematische Definition und die Aufgabengestaltung orientieren sich an den Vorlesungsfolien von Prof.~Dr.~Braun sowie am Lehrbuch von Vossen und Witt~\cite[Kapitel~4]{vossen2000}: Beim Moore-Automaten hängt die Ausgabe nur vom aktuellen Zustand ab ($\lambda: S \to \Gamma$). Beim Mealy-Automaten ist die Ausgabefunktion an das Wertepaar aus aktuellem Zustand und anliegendem Eingabesymbol gekoppelt ($\lambda: S \times \Sigma \to \Gamma$).
 
-Die Simulationslogik kapseln die Klassen \verb|MooreMachine| und \verb|MealyMachine|. Bei jedem Taktschritt sichern sie den gesamten Ausführungszustand in einer Historie ab. Dadurch kann der Benutzer über \verb|stepBack()| deterministisch zurückspringen, ohne dass Berechnungen neu aufgerollt werden müssen oder Seiteneffekte entstehen.
+Die Simulationslogik kapseln die Klassen \verb|MooreMachineSimulator| und \verb|MealyMachineSimulator|. Bei jedem Taktschritt sichern sie den gesamten Ausführungszustand in einer Historie ab. Dadurch kann der Benutzer über \verb|stepBack()| deterministisch zurückspringen, ohne dass Berechnungen neu aufgerollt werden müssen oder Seiteneffekte entstehen.
 
 Für beide Automatentypen erzeugt das Modul Wahrheitstabellen, disjunktive Normalformen (\gls{dnf}) und Logikgatter:
 \begin{itemize}

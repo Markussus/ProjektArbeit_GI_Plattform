@@ -2,7 +2,7 @@
 
 Die Architektur der Plattform ist modular aufgebaut, damit sich neue Lernmodule und Simulatoren ohne Änderungen an bestehenden Kernkomponenten einfügen lassen. Sie trennt die globale Rahmenstruktur, die deklarative Modulkonfiguration und die fachspezifischen Implementierungen voneinander.
 
-Die Komponente \verb|MainLayout| bildet den äußeren Rahmen der Anwendung. Sie bindet \verb|Header|, \verb|Sidebar| und \verb|Footer| ein und rendert die aktive Route über ein React-Router-\verb|Outlet|. Ein umschließendes \verb|Suspense|-Element mit der Komponente \verb|LayoutLoadingFallback| fängt Ladezeiten beim asynchronen Nachladen von Seiten ab. Den Zustand der Seitenleiste (ein- oder ausgeklappt) verwaltet ein eigener Zustand-Store (\verb|useSidebarStore|). Dadurch führen Änderungen an der Navigation nicht zum erneuten Rendern des Hauptinhalts.
+Die Komponente \verb|MainLayout| bildet den äußeren Rahmen der Anwendung. Sie bindet \verb|Header|, \verb|Sidebar| und \verb|Footer| ein und rendert die aktive Route über ein React-Router-\verb|Outlet|. Ein umschließendes \verb|Suspense|-Element mit der Komponente \verb|LoadingFallback| fängt Ladezeiten beim asynchronen Nachladen von Seiten ab. Den Zustand der Seitenleiste (ein- oder ausgeklappt) verwaltet ein zentraler Zustand-Store (\verb|useUiStore|). Dadurch führen Änderungen an der Navigation nicht zum erneuten Rendern des Hauptinhalts.
 
 Die Konfiguration der Lerninhalte teilt sich in zwei Dateien auf, um zirkuläre Abhängigkeiten zu vermeiden und Code-Splitting zu unterstützen:
 \begin{itemize}
