@@ -198,7 +198,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
       descriptionKey: "java-programming.exercise4Desc",
       fileName: "Main.java",
       starterCode: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n\n    // TODO: sort the array in ascending order\n\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
-      solutionCode: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n    Arrays.sort(numbers);\n\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
+      solutionCode: `import java.util.Arrays;\n\npublic class Main {\n  public static void main(String[] args) {\n    int[] numbers = {5, 2, 9, 1, 4};\n\n    for (int i = 0; i < numbers.length - 1; i++) {\n      for (int j = 0; j < numbers.length - 1 - i; j++) {\n        if (numbers[j] > numbers[j + 1]) {\n          int temp = numbers[j];\n          numbers[j] = numbers[j + 1];\n          numbers[j + 1] = temp;\n        }\n      }\n    }\n\n    System.out.println(Arrays.toString(numbers));\n  }\n}\n`,
       validationCases: [
         {
           id: "sort-default-array",
@@ -230,7 +230,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
       descriptionKey: "java-programming.exercise5Desc",
       fileName: "Main.java",
       starterCode: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    // TODO: find the largest value in the array\n\n    System.out.println(max);\n  }\n}\n`,
-      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    for (int number : numbers) {\n      if (number > max) {\n        max = number;\n      }\n    }\n\n    System.out.println(max);\n  }\n}\n`,
+      solutionCode: `public class Main {\n  public static void main(String[] args) {\n    int[] numbers = {3, 8, 1, 6, 9};\n    int max = numbers[0];\n\n    for (int i = 0; i < numbers.length; i++) {\n      if (numbers[i] > max) {\n        max = numbers[i];\n      }\n    }\n\n    System.out.println(max);\n  }\n}\n`,
       validationCases: [
         {
           id: "max-default-array",
@@ -355,8 +355,8 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
       titleKey: "java-programming.exercise9",
       descriptionKey: "java-programming.exercise9Desc",
       fileName: "Main.java",
-      starterCode: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
-      solutionCode: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    Collections.sort(numbers);\n    System.out.println(numbers);\n  }\n}\n`,
+      starterCode: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
+      solutionCode: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    for (int i = 0; i < numbers.size() - 1; i++) {\n      for (int j = 0; j < numbers.size() - 1 - i; j++) {\n        if (numbers.get(j) > numbers.get(j + 1)) {\n          int temp = numbers.get(j);\n          numbers.set(j, numbers.get(j + 1));\n          numbers.set(j + 1, temp);\n        }\n      }\n    }\n\n    System.out.println(numbers);\n  }\n}\n`,
       validationCases: [
         {
           id: "list-default",
@@ -372,7 +372,7 @@ export const javaProgrammingExercises: JavaExerciseScenario[] = (
           expectedStdout: "[-1, 3, 3, 9]\n",
         },
       ],
-      code: `import java.util.ArrayList;\nimport java.util.Collections;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
+      code: `import java.util.ArrayList;\n\npublic class Main {\n  public static void main(String[] args) {\n    ArrayList<Integer> numbers = new ArrayList<>();\n    numbers.add(4);\n    numbers.add(1);\n    numbers.add(4);\n    numbers.add(2);\n\n    // TODO: sort the list and print it\n  }\n}\n`,
       definition: {
         titleKey: "java-programming.exercise9",
         descriptionKey: "java-programming.exercise9Desc",

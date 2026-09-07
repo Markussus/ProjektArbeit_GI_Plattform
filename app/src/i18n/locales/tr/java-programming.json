@@ -17,9 +17,9 @@
   "exercise3": "İki sayı ekle",
   "exercise3Desc": "İki tamsayı değeri ekleyin ve toplamı konsolda yazdırın.",
   "exercise4": "Bir diziyi sıralama",
-  "exercise4Desc": "Bir tamsayı dizisini artan sırada sıralayın ve ardından sonucu yazdırın.",
+  "exercise4Desc": "Bir tamsayı dizisini Bubble Sort ile artan sırada sıralayın ve ardından sonucu yazdırın.",
   "exercise5": "Maksimum değeri bulun",
-  "exercise5Desc": "Bir dizi üzerinde yineleme yapın ve içerilen en büyük değeri belirleyin.",
+  "exercise5Desc": "Bir for döngüsü (length ile) kullanarak bir diziyi dolaşın ve en büyük değeri bulun.",
   "editorLabel": "Java düzenleyicisi",
   "editorLoading": "Monaco editörü yükleniyor...",
   "editorLimit": {
@@ -40,7 +40,7 @@
     "not-loaded": "Derleyici henüz yüklenmedi.",
     "loading": "Java derleyicisi arka planda yükleniyor...",
     "ready": "Derleyici Java derlemesi ve yürütülmesi için hazırdır.",
-    "failed": "Derleyici yüklenemedi. Ayrıntılar için aşağıdaki konsol çıkışını kontrol edin."
+    "failed": "Derleyici yüklenemedi. Ayrıntılar için aşağıdaki konsol çıktısını kontrol edin."
   },
   "commandOverview": {
     "button": "Java komutları",
@@ -77,7 +77,7 @@
         "description": "Özel sınıflar, yapıcılar, numaralandırmalar, kayıtlar, arayüzler ve statik yöntemler aynı düzenleyici dosyasına yerleştirilebilir."
       },
       "output": {
-        "title": "Konsol çıkışı",
+        "title": "Konsol çıktısı",
         "description": "Çıktı yakalanır ve editörün altındaki stdout veya stderr'de gösterilir."
       },
       "standardLibrary": {
@@ -124,7 +124,7 @@
     "table": {
       "passed": "Geçti",
       "case": "Test senaryosu",
-      "output": "Çıkış",
+      "output": "Çıktı",
       "expectedOutput": "Beklenen çıktı",
       "phase": "Durum"
     }
@@ -136,7 +136,7 @@
   "exercise8": "Basit bir sınıf kullanın",
   "exercise8Desc": "Yapıcı değerlerini bir sınıfta saklayın ve bir açıklama döndürün.",
   "exercise9": "ArrayList'i sıralama",
-  "exercise9Desc": "Collections.sort ile bir ArrayList'i sıralayın ve listeyi yazdırın.",
+  "exercise9Desc": "Bubble Sort ile bir ArrayList'i sıralayın ve listeyi yazdırın.",
   "exercise10": "FizzBuzz'ı uygulayın",
   "exercise10Desc": "Klasik FizzBuzz çıktısını üretmek için bir döngüyü, moduloyu ve koşulları birleştirin.",
   "exercise11": "Bir palindromu kontrol edin",
