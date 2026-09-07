@@ -1,0 +1,143 @@
+{
+  "topic": {
+    "title": "Turing Makineleri",
+    "description": "Turing Makineleri ve bunların geçiş fonksiyonları aracılığıyla hesaplamanın temelleri hakkında bilgi edinin. Neyin hesaplanabileceğinin sınırlarını keşfedin."
+  },
+  "overview": {
+    "tutorialVideo": "Turing Makinesi eğitim videosu"
+  },
+  "exercises": {
+    "exerciseWorksheetAlternatingSymbols": "Alternatif Sembolleri Kontrol Edin",
+    "exerciseWorksheetAlternatingSymbolsDesc": "{0, 1} üzerinden bir ikili kelime verildiğinde, 0 ve 1'in her zaman değişip değişmediğini kontrol eden, iki eşit sembol birbirini takip ettiğinde veya girişin sonuna ulaşıldığında durdurulan bir Turing makinesi oluşturun.",
+    "exerciseWorksheetSwapFirstTwoSymbols": "İlk İki Sembolün Yerini Değiştirin",
+    "exerciseWorksheetSwapFirstTwoSymbolsDesc": "İlk iki giriş sembolünü değiştiren, kalan tüm sembolleri değiştirmeden bırakan ve üçüncü sembolde bitiren bir Turing makinesi oluşturun.",
+    "exerciseWorksheetSetFirstAndLastToOne": "İlk ve Son Sembolü 1'e Ayarlayın",
+    "exerciseWorksheetSetFirstAndLastToOneDesc": "İlk ve son giriş sembollerinin üzerine 1 yazan, diğer tüm sembolleri değiştirmeden bırakan ve son giriş sembolünde bitiren bir Turing makinesi oluşturun.",
+    "exerciseWorksheetAlternatingOverwrite": "Alternatif Üzerine Yazma",
+    "exerciseWorksheetAlternatingOverwriteDesc": "0 ve 1 sembollerini değiştirerek soldan sağa girişin üzerine yazan ve son giriş sembolünde bitiren bir Turing makinesi oluşturun.",
+    "exerciseWorksheetOverwriteLastTwoWithZero": "Son İki Sembolü 0'a Ayarlayın",
+    "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Son iki giriş sembolünün üzerine 0 yazan ve son giriş sembolünü bitiren bir Turing makinesi oluşturun.",
+    "exerciseWorksheetAsciiParityBit": "ASCII Eşlik Bitini Ayarlayın",
+    "exerciseWorksheetAsciiParityBitDesc": "Tam olarak yedi bitlik bir girdi verildiğinde, birlerin sayısını sayan, çift eşlikli biti girdinin solundaki boş hücreye yazan ve girdiden sonraki ilk boş hücrede bitiren bir Turing makinesi oluşturun.",
+    "exerciseEraseTape": "Kaseti Sil",
+    "exerciseEraseTapeDesc": "Giriş sözcüğünün tamamını boşluklarla değiştiren ve bant temizlendikten sonra duran bir makine oluşturun.",
+    "exerciseInvertBinaryWord": "İkili Kelimeyi Tersine Çevirme",
+    "exerciseInvertBinaryWordDesc": "Her 0'dan 1'e ve her 1'den 0'a geçiş yapan ve ardından ilk boş hücrede duran bir makine yapın.",
+    "exerciseUnaryIncrement": "Tekli Artış",
+    "exerciseUnaryIncrementDesc": "Tekli bir kelimenin sonuna bir 1 daha ekleyen ve sonra duran bir makine oluşturun.",
+    "exerciseDuplicateZeros": "Yinelenen Sıfırlar",
+    "exerciseDuplicateZerosDesc": "İki adet 1 ile çevrelendiğinde banttaki 0'ların sayısını ikiye katlayan bir Turing makinesi oluşturun. Örnekler: 101 -> 1001, 1001 -> 100001.",
+    "exerciseAddBinary": "İkili Sayılar Ekle",
+    "exerciseAddBinaryDesc": "İkili gösterimde iki sayıyı toplayabilen bir Turing makinesi oluşturun. Görevi basitleştirmek için varsayımlarda bulunabilirsiniz. Örneğin, ilk toplananın (soldaki) ikinci toplanandan büyük olduğunu, okuma başlığının her zaman ilk giriş sembolünde başladığını veya sayıların arasında belirli bir sembolün görünmesi gerektiğini tanımlayabilirsiniz.",
+    "exerciseCheckRegex": "Düzenli İfadeyi Kontrol Edin",
+    "exerciseCheckRegexDesc": "R1 = (1(01)* | 0(10)*) düzenli ifadesi verildiğinde, herhangi bir ikili sözcüğün R1 ile tanımlanıp tanımlanamadığını kontrol eden bir Turing makinesi oluşturun. Çalışma sonunda bantta doğru için 't', yanlış için 'f' bulunmalıdır. Örnek: 11001 girdisi R1 ile gösterilemez; bu nedenle bantta yalnızca 'f' kalır.",
+    "exerciseBinaryIncrement": "İkili Artış",
+    "exerciseBinaryIncrementDesc": "Banttaki ikili sayıya 1 ekleyen ve artan sonuçla birlikte duran bir makine oluşturun."
+  },
+  "examples": {
+    "example1": "Bit Çevirme",
+    "example1Desc": "Soldan sağa tarama yaparken ikili sözcükteki her biti tersine çeviren eksiksiz bir makine.",
+    "example2": "Tekli Artış",
+    "example2Desc": "Tekli bir kelimenin sonuna kadar tarayan ve fazladan bir 1 yazan kompakt bir makine.",
+    "example3": "İkili Artış",
+    "example3Desc": "İkili bir kelimeyi birer birer artıran, taşıma tabanlı bir makine.",
+    "example4": "İkili Sayılar Ekle",
+    "example4Desc": "101+11 gibi girişler için eksiksiz bir ikili toplayıcı makinesi. İkinci toplananın nasıl tüketildiğini ve sonucun nasıl oluşturulduğunu görmek için bant durumlarını ve geçişlerini izleyin.",
+    "example5": "İki Sıfır Ara",
+    "example5Desc": "Ardışık iki sıfır arayın ve ardından E yazın. Örnek: ⋄1001⋄ girişi, ⋄100E⋄ çıkışını üretir.",
+    "example6": "Üç Sıfır Ara",
+    "example6Desc": "Bant, her iki tarafı da ⋄ ile sınırlanan sonlu bir 0 ve 1 dizisi içerir. Ardışık üç sıfır arayın, ardına E yazın ve durun. Daha sonra kafa, E'nin solundaki simgenin üzerinde durur. Desen bulunamazsa makine ⋄ üzerinde durur. Örnek: ⋄10000⋄, ⋄1000E⋄ olur.",
+    "example7": "Desen 010'u arayın",
+    "example7Desc": "Aynı koşullar altında, 010 desenini arayın, arkasına E yazın ve kafa E'nin solundaki simgenin üzerindeyken durun. Örnek: ⋄10100⋄, ⋄1010E⋄ olur. 0010 ve 00010 girişleri de modeli içerir."
+  },
+  "actions": {
+    "loadSolution": "Çözümü yükle",
+    "checkSolution": "Çözümü kontrol edin",
+    "checkingSolution": "Kontrol ediliyor..."
+  },
+  "config": {
+    "general": {
+      "title": "Turing Makinesi Yapılandırması",
+      "apply": "Simülasyonu Başlat",
+      "initialTape": "İlk Bant Kelimesi",
+      "initialTapePlaceholder": "Giriş kelimesini girin (örn. 1011)",
+      "startState": "Başlangıç Durumu"
+    },
+    "haltStates": {
+      "haltStates": "Durdurma Durumları",
+      "haltStatesDesc": "Mark durduğunu belirtiyor.",
+      "addHaltState": "Durdurma Durumu Ekle",
+      "addHaltStatePlaceholder": "Durdurma durumu ekle",
+      "noStates": "Mevcut durum yok"
+    },
+    "alphabets": {
+      "inputAlphabet": "Giriş Alfabesi",
+      "tapeAlphabet": "Teyp Alfabesi",
+      "noSymbols": "Sembol yok"
+    },
+    "transitionTable": {
+      "transitionTable": "Geçiş Tablosu",
+      "transitionHintLine1": "Format: (Sonraki Durum, Yazma Sembolü, Hareket) örneğin, (q1, 0, R)",
+      "transitionHintLine2": "İzin verilen yönler (L, N, R); boş sembol girişi ◊ (<>)"
+    },
+    "editing": {
+      "cannotRemoveBlank": "Boş sembol kaldırılamaz.",
+      "cannotRemoveSymbolColumn": "Sembol sütunu kaldırılamaz.",
+      "cannotRemoveLastState": "En az bir durum sütunu kalmalıdır.",
+      "symbolSingleChar": "Bant sembolleri tam olarak bir karakterden oluşmalıdır.",
+      "symbolDuplicate": "Bu bant sembolü geçiş tablosunda zaten mevcut.",
+      "transitionCellInvalid": "Geçişlerde format (Sonraki Durum, Yazma Sembolü, Hareket) kullanılmalı ve yazma sembolü tam olarak bir karakter olmalıdır."
+    }
+  },
+  "validation": {
+    "summary": {
+      "checkInvalidProgram": "Mevcut makine konfigürasyonu henüz geçerli değil.",
+      "exampleCheckUnavailable": "Örneklerin çözüm kontrollerine ihtiyacı yoktur.",
+      "popupTitle": "Çözüm kontrolü",
+      "pass": "GEÇ",
+      "fail": "BAŞARISIZ",
+      "emptyWord": "<boş>"
+    },
+    "table": {
+      "passed": "Geçti",
+      "input": "Giriş",
+      "output": "Çıkış",
+      "expectedOutput": "Beklenen çıktı",
+      "validHaltState": "Geçerli durma durumu"
+    },
+    "program": {
+      "statesEmpty": "En az bir durum tanımlanmalıdır.",
+      "initialStateMissing": "'{{state}}' başlangıç durumu, durumlar kümesinde mevcut olmalıdır.",
+      "haltStatesEmpty": "En az bir durma durumu tanımlanmalıdır.",
+      "haltStateMissing": "'{{state}}' durma durumu, durumlar kümesinde mevcut olmalıdır.",
+      "blankSymbolMissing": "Boş sembol '{{symbol}}' şerit alfabesinin bir parçası olmalıdır.",
+      "blankSymbolInvalid": "Boş sembol '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
+      "tapeSymbolInvalid": "Teyp alfabe sembolü '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
+      "initialTapeInvalidSymbol": "İlk bant sembolü '{{symbol}}' giriş alfabesinin bir parçası olmalı ve tam olarak bir karakterden oluşmalıdır.",
+      "transitionReadSymbolMissing": "'{{symbol}}' okuma sembolü için bir geçiş tanımlandı, ancak bu sembol bant alfabesinin bir parçası değil.",
+      "transitionReadSymbolInvalid": "Geçiş okuma sembolü '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
+      "transitionStateMissing": "'{{state}}' durumu için bir geçiş tanımlandı, ancak bu durum durumlar kümesinin parçası değil.",
+      "transitionNextStateMissing": "'{{symbol}}' sembolündeki '{{state}}' durumundan geçiş, bilinmeyen sonraki '{{nextState}}' durumuna işaret ediyor.",
+      "transitionWriteSymbolMissing": "'{{symbol}}' sembolündeki '{{state}}' durumundan geçiş, bilinmeyen sembol '{{writeSymbol}}' yazıyor.",
+      "transitionWriteSymbolInvalid": "'{{symbol}}' sembolündeki '{{state}}' durumundan geçiş tam olarak bir karakter yazmalıdır."
+    }
+  },
+  "sim": {
+    "screen": {
+      "title": "Turing Makinesi Simülatörü",
+      "edit": "Yapılandırmayı Düzenle"
+    },
+    "status": {
+      "status": "Durum",
+      "state": "Mevcut Durum",
+      "symbol": "Mevcut Sembol",
+      "step": "Adım",
+      "halt": "Durduruldu",
+      "yes": "Evet",
+      "no": "Hayır"
+    },
+    "haltReason": {
+      "missingTransition": "'{{state}}' durumu ve '{{symbol}}' sembolü için herhangi bir geçiş tanımlanmadı."
+    }
+  }
+}

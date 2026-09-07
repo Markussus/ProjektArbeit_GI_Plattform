@@ -11,11 +11,15 @@ import type { TranslationKey } from "@/types/i18n";
 const languageLabels: Record<SupportedLanguage, string> = {
   de: "DE",
   en: "EN",
+  tr: "TR",
+  uk: "UK",
 };
 
 const languageTranslationKeys: Record<SupportedLanguage, TranslationKey> = {
   de: "common.language.de",
   en: "common.language.en",
+  tr: "common.language.tr",
+  uk: "common.language.uk",
 };
 
 export function LanguageSelect() {

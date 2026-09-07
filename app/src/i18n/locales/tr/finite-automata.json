@@ -1,0 +1,236 @@
+{
+  "topic": {
+    "title": "Sonlu Otomatlar",
+    "description": "Deterministik ve deterministik olmayan sonlu otomatları inceleyin. DFA ve NFA oluşturun, düzenli dilbilgilerini dönüştürün ve giriş sözcüklerini adım adım işleyin.",
+    "tutorialVideo": "Sonlu Otomatlar tanıtım videosu"
+  },
+  "editor": {
+    "manual": "Manuel Düzenleyici",
+    "grammar": "Dilbilgisinden"
+  },
+  "config": {
+    "title": "Otomat Yapılandırması",
+    "type": "Tür",
+    "alphabet": "Alfabe (virgülle ayrılmış)",
+    "startState": "Başlangıç Durumu",
+    "acceptStates": "Durumları Kabul Et (virgülle ayrılmış)",
+    "addEpsilon": "ε-Geçişleri Ekle",
+    "addState": "Durum ekle",
+    "removeState": "{{state}} durumunu kaldır",
+    "transitionTable": "Geçiş Tablosu",
+    "inputWord": "Giriş Kelimesi",
+    "inputWordHelp": "Her karakter bir giriş sembolü olarak değerlendirilir.",
+    "apply": "Simülasyonu Başlat"
+  },
+  "exercisesTab": {
+    "status": {
+      "notStarted": "Başlatılmadı",
+      "inProgress": "Devam ediyor",
+      "completed": "Tamamlandı"
+    },
+    "endsWith01": {
+      "title": "\"01\" ile biten dizeler",
+      "goal": "\"01\" ile biten ikili dizeleri kabul eden bir DFA oluşturun.",
+      "description": "Tam olarak son iki sembolü \"0\" ve ardından \"1\" gelen dizeleri kabul eden {0, 1} üzerinde bir DFA tasarlayın (ör. \"01\", \"101\", \"1001\"). Başka herhangi bir kalıpla biten dizeler reddedilmelidir."
+    },
+    "endsWith00": {
+      "title": "\"00\" ile biten dizeler",
+      "goal": "İki sıfırla biten ikili dizeleri kabul eden bir DFA oluşturun.",
+      "description": "Tam olarak son iki sembolü 0 olan dizeleri kabul eden {0, 1} üzerinde bir DFA tasarlayın (ör. \"00\", \"100\", \"1100\"). Tek sıfırlar veya 1 ile biten dizeler reddedilmelidir."
+    },
+    "evenOnes": {
+      "title": "Çift sayı 1'ler",
+      "goal": "Çift sayıda 1 (sıfır 1'ler dahil) içeren ikili dizeleri kabul edin.",
+      "description": "Şu ana kadar görülen 1'lerin paritesini izleyen bir DFA tasarlayın. Boş dize kabul edilmelidir (sıfır çifttir)."
+    },
+    "noConsecOnes": {
+      "title": "Ardışık iki 1 yok",
+      "goal": "Hiçbir zaman \"11\" içermeyen ikili dizeleri alt dize olarak kabul edin.",
+      "description": "İki 1'in yan yana göründüğü herhangi bir dizeyi reddeden bir DFA tasarlayın. \"0\", \"01\", \"010\" gibi dizeler kabul edilir; \"11\", \"0110\" reddedilir."
+    },
+    "divBy3": {
+      "title": "3'e bölünebilen ikili sayılar",
+      "goal": "Ondalık değeri 3'e bölünebilen ikili dizeleri kabul edin.",
+      "description": "İkili değer modulo 3'ün çalışan geri kalanını izleyen bir DFA oluşturun. Kalan 0'ı temsil eden durumları kabul edin."
+    },
+    "grammarTwoOnesZeros": {
+      "title": "Dilbilgisinden Otomat: 11 0ⁿ",
+      "goal": "L = { 11 0ⁿ | dili için bir DFA oluşturun n ≥ 0 }: iki birin ardından herhangi bir sayıda sıfır gelir.",
+      "description": "Aşağıda gösterilen sağ-doğrusal dilbilgisi ile türetilen kelimeleri tam olarak kabul eden bir DFA oluşturun ve ardından \"11001\" kelimesinin dile ait olup olmadığını kontrol edin."
+    },
+    "grammarOnes": {
+      "title": "Dilbilgisinden Otomat: 1 0ⁿ 1",
+      "goal": "Aşağıdaki gramer tarafından oluşturulan dil için bir DFA oluşturun.",
+      "description": "Bu sağ doğrusal dilbilgisinden türetilen sözcükleri tam olarak kabul eden bir DFA oluşturun. Her terminal olmayan simge bir duruma dönüşür; ε üretimi bir kabul durumunu işaretler."
+    },
+    "grammar0011": {
+      "title": "Dilbilgisinden Otomat: (0011)(0011)*",
+      "goal": "Aşağıdaki gramer tarafından oluşturulan dil için bir DFA oluşturun.",
+      "description": "Bu sağ doğrusal dilbilgisinden türetilen sözcükleri tam olarak kabul eden bir DFA oluşturun. Her terminal olmayan simge bir duruma dönüşür; ε üretimi bir kabul durumunu işaretler."
+    },
+    "grammarOnesZero": {
+      "title": "Dilbilgisinden Otomat: 1ⁿ 0",
+      "goal": "Aşağıdaki gramer tarafından oluşturulan dil için bir DFA oluşturun.",
+      "description": "Bu sağ doğrusal dilbilgisinden türetilen sözcükleri tam olarak kabul eden bir DFA oluşturun. Her terminal olmayan simge bir duruma dönüşür; ε üretimi bir kabul durumunu işaretler."
+    },
+    "categories": {
+      "languageToAutomaton": {
+        "title": "Dil → Otomat",
+        "description": "Tanımlanan kelime kümesini tam olarak kabul eden bir otomat oluşturun."
+      },
+      "grammarToAutomaton": {
+        "title": "Dilbilgisi → Otomat",
+        "description": "Her sağ-doğrusal gramer bir dili tanımlar. Alıştırmada gösterilen dil bilgisi için DFA'yı oluşturun."
+      }
+    }
+  },
+  "exerciseWorkspace": {
+    "check": "Çözümü Kontrol Et",
+    "showSolution": "Çözümü yükle",
+    "structuralFail": "Otomatınız henüz geçerli değil",
+    "structuralHint": "Çözümle karşılaştırma yapmadan önce vurgulanan yapılandırma sorunlarını düzeltin.",
+    "passed": "Tüm kontroller geçti!",
+    "passedDetail": "{{total}} test dizelerinden {{n}} doğru şekilde kabul edildi/reddedildi.",
+    "failed": "Beklenen dille eşleşmiyor",
+    "failedDetail": "{{total}} test dizelerinden {{passed}} kabul edildi, {{failed}} kabul edilmedi.",
+    "counterexample": "Karşı örnek:",
+    "expected": "beklenen",
+    "got": "var",
+    "accept": "kabul et",
+    "reject": "reddetmek",
+    "unbuiltTitle": "Önce otomatınızı oluşturun",
+    "unbuiltBody": "Durumları, geçişleri ve en az bir kabul durumunu ekleyin, ardından Check Solution'ı yeniden çalıştırın.",
+    "grammarLabel": "Dilbilgisi",
+    "grammarEpsilonNote": "ε boş sözcüğü temsil eder ve kabul edilen (nihai) durumu işaret eder."
+  },
+  "examples": {
+    "containsAba": {
+      "title": "\"aba\" alt dizesini içerir",
+      "description": "{a, b} üzerinde herhangi bir yerde alt dize olarak \"aba\" içeren herhangi bir dizeyi kabul eden bir NFA. Belirlenemezliği gösterir."
+    },
+    "lecture": {
+      "title": "Bir veya daha fazla 0, ardından tek bir 1 (00*1)",
+      "description": "Bir veya daha fazla '0' ve ardından tam olarak bir '1' gelen ders alıştırmasından bir DFA (Regex: 00*1)."
+    },
+    "endsWithAb": {
+      "title": "\"ab\" ile bitiyor",
+      "description": "Simülatörün başlangıçta kullandığı otomat olan \"ab\" ile biten kelimeleri tam olarak kabul eden {a, b} üzerinde bir DFA. \"aab\" kabul edilir, \"aba\" reddedilir."
+    },
+    "grammar": {
+      "title": "Dilbilgisi → Otomatik",
+      "description": "Sağ-doğrusal gramer G = {S → 0S | 0A, A → 1A | 1}, bir NFA'ya ve ardından alt küme yapısı yoluyla minimal bir DFA'ya dönüştürülür. Her ikisi de L = {0ⁿ 1ᵐ | n,m ≥ 1}."
+    },
+    "categories": {
+      "dfa": {
+        "title": "Deterministik Otomat (DFA)",
+        "description": "Tek bir işlemi takip edin: durum ve sembol başına tam olarak bir geçiş."
+      },
+      "nfa": {
+        "title": "Deterministik Olmayan Otomata (NFA)",
+        "description": "Aynı anda birkaç durum etkin olabilir; herhangi bir yol kabul durumuna ulaşırsa sözcük kabul edilir."
+      },
+      "grammarToAutomaton": {
+        "title": "Dilbilgisi → Otomat",
+        "description": "Doğrusal bir dilbilgisini bir otomat haline getirin ve NFA'yı eşdeğer bir DFA ile karşılaştırın."
+      }
+    }
+  },
+  "batch": {
+    "title": "Toplu Test",
+    "placeholder": "Kelimeleri girin, örneğin: \n101\n100\n11100",
+    "runAll": "Tümünü Çalıştır",
+    "clear": "Temizle",
+    "total": "toplam",
+    "steps": "adımlar"
+  },
+  "grammar": {
+    "title": "Düzenli Dilbilgisi → Otomat",
+    "intro": "Sağa doğru bir dilbilgisi girin. Soldaki ilk terminal olmayan başlangıç ​​sembolü olur; Terminal olmayanlar ve terminaller üretimlerinizden çıkarılmaktadır.",
+    "productions": "Dilbilgisi",
+    "productionsHint": "Hat başına bir üretim. İki format desteklenir (otomatik olarak algılanır).",
+    "convert": "Otomat'a Dönüştür",
+    "loadExample": "Yük Örneği",
+    "supportedFormats": "Desteklenen Formatlar",
+    "format1Label": "Biçim 1 — basitleştirilmiş",
+    "format2Label": "Biçim 2 — yapılandırılmış",
+    "detectedFormat": "Algılanan format",
+    "format": {
+      "simple": "Basitleştirilmiş",
+      "structured": "Yapılandırılmış"
+    },
+    "parseError": "Dilbilgisi henüz ayrıştırılamaz",
+    "epsilonHint": "Boş dize sembolünü (ε) eklemek için kopyalayıp yapıştırabilir veya 'epsilon' kelimesini yazabilirsiniz.",
+    "grammar_epsilon_lhs_invalid": "Bir ε üretimi, terminal olmayan kümede olmayan bir terminal olmayanı referans alır.",
+    "grammar_no_nonterminals": "Dilbilgisinde terminal olmayan öğeler yoktur.",
+    "grammar_no_terminals": "Dilbilgisinde terminal sembolleri yoktur.",
+    "grammar_start_invalid": "Başlangıç sembolü gramerin terminal olmayan öğelerinden biri değildir.",
+    "grammar_lhs_invalid": "Bir kuralın sol tarafı dil bilgisinin terminal olmayanlarından biri değildir.",
+    "grammar_terminal_invalid": "Kural, alfabede olmayan bir terminal kullanıyor.",
+    "grammar_rhs_nonterminal_invalid": "Bir kural, dilbilgisinin tanımlamadığı bir terminal olmayanı işaret eder.",
+    "errors": {
+      "noProductions": "Üretim kuralı bulunamadı. 'S -> 0S | 1A' gibi en az bir kural ekleyin.",
+      "missingArrow": "'{{line}}' üretimi okunamıyor. 'LHS -> RHS' şeklinde bekleniyordu.",
+      "emptyAlternative": "'{{line}}' dosyasında boş bir alternatif var.",
+      "epsilonNotAlone": "ε alternatif olarak tek başına durmalıdır — '{{line}}' içinde '{{alternative}}' var.",
+      "unitProduction": "'{{line}}' içindeki '{{alternative}}' yalnızca bir terminal değildir. Doğrusal bir kural için öncelikle bir terminale ihtiyaç vardır, örneğin 'aB'.",
+      "undefinedNonTerminal": "'{{line}}' içindeki '{{alternative}}' sağ-doğrusal değildir: '{{rest}}'nin kendine ait bir kuralı yoktur. Tek bir terminal ('A -> a') veya bir terminal ve ardından tanımlı bir terminal olmayan ('A -> aB') yazın.",
+      "unsupportedType": "Desteklenmeyen tür '{{type}}'. Yalnızca 'type: grammar' desteklenir.",
+      "structuredLine": "Satır {{line}}: 'key: value' biçimi veya bir üretim kuralı bekleniyor.",
+      "structuredMissingType": "Yapılandırılmış biçim 'type: grammar' başlığını gerektirir."
+    }
+  },
+  "sim": {
+    "emptyWord": "Boş kelime (ε)",
+    "inputWord": "Giriş Kelimesi",
+    "title": "Simülasyon",
+    "edit": "Yapılandırmayı Düzenle",
+    "stepHistory": "Adım Geçmişi",
+    "stepOf": "{{total}} Adımı {{current}}",
+    "status": {
+      "label": "Durum",
+      "error": "Hata",
+      "running": "Koşu",
+      "accepted": "Kabul edildi ✓",
+      "rejected": "Reddedildi ✗",
+      "halted": "Durduruldu",
+      "type": "Tür",
+      "step": "Adım",
+      "activeStates": "Aktif Durumlar",
+      "position": "Pozisyon"
+    },
+    "explanation": {
+      "reading": "{{pos}} konumunda '{{symbol}}' sembolü okunuyor. Aktif durumlar: {{states}}",
+      "processing": "İşleniyor...",
+      "accepted": "Söz kabul edilir. Son durumlar {{states}} bir kabul durumu içerir.",
+      "rejectedDead": "Söz reddediliyor. Ulaşılabilir durum yok (çıkmaz sokak).",
+      "rejected": "Söz reddediliyor. {{states}} son durumları bir kabul durumunu içermez."
+    },
+    "inputWordLength": "{{count}} sembolleri",
+    "stepStart": "Başlat",
+    "stepTooltip": "Adım {{step}} · {{count}} durum(lar)ı",
+    "stepTooltipUnreached": "Adım {{step}} (henüz ulaşılmadı)"
+  },
+  "validation": {
+    "statesEmpty": "Eyaletler boş olmamalıdır.",
+    "startStateMissing": "Başlangıç durumu, durum kümesinde değil.",
+    "acceptStatesInvalid": "Kabul etme durumu, durum kümesinde değil.",
+    "alphabetEmpty": "Alfabe boş olmamalıdır.",
+    "transitionSourceInvalid": "Geçiş kaynağı durumu geçersiz.",
+    "transitionTargetInvalid": "Geçiş hedefi durumu geçersiz.",
+    "transitionSymbolInvalid": "Alfabede geçiş sembolü yok.",
+    "dfaNondeterministic": "DFA'nın deterministik olmayan geçişleri vardır.",
+    "dfaEpsilon": "DFA'da ε-geçişleri olmamalıdır."
+  },
+  "diagram": {
+    "title": "Durum Diyagramı",
+    "violations_one": "{{count}} DFA ihlali",
+    "violations_other": "{{count}} DFA ihlalleri",
+    "violationEpsilon": "{{state}} Durumunda ε geçişi vardır; DFA'da buna izin verilmez.",
+    "violationNondeterministic": "'{{symbol}}' sembolündeki {{state}} durumu {{targets}}'ye gider — bu, DFA determinizmini ihlal eder.",
+    "start": "başlangıç",
+    "usageHint": "taşımak için düğümü sürükleyin · kaydırmak için tuvali sürükleyin · yakınlaştırmak için kaydırın",
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "resetView": "Görünümü sıfırla"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "title": "Düzenli Diller",
+  "description": "Düzenli diller ve sağ doğrusal dilbilgileriyle çalışın; bir dilbilgisinin ürettiği sözcükleri listeleyin, bir dil tanımından dilbilgisi türetin ve sözcük üyeliğini sınayın.",
+  "tutorialVideo": "Düzenli Diller tanıtım videosu",
+  "simulator": {
+    "modes": {
+      "grammarToLanguage": "Dilbilgisi → Dil",
+      "languageToGrammar": "Dil → Dilbilgisi",
+      "recognizeWord": "Kelimeyi Tanı"
+    },
+    "grammarInput": "Dilbilgisi",
+    "grammarOutput": "Ortaya Çıkan Dilbilgisi",
+    "grammarMode": {
+      "label": "Dilbilgisi stili",
+      "detailed": "Detaylı",
+      "simplified": "Basitleştirilmiş"
+    },
+    "grammarHelp": "Her satıra bir üretim girin, örneğin 'S -> 0S | 1A'. ε (veya 'epsilon' kelimesi) boş kelimeyi temsil eder.",
+    "grammarInvalid": "Geçerli bir sağ-doğrusal dilbilgisi girin.",
+    "languageOutput": "Dil Numaralandırma",
+    "maxLen": "Maksimum Kelime Uzunluğu",
+    "maxWords": "Maksimum Kelime Sayısı",
+    "noWords": "Bu sınırlar içerisinde hiçbir kelime türetilemez.",
+    "truncatedNote": "Çıktı kelime sınırına göre kesildi. Daha fazlasını görmek için sınırı artırın.",
+    "completeNote": "Seçilen uzunluğa kadar türetilebilen tüm kelimeler gösterilir.",
+    "languageDefinition": "Dil Tanımı",
+    "languageInvalid": "Dil bilgisi türetmek için geçerli bir dil tanımı girin.",
+    "preset": {
+      "enumeration": "Numaralandırma",
+      "aStarcBStar": "a^n c b^m",
+      "aStar": "bir^n",
+      "abGroup": "(ab)^n"
+    },
+    "testWord": "Test Edilecek Kelimeler",
+    "testWordPlaceholder": "Virgülle ayrılmış kelimeler, ör. 0, 00, e",
+    "testWordHelp": "Birkaç kelimeyi virgülle ayırın. Her karakter bir terminal sembolü olarak sayılır ve virgüllerin etrafındaki boşluklar dikkate alınmaz. Boş kelimeye ε veya epsilon yazın.",
+    "testWordEmpty": "Test edilecek bir kelime yazın. Boş kelimeye ε veya epsilon yazın.",
+    "supportedFormats": "Desteklenen Formatlar",
+    "supportedFormatsExtensional": "Genişlemeli / set gösterimi",
+    "supportedFormatsIntensional": "Kasıtlı / biçimsel gösterim",
+    "reason": {
+      "accepted": "Çalıştırma şu tarihte sona erdi: {{states}} (kabul ediliyor)",
+      "rejectedStates": "Çalıştırma şu tarihte sona erdi: {{states}} (kabul edilmiyor)",
+      "rejectedDeadEnd": "Sonraki sembol için geçiş yok — reddedildi."
+    }
+  },
+  "examples": {
+    "categories": {
+      "grammarToLanguage": {
+        "title": "Dilbilgisi → Dil",
+        "description": "Bir gramerin hangi kelimeleri ürettiğini belirleyin."
+      },
+      "languageToGrammar": {
+        "title": "Dil → Dilbilgisi",
+        "description": "Kelime listesi veya kısa kalıp olarak verilen bir dilden uygun bir dil bilgisi oluşturun."
+      },
+      "recognizeWord": {
+        "title": "Kelimeleri Tanı",
+        "description": "Belirli bir kelimenin gramer diline ait olup olmadığına karar verin."
+      }
+    },
+    "grammarToLanguage": {
+      "title": "Dilbilgisi → Dil (Genişlik-önce Numaralandırma)",
+      "description": "Türetmeleri üzerinde kapsamlı arama kullanarak bir dilbilgisi tarafından oluşturulan ilk sözcükleri numaralandırır."
+    },
+    "grammarDefault": {
+      "title": "Dilbilgisi → Dil (a'lar, ardından en az bir b)",
+      "description": "Dilbilgisi → Dil dönüştürücünün başlangıçta kullandığı dilbilgisi: herhangi bir sayıda a ve ardından en az bir b."
+    },
+    "languageToGrammar": {
+      "title": "Dil → Dilbilgisi (Kelime Listesi)",
+      "description": "Kelimeleri bir önek ağacında birleştirerek L = {\"ab\", \"abb\", \"abbb\"} gibi açık bir kümeden düzenli bir dilbilgisi oluşturur."
+    },
+    "languageSetBuilder": {
+      "title": "Dil → Dilbilgisi (Küme Oluşturucu Modeli)",
+      "description": "Üslü ifadeler ve koşullar içeren küme oluşturucu gösterimini okur ve doğrudan tam olarak bu dili üreten bir doğru-doğrusal dilbilgisi türetir."
+    },
+    "recognizeWord": {
+      "title": "Word'ü Tanı (Üyelik Testi)",
+      "description": "Virgülle ayrılmış sözcük listesini dil bilgisinin oluşturduğu dile göre kontrol eder."
+    },
+    "lectureGrammar1": {
+      "title": "Dilbilgisi → Dil (Sıfırlardan Sonra Bir Bir)",
+      "description": "Bu sağ-doğrusal dilbilgisini okuyun: kelimeler en az bir 0 ile başlar ve tam olarak bir 1 ile biter."
+    },
+    "lectureGrammar2": {
+      "title": "Dilbilgisi → Dil (Dönüşümlü Sıfırlar ve Birler)",
+      "description": "Şu dilbilgisini okuyun: sıfırlar ve birler arasında kesinlikle değişen, her iki simgeyle başlayan ve minimum uzunluğu 1 olan."
+    },
+    "lectureLanguage1": {
+      "title": "Dil → Dilbilgisi (Sıfırlar Arasında Tek Bir)",
+      "description": "Bu dil için bir gramer bulun: en az bir 0, tam olarak bir 1 ve ardından en az bir 0."
+    },
+    "languageDefault": {
+      "title": "Dil → Dilbilgisi (Sıfırlar, Bir, Sıfırlar)",
+      "description": "Sıfırlar, tek bir 1 ve ardından sıfırlar — sonunda \"..\" ile yazılan açık uçlu bir desen."
+    }
+  },
+  "exercises": {
+    "categories": {
+      "grammarToLanguage": {
+        "title": "Dilbilgisi → Dil",
+        "description": "Üretim kurallarını okuyun ve dilbilgisinin hangi kelimeleri oluşturduğunu belirleyin."
+      },
+      "languageToGrammar": {
+        "title": "Dil → Dilbilgisi",
+        "description": "Kuralları tam olarak verilen kelimeleri üreten düzenli bir dilbilgisi yazın."
+      },
+      "applied": {
+        "title": "Uygulamalı Dilbilgisi",
+        "description": "Tamsayılar ve tanımlayıcılar gibi gerçek belirteç biçimlerini düzenli dilbilgileriyle modelleyin."
+      }
+    },
+    "g2lFiniteBinary": {
+      "title": "Dilbilgisi → Dil (Üç Bitlik Kelimeler)",
+      "description": "Bu gramerden türetilen tüm kelimeleri sıralayın (tam sonlu dil L(G)).",
+      "goal": "L(G) sonlu dilinin tamamını listeleyin."
+    },
+    "g2lTrailingZero": {
+      "title": "Gramer → Dil (Sıfırlar Arasındakiler)",
+      "description": "Bu gramerin oluşturduğu dili belirleyin ve ilk kelimeleri listeleyin.",
+      "goal": "Sonsuz dili tanımlayın ve ilk kelimelerini listeleyin."
+    },
+    "g2lEpsilonLoop": {
+      "title": "Dilbilgisi → Dil (ε ile Özyineleme)",
+      "description": "B'nin ε üretimini hesaba katarak türetilebilir kelimeleri listeleyin.",
+      "goal": "En kısa kelimeleri numaralandırın ve B'nin ε-üretimini açıklayın."
+    },
+    "g2lGrouped": {
+      "title": "Dilbilgisi → Dil (Gruplandırılmış Alternatifler)",
+      "description": "Gruplandırılmış kuralları çözün ve dilbilgisi tarafından oluşturulan kelimeleri listeleyin.",
+      "goal": "Parantezleri sıradan alternatifler olarak okuyun ve kelimeleri listeleyin."
+    },
+    "l2gZeroOnesZero": {
+      "title": "Dil → Dilbilgisi (Bir 0, Bazı 1'ler, Bir 0)",
+      "description": "n ≥ 1 için 0 1ⁿ 0 formundaki kelimeleri üreten doğru-doğrusal kuralları yazın.",
+      "goal": "n ≥ 1 için 0 1ⁿ 0 üreten sağ-doğrusal kuralları yazın."
+    },
+    "l2gFourWords": {
+      "title": "Dil → Dilbilgisi (Dört Sabit Kelime)",
+      "description": "Tam olarak dört adet 4 bitlik kelimeyi ({1011, 0011, 0111, 1111}) türeten bir dilbilgisi yazın.",
+      "goal": "Tam olarak bu dört adet 4 bitlik kelimeyi oluşturun, başka hiçbir şey yapmayın."
+    },
+    "l2gNestedZeros": {
+      "title": "Dil → Dilbilgisi (Sıfır Blokları)",
+      "description": "n, m ≥ 1 olmak üzere 1 0ⁿ 1 0ᵐ 1 biçimindeki sözcükleri üreten bir dilbilgisi oluşturun.",
+      "goal": "n, m ≥ 1 olmak üzere 1 0ⁿ 1 0ᵐ 1 formunda kelimeler oluşturun."
+    },
+    "appliedIntegers": {
+      "title": "Dil → Dilbilgisi (Tamsayılar)",
+      "description": "Geçerli tamsayılar için bir dilbilgisi yazın: isteğe bağlı eksi işareti, başta sıfır yok (örneğin 0, 42, -100).",
+      "goal": "0, 42, -100…'ü kabul edin, ancak 007'yi ve eksi işaretini tek başına reddedin."
+    },
+    "appliedIdentifiers": {
+      "title": "Dil → Dilbilgisi (Tanımlayıcılar)",
+      "description": "Değişken tanımlayıcılar için bir dilbilgisi yazın: ilk harf küçük harf ve ardından harfler gelir, rakam yoktur (örn. x, foo, myVar).",
+      "goal": "X, foo, myVar…'ı kabul edin, ancak başlangıçtaki büyük harfleri veya rakamları reddedin."
+    }
+  },
+  "exerciseWorkspace": {
+    "showSolution": "Çözümü yükle",
+    "check": "Çözümü Kontrol Et",
+    "checkMatch": "Doğru görünüyor!",
+    "checkMismatch": "Henüz hedef dille eşleşmiyor",
+    "checkMatchDetailG2L": "Listelediğiniz her kelime dilbilgisi tarafından oluşturulur ve en kısa kelimelerin hepsini buldunuz.",
+    "checkWrongG2L": "Bu kelimeler gramer tarafından oluşturulmamıştır: {{words}}",
+    "checkMissingG2L": "Yine de şu kelimeleri listelemeniz gerekiyor: {{words}}",
+    "g2lGivenGrammar": "Verilen Dilbilgisi",
+    "g2lYourEnumeration": "Numaralandırmanız",
+    "g2lHelp": "Dil bilgisinin oluşturduğu sözcükleri virgüllerle veya yeni satırlarla ayırarak listeleyin. Boş kelime için ε veya epsilon kullanın, ardından Çözümü Kontrol Et'e basın.",
+    "g2lPlaceholder": "örneğin 100, 101, 110",
+    "checkMatchDetailL2G": "Dilbilginiz gerekli tüm kelimeleri üretir ve karşı örnekleri reddeder.",
+    "checkWrongL2G": "Dil bilginiz aynı zamanda üretmemesi gereken sözcükleri de üretir: {{words}}",
+    "checkMissingL2G": "Dil bilginiz şu gerekli kelimeleri oluşturmuyor: {{words}}",
+    "checkInvalidGrammar": "Geçerli bir sağ-doğrusal dilbilgisi girin ve tekrar kontrol edin.",
+    "l2gTargetLanguage": "Hedef Dil",
+    "l2gYourGrammar": "Dilbilginiz",
+    "l2gHelp": "Hedef dili oluşturan sağa doğru bir dilbilgisi yazın ve ardından Çözümü Kontrol Et'e basın.",
+    "checkEmpty": "En az bir kelime girin ve tekrar kontrol edin.",
+    "checkUnavailable": "Bu alıştırma otomatik olarak kontrol edilemez."
+  },
+  "languageErrors": {
+    "empty": "Bir dil tanımı girin.",
+    "missingBraces": "Dili parantez içinde bir küme olarak yazın, ör. L = {\"010\", \"0010\"} veya L = {a^n c b^m | n, m > 0}.",
+    "strayQuote": "'{{item}}' fazladan bir tırnak işareti içeriyor. Tırnak işaretleri sözcüğün tamamını çevrelemelidir; sözcükleri virgülle ayırın, ör. L = {\"hello\", \"World\"}.",
+    "wordWhitespace": "'{{word}}' sözcüğü boşluk içeriyor. Boşluk bir sembol değildir; kelimeleri virgülle ayırın, ör. L = {\"ab\", \"cd\"}.",
+    "variableReused": "'{{name}}' değişkeni birden fazla çarpanda kullanılıyor. Bu, düzenli olmayan bir dili (a^n b^n gibi) tanımlar ve düzenli bir dilbilgisiyle yazılamaz.",
+    "patternUnexpectedChar": "Desende {{position}} konumundaki beklenmeyen karakter '{{char}}'.",
+    "missingGroupClose": "{{position}} konumundan önce başlayan grubu kapatmak için ')' eksik.",
+    "trailingCaret": "Üssüz bir '^' var.",
+    "badExponent": "{{position}} konumundaki '^'den sonra bir değişken harf veya tamsayı bekleniyordu.",
+    "nestedRepetition": "'{{factor}}' bir grup içinde tekrarlanıyor. Tekrarı bir kez yazın, ör. '(a^n)b' yerine 'a^n b'.",
+    "constraintVariable": "'{{constraint}}' koşulunun başlangıcında bir değişken adı bekleniyordu.",
+    "expectedNaturals": "'{{op}}' sonrasında ℕ (veya N) bekleniyordu, '{{got}}' alındı.",
+    "expectedInteger": "'{{op}}' sonrasında bir tamsayı bekleniyordu.",
+    "upperBound": "Üst sınırlar ('{{op}}') desteklenmez; dili sonlu hale getirir. Bunun yerine kelimeleri listeleyin.",
+    "unexpectedToken": "Koşulda beklenmeyen '{{token}}' belirteci."
+  }
+}

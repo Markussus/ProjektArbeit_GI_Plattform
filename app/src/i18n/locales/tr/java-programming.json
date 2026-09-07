@@ -1,0 +1,171 @@
+{
+  "title": "Java Programlama",
+  "description": "Konsol çıktısı, döngüler ve diziler gibi temel Java temelleriyle çalışın. Simülasyon sekmesi doğrudan düzenlenebilir bir Java kod düzenleyicisi sağlar.",
+  "tutorialVideo": "Eğitim videosu",
+  "example1Title": "Basit Merhaba Dünya",
+  "example1Text": "Bir ana yönteme ve bir konsol yazdırma ifadesine sahip en küçük Java programı.",
+  "example2Title": "Tekrarlanan çıktı",
+  "example2Text": "For döngüsü, aynı talimatı birkaç kez tekrarlamanın standart yoludur.",
+  "example3Title": "Bir diziyi sıralama",
+  "example3Text": "Bir tamsayı dizisi Arrays.sort ile artan düzende sıralanabilir.",
+  "example4Title": "Tarayıcı ile kullanıcı girişi",
+  "example4Text": "Giriş alanına değerleri önceden girin ve bunları Scanner.nextLine() ve Scanner.nextInt() kullanarak satır ve simge bazında okuyun.",
+  "exercise1": "Merhaba Dünyayı Yazdır",
+  "exercise1Desc": "Merhaba Dünya'yı konsola tam olarak bir kez yazdıran bir Java programı yazın.",
+  "exercise2": "Merhaba Dünya'yı beş kez yazdır",
+  "exercise2Desc": "Merhaba Dünya'yı konsola tam olarak beş kez yazdırmak için bir döngü kullanın.",
+  "exercise3": "İki sayı ekle",
+  "exercise3Desc": "İki tamsayı değeri ekleyin ve toplamı konsolda yazdırın.",
+  "exercise4": "Bir diziyi sıralama",
+  "exercise4Desc": "Bir tamsayı dizisini artan sırada sıralayın ve ardından sonucu yazdırın.",
+  "exercise5": "Maksimum değeri bulun",
+  "exercise5Desc": "Bir dizi üzerinde yineleme yapın ve içerilen en büyük değeri belirleyin.",
+  "editorLabel": "Java düzenleyicisi",
+  "editorLoading": "Monaco editörü yükleniyor...",
+  "editorLimit": {
+    "lines": "Java düzenleyicisi {{maxLines}} satırlarla sınırlıdır. Yapıştırılan veya içe aktarılan metin kabul edilmedi.",
+    "characters": "Java düzenleyicisi {{maxCharacters}} karakterle sınırlıdır. Yapıştırılan veya içe aktarılan metin kabul edilmedi."
+  },
+  "compilerLabel": "Derleyici",
+  "timeoutLabel": "Zaman aşımı",
+  "timeoutUnit": "saniye",
+  "runWhileLoading": "Derleyici yükleniyor",
+  "compilerStatus": {
+    "not-loaded": "yüklenmedi",
+    "loading": "yükleniyor",
+    "ready": "hazır",
+    "failed": "başarısız oldu"
+  },
+  "compilerStatusText": {
+    "not-loaded": "Derleyici henüz yüklenmedi.",
+    "loading": "Java derleyicisi arka planda yükleniyor...",
+    "ready": "Derleyici Java derlemesi ve yürütülmesi için hazırdır.",
+    "failed": "Derleyici yüklenemedi. Ayrıntılar için aşağıdaki konsol çıkışını kontrol edin."
+  },
+  "commandOverview": {
+    "button": "Java komutları",
+    "title": "Java düzenleyicisinde neler çalışır?",
+    "summary": "Küçük tarayıcı programları için Java {{version}}",
+    "limitationsText": "Main.Java tarzı bir program yazın. Java kaynak kodunu çalıştırabilirsiniz ancak düzenleyiciye terminal komutlarını yazamazsınız.",
+    "commandListTitle": "Kompakt genel bakış",
+    "status": {
+      "supported": "Eserler",
+      "limited": "Sınırlı",
+      "blocked": "çalışmıyor",
+      "not-supported": "Desteklenmiyor",
+      "explained": "Sınırlı"
+    },
+    "capabilities": {
+      "programShape": {
+        "title": "Program giriş noktası",
+        "description": "Tek bir Main.java programı çalışır. public class Main ve public olmayan ek yardımcı sınıflar aynı düzenleyici dosyasına yerleştirilebilir."
+      },
+      "basics": {
+        "title": "Temel Java sözdizimi",
+        "description": "Temel Java sözdizimi çalışır: değişkenler, operatörler, if/else, switch ve yöntem çağrıları."
+      },
+      "loops": {
+        "title": "Döngüler ve kontrol akışı",
+        "description": "for, while, do/while ve for-each döngüleri alıştırmalar ve küçük algoritmalar için çalışır."
+      },
+      "arraysCollections": {
+        "title": "Diziler, listeler, haritalar ve kümeler",
+        "description": "Diziler ve yaygın java.util koleksiyonları çalışır: Arrays.sort, ArrayList, LinkedList, HashMap, HashSet, Collections.sort."
+      },
+      "objects": {
+        "title": "Kendi türleri",
+        "description": "Özel sınıflar, yapıcılar, numaralandırmalar, kayıtlar, arayüzler ve statik yöntemler aynı düzenleyici dosyasına yerleştirilebilir."
+      },
+      "output": {
+        "title": "Konsol çıkışı",
+        "description": "Çıktı yakalanır ve editörün altındaki stdout veya stderr'de gösterilir."
+      },
+      "standardLibrary": {
+        "title": "Standart kitaplık alt kümesi",
+        "description": "java.lang, java.util ve java.math paketlerindeki yaygın sınıflar ile temel java.time sınıfları kullanılabilir. İşletim sistemine erişen API'ler güvenilir değildir."
+      },
+      "singleFile": {
+        "title": "Bir editör dosyası",
+        "description": "Kullanıcı arayüzü şu anda bir kaynak dosya gönderiyor. Çok dosyalı bir proje kullanmak yerine yardımcı sınıfları aynı dosyaya koyun."
+      },
+      "input": {
+        "title": "Konsol girişi (Scanner ve System.in)",
+        "description": "Tarayıcı simülatöründe konsol girişi şöyle kullanılır:\n\n1. Kodda başlatma:\n• Scanner sınıfını içe aktarın: import java.util.Scanner;\n• Scanner nesnesini oluşturun: Scanner sc = new Scanner(System.in);\n\n2. Giriş yöntemleri:\n• sc.nextLine() satır sonuna (Enter) kadar bir sonraki tam satırı String olarak okur.\n• sc.next() boşluk veya satır sonuyla ayrılan bir sonraki sözcüğü/belirteci String olarak okur.\n• sc.nextInt(), sc.nextDouble(), sc.nextLong(), sc.nextBoolean() sıradaki uygun belirteci okur ve dönüştürür.\n\n3. 'Program girişi' alanına veri girme:\n• Boşluk / Sekme: Ayrı belirteçleri ve değerleri ayırır (örneğin aynı satırdaki iki sc.nextInt() çağrısı için '10 20').\n• Satır sonu (Enter): Satır tabanlı girdileri ayırır (örneğin art arda sc.nextLine() çağrıları için).\n• Değerler program çalışmadan önce sağlanır. Çalışma sırasında etkileşimli giriş tarayıcıda desteklenmez."
+      },
+      "cli": {
+        "title": "Terminal komutları",
+        "description": "Editör komutları değil, Java kaynak kodunu bekler. java, javac, jshell, jar, mvn ve gradle terminal komutları olarak çalıştırılmaz."
+      },
+      "environment": {
+        "title": "İşletim sistemi erişimi",
+        "description": "Yerel dosyalar, yuvalar, başlatılan işlemler ve yerel kitaplıklar, tarayıcı çalışma zamanı modeli tarafından engellenir."
+      },
+      "runtimeFeatures": {
+        "title": "Dinamik çalışma zamanı özellikleri",
+        "description": "Yansıma ağırlıklı kod, dinamik sınıf yükleme ve gerçek Java iş parçacıkları bu WebAssembly hedefinde güvenilir değildir."
+      },
+      "stringsMath": {
+        "title": "Dizeler, Matematik ve büyük sayılar",
+        "description": "StringBuilder, String yöntemleri, Math işlevleri, BigInteger ve BigDecimal tipik konsol görevleri için çalışır."
+      }
+    }
+  },
+  "actions": {
+    "loadSolution": "Çözümü yükle",
+    "checkSolution": "Çözümü kontrol edin",
+    "checkingSolution": "Kontrol ediliyor..."
+  },
+  "validation": {
+    "popupTitle": "Çözüm kontrolü",
+    "pass": "GEÇ",
+    "fail": "BAŞARISIZ",
+    "emptyOutput": "<boş>",
+    "exampleCheckUnavailable": "Örneklerin çözüm kontrollerine ihtiyacı yoktur.",
+    "table": {
+      "passed": "Geçti",
+      "case": "Test senaryosu",
+      "output": "Çıkış",
+      "expectedOutput": "Beklenen çıktı",
+      "phase": "Durum"
+    }
+  },
+  "exercise6": "Büyük harf giriş metni",
+  "exercise6Desc": "Tarayıcı ile bir satırı okuyun ve metni büyük harfle yazdırın.",
+  "exercise7": "Bir yöntem yazın",
+  "exercise7Desc": "Bir sayının karesini alıp sonucu döndüren bir yöntem uygulayın.",
+  "exercise8": "Basit bir sınıf kullanın",
+  "exercise8Desc": "Yapıcı değerlerini bir sınıfta saklayın ve bir açıklama döndürün.",
+  "exercise9": "ArrayList'i sıralama",
+  "exercise9Desc": "Collections.sort ile bir ArrayList'i sıralayın ve listeyi yazdırın.",
+  "exercise10": "FizzBuzz'ı uygulayın",
+  "exercise10Desc": "Klasik FizzBuzz çıktısını üretmek için bir döngüyü, moduloyu ve koşulları birleştirin.",
+  "exercise11": "Bir palindromu kontrol edin",
+  "exercise11Desc": "Metni her iki uçtan karşılaştıran ve palindromları tespit eden bir yöntem uygulayın.",
+  "exercise12": "Bir matrisi değerlendirin",
+  "exercise12Desc": "Her satır toplamını ve ana çapraz toplamı hesaplamak için iç içe geçmiş döngüleri kullanın.",
+  "exercise13": "Bir alışveriş sepetini modelleyin",
+  "exercise13Desc": "Fiyatları ArrayList ile bir sınıfta saklayın ve öğe sayısını, toplamı ve maksimumu uygulayın.",
+  "stdin": {
+    "label": "Program girişi",
+    "placeholder": "Tarayıcı/Sistem girişi girişi, ör. merhaba java",
+    "help": "Bu giriş, program başlamadan önce basit Scanner.nextLine() ve Scanner.nextInt() bildirimleri için değiştirilir. Etkileşimli bir System.in akışı mevcut değil."
+  },
+  "console": {
+    "title": "Konsol",
+    "stdout": "Standart çıktı",
+    "stdoutEmpty": "Program çıktısı burada görünür.",
+    "stderr": "Hata çıkışı",
+    "stderrEmpty": "Çalışma zamanı hataları burada görünür.",
+    "issues": "Teşhis",
+    "noIssues": "Hiçbir teşhis bildirilmedi.",
+    "issueLocation": "Satır {{line}}, sütun {{column}}"
+  },
+  "execution": {
+    "stoppedMessage": "Yürütme kullanıcı tarafından durduruldu.",
+    "timeoutMessage": "Yürütme {{seconds}} saniye sonra durduruldu."
+  },
+  "timeout": {
+    "warningTitle": "Yürütme zaman aşımı nedeniyle durduruldu",
+    "warningText": "Program çok uzun süre çalıştı veya giriş bekliyor. Döngüleri, Tarayıcı çağrılarını ve zaman aşımını kontrol edin."
+  }
+}

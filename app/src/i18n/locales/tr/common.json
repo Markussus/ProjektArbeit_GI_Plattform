@@ -1,0 +1,177 @@
+{
+  "cancel": "İptal",
+  "confirm": "Onayla",
+  "close": "Kapat",
+  "trainingCenter": {
+    "resetCurrent": "Sıfırla",
+    "resetAllExercises": "Tüm egzersizleri sıfırla",
+    "confirmResetAllExercises": "Kaydedilen tüm egzersiz ilerlemeleri silinsin mi?",
+    "resetAllProgressTitle": "Kaydedilen ilerlemeyi sıfırla",
+    "resetAllProgressDescription": "Bu cihazdaki tüm konulardaki kayıtlı tüm simülatör ve egzersiz ilerlemelerini silin.",
+    "resetAllProgress": "Kaydedilen tüm ilerlemeyi sıfırla",
+    "confirmResetAllProgress": "Kaydedilen tüm ilerlemeler silinsin mi?"
+  },
+  "app": {
+    "title": "THWS - Eğitim Merkezi"
+  },
+  "nav": {
+    "home": "EĞİTİM MERKEZİ"
+  },
+  "sidebar": {
+    "toggle": "Kenar çubuğunu aç/kapat",
+    "info": "Bilgi"
+  },
+  "footer": {
+    "copyright": "© 2026 THWS",
+    "legal": "Üçüncü taraf bildirimleri"
+  },
+  "theme": {
+    "light": "Açık Mod",
+    "dark": "Karanlık Mod",
+    "switchToLight": "Açık moda geç",
+    "switchToDark": "Karanlık moda geç"
+  },
+  "font": {
+    "title": "Tipografi",
+    "description": "Birincil platform yazı tipi olarak Geist ve Inter arasında seçim yapın.",
+    "geist": "Geist",
+    "inter": "Inter"
+  },
+  "language": {
+    "select": "Dil seçin",
+    "de": "Almanca",
+    "en": "İngilizce",
+    "tr": "Türkçe",
+    "uk": "Ukraynaca"
+  },
+  "tabs": {
+    "overview": "Genel Bakış",
+    "exercises": "Egzersizler",
+    "examples": "Örnekler",
+    "simulation": "Simülasyon"
+  },
+  "home": {
+    "heroTitle1": "Karmaşık Sistemlerde Ustalaşın",
+    "heroTitle2": "etkileşimli öğrenme yoluyla.",
+    "heroDescription": "Üniversitenin Bilgisayar Biliminin Temelleri için resmi eğitim modüllerine erişin.",
+    "selectModule": "BİR MODÜL SEÇİN",
+    "exploreModules": "Mevcut Modülleri Keşfedin"
+  },
+  "legal": {
+    "label": "Yasal",
+    "title": "Üçüncü taraf bildirimleri",
+    "description": "Paketlenmiş derleyici bileşenleri ve ilgili bağımlılıklar için lisanslama ve kaynak bilgileri.",
+    "summary": "Bu uygulama teavm-javac'ı temel alan tarayıcı tabanlı bir Java derleyicisi kullanır. TeaVM'nin resmi, SHA-256 onaylı WebAssembly derleyici eserlerini kullanıyoruz. Derleyici modülü, Apache Lisansı 2.0 kapsamında Classpath Exception ve TeaVM bileşenleriyle birlikte GNU GPLv2 altında OpenJDK javac'ı içerir. Hiçbir OpenJDK kaynak dosyası değiştirilmedi."
+  },
+  "exercise": {
+    "label": "Egzersiz {{index}}",
+    "difficulty": "Zorluk",
+    "currentExercises": "Güncel Egzersizler",
+    "openInSimulation": "Simülasyonda aç"
+  },
+  "example": {
+    "label": "Örnek {{index}}",
+    "currentExamples": "Güncel Örnekler",
+    "openInSimulation": "Simülasyonda aç"
+  },
+  "difficulty": {
+    "easy": "KOLAY",
+    "medium": "ORTA",
+    "hard": "ZOR"
+  },
+  "simulation": {
+    "selectedExercise": "Seçilen egzersiz",
+    "selectedExample": "Seçilen örnek",
+    "expand": "Simülasyonu genişlet",
+    "exitFocus": "Simülasyon odağından çık",
+    "close": "Kapat",
+    "transfer": {
+      "placeholder": "Aktarım dizesini yapıştır",
+      "export": "Dışa aktar",
+      "import": "İçe aktar",
+      "copied": "Dize panoya kopyalandı.",
+      "clipboardError": "Pano kullanılamıyor. Dize manuel olarak kopyalanabilir.",
+      "exportPreviewLabel": "Dışa aktarma dizesi (5 saniye sonra gizlenir)",
+      "exportError": "Dize oluşturulamadı.",
+      "importError": "Dize yüklenemedi."
+    },
+    "emptyStates": {
+      "turing": "Turing Makinesi simülatörü burada mevcut olacak.",
+      "automata": "Sonlu Otomatlar simülatörü burada mevcut olacak.",
+      "number": "Sayı Sistemleri dönüştürücüsü burada mevcut olacak.",
+      "moore": "Moore & Mealy simülatörü burada mevcut olacak.",
+      "dnf": "DNF oluşturucu / doğruluk tablosu oluşturucu burada mevcut olacak.",
+      "encoding": "Kodlama simülatörü burada mevcut olacak.",
+      "regularLanguages": "Düzenli Diller simülatörü burada mevcut olacak.",
+      "java": "Bir Java alıştırması veya Java örneği seçin veya düzenleyicide doğrudan kendi kodunuzla başlayın."
+    },
+    "controls": {
+      "reset": "Sıfırla",
+      "stepBack": "Geri adım at",
+      "pause": "Duraklat",
+      "play": "Oyna",
+      "step": "İleri adım atın",
+      "speed": "Hız",
+      "stop": "Durdur"
+    },
+    "table": {
+      "label": "Tablo görünümü",
+      "empty": "Tablo boş",
+      "addRow": "Yeni satır ekle",
+      "addColumn": "Sütun ekle",
+      "removeColumn": "Sütunu kaldır",
+      "removeRow": "Satırı kaldır",
+      "columnActions": "Sütun eylemleri",
+      "rowActions": "Satır eylemleri",
+      "columnHeader": "Sütun {{index}}",
+      "editColumnHeader": "{{index}} sütun başlığını düzenleyin",
+      "editCell": "{{row}} satırındaki, {{column}} sütunundaki hücreyi düzenleyin",
+      "removeRowWithIndex": "{{index}} satırını kaldır"
+    }
+  },
+  "exerciseValidation": {
+    "title": "Sonucu Doğrula",
+    "enterSolution": "Nihai sonucunuzu buraya girin...",
+    "verify": "Çözümü Doğrulayın",
+    "showSolution": "Çözümü Göster (Atla)",
+    "correct": "Doğru! Çözümün kilidi açıldı.",
+    "incorrect": "Sonuç yanlış. Lütfen tekrar deneyin!",
+    "exitExerciseButton": "Egzersiz Modundan Çık",
+    "exitExerciseTitle": "Egzersiz Modundan çıkılsın mı?",
+    "exitExerciseDesc": "Bu alıştırmadaki ilerlemeniz kaybolacak. Egzersiz modundan çıkmak istediğinizden emin misiniz?",
+    "exitExerciseConfirm": "Çıkış",
+    "exitTabTitle": "Sekmeyi değiştir?",
+    "exitTabDesc": "Şu anda egzersiz modundasınız. Sekmeler arasında geçiş yaptığınızda mevcut egzersizden çıkılır; ilerlemeniz kayıtlı kalır ve Egzersizler sekmesindeki \"Tüm egzersizleri sıfırla\" seçeneğiyle silinebilir.",
+    "exitTabConfirm": "Sekmeyi Değiştir"
+  },
+  "modules": {
+    "label": "Modül",
+    "topicsTitle": "Konular",
+    "fundamentalsCs": {
+      "title": "Bilgisayar Biliminin Temelleri",
+      "description": "Bu modül, bilgisayar biliminin temel konularını bir araya getirir. Öğrenmeye başlamak için bir konu seçin."
+    },
+    "programming1": {
+      "title": "Programlama 1",
+      "description": "Bu modül ilk programlama temellerini tanıtır. Basit Java alıştırmaları ve yerleşik düzenleyiciyle başlayın."
+    },
+    "moreComingSoon": "Daha fazlası yakında gelecek",
+    "moreComingSoonDescription": "Gelecek sürümlere ek öğrenme modülleri eklenecektir."
+  },
+  "notFound": {
+    "title": "404 – Bu sayfa mevcut değil",
+    "description": "İstenen URL mevcut değil, silinmiş veya başka bir konuma taşınmış.",
+    "requestedUrl": "İstenen URL",
+    "goHome": "Ana sayfaya git",
+    "goBack": "Geri dön",
+    "hintLabel": "Olası nedenler",
+    "reason1": "Adres yanlış girilmiş olabilir.",
+    "reason2": "Sayfa kaldırılmış veya yeniden adlandırılmış olabilir.",
+    "reason3": "Bağlantı eski veya artık geçerli olmayabilir."
+  },
+  "info": {
+    "label": "Bilgi",
+    "title": "Bilgi ve Hukuk",
+    "description": "Yerel simülatör ilerlemenizi yönetin ve yasal bildirimleri ve üçüncü taraf lisanslarını bulun."
+  }
+}

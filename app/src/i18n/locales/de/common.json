@@ -12,7 +12,7 @@
     "confirmResetAllProgress": "Alle gespeicherten Fortschritte löschen?"
   },
   "app": {
-    "title": "THWS - Traingscenter"
+    "title": "THWS - Trainingscenter"
   },
   "nav": {
     "home": "TRAININGSCENTER"
@@ -40,7 +40,9 @@
   "language": {
     "select": "Sprache auswählen",
     "de": "Deutsch",
-    "en": "Englisch"
+    "en": "Englisch",
+    "tr": "Türkisch",
+    "uk": "Ukrainisch"
   },
   "tabs": {
     "overview": "Übersicht",

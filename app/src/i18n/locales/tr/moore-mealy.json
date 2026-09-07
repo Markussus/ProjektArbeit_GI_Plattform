@@ -1,0 +1,196 @@
+{
+  "exercises": {
+    "loadSolution": "Çözümü yükle",
+    "checkSolution": "Çözümü kontrol edin",
+    "checkingSolution": "Kontrol ediliyor...",
+    "checkResultTitle": "Sonucu kontrol et",
+    "checkCorrect": "Tüm test çalıştırmaları beklenen çıktı dizilerini üretir.",
+    "checkIncorrect": "{{total}} test çalıştırmalarının {{passed}}'si beklenen çıktı dizisini üretir.",
+    "validation": {
+      "exampleCheckUnavailable": "Bu senaryo için çözüm denetimi kullanılamaz.",
+      "passed": "Geçti",
+      "input": "Giriş",
+      "output": "Çıkış",
+      "expectedOutput": "Beklenen çıktı",
+      "pass": "Geçmek",
+      "fail": "Başarısız",
+      "emptyInput": "Boş giriş (ε)"
+    },
+    "turnstile": {
+      "title": "Turnike kontrolü",
+      "description": "Turnikeyi LOCKED ve UNLOCKED durumlarına sahip bir Moore makinesi olarak modelleyin. COIN kilitli turnikeyi açar, açık turnikeyi değiştirmez. PASS açık turnikeyi kilitler, kilitliyken etkisizdir. Çıkışlar 0/LOCKED ve 1/FREE'dir. Geçiş ve çıkış tablolarını, ikili kodlamaları, kodlanmış tabloları ve durum diyagramını tamamlayın."
+    },
+    "elevator": {
+      "title": "Asansör kontrolü",
+      "description": "İki katlı bir asansörü EG_CLOSED, EG_OPEN, OG_CLOSED ve OG_OPEN durumlarıyla modelleyin. OPEN ve CLOSE kapıyı kontrol eder. GO_OG ve GO_EG asansörü yalnızca kapı kapalıyken hareket ettirir; kapı açıkken hareket komutları etkisizdir. Moore geçiş tablosunu ve durum diyagramını tamamlayın."
+    },
+    "barrier": {
+      "title": "Otopark bariyeri",
+      "description": "Her zaman açık misafir modu ve kart kontrollü mod ile bir otopark bariyeri modelleyin. Kart modunda, VALID_CARD bariyeri açar ve PASS, indüksiyon döngüsü aracı tespit ettikten sonra bariyeri kapatır. Davranışı bir Moore makinesi olarak yeniden çalışın ve duruma bağlı uygun çıktı eylemlerini tanımlayın."
+    },
+    "vending": {
+      "title": "Otomat",
+      "description": "Fiyatı 1,00 ve 1,50 euro olan içecekler için 50 cent ve 1 euroluk bozuk para kabul eden bir otomat makinesi modelleyin. START'ın 1 euro'nun altında hiçbir etkisi yoktur, 1,50 euro tutarındaki ekstra jetonlar iade edilir ve CANCEL kredinin tamamını iade eder. Olayları ve eylemleri belirleyin, her durumdaki her olayı ele alın, başlangıç ​​durumunu işaretleyin ve davranışı bir Moore makinesi olarak ifade edin."
+    },
+    "wiper": {
+      "title": "Ön cam silecek kontrolü",
+      "description": "Ön cam silecekleri için kapalı, tek silme, sürekli ve yağmur sensörü modlarına sahip bir Moore kontrol sistemi geliştirin. Sürücü kontrolleri ve yağmur sinyali olaylardır. Durdurma, bir kez silme ve sürekli silme için duruma bağlı motor çıkışlarını tanımlayın ve ardından durum diyagramını tamamlayın."
+    },
+    "alarm": {
+      "title": "Alarm sistemi",
+      "description": "OFF, ARMED ve ALARM durumlarına sahip bir alarm sistemi modelleyin. ON sistemi kurar, kapı sensörü yalnızca sistem kuruluyken sürekli alarmı tetikler; OFF sistemi kapatır ve etkin alarmı durdurur. Başlangıç durumunu tanımlayın, tüm geçişleri tamamlayın ve uygun Moore çıkışlarını ekleyin."
+    },
+    "cruise": {
+      "title": "Seyir kontrolü",
+      "description": "Basitleştirilmiş hız sabitleme sistemini OFF, READY ve ACTIVE durumlarıyla modelleyin. ON_OFF gücü kontrol eder, SET denetimi etkinleştirir, frenleme veya hızlanma devre dışı bırakır, RESET kayıtlı hızı sürdürür, CANCEL devre dışı bırakır ve PLUS/MINUS sistem etkinken hızı ayarlar. Somut hız değerini modellemeyin ve uygun Moore çıkışlarını tanımlayın."
+    },
+    "edgeDetector": {
+      "title": "Yükselen kenar dedektörü",
+      "description": "Yalnızca giriş sinyali 0'dan 1'e değiştiğinde RISING_EDGE yayan bir Mealy makinesi tasarlayın. Değişmeyen bir sinyal veya düşen kenar NO_PULSE yayar."
+    },
+    "doorController": {
+      "title": "Eylem darbeleriyle kapı kontrolü",
+      "description": "Kilitli ve kilidi açık bir kapıyı Mealy makinesi olarak modelleyin. CARD yalnızca kapının kilidini açtığında UNLOCK_PULSE sinyali verir; PASS, yalnızca kapıyı tekrar kilitlediğinde LOCK_PULSE sinyali verir. Etkisi olmayan olaylar NO_ACTION yayar."
+    },
+    "sequenceDetector": {
+      "title": "01 dizisi algılayıcısı",
+      "description": "Her giriş biti için o bitin 01 dizisini tamamlayıp tamamlamadığını hemen raporlayan, örtüşme özelliğine sahip bir Mealy makinesi tasarlayın. Ardışık sıfırlar bir sonraki eşleşmenin olası başlangıcı olarak kalmalıdır."
+    },
+    "parityTracker": {
+      "title": "Seri eşlik çıkışı",
+      "description": "Her giriş bitinden sonra o ana kadar okunanların tümünün eşlikini veren bir Mealy makinesi tasarlayın. Sıfır pariteyi korur; bir tanesi EVEN_PARITY ve ODD_PARITY arasında geçiş yapar."
+    }
+  },
+  "groups": {
+    "moore": {
+      "title": "Moore makineleri",
+      "examplesDescription": "Duruma bağlı çıkış: Mevcut durum, çıkışı o anda okunmakta olan giriş sembolünden bağımsız olarak belirler.",
+      "exercisesDescription": "Çıkışları yalnızca durumlarla ilişkilendirilen makineler oluşturun."
+    },
+    "mealy": {
+      "title": "Unlu makineler",
+      "examplesDescription": "Geçişe bağlı çıktı: örnek, örtüşen eşleşmeler de dahil olmak üzere bit dizisini (101) algılar ve bir eşleşmeyi tamamlayan geçişte MATCH_101'i yayar.",
+      "exercisesDescription": "Hem mevcut duruma hem de girdiye bağlı olarak anlık çıktılara sahip makineler oluşturun."
+    }
+  },
+  "examples": {
+    "mooreDefault": "moore.examples.mooreDefault",
+    "mealyDefault": "moore.examples.mealyDefault",
+    "mooreTitle": "Moore örnek makinesi",
+    "mooreDescription": "Dört durumlu ve iki giriş sembolüne sahip bir Moore makinesi.",
+    "mealyTitle": "Etli örnek makine",
+    "mealyDescription": "Üç durumlu Mealy dizi dedektörü, örtüşen eşleşmeler de dahil olmak üzere 101'i tanır. Her geçişte doğrudan NO_MATCH veya MATCH_101 yayar; paketlenmiş giriş iki eşleşme içeriyor."
+  },
+  "title": "Moore ve Mealy Makineleri",
+  "description": "Moore ve Mealy durum makineleriyle sıralı devre tasarımını keşfedin. Farklılıkları ve her modelin ne zaman uygulanacağını öğrenin.",
+  "tutorialVideo": "Eğitim videosu",
+  "sim": {
+    "machineType": "Makine tipi",
+    "mooreTab": "Moore makinesi",
+    "mealyTab": "Unlu makine",
+    "configureTitle": "Moore makinesini tanımlayın",
+    "configureHelp": "Durumlar ve giriş simgeleri, soldan sağa ve yukarıdan aşağıya sıralarına göre dahili olarak numaralandırılır.",
+    "transitionTable": "Geçiş fonksiyonu δ",
+    "transitionTableHelp": "Her olay ve durum kombinasyonu için tam olarak bir ardıl durum seçin.",
+    "event": "Etkinlik",
+    "state": "Eyalet",
+    "output": "Çıkış",
+    "internalValue": "Dahili temsil",
+    "representation": "Dahili temsil",
+    "decimal": "Ondalık",
+    "binary": "İkili",
+    "startState": "Başlangıç durumu S₀",
+    "states": "Durum kümesi S",
+    "outputAlphabet": "Çıkış alfabesi Ω",
+    "inputWord": "Giriş",
+    "outputWord": "Çıkış",
+    "inputDropPlaceholder": "Giriş alfabesindeki sembolleri buraya bırakın",
+    "inputAlphabetHelp": "Giriş alfabesi Σ: sembollere tıklayın veya bunları girişe sürükleyip bırakın.",
+    "noSymbols": "Sembol yok",
+    "emptyWord": "Boş kelime (ε)",
+    "addState": "Durum ekle",
+    "removeState": "{{state}} durumunu kaldır",
+    "renameState": "Durumu yeniden adlandırın {{state}}",
+    "addInput": "Giriş sembolü ekle",
+    "removeInput": "Giriş sembolünü kaldır {{symbol}}",
+    "renameInput": "Giriş sembolünü yeniden adlandırın {{symbol}}",
+    "transitionForStateInput": "{{state}} durumu ve {{input}} girişi için geçiş",
+    "search": "Ara...",
+    "createState": "Yeni durum oluştur",
+    "createNamedState": "+ \"{{value}}\" oluştur",
+    "stateNotFound": "Eyalet bulunamadı",
+    "outputLambda": "Çıkış λ",
+    "createOutput": "Yeni çıktı sembolü oluştur",
+    "createNamedOutput": "+ \"{{symbol}}\" oluştur",
+    "renameNamedOutput": "\"{{previous}}\" öğesini \"{{next}}\" olarak yeniden adlandırın",
+    "outputNotFound": "Çıkış sembolü bulunamadı",
+    "outputForState": "{{state}} durumu için çıktı",
+    "outputCodeForState": "{{state}} durumu için dahili çıkış kodu",
+    "symbolOutput": "Çıkış (sembol)",
+    "internalOutputCode": "Dahili numara gösterimi",
+    "removeWordSymbol": "{{index}} konumundaki {{symbol}} sembolünü kaldırın",
+    "startSimulation": "Simülasyonu başlat",
+    "simulationTitle": "Moore simülasyonu",
+    "currentState": "Mevcut durum",
+    "progress": "İşlenmiş semboller",
+    "status": "Durum",
+    "ready": "Hazır",
+    "finished": "Bitti",
+    "error": "Hata",
+    "diagram": "Moore makinesinin durum geçiş grafiği",
+    "validation": {
+      "states_invalid": "En az bir eyalet gereklidir.",
+      "input_symbols_invalid": "Çok fazla giriş sembolü var.",
+      "state_names_invalid": "Durum adları benzersiz olmalı ve boş olmamalıdır.",
+      "input_symbol_names_invalid": "Giriş simgeleri benzersiz olmalı ve boş olmamalıdır.",
+      "initial_state_invalid": "Başlangıç durumu geçersiz.",
+      "outputs_invalid": "Her durumun bir çıkış sembolüne ve çıkış sembolü başına bir benzersiz, negatif olmayan koda ihtiyacı vardır.",
+      "transitions_invalid": "Her tablo hücresinin geçerli bir ardıl duruma ihtiyacı vardır.",
+      "input_word_invalid": "Giriş, giriş alfabesinin dışında bir sembol içeriyor."
+    }
+  },
+  "mealy": {
+    "configureTitle": "Mealy makinesini tanımlayın",
+    "simulationTitle": "Etli simülasyon",
+    "diagram": "Mealy makinesinin durum geçiş grafiği"
+  },
+  "graph": {
+    "start": "Başlat",
+    "showAsList": "Geçiş sembollerini dikey liste olarak göster",
+    "showWrapped": "Geçiş sembollerini virgülle ayrılmış olarak göster",
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "resetView": "Görünümü sıfırla",
+    "resetZoom": "Yakınlaştırmayı %100'e sıfırla"
+  },
+  "navigation": {
+    "editDefinition": "Tanımı düzenle",
+    "showSimulator": "Simülatörü göster",
+    "showConversion": "Aktarım işlevlerini göster",
+    "showLogic": "Mantık kapılarını göster"
+  },
+  "conversion": {
+    "open": "Geçiş işlevlerine dönüştürme",
+    "title": "Geçiş işlevleri",
+    "transitionTab": "Geçiş tablosu",
+    "outputTab": "Çıkış tablosu",
+    "currentState": "Mevcut durum",
+    "event": "Etkinlik",
+    "nextState": "Sonraki durum",
+    "state": "Eyalet",
+    "output": "Çıkış",
+    "canonicalDnf": "Kanonik DNF",
+    "minimalDnf": "Küçültülmüş Boolean işlevi",
+    "minimizationLimit": "Kanonik DNF gösterilir. Otomatik minimizasyon toplamda 8 durum ve giriş bitiyle sınırlıdır."
+  },
+  "logic": {
+    "open": "Mantık kapılarına dönüştür",
+    "title": "Mantık kapıları",
+    "minimalFunctions": "Minimize edilmiş işlevler",
+    "formulaMode": "Formül gösterimi",
+    "diagram": "{{output}} için mantık kapısı diyagramı",
+    "binaryGates": "Yalnızca iki girişli geçitleri kullanın",
+    "minimizationUnavailable": "Bu değişken sayısı için otomatik kapı minimizasyonu mevcut değildir.",
+    "iecHint": "IEC gösterimi: & = VE, ≥1 = VEYA, 1 çıkış balonu ile = DEĞİL."
+  }
+}

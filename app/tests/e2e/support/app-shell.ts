@@ -70,7 +70,7 @@ export const appTestIds = {
 
 export const localizedContent = {
   de: {
-    appTitle: "THWS - Traingscenter",
+    appTitle: "THWS - Trainingscenter",
     infoTitle: "Informationen & Rechtliches",
     documentationTitle: "Informationen & Rechtliches",
     helpTitle: "Informationen & Rechtliches",
@@ -81,7 +81,7 @@ export const localizedContent = {
     notFoundTitle: "404 – Diese Seite gibt es nicht",
   },
   en: {
-    appTitle: "THWS - Traing Center",
+    appTitle: "THWS - Training Center",
     infoTitle: "Information & Legal",
     documentationTitle: "Information & Legal",
     helpTitle: "Information & Legal",
