@@ -48,6 +48,12 @@ interface MealySimulatorProps {
 
 export const MEALY_SIMULATOR_TASK_STORAGE_ID = SIMULATOR_TASK_STORAGE_ID - 1;
 
+/**
+ * edit: Table editor for states, transitions delta(q, a), and transition outputs lambda(q, a)
+ * simulation: Interactive runtime visualization with step/stepBack and speed controls
+ * conversion: Binary truth table & DNF boolean formulas
+ * logic: Interactive logic gate schematic derived from the boolean formulas
+ */
 export const MealySimulator = forwardRef<
   MealySimulatorHandle,
   MealySimulatorProps

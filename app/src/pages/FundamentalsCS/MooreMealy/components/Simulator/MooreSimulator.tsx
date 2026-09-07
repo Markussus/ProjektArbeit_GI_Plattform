@@ -47,6 +47,12 @@ interface MooreSimulatorProps {
   transferActive?: boolean;
 }
 
+/**
+ * edit: Table editor for states, transitions delta(q, a), and state outputs lambda(q)
+ * simulation: Interactive runtime visualization with play/pause/step/stepBack controls
+ * conversion: Binary truth table & DNF boolean formulas
+ * logic: Interactive logic gate schematic derived from the boolean formulas
+ */
 export const MooreSimulator = forwardRef<
   MooreSimulatorHandle,
   MooreSimulatorProps

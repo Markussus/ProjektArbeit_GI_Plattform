@@ -3,6 +3,10 @@ import type { ISimulator } from "@/types/simulator";
 import { validateMooreProgram } from "./mooreProgram";
 import type { MooreProgram, MooreRuntime } from "./mooreTypes";
 
+/**
+ * Implements the Moore automaton model: M = (Q, Sigma, Gamma, delta, lambda, q0)
+ * Key characteristic: Output function lambda: Q -> Gamma depends on the state
+ */
 export class MooreMachineSimulator implements ISimulator<
   MooreProgram,
   MooreRuntime
@@ -11,6 +15,9 @@ export class MooreMachineSimulator implements ISimulator<
   private runtime: MooreRuntime | null = null;
   private history: MooreRuntime[] = [];
 
+  /**
+   * Validates the transition table, sets the initial state q0 resets the input position to 0, and clears the step history
+   */
   initialize(program: MooreProgram, runtime?: MooreRuntime): void {
     const issues = validateMooreProgram(program);
     if (issues.length > 0) {
@@ -31,6 +38,12 @@ export class MooreMachineSimulator implements ISimulator<
     this.history = [];
   }
 
+  /**
+   * Reads input symbol a from tape at inputPosition
+   * Evaluates state transition: nextState = delta(currentState, a)
+   * Calculates output: outputSymbol = lambda(nextState)
+   * Add snapshot to history stack for step-back
+   */
   step(): void {
     const { program, runtime } = this.getContext();
     if (runtime.halted) {
@@ -45,6 +58,7 @@ export class MooreMachineSimulator implements ISimulator<
 
     this.history.push(cloneJson(runtime));
     const nextPosition = runtime.inputPosition + 1;
+    // Moore: Output depends solely on the state:
     const outputSymbol = program.outputs[nextState].symbol;
     this.runtime = {
       currentState: nextState,
@@ -64,6 +78,9 @@ export class MooreMachineSimulator implements ISimulator<
     };
   }
 
+  /**
+   * Get the last state snapshot from history stack
+   */
   stepBack(): void {
     this.getContext();
     const previousRuntime = this.history.pop();

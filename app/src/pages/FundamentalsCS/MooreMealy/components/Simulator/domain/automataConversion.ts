@@ -55,6 +55,11 @@ export interface AutomataConversion {
   allFormulas: AutomataFormula[];
 }
 
+/**
+ * Converts Moore machine into digital hardware truth tables and boolean formulas
+ * Next-state logic: T = delta(S, E)
+ * Output logic: y = lambda(S)
+ */
 export function buildMooreConversion(
   program: MooreProgram,
 ): AutomataConversion {
@@ -128,6 +133,11 @@ export function buildMooreConversion(
   };
 }
 
+/**
+ * Converts Mealy machine into digital hardware truth tables and boolean formulas
+ * Next-state logic: T = delta(S, E)
+ * Output logic: y = lambda(S, E)
+ */
 export function buildMealyConversion(
   program: MealyProgram,
 ): AutomataConversion {
@@ -209,6 +219,12 @@ export function buildMealyConversion(
   };
 }
 
+/**
+ * For each output bit
+ * Computes the Canonical DNF (Disjunctive Normal Form) from all truth table rows where bit == 1
+ * Computes a smaller boolean expression
+ * These expressions feed directly into the interactive Logic Gate diagram
+ */
 export function buildFormulas(
   resultVariables: string[],
   inputVariables: string[],
