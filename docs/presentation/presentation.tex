@@ -11,7 +11,7 @@ bs=$\bullet$]{thwsbeamertheme}
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{ragged2e}
 \usepackage{pgfpages}
-\setbeameroption{show notes on second screen=right}
+% \setbeameroption{show notes on second screen=right}
 
 \title{Interaktive Lernplattform\\für\\Grundlagen Informatik}
 \author{M. Nöth, R. Schröder, E. Ebert, D. T. Pham, K. Popov}
@@ -179,7 +179,7 @@ bs=$\bullet$]{thwsbeamertheme}
         \item \textbf{Agil \& Iterativ:} Schnelle, lauffähige Prototypen der Kernsimulatoren statt langer isolierter Vorplanung.
         \item \textbf{Wöchentliche Meetings:} Fester Jour Fixe zur Abstimmung plattformweiter Standards (Transfer-Interface, UI-Komponenten) und Blocker.
         \item \textbf{GitLab-Organisation:} Transparente Aufgabenverteilung über Work Items, Feature-Branches und Meilensteine.
-        \item \textbf{CI-Pipeline:} Automatisierte Gates (Lint, Typecheck, 1.100+ Tests) sichern Codequalität vor jedem Merge.
+        \item \textbf{CI-Pipeline:} Automatisierte Gates (Lint, Typecheck, E2E Tests) sichern Codequalität vor jedem Merge.
         \item \textbf{Auftraggeber-Feedback:} Kontinuierlicher Abgleich mit Dozenten zur Sicherung von Vorlesungskonformität und didaktischem Mehrwert.
       \end{itemize}
     }
@@ -370,7 +370,7 @@ bs=$\bullet$]{thwsbeamertheme}
     \textbf{Zeit: 1,5 min}
 
     \begin{itemize}
-      \item \textbf{Interface:} \texttt{ISimulatorTransferCodec<TValue>} statt Monolith. Inversion of Control: Simulator meldet Export beim Mount im Zustand-Store an; Header bleibt entkoppelt.
+      \item \textbf{Interface:} \texttt{ISimulatorTransferCodec<TValue>} Inversion of Control: Simulator meldet Export beim Mount im Zustand-Store an; Header bleibt entkoppelt.
       \item \textbf{Base64URL:} 3 Zeichen Header (2 Chars Topic-ID, 1 Char Task-ID) fürs Routing. URL-sicher nach RFC 4648 (\texttt{-}/\texttt{\_}, kein Padding \texttt{=}). BitWriter für Automaten, Tokenizer + Deflate für Java.
       \item \textbf{Local Storage:} Zentraler Key \texttt{"TrainingCenterStorage"}. Kollisionsfrei durch 18-Bit Topic- und Task-Namespacing. Entprelltes Autosave, autom. Restore beim Laden.
     \end{itemize}
