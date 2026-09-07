@@ -29,8 +29,11 @@ describe("Moore program operations", () => {
     expect(normalized.outputs.HALT).toBeDefined();
   });
 
-  it("derives the next output code from the largest existing code", () => {
-    expect(getNextMooreOutputCode(defaultMooreProgram)).toBe(7);
+  it("derives the next output code from the smallest unused code", () => {
+    expect(getNextMooreOutputCode(defaultMooreProgram)).toBe(0);
+    const withZero = structuredClone(defaultMooreProgram);
+    withZero.outputs.HALT.code = 0;
+    expect(getNextMooreOutputCode(withZero)).toBe(3);
   });
 
   it("formats and parses the same internal value in decimal and binary", () => {
@@ -59,9 +62,10 @@ describe("Moore program operations", () => {
     const renamed = renameMooreInputSymbol(defaultMooreProgram, "0", " LOW ");
 
     expect(renamed).not.toBeNull();
-    expect(renamed?.transitions.LOW).toEqual(
-      defaultMooreProgram.transitions["0"],
-    );
-    expect(renamed?.inputWord).not.toContain("0");
+    expect(renamed?.inputSymbols).toContain("LOW");
+    expect(renamed?.inputSymbols).not.toContain("0");
+    expect(renamed?.inputWord).toEqual(["LOW", "1", "LOW", "1"]);
+    expect(renamed?.transitions.LOW).toBeDefined();
+    expect(renamed?.transitions["0"]).toBeUndefined();
   });
 });

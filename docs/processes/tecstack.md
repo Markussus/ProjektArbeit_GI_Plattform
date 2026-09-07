@@ -1,192 +1,89 @@
-# Tech Stack
-
-This document summarizes the current tech stack of the GI Learning Platform based on the code.
-
-## Overview
-
-The project is currently a frontend-only single-page application.
-
-Main stack:
-
-* React 19
-* TypeScript 5
-* Vite 8
-* React Router 7
-* i18next + react-i18next
-* Zustand
-* Tailwind CSS 4
-* Lucide React
-
-Currently not part of the system:
-
-* no backend
-* no database
-* no API integration
-* no SSR/SSG
-* no automated test framework
-
-## Runtime and Tooling
-
-* Node.js `22` is defined in `app/.nvmrc`.
-* `npm` is used as package manager.
-* Vite is used for development, build, and preview.
-* TypeScript is used across the whole frontend with strict compiler settings.
-* ESLint and Prettier are configured for code quality and formatting.
-
-Relevant files:
-
-* `app/package.json`
-* `app/vite.config.ts`
-* `app/tsconfig.app.json`
-* `app/eslint.config.js`
-* `app/prettier.config.cjs`
-
-## Frontend Architecture
-
-### React
-
-React is the core UI technology. The application is built from reusable components, layouts, and pages.
-
-Used in:
-
-* `app/src/main.tsx`
-* `app/src/App.tsx`
-* `app/src/components`
-* `app/src/layouts`
-* `app/src/pages`
-
-### React Router
-
-Routing is handled on the client with `createBrowserRouter`.
-
-Used in:
-
-* `app/src/router/index.tsx`
-* `app/src/App.tsx`
-
-Routes for learning topics are generated from the central module registry in `app/src/data/moduleCatalog.tsx`. This avoids duplicating route definitions in multiple places.
-
-### TypeScript
-
-TypeScript is used for all application code and shared interfaces.
-
-Important uses:
-
-* shared types in `app/src/types`
-* module and topic definitions in `app/src/data/moduleCatalog.tsx`
-* typed translation keys in `app/src/types/i18n.ts` and `app/src/types/i18next.d.ts`
-
-## UI and Styling
-
-### Tailwind CSS
-
-Tailwind CSS is the main styling system. It is combined with CSS variables for theming and semantic design tokens.
-
-Used in:
-
-* `app/src/index.css`
-* `app/tailwind.config.js`
-* `app/vite.config.ts`
-
-The project includes:
-
-* light and dark themes
-* semantic color variables
-* module-specific accent colors
-* utility-based component styling
-
-### Fonts and Icons
-
-* `@fontsource-variable/geist` is used for typography.
-* `lucide-react` is used for icons in navigation, cards, exercises, and controls.
-
-### shadcn / design-system setup
-
-The repository contains shadcn-related setup in `app/components.json` and imports `shadcn/tailwind.css` in `app/src/index.css`.
-
-Current state:
-
-* shadcn styling is prepared
-* custom shared components are used instead of generated shadcn UI components
-
-## Internationalization
-
-Internationalization is a built-in part of the architecture.
-
-Used libraries:
-
-* `i18next`
-* `react-i18next`
-* `i18next-browser-languagedetector`
-
-Used in:
-
-* `app/src/i18n/index.ts`
-* `app/src/i18n/languages.ts`
-* `app/src/i18n/locales/de/translation.json`
-* `app/src/i18n/locales/en/translation.json`
-
-The app currently supports:
-
-* German
-* English
-
-Language detection uses browser settings and `localStorage`.
-
-## State Management
-
-Global state is intentionally kept small and is managed with Zustand.
-
-Used in:
-
-* `app/src/store/themeStore.ts`
-* `app/src/store/uiStore.ts`
-
-Current global state includes:
-
-* theme selection
-* sidebar collapsed state
-
-Most feature state remains local in React components and hooks, for example tab state, selected exercises, and simulation focus mode.
-
-## Content and Module Structure
-
-The project uses a clear split between shared UI and topic-specific content.
-
-Shared infrastructure:
-
-* `app/src/components/shared`
-* `app/src/layouts`
-* `app/src/router`
-* `app/src/store`
-* `app/src/i18n`
-
-Topic-specific content:
-
-* `app/src/pages/FundamentalsCS/<Topic>`
-
-The central file `app/src/data/moduleCatalog.tsx` acts as the single source of truth for:
-
-* learning modules
-* topics
-* paths
-* icons
-* rendered page elements
-
-This supports a modular structure and makes new topics easier to add.
-
-## Current Limitations
-
-The current implementation is intentionally simple:
-
-* all content is stored in the frontend
-* there are no HTTP requests in the current `src` code
-* there is no persistence beyond browser storage
-* simulation areas are structurally prepared, but not yet backed by complex logic
-
-## Installed but Not Actively Used in `src`
-
-Some dependencies exist in `app/package.json` but are not currently used directly in the application code:
-
-* `class-variance-authority`
-* `radix-ui`
+# Aktueller Tech-Stack & Technologie-Übersicht
+
+Dieses Dokument fasst den aktuellen, produktiv genutzten Tech-Stack der GI-Lernplattform auf Basis der Codebasis und `app/package.json` zusammen.
+
+---
+
+## 1. Systemübersicht
+
+Die Plattform ist eine **reine Client-Only Single-Page Application (SPA)** ohne serverseitige Geschäftslogik oder Datenbank. Alle Berechnungen, Visualisierungen und Code-Kompilierungen laufen direkt im Webbrowser des Nutzers.
+
+| Kernbereich | Eingesetzte Technologie | Version |
+| :--- | :--- | :--- |
+| **Runtime & Paketmanager** | Node.js (LTS) & npm | `>= 22.12.0` / `>= 11.10.0` |
+| **Programmiersprache** | TypeScript (Strict Mode) | `~5.9.3` |
+| **Frontend-Framework** | React & React DOM | `^19.2.8` |
+| **Build-Tool & Bundler** | Vite (ESM-basiert) | `^8.2.2` |
+| **Client-Routing** | React Router DOM | `^7.13.2` |
+| **Styling & Design-System**| Tailwind CSS v4 & Lucide Icons | `^4.3.3` / `^1.33.0` |
+| **Code-Editor** | Monaco Editor | `^0.56.0` |
+| **Java Compiler / Engine**| OpenJDK `javac` + TeaVM (WASM) | Custom Web Worker |
+| **State Management** | Zustand | `^5.0.15` |
+| **Internationalisierung** | i18next & react-i18next | `^26.4.0` / `^17.0.12` |
+| **Unit- & Domain-Tests** | Vitest & Testing Library | `^4.1.11` |
+| **End-to-End-Testing** | Playwright (Headless Chromium) | `^1.59.1` |
+| **Audit & Performance** | Lighthouse CI & Fallow | `^0.15.1` / `^2.89.0` |
+| **Code-Qualität & Style** | ESLint 9 (Flat Config) & Prettier | `^9.39.5` / `^3.9.6` |
+
+---
+
+## 2. Detaillierte Komponenten des Tech-Stacks
+
+### 2.1 Frontend-Architektur & Core Runtime
+* **React 19:** Deklaratives Komponentenmodell; optimal abgestimmt auf reaktive Zustandsaktualisierungen in Didaktik-Simulatoren.
+* **TypeScript 5.9 (Strict):** Vollständige Typsicherheit für mathematische Modelle (Formale Grammatiken, Turing-Zustände, Übergangsfunktionen).
+* **Vite 8:** Ultraschneller Entwicklungs-Server dank nativer ES-Module (HMR) und optimiertes Rollup-Bundling für die Produktion.
+* **React Router 7:** Routen-Deklaration über `createBrowserRouter`; alle Module und Themen werden über `React.lazy()` asynchron nachgeladen (Code-Splitting).
+
+### 2.2 Styling, Typografie & UI
+* **Tailwind CSS 4:** Modernste Version des Utility-First-CSS-Frameworks über `@tailwindcss/vite`. Nutzt CSS Custom Properties für nahtloses Theme-Switching (Hell / Dunkel) und modulbezogene Akzentfarben (`--color-accent-gi`, `--color-accent-prog`).
+* **Geist Variable Font (`@fontsource-variable/geist`):** Moderne Schriftfamilie, lokal gebündelt (100 % DSGVO-konform, kein Nachladen von Google-Servern).
+* **Lucide React:** Modulares, performantes SVG-Icon-Set.
+* **Shadcn UI & Primitives:** Barrierefreie (WAI-ARIA-konforme), tastaturunterstützte UI-Elemente ohne externe Laufzeit-Abhängigkeiten.
+
+### 2.3 Didaktik- & Ausführungsinfrastruktur
+* **Monaco Editor (`monaco-editor`):** Derselbe Code-Editor wie in VS Code. Bietet Syntax-Highlighting, Code-Faltung und direkte Darstellung von Compiler-Fehlermarkern (Squiggles).
+* **TeaVM & OpenJDK `javac` (WebAssembly):**
+  * Ermöglicht echtes Java-Kompilieren und -Ausführen ohne Serverbetrieb.
+  * Läuft in einem isolierten **Web Worker**, wodurch die UI flüssig bleibt und Endlosschleifen über `worker.terminate()` abgebrochen werden können.
+* **SVG-Zustandsdiagramme & Force-Directed Graph:**
+  * Physikalische Graph-Berechnung zur automatischen Anordnung von Automatenzuständen (DFA, NFA, Mealy/Moore).
+
+### 2.4 State Management & Internationalisierung
+* **Zustand 5:** Extrem schlanker Store (< 2 kB) für rein globale UI-Zustände (`themeStore`, `sidebarStore`). Fachspezifische Zustände verbleiben lokal in React-Hooks.
+* **i18next-Ökosystem:** Mehrsprachigkeit (Deutsch und Englisch) mit modularer Namespace-Aufteilung pro Thema und typisierten Übersetzungsschlüsseln (`types/i18n.ts`).
+
+---
+
+## 3. Qualitätssicherung, Testing & Code-Audits
+
+Die Codebasis folgt einer vollständigen dreistufigen Testpyramide:
+
+1. **Unit- & Integrationstests (`vitest`):**
+   * Blitzschnelle Ausführung der Domänenlogik (Automatenalgorithmen, Zahlensystem-Umrechnungen, DNF-Minimierung) direkt in Node/JSDOM.
+   * Befehl: `npm test` oder `npm run test:coverage`
+2. **End-to-End-Tests (`playwright`):**
+   * Automatisiert vollständige Nutzerinteraktionen im echten Browser (z. B. Automaten zeichnen, Java-Code ausführen, Aufgaben lösen).
+   * Befehl: `npm run e2e-test` bzw. `npm run e2e-test:open` (UI-Modus)
+3. **Performance & Accessibility Audits (`@lhci/cli`):**
+   * Prüft jede Modul- und Topic-Route auf Ladezeiten, Performance, A11y (Barrierefreiheit) und Best Practices.
+   * Befehl: `npm run lhci`
+4. **Dead-Code- & Duplikats-Prüfung (`fallow`):**
+   * Statische Analyse gegen verwaiste Dateien, ungenutzte Exporte und Codeduplikate.
+   * Befehl: `npm run fallow:audit`
+5. **Code-Style & Linting:**
+   * ESLint 9 mit React-Hooks- und TypeScript-Regeln (`npm run lint`).
+   * Prettier für einheitliche Formatierung (`npm run format`).
+
+---
+
+## 4. Build, CI/CD & Deployment
+
+* **GitLab CI/CD Pipeline (`.gitlab-ci.yml`):**
+  * Mehrstufige Pipeline: `verify` -> `java-compiler` -> `quality` -> `unit` -> `build` -> `e2e` -> `lighthouse`.
+  * Eigene Docker-Images (`ci-node.dockerfile`, `ci-browser.dockerfile`) garantieren reproduzierbare Testumgebungen.
+* **Supply-Chain-Sicherheit:**
+  * `min-release-age=7` in `.npmrc`: Schutz vor kompromittierten Zero-Day-Releases auf npm.
+  * `verify:signatures`: Kryptografische Signaturprüfung der Registry.
+* **Offline-Release-Distribution (`deployment/`):**
+  * `npm run release` erzeugt vorkonfigurierte ZIP-Pakete inklusive Python-3-Server (`serve.py`) und 1-Klick-Starter (`start.cmd`, `start.sh`) für den Betrieb ohne Internetzugang.

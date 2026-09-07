@@ -1,111 +1,152 @@
-The topic-specific wrapper remains in:
+# Architektur & Systementwurf der GI-Lernplattform
 
-* `app/src/pages/<ModuleName>/<Topic>/components/ExercisesTab.tsx`
+Dieses Dokument beschreibt die Softwarearchitektur, die Entwurfsmuster und die technischen Leitplanken der webbasierten Lern- und Übungsplattform für Grundlagen der Informatik (GI) und Programmieren 1.
 
-This is intentional because the topic still owns the decision of which exercise list is bound into the shared renderer.
+---
 
-## Internationalization
+## 1. Architekturgrundsätze & Systemüberblick
 
-Translations are organized in split modular JSON files per topic:
+Die GI-Lernplattform ist als **rein clientseitige Single-Page Application (SPA)** ohne serverseitiges Anwendungs-Backend konzipiert. Alle Auswertungen, Automaten-Simulationen und sogar die Kompilierung und Ausführung von Java-Code finden unmittelbar in der Browserumgebung des Benutzers statt.
 
-* `app/src/i18n/locales/de/<topic-name>.json`
-* `app/src/i18n/locales/en/<topic-name>.json`
-* Common shared strings: `app/src/i18n/locales/de/common.json` and `en/common.json`
+```mermaid
+graph TB
+    subgraph Browser_Client["Client-Only SPA (Webbrowser)"]
+        subgraph UI_Layer["Präsentationsschicht (Presentation Layer)"]
+            Router["React Router 7 (Lazy Loaded Routes)"]
+            SharedShell["Shared Shells (ModuleTopicPage, Header, Sidebar)"]
+            SimViews["Interaktive UI (Monaco Editor, SVG-Zustandsdiagramme, Band, Tabellen)"]
+        end
 
-All topic translation modules are registered and bundled into namespaces in:
+        subgraph App_Layer["Anwendungsschicht (Application Layer)"]
+            Zustand["Zustand (Globaler UI-State: Theme, Sidebar)"]
+            Hooks["Feature Hooks & Reducer (useAutomatonSimulation, useTMConfigEditor, etc.)"]
+            Adapters["UI-Adapter (Graph-Layout, Table-Adapters, Codecs)"]
+        end
 
-* `app/src/i18n/index.ts`
+        subgraph Domain_Layer["Domänenschicht (Domain Layer - Pure TypeScript)"]
+            FSM_Core["Endliche Automaten & Epsilon-Hülle"]
+            TM_Core["Turing-Maschine Runtime & Step-Funktion"]
+            Logic_Core["DNF / KV-Diagramme / Zahlensysteme"]
+            Validator["Didaktische Testfall- & Lösungsprüfer"]
+        end
 
-Shared translation key typing lives in:
+        subgraph Worker_Layer["Isolierte Worker-Schicht (Web Worker)"]
+            JavacWorker["Java Compiler & Execution Worker"]
+            TeaVM["OpenJDK javac + TeaVM WebAssembly Engine"]
+        end
+    end
 
-* `app/src/types/i18n.ts`
-
-This is used for:
-
-* module titles and descriptions
-* topic titles and descriptions
-* exercise translation keys
-* simulation empty-state keys
-
-The goal is to pass typed translation keys instead of untyped `string` values wherever possible.
-
-## Routing
-
-Top-level routing remains in:
-
-* `app/src/router/index.tsx`
-
-Topic routes are generated from:
-
-* `app/src/data/moduleCatalog.tsx` via `learningRoutes`
-
-This avoids duplicate registration across router, sidebar, header, and module overview pages.
-
-Current lazy-loading behavior:
-
-* `HomePage`, `DocumentationPage`, `HelpPage`, and `NotFoundPage` are lazy-loaded directly in `router/index.tsx`
-* module pages and topic pages are lazy-loaded in `moduleCatalog.tsx`
-* topic tabs are not lazy-loaded
-* `MainLayout` provides the shared `Suspense` boundary for route content
-
-Important constraint:
-
-* if a new top-level route is added directly in `router/index.tsx`, it should follow the same page-level lazy pattern unless there is a strong reason not to
-
-## Global State
-
-Global state remains intentionally small.
-
-Current shared state:
-
-* theme
-* sidebar collapsed state (`app/src/stores/sidebarStore.ts`)
-
-Topic-specific state stays local to the shared topic shell and topic hooks unless there is a real need to globalize it.
-
-## How To Add A New Module
-
-Recommended workflow:
-
-1. **Create module folder:** Create `app/src/pages/<ModuleName>/`.
-2. **Create landing page:** Create `<ModuleName>Page.tsx` rendering `<ModuleOverviewPage moduleId="<module-id>" />`.
-3. **Register module metadata:** In `app/src/data/moduleCatalogData.ts`, add a new entry to `learningModules` with `id`, `titleKey`, `descriptionKey`, `path`, `icon`, and an empty `topics: []` array.
-4. **Register lazy component:** In `app/src/data/moduleCatalog.tsx`, import `<ModuleName>Page` via `lazy(...)` and add it to `modulePageElements`.
-5. **Add translations:** Add `titleKey` and `descriptionKey` to `app/src/i18n/locales/de/common.json` and `en/common.json` (or a dedicated module translation file registered in `app/src/i18n/index.ts`).
-
-Minimal module page pattern:
-
-```tsx
-import { ModuleOverviewPage } from "@/components/shared/ModuleOverviewPage/ModuleOverviewPage";
-
-export function ExampleModulePage() {
-  return <ModuleOverviewPage moduleId="example-module" />;
-}
+    Router --> SharedShell
+    SharedShell --> SimViews
+    SimViews --> Hooks
+    Hooks --> Adapters
+    Adapters --> Domain_Layer
+    SimViews -.->|postMessage| JavacWorker
+    JavacWorker --> TeaVM
 ```
 
-Important note:
+### Kernargumente des Zero-Backend-Ansatzes:
+* **Wartungsfreiheit & Kosten:** Keine Serverinfrastruktur, keine Datenbankadministration, keine Backend-Sicherheitsupdates. Die Plattform kann über jedes statische Webhosting (GitLab Pages, CDN, Hochschul-Webserver) betrieben werden.
+* **Unbegrenzte Skalierbarkeit:** Rechenlast wird vollständig auf die Endgeräte verteilt. Ob 10 oder 10.000 Studierende gleichzeitig arbeiten, erzeugt serverseitig keine Last.
+* **Datenschutz (Privacy by Design):** Keine Übertragung von Nutzerdaten, Quellcode oder Eingaben an zentrale Server. Übungsfortschritte verbleiben im lokalen Speicher (`localStorage`) des Endgeräts.
+* **Sicherheit:** Kein Backend, das durch bösartigen Code (z. B. Remote Code Execution aus Java-Übungen) kompromittiert werden könnte.
 
-* the module only becomes visible in home navigation, header, sidebar, and router after it is added to `moduleCatalogData.ts` and `moduleCatalog.tsx`
-* `router/index.tsx` automatically consumes `learningRoutes`, so no manual route entry is needed in the router itself
+---
 
-## How To Add A New Topic
+## 2. Schichtenarchitektur (Clean Architecture)
 
-Recommended workflow:
+Innerhalb der Fachmodule (z. B. `TuringMachine`, `FiniteAutomata`, `MooreMealy`, `Java`) wird eine strikte Trennung nach Schichten eingehalten:
 
-1. **Create topic directory:** Create `app/src/pages/<ModuleName>/<TopicName>/`.
-2. **Add tab components:** Add `components/OverviewTab.tsx`, `components/ExamplesTab.tsx`, `components/ExercisesTab.tsx`, and `components/SimulationTab.tsx`.
-3. **Add exercises:** Define topic exercises in `exercises/index.ts`.
-4. **Create topic page:** Create `<TopicName>Page.tsx` using `ModuleTopicPage`.
-5. **Register storage ID:** In `app/src/data/topicStorageIds.ts`, add a unique numeric storage ID to `TOPIC_STORAGE_IDS` (e.g. `exampleTopic: 9`).
-6. **Register metadata:** In `app/src/data/moduleCatalogData.ts`, append a `ModuleTopicDefinition` to the respective module's `topics` array with `id`, `storageId`, `titleKey`, `descriptionKey`, `path`, `icon`, `accent`, and `tutorialVideoUrl`.
-7. **Register lazy component:** In `app/src/data/moduleCatalog.tsx`, import `<TopicName>Page` via `lazy(...)` and register it in `topicPageElements`.
-8. **Add topic translation files:** Create `app/src/i18n/locales/de/<topic-name>.json` and `app/src/i18n/locales/en/<topic-name>.json` containing all topic-specific strings, tabs, and exercise descriptions.
-9. **Register in i18n bundle:** In `app/src/i18n/index.ts`, import both JSON files and mount them into the `de` and `en` resource objects under the `<topic-name>` namespace.
+```text
+pages/<ModuleName>/<TopicName>/
+├── domain/         # Reine Geschäftslogik & Datenmodelle (Reines TypeScript, 100% testbar)
+├── application/    # Hooks, State Machine & Orchestrierung (React Hooks, Reducer)
+├── adapters/       # Daten-Transformationen für Darstellung (z. B. Graph-Layout, Tabellen)
+├── components/     # UI-Komponenten (OverviewTab, ExamplesTab, ExercisesTab, SimulationTab)
+├── exercises/      # Übungsdefinitionen, Testfälle, Musterlösungen
+└── <TopicName>Page.tsx # Einstiegspunkt (verbindet Tabs mit der Shared Shell)
+```
 
-Minimal topic page pattern:
+1. **Domänenschicht (`domain/`):**
+   * Enthält rein mathematische Algorithmen und Typdefinitionen (z. B. Schrittfunktion einer Turing-Maschine, $\varepsilon$-Hülle, Minimierung von KV-Diagrammen).
+   * **Strikte Regel:** Keine Abhängigkeiten zu React, DOM-APIs, CSS oder UI-Bibliotheken.
+   * **Vorteil:** Schnelle, deterministische Unit-Tests mit Vitest ohne Browser-Overhead.
 
-```tsx
-import { ModuleTopicPage } from "@/components/shared/ModuleTopicPage/ModuleTopicPage";
-import { ExamplesTab } from "./components/ExamplesTab";
-import { ExercisesTab } from "./components/ExercisesTab";
-import { OverviewTab } from "./components/OverviewTab";
+2. **Anwendungsschicht (`application/`):**
+   * Verwaltet den Zustand der interaktiven Simulation via Custom Hooks (z. B. `useTMSimulation`, `useAutomaton`) und Reducern.
+   * Kapselt Vor-/Zurück-Historie, Schrittausführung, Breakpoints und Validierungsabläufe.
+
+3. **Adapter-Schicht (`adapters/`):**
+   * Wandelt Domänenzustände in darstellungsoptimierte Daten um (z. B. SVG-Knoten- und Kantenberechnung mittels Force-Directed-Layout, Tabellenmodelle für Übergangstabellen).
+
+4. **Präsentationsschicht (`components/`):**
+   * Komponenten für die Benutzeroberfläche, gestylt mit Tailwind CSS 4 und Icons aus `lucide-react`.
+
+---
+
+## 3. Didaktisches Shared-Shell- & Tab-Pattern
+
+Um eine einheitliche Lernerfahrung (User Experience) zu gewährleisten, folgt jedes Fach-Thema (Topic) demselben didaktischen 4-Säulen-Prinzip:
+
+1. **Überblick (`OverviewTab`):** Theoretische Einführung, formale Definitionen, didaktische Erklärungen und Lernziele.
+2. **Beispiele (`ExamplesTab`):** Vorkonfigurierte, interaktiv ladbare Lehrbeispiele zum Nachvollziehen von Kernkonzepten.
+3. **Übungen (`ExercisesTab`):** Aufgaben mit aufsteigendem Schwierigkeitsgrad, Starter-Konfiguration und automatisierter Lösungsprüfung.
+4. **Simulation (`SimulationTab`):** Vollwertige visuelle Sandbox zum freien Konstruieren, Testen, Importieren und Exportieren eigener Automaten/Modelle.
+
+### Die wiederverwendbare Shell: `ModuleTopicPage`
+* Liegt in `app/src/components/shared/ModuleTopicPage/ModuleTopicPage.tsx`.
+* Kapselt die Tab-Navigation, Header-Informationen, Walkthrough-Tutorial-Videos, Responsive-Verhalten sowie den **Focus-/Fullscreen-Modus** für maximale Arbeitsfläche im Simulator.
+* Ein Topic muss lediglich die 4 Tab-Komponenten implementieren und der Shell übergeben.
+
+---
+
+## 4. Web-Worker & WebAssembly Runtime
+
+Für rechenintensive oder potenziell unendlich laufende Aufgaben (z. B. Java-Codekompilierung oder Automaten mit Endlosschleifen) nutzt die Plattform **Web Worker**:
+
+* **Entkopplung vom Haupt-Thread:** Der UI-Thread bleibt mit 60 FPS flüssig bedienbar; kein "Einfrieren" des Browsers.
+* **Timeout- und Abbruchschutz:** Endlosschleifen (z. B. `while(true)` im studentischen Java-Code oder nicht-terminierende Turing-Maschinen) können über `worker.terminate()` sofort und sicher hart beendet werden.
+* **Java in WebAssembly:** Der Java-Compiler (`javac` aus OpenJDK) sowie die TeaVM-Laufzeitumgebung sind als WebAssembly-Module kompiliert und laufen vollständig isoliert im Worker. Monaco Editor empfängt Compiler-Diagnosen und visualisiert Fehler direkt im Quelltext.
+
+---
+
+## 5. Zentrales Registry-Pattern (`moduleCatalog`)
+
+Das gesamte Portal wird über einen zentralen Katalog gesteuert:
+
+* **Metadaten:** `app/src/data/moduleCatalogData.ts` definiert Module, Themen-IDs, Routen-Pfade, Icons, Akzentfarben und Video-URLs.
+* **Komponenten-Mapping & Routing:** `app/src/data/moduleCatalog.tsx` verknüpft Metadaten deklarativ mit lazy-geladenen React-Seiten (`learningRoutes`).
+* **Vorteil:** Header, Sidebar, Dashboard, Breadcrumbs und Router konsumieren denselben Katalog (**Single Source of Truth**). Neue Module oder Themen können nach dem Open-Closed-Prinzip ergänzt werden, ohne bestehende Routing-Komponenten anzupassen.
+
+---
+
+## 6. State Management
+
+Das State Management folgt dem Prinzip der **minimalen globalen Kopplung**:
+
+* **Globaler State (Zustand):**
+  * Ausschliesslich für globale UI-Zustände:
+    * `themeStore.ts`: Theme-Verwaltung (Light, Dark, System)
+    * `sidebarStore.ts`: Zustand der Navigations-Sidebar (eingeklappt/ausgeklappt)
+  * Zustand-Stores sind extrem schlank (< 2 kB) und erfordern keinen Boilerplate-Code.
+* **Fachlicher State (Lokal in Hooks & Komponenten):**
+  * Simulationen, Bandinhalte, Eingabepuffer und Editordaten verbleiben lokal im jeweiligen Fachmodul. Dadurch entstehen keine modulübergreifenden Seiteneffekte.
+
+---
+
+## 7. Internationalisierung (i18n)
+
+* **Technologie:** `i18next` und `react-i18next` mit automatischer Browser-Spracherkennung und `localStorage`-Persistenz.
+* **Modulare Struktur:** Übersetzungen sind in themenspezifische JSON-Dateien aufgeteilt:
+  * `app/src/i18n/locales/de/<topic-name>.json`
+  * `app/src/i18n/locales/en/<topic-name>.json`
+  * Globale Übersetzungen in `common.json`.
+* **Typsicherheit:** TypeScript-Definitionen in `app/src/types/i18n.ts` stellen sicher, dass nur existierende Übersetzungsschlüssel referenziert werden können (Schutz vor Tippfehlern zur Compile-Zeit).
+
+---
+
+## 8. Routing & Code-Splitting
+
+* **Client-Routing:** React Router 7 (`createBrowserRouter`).
+* **Granulares Lazy Loading:** Jedes Modul und jedes Thema wird über `React.lazy()` dynamisch nachgeladen.
+* **Suspense-Grenzen:** `MainLayout` stellt die zentrale Ladeanimation (`Suspense`-Fallback) bereit, sodass der Initial-Payload der Anwendung minimal bleibt.

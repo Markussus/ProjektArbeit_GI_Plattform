@@ -298,7 +298,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.turnstile.title",
     storageId: 0x30,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: turnstileStarter,
     solutionProgram: turnstileSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -322,7 +322,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.elevator.title",
     storageId: 0x31,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: elevatorStarter,
     solutionProgram: elevatorSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -346,7 +346,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.barrier.title",
     storageId: 0x32,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: barrierStarter,
     solutionProgram: barrierSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -373,7 +373,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.vending.title",
     storageId: 0x33,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: vendingStarter,
     solutionProgram: vendingSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -401,7 +401,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.wiper.title",
     storageId: 0x34,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: wiperStarter,
     solutionProgram: wiperSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -430,7 +430,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.alarm.title",
     storageId: 0x35,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: alarmStarter,
     solutionProgram: alarmSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -456,7 +456,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.cruise.title",
     storageId: 0x36,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: cruiseStarter,
     solutionProgram: cruiseSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -490,15 +490,3 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
 export const mooreExercises = mooreExerciseScenarios.map(
   (scenario) => scenario.definition,
 );
-
-function createEmptyExerciseProgram(): MooreProgram {
-  return {
-    states: ["STATE_0"],
-    inputSymbols: [],
-    transitions: {},
-    outputs: { STATE_0: { symbol: "OUT_0", code: 0 } },
-    initialState: "STATE_0",
-    inputWord: [],
-    representation: "binary",
-  };
-}

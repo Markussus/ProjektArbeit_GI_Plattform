@@ -11,6 +11,8 @@ export {
 export {
   renameMooreState,
   renameMooreInputSymbol,
+  getNextMooreOutputCode,
+  findMooreOutputCodeBySymbol,
 } from "./mooreProgramUpdates";
 
 export function validateMooreProgram(program: MooreProgram): string[] {
@@ -97,15 +99,6 @@ export function normalizeMooreProgram(program: MooreProgram): MooreProgram {
   return normalized;
 }
 
-export function getNextMooreOutputCode(program: MooreProgram): number {
-  return (
-    Math.max(
-      -1,
-      ...program.states.map((state) => program.outputs[state]?.code ?? -1),
-    ) + 1
-  );
-}
-
 function hasConsistentOutputCodes(program: MooreProgram): boolean {
   const codeBySymbol = new Map<string, number>();
   const symbolByCode = new Map<number, string>();
@@ -115,18 +108,16 @@ function hasConsistentOutputCodes(program: MooreProgram): boolean {
     if (!output) {
       continue;
     }
-
     const existingCode = codeBySymbol.get(output.symbol);
+    if (existingCode !== undefined && existingCode !== output.code) {
+      return false;
+    }
     const existingSymbol = symbolByCode.get(output.code);
-    if (
-      (existingCode !== undefined && existingCode !== output.code) ||
-      (existingSymbol !== undefined && existingSymbol !== output.symbol)
-    ) {
+    if (existingSymbol !== undefined && existingSymbol !== output.symbol) {
       return false;
     }
     codeBySymbol.set(output.symbol, output.code);
     symbolByCode.set(output.code, output.symbol);
   }
-
   return true;
 }

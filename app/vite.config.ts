@@ -2,7 +2,8 @@
 import path from "path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
+import compression from "compression";
+import { defineConfig, type Connect, type Plugin } from "vite";
 
 const VENDOR_PACKAGES = ["react-dom", "react-router-dom", "/react/"];
 const UI_PACKAGES = ["motion", "lucide-react"];
@@ -14,8 +15,19 @@ function getChunkForModule(id: string): string | undefined {
   return undefined;
 }
 
+function previewCompressionPlugin(): Plugin {
+  return {
+    name: "preview-compression",
+    configurePreviewServer(server) {
+      server.middlewares.use(
+        compression() as unknown as Connect.NextHandleFunction,
+      );
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), previewCompressionPlugin()],
   optimizeDeps: {
     include: ["java-parser"],
   },

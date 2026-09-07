@@ -6,6 +6,7 @@ import {
   renameMealyState,
   validateMealyProgram,
 } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyProgram";
+import { MAX_COLLECTION_SIZE } from "@/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/programCommon";
 
 describe("Mealy program operations", () => {
   it("validates all state × input transitions and outputs", () => {
@@ -15,6 +16,24 @@ describe("Mealy program operations", () => {
 
     expect(validateMealyProgram(invalid)).toEqual(
       expect.arrayContaining(["transitions_invalid", "outputs_invalid"]),
+    );
+  });
+
+  it("enforces collection limits on states and input symbols", () => {
+    const tooManyStates = structuredClone(defaultMealyProgram);
+    tooManyStates.states = Array.from(
+      { length: MAX_COLLECTION_SIZE + 1 },
+      (_, i) => `S_${i}`,
+    );
+    expect(validateMealyProgram(tooManyStates)).toContain("states_invalid");
+
+    const tooManyInputs = structuredClone(defaultMealyProgram);
+    tooManyInputs.inputSymbols = Array.from(
+      { length: MAX_COLLECTION_SIZE + 1 },
+      (_, i) => `I_${i}`,
+    );
+    expect(validateMealyProgram(tooManyInputs)).toContain(
+      "input_symbols_invalid",
     );
   });
 
