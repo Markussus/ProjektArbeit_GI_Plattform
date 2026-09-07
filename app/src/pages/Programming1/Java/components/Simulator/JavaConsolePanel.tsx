@@ -8,6 +8,12 @@ export interface JavaConsolePanelProps {
   className?: string;
 }
 
+/**
+ * 1. Execution phase / Timeout warning banner
+ * 2. Standard Output (stdout: System.out.println)
+ * 3. Standard Error (stderr: exceptions / stack traces)
+ * 4. Compiler Issues (diagnostics mapped with line & column)
+ */
 export function JavaConsolePanel({
   snapshot,
   className,

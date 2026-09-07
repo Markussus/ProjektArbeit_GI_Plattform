@@ -12,6 +12,10 @@ import {
 } from "../../Simulator/domain/javaExecution";
 import type { ExecutionPhase } from "@/types/simulator";
 
+/**
+ * Creates a dedicated ES-Module Web Worker for Java execution
+ * Running code here keeps the main React UI responsive
+ */
 function createJavaWorker(): Worker {
   return new Worker(
     new URL("../workers/javaRunner.worker.ts", import.meta.url),
@@ -46,6 +50,10 @@ function mapJavaPhaseToExecutablePhase(
   return "running";
 }
 
+/**
+ * Manages the full state machine (idle -> compiling -> running -> done/error/timeout)
+ * handles watchdog timers, dispatches code to the worker, and captures streamed stdout/stderr
+ */
 export function useJavaExecution(): JavaExecutionController {
   const { t } = useTranslation();
   const [snapshot, setSnapshot] = useState<JavaExecutionSnapshot>(() =>
@@ -71,6 +79,10 @@ export function useJavaExecution(): JavaExecutionController {
     pendingRunResolveRef.current = null;
   }, []);
 
+  /**
+   * Hard-terminates the background Web Worker process
+   * If user code is stuck in an infinite loop (e.g. while(true)) this halts execution 
+   */
   const disposeWorker = useCallback(() => {
     if (workerRef.current) {
       workerRef.current.terminate();
@@ -144,6 +156,9 @@ export function useJavaExecution(): JavaExecutionController {
     [createTerminalSnapshot],
   );
 
+  /**
+   * Receives batched stdout/stderr chunks and phase updates from the Web Worker
+   */
   const handleExecutionMessage = useCallback(
     (message: JavaWorkerResponse) => {
       switch (message.type) {
@@ -273,6 +288,9 @@ export function useJavaExecution(): JavaExecutionController {
     return worker;
   }, [attachWorkerListeners]);
 
+  /**
+   * Called on initial mount to make the  compiler worker ready before user interaction
+   */
   const preload = useCallback(() => {
     shouldPreloadRef.current = true;
 
@@ -299,6 +317,9 @@ export function useJavaExecution(): JavaExecutionController {
     });
   }, [ensureWorker]);
 
+  /**
+   * Terminates any old/stuck worker and creates a fresh one
+   */
   const recreatePreloadedWorker = useCallback(() => {
     disposeWorker();
     activeRequestIdRef.current = null;
@@ -316,6 +337,9 @@ export function useJavaExecution(): JavaExecutionController {
     }
   }, [clearPendingTimeout, disposeWorker, preload]);
 
+  /**
+   * Called when the user clicks 'Stop' or when execution time exceeds the configured limit.
+   */
   const stop = useCallback(
     (reason: "stopped" | "timeout" = "stopped", timeoutMs?: number) => {
       const seconds = Math.max(1, Math.round((timeoutMs ?? 0) / 1000));
@@ -366,6 +390,11 @@ export function useJavaExecution(): JavaExecutionController {
     }));
   }, [recreatePreloadedWorker]);
 
+  /**
+   * 1. Generates unique request ID
+   * 2. Set up watchdog timer (window.setTimeout -> stop("timeout"))
+   * 3. Post compile-and-run message with sourceCode and stdin to the Web Worker
+   */
   const run = useCallback(
     (request: JavaExecutionRequest) => {
       shouldPreloadRef.current = true;
@@ -375,6 +404,7 @@ export function useJavaExecution(): JavaExecutionController {
       activeRequestIdRef.current = requestId;
       clearPendingTimeout();
 
+      // Watchdog timeout to catch infinite loops
       pendingTimeoutRef.current = window.setTimeout(() => {
         if (activeRequestIdRef.current === requestId) {
           stop("timeout", request.timeoutMs);
@@ -388,6 +418,7 @@ export function useJavaExecution(): JavaExecutionController {
         startedAt: new Date().toISOString(),
       }));
 
+      // Sending code and inputs to the worker
       worker.postMessage({
         type: "compile-and-run",
         requestId,

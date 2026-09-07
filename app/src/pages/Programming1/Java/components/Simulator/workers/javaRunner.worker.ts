@@ -63,6 +63,12 @@ let resolveCompilerReady: (() => void) | null = null;
 let rejectCompilerReady: ((error: unknown) => void) | null = null;
 let pendingCompilation: PendingCompilation | null = null;
 
+/**
+ * Listens for incoming commands dispatched from the React UI / useJavaExecution hook:
+ * preload-compiler
+ * compile-and-run: starts compile & execution pipeline
+ *  stop: disposes execution
+ */
 workerScope.onmessage = async (event: MessageEvent<JavaWorkerRequest>) => {
   const message = event.data;
 
@@ -75,6 +81,10 @@ workerScope.onmessage = async (event: MessageEvent<JavaWorkerRequest>) => {
   }
 };
 
+/**
+ * Loads the Java compiler worker and standard class libraries asynchronously
+ * so when the user clicks Run, the execution starts without waiting
+ */
 async function preloadCompiler(requestId?: string): Promise<void> {
   workerScope.postMessage({ type: "compiler-loading", requestId });
 
@@ -90,6 +100,12 @@ async function preloadCompiler(requestId?: string): Promise<void> {
   }
 }
 
+/**
+ * 1. Ensures the compiler worker is ready
+ * 2. Inlines interactive Scanner stdin into executable Java code
+ * 3. Compiles Java source into WebAssembly bytecode via compileSource()
+ * 4. Runs generated Wasm in sandbox with stdout/stderr hooks
+ */
 async function compileAndRun(
   message: JavaWorkerCompileAndRunRequest,
 ): Promise<void> {
@@ -158,6 +174,9 @@ function postCompilationError(requestId: string, error: unknown): void {
   });
 }
 
+/**
+ * Spawns the dedicated background Worker containing TeaVM javac compiler (worker.js)
+ */
 async function ensureCompilerReady(): Promise<void> {
   if (compilerReady && compilerWorker) {
     return;
@@ -262,6 +281,10 @@ function handleCompilerWorkerError(event: ErrorEvent): void {
   disposeCompilerWorker();
 }
 
+/**
+ * Sends the users Java source code to the TeaVM javac worker via postMessage
+ * Returns a Promise that resolves with the WebAssembly bytecode or compiler diagnostics
+ */
 function compileSource(requestId: string, sourceCode: string) {
   if (!compilerWorker) {
     throw createWorkerError("compiler-load", "Compiler could not be loaded.");
@@ -294,6 +317,10 @@ function compileSource(requestId: string, sourceCode: string) {
   });
 }
 
+/**
+ * Load the compiled Wasm bytecode into the TeaVM runtime
+ * Connect stdout/stderr via installTeaVmConsole (FFI) and invokes main([])
+ */
 async function runGeneratedProgram(
   wasmModule: Int8Array,
   requestId: string,
@@ -350,6 +377,9 @@ async function runGeneratedProgram(
   return { stdout: stdout.getOutput(), stderr: stderr.getOutput() };
 }
 
+/**
+ * terminates the inner compiler worker and rejects any active compilation
+ */
 function disposeCompilerWorker(): void {
   if (compilerWorker) {
     compilerWorker.terminate();

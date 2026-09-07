@@ -22,6 +22,10 @@ export interface BufferedWorkerOutput {
   getOutput(): string;
 }
 
+/**
+ * Buffers individual character outputs from the WebAssembly/TeaVM runtime
+ * Instead of postMessage for every character, batches them and flushes every 50ms
+ */
 export function createBufferedWorkerOutput({
   stream,
   requestId,
@@ -81,6 +85,11 @@ export function createBufferedWorkerOutput({
   };
 }
 
+/**
+ * Connects the TeaVM compiled WebAssembly runtime to JavaScript
+ * Injects `utcharStdout and putcharStderr into the WebAssembly imports table
+ * redirecting Java System.out.print and System.err.print into our buffered worker streams
+ */
 export function installTeaVmConsole(
   imports: TeaVmImports,
   stdout: BufferedWorkerOutput,

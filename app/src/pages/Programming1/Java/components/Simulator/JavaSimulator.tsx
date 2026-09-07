@@ -67,6 +67,9 @@ function parseTimeoutSeconds(rawValue: string): number | null {
   return Math.min(300, Math.max(1, nextValue));
 }
 
+/**
+ * Handles session switching based on the selected exercise/example item.
+ */
 export const JavaSimulator = forwardRef<
   JavaSimulatorHandle,
   JavaSimulatorProps
@@ -88,6 +91,12 @@ interface JavaSimulatorSessionProps {
   isFocused: boolean;
 }
 
+/**
+ * 1. Code state & training center persistence
+ * 2. Standard input (stdin) & timeout configuration
+ * 3. Execution state from useJavaExecutionContext()
+ * 4. Monaco editor, compiler badge, execution controls, and console panel
+ */
 const JavaSimulatorSession = forwardRef<
   JavaSimulatorHandle,
   JavaSimulatorSessionProps
