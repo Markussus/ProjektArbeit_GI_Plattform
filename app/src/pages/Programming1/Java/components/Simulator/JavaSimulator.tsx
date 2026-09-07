@@ -43,6 +43,30 @@ interface JavaSimulatorProps {
   isFocused: boolean;
 }
 
+function computeSessionControlState(snapshot: {
+  phase: string;
+  compilerStatus: string;
+}) {
+  const isBusy =
+    snapshot.phase === "loading" ||
+    snapshot.phase === "compiling" ||
+    snapshot.phase === "running";
+  const canRun = snapshot.compilerStatus === "ready" && !isBusy;
+  const canStop = isBusy || snapshot.compilerStatus === "loading";
+  return { canRun, canStop };
+}
+
+function parseTimeoutSeconds(rawValue: string): number | null {
+  if (!rawValue.trim()) {
+    return null;
+  }
+  const nextValue = Number(rawValue);
+  if (Number.isNaN(nextValue)) {
+    return null;
+  }
+  return Math.min(300, Math.max(1, nextValue));
+}
+
 export const JavaSimulator = forwardRef<
   JavaSimulatorHandle,
   JavaSimulatorProps
@@ -82,12 +106,11 @@ const JavaSimulatorSession = forwardRef<
     useJavaExecutionContext();
 
   const fileName = useMemo(() => getJavaFileName(itemId), [itemId]);
-  const isBusy =
-    snapshot.phase === "loading" ||
-    snapshot.phase === "compiling" ||
-    snapshot.phase === "running";
-  const canRun = snapshot.compilerStatus === "ready" && !isBusy;
-  const canStop = isBusy || snapshot.compilerStatus === "loading";
+  const { canRun, canStop } = useMemo(
+    () => computeSessionControlState(snapshot),
+    [snapshot],
+  );
+
   useEffect(() => {
     preload();
   }, [preload]);
@@ -128,6 +151,16 @@ const JavaSimulatorSession = forwardRef<
     standardInput,
     timeoutSeconds,
   ]);
+
+  const handleTimeoutChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const parsed = parseTimeoutSeconds(event.target.value);
+      if (parsed !== null) {
+        setTimeoutSeconds(parsed);
+      }
+    },
+    [],
+  );
 
   useImperativeHandle(
     ref,
@@ -243,14 +276,7 @@ const JavaSimulatorSession = forwardRef<
               max={300}
               step={1}
               value={timeoutSeconds}
-              onChange={(event) => {
-                const nextValue = Number(event.target.value);
-                if (Number.isNaN(nextValue)) {
-                  return;
-                }
-
-                setTimeoutSeconds(Math.min(300, Math.max(1, nextValue)));
-              }}
+              onChange={handleTimeoutChange}
               data-testid="java-timeout-input"
               className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
             />
