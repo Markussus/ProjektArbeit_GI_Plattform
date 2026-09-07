@@ -21,7 +21,8 @@
 
     \begin{itemize}
       \item \textbf{Aufbau:} UND-Terme werden durch ODER verbunden
-      \item \textbf{Kanonisch:} Jede 1-Zeile ergibt einen Vollminterm
+      \item \textbf{Zwei Wege:} Ausdruck zur Wahrheitstabelle oder Wahrheitstabelle zur DNF
+      \item \textbf{Kanonisch:} Jede 1-Zeile ergibt einen vollständigen Term mit allen Variablen
       \item \textbf{Minimal:} Weniger Literale, exakt mit QMC + B\&B
       \item \textbf{Global:} Ausklammern erlaubt, daher nicht zwingend DNF
       \item \textbf{Äquivalenz:} Funktion über Wahrheitstabelle vergleichen
@@ -54,7 +55,7 @@
   \draw[diagramarrow] (cdnf) -- (qmc);
   \draw[diagramarrow] (table) --
     node[pos=0.52, right, xshift=2mm, font=\small, text=black] {Funktion} (exact);
-  \draw[diagramarrow, dashed] (qmc) -- node[above, font=\small, text=black] {Startwert} (exact);
+  \draw[diagramarrow, dashed] (qmc) -- node[above, font=\small, text=black] {Obergrenze} (exact);
 
   \draw[diagramarrow] (student) -- (check);
   \draw[diagramarrow] (table) --
@@ -68,13 +69,12 @@
   \textbf{Zeit:  1,5 min}
 
   \begin{itemize}
-    \item \textbf{Referenz:} Wahrheitstabelle der erwarteten Funktion
-    \item \textbf{Eingabewege:} Formel parsen, Tabelle direkt verwenden
-    \item \textbf{Kanonisch:} 1-Zeilen werden zu Vollmintermen
+    \item \textbf{Ausdrucksmodus:} Referenztabelle erzeugen und eingegebene Werte vergleichen
+    \item \textbf{Tabellenmodus:} Vorgegebene Tabelle direkt als Referenz verwenden
+    \item \textbf{Gemeinsamer Weg:} 1-Zeilen werden zur kanonischen DNF
     \item \textbf{Minimal:} Primimplikanten bilden und exakt auswählen
-    \item \textbf{Global:} Minimale DNF dient nur als Startwert
-    \item \textbf{Freigabe:} Vereinfachen erst nach korrekter kanonischer DNF
-    \item \textbf{Feedback:} Werte, Form und Äquivalenz prüfen
+    \item \textbf{Global:} Minimale DNF als Obergrenze, kleinere Formel exakt suchen
+    \item \textbf{Feedback:} Form und logische Äquivalenz mit der Referenztabelle prüfen
   \end{itemize}
 }
 \end{contentsframe}
