@@ -36,7 +36,7 @@
     "testWordHelp": "Birkaç kelimeyi virgülle ayırın. Her karakter bir terminal sembolü olarak sayılır ve virgüllerin etrafındaki boşluklar dikkate alınmaz. Boş kelimeye ε veya epsilon yazın.",
     "testWordEmpty": "Test edilecek bir kelime yazın. Boş kelimeye ε veya epsilon yazın.",
     "supportedFormats": "Desteklenen Formatlar",
-    "supportedFormatsExtensional": "Kapsamsal / küme gösterimi",
+    "supportedFormatsExtensional": "Kaplamsal / küme gösterimi",
     "supportedFormatsIntensional": "İçlemsel / biçimsel gösterim",
     "reason": {
       "accepted": "Çalıştırma şu durumlarda bitti: {{states}} (kabul edildi)",

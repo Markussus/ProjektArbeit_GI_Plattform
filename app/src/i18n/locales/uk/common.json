@@ -7,7 +7,7 @@
     "resetAllExercises": "Скинути всі вправи",
     "confirmResetAllExercises": "Видалити весь збережений прогрес вправ?",
     "resetAllProgressTitle": "Скинути збережений прогрес",
-    "resetAllProgressDescription": "Скидає прогрес симуляторів у пам'яті браузера до початкового стану.",
+    "resetAllProgressDescription": "Видаляє весь збережений прогрес симуляторів і вправ з усіх тем на цьому пристрої.",
     "resetAllProgress": "Скинути весь збережений прогрес",
     "confirmResetAllProgress": "Видалити весь збережений прогрес?"
   },
@@ -83,7 +83,7 @@
     "selectedExercise": "Вибрана вправа",
     "selectedExample": "Вибраний приклад",
     "expand": "Розгорнути симуляцію",
-    "exitFocus": "Вийти з повноекранного режиму симуляції",
+    "exitFocus": "Вийти з режиму фокусування симуляції",
     "close": "Закрити",
     "transfer": {
       "placeholder": "Вставте рядок передачі",

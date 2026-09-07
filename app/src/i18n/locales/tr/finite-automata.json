@@ -145,9 +145,9 @@
   },
   "grammar": {
     "title": "Düzenli Dilbilgisi → Otomat",
-    "intro": "Sağ-doğrusal bir dilbilgisi girin. Bir başlangıç sembolü seçin, türetilen dili oluşturun ve isteğe bağlı olarak dilbilgisini sağ-doğrusal kurallardan bir sonlu otomata dönüştürün.",
+    "intro": "Sağ-doğrusal bir dilbilgisi girin. Sol taraftaki ilk terminal olmayan sembol başlangıç sembolü olur; terminal olmayan semboller ve terminaller üretimlerinizden çıkarılır.",
     "productions": "Dilbilgisi",
-    "productionsHint": "Her satırda bir kural.",
+    "productionsHint": "Her satırda bir üretim kuralı. İki format desteklenir ve otomatik olarak algılanır.",
     "convert": "Otomat'a Dönüştür",
     "loadExample": "Örnek Yükle",
     "supportedFormats": "Desteklenen Formatlar",
