@@ -19,7 +19,7 @@ const edgeDetectorSolution: MealyProgram = {
       HIGH: { symbol: "NO_PULSE", code: 0 },
     },
   },
-  initialState: "LOW",
+  initialState: "HIGH",
   inputWord: [],
   representation: "binary",
 };
@@ -122,10 +122,10 @@ const edgeDetectorStarter = createMealyStarter(
     },
     "1": {
       LOW: { symbol: "NO_PULSE", code: 0 },
-      HIGH: { symbol: "RISING_EDGE", code: 1 },
+      HIGH: { symbol: "NO_PULSE", code: 0 },
     },
   },
-  "LOW",
+  "HIGH",
 );
 
 const doorControllerStarter = createMealyStarter(
@@ -185,10 +185,12 @@ export const mealyExerciseScenarios: MealyExerciseScenario[] = [
     solutionProgram: edgeDetectorSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [] },
+      { input: ["1"], expectedOutputCodes: [0] },
       { input: ["0"], expectedOutputCodes: [0] },
-      { input: ["1"], expectedOutputCodes: [1] },
-      { input: ["1", "1"], expectedOutputCodes: [1, 0] },
-      { input: ["1", "0", "1"], expectedOutputCodes: [1, 0, 1] },
+      { input: ["0", "1"], expectedOutputCodes: [0, 1] },
+      { input: ["1", "1"], expectedOutputCodes: [0, 0] },
+      { input: ["1", "0", "1"], expectedOutputCodes: [0, 0, 1] },
+      { input: ["0", "1", "0", "1"], expectedOutputCodes: [0, 1, 0, 1] },
     ],
     definition: {
       titleKey: "moore-mealy.exercises.edgeDetector.title",

@@ -341,7 +341,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     const exercises = [
       ["moore-mealy.exercises.turnstile.title", "moore-config-view"],
       ["moore-mealy.exercises.elevator.title", "moore-config-view"],
-      ["moore-mealy.exercises.barrier.title", "moore-config-view"],
+      ["moore-mealy.exercises.trafficLight.title", "moore-config-view"],
       ["moore-mealy.exercises.vending.title", "moore-config-view"],
       ["moore-mealy.exercises.wiper.title", "moore-config-view"],
       ["moore-mealy.exercises.alarm.title", "moore-config-view"],

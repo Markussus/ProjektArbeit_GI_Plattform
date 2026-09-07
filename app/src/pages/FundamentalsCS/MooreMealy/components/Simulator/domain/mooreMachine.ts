@@ -24,13 +24,15 @@ export class MooreMachineSimulator implements ISimulator<
       throw new Error(`Invalid Moore program: ${issues.join(", ")}`);
     }
 
+    const initialOutputSymbol = program.outputs[program.initialState]?.symbol;
     this.program = cloneJson(program);
     this.runtime = runtime
       ? cloneJson(runtime)
       : {
           currentState: program.initialState,
           inputPosition: 0,
-          outputSymbols: [],
+          outputSymbols:
+            initialOutputSymbol !== undefined ? [initialOutputSymbol] : [],
           stepCount: 0,
           halted: program.inputWord.length === 0,
           transitionHistory: [],

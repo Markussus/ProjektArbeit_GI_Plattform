@@ -24,13 +24,9 @@
       "title": "Asansör kontrolü",
       "description": "İki katlı bir asansörü EG_CLOSED, EG_OPEN, OG_CLOSED ve OG_OPEN durumlarıyla modelleyin. OPEN ve CLOSE kapıyı kontrol eder. GO_OG ve GO_EG asansörü yalnızca kapı kapalıyken hareket ettirir; kapı açıkken hareket komutları etkisizdir. Moore geçiş tablosunu ve durum diyagramını tamamlayın."
     },
-    "barrier": {
-      "title": "Otopark bariyeri",
-      "description": "Her zaman açık misafir modu ve kart kontrollü mod ile bir otopark bariyeri modelleyin. Kart modunda, VALID_CARD bariyeri açar ve PASS, indüksiyon döngüsü aracı tespit ettikten sonra bariyeri kapatır. Davranışı bir Moore makinesi olarak yeniden çalışın ve duruma bağlı uygun çıktı eylemlerini tanımlayın."
-    },
     "vending": {
       "title": "Otomat",
-      "description": "Fiyatı 1,00 ve 1,50 euro olan içecekler için 50 cent ve 1 euroluk bozuk para kabul eden bir otomat makinesi modelleyin. START'ın 1 euro'nun altında hiçbir etkisi yoktur, 1,50 euro tutarındaki ekstra jetonlar iade edilir ve CANCEL kredinin tamamını iade eder. Olayları ve eylemleri belirleyin, her durumdaki her olayı ele alın, başlangıç ​​durumunu işaretleyin ve davranışı bir Moore makinesi olarak ifade edin."
+      "description": "Fiyatı 1,00 ve 1,50 euro olan içecekler için 50 cent ve 1 euroluk bozuk para kabul eden bir Moore otomatı modelleyin. Fazla para atılması (1,50 euro üzeri) veya CANCEL durumunda makine REFUND durumuna geçer (paralar iade edilir) ve START veya CANCEL ile yeniden başlatılması gerekir. 1,00 euro altında START etkisizdir."
     },
     "wiper": {
       "title": "Ön cam silecek kontrolü",
@@ -46,11 +42,11 @@
     },
     "edgeDetector": {
       "title": "Yükselen kenar dedektörü",
-      "description": "Yalnızca giriş sinyali 0'dan 1'e değiştiğinde RISING_EDGE yayan bir Mealy makinesi tasarlayın. Değişmeyen bir sinyal veya düşen kenar NO_PULSE yayar."
+      "description": "Başlangıç durumu HIGH (boşta seviyesi) olan bir Mealy makinesi tasarlayın. Yalnızca giriş sinyali 0'dan 1'e geçtiğinde bir RISING_EDGE darbesi verilir. Sinyal değişmezse veya 0'a düşerse NO_PULSE verilir."
     },
     "doorController": {
       "title": "Eylem darbeleriyle kapı kontrolü",
-      "description": "Kilitli ve kilidi açık bir kapıyı Mealy makinesi olarak modelleyin. CARD yalnızca kapının kilidini açtığında UNLOCK_PULSE sinyali verir; PASS, yalnızca kapıyı tekrar kilitlediğinde LOCK_PULSE sinyali verir. Etkisi olmayan olaylar NO_ACTION yayar."
+      "description": "Kilitli ve kilitsiz bir kapıyı Mealy makinesi olarak modelleyin (başlangıç durumu LOCKED). CARD kilidi açarken UNLOCK_PULSE üretir. Açık kapıdan geçilmesi (UNLOCKED durumunda PASS) bir LOCK_PULSE sinyali tetikler ve kapıyı tekrar kilitler (LOCKED). Etkisiz olaylar (örneğin kilitli kapıdayken PASS) NO_ACTION üretir."
     },
     "sequenceDetector": {
       "title": "01 dizisi algılayıcısı",
@@ -59,6 +55,10 @@
     "parityTracker": {
       "title": "Seri eşlik çıkışı",
       "description": "Her giriş bitinden sonra o ana kadar okunanların tümünün eşlikini veren bir Mealy makinesi tasarlayın. Sıfır pariteyi korur; bir tanesi EVEN_PARITY ve ODD_PARITY arasında geçiş yapar."
+    },
+    "trafficLight": {
+      "title": "Trafik lambası kontrolü",
+      "description": "Dört tipik faz olan RED, RED_YELLOW, GREEN ve YELLOW ile bir trafik lambası kontrolcüsü modelleyin. TICK saati lambayı döngüsel olarak bir sonraki faza geçirir. HOLD sinyali mevcut fazda kalmayı sağlar (örn. yeşil dalga). RESET sinyali kontrolcüyü her durumdan güvenli bir şekilde başlangıç fazı olan RED durumuna döndürür."
     }
   },
   "groups": {
