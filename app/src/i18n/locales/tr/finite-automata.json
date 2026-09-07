@@ -108,6 +108,10 @@
       "title": "\"aba\" alt dizesini içerir",
       "description": "{a, b} üzerinde herhangi bir yerde alt dize olarak \"aba\" içeren herhangi bir dizeyi kabul eden bir NFA. Belirlenemezliği gösterir."
     },
+    "multipleStartStates": {
+      "title": "ε ile birden fazla başlangıç durumu",
+      "description": "Model tam olarak bir başlangıç durumu taşır. Başlangıç durumu kümesi S ⊆ Q içeren bir tanım, ε-geçişleriyle bu durumların tümüne ulaşan fazladan bir durum eklenerek elde edilir: S'nin ε-kapanışı {S, A0, B0} olduğundan çalışma her iki bileşen otomatta aynı anda başlar. L = a⁺ ∪ b⁺ dilini kabul eder."
+    },
     "lecture": {
       "title": "Bir veya daha fazla 0, ardından tek bir 1 (00*1)",
       "description": "Bir veya daha fazla '0' ve ardından tam olarak bir '1' gelen ders alıştırmasından bir DFA (Regex: 00*1)."
