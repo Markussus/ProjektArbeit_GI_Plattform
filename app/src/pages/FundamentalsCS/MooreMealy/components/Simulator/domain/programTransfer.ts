@@ -1,7 +1,5 @@
 import { BitReader, BitWriter } from "@/lib/trainingCenter";
-import { bitsNeeded, MAX_COLLECTION_SIZE } from "./programCommon";
-
-export { bitsNeeded };
+import { MAX_COLLECTION_SIZE } from "./programCommon";
 
 export const FORMAT_VERSION = 0;
 export const MAX_STRING_BYTES = 4096;

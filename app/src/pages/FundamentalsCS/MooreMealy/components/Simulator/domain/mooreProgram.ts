@@ -12,7 +12,6 @@ export {
   renameMooreState,
   renameMooreInputSymbol,
   getNextMooreOutputCode,
-  findMooreOutputCodeBySymbol,
 } from "./mooreProgramUpdates";
 
 export function validateMooreProgram(program: MooreProgram): string[] {

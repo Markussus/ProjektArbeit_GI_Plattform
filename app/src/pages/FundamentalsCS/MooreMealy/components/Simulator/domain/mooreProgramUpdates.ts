@@ -21,19 +21,6 @@ export function getNextMooreOutputCode(program: MooreProgram): number {
   return next;
 }
 
-export function findMooreOutputCodeBySymbol(
-  program: MooreProgram,
-  symbol: string,
-): number | undefined {
-  for (const state of program.states) {
-    const output = program.outputs[state];
-    if (output && output.symbol === symbol) {
-      return output.code;
-    }
-  }
-  return undefined;
-}
-
 function remapStateTransitions(
   transitions: Record<string, Record<string, string>>,
   previousName: string,

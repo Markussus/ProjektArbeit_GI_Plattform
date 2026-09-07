@@ -31,8 +31,3 @@ export function getAutomataExerciseScenario(
     automataExerciseScenarios.find((scenario) => scenario.id === id) ?? null
   );
 }
-
-export function getMooreExerciseScenario(id: TranslationKey) {
-  const scenario = getAutomataExerciseScenario(id);
-  return scenario?.machineType === "moore" ? scenario : null;
-}

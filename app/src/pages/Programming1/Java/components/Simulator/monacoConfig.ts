@@ -1,6 +1,6 @@
 import { loader } from "@monaco-editor/react";
 
-export async function initMonacoOffline(): Promise<void> {
+async function initMonacoOffline(): Promise<void> {
   if (typeof window === "undefined" || import.meta.env.TEST) {
     return;
   }
