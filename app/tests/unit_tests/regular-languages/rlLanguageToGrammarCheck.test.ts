@@ -5,6 +5,7 @@ import { rlExercises } from "@/pages/FundamentalsCS/RegularLanguages/exercises/r
 // L = 0 1ⁿ 0, n ≥ 1
 const SEED = 'L = {"010", "0110", "01110", "011110"}';
 const REJECT = ["0", "00", "10", "01", "0100"];
+const REFERENCE = ["START -> 0A", "A -> 1B", "B -> 1B | 0"].join("\n");
 
 describe("checkLanguageToGrammarExercise", () => {
   it("matches a correct grammar for the target language", () => {
@@ -49,10 +50,71 @@ describe("checkLanguageToGrammarExercise", () => {
         exercise.referenceGrammar!,
         exercise.seed.languageSource ?? "",
         exercise.rejectWords ?? [],
+        exercise.referenceGrammar,
       );
       expect(result, `reference grammar for ${exercise.id}`).toMatchObject({
         status: "match",
       });
     }
+  });
+
+  it("accepts an equivalent grammar that only renames its non-terminals", () => {
+    const grammar = ["S -> 0X", "X -> 1Y", "Y -> 1Y | 0"].join("\n");
+    const result = checkLanguageToGrammarExercise(
+      grammar,
+      SEED,
+      REJECT,
+      REFERENCE,
+    );
+    expect(result.status).toBe("match");
+  });
+
+  /**
+   * The regression this reference-grammar layer exists for. `S -> 0A | 1A`
+   * also generates 1 1ⁿ 0, but it satisfies every curated word of the
+   * exercise, so the word lists on their own call it correct.
+   */
+  it("flags an over-general grammar the curated words cannot catch", () => {
+    const grammar = ["S -> 0A | 1A", "A -> 1B", "B -> 1B | 0"].join("\n");
+
+    const withoutReference = checkLanguageToGrammarExercise(
+      grammar,
+      SEED,
+      REJECT,
+    );
+    expect(withoutReference.status).toBe("match");
+
+    const withReference = checkLanguageToGrammarExercise(
+      grammar,
+      SEED,
+      REJECT,
+      REFERENCE,
+    );
+    expect(withReference.status).toBe("mismatch");
+    expect(withReference.wrong).toContain("110");
+  });
+
+  it("ignores a reference grammar that does not parse", () => {
+    const result = checkLanguageToGrammarExercise(
+      REFERENCE,
+      SEED,
+      REJECT,
+      "not a grammar",
+    );
+    expect(result.status).toBe("match");
+  });
+
+  it("keeps reporting curated words alongside a derived counter-example", () => {
+    // Generates "00" (a curated counter-example) and misses "0110".
+    const grammar = ["START -> 0A", "A -> 1B | 0", "B -> 0"].join("\n");
+    const result = checkLanguageToGrammarExercise(
+      grammar,
+      SEED,
+      REJECT,
+      REFERENCE,
+    );
+    expect(result.status).toBe("mismatch");
+    expect(result.wrong).toContain("00");
+    expect(result.missing).toContain("0110");
   });
 });

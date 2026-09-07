@@ -50,6 +50,7 @@ export function checkExerciseSolution(
       studentDraft,
       exercise.seed.languageSource ?? "",
       exercise.rejectWords ?? [],
+      exercise.referenceGrammar,
     );
   }
 

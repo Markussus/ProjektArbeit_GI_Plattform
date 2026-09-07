@@ -108,6 +108,10 @@
       "title": "Enthält Teilwort \"aba\"",
       "description": "Ein NFA, der jeden String über {a, b} akzeptiert, der \"aba\" als Teilwort enthält. Demonstriert Nichtdeterminismus."
     },
+    "multipleStartStates": {
+      "title": "Mehrere Startzustände über ε",
+      "description": "Das Modell kennt genau einen Startzustand. Eine Definition mit einer Startzustandsmenge S ⊆ Q wird durch einen zusätzlichen Zustand nachgebildet, dessen ε-Übergänge alle gewünschten Startzustände erreichen: Die ε-Hülle von S ist {S, A0, B0}, der Lauf beginnt also gleichzeitig in beiden Teilautomaten. Akzeptiert wird L = a⁺ ∪ b⁺."
+    },
     "lecture": {
       "title": "Eine oder mehrere 0en, dann eine einzelne 1 (00*1)",
       "description": "Ein DFA, der eine oder mehrere '0'en gefolgt von genau einer '1' akzeptiert (Regex: 00*1). Zum Beispiel wird „001“ akzeptiert, da es im Endzustand S2 endet, während „010“ abgelehnt wird, da für die letzte „0“ in S2 kein Übergang definiert ist. Öffnen Sie ihn, um diese Wörter im Simulator auszuführen."

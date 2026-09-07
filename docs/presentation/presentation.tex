@@ -381,25 +381,26 @@ bs=$\bullet$]{thwsbeamertheme}
 
 \begin{itemframe}{KI-Werkzeuge im Projekt}
   \item Stitch, ChatGPT, Gemini, Claude, Codex, Antigravity, verschiedene OpenCode und lokale Modelle
-            \vspace{1em}
-  \item MCP, LSP, Graphify und Agent Skills
-    \note{
+  \vspace{1em}
+  \item MCP, Graphify und Agent Skills
+
+  \note{
       \textbf{Person: Kristian}
 
       \textbf{Zeit: 1 min}
 
       \begin{itemize}
-        \item Keine Vorgabe -- jeder hat eigene Tools ausprobiert
-        \item \textbf{Stitch}: UI-Ideen, erste Oberflächen
-        \item \textbf{Übrige Modelle}: je nach Aufgabe - Entwicklung, Planung und Fehlersuche
-        \item \textbf{OpenCode}, lokale Modelle über \textbf{Ollama}: ausprobiert
-        \item \textbf{MCP}: Browser + DevTools, App direkt testen
-        \item \textbf{LSP} (\texttt{typescript-lsp}): KI sieht dieselben Typinformationen wie die IDE
-        \item \textbf{Graphify}: Wissensgraph, keine Neuanalyse pro Session
+        \item Jeder von uns hat dabei eigene Tools ausprobiert und Erfahrungen gesammelt
+        \item \textbf{Stitch}: Frontend -- UI-Ideen und erste Oberflächen
+        \item \textbf{ChatGPT, Gemini, Claude, Codex, Antigravity}: als Coding-Agents eingesetzt
+        \item verschiedene \textbf{OpenCode} und \textbf{lokale Open-Source-Modelle} über Ollama ausprobiert
+        \item Tools und Plugins mit der KI verbunden, um ihre Fähigkeiten zu erweitern
+        \item \textbf{MCP}: KI kann Browser \& Developer Tools zugreifen und die App direkt testen
+        \item \textbf{Graphify}: konnte unsere Projektstruktur als Wissensgraph darstellen, keine Neuanalyse pro Session
           $\rightarrow$ spart Tokens und Zeit
-        \item \textbf{Agent Skills}: Vorgehensweisen für wiederkehrende Aufgaben
+        \item \textbf{Agent Skills}: konnten wir der KI zeigen, wie sie bestimmte Aufgaben erledigen soll
       \end{itemize}
-    }
+  }
 \end{itemframe}
 
 \begin{contentsframe}{Arbeitsweise: KI als Co-Developer}
@@ -424,14 +425,15 @@ bs=$\bullet$]{thwsbeamertheme}
     \textbf{Zeit: 2 min}
 
     \begin{itemize}
-      \item Ablauf nicht vorgegeben -- bei allen fünf unabhängig entstanden
-      \item \textbf{Start}: Aufgabe + Architekturkontext (shared statt lokal im Modul)
-      \item \textbf{Plan vor Code}: Missverständnisse früh, nicht erst im Diff
-      \item \textbf{Änderungsvorschlag} $\rightarrow$ \textbf{Review}: Diff fachlich + didaktisch
-      \item Neuer Chat für den Review: Modell bewertet nicht sich selbst
-      \item \textbf{Tests}: Unit + E2E automatisiert (Vitest, Playwright), Browser über MCP
-      \item \textbf{Pfeil zurück}: iterativ, kleine Schritte -- große Aufgaben verlieren Kontext
-      \item \textbf{Schluss}: Entscheidung beim Menschen -- nur Geprüftes wird übernommen
+      \item \textbf{Ablauf} nicht vorgegeben, sondern bei allen 5 unabhängig entwickelt
+      \item \textbf{Aufgabe + Architekturkontext}: Hier beschreibe ich die Aufgabe detailliert und erkläre,
+      wo im Projekt die Änderung hingehört. BSP: Sie passt eine Shared-Komponente an, obwohl eine lokale Anpassung im Modul richtig wäre
+      \item \textbf{Plan vor Code}: Sie liest sich in die betroffenen Dateien ein und beschreibt, was sie ändern will,
+      bevor eine Zeile Code entsteht. Erkennen wir früh Missverständnisse.
+      \item \textbf{Diff + Fachreview}: Ich lese den Diff und prüfe,
+      ob das Ergebnis fachlich und didaktisch stimmt. Für den Review habe ich bewusst einen neuen Chat geöffnet
+      \item \textbf{Tests}: manuell (Layout im Browser) und von der KI automatisch (Vitest, Playwright)
+      \item \textbf{Pfeil zurück}: Finden wir noch Fehler, geht das Feedback direkt zurück an die KI und die Korrekturschleife beginnt von vorn
     \end{itemize}
   }
 \end{contentsframe}
@@ -556,14 +558,14 @@ bs=$\bullet$]{thwsbeamertheme}
       \textbf{Zeit: 1 min}
 
       \begin{itemize}
-        \item Zwei Gruppen in Folienreihenfolge: vier ohne neue Infrastruktur, drei mit Backend.
-        \item \textbf{Lernbereiche}: Modulkatalog trägt Navigation und Routing.
-        \item \textbf{Aufgabenverwaltung}: Lehrende legen an, Varianten aus Vorlage,
-          dazu Quizfragen und Lernkarten.
-        \item \textbf{Mobil}: Tabelle und Diagramm auf kleinen Bildschirmen.
-          \textbf{Java}: Machbarkeit geprüft, Marker grenzen den freien Bereich ab.
-        \item Backend: \textbf{Lernstandsverfolgung} zuerst, Gamification und LMS darauf.
-        \item Ehrlich: bewusst ohne Backend, lokal im Browser, statischer Build.
+        \item \textbf{Lernbereiche}: Weitere Themen von den anderen Professoren
+        \item \textbf{Aufgaben über die Oberfläche anlegen}:
+        Lehrende könnten Aufgaben, automatische Varianten aus Vorlagen,
+        Quizfragen, Lernkarten und Theoriefragen direkt erstellen.
+        \item \textbf{Mobile Nutzung verbessern}: Auf kleinen Bildschirmen oder Tablets.
+        \item \textbf{Java}: Zeilensperrung implementieren.
+        Das man nicht die Zeilen ändern kann, die nicht bearbeitet werden sollen.
+        \item \textbf{Moodle Verbindung} + Gamification.
       \end{itemize}
     }
 \end{itemframe}
