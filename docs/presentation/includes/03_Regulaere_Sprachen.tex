@@ -9,21 +9,22 @@
   \item \textbf{Rechtslineare Grammatik} selbst schreiben -- geprüft schon beim Tippen
   \item Drei Modi: \textbf{Aufzählung}, \textbf{Erzeugung}, \textbf{Worterkennung}
   \item \textbf{Übungen} mit Rückmeldung: fehlende und falsche Wörter
-          \note{
+
+  \note{
             \textbf{Person: Kristian}
 
             \textbf{Zeit: 1 min}
 
             \begin{itemize}
-              \item Einstieg zweites Thema, parallel zum Überblick bei den Automaten.
-              \item Grammatik selbst schreiben, eine Produktion pro Zeile. Prüfung beim Tippen.
+              \item Die Grammatik wird Zeile für Zeile eingegeben
+              und live beim Tippen geprüft.
+              Ein Berechnen-Knopf fehlt bewusst: Jeder Fehler – wie eine falsche Produktion
+              oder ein nicht deklariertes Symbol – wird direkt in der betroffenen Zeile gemeldet.
               \item Drei Modi nur benennen $\rightarrow$ Details auf der nächsten Folie.
-              \item In der Oberfläche: Grammatik -> Sprache, Sprache -> Grammatik, Wort erkennen.
-              \item \textbf{Übungen}: geprüft wird das Verhalten
-                    $\rightarrow$ fehlende und zu viele Wörter.
-              \item Überleitung: diese drei Arbeitsweisen im Zusammenhang.
+              \item \textbf{Übungen}: Prüfung der erkannten Sprache durch konkrete Gegenbeispiele
+              wie fehlende oder falsche Wörter. Genau wie bei den Automaten
             \end{itemize}
-          }
+  }
 \end{itemframe}
 
 % ---------------------------------------------------------------------------
@@ -54,21 +55,22 @@
       \draw[->, very thick, thwspetrol] (word) -- node[lbl, above, thwspetrol] {Worterkennung} (verdict);
     \end{tikzpicture}
   \end{center}
-            \note{
+
+  \note{
               \textbf{Person: Kristian}
 
               \textbf{Zeit: 1 min}
 
               \begin{itemize}
-                \item \textbf{Aufzählung}: Grammatik $\rightarrow$ Wörter. Begrenzt nach Länge
-                      und Anzahl.
-                \item \textbf{Erzeugung}: Sprache $\rightarrow$ Grammatik.
-                      Strikt rechtslinear, ausführlich oder vereinfacht.
-                \item Eingabeformate der Sprache: Wortliste oder Mengenschreibweise.
-                \item \textbf{Worterkennung}: mehrere Wörter gegen die Grammatik,
-                      mit Begründung statt nur ja/nein.
-                \item Frei sagen, steht nicht auf der Folie: Modi bleiben gemountet
-                      $\rightarrow$ begonnene Eingabe überlebt den Moduswechsel.
+                \item \textbf{Aufzählung}: Grammatik $\rightarrow$ Wörter der Sprache.
+                Man kann nach Länge und Anzahl begrenzen.
+                \item \textbf{Erzeugung}: Die Gegenrichtung.
+                Sprache $\rightarrow$ Grammatik.
+                Sprache kann man als \textbf{Wortliste} oder \textbf{Mengenschreibweise} darstellen.
+                \item \textbf{Ausführlich} $\rightarrow$ jedes Präfix ein eigenes Nichtterminal bekommt.
+                \item \textbf{Vereinfachte} Grammatik $\rightarrow$ Präfixe werden zusammengefasst.
+                \item \textbf{Worterkennung}: Mehrere Wörter gegen die Grammatik testen.
+                Ergebnis: Man bekommt Begründung statt nur ja/nein.
               \end{itemize}
-            }
+  }
 \end{fullframe}
