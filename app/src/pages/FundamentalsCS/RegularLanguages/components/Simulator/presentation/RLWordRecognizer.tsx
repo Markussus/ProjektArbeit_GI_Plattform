@@ -37,6 +37,7 @@ function parseTestWords(source: string): string[] {
     .map(resolveEmptyWord);
 }
 
+/** One checked word, with the verdict and the states the run ended in. */
 interface PerWordResult {
   word: string;
   accepted: boolean;
@@ -44,6 +45,7 @@ interface PerWordResult {
   states: string;
 }
 
+/** Free mode for word recognition: checks a list of words against a grammar. */
 export function RLWordRecognizer({
   initialGrammar,
   initialWord,

@@ -31,6 +31,7 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
   "A -> 0A | 1",
 ].join("\n");
 
+/** Free mode grammar → language: enumerates the words a grammar generates. */
 export function RLGrammarToLanguage({
   initialGrammar,
   transferActive = true,

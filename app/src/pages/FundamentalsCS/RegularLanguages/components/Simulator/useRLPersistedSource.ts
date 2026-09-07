@@ -5,14 +5,11 @@ import { SIMULATOR_TASK_STORAGE_ID } from "@/lib/trainingCenter";
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 
 /**
- * Dedicated Training Center task slots for the Regular Languages simulator
- * modes. Each mode keeps its own source so switching modes doesn't clobber the
- * other's saved work.
- *
- * They sit at the top of the task range because the low ids belong to the
- * exercises, which are numbered from 0 like every other topic's. The default
- * mode takes {@link SIMULATOR_TASK_STORAGE_ID}, so a shared free-mode grammar
- * imports as "the simulator" rather than as a task.
+ * One Training Center slot per simulator mode, so switching modes doesn't clobber
+ * the other's saved work. They sit at the top of the range because the low ids
+ * belong to the exercises; the default mode takes
+ * {@link SIMULATOR_TASK_STORAGE_ID}, so a shared free-mode grammar imports as
+ * "the simulator" rather than as a task.
  */
 export const RL_STORAGE_TASK_IDS = {
   grammarToLanguage: SIMULATOR_TASK_STORAGE_ID,
@@ -25,7 +22,6 @@ interface UseRLPersistedSourceOptions {
   taskStorageId: number;
   /** Codec used both for the export/import box and for persistence. */
   codec: ISimulatorTransferCodec<string>;
-  /** The current editable source text. */
   source: string;
   /** Adopt a restored source on mount. */
   setSource: (value: string) => void;

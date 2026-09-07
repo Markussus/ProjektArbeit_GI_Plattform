@@ -5,6 +5,7 @@ import type { UseFAConfigEditorResult } from "../application/useFAConfigEditor";
 import type { FAProgramIssueCode } from "../domain/faProgramValidation";
 import { FATransitionTableEditor } from "./FATransitionTableEditor";
 
+/** Comma-separated text field for a set of states or symbols. */
 function ArrayInput({
   value,
   onChange,
@@ -34,9 +35,6 @@ function ArrayInput({
         setLocalValue(e.target.value);
         onChange(e.target.value);
       }}
-      // Typing needs the raw text — "0, 1," is a half-typed third symbol, not a
-      // mistake. Once the field is left, it shows the set that was actually
-      // kept, so a repeated entry visibly collapses instead of looking accepted.
       onBlur={() => setLocalValue(value.join(", "))}
       className={className}
       placeholder={placeholder}
@@ -48,6 +46,7 @@ export interface FAConfigViewProps {
   editor: UseFAConfigEditorResult;
 }
 
+/** Editor panel: type, the state/symbol sets and the transition table. */
 export function FAConfigView({ editor }: FAConfigViewProps) {
   const { t } = useTranslation();
 

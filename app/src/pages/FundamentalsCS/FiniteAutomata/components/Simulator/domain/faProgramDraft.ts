@@ -3,32 +3,24 @@ import { BitReader, BitWriter } from "@/lib/trainingCenter";
 import type { AutomatonType, FAProgram, FATransitionMap } from "./faTypes";
 import { faProgramTransferCodec } from "./faProgramTransfer";
 
+/** Error codes and the size ceiling a stored draft may not exceed. */
 const DRAFT_INVALID = "fa_draft_transfer_invalid";
 const PAYLOAD_INVALID = "fa_draft_transfer_payload_invalid";
 const MAX_DRAFT_BYTES = 1_000_000;
 
 /**
  * Marks a payload as a draft. A slot can also hold a compact transfer payload —
- * a save written before this codec existed, or a string imported from someone
- * else — so the marker is what tells the two formats apart before either one
- * gets parsed.
+ * an older save, or an imported string — so the marker is what tells the two
+ * formats apart before either gets parsed.
  */
 const DRAFT_FORMAT_MARKER = 0x4641; // "FA"
 const DRAFT_FORMAT_MARKER_BITS = 16;
 
 /**
- * Transfer codec for an automaton in progress.
- *
- * {@link faProgramTransferCodec} encodes the automaton a learner means to
- * share, and refuses anything that is not a well-formed program: no repeated
- * alphabet symbol, no start state outside the state set. Those are the right
- * rules for a string handed to somebody else, and the wrong ones for an
- * autosave — a draft is half-built for as long as it is being built, and a
- * codec that rejects it makes every save of that exercise fail silently, since
- * nothing in the save path reports an error.
- *
- * So this codec never judges the automaton. It writes the draft as JSON and
- * reads back only enough to be sure the editor can render what it got.
+ * Transfer codec for an automaton in progress. Unlike
+ * {@link faProgramTransferCodec} it never judges the automaton: a draft is
+ * half-built while it is being built, and a codec that rejected it would make
+ * every autosave fail silently. The draft is written as JSON.
  */
 export const faProgramDraftCodec: ISimulatorTransferCodec<FAProgram> = {
   async exportValue(program) {
@@ -56,9 +48,6 @@ export const faProgramDraftCodec: ISimulatorTransferCodec<FAProgram> = {
       return draft;
     }
 
-    // Not a draft: either a slot saved by an older build or a transfer string
-    // someone shared. Reading those here is what carries saved work across the
-    // format change instead of quietly dropping it.
     return faProgramTransferCodec.importValue(trimmedValue);
   },
 };
@@ -105,10 +94,8 @@ function readDraftPayload(payload: string): FAProgram | null {
 }
 
 /**
- * Check the shape the editor needs, and only that. Whether the automaton is
- * sensible is the validator's business and the learner's; whether it is an
- * object with the right fields is this codec's, because the payload comes out
- * of browser storage and could be anything at all.
+ * Check the shape the editor needs, and only that — the payload comes out of
+ * browser storage and could be anything at all.
  */
 function toDraftProgram(value: unknown): FAProgram | null {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -155,6 +142,7 @@ function toStringArray(value: unknown): string[] | null {
     : null;
 }
 
+/** Narrow parsed JSON to a transition table, rejecting bad rows. */
 function toTransitionMap(value: unknown): FATransitionMap | null {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return null;

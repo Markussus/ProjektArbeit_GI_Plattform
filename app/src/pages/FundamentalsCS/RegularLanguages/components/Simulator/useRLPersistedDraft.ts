@@ -4,19 +4,15 @@ import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersisten
 import type { RLExerciseDefinition } from "../../exercises/rlExerciseDefinitions";
 import { rlDraftTransferCodec } from "./domain/rlDraftTransfer";
 
+/** What the caller can do with the saved draft; restoring happens on its own. */
 export interface RLPersistedDraft {
-  /** Drop this exercise's saved draft. */
   clear: () => void;
 }
 
 /**
- * Persists the answer a learner is writing for one Regular Languages exercise,
- * in that exercise's own Training Center slot — the same per-task persistence
- * the Turing Machine and Java modules give their exercises.
- *
- * Passing no exercise disables the whole thing, which is what free mode and
- * examples want: free mode persists per simulator mode instead
- * (see `useRLPersistedSource`), and examples never persist anywhere.
+ * Persists the answer a learner is writing for one exercise, in that exercise's
+ * own Training Center slot. Passing no exercise disables it, which is what free
+ * mode (persisted per mode by `useRLPersistedSource`) and examples want.
  */
 export function useRLPersistedDraft({
   exercise,

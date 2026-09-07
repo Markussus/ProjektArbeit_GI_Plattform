@@ -1,28 +1,24 @@
 import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { BitReader, BitWriter } from "@/lib/trainingCenter";
 
+/** Error codes and the size ceiling a stored draft may not exceed. */
 const DRAFT_INVALID = "rl_draft_transfer_invalid";
 const PAYLOAD_INVALID = "rl_draft_transfer_payload_invalid";
 const MAX_SOURCE_BYTES = 1_000_000;
 
 /**
- * Marks a payload as a draft. Without it, this codec would happily decode
- * anything byte-shaped: a grammar or language payload left in a slot by an
- * older build decodes into mojibake rather than failing, which would greet the
- * learner with control characters in their answer box. Two bytes to make a
- * foreign payload fail cleanly instead.
+ * Marks a payload as a draft. Without it this codec would decode anything
+ * byte-shaped: a grammar or language payload from an older build would reach the
+ * answer box as mojibake instead of failing.
  */
 const DRAFT_FORMAT_MARKER = 0x524c;
 const DRAFT_FORMAT_MARKER_BITS = 16;
 
 /**
- * Transfer codec for an exercise answer in progress.
- *
- * Unlike the grammar and language codecs, this one never parses what it is
- * given: a learner's draft is half-written most of the time it gets autosaved,
- * and a codec that rejected malformed text would quietly persist nothing until
- * the answer happened to be complete. The text is encoded verbatim
- * (UTF-8 -> Base64url), so a restored draft reads back exactly as it was typed.
+ * Transfer codec for an exercise answer in progress. Unlike the grammar and
+ * language codecs it never parses what it is given — a draft is half-written most
+ * of the time it is autosaved — and encodes the text verbatim, so a restored
+ * draft reads back exactly as typed.
  */
 export const rlDraftTransferCodec: ISimulatorTransferCodec<string> = {
   async exportValue(draft) {

@@ -1,9 +1,9 @@
-\subNsection{1}{Abgleich mit dem Lastenheft}{Kristian Popov}
+\subNsection{1}{Abgleich mit dem Lastenheft}{Kristian Popov} \label{5_2_LH}
 
-Der im Lastenheft festgelegte fachliche Umfang wurde umgesetzt und im Verlauf des
-Projekts erweitert: Zu den ursprünglich vorgesehenen Themen kamen die regulären
-Sprachen und die Kodierungsverfahren hinzu, mit Programmieren~1 außerdem ein
-zweiter Lernbereich.
+Der im Lastenheft festgelegte fachliche Umfang wurde
+umgesetzt und im Verlauf des Projekts erweitert: Zu den ursprünglich vorgesehenen
+Themen kamen die regulären Sprachen und die Kodierungsverfahren hinzu, mit
+Programmieren~1 außerdem ein zweiter Lernbereich.
 Die Erweiterungen wurden mit dem Auftraggeber abgestimmt und in die bestehende
 Plattform integriert (siehe Abschnitt~\ref{5_4_DI}).
 
@@ -14,10 +14,11 @@ Rückmeldungen statt einer reinen Ja-Nein-Aussage.
 Auch der Betrieb ohne Backend ist umgesetzt, da Aufgabenstände im lokalen Speicher
 des Browsers liegen und Aufgaben über Import und Export ausgetauscht werden.
 
-Die geforderte Erweiterbarkeit hat sich im Projektverlauf bewährt: Neue Themen wurden
-über den zentralen Modulkatalog registriert, ohne Navigation oder Routing der bestehenden
-Bereiche umbauen zu müssen, während das Unified UI-Konzept Aufbau, Tabs und
-Rückmeldungen über die Themen hinweg wiedererkennbar hält.
+Die geforderte Erweiterbarkeit hat sich im Projektverlauf bewährt.
+Neue Themen wurden über den zentralen Modulkatalog registriert, ohne Navigation oder
+Routing der bestehenden Bereiche umbauen zu müssen.
+Das Unified UI-Konzept hält dabei Aufbau, Tabs und Rückmeldungen über die Themen
+hinweg wiedererkennbar.
 Dasselbe Prinzip trägt die Mehrsprachigkeit: Die Oberfläche ist vollständig
 übersetzt, und eine weitere Sprache wird über den zentralen Sprachkatalog und ein
 zusätzliches Verzeichnis mit Übersetzungsdateien ergänzt, ohne die Themen selbst
@@ -26,20 +27,29 @@ Das Farbschema folgt wahlweise der Systemeinstellung oder einer manuellen Auswah
 
 Die Qualitätsziele des Lastenhefts werden in der \gls{ci}-Pipeline bei jedem Merge
 Request automatisch überprüft (siehe Abschnitt~\ref{5_1_QS}).
-Sie reicht über sieben aufeinander aufbauende Stufen von der Prüfung der
-Werkzeugversionen und dem Bau des Java-Compilers über Formatierung, Lint,
-Unit-Tests und Build bis zu den \gls{e2e}-Tests und der abschließenden
-Lighthouse-Messung; nur bei durchgehend erfolgreichem Lauf ist ein Merge möglich.
-Für das Qualitätsziel Performance schlägt die letzte Stufe fehl, sobald der Median
-des \gls{lcp} für reguläre Themenseiten 1,5~Sekunden überschreitet; für die
-Java-Programmierumgebung gilt ein Schwellenwert von 5~Sekunden, da Monaco-Editor
-und TeaVM aufgrund ihrer Größe mehr Ladezeit benötigen.
+Sie besteht aus sieben aufeinander aufbauenden Stufen: Prüfung der
+Werkzeugversionen, Bau des Java-Compilers, Formatierung und Lint, Unit-Tests,
+Build, \gls{e2e}-Tests und Lighthouse-Messung.
+Jede Stufe startet erst nach einem erfolgreichen Vorgänger, und nur ein
+vollständig fehlerfreier Lauf gibt den Merge frei.
+Für das Qualitätsziel Performance wertet die letzte Stufe den Median aus drei
+Läufen je Seite aus.
+Überschreitet der \gls{lcp} einer Themenseite 1,4~Sekunden, schlägt sie fehl;
+für die Java-Seite, die den Compiler lädt, gilt eine Schranke von 5~Sekunden.
 Dass die Themenseiten einzeln nachgeladen werden, hält die je Aufruf übertragene
 Datenmenge klein.
 Ergänzend sichert die Pipeline die Herkunft der Abhängigkeiten ab, indem sie deren
 Signaturen prüft und nur Paketversionen mit einem Mindestalter von sieben Tagen
 zulässt.
 
-Insgesamt wurden die Anforderungen des Lastenhefts damit weitgehend umgesetzt.
-Offen bleiben eine systematische Usability-Erhebung mit Studierenden, eine Prüfung
-der Barrierefreiheit und Messungen für kleine Bildschirme.
+Bis auf drei Punkte wurden die Anforderungen des Lastenhefts damit umgesetzt.
+Eine systematische Usability-Erhebung mit Studierenden war nicht möglich, da die
+Anwendung auf Wunsch des Auftraggebers nicht öffentlich betrieben, sondern als
+statischer Build ausgeliefert wird.
+Die Barrierefreiheit prüft die Pipeline nicht automatisch, weil die
+Lighthouse-Stufe bewusst auf die Kategorie Performance beschränkt ist.
+Messungen für kleine Bildschirme fehlen, da alle Lighthouse-Läufe mit dem
+Desktop-Profil erfolgen.
+Alle drei Punkte werden im Ausblick wieder aufgegriffen
+(siehe Abschnitt~\ref{6_2_Perspektiven}).
+

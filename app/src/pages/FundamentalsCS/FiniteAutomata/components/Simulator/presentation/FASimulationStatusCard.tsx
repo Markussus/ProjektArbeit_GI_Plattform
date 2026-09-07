@@ -65,6 +65,7 @@ function explanationFor(
     : runningExplanation(runtime, t);
 }
 
+/** Status line of the run: accepted, rejected, still running or errored. */
 export function FASimulationStatusCard({
   program,
   runtime,

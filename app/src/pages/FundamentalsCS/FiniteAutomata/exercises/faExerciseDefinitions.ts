@@ -4,6 +4,7 @@ import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
 
+/** One authored FA exercise: prompt, reference automaton and starter program. */
 export interface FAExerciseDefinition extends ExerciseDefinition {
   /** Stable id used internally for store lookups. */
   id: string;
@@ -43,6 +44,7 @@ export interface FAExerciseDefinition extends ExerciseDefinition {
    Helpers for authoring starter programs
    ──────────────────────────────────────────────────────────── */
 
+/** Starter with only a start state — the learner builds the rest. */
 function emptyStarter(alphabet: string[]): FAProgram {
   return {
     type: "DFA",
@@ -142,6 +144,7 @@ const divisibleBy3Solution: FAProgram = {
    Registry
    ──────────────────────────────────────────────────────────── */
 
+/** The build-an-automaton exercises, in the order the tab shows them. */
 export const faExercises: FAExerciseDefinition[] = [
   {
     id: "ends-with-01",

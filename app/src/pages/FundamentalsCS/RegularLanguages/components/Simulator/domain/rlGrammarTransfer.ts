@@ -14,6 +14,7 @@ import { formatGrammar } from "./rlRegexToGrammar";
 import { parseGrammar } from "./rlGrammarValidation";
 import { NON_TERMINAL_NAMES, nonTerminalName } from "./rlGrammarNaming";
 
+/** Error codes: one for a grammar we refuse to export, one for a bad payload. */
 const GRAMMAR_INVALID = "rl_transfer_grammar_invalid";
 const PAYLOAD_INVALID = "rl_transfer_payload_invalid";
 
@@ -47,6 +48,7 @@ interface NormalizedProduction {
   nextNonTerminalId: number | null;
 }
 
+/** The grammar reduced to ids and masks — the form the bit writer works on. */
 interface NormalizedGrammar {
   nonTerminalCount: number;
   terminals: string[];
@@ -96,6 +98,7 @@ export const rlGrammarTransferCodec: ISimulatorTransferCodec<string> = {
   },
 };
 
+/** Parse the source and turn it into ids, with the start symbol as id 0. */
 function normalizeGrammar(source: string): NormalizedGrammar {
   const parsed = parseGrammar(source);
   if (!parsed.ok || !parsed.grammar) {
@@ -140,6 +143,7 @@ function normalizeGrammar(source: string): NormalizedGrammar {
   };
 }
 
+/** Replace a rule's names by their ids; an unknown name is a broken grammar. */
 function normalizeProduction(
   rule: ProductionRule,
   nonTerminalIds: Map<string, number>,
@@ -228,10 +232,12 @@ function createCanonicalNonTerminalNames(count: number): string[] {
   );
 }
 
+/** Bits to hold ids 0..count-1; zero when there is only one id to write. */
 function bitsNeeded(count: number): number {
   return count <= 1 ? 0 : Math.floor(Math.log2(count - 1)) + 1;
 }
 
+/** Map lookup that treats a missing key as a grammar we cannot encode. */
 function getRequiredMapValue<TKey, TValue>(
   map: Map<TKey, TValue>,
   key: TKey,

@@ -12,13 +12,12 @@ import type { SimulationMode } from "../components/Simulator/domain/rlTypes";
 export type RLExerciseCategory =
   "grammarToLanguage" | "languageToGrammar" | "applied";
 
+/** One authored RL exercise: prompt, seed and reference answer. */
 export interface RLExerciseDefinition extends ExerciseDefinition {
   id: string;
   /**
-   * Training Center task slot, unique within the Regular Languages topic, so
-   * each exercise keeps its own saved draft. The free simulator's three modes
-   * sit at the top of the range (see `RL_STORAGE_TASK_IDS`), leaving the low
-   * ids to exercises.
+   * Training Center slot, unique within the topic, so each exercise keeps its own
+   * draft. The free simulator's modes sit at the top of the range.
    */
   storageId: number;
   titleKey: TranslationKey;
@@ -30,20 +29,17 @@ export interface RLExerciseDefinition extends ExerciseDefinition {
   /** Which of the three on-page sections this exercise belongs to. */
   category: RLExerciseCategory;
   /**
-   * The monospaced problem statement shown in the workspace panel before the
-   * solution is revealed: the given grammar (grammarToLanguage) or the target
-   * language (languageToGrammar / applied). Notation is language-neutral, so it
-   * lives here rather than in the translation files. Use "ε" for the empty word.
+   * The problem statement shown in the workspace panel: the given grammar, or the
+   * target language. Notation is language-neutral, so it lives here rather than
+   * in the translation files. Use "ε" for the empty word.
    */
   prompt: string;
   /** Which simulator mode the exercise opens in. */
   mode: SimulationMode;
   /**
-   * The worked input loaded into the simulator when the solution is revealed
-   * (arrow notation the parser understands). For grammarToLanguage this is the
-   * given grammar (the simulator then enumerates the language); for
-   * languageToGrammar / applied it is the language (the simulator then derives
-   * a grammar).
+   * The worked input loaded when the solution is revealed, in arrow notation: the
+   * grammar for grammarToLanguage (the simulator enumerates it), the language for
+   * the other modes (the simulator derives a grammar).
    */
   seed: {
     grammarSource?: string;
@@ -81,6 +77,7 @@ const identifiersReferenceGrammar = [
   `A -> ${LETTERS.map((c) => `${c}A`).join(" | ")} | ε`,
 ].join("\n");
 
+/** All exercises, grouped by category in the order the tab shows them. */
 export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 1: Grammar → Language ───────────────────────────────────────────
   {

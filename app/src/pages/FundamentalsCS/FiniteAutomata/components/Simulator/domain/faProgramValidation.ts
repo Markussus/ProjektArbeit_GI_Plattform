@@ -1,6 +1,7 @@
 import type { FAProgram } from "./faTypes";
 import { EPSILON } from "./faTypes";
 
+/** Issue codes; each maps to a translation key shown next to the editor. */
 export type FAProgramIssueCode =
   | "states_empty"
   | "start_state_missing"

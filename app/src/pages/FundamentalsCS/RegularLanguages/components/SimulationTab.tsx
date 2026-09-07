@@ -9,6 +9,10 @@ import { findRLExample } from "./Simulator/config/rlExamples";
 import { RLSimulator, type RLSimulatorHandle } from "./Simulator/RLSimulator";
 import { RLCheckSummary } from "./RLCheckSummary";
 
+/**
+ * Simulation tab: the simulator plus an exercise's header buttons. Only the two
+ * grammar directions are gradable, so word recognition gets no check button.
+ */
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const simulatorRef = useRef<RLSimulatorHandle>(null);

@@ -16,6 +16,7 @@ import {
   type RLExerciseCategory,
 } from "../exercises/rlExerciseDefinitions";
 
+/** Section order on the page — one block per kind of task. */
 const CATEGORY_ORDER: RLExerciseCategory[] = [
   "grammarToLanguage",
   "languageToGrammar",

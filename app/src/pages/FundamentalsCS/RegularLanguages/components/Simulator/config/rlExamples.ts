@@ -6,14 +6,14 @@ import { FileText, ListOrdered, SearchCheck } from "lucide-react";
 import type { SimulationMode } from "../domain/rlTypes";
 
 /**
- * The example sections shown on the Regular Languages examples page. They mirror
- * the exercise categories so both tabs read the same way: each category is one
- * task the learner can practise. Both language → grammar examples (an explicit
- * word list and a compact pattern) live under `languageToGrammar`.
+ * Example sections on the page, mirroring the exercise categories so both tabs
+ * read the same way. Both language → grammar examples — an explicit word list
+ * and a compact pattern — share the one category.
  */
 export type RLExampleCategory =
   "grammarToLanguage" | "languageToGrammar" | "recognizeWord";
 
+/** One predefined task, seeded into the editor of the mode it belongs to. */
 export interface RLExample {
   id: string;
   titleKey: string;
@@ -132,6 +132,7 @@ const exampleLectureLanguage1: RLExample = {
   languageSource: 'L = {"010", "0010", "00100", "00010", "000100"}',
 };
 
+/** All predefined examples, in the order the tab shows them. */
 export const rlExamples: RLExample[] = [
   exampleGrammarToLanguage,
   exampleGrammarDefault,

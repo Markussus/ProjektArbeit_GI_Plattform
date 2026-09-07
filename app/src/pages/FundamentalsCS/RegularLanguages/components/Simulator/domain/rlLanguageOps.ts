@@ -28,6 +28,7 @@ export interface EnumerateResult {
   truncated: boolean;
 }
 
+/** Enumeration limits when the caller names none. */
 const DEFAULT_MAX_WORDS = 30;
 const DEFAULT_MAX_LEN = 6;
 
@@ -96,11 +97,9 @@ function byLengthThenAlphabetically(a: string, b: string): number {
 }
 
 /**
- * Enumerate all words derivable from a regular grammar up to a length cap.
- *
- * Implementation: convert grammar to NFA, do BFS over (state, prefix) pairs.
- * Accept whenever an accept state is reached. Bounded by `maxLen` and
- * `maxWords` to keep runaway grammars from locking up the UI.
+ * Every word a grammar derives up to a length cap: BFS over (state, prefix) pairs
+ * of the converted NFA, bounded by `maxLen` and `maxWords` so a runaway grammar
+ * cannot lock up the UI.
  */
 export function enumerateLanguage(
   grammar: RegularGrammar,
@@ -154,6 +153,7 @@ export function recognizeWords(
   return words.map((word) => simulateFA(fa, word));
 }
 
+/** Run one word to a halt; the guard only trips if a run stops progressing. */
 function simulateFA(program: FAProgram, word: string): RecognizeResult {
   let runtime = createInitialRuntime(program, word.split(""));
   let guard = word.length + 8;
@@ -171,6 +171,7 @@ function simulateFA(program: FAProgram, word: string): RecognizeResult {
   return { accepted: false, reasonCode: "rejectedStates", states };
 }
 
+/** One prefix-tree node: its outgoing symbols, and whether a word ends here. */
 interface PrefixNode {
   children: Map<string, PrefixNode>;
   accepting: boolean;
@@ -245,10 +246,9 @@ function sortedChildren(
 }
 
 /**
- * Build a right-linear regular grammar that derives at least every word in
- * `words`. Uses a prefix tree: each unique prefix becomes a non-terminal and
- * each edge becomes a single-symbol production. Word endings mark the node
- * as ε-producing.
+ * A right-linear grammar deriving every word in `words`, via a prefix tree: each
+ * unique prefix becomes a non-terminal, each edge a single-symbol production, and
+ * a word ending marks its node ε-producing.
  */
 export function languageToGrammar(words: string[]): RegularGrammar {
   const cleaned = cleanWords(words);
@@ -297,16 +297,11 @@ export function languageToGrammar(words: string[]): RegularGrammar {
 }
 
 /**
- * Build the *shortest, most readable* right-linear grammar for a finite list of
- * words. Where {@link languageToGrammar} emits one non-terminal per prefix, this
- * merges states that accept the same set of suffixes (the minimal acyclic
- * automaton / DAWG), then prints productions compactly:
- *
- *   - equal suffixes share a non-terminal (no redundant duplicate branches),
- *   - the single accepting "end" state is folded away, so a transition into it
- *     becomes a terminal-only rule `A -> a` instead of `A -> aE` plus `E -> ε`.
- *
- * The result still generates exactly the listed words and stays right-linear.
+ * The shortest readable right-linear grammar for a finite word list. Where
+ * {@link languageToGrammar} emits one non-terminal per prefix, this merges states
+ * accepting the same suffixes (the minimal acyclic automaton) and folds the
+ * single accepting state away, so a transition into it prints as `A -> a` rather
+ * than `A -> aE` plus `E -> ε`.
  */
 export function languageToGrammarMinimal(words: string[]): RegularGrammar {
   const cleaned = cleanWords(words);

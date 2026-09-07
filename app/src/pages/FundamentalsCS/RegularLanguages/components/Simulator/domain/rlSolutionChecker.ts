@@ -27,6 +27,7 @@ export function parseEnumerationInput(source: string): string[] {
     .map(resolveEmptyWord);
 }
 
+/** `invalid` means the input could not be judged; `reason` says why. */
 export type RLCheckStatus = "match" | "mismatch" | "invalid";
 
 export interface RLCheckResult {
@@ -36,6 +37,7 @@ export interface RLCheckResult {
   missing: string[];
 }
 
+/** Trim, drop duplicates, and keep the order the words came in. */
 function uniqueTrimmed(words: string[]): string[] {
   const seen = new Set<string>();
   const result: string[] = [];

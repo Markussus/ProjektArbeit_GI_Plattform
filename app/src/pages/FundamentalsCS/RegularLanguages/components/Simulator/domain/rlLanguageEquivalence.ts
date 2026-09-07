@@ -3,10 +3,8 @@ import type { FAProgram } from "@/pages/FundamentalsCS/FiniteAutomata/components
 import type { RegularGrammar } from "./rlTypes";
 
 /**
- * How many (candidate, reference) state pairs the walk may visit before it
- * gives up. Exercise grammars have a handful of non-terminals, so the real
- * product stays far below this; the cap only stops a pathological learner
- * grammar from freezing the check.
+ * Cap on visited (candidate, reference) state pairs. Exercise grammars stay far
+ * below it; it only stops a pathological grammar from freezing the check.
  */
 const MAX_PRODUCT_NODES = 20_000;
 
@@ -46,6 +44,7 @@ interface Found {
   missing: string | null;
 }
 
+/** Identity of a frame — the two subsets, ignoring the word that led there. */
 function frameKey(frame: ProductFrame): string {
   return `${frame.candidate.join("\u0000")}|${frame.reference.join("\u0000")}`;
 }
@@ -126,16 +125,10 @@ function enqueueSuccessors(
 }
 
 /**
- * Compare two regular grammars by language, not by sample words.
- *
- * Both grammars become automata, and the walk explores the product of their
- * subset constructions breadth-first. A pair whose two sides disagree on
- * acceptance is a counter-example, and because the walk is breadth-first the
- * first one found for each direction is the shortest such word.
- *
- * This is what makes an over-general grammar detectable: `S -> 0A | 1A` for
- * L = {0 1ⁿ 0} passes every curated accept/reject word of its exercise, yet the
- * product finds `110` in three steps.
+ * Compare two grammars by language, not by sample words: both become automata and
+ * the walk explores the product of their subset constructions breadth-first, so
+ * the first disagreement in each direction is the shortest counter-example. This
+ * is what catches an over-general grammar that passes every curated word.
  */
 export function compareGrammarLanguages(
   candidate: RegularGrammar,

@@ -13,5 +13,6 @@ export type RegexNode =
   | { kind: "union"; left: RegexNode; right: RegexNode }
   | { kind: "star"; child: RegexNode };
 
+/** The three tasks the simulator offers; also the id of each mode's panel. */
 export type SimulationMode =
   "grammarToLanguage" | "languageToGrammar" | "recognizeWord";
