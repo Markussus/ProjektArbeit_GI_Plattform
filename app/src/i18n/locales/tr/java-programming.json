@@ -8,7 +8,7 @@
   "example2Text": "For döngüsü, aynı talimatı birkaç kez tekrarlamanın standart yoludur.",
   "example3Title": "Bir diziyi sıralama",
   "example3Text": "Bir tamsayı dizisi Arrays.sort ile artan düzende sıralanabilir.",
-  "example4Title": "Tarayıcı ile kullanıcı girişi",
+  "example4Title": "Scanner ile kullanıcı girişi",
   "example4Text": "Giriş alanına değerleri önceden girin ve bunları Scanner.nextLine() ve Scanner.nextInt() kullanarak satır ve simge bazında okuyun.",
   "exercise1": "Merhaba Dünyayı Yazdır",
   "exercise1Desc": "Merhaba Dünya'yı konsola tam olarak bir kez yazdıran bir Java programı yazın.",
@@ -49,7 +49,7 @@
     "limitationsText": "Main.Java tarzı bir program yazın. Java kaynak kodunu çalıştırabilirsiniz ancak düzenleyiciye terminal komutlarını yazamazsınız.",
     "commandListTitle": "Kompakt genel bakış",
     "status": {
-      "supported": "Eserler",
+      "supported": "Destekleniyor",
       "limited": "Sınırlı",
       "blocked": "çalışmıyor",
       "not-supported": "Desteklenmiyor",
@@ -117,7 +117,7 @@
   },
   "validation": {
     "popupTitle": "Çözüm kontrolü",
-    "pass": "GEÇ",
+    "pass": "BAŞARILI",
     "fail": "BAŞARISIZ",
     "emptyOutput": "<boş>",
     "exampleCheckUnavailable": "Örneklerin çözüm kontrollerine ihtiyacı yoktur.",
@@ -147,7 +147,7 @@
   "exercise13Desc": "Fiyatları ArrayList ile bir sınıfta saklayın ve öğe sayısını, toplamı ve maksimumu uygulayın.",
   "stdin": {
     "label": "Program girişi",
-    "placeholder": "Tarayıcı/Sistem girişi girişi, ör. merhaba java",
+    "placeholder": "Scanner/System.in için girdi, ör. hello java",
     "help": "Bu giriş, program başlamadan önce basit Scanner.nextLine() ve Scanner.nextInt() bildirimleri için değiştirilir. Etkileşimli bir System.in akışı mevcut değil."
   },
   "console": {

@@ -117,7 +117,7 @@
       "description": "A DFA over {a, b} that accepts exactly the words ending in \"ab\" — the automaton the simulator used to start with. \"aab\" is accepted, \"aba\" is rejected."
     },
     "grammar": {
-      "title": "Grammar → Automat",
+      "title": "Grammar → Automaton",
       "description": "The right-linear grammar G = {S → 0S | 0A, A → 1A | 1} is converted into an NFA and then into a minimal DFA via subset construction. Both recognize the language L = {0ⁿ 1ᵐ | n,m ≥ 1}."
     },
     "categories": {

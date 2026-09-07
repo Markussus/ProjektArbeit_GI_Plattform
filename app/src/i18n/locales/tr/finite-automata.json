@@ -13,7 +13,7 @@
     "type": "Tür",
     "alphabet": "Alfabe (virgülle ayrılmış)",
     "startState": "Başlangıç Durumu",
-    "acceptStates": "Durumları Kabul Et (virgülle ayrılmış)",
+    "acceptStates": "Kabul Durumları (virgülle ayrılmış)",
     "addEpsilon": "ε-Geçişleri Ekle",
     "addState": "Durum ekle",
     "removeState": "{{state}} durumunu kaldır",
@@ -39,12 +39,12 @@
       "description": "Tam olarak son iki sembolü 0 olan dizeleri kabul eden {0, 1} üzerinde bir DFA tasarlayın (ör. \"00\", \"100\", \"1100\"). Tek sıfırlar veya 1 ile biten dizeler reddedilmelidir."
     },
     "evenOnes": {
-      "title": "Çift sayı 1'ler",
+      "title": "Çift Sayıda 1",
       "goal": "Çift sayıda 1 (sıfır 1'ler dahil) içeren ikili dizeleri kabul edin.",
       "description": "Şu ana kadar görülen 1'lerin paritesini izleyen bir DFA tasarlayın. Boş dize kabul edilmelidir (sıfır çifttir)."
     },
     "noConsecOnes": {
-      "title": "Ardışık iki 1 yok",
+      "title": "Ardışık İki 1 İçermeyen",
       "goal": "Hiçbir zaman \"11\" içermeyen ikili dizeleri alt dize olarak kabul edin.",
       "description": "İki 1'in yan yana göründüğü herhangi bir dizeyi reddeden bir DFA tasarlayın. \"0\", \"01\", \"010\" gibi dizeler kabul edilir; \"11\", \"0110\" reddedilir."
     },
@@ -95,7 +95,7 @@
     "failedDetail": "{{total}} test dizelerinden {{passed}} kabul edildi, {{failed}} kabul edilmedi.",
     "counterexample": "Karşı örnek:",
     "expected": "beklenen",
-    "got": "var",
+    "got": "Alınan",
     "accept": "kabul et",
     "reject": "reddetmek",
     "unbuiltTitle": "Önce otomatınızı oluşturun",
@@ -117,7 +117,7 @@
       "description": "Simülatörün başlangıçta kullandığı otomat olan \"ab\" ile biten kelimeleri tam olarak kabul eden {a, b} üzerinde bir DFA. \"aab\" kabul edilir, \"aba\" reddedilir."
     },
     "grammar": {
-      "title": "Dilbilgisi → Otomatik",
+      "title": "Dilbilgisi → Otomat",
       "description": "Sağ-doğrusal gramer G = {S → 0S | 0A, A → 1A | 1}, bir NFA'ya ve ardından alt küme yapısı yoluyla minimal bir DFA'ya dönüştürülür. Her ikisi de L = {0ⁿ 1ᵐ | n,m ≥ 1}."
     },
     "categories": {
@@ -145,11 +145,11 @@
   },
   "grammar": {
     "title": "Düzenli Dilbilgisi → Otomat",
-    "intro": "Sağa doğru bir dilbilgisi girin. Soldaki ilk terminal olmayan başlangıç ​​sembolü olur; Terminal olmayanlar ve terminaller üretimlerinizden çıkarılmaktadır.",
+    "intro": "Sağ-doğrusal bir dilbilgisi girin. Bir başlangıç sembolü seçin, türetilen dili oluşturun ve isteğe bağlı olarak dilbilgisini sağ-doğrusal kurallardan bir sonlu otomata dönüştürün.",
     "productions": "Dilbilgisi",
-    "productionsHint": "Hat başına bir üretim. İki format desteklenir (otomatik olarak algılanır).",
+    "productionsHint": "Her satırda bir kural.",
     "convert": "Otomat'a Dönüştür",
-    "loadExample": "Yük Örneği",
+    "loadExample": "Örnek Yükle",
     "supportedFormats": "Desteklenen Formatlar",
     "format1Label": "Biçim 1 — basitleştirilmiş",
     "format2Label": "Biçim 2 — yapılandırılmış",
@@ -189,7 +189,7 @@
     "status": {
       "label": "Durum",
       "error": "Hata",
-      "running": "Koşu",
+      "running": "Çalışıyor",
       "accepted": "Kabul edildi ✓",
       "rejected": "Reddedildi ✗",
       "halted": "Durduruldu",
@@ -211,7 +211,7 @@
     "stepTooltipUnreached": "Adım {{step}} (henüz ulaşılmadı)"
   },
   "validation": {
-    "statesEmpty": "Eyaletler boş olmamalıdır.",
+    "statesEmpty": "Durumlar boş olmamalıdır.",
     "startStateMissing": "Başlangıç durumu, durum kümesinde değil.",
     "acceptStatesInvalid": "Kabul etme durumu, durum kümesinde değil.",
     "alphabetEmpty": "Alfabe boş olmamalıdır.",

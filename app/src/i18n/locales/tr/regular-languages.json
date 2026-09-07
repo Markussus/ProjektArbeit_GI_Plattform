@@ -28,7 +28,7 @@
     "preset": {
       "enumeration": "Numaralandırma",
       "aStarcBStar": "a^n c b^m",
-      "aStar": "bir^n",
+      "aStar": "a^n",
       "abGroup": "(ab)^n"
     },
     "testWord": "Test Edilecek Kelimeler",
@@ -36,11 +36,11 @@
     "testWordHelp": "Birkaç kelimeyi virgülle ayırın. Her karakter bir terminal sembolü olarak sayılır ve virgüllerin etrafındaki boşluklar dikkate alınmaz. Boş kelimeye ε veya epsilon yazın.",
     "testWordEmpty": "Test edilecek bir kelime yazın. Boş kelimeye ε veya epsilon yazın.",
     "supportedFormats": "Desteklenen Formatlar",
-    "supportedFormatsExtensional": "Genişlemeli / set gösterimi",
-    "supportedFormatsIntensional": "Kasıtlı / biçimsel gösterim",
+    "supportedFormatsExtensional": "Kapsamsal / küme gösterimi",
+    "supportedFormatsIntensional": "İçlemsel / biçimsel gösterim",
     "reason": {
-      "accepted": "Çalıştırma şu tarihte sona erdi: {{states}} (kabul ediliyor)",
-      "rejectedStates": "Çalıştırma şu tarihte sona erdi: {{states}} (kabul edilmiyor)",
+      "accepted": "Çalıştırma şu durumlarda bitti: {{states}} (kabul edildi)",
+      "rejectedStates": "Çalıştırma şu durumlarda bitti: {{states}} (kabul edilmedi)",
       "rejectedDeadEnd": "Sonraki sembol için geçiş yok — reddedildi."
     }
   },
@@ -76,7 +76,7 @@
       "description": "Üslü ifadeler ve koşullar içeren küme oluşturucu gösterimini okur ve doğrudan tam olarak bu dili üreten bir doğru-doğrusal dilbilgisi türetir."
     },
     "recognizeWord": {
-      "title": "Word'ü Tanı (Üyelik Testi)",
+      "title": "Kelimeyi Tanı (Aitlik Testi)",
       "description": "Virgülle ayrılmış sözcük listesini dil bilgisinin oluşturduğu dile göre kontrol eder."
     },
     "lectureGrammar1": {
@@ -117,7 +117,7 @@
       "goal": "L(G) sonlu dilinin tamamını listeleyin."
     },
     "g2lTrailingZero": {
-      "title": "Gramer → Dil (Sıfırlar Arasındakiler)",
+      "title": "Dilbilgisi → Dil (Sıfırlar Arasındaki Birler)",
       "description": "Bu gramerin oluşturduğu dili belirleyin ve ilk kelimeleri listeleyin.",
       "goal": "Sonsuz dili tanımlayın ve ilk kelimelerini listeleyin."
     },
@@ -154,7 +154,7 @@
     "appliedIdentifiers": {
       "title": "Dil → Dilbilgisi (Tanımlayıcılar)",
       "description": "Değişken tanımlayıcılar için bir dilbilgisi yazın: ilk harf küçük harf ve ardından harfler gelir, rakam yoktur (örn. x, foo, myVar).",
-      "goal": "X, foo, myVar…'ı kabul edin, ancak başlangıçtaki büyük harfleri veya rakamları reddedin."
+      "goal": "x, foo, myVar…'ı kabul edin, ancak başlangıçtaki büyük harfleri veya rakamları reddedin."
     }
   },
   "exerciseWorkspace": {
