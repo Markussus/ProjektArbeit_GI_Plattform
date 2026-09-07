@@ -34,6 +34,7 @@ export interface FASimulationViewProps {
   onSelectBatchWord?: (word: string) => void;
 }
 
+/** Run view: diagram, tape, timeline, transition table and the batch tester. */
 export function FASimulationView({
   program,
   runtime,

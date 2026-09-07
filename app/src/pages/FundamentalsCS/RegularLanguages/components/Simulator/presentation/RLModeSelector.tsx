@@ -15,6 +15,7 @@ interface ModeMeta {
   fallback: string;
 }
 
+/** Tab order of the three modes, each with the icon its cards also use. */
 const MODES: ModeMeta[] = [
   {
     id: "grammarToLanguage",

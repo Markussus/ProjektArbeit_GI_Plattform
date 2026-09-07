@@ -8,17 +8,10 @@ interface FAStepTimelineProps {
   onJumpToStep: (step: number) => void;
 }
 
+/** Clickable dot per step; jumping replays the run up to that step. */
 export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
   const { t } = useTranslation();
   const currentStep = runtime.stepCount;
-
-  // The dot row is scrolled by hand — deliberately no auto-scroll on step
-  // change, so the view never jumps out from under the user.
-
-  // Render one slot per step the run will take (Start + one per input symbol),
-  // not just the steps reached so far. Reached steps are interactive; the rest
-  // are faded placeholders. Showing the whole track lets the connectors stretch
-  // to fill the panel width instead of leaving it mostly empty.
   const reachedCount = runtime.stateHistory.length;
   const totalSteps = runtime.inputWord.length;
   const slots = Array.from({ length: totalSteps + 1 }, (_, i) => {
@@ -28,7 +21,6 @@ export function FAStepTimeline({ runtime, onJumpToStep }: FAStepTimelineProps) {
       isReached,
       isCurrent: i === currentStep,
       stateCount: isReached ? runtime.stateHistory[i].length : 0,
-      // Step 0 is the initial state, step N means N symbols consumed
       label: i === 0 ? t("finite-automata.sim.stepStart", "Start") : `${i}`,
     };
   });

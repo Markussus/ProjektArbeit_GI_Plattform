@@ -8,6 +8,7 @@ interface RLGrammarEnumerationExerciseProps {
   onChange: (value: string) => void;
 }
 
+/** Exercise view: the given grammar beside the word list the learner writes. */
 export function RLGrammarEnumerationExercise({
   exercise,
   value,

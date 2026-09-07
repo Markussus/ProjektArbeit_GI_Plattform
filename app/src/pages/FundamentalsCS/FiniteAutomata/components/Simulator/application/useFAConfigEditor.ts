@@ -29,6 +29,7 @@ type EditorAction =
   | { type: "REMOVE_STATE"; payload: string }
   | { type: "RESET"; payload: FAProgram };
 
+/** First free `S<n>` name, so a new state never collides. */
 function findNextStateName(states: string[]): string {
   let index = 0;
   while (states.includes(`S${index}`)) {
@@ -38,10 +39,8 @@ function findNextStateName(states: string[]): string {
 }
 
 /**
- * Parse a comma-separated list into the set it denotes: entries are trimmed,
- * blanks dropped, and repeats collapsed. Every list this editor parses — states,
- * accept states, transition targets — is a set, so naming the same entry twice
- * means exactly what naming it once means.
+ * Parse a comma-separated list into the set it denotes: trimmed, blanks dropped,
+ * repeats collapsed — every list this editor parses is a set.
  */
 function parseCSV(value: string): string[] {
   return [
@@ -58,16 +57,12 @@ function parseCSV(value: string): string[] {
  * Like {@link parseCSV} but restricts each entry to a single symbol. The
  * alphabet of a DFA/NFA is a set of one-character symbols, so multi-character
  * tokens such as "10", "ab", or "xyz" are rejected rather than added.
- *
- * Collapsing repeats here is not only tidiness: the transfer codec refuses to
- * encode a program whose alphabet lists the same symbol twice, and an autosave
- * that cannot encode is discarded without a word. An alphabet left as
- * "0, 1, 1" would therefore cost the learner every later edit to that exercise.
  */
 function parseAlphabetCSV(value: string): string[] {
   return parseCSV(value).filter((s) => [...s].length === 1);
 }
 
+/** Drop transitions whose source, symbol or target no longer exists. */
 function pruneTransitions(
   transitions: FATransitionMap,
   validStates: string[],
@@ -86,7 +81,6 @@ function pruneTransitions(
 
     const filtered: Record<string, string[]> = {};
     for (const symbol of Object.keys(symMap)) {
-      // ε is never in the alphabet but is always a legal transition symbol.
       if (!symbolSet.has(symbol) && symbol !== EPSILON) continue;
       const targets = (symMap[symbol] || []).filter((t) => stateSet.has(t));
       if (targets.length > 0) {
@@ -121,6 +115,7 @@ function switchAutomatonType(state: FAProgram, type: AutomatonType): FAProgram {
   return { ...state, type };
 }
 
+/** Deep copy, so a preset is never edited through the draft that reuses it. */
 function cloneProgram(program: FAProgram): FAProgram {
   return JSON.parse(JSON.stringify(program)) as FAProgram;
 }
@@ -183,7 +178,6 @@ function withNewState(state: FAProgram): FAProgram {
 
 /** Drop a state and everything referring to it. The last state always stays. */
 function withoutState(state: FAProgram, target: string): FAProgram {
-  // Keep at least one state so the program stays well-formed.
   if (state.states.length <= 1) return state;
 
   const states = state.states.filter((s) => s !== target);
@@ -251,6 +245,7 @@ export interface UseFAConfigEditorResult {
   resetToProgram: (program: FAProgram) => void;
 }
 
+/** Holds the edited draft; `applyProgram` releases it only once it is valid. */
 export function useFAConfigEditor(
   initialProgram: FAProgram,
 ): UseFAConfigEditorResult {

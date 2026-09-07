@@ -16,6 +16,7 @@ interface RLGrammarInputCardProps {
 
 const DEFAULT_PLACEHOLDER = ["S -> 0S | 1A", "A -> 0A | 1 | ε"].join("\n");
 
+/** Grammar textarea with live parse feedback, shared by the grammar modes. */
 export function RLGrammarInputCard({
   value,
   onChange,

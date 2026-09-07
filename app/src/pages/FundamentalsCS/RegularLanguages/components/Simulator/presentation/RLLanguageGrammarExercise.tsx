@@ -9,6 +9,7 @@ interface RLLanguageGrammarExerciseProps {
   onChange: (value: string) => void;
 }
 
+/** Exercise view: the target language beside the grammar the learner writes. */
 export function RLLanguageGrammarExercise({
   exercise,
   value,

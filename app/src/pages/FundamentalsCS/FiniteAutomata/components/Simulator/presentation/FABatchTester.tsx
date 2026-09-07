@@ -7,10 +7,10 @@ import type { FAProgram } from "../domain/faTypes";
 
 interface FABatchTesterProps {
   program: FAProgram;
-  /** Called when user clicks a word to debug it step-by-step */
   onSelectWord?: (word: string) => void;
 }
 
+/** Runs a list of words against the automaton and lists the verdicts. */
 export function FABatchTester({ program, onSelectWord }: FABatchTesterProps) {
   const { t } = useTranslation();
   const [rawInput, setRawInput] = useState("");

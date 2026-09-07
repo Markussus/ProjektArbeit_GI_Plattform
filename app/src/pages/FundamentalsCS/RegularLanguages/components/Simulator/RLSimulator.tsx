@@ -31,18 +31,21 @@ export interface RLSimulatorProps {
   ref?: Ref<RLSimulatorHandle>;
 }
 
+/** Imperative surface the simulation tab drives from its header buttons. */
 export interface RLSimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
   checkSolution: () => RLCheckResult | null;
 }
 
+/** Bumping a mode's counter makes its panel drop what was typed and re-seed. */
 const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
   grammarToLanguage: 0,
   languageToGrammar: 0,
   recognizeWord: 0,
 };
 
+/** All three mode panels stay mounted, so switching modes keeps their work. */
 export function RLSimulator({
   exercise,
   example,

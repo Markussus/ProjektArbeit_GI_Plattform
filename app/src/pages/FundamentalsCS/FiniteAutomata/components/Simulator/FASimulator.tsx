@@ -29,8 +29,10 @@ import type { FAExerciseDefinition } from "../../exercises/faExerciseDefinitions
 
 type EditorMode = "manual" | "grammar";
 
+/** Check outcome; `unbuilt` means no automaton was entered yet. */
 export type FACheckResult = ValidationResult | "unbuilt";
 
+/** Imperative surface the simulation tab drives from its header buttons. */
 export interface FASimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
@@ -44,6 +46,7 @@ export interface FASimulatorProps {
   ref?: Ref<FASimulatorHandle>;
 }
 
+/** Editor and run view, seeded from an exercise, an example, or nothing. */
 export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -86,12 +89,9 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     [pauseSimulation, resetEditorToProgram],
   );
 
-  // Each exercise gets its own slot, so work on one never overwrites another;
-  // the free simulator keeps the topic's default slot.
-  //
-  // The slot takes the draft codec and the transfer box the compact one: a
-  // half-built automaton has to survive being left, but only a finished one is
-  // worth handing to somebody else.
+  // Each exercise gets its own slot; the free simulator keeps the topic's
+  // default one. The slot takes the draft codec and the transfer box the compact
+  // one: only a finished automaton is worth handing to somebody else.
   const { clear: clearStoredState, save: saveProgram } =
     useTrainingCenterPersistence({
       topicStorageId: TOPIC_STORAGE_IDS.finiteAutomata,

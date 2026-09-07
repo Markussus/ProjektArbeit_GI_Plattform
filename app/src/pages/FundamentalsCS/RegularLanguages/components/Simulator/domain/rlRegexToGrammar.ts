@@ -74,13 +74,10 @@ function buildSetBuilderChain(spec: SetBuilderLang): {
 }
 
 /**
- * Build a strictly right-linear grammar for a set-builder spec.
- *
- * Walks the pattern symbol by symbol and reads the result off as
- * `A -> aB | a | ε` rules only — the shape this module is actually about. An
- * earlier version printed a compact `S -> A c B`, which is a general CFG and
- * therefore not a regular grammar at all; {@link minimizeRightLinearGrammar}
- * now provides the shorter view without leaving Type 3.
+ * Build a strictly right-linear grammar for a set-builder spec: the pattern is
+ * walked symbol by symbol and read off as `A -> aB | a | ε` rules only.
+ * {@link minimizeRightLinearGrammar} provides the shorter view without leaving
+ * Type 3.
  */
 export function setBuilderToRightLinearGrammar(
   spec: SetBuilderLang,
@@ -146,10 +143,9 @@ function toGrammarAutomaton(grammar: RegularGrammar): GrammarAutomaton {
 }
 
 /**
- * Bisimulation quotient by partition refinement: start by separating accepting
- * nodes from the rest, then keep splitting a block whenever two of its members
- * disagree about which block some terminal leads into. The result maps every
- * node to the id of the block it ended up in.
+ * Partition refinement: separate the accepting nodes, then keep splitting a block
+ * whenever two members disagree about which block a terminal leads into. Maps
+ * every node to its block id.
  */
 function refineIntoBlocks({
   nodes,
@@ -223,17 +219,10 @@ function mergeBlockEdges(
 }
 
 /**
- * Collapse a right-linear grammar to its smallest equivalent right-linear
- * grammar, by merging non-terminals that derive the same set of words.
- *
- * This is a bisimulation quotient: start by separating ε-producing (accepting)
- * non-terminals from the rest, then keep splitting a block whenever two of its
- * members disagree about which block some terminal leads into. Merging what is
- * left over never changes the generated language, and it can only shrink the
- * grammar — a grammar that is already minimal comes back unchanged.
- *
- * The result stays strictly right-linear (`A -> aB | a | ε`), so switching to
- * the simplified view never turns a regular grammar into something else.
+ * Collapse a right-linear grammar to its smallest equivalent one by merging
+ * non-terminals that derive the same words (a bisimulation quotient). The result
+ * stays strictly right-linear, and an already minimal grammar comes back
+ * unchanged.
  */
 export function minimizeRightLinearGrammar(
   grammar: RegularGrammar,
@@ -267,6 +256,7 @@ export function minimizeRightLinearGrammar(
   });
 }
 
+/** The literal word an atom stands for — only fixed atoms have one. */
 function atomToTerminalString(node: RegexNode): string {
   if (node.kind === "symbol") return node.value;
   if (node.kind === "epsilon") return "";

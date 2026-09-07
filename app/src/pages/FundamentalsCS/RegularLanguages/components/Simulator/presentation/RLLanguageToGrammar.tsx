@@ -50,6 +50,7 @@ type ConversionResult =
       grammarText: string;
     };
 
+/** Free mode language → grammar: derives a grammar from a definition. */
 export function RLLanguageToGrammar({
   initialSource,
   transferActive = true,
@@ -106,11 +107,9 @@ export function RLLanguageToGrammar({
         grammarText: formatGrammar(grammar),
       };
     }
-    // Enumeration: build a prefix-tree grammar. If the user wrote a `..`
-    // continuation marker, the parser will already have promoted the
-    // enumeration to a set-builder above, so this only fires for finite
-    // languages. The Simplified mode merges equivalent suffixes into a minimal,
-    // human-readable grammar instead.
+    // Enumeration: build a prefix-tree grammar. A `..` continuation marker was
+    // already promoted to a set-builder above, so this only fires for finite
+    // languages; Simplified merges equivalent suffixes into a minimal grammar.
     const grammar = simplified
       ? languageToGrammarMinimal(parsed.spec.words)
       : languageToGrammar(parsed.spec.words);

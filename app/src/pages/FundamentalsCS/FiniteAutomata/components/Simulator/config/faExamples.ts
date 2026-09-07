@@ -10,7 +10,6 @@ export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
  * is loaded into the simulator when the example is opened.
  */
 export interface FAExample {
-  /** Translation key for the example title */
   id: string;
   titleKey: string;
   descriptionKey: string;
@@ -122,7 +121,6 @@ const exampleGrammar: FAExample = {
   inputWord: "0011",
 };
 
-/** All predefined examples */
 export const faExamples: FAExample[] = [
   exampleLecture,
   exampleEndsWithAb,

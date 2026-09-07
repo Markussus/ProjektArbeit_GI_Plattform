@@ -1,18 +1,11 @@
 import type { StateName } from "./faTypes";
 
 /**
- * Snaps typed transition targets onto the automaton's real state names,
- * ignoring case: "s0" becomes "S0" because that state exists.
- *
- * Deliberately not a plain uppercase. States added in the editor are always
- * `S0`, `S1`, … , but the grammar converter names its final state `sF` (see
- * `uniqueFinalStateName`) and turns grammar non-terminals into states verbatim,
- * so uppercasing would rewrite `sF` to `SF` and break every automaton built
- * from a grammar. Matching against the state list gets the convenience without
- * inventing names — and fixes `sf` to `sF` too.
- *
- * A token that matches no state, or matches more than one, is left exactly as
- * typed so the existing validation can report it.
+ * Snaps typed transition targets onto the automaton's real state names, ignoring
+ * case: "s0" becomes "S0" because that state exists. Deliberately not a plain
+ * uppercase — that would rewrite the grammar converter's `sF` and its verbatim
+ * non-terminal states. A token matching no state, or several, is left as typed
+ * for validation to report.
  */
 export function canonicalizeTargetStates(
   value: string,
