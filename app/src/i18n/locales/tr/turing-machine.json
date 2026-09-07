@@ -19,7 +19,7 @@
     "exerciseWorksheetOverwriteLastTwoWithZeroDesc": "Son iki giriş sembolünün üzerine 0 yazan ve son giriş sembolünü bitiren bir Turing makinesi oluşturun.",
     "exerciseWorksheetAsciiParityBit": "ASCII Eşlik Bitini Ayarlayın",
     "exerciseWorksheetAsciiParityBitDesc": "Tam olarak yedi bitlik bir girdi verildiğinde, birlerin sayısını sayan, çift eşlikli biti girdinin solundaki boş hücreye yazan ve girdiden sonraki ilk boş hücrede bitiren bir Turing makinesi oluşturun.",
-    "exerciseEraseTape": "Kaseti Sil",
+    "exerciseEraseTape": "Bandı Sil",
     "exerciseEraseTapeDesc": "Giriş sözcüğünün tamamını boşluklarla değiştiren ve bant temizlendikten sonra duran bir makine oluşturun.",
     "exerciseInvertBinaryWord": "İkili Kelimeyi Tersine Çevirme",
     "exerciseInvertBinaryWordDesc": "Her 0'dan 1'e ve her 1'den 0'a geçiş yapan ve ardından ilk boş hücrede duran bir makine yapın.",
@@ -65,14 +65,14 @@
     },
     "haltStates": {
       "haltStates": "Durdurma Durumları",
-      "haltStatesDesc": "Mark durduğunu belirtiyor.",
+      "haltStatesDesc": "Durumları durma durumu olarak işaretleyin.",
       "addHaltState": "Durdurma Durumu Ekle",
       "addHaltStatePlaceholder": "Durdurma durumu ekle",
       "noStates": "Mevcut durum yok"
     },
     "alphabets": {
       "inputAlphabet": "Giriş Alfabesi",
-      "tapeAlphabet": "Teyp Alfabesi",
+      "tapeAlphabet": "Bant Alfabesi",
       "noSymbols": "Sembol yok"
     },
     "transitionTable": {
@@ -94,7 +94,7 @@
       "checkInvalidProgram": "Mevcut makine konfigürasyonu henüz geçerli değil.",
       "exampleCheckUnavailable": "Örneklerin çözüm kontrollerine ihtiyacı yoktur.",
       "popupTitle": "Çözüm kontrolü",
-      "pass": "GEÇ",
+      "pass": "BAŞARILI",
       "fail": "BAŞARISIZ",
       "emptyWord": "<boş>"
     },
@@ -112,7 +112,7 @@
       "haltStateMissing": "'{{state}}' durma durumu, durumlar kümesinde mevcut olmalıdır.",
       "blankSymbolMissing": "Boş sembol '{{symbol}}' şerit alfabesinin bir parçası olmalıdır.",
       "blankSymbolInvalid": "Boş sembol '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
-      "tapeSymbolInvalid": "Teyp alfabe sembolü '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
+      "tapeSymbolInvalid": "Bant alfabesi sembolü '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",
       "initialTapeInvalidSymbol": "İlk bant sembolü '{{symbol}}' giriş alfabesinin bir parçası olmalı ve tam olarak bir karakterden oluşmalıdır.",
       "transitionReadSymbolMissing": "'{{symbol}}' okuma sembolü için bir geçiş tanımlandı, ancak bu sembol bant alfabesinin bir parçası değil.",
       "transitionReadSymbolInvalid": "Geçiş okuma sembolü '{{symbol}}' tam olarak bir karakterden oluşmalıdır.",

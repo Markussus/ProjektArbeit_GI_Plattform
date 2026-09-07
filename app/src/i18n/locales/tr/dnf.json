@@ -167,15 +167,15 @@
       "notCheckedDnfOnly": "Henüz kontrol edilmedi. Verilen doğruluk tablosu için DNF'yi girin ve Kontrol Et'e tıklayın.",
       "notCheckedEditable": "Henüz kontrol edilmedi. Sonuç değerlerini ayarlayın, eşleşen DNF'yi girin ve Kontrol Et'e tıklayın.",
       "progressTable": "Doğruluk tablosu",
-      "progressTableValue": "{{answered}} / {{total}} satırları yanıtlandı",
+      "progressTableValue": "{{answered}} / {{total}} satır yanıtlandı",
       "progressTableProvided": "verildi",
       "progressTableEditable": "kendi kendine tanımlanmış",
       "progressDnf": "DNF girişi",
       "progressDnfReady": "mevcut",
       "progressDnfMissing": "hala boş",
-      "tableCorrectValue": "{{correct}} / {{total}} satırlar doğru",
+      "tableCorrectValue": "{{correct}} / {{total}} satır doğru",
       "dnfStatus": {
-        "deferred": "tablo bekleniyor",
+        "deferred": "doğruluk tablosu bekleniyor",
         "empty": "kayıp",
         "syntax_error": "sözdizimini kontrol et",
         "correct": "doğru",
@@ -216,7 +216,7 @@
       "simplifiedDnfLabel": "Basitleştirilmiş form",
       "simplifiedDnfPlaceholder": "örneğin a ∨ (b ∧ ¬c)",
       "checkSimplification": "Basitleştirmeyi kontrol edin",
-      "revealAlgebraReferenceTitle": "Kural hile sayfası",
+      "revealAlgebraReferenceTitle": "Kural Özeti",
       "minimalDnfLabel": "Olası bir minimum DNF",
       "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF formu (VE terimlerinin VEYA), ör. Quine-McCluskey'in sonucu.",
       "factoredLabel": "Matematiksel olarak en kısa form",
@@ -225,7 +225,7 @@
       "factoredFallbackNote": "{{literalsLabel}} — minimum DNF'ye eşdeğer ve daha kısa. 4'ten fazla değişken için bu formun genel olarak minimum düzeyde olacağı garanti edilmez.",
       "literalCount_one": "{{count}} literal",
       "literalCount_other": "{{count}} literal",
-      "termCount_one": "{{count}} terimi",
+      "termCount_one": "{{count}} terim",
       "termCount_other": "{{count}} terim",
       "walkthroughTitle": "Olası bir çözüm yolu",
       "walkthroughNote": "Bu yol tek çözüm değildir. Sonucu 1 olan satırların minimum biçimdeki olası bir gruplandırmasını gösterir.",
@@ -257,7 +257,7 @@
         "factorOut": "{{variable}} çarpanını paranteze alın; diğer literaller kalır.",
         "complementToOne": "{{variable}} ∨ ¬{{variable}} 1 olarak değerlendirilir.",
         "andOneEqualsTerm": "Herhangi bir ∧ 1 terimi aynı kalır; sondaki 1 çıkar.",
-        "factorOutCommon": "Bu terimlerle paylaşılan {{variables}} (dağıtım) faktörünü dışarıda bırakın."
+        "factorOutCommon": "Ortak {{variables}} değişkenlerini paranteze alın (dağılma özelliği)."
       },
       "simplificationStatus": {
         "empty": "Henüz hiçbir şey girilmedi",
@@ -274,7 +274,7 @@
         "unknown_variable": "Aşağıdaki değişken(ler) doğruluk tablosunun parçası değildir: {{variables}}.",
         "not_equivalent": "Formunuz orijinal doğruluk tablosuyla eşleşmiyor.",
         "equivalent_not_shorter": "Eşdeğerdir ancak {{userLiterals}} literal ile özgün DNF'den ({{canonicalLiterals}} literal) daha kısa değildir.",
-        "accepted_not_minimal": "Orijinal DNF'ye eşdeğer ve daha kısa. {{userLiterals}} değişmez bilginiz var; minimum değer {{minimumLiterals}}.",
+        "accepted_not_minimal": "Orijinal DNF'ye eşdeğer ve daha kısa. {{userLiterals}} literaliniz var; minimum değer {{minimumLiterals}}.",
         "accepted_minimal": "{{userLiterals}} literal ile minimum değere ({{minimumLiterals}}) ulaşıldı."
       }
     },

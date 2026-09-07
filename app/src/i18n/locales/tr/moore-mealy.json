@@ -12,7 +12,7 @@
       "input": "Giriş",
       "output": "Çıkış",
       "expectedOutput": "Beklenen çıktı",
-      "pass": "Geçmek",
+      "pass": "Başarılı",
       "fail": "Başarısız",
       "emptyInput": "Boş giriş (ε)"
     },
@@ -68,7 +68,7 @@
       "exercisesDescription": "Çıkışları yalnızca durumlarla ilişkilendirilen makineler oluşturun."
     },
     "mealy": {
-      "title": "Unlu makineler",
+      "title": "Mealy makineleri",
       "examplesDescription": "Geçişe bağlı çıktı: örnek, örtüşen eşleşmeler de dahil olmak üzere bit dizisini (101) algılar ve bir eşleşmeyi tamamlayan geçişte MATCH_101'i yayar.",
       "exercisesDescription": "Hem mevcut duruma hem de girdiye bağlı olarak anlık çıktılara sahip makineler oluşturun."
     }
@@ -78,7 +78,7 @@
     "mealyDefault": "moore.examples.mealyDefault",
     "mooreTitle": "Moore örnek makinesi",
     "mooreDescription": "Dört durumlu ve iki giriş sembolüne sahip bir Moore makinesi.",
-    "mealyTitle": "Etli örnek makine",
+    "mealyTitle": "Mealy örnek makinesi",
     "mealyDescription": "Üç durumlu Mealy dizi dedektörü, örtüşen eşleşmeler de dahil olmak üzere 101'i tanır. Her geçişte doğrudan NO_MATCH veya MATCH_101 yayar; paketlenmiş giriş iki eşleşme içeriyor."
   },
   "title": "Moore ve Mealy Makineleri",
@@ -87,13 +87,13 @@
   "sim": {
     "machineType": "Makine tipi",
     "mooreTab": "Moore makinesi",
-    "mealyTab": "Unlu makine",
+    "mealyTab": "Mealy makinesi",
     "configureTitle": "Moore makinesini tanımlayın",
     "configureHelp": "Durumlar ve giriş simgeleri, soldan sağa ve yukarıdan aşağıya sıralarına göre dahili olarak numaralandırılır.",
     "transitionTable": "Geçiş fonksiyonu δ",
     "transitionTableHelp": "Her olay ve durum kombinasyonu için tam olarak bir ardıl durum seçin.",
     "event": "Etkinlik",
-    "state": "Eyalet",
+    "state": "Durum",
     "output": "Çıkış",
     "internalValue": "Dahili temsil",
     "representation": "Dahili temsil",
@@ -118,7 +118,7 @@
     "search": "Ara...",
     "createState": "Yeni durum oluştur",
     "createNamedState": "+ \"{{value}}\" oluştur",
-    "stateNotFound": "Eyalet bulunamadı",
+    "stateNotFound": "Durum bulunamadı",
     "outputLambda": "Çıkış λ",
     "createOutput": "Yeni çıktı sembolü oluştur",
     "createNamedOutput": "+ \"{{symbol}}\" oluştur",
@@ -139,7 +139,7 @@
     "error": "Hata",
     "diagram": "Moore makinesinin durum geçiş grafiği",
     "validation": {
-      "states_invalid": "En az bir eyalet gereklidir.",
+      "states_invalid": "En az bir durum gereklidir.",
       "input_symbols_invalid": "Çok fazla giriş sembolü var.",
       "state_names_invalid": "Durum adları benzersiz olmalı ve boş olmamalıdır.",
       "input_symbol_names_invalid": "Giriş simgeleri benzersiz olmalı ve boş olmamalıdır.",
@@ -151,7 +151,7 @@
   },
   "mealy": {
     "configureTitle": "Mealy makinesini tanımlayın",
-    "simulationTitle": "Etli simülasyon",
+    "simulationTitle": "Mealy simülasyonu",
     "diagram": "Mealy makinesinin durum geçiş grafiği"
   },
   "graph": {
@@ -177,7 +177,7 @@
     "currentState": "Mevcut durum",
     "event": "Etkinlik",
     "nextState": "Sonraki durum",
-    "state": "Eyalet",
+    "state": "Durum",
     "output": "Çıkış",
     "canonicalDnf": "Kanonik DNF",
     "minimalDnf": "Küçültülmüş Boolean işlevi",
