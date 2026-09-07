@@ -55,7 +55,7 @@ export const learningModules: LearningModuleDefinition[] = [
         icon: Cpu,
         accent: "orange",
         tutorialVideoUrl:
-          "https://oc-stream.thws.de/static/mh_default_org/api/f2cab67e-deb0-4782-9c50-0637d42a0fea/0a59a17d-dba9-49de-967c-35fc72b14c78/Turingmaschine.mp4",
+          "https://oc-stream.thws.de/static/mh_default_org/api/656feaeb-0034-4633-a83b-b25ceb3ce749/179c1523-c467-46c7-a1dc-59311e6cff4e/Turingmaschine.mp4",
       },
       {
         id: "finite-automata",
