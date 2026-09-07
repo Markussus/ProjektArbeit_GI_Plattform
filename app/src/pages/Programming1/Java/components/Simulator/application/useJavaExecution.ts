@@ -81,7 +81,7 @@ export function useJavaExecution(): JavaExecutionController {
 
   /**
    * Hard-terminates the background Web Worker process
-   * If user code is stuck in an infinite loop (e.g. while(true)) this halts execution 
+   * If user code is stuck in an infinite loop (e.g. while(true)) this halts execution
    */
   const disposeWorker = useCallback(() => {
     if (workerRef.current) {
