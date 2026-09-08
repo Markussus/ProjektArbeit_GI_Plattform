@@ -4,6 +4,28 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import compression from "compression";
 import { defineConfig, type Connect, type Plugin } from "vite";
+import { DEPLOYMENT_BASE_URL } from "./deployment.config.ts";
+
+function normalizeDeploymentBaseUrl(value: string) {
+  const base = value.trim();
+
+  if (!base) {
+    return "/";
+  }
+
+  if (base === "./") {
+    throw new Error(
+      'DEPLOYMENT_BASE_URL="./" is not supported with BrowserRouter. Use "/", a subpath such as "/gi_learningtool/", or a full URL.',
+    );
+  }
+
+  if (/^https?:\/\//i.test(base)) {
+    return base.endsWith("/") ? base : `${base}/`;
+  }
+
+  const absolutePath = base.startsWith("/") ? base : `/${base}`;
+  return absolutePath.endsWith("/") ? absolutePath : `${absolutePath}/`;
+}
 
 const VENDOR_PACKAGES = ["react-dom", "react-router-dom", "/react/"];
 const UI_PACKAGES = ["motion", "lucide-react"];
@@ -27,7 +49,8 @@ function previewCompressionPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), previewCompressionPlugin()],
+  plugins: [react(), tailwindcss(),previewCompressionPlugin()],
+  base: normalizeDeploymentBaseUrl(DEPLOYMENT_BASE_URL),
   optimizeDeps: {
     include: ["java-parser"],
   },
