@@ -23,7 +23,8 @@ $\varepsilon$-Hülle aufgelöst.
 Der deklarierte Automatentyp steuert Validierung und Eingabemaske, nicht aber die
 Ausführung.
 
-Der Simulator ist in fünf Bereiche aufgeteilt:
+Der Simulator ist in fünf Bereiche aufgeteilt
+(siehe Abbildung~\ref{fig:fa_schichten}):
 
 \begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
 \item[\texttt{domain}]
@@ -43,6 +44,60 @@ Grammatikeingabe.
 \item[\texttt{config}]
 enthält Standardautomaten und Beispiele.
 \end{description}
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[
+		font=\footnotesize,
+		box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.0cm},
+		wide/.style={box, text width=13.6cm},
+		half/.style={box, text width=6.3cm},
+		nutzt/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
+		reuse/.style={nutzt, dashed},
+		lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
+	]
+		\node[wide, fill=black!5] (pres) at (0,0)
+			{\textbf{\texttt{presentation}}\\
+			 Zustandsdiagramm, Übergangstabelle, Eingabewort, Stapeltest, Grammatikeingabe};
+
+		\node[half, fill=black!5] (app) at (-3.55,-2.1)
+			{\textbf{\texttt{application}}\\
+			 Anbindung an React,\\
+			 Simulation und Editor};
+
+		\node[half, fill=black!5] (adap) at (3.55,-2.1)
+			{\textbf{\texttt{adapters}}\\
+			 Aufbereitung der\\
+			 Übergangstabelle};
+
+		\node[wide, fill=black!12] (dom) at (0,-4.2)
+			{\textbf{\texttt{domain}} -- ohne React-Abhängigkeit, ohne Oberfläche testbar\\
+			 Simulation, Validierung, Grammatikumwandlung, Stapeltest, Übungskontrolle};
+
+		\node[half, fill=black!5] (conf) at (-3.55,-6.5)
+			{\textbf{\texttt{config}}\\
+			 Standardautomaten\\
+			 und Beispiele};
+
+		\node[half, dashed] (rl) at (3.55,-6.5)
+			{Thema \emph{Reguläre Sprachen}\\
+			 (Abschnitt~\ref{4_3_RL})};
+
+		\draw[nutzt] (app.north  |- pres.south) -- (app.north)  node[lbl, midway, right] {nutzt};
+		\draw[nutzt] (adap.north |- pres.south) -- (adap.north) node[lbl, midway, right] {nutzt};
+		\draw[nutzt] (app.south)  -- (app.south  |- dom.north)  node[lbl, midway, right] {nutzt};
+		\draw[nutzt] (adap.south) -- (adap.south |- dom.north)  node[lbl, midway, right] {nutzt};
+		\draw[nutzt] (conf.north) -- (conf.north |- dom.south)  node[lbl, midway, right] {liefert};
+		\draw[reuse] (rl.north)   -- (rl.north   |- dom.south)
+			node[lbl, midway, left=3pt, align=right] {nutzt die\\Grammatikumwandlung};
+	\end{tikzpicture}
+	\caption[Schichten des Simulators für endliche Automaten]{%
+		Schichten des Simulators für endliche Automaten. Durchgezogene Pfeile zeigen,
+		welche Schicht auf welche zugreift. Die Fachlogik in \texttt{domain} kennt
+		React nicht und ist ohne gerenderte Oberfläche testbar; das Thema
+		\emph{Reguläre Sprachen} greift ausschließlich auf diese Schicht zu.}
+	\label{fig:fa_schichten}
+\end{figure}
 
 Die Trennung sorgt dafür, dass die Fachlogik unabhängig von React bleibt und ohne
 gerenderte Oberfläche testbar ist.
@@ -71,7 +126,8 @@ nachzuvollziehen ist: Zyklen und Sackgassen werden erst sichtbar, wenn man mehre
 Zeilen gedanklich verknüpft.
 Deshalb wurde zusätzlich ein Zustandsdiagramm integriert.
 
-Beide Darstellungen sind an denselben Simulationsschritt gebunden: Die Tabelle hebt
+Beide Darstellungen sind an denselben Simulationsschritt gebunden
+(siehe Abbildung~\ref{fig:fa_kopplung}): Die Tabelle hebt
 genau die Zelle hervor, die dem im Diagramm markierten Übergang entspricht.
 Sie zeigt die formale Definition des Automaten, während das Diagramm den
 tatsächlichen Weg des Wortes sichtbar macht.
@@ -81,6 +137,54 @@ Einzelne Zustände lassen sich deshalb frei ziehen, der Ausschnitt vergrößern 
 verkleinern und die Ausgangsansicht mit einem Klick wiederherstellen.
 Aktive und fehlerhafte Übergänge bleiben dabei auch bei geringer Zoomstufe
 beschriftet.
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[
+		font=\footnotesize,
+		state/.style={draw, circle, minimum size=0.9cm, inner sep=1pt},
+		accept/.style={state, double, double distance=1.1pt},
+		trans/.style={-{Stealth[length=2mm,width=1.6mm]}, semithick},
+		hi/.style={line width=1.1pt, orange!75!black},
+		link/.style={dashed, black!55, semithick, -{Stealth[length=2mm,width=1.6mm]}},
+		lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
+	]
+		\matrix (tab) [
+			matrix of nodes,
+			nodes in empty cells,
+			row sep=-\pgflinewidth, column sep=-\pgflinewidth,
+			nodes={draw, minimum width=1.05cm, minimum height=0.62cm, anchor=center, font=\footnotesize},
+			column 1/.style={nodes={minimum width=1.5cm}}
+		] at (0,0) {
+			|[fill=black!12]| $\delta$ & |[fill=black!12]| $a$ & |[fill=black!12]| $b$ \\
+			$\rightarrow q_0$ & |[fill=orange!45]| $q_1$ & $-$ \\
+			$q_1$ & $-$ & $q_2$ \\
+			$\ast\,q_2$ & $q_1$ & $-$ \\
+		};
+
+		\node[lbl] at (0,1.62) {Übergangstabelle};
+
+		\node[state]  (s0) at (5.6,0.31) {$q_0$};
+		\node[state]  (s1) at (7.7,0.31) {$q_1$};
+		\node[accept] (s2) at (9.8,0.31) {$q_2$};
+
+		\draw[trans] (4.65,0.31) -- (s0);
+		\draw[trans, hi] (s0) -- node[above, black] {$a$} (s1);
+		\draw[trans] (s1) -- node[above] {$b$} (s2);
+		\draw[trans] (s2) to[bend left=38] node[below] {$a$} (s1);
+
+		\node[lbl] at (7.7,1.62) {Zustandsdiagramm};
+
+		\draw[link] (tab-2-3.east) -- (2.3,0.31) -- (2.3,-1.7) -- (6.65,-1.7) -- (6.65,0.06);
+		\node[lbl, fill=white] at (4.475,-1.7) {derselbe Simulationsschritt};
+	\end{tikzpicture}
+	\caption[Kopplung von Übergangstabelle und Zustandsdiagramm]{%
+		Beim Lesen des Symbols $a$ im Zustand $q_0$ hebt die Übergangstabelle genau
+		die Zelle hervor, die dem im Zustandsdiagramm markierten Übergang entspricht.
+		Der Automat ist partiell definiert; ein fehlender Übergang ist mit $-$
+		gekennzeichnet und führt zur Ablehnung des Wortes.}
+	\label{fig:fa_kopplung}
+\end{figure}
 
 Verstöße gegen den Determinismus werden nicht nur aufgelistet, sondern unmittelbar an
 Zustand und Übergang im Diagramm markiert.

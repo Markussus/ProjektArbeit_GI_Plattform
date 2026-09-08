@@ -71,7 +71,35 @@ Schwierigkeitsgraden.
 Ob eine Aufgabe tatsächlich korrekt war, habe ich anschließend mit der automatischen
 Übungskontrolle des Simulators gegen die Referenzlösung geprüft
 (siehe Abschnitt~\ref{4_2_EA}).
-Nur geprüfte Aufgaben wurden in den Aufgabenkatalog aufgenommen.
+Nur geprüfte Aufgaben wurden in den Aufgabenkatalog aufgenommen
+(siehe Abbildung~\ref{fig:ki_aufgaben}).
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[
+		font=\footnotesize,
+		box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.4cm},
+		flow/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
+		lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
+	]
+		\node[box, text width=2.6cm, fill=black!5]  (a) at (0,0)    {Bestehende Aufgabe\\als Vorlage};
+		\node[box, text width=3.4cm, fill=black!5]  (b) at (4.1,0)  {KI erzeugt Variante\\(Alphabet, Wortlänge, Schwierigkeit)};
+		\node[box, text width=3.2cm, fill=black!12] (c) at (8.6,0)  {Übungskontrolle prüft gegen die Referenzlösung};
+		\node[box, text width=2.6cm, fill=black!5]  (d) at (13.2,0) {Aufnahme in den Aufgabenkatalog};
+
+		\draw[flow] (a) -- (b);
+		\draw[flow] (b) -- (c);
+		\draw[flow] (c) -- (d) node[lbl, midway, above=2pt, fill=white] {bestanden};
+		\draw[flow] (c.south) -- ++(0,-1.0) coordinate (fb) -| (b.south);
+		\node[lbl, below=1mm] at ($(fb)!0.5!(fb -| b.south)$)
+			{Abweichung: Variante wird verworfen};
+	\end{tikzpicture}
+	\caption[Erzeugung und Prüfung von Aufgabenvarianten]{%
+		Erzeugung und Prüfung von Aufgabenvarianten. Nur Varianten, die sich
+		gegenüber der Referenzlösung identisch verhalten, werden in den
+		Aufgabenkatalog übernommen.}
+	\label{fig:ki_aufgaben}
+\end{figure}
 
 \subNsection{2}{Kritische Reflexion}{Kristian Popov}
 

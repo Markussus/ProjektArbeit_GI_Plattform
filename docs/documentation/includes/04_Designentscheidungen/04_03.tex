@@ -20,7 +20,8 @@ enthält selbst aber keine formale Logik.
 Diese liegt im Verzeichnis \texttt{domain} und bleibt dadurch unabhängig von React
 testbar.
 
-Die Fachlogik ist in mehrere Bereiche aufgeteilt:
+Die Fachlogik ist in mehrere Bereiche aufgeteilt
+(siehe Abbildung~\ref{fig:rl_aufbau}):
 
 \begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
 \item[Grammatikverarbeitung]
@@ -39,6 +40,49 @@ Gleichwertige Nichtterminale können anschließend zusammengefasst werden.
 Die Aufzählung und Worterkennung sowie die Übungskontrolle verwenden dieselben
 fachlichen Funktionen.
 \end{description}
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[
+		font=\footnotesize,
+		box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.0cm},
+		wide/.style={box, text width=13.6cm},
+		quarter/.style={box, text width=2.8cm, minimum height=1.3cm},
+		nutzt/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
+		reuse/.style={nutzt, dashed},
+		lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
+	]
+		\node[wide, fill=black!5] (rls) at (0,0)
+			{\textbf{\texttt{RLSimulator}} -- Koordination der Arbeitsmodi und Einstieg in Übungen\\
+			 (enthält selbst keine formale Logik)};
+
+		\node[quarter, fill=black!5]  (m1) at (-5.0,-2.3) {Aufzählung\\erzeugter Wörter};
+		\node[quarter, fill=black!5]  (m2) at (-1.7,-2.3) {Sprache\\$\rightarrow$ Grammatik};
+		\node[quarter, fill=black!5]  (m3) at ( 1.7,-2.3) {Worterkennung};
+		\node[quarter, fill=black!12] (m4) at ( 5.0,-2.3) {Übungskontrolle};
+
+		\node[wide, fill=black!12] (dom) at (0,-4.8)
+			{\textbf{\texttt{domain}} -- gemeinsame Fachlogik, ohne React testbar\\
+			 Grammatikverarbeitung \quad Sprachbeschreibung\\
+			 Umwandlung und Vereinfachung \quad Sprachauswertung};
+
+		\node[wide, dashed] (fa) at (0,-7.3)
+			{Thema \emph{Endliche Automaten} (Abschnitt~\ref{4_2_EA})\\
+			 Grammatikparser, Grammatikvalidierung,\\
+			 Umwandlung in Automaten, gemeinsame Datentypen};
+
+		\foreach \m in {m1,m2,m3,m4}{%
+			\draw[nutzt] (\m.north |- rls.south) -- (\m.north);
+			\draw[nutzt] (\m.south) -- (\m.south |- dom.north);
+		}
+		\draw[reuse] (fa.north) -- (fa.north |- dom.south) node[lbl, midway, right] {stellt bereit};
+	\end{tikzpicture}
+	\caption[Aufbau des Simulators für reguläre Sprachen]{%
+		Aufbau des Simulators für reguläre Sprachen. Alle drei Arbeitsmodi und die
+		Übungskontrolle greifen auf dieselbe Fachlogik zu. Dadurch stimmen
+		Aufzählung, Worterkennung und Übungskontrolle stets überein.}
+	\label{fig:rl_aufbau}
+\end{figure}
 
 Wiederverwendet werden der Grammatikparser, die Grammatikvalidierung und die
 gemeinsamen Datentypen.
