@@ -20,6 +20,7 @@ interface ModePanelProps {
   onStudentDraftChange: (value: string) => void;
 }
 
+/** Grammar → language: enumerate it, or answer the exercise's prompt. */
 export function RLGrammarModePanel({
   mode,
   exercise,
@@ -53,6 +54,7 @@ export function RLGrammarModePanel({
   );
 }
 
+/** Language → grammar: derive a grammar, or answer the exercise's prompt. */
 export function RLLanguageModePanel({
   mode,
   exercise,
@@ -86,6 +88,7 @@ export function RLLanguageModePanel({
   );
 }
 
+/** Recognize word: check words against a grammar. Never an exercise mode. */
 export function RLRecognizeModePanel({
   mode,
   example,

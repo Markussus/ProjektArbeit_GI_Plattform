@@ -19,6 +19,7 @@ export interface FAStateDiagramProps {
   className?: string;
 }
 
+/** State diagram, marking active states and any DFA violations. */
 export function FAStateDiagram({
   program,
   runtime,
@@ -115,6 +116,7 @@ export function FAStateDiagram({
   );
 }
 
+/** One line explaining why a state breaks determinism. */
 function ViolationNotice({ violation }: { violation: DFAViolation }) {
   const { t } = useTranslation();
 

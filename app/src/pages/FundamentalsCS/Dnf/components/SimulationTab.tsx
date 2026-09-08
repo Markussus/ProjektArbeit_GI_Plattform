@@ -16,9 +16,6 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     (handle: DnfSimulatorHandle | null) => {
       simulatorRef.current = handle;
       setIsSimulatorReady(handle !== null);
-      if (handle === null) {
-        setIsStorageReady(false);
-      }
     },
     [],
   );

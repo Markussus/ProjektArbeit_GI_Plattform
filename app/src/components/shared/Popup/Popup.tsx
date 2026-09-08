@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 interface PopupProps {
   open: boolean;
@@ -11,6 +12,8 @@ interface PopupProps {
 }
 
 export function Popup({ open, title, onClose, children, testId }: PopupProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!open) {
       return;
@@ -53,7 +56,7 @@ export function Popup({ open, title, onClose, children, testId }: PopupProps) {
             onClick={onClose}
             data-testid={testId ? `${testId}-close` : undefined}
             className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-9 items-center justify-center rounded-md border"
-            aria-label="Close popup"
+            aria-label={t("common.close", "Close")}
           >
             <X className="size-4" />
           </button>

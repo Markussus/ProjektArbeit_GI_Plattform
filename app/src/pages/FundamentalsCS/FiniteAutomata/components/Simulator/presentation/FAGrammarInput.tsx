@@ -16,6 +16,7 @@ interface FAGrammarInputProps {
   onConvert: (program: FAProgram) => void;
 }
 
+/** The two accepted input formats, doubling as placeholder and help text. */
 const SIMPLE_EXAMPLE = ["S -> 0S | 1A", "A -> 0A | 1"].join("\n");
 
 const STRUCTURED_EXAMPLE = [
@@ -25,6 +26,7 @@ const STRUCTURED_EXAMPLE = [
   "A -> 0A | 1",
 ].join("\n");
 
+/** Grammar entry: parse errors show while typing, right-linearity on convert. */
 export function FAGrammarInput({ onConvert }: FAGrammarInputProps) {
   const { t } = useTranslation();
   const [source, setSource] = useState("");

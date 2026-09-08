@@ -3,6 +3,10 @@ import type { ISimulator } from "@/types/simulator";
 import { validateMealyProgram } from "./mealyProgram";
 import type { MealyProgram, MealyRuntime } from "./mealyTypes";
 
+/**
+ * Implements the theoretical Mealy automaton model: M = (Q, Sigma, Gamma, delta, lambda, q0)
+ * Output function lambda: Q x Sigma -> Gamma depends on the current state and the current input symbol
+ */
 export class MealyMachineSimulator implements ISimulator<
   MealyProgram,
   MealyRuntime
@@ -11,6 +15,9 @@ export class MealyMachineSimulator implements ISimulator<
   private runtime: MealyRuntime | null = null;
   private history: MealyRuntime[] = [];
 
+  /**
+   * Validates state & transition matrices, initializes runtime state at initialState sets position to 0, and clear history
+   */
   initialize(program: MealyProgram, runtime?: MealyRuntime): void {
     const issues = validateMealyProgram(program);
     if (issues.length)
@@ -27,11 +34,18 @@ export class MealyMachineSimulator implements ISimulator<
     this.history = [];
   }
 
+  /**
+   * Reads input symbol from tape: inputSymbol = inputWord[inputPosition]
+   * Evaluates state transition: toState = delta(currentState, inputSymbol)
+   * Calculates output: outputSymbol = lambda(currentState, inputSymbol) (Mealy: Output depends on current state and input symbol!)
+   * Pushes current state snapshot to history for backward stepping
+   */
   step(): void {
     const { program, runtime } = this.context();
     if (runtime.halted) return;
     const inputSymbol = program.inputWord[runtime.inputPosition];
     const toState = program.transitions[inputSymbol]?.[runtime.currentState];
+    // Mealy: Output depends on inputSymbol and currentState:
     const outputSymbol =
       program.outputs[inputSymbol]?.[runtime.currentState]?.symbol;
     if (!toState || outputSymbol === undefined)
@@ -51,6 +65,9 @@ export class MealyMachineSimulator implements ISimulator<
     };
   }
 
+  /**
+   * Restores prior execution snapshot from history stack
+   */
   stepBack(): void {
     this.context();
     this.runtime = this.history.pop() ?? this.runtime;

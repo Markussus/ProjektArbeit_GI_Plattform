@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  dnfExerciseTransferCodec,
-  dnfExpressionTransferCodec,
   dnfTransferCodec,
-  dnfTruthTableTransferCodec,
+  type DnfTransferValue,
 } from "@/pages/FundamentalsCS/Dnf/components/DnfBuilder/domain/dnfTransfer";
 import {
   createTrainingCenterIdentifier,
@@ -12,36 +10,38 @@ import {
 
 describe("DNF transfer codec", () => {
   it("round-trips a complete expression session", async () => {
-    const session = {
+    const session: DnfTransferValue = {
+      mode: "expression_to_truth_table",
       expression: "a & (!b | c)",
       committed: true,
       truthTableAnswers: [true, null, false],
       dnfAnswer: "a & !b",
       simplificationAnswer: "a",
     };
-    const exportedValue = await dnfExpressionTransferCodec.exportValue(session);
-    const importedValue =
-      await dnfExpressionTransferCodec.importValue(exportedValue);
+    const exportedValue = await dnfTransferCodec.exportValue(session);
+    const importedValue = dnfTransferCodec.importValue(exportedValue);
 
     expect(exportedValue).toMatch(/^D[A-Za-z0-9_-]+$/u);
     expect(importedValue).toEqual(session);
   });
 
   it("accepts transfer strings with surrounding whitespace", async () => {
-    const session = {
+    const session: DnfTransferValue = {
+      mode: "expression_to_truth_table",
       expression: "a | b",
       committed: false,
       ...emptyAttempt,
     };
-    const exportedValue = await dnfExpressionTransferCodec.exportValue(session);
+    const exportedValue = await dnfTransferCodec.exportValue(session);
 
-    await expect(
-      dnfExpressionTransferCodec.importValue(` \n${exportedValue}\n `),
-    ).resolves.toEqual(session);
+    expect(dnfTransferCodec.importValue(` \n${exportedValue}\n `)).toEqual(
+      session,
+    );
   });
 
   it("round-trips a complete truth-table session", async () => {
-    const session = {
+    const session: DnfTransferValue = {
+      mode: "truth_table_to_dnf",
       variableCount: 3,
       resultValues: [false, true, false, true, true, false, false, true],
       committed: true,
@@ -49,16 +49,16 @@ describe("DNF transfer codec", () => {
       dnfAnswer: "(!a & !b & c) | (a & !b & !c)",
       simplificationAnswer: "(!a & c) | (a & !c)",
     };
-    const exportedValue = await dnfTruthTableTransferCodec.exportValue(session);
-    const importedValue =
-      await dnfTruthTableTransferCodec.importValue(exportedValue);
+    const exportedValue = await dnfTransferCodec.exportValue(session);
+    const importedValue = dnfTransferCodec.importValue(exportedValue);
 
     expect(exportedValue).toMatch(/^D[A-Za-z0-9_-]+$/u);
     expect(importedValue).toEqual(session);
   });
 
   it("round-trips a truth-table session at the four-variable limit", async () => {
-    const session = {
+    const session: DnfTransferValue = {
+      mode: "truth_table_to_dnf",
       variableCount: 4,
       resultValues: Array.from({ length: 16 }, (_value, index) => index === 0),
       committed: false,
@@ -67,72 +67,65 @@ describe("DNF transfer codec", () => {
       simplificationAnswer: "",
     };
 
-    const exportedValue = await dnfTruthTableTransferCodec.exportValue(session);
-    const importedValue =
-      await dnfTruthTableTransferCodec.importValue(exportedValue);
+    const exportedValue = await dnfTransferCodec.exportValue(session);
+    const importedValue = dnfTransferCodec.importValue(exportedValue);
 
     expect(importedValue).toEqual(session);
   });
 
   it("round-trips an exercise attempt with unanswered rows", async () => {
-    const exportedValue = await dnfExerciseTransferCodec.exportValue({
+    const session: DnfTransferValue = {
+      mode: "exercise_attempt",
       truthTableAnswers: [true, null, false],
       dnfAnswer: "a | b",
       simplificationAnswer: "a",
-    });
+    };
+    const exportedValue = await dnfTransferCodec.exportValue(session);
 
-    await expect(
-      dnfExerciseTransferCodec.importValue(exportedValue),
-    ).resolves.toEqual({
-      truthTableAnswers: [true, null, false],
-      dnfAnswer: "a | b",
-      simplificationAnswer: "a",
-    });
+    expect(dnfTransferCodec.importValue(exportedValue)).toEqual(session);
   });
 
   it("binds a transfer string to its training-center context", async () => {
     const firstExerciseCodec = createTrainingCenterTransferCodec(
       createTrainingCenterIdentifier(5, 0),
-      dnfExerciseTransferCodec,
+      dnfTransferCodec,
     );
     const secondExerciseCodec = createTrainingCenterTransferCodec(
       createTrainingCenterIdentifier(5, 1),
-      dnfExerciseTransferCodec,
+      dnfTransferCodec,
     );
-    const exportedValue = await firstExerciseCodec.exportValue({
+    const session: DnfTransferValue = {
+      mode: "exercise_attempt",
       truthTableAnswers: [],
       dnfAnswer: "a",
       simplificationAnswer: "",
-    });
+    };
+    const exportedValue = await firstExerciseCodec.exportValue(session);
 
     await expect(
       firstExerciseCodec.importValue(exportedValue),
-    ).resolves.toEqual({
-      truthTableAnswers: [],
-      dnfAnswer: "a",
-      simplificationAnswer: "",
-    });
+    ).resolves.toEqual(session);
     await expect(
       secondExerciseCodec.importValue(exportedValue),
     ).rejects.toThrow("training_center_transfer_identifier_invalid");
   });
 
   it("round-trips an unfinished expression draft", async () => {
-    const draft = {
+    const draft: DnfTransferValue = {
+      mode: "expression_to_truth_table",
       expression: "a &",
       committed: false,
       ...emptyAttempt,
     };
-    const exportedValue = await dnfExpressionTransferCodec.exportValue(draft);
+    const exportedValue = await dnfTransferCodec.exportValue(draft);
 
-    await expect(
-      dnfExpressionTransferCodec.importValue(exportedValue),
-    ).resolves.toEqual(draft);
+    expect(dnfTransferCodec.importValue(exportedValue)).toEqual(draft);
   });
 
-  it("rejects truth tables with a mismatching result count", async () => {
+  it("rejects truth tables with a mismatching result count", () => {
     expect(() =>
-      dnfTruthTableTransferCodec.exportValue({
+      dnfTransferCodec.exportValue({
+        mode: "truth_table_to_dnf",
         variableCount: 3,
         resultValues: [true, false],
         committed: false,
@@ -141,7 +134,7 @@ describe("DNF transfer codec", () => {
     ).toThrow("dnf_transfer_value_invalid");
   });
 
-  it("rejects malformed payloads", async () => {
+  it("rejects malformed payloads", () => {
     expect(() => dnfTransferCodec.importValue("not-base64")).toThrow(
       "dnf_transfer_payload_invalid",
     );
@@ -150,23 +143,10 @@ describe("DNF transfer codec", () => {
     );
   });
 
-  it("rejects obsolete version-two payloads", async () => {
+  it("rejects obsolete version-two payloads", () => {
     expect(() => dnfTransferCodec.importValue("DQCsJATEDE")).toThrow(
       "dnf_transfer_payload_invalid",
     );
-  });
-
-  it("rejects transfers imported through the wrong mode adapter", async () => {
-    const exportedTable = await dnfTruthTableTransferCodec.exportValue({
-      variableCount: 1,
-      resultValues: [false, true],
-      committed: false,
-      ...emptyAttempt,
-    });
-
-    await expect(
-      dnfExpressionTransferCodec.importValue(exportedTable),
-    ).rejects.toThrow("dnf_transfer_mode_invalid");
   });
 });
 

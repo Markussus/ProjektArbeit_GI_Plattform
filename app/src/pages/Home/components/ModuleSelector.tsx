@@ -19,6 +19,8 @@ export function ModuleSelector() {
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-label={t("common.home.exploreModules")}
           data-testid="module-selector-trigger"
           className="hover:bg-muted/40 flex w-full items-center justify-between px-5 py-4 text-left"
         >

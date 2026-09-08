@@ -277,7 +277,7 @@
       "binToDec": "Binary to Decimal (Sum of powers)",
       "binToDecDesc": "Each digit is multiplied by the corresponding power of base 2 and added.",
       "toDec": "to Decimal",
-      "otherToDecDesc": "The conversion works analogously with the sum of powers to the given base.",
+      "otherToDecDesc": "The conversion works analogously with the sum of powers to base {{base}}.",
       "eightBit": "8-Bit Representation",
       "decInput": "Decimal (-128 to +127)",
       "invalidRange": "Please enter a value between -128 and +127.",

@@ -13,11 +13,13 @@ import {
 } from "./faTypes";
 import { isFAProgramValid } from "./faProgramValidation";
 
+/** Error codes and the cell ceiling an oversized payload may not exceed. */
 const PROGRAM_INVALID = "fa_transfer_program_invalid";
 const PAYLOAD_INVALID = "fa_transfer_payload_invalid";
 
 const MAX_TRANSITION_CELLS = 10_000_000;
 
+/** Digits and a-f cost a few bits; other symbols fall back to code points. */
 const symbolDictionary = createSymbolDictionaryCodec({
   registry: [
     "0",
@@ -42,19 +44,20 @@ const symbolDictionary = createSymbolDictionaryCodec({
   isReserved: (symbol) => symbol === EPSILON,
 });
 
+/** Table layout: dense writes every cell, sparse adds an occupancy bit. */
 const TransitionMode = {
   Dense: 0,
   Sparse: 1,
 } as const;
 type TransitionMode = (typeof TransitionMode)[keyof typeof TransitionMode];
 
+/** The program reduced to ids and masks — the form the bit writer works on. */
 interface NormalizedProgram {
   stateCount: number;
   isNFA: boolean;
   symbols: string[];
   acceptMask: boolean[];
   readableSymbolIds: number[];
-  /** One entry per transition cell: the sorted set of target state IDs. */
   transitionCells: number[][];
 }
 
@@ -63,6 +66,7 @@ interface TransitionEncoding {
   bits: number[];
 }
 
+/** Compact transfer codec; only valid programs export, names are dropped. */
 export const faProgramTransferCodec: ISimulatorTransferCodec<FAProgram> = {
   async exportValue(program) {
     const normalizedProgram = normalizeProgram(program);
@@ -148,6 +152,7 @@ function buildTransitionRows(
   return { readableSymbolIds, transitionCells };
 }
 
+/** Turn a valid program into ids and masks, with the start state as id 0. */
 function normalizeProgram(program: FAProgram): NormalizedProgram {
   if (!canNormalize(program)) {
     throw new Error(PROGRAM_INVALID);
@@ -184,6 +189,7 @@ function normalizeProgram(program: FAProgram): NormalizedProgram {
   };
 }
 
+/** Target ids of one cell, deduplicated and sorted so encoding is stable. */
 function collectCellTargets(
   targets: string[] | undefined,
   stateIds: Map<string, number>,
@@ -215,6 +221,7 @@ function chooseTransitionEncoding(
     : { mode: TransitionMode.Dense, bits: denseBits };
 }
 
+/** Write every cell in row-major order, in the requested layout. */
 function encodeTransitions(
   program: NormalizedProgram,
   sparse: boolean,
@@ -234,6 +241,7 @@ function encodeTransitions(
   return writer.bits;
 }
 
+/** One bit per state saying whether it is a target of this cell. */
 function writeTargetMask(
   writer: BitWriter,
   targets: number[],
@@ -263,6 +271,7 @@ interface TransferHeader {
   symbols: string[];
 }
 
+/** Read the header, rejecting counts or modes the writer could not produce. */
 function readTransferHeader(reader: BitReader): TransferHeader {
   const stateCount = reader.readVarUint();
   const symbolCount = reader.readVarUint();
@@ -354,6 +363,7 @@ function readTransitions(
   return transitions;
 }
 
+/** Rebuild a program from its payload, with canonical `S<n>` state names. */
 function decodeProgram(serializedProgram: string): FAProgram {
   const reader = BitReader.fromBase64Url(serializedProgram, PAYLOAD_INVALID);
   const header = readTransferHeader(reader);
@@ -385,6 +395,7 @@ function decodeProgram(serializedProgram: string): FAProgram {
   return program;
 }
 
+/** Read one transition cell back, honouring the sparse occupancy bit. */
 function readCell(
   reader: BitReader,
   isSparse: boolean,
@@ -404,6 +415,7 @@ function readCell(
   return targets;
 }
 
+/** `S0`… names for a decoded program, with `S0` the start state. */
 function createCanonicalStateNames(stateCount: number): string[] {
   return Array.from({ length: stateCount }, (_, stateId) => `S${stateId}`);
 }

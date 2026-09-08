@@ -73,16 +73,9 @@ function isDeterministic(transitions: FATransitionMap): boolean {
 }
 
 /**
- * Convert a right-linear regular grammar to an NFA.
- *
- * Mapping:
- * - Non-terminals → states
- * - Terminals → alphabet symbols
- * - A → aB becomes transition(A, a) → B
- * - A → a  becomes transition(A, a) → FINAL (dedicated accept state)
- * - A → ε  marks state A as accepting (no ε-transition is emitted —
- *          all transitions in the result consume input symbols only)
- * - Start symbol → start state
+ * Convert a right-linear grammar to an NFA: non-terminals become states, `A → aB`
+ * a transition, `A → a` a transition into one dedicated accept state, and `A → ε`
+ * marks A accepting. No ε-transitions are emitted.
  */
 export function grammarToAutomaton(grammar: RegularGrammar): FAProgram {
   // The synthetic accept state must not clash with a non-terminal the user

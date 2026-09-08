@@ -24,6 +24,9 @@ export interface AutomataValidationResultRow {
   error: string | null;
 }
 
+/**
+ * Runs the Moore machine definition against multiple test input words
+ */
 export function runMooreValidation(
   program: MooreProgram,
   validationCases: AutomataValidationCase[],
@@ -37,6 +40,9 @@ export function runMooreValidation(
   );
 }
 
+/**
+ * Runs the Mealy machine definition against multiple test input words.
+ */
 export function runMealyValidation(
   program: MealyProgram,
   validationCases: AutomataValidationCase[],
@@ -124,6 +130,10 @@ function numberArraysEqual(left: number[], right: number[]): boolean {
   );
 }
 
+/**
+ * Moore outputs an initial symbol for the initial state q0 BEFORE any input is consumed
+ * Total output length is (n + 1) for an input of length n.
+ */
 function runMooreProgram(program: MooreProgram, inputWord: string[]): number[] {
   const simulator = new MooreMachineSimulator();
   simulator.initialize({ ...program, inputWord });
@@ -137,6 +147,10 @@ function runMooreProgram(program: MooreProgram, inputWord: string[]): number[] {
   return outputCodes;
 }
 
+/**
+ * Mealy outputs are generated along transitions (state + input symbol).
+ * Total output length exactly equals the input length n.
+ */
 function runMealyProgram(program: MealyProgram, inputWord: string[]): number[] {
   const simulator = new MealyMachineSimulator();
   simulator.initialize({ ...program, inputWord });

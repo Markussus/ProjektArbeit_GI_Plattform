@@ -1,23 +1,20 @@
 \subNsection{1}{Zusammenfassung der Projektergebnisse}{Alle}
 
 \textbf{Kristian Popov}: Mein Schwerpunkt im Projekt lag auf den Themen
-\emph{Endliche Automaten} und \emph{Reguläre Sprachen}. Für die Endlichen
-Automaten habe ich eine Umgebung umgesetzt, in der Studierende deterministische
-und nichtdeterministische Automaten definieren und Wörter Schritt für Schritt
-simulieren können. Beide Automatentypen verwenden dabei eine gemeinsame
-Ausführungslogik. Ergänzt wird das Thema durch einen Schrittverlauf, einen
-Stapeltest, Beispiele, Übungen mit automatischer Rückmeldung und die Umwandlung
-rechtslinearer Grammatiken in Automaten.
+\emph{Endliche Automaten} und \emph{Reguläre Sprachen}.
+Für die Endlichen Automaten ist eine Umgebung entstanden, in der Studierende
+deterministische und nichtdeterministische Automaten definieren und Wörter Schritt
+für Schritt simulieren; beide Automatentypen teilen sich eine gemeinsame
+Ausführungslogik (siehe Abschnitt~\ref{4_2_EA}).
+Das Thema \emph{Reguläre Sprachen} verbindet Sprachbeschreibung, Grammatik und
+Worterkennung über dieselbe Fachlogik, sodass Aufzählung, Worterkennung und
+Übungskontrolle stets übereinstimmen (siehe Abschnitt~\ref{4_3_RL}).
 
-Das Thema \emph{Reguläre Sprachen} ermöglicht die Aufzählung von Wörtern, die
-Erzeugung einer Grammatik aus einer Sprachbeschreibung und die Prüfung einzelner
-Wörter, bei der neben dem Ergebnis auch dessen Grund angezeigt wird.
-Sprachbeschreibungen können als Aufzählung oder in Mengenschreibweise angegeben
-werden. Beschreibungen, die keine reguläre Sprache ergeben, etwa gekoppelte Längen
-wie \verb|a^n b^n|, werden mit einer eigenen Meldung abgelehnt; obere Schranken
-sind zwar regulär, lassen sich aber klarer als Aufzählung angeben und bleiben
-deshalb ebenfalls ausgeschlossen. Die erzeugten Grammatiken bleiben strikt
-rechtslinear und beide Umwandlungsrichtungen sind als Übungen verfügbar.
+Beide Themen bewerten Übungen über das Verhalten der Lösung statt über ihre
+Struktur.
+Studierende erhalten dadurch auch für eigenständig aufgebaute Automaten und
+Grammatiken eine Rückmeldung mit konkretem Gegenbeispiel statt einer reinen
+Ja-Nein-Aussage.
 
 Bei beiden Themen war mir wichtig, nicht nur Ergebnisse zu zeigen, sondern auch
 den Weg dorthin. Übergangstabelle und Zustandsdiagramm sind an denselben
@@ -58,3 +55,11 @@ Auf Architekturebene habe ich das generische Interface \verb|ISimulator<TConfig,
 Im Encoding-Modul wurden die Transformationen zwischen Text, Codepoints und Byte-Sequenzen für \gls{utf8} und \gls{base64} implementiert. Die visuelle Aufschlüsselung der Bitoperationen, einschließlich der Unterscheidung von Steuerbits und Nutzbits, hilft Studierenden die Funktionsweise dieser allgegenwärtigen Standards zu verstehen. Die programmatische Generierung von Übungsaufgaben bot unbegrenzte Variationsmöglichkeiten ohne statische Aufgabenlisten pflegen zu müssen.
 
 Die Tests für die mathematischen Module wurden auf die Kernfunktionen konzentriert. \gls{bigint}-Operationen und \gls{ieee754}-Bitmanipulationen wurden systematisch mit bekannten Eingabe-Ausgabe-Paaren validiert. Die \gls{utf8}-Dekodierung und \gls{base64}-Transformation wurden durch gezielte Unit-Tests abgesichert. Dies hilft Studierenden, mit verlässlichen Simulationen zu arbeiten, die korrekte Ergebnisse liefern.
+
+\textbf{Markus Nöth}: Mein fachlicher Schwerpunkt im Projekt lag auf der Umsetzung der \emph{Java-Programmierumgebung} sowie des Moduls für \emph{Moore- und Mealy-Automaten}.
+
+Für die Java-Umgebung war es mir wichtig, eine vollständige Entwicklungsumgebung ohne Serveranbindung direkt im Browser bereitzustellen. Ich habe dafür den Monaco-Editor eingebunden, der Studierenden durch Fehler-Marker und bekannte Tastenkürzel eine vertraute Arbeitsweise ermöglicht. Die Kompilierung mit OpenJDK-\verb|javac| und die Ausführung via TeaVM in \gls{wasm} laufen getrennt von der Benutzeroberfläche in einem Web Worker ab. Ausgaben werden über einen Puffer gebündelt in die Konsole gestreamt, und für Konsoleneingaben habe ich eine Quelltext-Vorverarbeitung geschrieben, die \texttt{Scanner}-Aufrufe vorab durch Eingabewerte ersetzt.
+
+Bei den Moore- und Mealy-Automaten habe ich die Simulationslogik beider Typen auf Basis des gemeinsamen Interfaces \texttt{ISimulator\allowbreak<TConfig,\allowbreak{}TState>} umgesetzt. Dabei lag mir besonders am Herzen, möglichst viele Komponenten als wiederverwendbare Bausteine unter \verb|components/shared/| auszulegen. Sowohl die interaktive Graphdarstellung \verb|StateMachineGraph| mit radialer Knotenverteilung als auch das Logikgatter-Diagramm \verb|LogicGateDiagram| wurden so konzipiert, dass auch andere Module der Plattform sie nutzen können. Zudem habe ich für beide Automatentypen die Umwandlung in Wahrheitstabellen, disjunktive Normalformen (\gls{dnf}) und minimale Schaltfunktionen integriert.
+
+Über diese beiden Fachmodule hinaus habe ich die übergeordnete modulare Architektur der Plattform entworfen. Dazu gehörten das Seitenlayout, das asynchrone Code-Splitting über den zentralen Modulkatalog sowie die Koordination der internen Kommunikation, der Aufgabenverteilung und der regelmäßigen Abstimmungstermine mit dem Auftraggeber.

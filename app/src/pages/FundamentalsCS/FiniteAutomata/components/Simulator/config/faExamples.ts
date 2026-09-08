@@ -1,4 +1,5 @@
 import type { FAProgram } from "../domain/faTypes";
+import { EPSILON } from "../domain/faTypes";
 import { defaultDFAProgram, defaultInputWord } from "./defaultFAProgram";
 
 /** Which on-page section an example belongs to. */
@@ -9,7 +10,6 @@ export type FAExampleCategory = "dfa" | "nfa" | "grammarToAutomaton";
  * is loaded into the simulator when the example is opened.
  */
 export interface FAExample {
-  /** Translation key for the example title */
   id: string;
   titleKey: string;
   descriptionKey: string;
@@ -42,6 +42,30 @@ const exampleContainsAba: FAExample = {
   inputWord: "baba",
 };
 
+// ─── NFA: Multiple start states via ε ───────────────────────────────────────
+const exampleMultipleStartStates: FAExample = {
+  id: "multiple-start-states",
+  titleKey: "finite-automata.examples.multipleStartStates.title",
+  descriptionKey: "finite-automata.examples.multipleStartStates.description",
+  type: "NFA",
+  category: "nfa",
+  program: {
+    type: "NFA",
+    states: ["S", "A0", "A1", "B0", "B1"],
+    alphabet: ["a", "b"],
+    transitions: {
+      S: { [EPSILON]: ["A0", "B0"] },
+      A0: { a: ["A1"] },
+      A1: { a: ["A1"] },
+      B0: { b: ["B1"] },
+      B1: { b: ["B1"] },
+    },
+    startState: "S",
+    acceptStates: ["A1", "B1"],
+  },
+  inputWord: "aaa",
+};
+
 // ─── DFA: Lecture Example (00*1) ────────────────────────────────────────────
 const exampleLecture: FAExample = {
   id: "lecture-example",
@@ -49,7 +73,6 @@ const exampleLecture: FAExample = {
   descriptionKey: "finite-automata.examples.lecture.description",
   type: "DFA",
   category: "dfa",
-  // Partial DFA: a missing transition rejects, so no trap state is drawn.
   program: {
     type: "DFA",
     states: ["S0", "S1", "S2"],
@@ -66,8 +89,6 @@ const exampleLecture: FAExample = {
 };
 
 // ─── DFA: Ends with "ab" ───────────────────────────────────────────────────
-// The automaton the simulator used to open with. It lives here now that free
-// mode starts blank, so the worked version is still one click away.
 const exampleEndsWithAb: FAExample = {
   id: "ends-with-ab",
   titleKey: "finite-automata.examples.endsWithAb.title",
@@ -100,12 +121,12 @@ const exampleGrammar: FAExample = {
   inputWord: "0011",
 };
 
-/** All predefined examples */
 export const faExamples: FAExample[] = [
   exampleLecture,
   exampleEndsWithAb,
   exampleGrammar,
   exampleContainsAba,
+  exampleMultipleStartStates,
 ];
 
 export function findFAExample(id: string): FAExample | undefined {

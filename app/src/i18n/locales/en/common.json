@@ -12,7 +12,7 @@
     "confirmResetAllProgress": "Delete all saved progress?"
   },
   "app": {
-    "title": "THWS - Traing Center"
+    "title": "THWS - Training Center"
   },
   "nav": {
     "home": "TRAINING CENTER"
@@ -40,7 +40,9 @@
   "language": {
     "select": "Select language",
     "de": "German",
-    "en": "English"
+    "en": "English",
+    "tr": "Turkish",
+    "uk": "Ukrainian"
   },
   "tabs": {
     "overview": "Overview",

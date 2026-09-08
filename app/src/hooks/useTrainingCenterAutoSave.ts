@@ -21,11 +21,11 @@ export function useTrainingCenterAutoSave<TValue>({
   intervalMs = DEFAULT_TRAINING_CENTER_AUTO_SAVE_INTERVAL,
   onError,
 }: UseTrainingCenterAutoSaveOptions<TValue>) {
-  const latestRef = useRef({ identifier, value, codec, onError });
+  const latestRef = useRef({ identifier, value, codec, onError, enabled });
 
   useEffect(() => {
-    latestRef.current = { identifier, value, codec, onError };
-  }, [identifier, value, codec, onError]);
+    latestRef.current = { identifier, value, codec, onError, enabled };
+  }, [identifier, value, codec, onError, enabled]);
 
   const save = useCallback(async (): Promise<string> => {
     const latest = latestRef.current;
@@ -56,9 +56,16 @@ export function useTrainingCenterAutoSave<TValue>({
 
     return () => {
       window.clearInterval(intervalId);
-      void save().catch(() => undefined);
     };
   }, [enabled, intervalMs, save]);
+
+  useEffect(() => {
+    return () => {
+      if (latestRef.current.enabled) {
+        void save().catch(() => undefined);
+      }
+    };
+  }, [save]);
 
   return save;
 }

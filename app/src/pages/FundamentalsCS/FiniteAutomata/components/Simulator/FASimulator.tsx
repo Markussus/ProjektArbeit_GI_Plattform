@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -9,15 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Play, Settings, Sparkles } from "lucide-react";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  exportAndStoreTrainingCenterValue,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import { cloneJson, cn } from "@/lib/utils";
 import { InlineTabNavigation } from "@/components/shared/InlineTabNavigation";
 import { useFAConfigEditor } from "./application/useFAConfigEditor";
@@ -26,6 +17,7 @@ import { emptyFAProgram, emptyInputWord } from "./config/emptyFAProgram";
 import type { FAExample } from "./config/faExamples";
 import type { FAProgram } from "./domain/faTypes";
 import { faProgramTransferCodec } from "./domain/faProgramTransfer";
+import { faProgramDraftCodec } from "./domain/faProgramDraft";
 import {
   validateAgainstSolution,
   type ValidationResult,
@@ -37,8 +29,10 @@ import type { FAExerciseDefinition } from "../../exercises/faExerciseDefinitions
 
 type EditorMode = "manual" | "grammar";
 
+/** Check outcome; `unbuilt` means no automaton was entered yet. */
 export type FACheckResult = ValidationResult | "unbuilt";
 
+/** Imperative surface the simulation tab drives from its header buttons. */
 export interface FASimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
@@ -52,6 +46,7 @@ export interface FASimulatorProps {
   ref?: Ref<FASimulatorHandle>;
 }
 
+/** Editor and run view, seeded from an exercise, an example, or nothing. */
 export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
   const { t } = useTranslation();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -68,16 +63,10 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
   const [isEditMode, setIsEditMode] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>("manual");
 
-  const storageIdentifier = createTrainingCenterIdentifier(
-    TOPIC_STORAGE_IDS.finiteAutomata,
-    SIMULATOR_TASK_STORAGE_ID,
-  );
-
-  // A seeded exercise or example takes priority over the saved draft, so there
-  // is nothing to restore and the autosave slot is ready straight away.
-  const [isStorageReady, setIsStorageReady] = useState(() =>
-    Boolean(exercise || example),
-  );
+  // Examples are pristine demonstrations, so they are the one scenario that
+  // neither restores nor saves — every other topic draws the line in the same
+  // place.
+  const isStorageEnabled = !example;
 
   const editor = useFAConfigEditor(program);
   const simulation = useFASimulator(program, inputWord);
@@ -100,46 +89,20 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     [pauseSimulation, resetEditorToProgram],
   );
 
-  // In free mode (no exercise/example), restore saved automaton from storage.
-  const hasInitializedStorage = useRef(false);
-  useEffect(() => {
-    if (hasInitializedStorage.current || exercise || example) {
-      return;
-    }
-    hasInitializedStorage.current = true;
-
-    let isCancelled = false;
-    void loadTrainingCenterValue(storageIdentifier, faProgramTransferCodec)
-      .then((storedProgram) => {
-        if (!isCancelled && storedProgram) {
-          handleImportProgram(storedProgram);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!isCancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [exercise, example, handleImportProgram, storageIdentifier]);
-
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: isEditMode ? editor.draft : program,
-    codec: faProgramTransferCodec,
-  });
-
-  // Autosave free mode only (not exercises/examples)
-  useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: editor.draft,
-    codec: faProgramTransferCodec,
-    enabled: isStorageReady && !exercise && !example,
-  });
+  // Each exercise gets its own slot; the free simulator keeps the topic's
+  // default one. The slot takes the draft codec and the transfer box the compact
+  // one: only a finished automaton is worth handing to somebody else.
+  const { clear: clearStoredState, save: saveProgram } =
+    useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.finiteAutomata,
+      taskStorageId: exercise?.storageId,
+      codec: faProgramDraftCodec,
+      transferCodec: faProgramTransferCodec,
+      value: editor.draft,
+      transferValue: isEditMode ? editor.draft : program,
+      onRestore: handleImportProgram,
+      enabled: isStorageEnabled,
+    });
 
   const handleStartSimulation = () => {
     const result = editor.applyProgram();
@@ -147,12 +110,8 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     setProgram(result.program);
     setIsEditMode(false);
     scrollWorkspaceIntoView();
-    if (!exercise && !example) {
-      void exportAndStoreTrainingCenterValue(
-        storageIdentifier,
-        result.program,
-        faProgramTransferCodec,
-      );
+    if (isStorageEnabled) {
+      void saveProgram().catch(() => undefined);
     }
   };
 
@@ -166,24 +125,14 @@ export function FASimulator({ exercise, example, ref }: FASimulatorProps) {
     simulation.pause();
     const resetProgram = cloneJson(initialProgram);
 
-    if (!exercise && !example) {
-      trainingCenterStorage.delete(storageIdentifier);
-    }
+    clearStoredState();
 
     setProgram(resetProgram);
     editor.resetToProgram(resetProgram);
     setInputWord(initialInputWord);
     setIsEditMode(true);
     setEditorMode("manual");
-  }, [
-    initialProgram,
-    initialInputWord,
-    exercise,
-    example,
-    editor,
-    simulation,
-    storageIdentifier,
-  ]);
+  }, [initialProgram, initialInputWord, clearStoredState, editor, simulation]);
 
   const loadSolution = useCallback(() => {
     if (!exercise) return;

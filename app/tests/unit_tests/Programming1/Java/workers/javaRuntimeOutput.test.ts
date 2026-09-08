@@ -42,6 +42,48 @@ describe("javaRuntimeOutput", () => {
     });
   });
 
+  it("flushes synchronously during execution when flushDelay has elapsed", () => {
+    let currentTime = 1000;
+    const now = () => currentTime;
+    const postMessage = vi.fn();
+    const { scheduler } = createScheduler();
+    const output = createBufferedWorkerOutput({
+      stream: "stdout",
+      requestId: "request-sync",
+      postMessage,
+      scheduler,
+      flushDelay: 50,
+      now,
+    });
+
+    output.writeCharacter(65); // t = 1000, first char buffers
+    expect(postMessage).not.toHaveBeenCalled();
+
+    currentTime = 1055; // 55ms later
+    output.writeCharacter(66); // triggers synchronous flush of accumulated buffer
+
+    expect(postMessage).toHaveBeenCalledTimes(1);
+    expect(postMessage).toHaveBeenCalledWith({
+      type: "stdout",
+      requestId: "request-sync",
+      data: "AB",
+    });
+
+    // Subsequent characters start a new interval
+    currentTime = 1060;
+    output.writeCharacter(67);
+    expect(postMessage).toHaveBeenCalledTimes(1);
+
+    currentTime = 1115; // another 55ms later
+    output.writeCharacter(68);
+    expect(postMessage).toHaveBeenCalledTimes(2);
+    expect(postMessage).toHaveBeenLastCalledWith({
+      type: "stdout",
+      requestId: "request-sync",
+      data: "CD",
+    });
+  });
+
   it("clears the pending timeout and flushes on dispose", () => {
     const postMessage = vi.fn();
     const { scheduler } = createScheduler();

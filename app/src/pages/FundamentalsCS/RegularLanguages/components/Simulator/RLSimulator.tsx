@@ -19,6 +19,7 @@ import {
   RLRecognizeModePanel,
 } from "./presentation/RLModePanels";
 import { RLModeSelector } from "./presentation/RLModeSelector";
+import { useRLPersistedDraft } from "./useRLPersistedDraft";
 import { RL_STORAGE_TASK_IDS } from "./useRLPersistedSource";
 
 export interface RLSimulatorProps {
@@ -30,18 +31,21 @@ export interface RLSimulatorProps {
   ref?: Ref<RLSimulatorHandle>;
 }
 
+/** Imperative surface the simulation tab drives from its header buttons. */
 export interface RLSimulatorHandle {
   resetStoredState: () => void;
   loadSolution: () => void;
   checkSolution: () => RLCheckResult | null;
 }
 
+/** Bumping a mode's counter makes its panel drop what was typed and re-seed. */
 const INITIAL_RESET_VERSIONS: Record<SimulationMode, number> = {
   grammarToLanguage: 0,
   languageToGrammar: 0,
   recognizeWord: 0,
 };
 
+/** All three mode panels stay mounted, so switching modes keeps their work. */
 export function RLSimulator({
   exercise,
   example,
@@ -58,14 +62,25 @@ export function RLSimulator({
   const [studentDraft, setStudentDraft] = useState("");
   const [resetVersions, setResetVersions] = useState(INITIAL_RESET_VERSIONS);
 
+  // An open exercise keeps its answer in its own slot, so leaving the page and
+  // coming back restores the draft rather than an empty box.
+  const persistedDraft = useRLPersistedDraft({
+    exercise,
+    draft: studentDraft,
+    onRestore: setStudentDraft,
+  });
+
   const handleModeChange = (target: SimulationMode) => {
     if (target === mode) return;
     if (exercise) onExitExercise?.();
     setMode(target);
   };
 
+  const clearPersistedDraft = persistedDraft.clear;
+
   const resetStoredState = useCallback(() => {
     if (exercise) {
+      clearPersistedDraft();
       setStudentDraft("");
       return;
     }
@@ -80,7 +95,7 @@ export function RLSimulator({
       ...versions,
       [mode]: versions[mode] + 1,
     }));
-  }, [exercise, mode]);
+  }, [clearPersistedDraft, exercise, mode]);
 
   const loadSolution = useCallback(() => {
     if (!exercise) return;

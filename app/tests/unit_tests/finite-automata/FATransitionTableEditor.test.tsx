@@ -144,3 +144,81 @@ describe("FATransitionTableEditor — NFA with existing epsilon transitions", ()
     expect(screen.getByLabelText("δ(S0, ε)")).toBeInTheDocument();
   });
 });
+
+describe("FATransitionTableEditor — target case correction", () => {
+  /** The automaton the grammar converter builds: a lowercase final state. */
+  const fromGrammar: FAProgram = {
+    type: "NFA",
+    states: ["S", "A", "sF"],
+    alphabet: ["0", "1"],
+    transitions: { S: { "0": ["S", "A"] }, A: { "1": ["A", "sF"] }, sF: {} },
+    startState: "S",
+    acceptStates: ["sF"],
+  };
+
+  it("snaps a lowercase target onto the real state when the cell is left", () => {
+    const onTransitionChange = vi.fn();
+    render(
+      <FATransitionTableEditor
+        program={defaultDFAProgram}
+        onTransitionChange={onTransitionChange}
+      />,
+    );
+
+    const cell = screen.getByLabelText("δ(S0, a)");
+    fireEvent.change(cell, { target: { value: "s1" } });
+    fireEvent.blur(cell);
+
+    expect(onTransitionChange).toHaveBeenLastCalledWith("S0", "a", "S1");
+  });
+
+  it("leaves the value alone while the cell is still being typed in", () => {
+    const onTransitionChange = vi.fn();
+    render(
+      <FATransitionTableEditor
+        program={defaultDFAProgram}
+        onTransitionChange={onTransitionChange}
+      />,
+    );
+
+    // Correcting per keystroke would turn "sF" into "S" after the first letter.
+    const cell = screen.getByLabelText("δ(S0, a)");
+    fireEvent.change(cell, { target: { value: "s" } });
+
+    expect(onTransitionChange).toHaveBeenLastCalledWith("S0", "a", "s");
+  });
+
+  it("restores the grammar converter's lowercase final state", () => {
+    const onTransitionChange = vi.fn();
+    render(
+      <FATransitionTableEditor
+        program={fromGrammar}
+        onTransitionChange={onTransitionChange}
+      />,
+    );
+
+    const cell = screen.getByLabelText("δ(A, 1)");
+    fireEvent.change(cell, { target: { value: "A, SF" } });
+    fireEvent.blur(cell);
+
+    // Uppercasing would have left "SF", which matches no state.
+    expect(onTransitionChange).toHaveBeenLastCalledWith("A", "1", "A, sF");
+  });
+
+  it("does not rewrite a target that matches no state", () => {
+    const onTransitionChange = vi.fn();
+    render(
+      <FATransitionTableEditor
+        program={defaultDFAProgram}
+        onTransitionChange={onTransitionChange}
+      />,
+    );
+
+    const cell = screen.getByLabelText("δ(S0, a)");
+    fireEvent.change(cell, { target: { value: "q9" } });
+    onTransitionChange.mockClear();
+    fireEvent.blur(cell);
+
+    expect(onTransitionChange).not.toHaveBeenCalled();
+  });
+});

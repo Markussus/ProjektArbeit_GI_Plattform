@@ -73,14 +73,14 @@ test.describe("Moore and Mealy simulation tab", () => {
     await page.keyboard.press("Enter");
 
     await expect(output).toHaveAttribute("data-value", "TEST");
-    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("7");
+    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("0");
     await expect(page.getByTestId("moore-output-alphabet")).toContainText(
-      "TEST7",
+      "TEST0",
     );
 
     await page.getByTestId("moore-representation-select").click();
     await page.getByTestId("moore-representation-option-binary").click();
-    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("111");
+    await expect(page.getByTestId("moore-output-code-0")).toHaveValue("0");
   });
 
   test("keeps Mealy outputs attached to transition cells", async ({ page }) => {
@@ -341,7 +341,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     const exercises = [
       ["moore-mealy.exercises.turnstile.title", "moore-config-view"],
       ["moore-mealy.exercises.elevator.title", "moore-config-view"],
-      ["moore-mealy.exercises.barrier.title", "moore-config-view"],
+      ["moore-mealy.exercises.trafficLight.title", "moore-config-view"],
       ["moore-mealy.exercises.vending.title", "moore-config-view"],
       ["moore-mealy.exercises.wiper.title", "moore-config-view"],
       ["moore-mealy.exercises.alarm.title", "moore-config-view"],
@@ -372,12 +372,12 @@ test.describe("Moore and Mealy simulation tab", () => {
       page
         .getByTestId("moore-config-view")
         .locator('[data-testid^="moore-state-name-"]'),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
     await expect(
       page
         .getByTestId("moore-config-view")
         .locator('[data-testid^="moore-input-symbol-"]'),
-    ).toHaveCount(0);
+    ).toHaveCount(2);
 
     await page.getByTestId("automata-check-solution").click();
     await expect(
@@ -409,12 +409,12 @@ test.describe("Moore and Mealy simulation tab", () => {
       page
         .getByTestId("moore-config-view")
         .locator('[data-testid^="moore-state-name-"]'),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
     await expect(
       page
         .getByTestId("moore-config-view")
         .locator('[data-testid^="moore-input-symbol-"]'),
-    ).toHaveCount(0);
+    ).toHaveCount(2);
   });
 
   test("returns to the free simulator after leaving an exercise", async ({
@@ -471,7 +471,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await openExercise(page, "moore-mealy.exercises.turnstile.title");
     await expect(
       page.getByTestId("moore-config-view").getByTestId("moore-state-name-0"),
-    ).toHaveValue("STATE_0");
+    ).toHaveValue("LOCKED");
 
     await page.getByTestId("tab-button-exercises").click();
     await openExercise(page, "moore-mealy.exercises.edgeDetector.title");
@@ -493,7 +493,7 @@ test.describe("Moore and Mealy simulation tab", () => {
     await openExercise(page, "moore-mealy.exercises.edgeDetector.title");
     await expect(
       page.getByTestId("mealy-config-view").getByTestId("moore-state-name-0"),
-    ).toHaveValue("STATE_0");
+    ).toHaveValue("LOW");
   });
 
   test("opens transition/output functions and returns to the editor", async ({

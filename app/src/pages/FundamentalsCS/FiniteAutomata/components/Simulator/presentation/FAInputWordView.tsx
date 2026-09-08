@@ -29,6 +29,7 @@ const SYMBOL_PHASE_CLASS: Record<SymbolPhase, string> = {
   stopped: "border-border bg-muted/30 text-muted-foreground opacity-40",
 };
 
+/** The input word as a tape, with the read head on the current symbol. */
 export function FAInputWordView({ runtime }: FAInputWordViewProps) {
   const { t } = useTranslation();
 

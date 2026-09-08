@@ -14,6 +14,7 @@ export function modeForImportedTask(
   )?.[0] as SimulationMode | undefined;
 }
 
+/** Whatever the page currently has open; any of it can dictate the mode. */
 export interface RLSimulatorSelection {
   exercise?: RLExerciseDefinition | null;
   example?: RLExample | null;
@@ -21,9 +22,8 @@ export interface RLSimulatorSelection {
 }
 
 /**
- * An open exercise or example dictates the mode: it is the more specific
- * choice, and `importedTaskStorageId` lingers after an import, so letting the
- * import win here would leave a later task without its editor.
+ * An exercise or example outranks `importedTaskStorageId`, which is never
+ * cleared — otherwise a later exercise would open in the imported task's mode.
  */
 export function resolveInitialMode(
   selection: RLSimulatorSelection,
@@ -37,13 +37,10 @@ export function resolveInitialMode(
 }
 
 /**
- * The active editor mode, kept in step with whatever the page hands down.
- *
- * Both adoptions happen during render rather than in an effect, the same way
- * the input cards adopt seeded values: a freshly imported task brings its own
- * mode, and so does a newly picked exercise or example. Without them the
- * simulator keeps the mode its initialiser computed once, and the task's
- * editor never appears.
+ * The active editor mode, kept in step with what the page hands down. Both
+ * adoptions happen during render rather than in an effect: without them the mode
+ * stays whatever the initialiser computed once, and the new task's editor never
+ * appears.
  */
 export function useRLSimulatorMode(selection: RLSimulatorSelection) {
   const { exercise, example, importedTaskStorageId } = selection;

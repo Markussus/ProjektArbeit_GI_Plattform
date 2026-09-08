@@ -2,9 +2,8 @@ import type { ProductionRule, RegularGrammar } from "./rlTypes";
 
 /**
  * Naming and emission rules shared by everything that builds a right-linear
- * grammar here — the prefix-tree builders, the set-builder walker, the
- * minimiser and the transfer codec. Keeping them in one place is what lets a
- * grammar survive an export/import round trip with the same names it had.
+ * grammar here. One place for them is what lets a grammar survive an
+ * export/import round trip with the same names.
  */
 export const NON_TERMINAL_NAMES = {
   /** The start symbol. Held out of {@link NON_TERMINAL_NAMES.sequence}
@@ -40,10 +39,9 @@ export interface GrammarGraph<TNode> {
 }
 
 /**
- * Breadth-first walk from the start node, naming nodes S, A, B, C, … in the
- * order they are reached. The folded node never gets a name — edges into it
- * become terminal-only rules — and nodes unreachable from the start are simply
- * never enqueued, so they drop out of the grammar.
+ * Breadth-first from the start node, naming nodes S, A, B, C, … in the order they
+ * are reached. The folded node stays unnamed; unreachable nodes are never
+ * enqueued.
  */
 function assignNonTerminalNames<TNode>({
   start,
@@ -82,10 +80,8 @@ function productionsOf<TNode>(
 }
 
 /**
- * Walk a grammar graph breadth-first from its start node, name the nodes
- * S, A, B, C, … in the order they are reached, and read the productions off
- * the edges. Nodes unreachable from the start are dropped: they cannot
- * contribute to any derivation.
+ * Walk a grammar graph breadth-first, name the nodes S, A, B, C, … and read the
+ * productions off the edges. Unreachable nodes are dropped.
  */
 export function emitRightLinearGrammar<TNode>(
   graph: GrammarGraph<TNode>,

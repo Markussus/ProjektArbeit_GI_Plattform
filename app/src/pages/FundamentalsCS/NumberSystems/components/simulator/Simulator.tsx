@@ -14,14 +14,7 @@ import { FractionalConverter } from "./FractionalConverter";
 import { ArithmeticMode } from "./arithmetic";
 import type { TopicItem } from "@/types/exercise";
 import { cn } from "@/lib/utils";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import { numberSystemsExercises } from "../../exercises";
 import { nsTransferCodec } from "./nsTransferCodec";
@@ -228,7 +221,6 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
         };
       },
     );
-    const [isStorageReady, setIsStorageReady] = useState(false);
     const [loadVersion, setLoadVersion] = useState(0);
     const activeMode = simulatorState.activeMode;
 
@@ -239,10 +231,11 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
     useEffect(() => {
       const nextResolved = resolveExerciseInitialState(selectedExercise);
       setResolvedState(nextResolved);
-      setSimulatorState((prev) => ({
-        ...prev,
-        activeMode: nextResolved.activeMode,
-      }));
+      setSimulatorState((prev) =>
+        prev.activeMode === nextResolved.activeMode
+          ? prev
+          : { ...prev, activeMode: nextResolved.activeMode },
+      );
     }, [selectedExercise]);
 
     const { isExerciseMode, showSolution } = resolvedState;
@@ -269,62 +262,27 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
           (ex) => ex.titleKey === selectedExercise.id,
         )
       : -1;
-    const taskStorageId =
-      exerciseIndex >= 0 ? exerciseIndex : SIMULATOR_TASK_STORAGE_ID;
+    const taskStorageId = exerciseIndex >= 0 ? exerciseIndex : undefined;
 
-    const storageIdentifier = createTrainingCenterIdentifier(
-      TOPIC_STORAGE_IDS.numberSystems,
-      taskStorageId,
+    const restoreSimulatorState = useCallback(
+      (storedState: NumberSystemState) => {
+        const nextState = { ...storedState };
+        if (selectedExercise) {
+          nextState.activeMode = getInitialActiveMode(selectedExercise.id);
+        }
+        setSimulatorState(nextState);
+        setLoadVersion((version) => version + 1);
+      },
+      [selectedExercise],
     );
 
-    useActiveSimulatorTransfer({
-      identifier: storageIdentifier,
-      value: simulatorState,
+    const { clear: clearStoredState } = useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.numberSystems,
+      taskStorageId,
       codec: nsTransferCodec,
-    });
-
-    useEffect(() => {
-      let isCancelled = false;
-
-      setIsStorageReady(false);
-
-      if (!isStorageEnabled) {
-        return;
-      }
-
-      void loadTrainingCenterValue(storageIdentifier, nsTransferCodec)
-        .then((storedState) => {
-          if (!isCancelled && storedState) {
-            setSimulatorState(() => {
-              const nextState = { ...storedState };
-              if (selectedExercise) {
-                nextState.activeMode = getInitialActiveMode(
-                  selectedExercise.id,
-                );
-              }
-              return nextState;
-            });
-            setLoadVersion((v) => v + 1);
-          }
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          if (!isCancelled) {
-            setIsStorageReady(true);
-          }
-        });
-
-      return () => {
-        isCancelled = true;
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isStorageEnabled, storageIdentifier]);
-
-    useTrainingCenterAutoSave({
-      identifier: storageIdentifier,
       value: simulatorState,
-      codec: nsTransferCodec,
-      enabled: isStorageEnabled && isStorageReady,
+      onRestore: restoreSimulatorState,
+      enabled: isStorageEnabled,
     });
 
     const handleTabClick = (mode: SimulatorMode) => {
@@ -341,9 +299,7 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
     );
 
     const resetStoredState = useCallback(() => {
-      if (isStorageEnabled) {
-        trainingCenterStorage.delete(storageIdentifier);
-      }
+      clearStoredState();
 
       setSimulatorState({
         activeMode: selectedExercise
@@ -351,7 +307,7 @@ export const Simulator = forwardRef<SimulatorHandle, SimulatorProps>(
           : "integers",
       });
       setLoadVersion((v) => v + 1);
-    }, [isStorageEnabled, storageIdentifier, selectedExercise]);
+    }, [clearStoredState, selectedExercise]);
 
     useImperativeHandle(
       ref,

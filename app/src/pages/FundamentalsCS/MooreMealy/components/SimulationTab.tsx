@@ -121,6 +121,7 @@ function AutomataSimulatorPanels({
   mooreExerciseScenario,
   mealyExerciseScenario,
   mooreInitialProgram,
+  mealyInitialProgram,
   isMooreExample,
   isMealyExample,
   storageEnabled,
@@ -137,6 +138,7 @@ function AutomataSimulatorPanels({
     { machineType: "mealy" }
   > | null;
   mooreInitialProgram: typeof defaultMooreProgram | undefined;
+  mealyInitialProgram: typeof defaultMealyProgram | undefined;
   isMooreExample: boolean;
   isMealyExample: boolean;
   storageEnabled: boolean;
@@ -166,7 +168,7 @@ function AutomataSimulatorPanels({
           }
           ref={onMealySimulatorReady}
           scenario={mealyExerciseScenario}
-          initialProgram={isMealyExample ? defaultMealyProgram : undefined}
+          initialProgram={mealyInitialProgram}
           storageEnabled={storageEnabled}
           isExample={isMealyExample}
           transferActive={activeMachineType === "mealy"}
@@ -206,14 +208,14 @@ function useAutomataSimulatorRefs() {
   };
 }
 
-function AutomataSimulationBody({
+function AutomataSimulationWorkspace({
   simulationContext,
   onMachineTypeChange,
   onMooreSimulatorReady,
   onMealySimulatorReady,
 }: {
   simulationContext: ReturnType<typeof resolveAutomataSimulationContext>;
-  onMachineTypeChange: (machineType: MachineType) => void;
+  onMachineTypeChange: (nextType: MachineType) => void;
   onMooreSimulatorReady: (handle: MooreSimulatorHandle | null) => void;
   onMealySimulatorReady: (handle: MealySimulatorHandle | null) => void;
 }) {
@@ -255,6 +257,7 @@ function AutomataSimulationBody({
         mooreExerciseScenario={simulationContext.mooreExerciseScenario}
         mealyExerciseScenario={simulationContext.mealyExerciseScenario}
         mooreInitialProgram={simulationContext.mooreInitialProgram}
+        mealyInitialProgram={simulationContext.mealyInitialProgram}
         isMooreExample={simulationContext.isMooreExample}
         isMealyExample={simulationContext.isMealyExample}
         storageEnabled={simulationContext.storageEnabled}
@@ -266,20 +269,35 @@ function AutomataSimulationBody({
 }
 
 export function SimulationTab(props: ModuleSimulationTabProps) {
-  const exerciseScenario = useMemo(
-    () =>
-      props.selectedExercise
-        ? getAutomataExerciseScenario(props.selectedExercise.id)
-        : null,
-    [props.selectedExercise],
-  );
+  const exerciseScenario = useMemo(() => {
+    if (props.selectedExercise) {
+      return getAutomataExerciseScenario(props.selectedExercise.id);
+    }
+    return props.selectedItem?.kind === "exercise"
+      ? getAutomataExerciseScenario(props.selectedItem.id)
+      : null;
+  }, [props.selectedExercise, props.selectedItem]);
+
+  const isMealyExample = props.selectedItem?.id === MEALY_EXAMPLE_ID;
+
   const [machineType, setMachineType] = useState<MachineType>(() =>
     resolveInitialMachineType({
       exerciseScenario,
-      isMealyExample: props.selectedItem?.id === MEALY_EXAMPLE_ID,
+      isMealyExample,
       importedTaskStorageId: props.importedTaskStorageId,
     }),
   );
+
+  const simulationContext = useMemo(
+    () =>
+      resolveAutomataSimulationContext({
+        exerciseScenario,
+        selectedItemId: props.selectedItem?.id,
+        machineType,
+      }),
+    [exerciseScenario, machineType, props.selectedItem?.id],
+  );
+
   const {
     isMooreSimulatorReady,
     isMealySimulatorReady,
@@ -288,18 +306,19 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     handleMooreSimulatorRef,
     handleMealySimulatorRef,
   } = useAutomataSimulatorRefs();
-  const simulationContext = resolveAutomataSimulationContext({
-    exerciseScenario,
-    selectedItemId: props.selectedItem?.id,
-    machineType,
-  });
-  const { activeMachineType } = simulationContext;
-  const activeSimulatorReady =
-    exerciseScenario?.machineType === "mealy"
-      ? isMealySimulatorReady
-      : isMooreSimulatorReady;
 
-  const solutionActions = useAutomataSolutionActions({
+  const activeSimulatorReady =
+    simulationContext.activeMachineType === "moore"
+      ? isMooreSimulatorReady
+      : isMealySimulatorReady;
+
+  const {
+    checkResult,
+    isChecking,
+    checkSolution,
+    loadSolution,
+    clearCheckResult,
+  } = useAutomataSolutionActions({
     exerciseScenario,
     activeSimulatorReady,
     mooreSimulatorRef,
@@ -310,28 +329,27 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
     <>
       <TopicSimulationTab
         {...props}
-        selectedItem={props.selectedItem}
+        emptyStateTextKey="common.simulation.emptyStates.moore"
         selectedItemActions={
           exerciseScenario ? (
             <AutomataExerciseActions
-              isChecking={solutionActions.isChecking}
+              isChecking={isChecking}
               simulatorReady={activeSimulatorReady}
-              onCheckSolution={solutionActions.checkSolution}
-              onLoadSolution={solutionActions.loadSolution}
+              onCheckSolution={checkSolution}
+              onLoadSolution={loadSolution}
             />
           ) : undefined
         }
-        emptyStateTextKey="common.simulation.emptyStates.moore"
         onReset={() => {
-          solutionActions.clearCheckResult();
-          if (activeMachineType === "moore") {
+          clearCheckResult();
+          if (simulationContext.activeMachineType === "moore") {
             mooreSimulatorRef.current?.resetStoredState();
           } else {
             mealySimulatorRef.current?.resetStoredState();
           }
         }}
       >
-        <AutomataSimulationBody
+        <AutomataSimulationWorkspace
           simulationContext={simulationContext}
           onMachineTypeChange={setMachineType}
           onMooreSimulatorReady={handleMooreSimulatorRef}
@@ -339,8 +357,8 @@ export function SimulationTab(props: ModuleSimulationTabProps) {
         />
       </TopicSimulationTab>
       <AutomataSolutionCheckDialog
-        checkResult={solutionActions.checkResult}
-        onClose={solutionActions.clearCheckResult}
+        checkResult={checkResult}
+        onClose={clearCheckResult}
       />
     </>
   );

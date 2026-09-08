@@ -24,13 +24,9 @@
       "title": "Fahrstuhlsteuerung",
       "description": "Vervollständige den Moore-Automaten für einen Fahrstuhl mit Erdgeschoss, Obergeschoss und offener oder geschlossener Tür. Fahrbefehle dürfen bei offener Tür den Zustand nicht ändern."
     },
-    "barrier": {
-      "title": "Schranke zur Tiefgarage",
-      "description": "Modelliere die Schranke mit dauerhaft geöffnetem Gästemodus und Kartenmodus. Eine gültige Karte öffnet die Schranke; nach der Durchfahrt schließt sie wieder."
-    },
     "vending": {
       "title": "Getränkeautomat",
-      "description": "Vervollständige den Automaten für 50-Cent- und 1-Euro-Münzen, Guthaben bis 1,50 Euro, Start und Abbrechen. Berücksichtige alle Ereignisse in jedem Zustand."
+      "description": "Vervollständige den Moore-Automaten für 50-Cent- und 1-Euro-Münzen für Getränke zu 1,00 € und 1,50 €. Zu hoher Einwurf (über 1,50 €) oder Abbrechen (CANCEL) führt in den Rückgabezustand REFUND (Geld wird ausgeworfen), aus dem über START oder CANCEL neu gestartet werden muss. Unter 1,00 € hat START keine Wirkung."
     },
     "wiper": {
       "title": "Scheibenwischersteuerung",
@@ -46,11 +42,11 @@
     },
     "edgeDetector": {
       "title": "Flankendetektor",
-      "description": "Entwirf einen Mealy-Automaten, der nur beim Wechsel des Eingangssignals von 0 auf 1 einen Impuls RISING_EDGE ausgibt. Bleibt das Signal unverändert oder fällt es auf 0, wird NO_PULSE ausgegeben."
+      "description": "Entwirf einen Mealy-Automaten mit Startzustand HIGH (Ruhezustand). Nur beim Wechsel des Eingangssignals von 0 auf 1 wird ein Impuls RISING_EDGE ausgegeben. Bleibt das Signal unverändert oder fällt es auf 0, wird NO_PULSE ausgegeben."
     },
     "doorController": {
       "title": "Türsteuerung mit Aktionsimpulsen",
-      "description": "Modelliere eine verriegelte und eine entriegelte Tür als Mealy-Automaten. CARD erzeugt nur beim Entriegeln einen UNLOCK_PULSE; PASS erzeugt nur beim erneuten Verriegeln einen LOCK_PULSE. Wirkunglose Ereignisse liefern NO_ACTION."
+      "description": "Modelliere eine verriegelte und eine entriegelte Tür als Mealy-Automaten (Startzustand LOCKED). CARD erzeugt beim Entriegeln einen UNLOCK_PULSE. Das Durchgehen nach geöffneter Tür (PASS im Zustand UNLOCKED) triggert ein LOCK_PULSE-Signal und verriegelt die Tür wieder (LOCKED). Wirkunglose Ereignisse (z. B. PASS bei bereits verriegelter Tür) liefern NO_ACTION."
     },
     "sequenceDetector": {
       "title": "Folgendetektor für 01",
@@ -59,6 +55,10 @@
     "parityTracker": {
       "title": "Serielle Paritätsausgabe",
       "description": "Entwirf einen Mealy-Automaten, der nach jedem eingelesenen Bit die Parität aller bisher gelesenen Einsen ausgibt. Eine 0 erhält die Parität, eine 1 wechselt zwischen EVEN_PARITY und ODD_PARITY."
+    },
+    "trafficLight": {
+      "title": "Ampelsteuerung",
+      "description": "Modelliere eine Ampelsteuerung mit den vier typischen Phasen RED, RED_YELLOW, GREEN und YELLOW. Mit dem Taktsignal TICK schaltet die Ampel zyklisch in die nächste Phase weiter. Das Signal HOLD hält die Ampel in der aktuellen Phase (z. B. für eine Grünphase). Mit RESET springt die Ampel aus jedem Zustand sicher in die Ausgangsphase RED zurück."
     }
   },
   "groups": {
@@ -191,6 +191,6 @@
     "diagram": "Logikgatterdiagramm für {{output}}",
     "binaryGates": "Nur Gatter mit zwei Eingängen",
     "minimizationUnavailable": "Für diese Variablenzahl ist keine automatische Gatter-Minimierung verfügbar.",
-    "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT. Falstad-Export: TODO."
+    "iecHint": "Darstellung nach IEC-Konvention: & = UND, ≥1 = ODER, 1 mit Ausgangskreis = NICHT."
   }
 }

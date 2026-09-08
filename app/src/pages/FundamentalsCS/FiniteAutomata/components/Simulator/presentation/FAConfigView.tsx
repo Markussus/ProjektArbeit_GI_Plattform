@@ -5,6 +5,7 @@ import type { UseFAConfigEditorResult } from "../application/useFAConfigEditor";
 import type { FAProgramIssueCode } from "../domain/faProgramValidation";
 import { FATransitionTableEditor } from "./FATransitionTableEditor";
 
+/** Comma-separated text field for a set of states or symbols. */
 function ArrayInput({
   value,
   onChange,
@@ -34,6 +35,7 @@ function ArrayInput({
         setLocalValue(e.target.value);
         onChange(e.target.value);
       }}
+      onBlur={() => setLocalValue(value.join(", "))}
       className={className}
       placeholder={placeholder}
     />
@@ -44,6 +46,7 @@ export interface FAConfigViewProps {
   editor: UseFAConfigEditorResult;
 }
 
+/** Editor panel: type, the state/symbol sets and the transition table. */
 export function FAConfigView({ editor }: FAConfigViewProps) {
   const { t } = useTranslation();
 

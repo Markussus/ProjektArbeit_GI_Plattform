@@ -12,6 +12,8 @@ describe("i18n configuration and translations", () => {
     expect(DEFAULT_LANGUAGE).toBe("de");
     expect(supportedLanguages).toContain("de");
     expect(supportedLanguages).toContain("en");
+    expect(supportedLanguages).toContain("tr");
+    expect(supportedLanguages).toContain("uk");
   });
 
   it("normalizes unknown browser languages to the de fallback", () => {
@@ -20,6 +22,8 @@ describe("i18n configuration and translations", () => {
     expect(normalizeSupportedLanguage(undefined)).toBe("de");
     expect(normalizeSupportedLanguage("de-DE")).toBe("de");
     expect(normalizeSupportedLanguage("en-US")).toBe("en");
+    expect(normalizeSupportedLanguage("tr-TR")).toBe("tr");
+    expect(normalizeSupportedLanguage("uk-UA")).toBe("uk");
   });
 
   it("has all topic keys immediately available in German", async () => {
@@ -65,6 +69,30 @@ describe("i18n configuration and translations", () => {
       }
     }
   });
+
+  it.each([
+    ["tr", "Turing Makineleri"],
+    ["uk", "Машини Тюрінга"],
+  ] as const)(
+    "has all topic keys immediately available in %s after language switch",
+    async (language, expectedTuringTitle) => {
+      await i18n.changeLanguage(language);
+      expect(i18n.language).toBe(language);
+      expect(i18n.t("turing-machine.topic.title")).toBe(expectedTuringTitle);
+
+      for (const module of learningModules) {
+        expect(i18n.t(module.titleKey)).not.toBe(module.titleKey);
+        expect(i18n.t(module.descriptionKey)).not.toBe(module.descriptionKey);
+
+        for (const topic of module.topics) {
+          expect(i18n.t(topic.titleKey)).not.toBe(topic.titleKey);
+          if (topic.descriptionKey) {
+            expect(i18n.t(topic.descriptionKey)).not.toBe(topic.descriptionKey);
+          }
+        }
+      }
+    },
+  );
 
   it("falls back to German when an unsupported language is requested", async () => {
     await i18n.changeLanguage("fr");

@@ -15,58 +15,71 @@
 
 % ---------------------------------------------------------------------------
 \begin{itemframe}{Kodierung konfigurieren}
-  \item Zwei Verfahren vollständig umgesetzt: \textbf{UTF-8} und \textbf{Base64}
-  \item Freier Text oder Übungsaufgabe als Eingabe -- Ver- und Entschlüsselung unterstützt
-  \item Strenge Decodierung: \textit{Overlong Encodings} werden als Sicherheitsrisiko abgelehnt, nicht druckbare Zeichen erscheinen als Escape-Sequenzen
-  \item Übungen dynamisch generiert (easy = ASCII, medium = 2-Byte, hard = 3-Byte-Unicode) -- Fortschritt dabei bewusst nicht persistent
-  \item Zustand nur im freien Simulator automatisch gespeichert
+  \item Zwei Verfahren: \textbf{UTF-8} und \textbf{Base64}
+  \item Freier Text oder dynamische Übung als Eingabe
+  \item Kodieren und Dekodieren in beide Richtungen möglich
+  \item Aufklappbare Zwischenschritte mit Farbcodierung
+  \item Dynamische Übungen nach Schwierigkeit (easy / medium / hard)
+  \note{
+    \textbf{Person: Enrico}
+
+    \textbf{Zeit: 1 min}
+
+    \begin{itemize}
+      \item Modul kam auf Wunsch des Auftraggebers zusätzlich hinzu
+      \item Eingabe wählbar: freier Text oder Übung
+      \item Verfahren + Richtung (kodieren / dekodieren) wählbar
+      \item Details aufklappbar: UTF-8 (Codepoints, Steuerbits, Hex) oder Base64 (6-Bit, Alphabet, Padding)
+      \item Farbcodierung hilft, Bit-Muster zu erkennen
+      \item Übungen dynamisch generiert, nicht persistent -- bewusst als Wegwerf-Tests
+      \item Freier Simulator speichert dagegen automatisch
+      \item Überleitung: "Wie läuft das konkret in der App ab?"
+    \end{itemize}
+  }
 \end{itemframe}
-\note{%
-  Einstieg: Kodierung kam später dazu, auf Wunsch des Auftraggebers --
-  im Lastenheft war sie nicht vorgesehen.
-  Besonderheit gegenüber anderen Modulen: Übungen sind ephemer und werden
-  nicht dauerhaft gespeichert, der freie Simulator dagegen schon.
-  Überleitung: "Wie sieht die Transformation im Detail aus?"
-}
+
 
 % ---------------------------------------------------------------------------
-\begin{contentsframe}{Transformationsschritte}
+\begin{contentsframe}{Ablauf in der App}
 \centering
 \vspace{1mm}
-\resizebox{0.9\textwidth}{!}{%
-\begin{tikzpicture}[node distance=11mm and 9mm]
-  % UTF-8 pipeline (top)
-  \node[diagramnode, minimum width=2.7cm, font=\normalsize] (text) {Rohtext};
-  \node[diagramnode, right=of text, minimum width=3.0cm, font=\normalsize] (cps) {Codepoints\\via \texttt{Array.from()}};
-  \node[diagramnode, right=of cps, minimum width=2.9cm, font=\normalsize] (utf8) {UTF-8-Bytes\\Steuerbits + Nutzbits};
-  \node[diagramnode, right=of utf8, minimum width=2.4cm, font=\normalsize] (hex) {Hex-Darstellung};
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[node distance=15mm and 11mm]
+  \node[diagramnode, minimum width=3.0cm, font=\normalsize] (input) {Eingabe\\wählen};
+  \node[diagramnode, right=of input, minimum width=3.3cm, font=\normalsize] (mode) {Verfahren +\\Richtung\\wählen};
+  \node[diagramnode, right=of mode, minimum width=3.2cm, font=\normalsize] (steps) {Aufklappbare\\Transformationsschritte};
+  \node[diagramnode, right=of steps, minimum width=3.0cm, font=\normalsize] (validate) {Validierung\\+ Feedback};
 
-  \draw[diagramarrow] (text) -- (cps);
-  \draw[diagramarrow] (cps) -- (utf8);
-  \draw[diagramarrow] (utf8) -- (hex);
+  \node[diagramnode, below=18mm of mode, minimum width=3.3cm, font=\normalsize] (details) {UTF-8: Codepoints /\\Steuerbits / Hex\\Base64: 6-Bit /\\Alphabet / Padding};
 
-  % Base64 pipeline (bottom)
-  \node[diagramnode, below=13mm of text, minimum width=2.7cm, font=\normalsize] (ascii) {ASCII-Bytes};
-  \node[diagramnode, right=of ascii, minimum width=3.0cm, font=\normalsize] (bits8) {8-Bit-Verkettung};
-  \node[diagramnode, right=of bits8, minimum width=2.9cm, font=\normalsize] (bits6) {6-Bit-Aufteilung};
-  \node[diagramnode, right=of bits6, minimum width=2.4cm, font=\normalsize] (b64) {Alphabet +\\Padding};
-
-  \draw[diagramarrow] (ascii) -- (bits8);
-  \draw[diagramarrow] (bits8) -- (bits6);
-  \draw[diagramarrow] (bits6) -- (b64);
+  \draw[diagramarrow] (input) -- (mode);
+  \draw[diagramarrow] (mode) -- (steps);
+  \draw[diagramarrow] (steps) -- (validate);
+  \draw[diagramarrow] (steps) -- (details);
 \end{tikzpicture}%
 }
 
 \vspace{2mm}
-{\footnotesize Jeder Pfeil steht für eine eigene aufklappbare Ansicht --
-Studierende entscheiden selbst, wie tief sie einsteigen.
-Bewusst keine Animationen: die Schritte bleiben statisch und im eigenen Tempo nachvollziehbar.}
-\end{contentsframe}
-\note{%
-  Zwei Pipelines explizit getrennt zeigen: dieselbe didaktische Struktur,
-  aber unterschiedliche fachliche Stufen.
-  Bei UTF-8 die \texttt{Array.from()}-Entscheidung erwähnen: sichere Iteration
-  über Codepoints vermeidet Surrogate-Pair-Fehler bei Emojis.
-  Rückfrage: "Warum keine Animation?" -- weil kontrollierbares Tempo
-  didaktisch mehr bringt als automatisch ablaufende Schritte.
+{\footnotesize Jeder Zwischenschritt ist aufklappbar -- Studierende entscheiden selbst,
+wie tief sie einsteigen. Bewusst keine Animationen: Schritte bleiben statisch und im eigenen Tempo nachvollziehbar.}
+
+\note{
+  \textbf{Person: Enrico}
+
+  \textbf{Zeit: 1 min}
+
+  \begin{itemize}
+    \item Ablauf in der App, nicht nur der Algorithmus
+    \item Eingabe: freier Text oder Übungsaufgabe
+    \item Verfahren wählen: UTF-8 oder Base64; Richtung: kodieren / dekodieren
+    \item Darstellung: aufklappbare Stufen mit Farbcodierung (z.\,B. UTF-8 Steuerbits rot, Nutzbits blau)
+    \item Details je nach Verfahren:
+      \begin{itemize}
+        \item UTF-8: Codepoints, Steuerbits, Hex-Darstellung
+        \item Base64: 8-Bit $\rightarrow$ 6-Bit, Alphabet, Padding
+      \end{itemize}
+    \item Keine Animationen -- statisch, eigenes Tempo, besser für Verständnis
+    \item Validierungspanel gibt Lösung erst bei korrekter Eingabe frei
+  \end{itemize}
 }
+\end{contentsframe}

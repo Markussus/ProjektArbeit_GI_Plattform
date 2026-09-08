@@ -12,6 +12,7 @@ import { findFAExercise } from "../exercises/faExerciseDefinitions";
 import { findFAExample } from "./Simulator/config/faExamples";
 import { FACheckSummary } from "./FACheckSummary";
 
+/** Simulation tab: the simulator plus an exercise's header buttons. */
 export function SimulationTab(props: ModuleSimulationTabProps) {
   const { t } = useTranslation();
   const simulatorRef = useRef<FASimulatorHandle>(null);

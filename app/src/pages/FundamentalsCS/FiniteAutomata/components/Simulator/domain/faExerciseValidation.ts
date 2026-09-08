@@ -3,10 +3,8 @@ import { epsilonClosure } from "./faMachine";
 import { validateFAProgram } from "./faProgramValidation";
 
 /* ────────────────────────────────────────────────────────────
-   Acceptance check shared by both programs so the same evaluator
-   is used regardless of DFA/NFA type. This is the set-at-a-time
-   equivalent of stepping `faMachine`, without building the step
-   history a run needs — validation only cares about the verdict.
+   Acceptance check shared by both programs — the set-at-a-time
+   equivalent of stepping `faMachine`, without the step history.
    ──────────────────────────────────────────────────────────── */
 
 function step(program: FAProgram, active: string[], symbol: string): string[] {
@@ -40,10 +38,9 @@ function createAcceptor(program: FAProgram): (word: string) => boolean {
   };
 }
 
-/* ────────────────────────────────────────────────────────────
-   Test-string enumeration over a shared alphabet
-   ──────────────────────────────────────────────────────────── */
-
+/*
+ * Test-string enumeration over a shared alphabet
+ */
 function enumerateWords(alphabet: string[], maxLen: number): string[] {
   const words: string[] = [""];
   let frontier: string[] = [""];
@@ -58,10 +55,9 @@ function enumerateWords(alphabet: string[], maxLen: number): string[] {
   return words;
 }
 
-/* ────────────────────────────────────────────────────────────
-   Public API: compare student vs. reference automaton
-   ──────────────────────────────────────────────────────────── */
-
+/*
+ * Public API: compare student vs. reference automaton
+ */
 export interface TestCase {
   word: string;
   expected: boolean;
@@ -75,11 +71,9 @@ export interface ValidationResult {
   total: number;
   passedCount: number;
   failedCount: number;
-  /** The first failing test, if any — used as the counterexample in UI. */
   firstFailure: TestCase | null;
   /** Full per-word detail (capped by maxSamples for UI display). */
   cases: TestCase[];
-  /** Structural issues in the student's program (invalid transitions, etc). */
   structuralIssues: string[];
 }
 
@@ -90,6 +84,7 @@ export interface ValidateOptions {
   maxSamples?: number;
 }
 
+/** Compare both automata on every word up to `maxLen`. */
 export function validateAgainstSolution(
   student: FAProgram,
   solution: FAProgram,
@@ -97,9 +92,6 @@ export function validateAgainstSolution(
 ): ValidationResult {
   const maxLen = options.maxLen ?? 4;
   const maxSamples = options.maxSamples ?? 50;
-
-  // Surface structural problems first — they're usually the real reason an
-  // automaton fails, and blaming test-string mismatches would be misleading.
   const structuralIssues: string[] = [];
   const studentIssues = validateFAProgram(student);
   for (const issue of studentIssues) {
@@ -120,8 +112,6 @@ export function validateAgainstSolution(
 
   for (const word of words) {
     const expected = solutionAccepts(word);
-    // If the student's alphabet doesn't cover a symbol, the acceptor returns
-    // false — which is a legitimate rejection to report, not a crash.
     const got = studentAccepts(word);
     const passed = expected === got;
     const tc: TestCase = { word, expected, got, passed };

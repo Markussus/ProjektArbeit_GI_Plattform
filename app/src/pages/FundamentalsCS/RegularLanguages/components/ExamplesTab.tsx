@@ -80,6 +80,7 @@ export function ExamplesTab({
   );
 }
 
+/** Adapt an RL example to the card shape the shared topic components expect. */
 function toTopicExample(
   example: RLExample,
   t: (key: TranslationKey) => string,

@@ -12,6 +12,7 @@ interface FASimulatorConfig {
   inputWord: string[];
 }
 
+/** One run on the shared engine; a new program or word resets it. */
 export function useFASimulator(program: FAProgram, inputWord: string) {
   const simulator = useMemo(() => new FiniteAutomatonSimulator(), []);
   const config: FASimulatorConfig = useMemo(
@@ -27,10 +28,11 @@ export function useFASimulator(program: FAProgram, inputWord: string) {
 
   const jumpToStep = useCallback(
     (stepIndex: number) => {
-      simulator.jumpToStep(stepIndex);
-      engine.forceStateRefresh();
+      engine.executeAction((sim) => {
+        (sim as FiniteAutomatonSimulator).jumpToStep(stepIndex);
+      });
     },
-    [simulator, engine],
+    [engine],
   );
 
   return {
@@ -49,6 +51,7 @@ export function useFASimulator(program: FAProgram, inputWord: string) {
   };
 }
 
+/** Engine adapter; snapshots are cloned so a step cannot mutate the history. */
 class FiniteAutomatonSimulator implements ISimulator<
   FASimulatorConfig,
   FARuntime
