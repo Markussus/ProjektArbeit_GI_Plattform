@@ -5,15 +5,10 @@ import type { FAProgram } from "./faTypes";
  * Result of running a single word through the automaton to completion.
  */
 export interface FABatchResult {
-  /** The original input string */
   inputWord: string;
-  /** Whether the word was accepted */
   accepted: boolean;
-  /** How many simulation steps were taken */
   steps: number;
-  /** Final active states when halted */
   finalStates: string[];
-  /** Index of the step where no transition was available (dead end), or null */
   failStepIndex: number | null;
 }
 

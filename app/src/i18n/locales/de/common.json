@@ -12,7 +12,7 @@
     "confirmResetAllProgress": "Alle gespeicherten Fortschritte löschen?"
   },
   "app": {
-    "title": "THWS - Traingscenter"
+    "title": "THWS - Trainingscenter"
   },
   "nav": {
     "home": "TRAININGSCENTER"
@@ -40,7 +40,9 @@
   "language": {
     "select": "Sprache auswählen",
     "de": "Deutsch",
-    "en": "Englisch"
+    "en": "Englisch",
+    "tr": "Türkisch",
+    "uk": "Ukrainisch"
   },
   "tabs": {
     "overview": "Übersicht",
@@ -58,7 +60,7 @@
   "legal": {
     "label": "Rechtliches",
     "title": "Drittanbieter-Hinweise",
-    "description": "Lizenz- und Quelleninformationen fuer eingebundene Compiler-Komponenten und zugehoerige Abhaengigkeiten.",
+    "description": "Lizenz- und Quelleninformationen für eingebundene Compiler-Komponenten und zugehörige Abhängigkeiten.",
     "summary": "Diese Anwendung nutzt einen browserbasierten Java-Compiler auf Basis von teavm-javac. Wir verwenden die offiziellen, per SHA-256 kryptografisch verifizierten WebAssembly-Compiler-Artefakte von TeaVM. Das Compiler-Modul enthält OpenJDK javac unter GNU GPLv2 mit Classpath Exception sowie TeaVM-Komponenten unter Apache License 2.0. Es wurden keine OpenJDK-Quelldateien verändert."
   },
   "exercise": {
@@ -151,7 +153,7 @@
     },
     "programming1": {
       "title": "Programmieren 1",
-      "description": "Dieses Modul fuehrt in die ersten Programmiergrundlagen ein. Starten Sie mit einfachen Java-Aufgaben und einem direkten Editor."
+      "description": "Dieses Modul führt in die ersten Programmiergrundlagen ein. Starten Sie mit einfachen Java-Aufgaben und einem direkten Editor."
     },
     "moreComingSoon": "Mehr Module folgen bald",
     "moreComingSoonDescription": "Weitere Lernmodule werden in zukünftigen Versionen ergänzt."

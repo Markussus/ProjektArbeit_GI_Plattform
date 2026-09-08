@@ -15,18 +15,25 @@
 
 % ---------------------------------------------------------------------------
 \begin{itemframe}{Zahlensysteme konfigurieren}
-  \item Fünf Modi: \textit{Integers}, \textit{Negative}, \textit{Fractional}, \textit{IEEE-754} und \textit{Arithmetik} -- Übung oder Beispiel ordnet sich automatisch dem passenden Modus zu
+  \item Fünf Modi: \textit{Integers}, \textit{Negative}, \textit{Fractional}, \textit{IEEE-754} und \textit{Arithmetik}
   \item Eingaben je nach Basis mit Regex-Filtern validiert, Bitlänge explizit begrenzt
   \item Negative Zahlen in fester 8-Bit-Breite (Wertebereich $-128$ bis $127$, abgestimmt auf die Vorlesung)
   \item Berechnungen durchgängig mit \texttt{BigInt} statt \texttt{Number}: keine Rundungsfehler bei großen Zahlen
-  \item 10 Übungen und 36 vorlesungsbegleitende Beispiele mit automatischer Rückmeldung
-\end{itemframe}
-\note{%
-  Einstieg: Das Modul deckt den Zahlenbereich der Vorlesung ab -- von der Basisumrechnung
-  bis zur Gleitkommadarstellung.
-  Die BigInt-Entscheidung kurz begründen: Number verliert ab 2\textasciicircum53 an Präzision.
-  Überleitung: "Wie läuft so eine Simulation konkret ab?"
+\note{
+  \textbf{Person: Enrico}
+
+  \textbf{Zeit: 1,5 min}
+
+  \begin{itemize}
+    \item Deckt Vorlesungsstoff ab: Basisumrechnung bis IEEE\,754
+    \item 5 Modi: Integers, Negative, Fractional, IEEE-754, Arithmetik
+    \item Eingaben basisgerecht validiert, Bitlänge begrenzt
+    \item Negative: 8 Bit, Wertebereich -128 bis 127 (Vorlesung)
+    \item Berechnungen mit \texttt{BigInt} statt \texttt{Number} -- keine Rundungsfehler
+    \item Überleitung: Ablauf in der App zeigen
+  \end{itemize}
 }
+\end{itemframe}
 
 % ---------------------------------------------------------------------------
 \begin{contentsframe}{Schrittausführung}
@@ -49,10 +56,25 @@
   \draw[diagramarrow] (error.west) -| node[pos=0.25, below, font=\small, text=black] {korrigiert} (select.south);
 \end{tikzpicture}%
 }
-\end{contentsframe}
-\note{%
-  Hier zählt der Ablauf in der App, nicht das Rechenverfahren selbst.
-  Jede Stufe ist einzeln aufklappbar und mit i18n-Schlüsseln verknüpft --
-  dadurch bleibt die Erklärung bei Sprachwechsel konsistent.
-  Beim Überlauf: das Banner warnt nur, korrigiert aber nicht -- bewusste didaktische Entscheidung.
+\note{
+ \textbf{Person: Enrico}
+
+ \textbf{Zeit: 1 min}
+
+ \begin{itemize}
+   \item Ablauf in der App, nicht das Rechenverfahren
+   \item Modus + Eingabe $\rightarrow$ validieren $\rightarrow$ Schritt-Objekte $\rightarrow$ Rechengitter
+   \item Ungültige Eingabe = Hinweis, Nutzer korrigiert
+   \item Stufen aufklappbar, i18n-Texte bleiben beim Sprachwechsel erhalten
+   \item Overflow-Banner warnt, korrigiert nicht -- didaktisch bewusst
+   \item Darstellung passt sich Modus an:
+     \begin{itemize}
+       \item Wandler: klassische Mathematik-Blöcke
+       \item Arithmetik: farbcodiertes Rechengitter
+       \item Negative: Vorzeichen, Einer-, Zweierkomplement
+       \item IEEE-754: Sign / Exponent / Mantisse getrennt
+     \end{itemize}
+ \end{itemize}
 }
+\end{contentsframe}
+

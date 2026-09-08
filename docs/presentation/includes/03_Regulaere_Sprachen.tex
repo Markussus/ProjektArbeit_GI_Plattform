@@ -1,19 +1,31 @@
 % ---------------------------------------------------------------------------
 % Fachmodul Reguläre Sprachen (Kristian Popov)
-%
-% Inhaltlich abgeleitet aus Abschnitt 4.3 der Dokumentation.
-%
-% Der ausformulierte Sprechtext liegt in:
-%     docs/presentation/Sprechtext_Automaten_Sprachen.md
-%
-% Die Kurznotizen stehen in \note{...}. Sie sind standardmäßig unsichtbar.
-% Zum Anzeigen in presentation.tex vor \begin{document} ergänzen:
-%     \setbeameroption{show notes}
-% oder für einen zweiten Bildschirm:
-%     \setbeameroption{show notes on second screen=right}
 % ---------------------------------------------------------------------------
 
 \addsectionframe{Fachmodul: Reguläre Sprachen}
+
+% ---------------------------------------------------------------------------
+\begin{itemframe}{Reguläre Sprachen -- Überblick}
+  \item \textbf{Rechtslineare Grammatik} selbst schreiben -- geprüft schon beim Tippen
+  \item Drei Modi: \textbf{Aufzählung}, \textbf{Erzeugung}, \textbf{Worterkennung}
+  \item \textbf{Übungen} mit Rückmeldung: fehlende und falsche Wörter
+
+  \note{
+            \textbf{Person: Kristian}
+
+            \textbf{Zeit: 1 min}
+
+            \begin{itemize}
+              \item Die Grammatik wird Zeile für Zeile eingegeben
+              und live beim Tippen geprüft.
+              Ein Berechnen-Knopf fehlt bewusst: Jeder Fehler – wie eine falsche Produktion
+              oder ein nicht deklariertes Symbol – wird direkt in der betroffenen Zeile gemeldet.
+              \item Drei Modi nur benennen $\rightarrow$ Details auf der nächsten Folie.
+              \item \textbf{Übungen}: Prüfung der erkannten Sprache durch konkrete Gegenbeispiele
+              wie fehlende oder falsche Wörter. Genau wie bei den Automaten
+            \end{itemize}
+  }
+\end{itemframe}
 
 % ---------------------------------------------------------------------------
 \begin{fullframe}{Reguläre Sprachen -- drei Arbeitsweisen}
@@ -24,15 +36,19 @@
                     minimum width=30mm, minimum height=12mm, align=center, font=\small},
         res/.style={draw=thwspetrol, very thick, rounded corners=3pt, fill=thwspetrol!8,
                     minimum width=26mm, minimum height=10mm, align=center, font=\small},
-        lbl/.style={font=\scriptsize, thwsorange}
+        lbl/.style={font=\scriptsize, thwsorange},
+        fmt/.style={font=\scriptsize, text=black!60, align=center}
       ]
       \node[box] (gram) {Grammatik\\{\scriptsize rechtslinear}};
       \node[box, right=42mm of gram] (lang) {Sprach-\\beschreibung};
 
+      \node[fmt, above=2.5mm of gram] {erzeugte Grammatik:\\ausführlich oder vereinfacht};
+      \node[fmt, above=2.5mm of lang] {Wortliste oder Mengenschreibweise\\$\{a^n b \mid n \geq 1\}$};
+
       \draw[->, very thick, thwsorange] ([yshift=3mm]gram.east)
-        -- node[lbl, above, align=center] {Aufzählung\\{\scriptsize begrenzt: Länge, Anzahl}} ([yshift=3mm]lang.west);
+        -- node[lbl, above, align=center] {Aufzählung} ([yshift=3mm]lang.west);
       \draw[<-, very thick, thwsorange] ([yshift=-5mm]gram.east)
-        -- node[lbl, below, align=center] {Erzeugung\\{\scriptsize strikt rechtslinear}} ([yshift=-5mm]lang.west);
+        -- node[lbl, below, align=center] {Erzeugung} ([yshift=-5mm]lang.west);
 
       \node[res, below=16mm of gram] (word) {Wort + Grammatik};
       \node[res, right=42mm of word] (verdict) {akzeptiert / abgelehnt\\{\scriptsize mit Begründung}};
@@ -40,125 +56,21 @@
     \end{tikzpicture}
   \end{center}
 
-  \vspace{-1mm}
-  \footnotesize
-  Alle drei Modi bleiben im Hintergrund erhalten und werden nur ein- oder ausgeblendet --
-  dadurch überlebt eine begonnene Eingabe den Moduswechsel.
+  \note{
+              \textbf{Person: Kristian}
+
+              \textbf{Zeit: 1 min}
+
+              \begin{itemize}
+                \item \textbf{Aufzählung}: Grammatik $\rightarrow$ Wörter der Sprache.
+                Man kann nach Länge und Anzahl begrenzen.
+                \item \textbf{Erzeugung}: Die Gegenrichtung.
+                Sprache $\rightarrow$ Grammatik.
+                Sprache kann man als \textbf{Wortliste} oder \textbf{Mengenschreibweise} darstellen.
+                \item \textbf{Ausführlich} $\rightarrow$ jedes Präfix ein eigenes Nichtterminal bekommt.
+                \item \textbf{Vereinfachte} Grammatik $\rightarrow$ Präfixe werden zusammengefasst.
+                \item \textbf{Worterkennung}: Mehrere Wörter gegen die Grammatik testen.
+                Ergebnis: Man bekommt Begründung statt nur ja/nein.
+              \end{itemize}
+  }
 \end{fullframe}
-\note{%
-  Kurz durch die drei Modi gehen, nicht vertiefen.
-  Der Satz unten ist eine UI-Entscheidung: Komponenten bleiben gemountet, damit Eingaben nicht verloren gehen.
-  Überleitung zur nächsten Folie: "Nicht jede Eingabe wird akzeptiert -- und das mit Absicht."
-}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Bewusst abgelehnte Sprachbeschreibungen}
-  \begin{center}
-    \begin{tikzpicture}[
-        bad/.style={draw=red!65!black, very thick, rounded corners=3pt, fill=red!5,
-                    minimum width=52mm, minimum height=13mm, font=\small\ttfamily},
-        why/.style={font=\footnotesize, align=left, text width=58mm}
-      ]
-      \node[bad]                     (a) {L = \{a\^{}n b\^{}n | n > 0\}};
-      \node[why, right=6mm of a]     (aw) {\textbf{nicht regulär} -- dieselbe Variable in zwei
-                                            Faktoren koppelt die Wortlängen aneinander};
-
-      \node[bad, below=9mm of a]     (b) {L = \{a\^{}n | n < 5\}};
-      \node[why, right=6mm of b]     (bw) {\textbf{obere Schranke} -- beschreibt zwar eine endliche
-                                            Sprache, ist als Aufzählung aber klarer};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{1mm}
-  \footnotesize
-  Beide Eingaben ließen sich formal verarbeiten. Sie werden trotzdem mit einer
-  \textbf{eigenen Meldung} zurückgewiesen: Diese Fälle ausdrücklich zu erklären ist lehrreicher,
-  als sie stillschweigend zu verwerfen.
-\end{fullframe}
-\note{%
-  Hier ist die didaktische Begründung der Punkt, nicht die Technik.
-  a\^{}n b\^{}n ist das Standardbeispiel für eine nicht-reguläre Sprache -- gut geeignet, um zu zeigen,
-  dass das Werkzeug die Theorie ernst nimmt.
-  Mögliche Rückfrage: "Warum keine oberen Schranken?" -- Antwort: endlich, also regulär, aber die
-  Aufzählung ist die klarere Schreibweise; die Eingabesprache bleibt kleiner.
-}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Übungsprüfung: Verhalten statt Struktur}
-  \begin{center}
-    \begin{tikzpicture}[
-        >=Stealth,
-        aut/.style={draw=thwsblue, very thick, rounded corners=3pt, fill=thwsblue!5,
-                    minimum width=34mm, minimum height=14mm, align=center, font=\small},
-        test/.style={draw=thwsorange, very thick, rounded corners=3pt, fill=thwsorange!8,
-                     minimum width=40mm, minimum height=14mm, align=center, font=\small},
-        ok/.style={font=\footnotesize, thwspetrol}
-      ]
-      \node[aut]                    (stud) {Lösung der\\Studierenden};
-      \node[aut, below=8mm of stud] (ref)  {Referenzlösung};
-      \node[test, right=26mm of $(stud)!0.5!(ref)$] (words)
-        {alle Wörter über dem\\gemeinsamen Alphabet\\{\scriptsize bis zur festgelegten Länge}};
-
-      \draw[->, very thick, thwsblue] (stud.east) -- (words.west);
-      \draw[->, very thick, thwsblue] (ref.east)  -- (words.west);
-
-      \node[align=left, font=\footnotesize, right=6mm of words, text width=46mm]
-        {gleiche Entscheidung für jedes Wort? \\[1mm]
-         \textcolor{thwspetrol}{\textbf{ja}} $\Rightarrow$ bestanden \\
-         \textcolor{red!65!black}{\textbf{nein}} $\Rightarrow$ erstes abweichendes Wort als Gegenbeispiel};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{1mm}
-  \footnotesize
-  Ein \textbf{Strukturvergleich} würde korrekte Lösungen ablehnen, die nur anders aufgebaut sind.
-  Die begrenzte Wortmenge ist bewusst eine \textbf{didaktische Rückmeldung} und kein formaler
-  Äquivalenznachweis. Strukturelle Mängel werden vorrangig gemeldet -- sie sind meist die eigentliche Ursache.
-\end{fullframe}
-\note{%
-  Wichtig: das ist eine bewusste Grenze, kein Mangel. Offen sagen, dass es kein Äquivalenzbeweis ist.
-  Der Standardwert für die Wortlänge ist vier; einzelne Aufgaben setzen ihn höher.
-  Das Gegenbeispiel ist der didaktische Mehrwert gegenüber einem blossen "falsch".
-}
-
-% ---------------------------------------------------------------------------
-\begin{fullframe}{Wiederverwendung statt Duplikat}
-  \begin{center}
-    \begin{tikzpicture}[
-        >=Stealth,
-        mod/.style={draw=thwsblue, very thick, rounded corners=3pt, fill=thwsblue!5,
-                    minimum width=44mm, minimum height=9mm, font=\small\ttfamily},
-        rl/.style={draw=thwspetrol, very thick, rounded corners=3pt, fill=thwspetrol!8,
-                   minimum width=44mm, minimum height=9mm, font=\small\ttfamily},
-        hd/.style={font=\footnotesize\bfseries}
-      ]
-      \node[hd] (h1) {Reguläre Sprachen};
-      \node[rl, below=3mm of h1]  (r1) {rlLanguageOps};
-      \node[rl, below=2mm of r1]  (r2) {rlGrammarValidation};
-
-      \node[hd, right=34mm of h1] (h2) {Endliche Automaten};
-      \node[mod, below=3mm of h2] (m1) {faMachine};
-      \node[mod, below=2mm of m1] (m2) {faGrammarConversion};
-      \node[mod, below=2mm of m2] (m3) {faGrammarParsing};
-
-      \draw[->, very thick, thwsorange] (r1.east) -- (m1.west);
-      \draw[->, very thick, thwsorange] (r1.east) -- (m2.west);
-      \draw[->, very thick, thwsorange] (r2.east) -- (m3.west);
-
-      \node[font=\scriptsize\itshape, gray, below=4mm of m3, align=center]
-        {Abhängigkeit nur in eine Richtung -- kein Zyklus};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{-3mm}
-  \footnotesize
-  Das Verzeichnis \texttt{domain} hat \textbf{keine Abhängigkeit zu React} und bleibt ohne
-  gerenderte Oberfläche testbar. Die Aufzählung führt eine Grammatik über denselben
-  Automatenkern aus wie die Simulation -- eine eigene Ableitungslogik hätte zwei
-  Implementierungen desselben Verhaltens erfordert.
-\end{fullframe}
-\note{%
-  Abschluss des Blocks: die Trennung Fachlogik/Oberfläche hat sich konkret ausgezahlt.
-  Guter Anknüpfungspunkt für Fragen zu Tests -- die Domain-Logik ist ohne UI testbar,
-  darauf lässt sich der Testteil der Präsentation aufbauen.
-}

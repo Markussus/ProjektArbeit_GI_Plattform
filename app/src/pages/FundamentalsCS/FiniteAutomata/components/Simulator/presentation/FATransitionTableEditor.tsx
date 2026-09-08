@@ -3,6 +3,7 @@ import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FAProgram } from "../domain/faTypes";
 import { EPSILON } from "../domain/faTypes";
+import { canonicalizeTargetStates } from "../domain/faStateNames";
 import { buildTransitionTableSymbols } from "../adapters/faTableAdapter";
 
 interface FATransitionTableEditorProps {
@@ -12,6 +13,7 @@ interface FATransitionTableEditorProps {
   onRemoveState?: (state: string) => void;
 }
 
+/** Editable transition table: one row per symbol, one column per state. */
 export function FATransitionTableEditor({
   program,
   onTransitionChange,
@@ -22,19 +24,12 @@ export function FATransitionTableEditor({
   const canRemoveState = program.states.length > 1;
 
   const [showEpsilon, setShowEpsilon] = useState(false);
-
-  // A cell normally shows its parsed target list, but that round-trip erases
-  // the separator as it is typed: "S1," parses to ["S1"] and renders back as
-  // "S1", so an NFA cell could never reach a second target. While one cell is
-  // being edited we show the raw text instead and let the parsed program
-  // follow behind it; on blur the canonical form takes over again.
   const [editedCell, setEditedCell] = useState<{
     key: string;
     text: string;
   } | null>(null);
 
   // Same rows as the read-only table, plus an empty ε row once the user has
-  // asked for one — that is the only way to enter the first ε-transition.
   const symbols = buildTransitionTableSymbols(program);
   if (program.type === "NFA" && showEpsilon && !symbols.includes(EPSILON)) {
     symbols.push(EPSILON);
@@ -121,7 +116,18 @@ export function FATransitionTableEditor({
                           setEditedCell({ key: cellKey, text: e.target.value });
                           onTransitionChange(state, symbol, e.target.value);
                         }}
-                        onBlur={() => setEditedCell(null)}
+                        onBlur={() => {
+                          if (editedCell?.key === cellKey) {
+                            const canonical = canonicalizeTargetStates(
+                              editedCell.text,
+                              program.states,
+                            );
+                            if (canonical !== editedCell.text) {
+                              onTransitionChange(state, symbol, canonical);
+                            }
+                          }
+                          setEditedCell(null);
+                        }}
                         className={inputClass}
                         placeholder="–"
                         aria-label={`δ(${state}, ${symbol})`}

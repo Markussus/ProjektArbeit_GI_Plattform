@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type VideoTrackKind =
@@ -18,6 +17,8 @@ interface VideoPlayerProps {
   className?: string;
   tracks?: VideoPlayerTrack[];
   testId?: string;
+  controls?: boolean;
+  preload?: "none" | "metadata" | "auto";
 }
 
 export function VideoPlayer({
@@ -26,9 +27,9 @@ export function VideoPlayer({
   className,
   tracks = [],
   testId,
+  controls = true,
+  preload = "none",
 }: VideoPlayerProps) {
-  const [showControls, setShowControls] = useState(false);
-
   return (
     <video
       aria-label={title}
@@ -36,15 +37,10 @@ export function VideoPlayer({
         "bg-muted aspect-video w-full max-w-[10cm] rounded-lg object-contain",
         className,
       )}
-      controls={showControls}
-      preload="auto"
+      controls={controls}
+      preload={preload}
       playsInline
       data-testid={testId}
-      onBlur={() => setShowControls(false)}
-      onFocus={() => setShowControls(true)}
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-      tabIndex={0}
     >
       <source src={url} type="video/mp4" />
       {tracks.map((track) => (

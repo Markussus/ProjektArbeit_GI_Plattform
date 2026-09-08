@@ -3,6 +3,7 @@ import {
   addMooreInputSymbol,
   addMooreState,
   createMooreOutputSymbol,
+  getNextMooreOutputCode,
   removeMooreInputSymbol,
   removeMooreState,
   renameMooreInputSymbol,
@@ -93,7 +94,11 @@ export function useMooreProgramEditor(initialProgram: MooreProgram) {
           .filter((candidate) => candidate !== state)
           .map((candidate) => current.outputs[candidate])
           .find((output) => output?.symbol === symbol);
-        const code = existingOutput?.code ?? current.outputs[state]?.code ?? 0;
+        const code =
+          existingOutput?.code ??
+          (current.outputs[state]?.symbol === symbol
+            ? current.outputs[state]?.code
+            : getNextMooreOutputCode(current));
         return {
           ...setMooreOutputSymbol(current, state, symbol),
           outputs: {

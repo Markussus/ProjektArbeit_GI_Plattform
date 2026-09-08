@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lightbulb, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
 import { buildTruthTableDisplay } from "../DnfBuilder/adapters/truthTableAdapter";
 import { analyzeDnfTruthTable } from "../DnfBuilder/application/dnfAnalysis";
 import { buildDnfFollowUpConfiguration } from "../DnfBuilder/application/dnfFollowUp";
@@ -15,10 +13,7 @@ import {
 } from "../DnfBuilder/domain/dnfExerciseCheck";
 import { checkDnfSimplification } from "../DnfBuilder/domain/dnfSimplificationCheck";
 import { computeSmallestBooleanExpression } from "../DnfBuilder/domain/minimalExpression";
-import {
-  dnfTruthTableTransferCodec,
-  type DnfTruthTableTransferDraft,
-} from "../DnfBuilder/domain/dnfTransfer";
+import type { DnfTruthTableTransferDraft } from "../DnfBuilder/domain/dnfTransfer";
 import { createTruthTableFromResults } from "../DnfBuilder/domain/truthTable";
 import { DnfExerciseWorkspace } from "../DnfBuilder/presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "../DnfBuilder/presentation/DnfFollowUpSections";
@@ -31,9 +26,6 @@ const editableVariableNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 interface TableToDnfBuilderProps {
   initialValue?: DnfTruthTableTransferDraft;
-  storageIdentifier: string;
-  storageEnabled: boolean;
-  storageReady: boolean;
   onTransferValueChange?: (value: DnfTruthTableTransferDraft) => void;
   onUserChange?: () => void;
   seedInitialFeedback?: boolean;
@@ -41,9 +33,6 @@ interface TableToDnfBuilderProps {
 
 export function TableToDnfBuilder({
   initialValue,
-  storageIdentifier,
-  storageEnabled,
-  storageReady,
   onTransferValueChange,
   onUserChange,
   seedInitialFeedback = false,
@@ -115,18 +104,6 @@ export function TableToDnfBuilder({
     }),
     [committed, dnfAnswer, resultValues, simplification.answer, variableCount],
   );
-
-  useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: transferValue,
-    codec: dnfTruthTableTransferCodec,
-    enabled: storageEnabled && storageReady,
-  });
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: transferValue,
-    codec: dnfTruthTableTransferCodec,
-  });
 
   useEffect(() => {
     onTransferValueChange?.(transferValue);

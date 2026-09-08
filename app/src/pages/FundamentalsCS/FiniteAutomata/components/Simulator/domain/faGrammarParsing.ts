@@ -2,6 +2,7 @@ import type { TFunction } from "i18next";
 import type { TranslationKey } from "@/types/i18n";
 import type { RegularGrammar, ProductionRule } from "./faTypes";
 
+/** Bare production lines, or the `type:`/`productions:` block form. */
 export type GrammarFormat = "simple" | "structured";
 
 /**
@@ -78,10 +79,8 @@ function fail(
 }
 
 /**
- * Detect which grammar input format the user typed.
- *
- * - "structured": starts with `type: grammar` followed by a `productions:` block
- * - "simple": one production per line, e.g. `S -> 0S | 1A`
+ * Which format the user typed: "structured" when it opens with `type: grammar`
+ * and a `productions:` block, "simple" for bare production lines.
  */
 export function detectGrammarFormat(source: string): GrammarFormat {
   const lines = source.split(/\r?\n/);
@@ -95,20 +94,8 @@ export function detectGrammarFormat(source: string): GrammarFormat {
 }
 
 /**
- * Parse either grammar format and return a fully-populated `RegularGrammar`.
- *
- * Format 1 (simple):
- *   S -> 0S | 1A
- *   A -> 0A | 1
- *
- * Format 2 (structured):
- *   type: grammar
- *   productions:
- *   S -> 0S | 1A
- *   A -> 0A | 1
- *
- * Only right-linear (Type 3) grammars are accepted — see
- * {@link buildGrammarFromProductions} for the exact rule.
+ * Parse either format into a fully-populated `RegularGrammar`. Only right-linear
+ * (Type 3) grammars are accepted — see {@link buildGrammarFromProductions}.
  */
 export function parseGrammarSource(source: string): ParseGrammarResult {
   const format = detectGrammarFormat(source);
@@ -144,6 +131,7 @@ export function parseGrammarSource(source: string): ParseGrammarResult {
   }
 }
 
+/** Non-empty, non-comment lines of a simple-format source. */
 function extractSimpleProductions(source: string): string[] {
   return source
     .split(/\r?\n/)
@@ -217,6 +205,7 @@ function extractStructuredProductions(source: string): string[] {
   return productionLines;
 }
 
+/** A production line after the arrow split, before parsing alternatives. */
 interface SplitLine {
   lhs: string;
   alternatives: string[];
@@ -249,11 +238,9 @@ type Alternative =
   | { kind: "rule"; terminal: string; nextNonTerminal: string | null };
 
 /**
- * Read one alternative, rejecting everything that is not right-linear.
- *
- * Terminals and non-terminals may share a name (`A -> AA` reads "terminal A
- * followed by non-terminal A"), so the split cannot be decided from the
- * characters alone — `declared` is the ground truth.
+ * Read one alternative, rejecting everything that is not right-linear. A name may
+ * be both (`A -> AA` is terminal A then non-terminal A), so the split needs
+ * `declared` rather than the characters alone.
  */
 function classifyAlternative(
   alt: string,
@@ -306,15 +293,10 @@ function classifyAlternative(
 }
 
 /**
- * Build a right-linear grammar from production lines.
- *
- * Every alternative on a right-hand side must be one of
- *   - `ε` (or the word `epsilon`), standing alone;
- *   - a single terminal symbol,      e.g. `A -> a`;
- *   - a terminal plus a non-terminal, e.g. `A -> aB`.
- *
- * This runs in two passes: the left-hand sides are collected first, so a rule
- * may reference a non-terminal that is only defined further down.
+ * Build a right-linear grammar from production lines: every alternative is `ε`
+ * alone, a single terminal, or a terminal plus a non-terminal. Left-hand sides
+ * are collected in a first pass, so a rule may reference a non-terminal defined
+ * further down.
  */
 function buildGrammarFromProductions(
   productionLines: string[],

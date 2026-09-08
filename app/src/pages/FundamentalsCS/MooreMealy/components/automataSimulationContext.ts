@@ -1,6 +1,7 @@
 import { MEALY_SIMULATOR_TASK_STORAGE_ID } from "./Simulator/MealySimulator";
 import type { AutomataExerciseScenario } from "../exercises";
 import { defaultMooreProgram } from "./Simulator/config/defaultMooreProgram";
+import { defaultMealyProgram } from "./Simulator/config/defaultMealyProgram";
 
 export const MOORE_EXAMPLE_ID = "moore-mealy.examples.mooreDefault";
 export const MEALY_EXAMPLE_ID = "moore-mealy.examples.mealyDefault";
@@ -51,6 +52,9 @@ export function resolveAutomataSimulationContext({
     mooreInitialProgram:
       mooreExerciseScenario?.starterProgram ??
       (isMooreExample ? defaultMooreProgram : undefined),
+    mealyInitialProgram:
+      mealyExerciseScenario?.starterProgram ??
+      (isMealyExample ? defaultMealyProgram : undefined),
     storageEnabled: !isMooreExample && !isMealyExample,
     activeMachineType: lockedMachineType ?? machineType,
     isMachineTypeLocked: lockedMachineType !== null,

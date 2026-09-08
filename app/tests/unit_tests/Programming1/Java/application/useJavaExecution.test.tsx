@@ -37,6 +37,18 @@ class MockWorker {
   }
 }
 
+function renderRunningJavaExecution(source = "class Main {}") {
+  const hookResult = renderHook(() => useJavaExecution());
+  act(() => {
+    hookResult.result.current.run({
+      source,
+      timeoutMs: 60_000,
+    });
+  });
+  const worker = MockWorker.instances[0];
+  return { result: hookResult.result, worker };
+}
+
 describe("useJavaExecution", () => {
   beforeEach(() => {
     MockWorker.instances = [];
@@ -56,6 +68,16 @@ describe("useJavaExecution", () => {
       });
 
       const preloadWorker = MockWorker.instances[0];
+
+      act(() => {
+        preloadWorker.emit({
+          type: "compiler-loading",
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.compilerStatus).toBe("loading");
+      });
 
       act(() => {
         preloadWorker.emit({
@@ -103,6 +125,18 @@ describe("useJavaExecution", () => {
 
       act(() => {
         worker.emit({
+          type: "compile-finished",
+          requestId,
+          artifacts,
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.artifacts).toEqual(artifacts);
+      });
+
+      act(() => {
+        worker.emit({
           type: "run-started",
           requestId,
         });
@@ -140,6 +174,81 @@ describe("useJavaExecution", () => {
       expect(result.current.snapshot.artifacts).toEqual(artifacts);
       expect(result.current.getPhase()).toBe("done");
       expect(result.current.getOutput()).toBe(result.current.snapshot);
+    });
+
+    it("ignores messages with mismatched or stale request IDs", async () => {
+      const { result, worker } = renderRunningJavaExecution();
+
+      act(() => {
+        worker.emit({
+          type: "stdout",
+          requestId: "some-stale-or-unrelated-id",
+          data: "ignored stdout\n",
+        });
+      });
+
+      expect(result.current.snapshot.stdout).toEqual([]);
+    });
+  });
+
+  describe("when compiler loading fails", () => {
+    it("transitions compilerStatus to failed and records an error diagnostic", async () => {
+      const { result } = renderHook(() => useJavaExecution());
+
+      act(() => {
+        result.current.preload();
+      });
+
+      const worker = MockWorker.instances[0];
+
+      act(() => {
+        worker.emit({
+          type: "compiler-load-error",
+          error: "Failed to download javac wasm module",
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.compilerStatus).toBe("failed");
+      });
+      expect(result.current.snapshot.phase).toBe("error");
+      expect(result.current.snapshot.lastErrorCategory).toBe("compiler-load");
+      expect(result.current.snapshot.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: "compiler_load_failed",
+            stage: "compiler-load",
+            severity: "error",
+          }),
+        ]),
+      );
+      expect(result.current.snapshot.stderr.join("")).toContain(
+        "Failed to download javac wasm module",
+      );
+    });
+  });
+
+  describe("when the worker encounters an unhandled runtime error", () => {
+    it("reports an unknown worker error and marks phase as error", async () => {
+      const { result, worker } = renderRunningJavaExecution();
+
+      act(() => {
+        worker.fail("Worker process crashed unexpectedly");
+      });
+
+      await waitFor(() => {
+        expect(result.current.snapshot.phase).toBe("error");
+      });
+      expect(result.current.snapshot.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: "worker_error",
+            stage: "worker",
+            severity: "error",
+            message: "Worker process crashed unexpectedly",
+          }),
+        ]),
+      );
     });
   });
 
@@ -209,13 +318,7 @@ describe("useJavaExecution", () => {
     ] as const)(
       "preserves the %s error category and diagnostic",
       async (errorCategory, code) => {
-        const { result } = renderHook(() => useJavaExecution());
-
-        act(() => {
-          result.current.run({ source: "class Main {}", timeoutMs: 60_000 });
-        });
-
-        const worker = MockWorker.instances[0];
+        const { result, worker } = renderRunningJavaExecution();
         const executeMessage = worker.postedMessages[0] as {
           requestId: string;
         };
@@ -250,16 +353,7 @@ describe("useJavaExecution", () => {
 
   describe("when the execution state is reset", () => {
     it("clears the snapshot back to the initial idle state", async () => {
-      const { result } = renderHook(() => useJavaExecution());
-
-      act(() => {
-        result.current.run({
-          source: "class Main {}",
-          timeoutMs: 60_000,
-        });
-      });
-
-      const worker = MockWorker.instances[0];
+      const { result, worker } = renderRunningJavaExecution();
       const executeMessage = worker.postedMessages[0] as {
         requestId: string;
       };

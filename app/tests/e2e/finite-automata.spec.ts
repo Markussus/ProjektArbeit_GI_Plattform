@@ -17,6 +17,22 @@ async function openSimulationTab(page: Page) {
   await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
 }
 
+/** The training-center slot as the browser currently holds it. */
+function savedTrainingCenterSlot(page: Page) {
+  return page.evaluate(() => localStorage.getItem("TrainingCenterStorage"));
+}
+
+/**
+ * Apply the program and wait until the draft has reached storage. Applying
+ * writes the slot straight away; autosave alone only runs on its interval or
+ * when the simulator unmounts, so without the poll whatever follows races the
+ * write.
+ */
+async function applyProgramAndAwaitSavedDraft(page: Page) {
+  await page.getByTestId("fa-start-simulation").click();
+  await expect.poll(() => savedTrainingCenterSlot(page)).not.toBeNull();
+}
+
 test.describe("Finite Automata page", () => {
   test("page loads and shows the topic title", async ({ page }) => {
     await gotoFAPage(page);
@@ -168,21 +184,12 @@ test.describe("Finite Automata — editor interactions", () => {
     const transition = page.getByLabel("δ(S0, a)");
     await transition.fill("S0");
     await page.getByPlaceholder("aab").fill("ab");
-    await page.getByTestId("fa-start-simulation").click();
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .not.toBeNull();
+    await applyProgramAndAwaitSavedDraft(page);
 
     await page.getByTestId("simulation-reset").click();
     await expect(page.getByLabel("δ(S0, a)")).toHaveValue("");
     await expect(page.getByPlaceholder("aab")).toHaveValue("");
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .toBeNull();
+    await expect.poll(() => savedTrainingCenterSlot(page)).toBeNull();
     await page.getByTestId("header-transfer-export").click();
     await expect(page.getByTestId("header-transfer-input")).toHaveValue(
       defaultExport,
@@ -288,12 +295,7 @@ test.describe("Finite Automata — opening an example", () => {
     page,
   }) => {
     await openSimulationTab(page);
-    await page.getByTestId("fa-start-simulation").click();
-    await expect
-      .poll(() =>
-        page.evaluate(() => localStorage.getItem("TrainingCenterStorage")),
-      )
-      .not.toBeNull();
+    await applyProgramAndAwaitSavedDraft(page);
 
     await page.getByTestId("tab-button-examples").click();
     await page.getByTestId("fa-example-card-ends-with-ab-select").click();
@@ -318,5 +320,66 @@ test.describe("Finite Automata — Examples tab", () => {
   test("displays at least one example card", async ({ page }) => {
     const content = page.locator("main, [role='main'], .p-8, .p-4").first();
     await expect(content).toBeVisible();
+  });
+});
+
+/**
+ * Per-exercise Training Center persistence, matching what the Turing Machine
+ * and Moore/Mealy specs assert for their topics.
+ */
+const ENDS_WITH_01 = "finite-automata.exercisesTab.endsWith01.title";
+const ENDS_WITH_00 = "finite-automata.exercisesTab.endsWith00.title";
+
+async function openFAExercise(page: Page, titleKey: string) {
+  await page.getByTestId("tab-button-exercises").click();
+  await page.getByTestId(`exercise-card-${titleKey}`).click();
+  await page.getByTestId(`exercise-card-${titleKey}-open`).click();
+  await expect(page.getByTestId("fa-mode-tab-manual")).toBeVisible();
+}
+
+test.describe("Finite Automata — exercise persistence", () => {
+  test("restores an exercise draft and keeps it out of other slots", async ({
+    page,
+  }) => {
+    await gotoFAPage(page);
+
+    await openFAExercise(page, ENDS_WITH_01);
+    await page.getByLabel("δ(S0, 0)").fill("S0");
+    await applyProgramAndAwaitSavedDraft(page);
+
+    // Leaving and returning must bring the work back.
+    await page.getByTestId("tab-button-overview").click();
+    await openFAExercise(page, ENDS_WITH_01);
+    await expect(page.getByLabel("δ(S0, 0)")).toHaveValue("S0");
+
+    // A different exercise must not inherit it — the whole point of one slot
+    // per exercise.
+    await page.getByTestId("tab-button-overview").click();
+    await openFAExercise(page, ENDS_WITH_00);
+    await expect(page.getByLabel("δ(S0, 0)")).toHaveValue("");
+  });
+
+  test("resets all FA exercises while preserving the free simulator", async ({
+    page,
+  }) => {
+    await gotoFAPage(page);
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        "TrainingCenterStorage",
+        JSON.stringify(["ABAexercise-0", "ABBexercise-1", "AB_free-simulator"]),
+      );
+    });
+
+    await page.getByTestId("tab-button-exercises").click();
+    await page.getByTestId("fa-reset-all-exercises").click();
+    await page.getByTestId("fa-reset-all-exercises-confirm").click();
+
+    expect(
+      await page.evaluate(() =>
+        JSON.parse(
+          window.localStorage.getItem("TrainingCenterStorage") ?? "[]",
+        ),
+      ),
+    ).toEqual(["AB_free-simulator"]);
   });
 });

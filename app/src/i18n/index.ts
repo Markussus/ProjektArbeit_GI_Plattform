@@ -25,6 +25,28 @@ import deJavaProgramming from "./locales/de/java-programming.json";
 import deTuringMachine from "./locales/de/turing-machine.json";
 import deRegularLanguages from "./locales/de/regular-languages.json";
 
+// Turkish split translation modules
+import trCommon from "./locales/tr/common.json";
+import trFiniteAutomata from "./locales/tr/finite-automata.json";
+import trNumberSystems from "./locales/tr/number-systems.json";
+import trEncoding from "./locales/tr/encoding.json";
+import trMooreMealy from "./locales/tr/moore-mealy.json";
+import trDnf from "./locales/tr/dnf.json";
+import trJavaProgramming from "./locales/tr/java-programming.json";
+import trTuringMachine from "./locales/tr/turing-machine.json";
+import trRegularLanguages from "./locales/tr/regular-languages.json";
+
+// Ukrainian split translation modules
+import ukCommon from "./locales/uk/common.json";
+import ukFiniteAutomata from "./locales/uk/finite-automata.json";
+import ukNumberSystems from "./locales/uk/number-systems.json";
+import ukEncoding from "./locales/uk/encoding.json";
+import ukMooreMealy from "./locales/uk/moore-mealy.json";
+import ukDnf from "./locales/uk/dnf.json";
+import ukJavaProgramming from "./locales/uk/java-programming.json";
+import ukTuringMachine from "./locales/uk/turing-machine.json";
+import ukRegularLanguages from "./locales/uk/regular-languages.json";
+
 const en = {
   common: enCommon,
   "finite-automata": enFiniteAutomata,
@@ -49,6 +71,30 @@ const de = {
   "regular-languages": deRegularLanguages,
 };
 
+const tr = {
+  common: trCommon,
+  "finite-automata": trFiniteAutomata,
+  "number-systems": trNumberSystems,
+  encoding: trEncoding,
+  "moore-mealy": trMooreMealy,
+  dnf: trDnf,
+  "java-programming": trJavaProgramming,
+  "turing-machine": trTuringMachine,
+  "regular-languages": trRegularLanguages,
+};
+
+const uk = {
+  common: ukCommon,
+  "finite-automata": ukFiniteAutomata,
+  "number-systems": ukNumberSystems,
+  encoding: ukEncoding,
+  "moore-mealy": ukMooreMealy,
+  dnf: ukDnf,
+  "java-programming": ukJavaProgramming,
+  "turing-machine": ukTuringMachine,
+  "regular-languages": ukRegularLanguages,
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -56,6 +102,8 @@ i18n
     resources: {
       en: { translation: en },
       de: { translation: de },
+      tr: { translation: tr },
+      uk: { translation: uk },
     },
     fallbackLng: DEFAULT_LANGUAGE,
     defaultNS: "translation",

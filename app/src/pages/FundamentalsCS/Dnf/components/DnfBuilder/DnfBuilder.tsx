@@ -1,15 +1,15 @@
-import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import type { Exercise } from "@/types/exercise";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import { exportAndStoreTrainingCenterValue } from "@/lib/trainingCenter";
 import { buildTruthTableDisplay } from "./adapters/truthTableAdapter";
 import { buildDnfFollowUpConfiguration } from "./application/dnfFollowUp";
 import { useDnfBuilder } from "./application/useDnfBuilder";
-import {
-  dnfExerciseTransferCodec,
-  type DnfExerciseTransferDraft,
-} from "./domain/dnfTransfer";
+import type { DnfExerciseTransferDraft } from "./domain/dnfTransfer";
 import { DnfExerciseWorkspace } from "./presentation/DnfExerciseWorkspace";
 import { DnfFollowUpSections } from "./presentation/DnfFollowUpSections";
 import {
@@ -20,26 +20,17 @@ import {
 interface DnfBuilderProps {
   selectedExercise: Exercise;
   initialAttempt?: DnfExerciseTransferDraft;
-  storageIdentifier: string;
-  storageEnabled: boolean;
-  storageReady: boolean;
+  onTransferValueChange?: (value: DnfExerciseTransferDraft) => void;
   onUserChange?: () => void;
 }
 
 export interface DnfBuilderHandle {
-  loadSolution: () => void;
+  loadSolution: () => DnfExerciseTransferDraft | null;
 }
 
 export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
   function DnfBuilder(
-    {
-      selectedExercise,
-      initialAttempt,
-      storageIdentifier,
-      storageEnabled,
-      storageReady,
-      onUserChange,
-    },
+    { selectedExercise, initialAttempt, onTransferValueChange, onUserChange },
     ref,
   ) {
     const builder = useDnfBuilder(selectedExercise, initialAttempt);
@@ -50,28 +41,20 @@ export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
         loadSolution: () => {
           const solvedAttempt = buildSolutionAttempt();
           if (!solvedAttempt) {
-            return;
+            return null;
           }
 
-          void (async () => {
-            if (storageReady) {
-              await exportAndStoreTrainingCenterValue(
-                storageIdentifier,
-                solvedAttempt,
-                dnfExerciseTransferCodec,
-              );
-            }
-            applyLoadedSolution(solvedAttempt);
-          })().catch(() => {
-            applyLoadedSolution(solvedAttempt);
-          });
+          applyLoadedSolution(solvedAttempt);
+          onUserChange?.();
+          onTransferValueChange?.(solvedAttempt);
+          return solvedAttempt;
         },
       }),
       [
         applyLoadedSolution,
         buildSolutionAttempt,
-        storageIdentifier,
-        storageReady,
+        onTransferValueChange,
+        onUserChange,
       ],
     );
     const [showFullTable, setShowFullTable] = useState(false);
@@ -88,17 +71,9 @@ export const DnfBuilder = forwardRef<DnfBuilderHandle, DnfBuilderProps>(
       ],
     );
 
-    useTrainingCenterAutoSave({
-      identifier: storageIdentifier,
-      value: transferValue,
-      codec: dnfExerciseTransferCodec,
-      enabled: storageEnabled && storageReady,
-    });
-    useActiveSimulatorTransfer({
-      identifier: storageIdentifier,
-      value: transferValue,
-      codec: dnfExerciseTransferCodec,
-    });
+    useEffect(() => {
+      onTransferValueChange?.(transferValue);
+    }, [onTransferValueChange, transferValue]);
 
     const display = useMemo(() => {
       if (!builder.showSolution || builder.analysis.status !== "valid") {

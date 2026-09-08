@@ -1,6 +1,100 @@
 \addsectionframe{Fachmodul: Moore Mealy}
 
 % ---------------------------------------------------------------------------
-\begin{itemframe}{Moore Mealy -- Überblick}
-  \item Meine Erklärung
-\end{itemframe}
+
+\begin{contentsframe}{Interaktive Simulator Darstellung}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+        \includegraphics[width=\linewidth]{includes/moore_mealy.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+    \begin{itemize}
+        \item Automaten frei konfigurieren
+        \item Eingaben Schritt für Schritt simulierbar
+        \item Aktueller Zustand und Übergang direkt sichtbar
+        \item Vor- und Zurückspringen in der Simulation
+    \end{itemize}
+    \end{column}
+  \end{columns}
+    \note{
+    \textbf{Person: Markus}
+
+    \textbf{Zeit: 1 min}
+
+    \begin{itemize}
+      \item \textbf{Freie Konfiguration:} Zustände und Übergänge interaktiv modellieren; Umschaltung zwischen Moore- und Mealy-Automat.
+      \item \textbf{Schritt-Simulation:} Zeichenweise Abarbeitung des Eingabeworts mit visueller Kanten- und Zustandshervorhebung.
+      \item \textbf{Zustand \& Ausgabe:} Direkte Ausgabeanzeige: bei Moore am Zustand verankert, bei Mealy an der Kante.
+      \item \textbf{Trace-Historie:} Vor- und Zurückspringen im Simulations-Stack zum gezielten Auffinden von Denkfehlern.
+    \end{itemize}
+  }
+\end{contentsframe}
+
+
+
+
+\begin{contentsframe}{Automat analysieren \& Schaltung darstellen}
+\vspace{-1em}
+
+\begin{columns}[T,onlytextwidth]
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Automat \& Übergänge}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Zustände und Übergänge definieren
+            \item Ausgabe abhängig von Moore bzw. Mealy
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Wahrheitstabelle}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Zustände und Eingaben binär codieren
+            \item Boolesche Funktionen automatisch ableiten
+            \item DNF minimieren
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+        \centering
+        \textbf{Logikgatter}
+
+        \vspace{0.5em}
+
+        \raggedright
+        \begin{itemize}
+            \item Funktionen als Schaltung visualisieren
+            \item Gatterdarstellung
+            \item Verbindung von Automat und Hardware
+        \end{itemize}
+    \end{column}
+
+\end{columns}
+
+\vspace{1.8em}
+
+\centering
+\small
+\textbf{$\rightarrow$ logische bzw. hardwareseitige Umsetzung sichtbar machen}
+\note{
+  \textbf{Person: Markus}
+
+  \textbf{Zeit: 1 min}
+
+  \begin{itemize}
+    \item \textbf{Automat \& Übergänge:} Modellierung des Automaten mit Zustandsübergängen ($\delta$) und Ausgabe ($\lambda$) nach Vorlesungsstandard.
+    \item \textbf{Wahrheitstabelle:} Binäre Codierung der Zustände ($\lceil\log_2 n\rceil$ Flip-Flop-Bits); automatische Ableitung und Minimierung der DNF.
+    \item \textbf{Logikgatter:} Automatische Generierung des Schaltplans (Gatter + D-Flip-Flops); didaktische Brücke zur Digitaltechnik.
+  \end{itemize}
+}
+\end{contentsframe}

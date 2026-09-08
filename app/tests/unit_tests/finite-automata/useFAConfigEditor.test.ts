@@ -9,6 +9,7 @@ import {
 } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/config/defaultFAProgram";
 import type { FAProgram } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faTypes";
 import { EPSILON } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faTypes";
+import { faProgramTransferCodec } from "@/pages/FundamentalsCS/FiniteAutomata/components/Simulator/domain/faProgramTransfer";
 
 function editor(initial: FAProgram = defaultDFAProgram) {
   return renderHook(() => useFAConfigEditor(structuredClone(initial))).result;
@@ -122,6 +123,36 @@ describe("useFAConfigEditor — alphabet", () => {
     expect(result.current.draft.alphabet).toEqual(["a", "c"]);
   });
 
+  it("collapses a symbol repeated in the input", () => {
+    const result = editor();
+
+    act(() => result.current.setAlphabet("0, 1, 1, 1, 1, 1"));
+
+    expect(result.current.draft.alphabet).toEqual(["0", "1"]);
+  });
+
+  it("keeps a repeated alphabet from producing duplicate table rows", () => {
+    const result = editor();
+
+    act(() => result.current.setAlphabet("0, 1, 1"));
+
+    // One row per symbol; the ε row only exists on an NFA.
+    expect(result.current.tableRows).toHaveLength(2);
+  });
+
+  it("stays exportable when a symbol is typed twice", async () => {
+    const result = editor();
+
+    act(() => result.current.setAlphabet("0, 1, 1"));
+
+    // The codec refuses a program whose alphabet repeats a symbol, and a save
+    // that throws is dropped without a word — which used to lose every edit a
+    // learner made to that exercise afterwards.
+    await expect(
+      faProgramTransferCodec.exportValue(result.current.draft),
+    ).resolves.toEqual(expect.any(String));
+  });
+
   it("prunes transitions on symbols that left the alphabet", () => {
     const result = editor();
 
@@ -164,6 +195,14 @@ describe("useFAConfigEditor — start and accept states", () => {
 
     expect(result.current.draft.acceptStates).toEqual(["S1", "S2"]);
   });
+
+  it("collapses an accept state named twice", () => {
+    const result = editor();
+
+    act(() => result.current.setAcceptStates("S1, S1, S2"));
+
+    expect(result.current.draft.acceptStates).toEqual(["S1", "S2"]);
+  });
 });
 
 describe("useFAConfigEditor — transitions", () => {
@@ -189,6 +228,14 @@ describe("useFAConfigEditor — transitions", () => {
     act(() => result.current.setTransition("Sx", "a", "S0"));
 
     expect(result.current.draft.transitions.Sx).toEqual({ a: ["S0"] });
+  });
+
+  it("collapses a target named twice in one cell", () => {
+    const result = editor();
+
+    act(() => result.current.setTransition("S0", "a", "S1, S1"));
+
+    expect(result.current.draft.transitions.S0.a).toEqual(["S1"]);
   });
 });
 

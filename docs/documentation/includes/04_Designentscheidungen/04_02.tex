@@ -1,33 +1,34 @@
-\subNsection{1}{Endliche Automaten}{Kristian Popov}
+\subNsection{1}{Endliche Automaten}{Kristian Popov} \label{4_2_EA}
 
 Im Thema \emph{Endliche Automaten} können Studierende deterministische und
-nichtdeterministische endliche Automaten selbst definieren und Eingabewörter
-Schritt für Schritt ausführen. Jeder Simulationsschritt wird gleichzeitig in
-der Übergangstabelle und im Zustandsdiagramm dargestellt. Ergänzt wird die
-Einzelsimulation durch einen Stapeltest für mehrere Wörter, die Umwandlung
-rechtslinearer Grammatiken in Automaten und Übungen mit automatischer
+nichtdeterministische endliche Automaten selbst definieren und Eingabewörter Schritt
+für Schritt ausführen.
+Jeder Simulationsschritt wird gleichzeitig in der Übergangstabelle und im
+Zustandsdiagramm dargestellt.
+Ergänzt wird die Einzelsimulation durch einen Stapeltest für mehrere Wörter, die
+Umwandlung rechtslinearer Grammatiken in Automaten und Übungen mit automatischer
 Rückmeldung.
 
 \subNsection{2}{Entscheidungen in der Architektur}{Kristian Popov}
 
 Ursprünglich war nur die Unterstützung deterministischer Automaten vorgesehen.
-Nichtdeterministische kamen hinzu, weil dort ein Symbol in mehrere Zustände
-zugleich führen darf: Ein Automat ist so oft direkt aus der Sprachbeschreibung
-ablesbar und kompakter, und die Mehrdeutigkeit muss erst beim Schritt zum DFA
-aufgelöst werden.
-Da jeder DFA gleichzeitig ein NFA ist, wurde für beide Varianten bewusst nur
-eine Ausführungslogik verwendet. Der Kern arbeitet mit einer Menge aktiver
-Zustände, die bei einem DFA höchstens ein Element enthält; $\varepsilon$-Übergänge
-werden dabei stets über die $\varepsilon$-Hülle aufgelöst.
-Der deklarierte Automatentyp steuert Validierung und Eingabemaske, nicht aber
-die Ausführung.
+Nichtdeterministische kamen hinzu, weil dort ein Symbol in mehrere Zustände zugleich
+führen darf: Ein Automat ist so oft direkt aus der Sprachbeschreibung ablesbar und
+kompakter, und die Mehrdeutigkeit muss erst beim Schritt zum DFA aufgelöst werden.
+Da jeder DFA gleichzeitig ein NFA ist, wurde für beide Varianten bewusst nur eine
+Ausführungslogik verwendet.
+Der Kern arbeitet mit einer Menge aktiver Zustände, die bei einem DFA höchstens ein
+Element enthält; $\varepsilon$-Übergänge werden dabei stets über die
+$\varepsilon$-Hülle aufgelöst.
+Der deklarierte Automatentyp steuert Validierung und Eingabemaske, nicht aber die
+Ausführung.
 
 Der Simulator ist in fünf Bereiche aufgeteilt:
 
 \begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
 \item[\texttt{domain}]
-enthält die Fachlogik wie Simulation, Validierung, Grammatikumwandlung,
-Stapeltest und Übungskontrolle.
+enthält die Fachlogik wie Simulation, Validierung, Grammatikumwandlung, Stapeltest
+und Übungskontrolle.
 
 \item[\texttt{application}]
 verbindet die Fachlogik mit React und verwaltet Simulation und Editor.
@@ -36,93 +37,101 @@ verbindet die Fachlogik mit React und verwaltet Simulation und Editor.
 bereitet die Daten für die Übergangstabelle auf.
 
 \item[\texttt{presentation}]
-enthält die Benutzeroberfläche mit Diagramm, Tabelle, Eingabewort,
-Stapeltest und Grammatikeingabe.
+enthält die Benutzeroberfläche mit Diagramm, Tabelle, Eingabewort, Stapeltest und
+Grammatikeingabe.
 
 \item[\texttt{config}]
 enthält Standardautomaten und Beispiele.
 \end{description}
 
-Die Trennung sorgt dafür, dass die Fachlogik unabhängig von React bleibt und
-ohne gerenderte Oberfläche testbar ist; im Thema \emph{Reguläre Sprachen} wurde
-sie unverändert wiederverwendet.
+Die Trennung sorgt dafür, dass die Fachlogik unabhängig von React bleibt und ohne
+gerenderte Oberfläche testbar ist.
+Das Thema \emph{Reguläre Sprachen} folgt demselben Schnitt und greift zusätzlich
+direkt auf die Grammatikumwandlung dieses Themas zurück.
 
 Ein Simulationsschritt erzeugt einen neuen Zustand mit der bisherigen Historie.
-Dadurch sind sowohl das Zurückgehen als auch die Auswahl früherer Schritte
-möglich, ohne eine zusätzliche Historie in der Oberfläche zu verwalten.
+Dadurch sind sowohl das Zurückgehen als auch die Auswahl früherer Schritte möglich,
+ohne eine zusätzliche Historie in der Oberfläche zu verwalten.
 
-Auch die Validierung ist von der Oberfläche getrennt. Sie liefert Fehlercodes
-und relevante Werte, während die Oberfläche daraus die passenden Meldungen
-erzeugt. Dadurch bleibt die Fachlogik unabhängig von der Sprache der
-Benutzeroberfläche.
+Auch die Validierung ist von der Oberfläche getrennt.
+Sie liefert Fehlercodes und relevante Werte, während die Oberfläche daraus die
+passenden Meldungen erzeugt.
+Dadurch bleibt die Fachlogik unabhängig von der Sprache der Benutzeroberfläche.
 
-Die mitgelieferten Automaten sind bewusst partiell definiert. Fehlt ein
-Übergang, wird das Wort abgelehnt. Auf einen zusätzlichen Fangzustand wurde
-verzichtet, da dieser zwar die Sprache nicht verändert, aber die Diagramme
-unnötig vergrößert.
+Die mitgelieferten Automaten sind bewusst partiell definiert.
+Fehlt ein Übergang, wird das Wort abgelehnt.
+Auf einen zusätzlichen Fangzustand wurde verzichtet, da dieser zwar die Sprache nicht
+verändert, aber die Diagramme unnötig vergrößert.
 
 \subNsection{2}{Entscheidungen im UI}{Kristian Popov}
 
 Ursprünglich war für die Simulation nur die Übergangstabelle vorgesehen.
-Während der Entwicklung zeigte sich jedoch, dass der Ablauf eines Wortes
-damit schwer nachzuvollziehen ist: Zyklen und Sackgassen werden erst sichtbar,
-wenn man mehrere Zeilen gedanklich verknüpft. Deshalb wurde zusätzlich ein
-Zustandsdiagramm integriert.
+Während der Entwicklung zeigte sich jedoch, dass der Ablauf eines Wortes damit schwer
+nachzuvollziehen ist: Zyklen und Sackgassen werden erst sichtbar, wenn man mehrere
+Zeilen gedanklich verknüpft.
+Deshalb wurde zusätzlich ein Zustandsdiagramm integriert.
 
-Beide Darstellungen sind an denselben Simulationsschritt gebunden: Die Tabelle
-hebt genau die Zelle hervor, die dem im Diagramm markierten Übergang entspricht.
+Beide Darstellungen sind an denselben Simulationsschritt gebunden: Die Tabelle hebt
+genau die Zelle hervor, die dem im Diagramm markierten Übergang entspricht.
 Sie zeigt die formale Definition des Automaten, während das Diagramm den
-tatsächlichen Weg des Wortes sichtbar macht. Bei größeren Automaten wird das
-automatisch berechnete Layout schnell unübersichtlich. Einzelne Zustände lassen
-sich deshalb frei ziehen, der Ausschnitt vergrößern und verkleinern und die
-Ausgangsansicht mit einem Klick wiederherstellen. Aktive und
-fehlerhafte Übergänge bleiben dabei auch bei geringer Zoomstufe beschriftet.
+tatsächlichen Weg des Wortes sichtbar macht.
+Bei größeren Automaten wird das automatisch berechnete Layout schnell
+unübersichtlich.
+Einzelne Zustände lassen sich deshalb frei ziehen, der Ausschnitt vergrößern und
+verkleinern und die Ausgangsansicht mit einem Klick wiederherstellen.
+Aktive und fehlerhafte Übergänge bleiben dabei auch bei geringer Zoomstufe
+beschriftet.
 
-Verstöße gegen den Determinismus werden nicht nur aufgelistet, sondern
-unmittelbar an Zustand und Übergang im Diagramm markiert. Damit ist die Ursache
-dort sichtbar, wo sie entsteht.
+Verstöße gegen den Determinismus werden nicht nur aufgelistet, sondern unmittelbar an
+Zustand und Übergang im Diagramm markiert.
+Damit ist die Ursache dort sichtbar, wo sie entsteht.
 
-Der Editor umfasst alle wesentlichen Bestandteile eines Automaten:
-Automatentyp, Alphabet, Zustände, Start- und Endzustände sowie das
-Eingabewort. Die Zustandsmenge wird direkt über die Übergangstabelle verwaltet.
+Der Editor umfasst alle wesentlichen Bestandteile eines Automaten: Automatentyp,
+Alphabet, Zustände, Start- und Endzustände sowie das Eingabewort.
+Die Zustandsmenge wird direkt über die Übergangstabelle verwaltet.
 Alphabetsymbole sind auf einzelne Zeichen beschränkt, damit eine Eingabe wie
-\verb|10| nicht versehentlich als ein einzelnes Symbol aufgenommen wird. Die Zeile für
-$\varepsilon$-Übergänge erscheint nur bei einem NFA, sobald sie belegt ist oder
-ausdrücklich angefordert wird.
+\verb|10| nicht versehentlich als ein einzelnes Symbol aufgenommen wird.
+Die Zeile für $\varepsilon$-Übergänge erscheint nur bei einem NFA, sobald sie belegt
+ist oder ausdrücklich angefordert wird.
 
 \subNsection{2}{Andere Entscheidungen}{Kristian Popov}
 
-Neben der Einzelsimulation gibt es einen Schrittverlauf, über den bereits
-erreichte Schritte direkt ausgewählt werden können. Der gewählte Schritt wird
-dabei vom Anfang des Laufs an neu berechnet statt zwischengespeichert; bei den
-hier üblichen Wortlängen ist das unkritisch und hält Anzeige und tatsächlichen
-Ablauf zwingend deckungsgleich. Der Stapeltest ermöglicht
-es, mehrere Wörter gleichzeitig zu prüfen. Ein Ergebnis kann anschließend
-direkt in die Einzelsimulation übernommen werden.
+Neben der Einzelsimulation gibt es einen Schrittverlauf, über den bereits erreichte
+Schritte direkt ausgewählt werden können.
+Der gewählte Schritt wird dabei vom Anfang des Laufs an neu berechnet statt
+zwischengespeichert; bei den hier üblichen Wortlängen ist das unkritisch und hält
+Anzeige und tatsächlichen Ablauf zwingend deckungsgleich.
+Der Stapeltest ermöglicht es, mehrere Wörter gleichzeitig zu prüfen.
+Ein Ergebnis kann anschließend direkt in die Einzelsimulation übernommen werden.
 
-Eine weitere Funktion ist die Umwandlung rechtslinearer Grammatiken in
-Automaten. Nichtterminale werden dabei zu Zuständen und Produktionen werden
-in entsprechende Übergänge oder Endzustände übersetzt. Für die Eingabe werden
-zwei Schreibweisen unterstützt, die automatisch erkannt werden.
+Eine weitere Funktion ist die Umwandlung rechtslinearer Grammatiken in Automaten.
+Nichtterminale werden dabei zu Zuständen und Produktionen werden in entsprechende
+Übergänge oder Endzustände übersetzt.
+Für die Eingabe werden zwei Schreibweisen unterstützt, die automatisch erkannt
+werden.
 
-Beispiele und Übungen sind getrennt aufgebaut. Beispiele enthalten fertige
-Automaten und dienen zum Nachvollziehen, während Übungen mit einem leeren
-Automaten beginnen und zusätzlich Aufgabenstellung, Referenzlösung und
-automatische Kontrolle enthalten. Die Übungen sind nach
-\emph{Sprache} $\rightarrow$ \emph{Automat} und
+Beispiele und Übungen sind getrennt aufgebaut.
+Beispiele enthalten fertige Automaten und dienen zum Nachvollziehen, während Übungen
+mit einem leeren Automaten beginnen und zusätzlich Aufgabenstellung, Referenzlösung
+und automatische Kontrolle enthalten.
+Die Übungen sind nach \emph{Sprache} $\rightarrow$ \emph{Automat} und
 \emph{Grammatik} $\rightarrow$ \emph{Automat} gegliedert.
 
 Die Übungskontrolle vergleicht nicht die Struktur der Automaten, sondern deren
-Verhalten. Dazu werden alle Wörter über dem gemeinsamen Alphabet bis zu einer
-festgelegten Länge geprüft. Der Automat der Studierenden muss für jedes Wort
-dieselbe Entscheidung treffen wie die Referenzlösung. Bei einer Abweichung
-wird das erste unterschiedliche Wort als Gegenbeispiel angezeigt. Dadurch
-können auch unterschiedlich aufgebaute, aber funktional korrekte Automaten
-akzeptiert werden. Die Prüfung stellt jedoch keinen formalen
-Äquivalenznachweis dar. Strukturelle Mängel wie ungültige Übergänge werden
-vorrangig gemeldet, da sie meist die eigentliche Ursache sind und eine Liste
-fehlgeschlagener Testwörter dann in die Irre führen würde.
+Verhalten.
+Dazu werden alle Wörter über dem gemeinsamen Alphabet bis zu einer festgelegten Länge
+geprüft.
+Der Automat der Studierenden muss für jedes Wort dieselbe Entscheidung treffen wie
+die Referenzlösung.
+Bei einer Abweichung wird das erste unterschiedliche Wort als Gegenbeispiel
+angezeigt.
+Dadurch können auch unterschiedlich aufgebaute, aber funktional korrekte Automaten
+akzeptiert werden.
+Die Prüfung stellt jedoch keinen formalen Äquivalenznachweis dar.
+Strukturelle Mängel wie ungültige Übergänge werden vorrangig gemeldet, da sie meist
+die eigentliche Ursache sind und eine Liste fehlgeschlagener Testwörter dann in die
+Irre führen würde.
 
 Der Bearbeitungsstand jeder Übung wird gespeichert und beim erneuten Öffnen
-wiederhergestellt, sodass der Wechsel zwischen Übungen keine bereits
-begonnene Bearbeitung überschreibt.
+wiederhergestellt, sodass der Wechsel zwischen Übungen keine bereits begonnene
+Bearbeitung überschreibt.

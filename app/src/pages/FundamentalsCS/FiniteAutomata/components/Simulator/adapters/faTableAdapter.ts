@@ -34,10 +34,8 @@ export function buildTransitionTableHeaders(states: string[]): string[] {
 }
 
 /**
- * Build transition table rows.
- * Each row: [symbol, targets_for_state_0, targets_for_state_1, ...]
- * For DFA: single state name or "–"
- * For NFA: "{q0, q1}" or "–"
+ * Build transition table rows: `[symbol, targetsForState0, …]`, where a cell is
+ * a state name (DFA), `{q0, q1}` (NFA) or `–` when there is no transition.
  */
 export function buildTransitionTableRows(program: FAProgram): string[][] {
   return buildTransitionTableSymbols(program).map((symbol) => {

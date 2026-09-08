@@ -1,7 +1,7 @@
 import {
   BellRing,
   Building2,
-  Car,
+  TrafficCone,
   Coffee,
   DoorOpen,
   Gauge,
@@ -126,50 +126,50 @@ function createStarter(
   };
 }
 
-const barrierStarter = createStarter(
-  ["ALWAYS_OPEN", "CARD_CLOSED", "CARD_OPEN"],
-  ["GUEST_MODE", "CARD_MODE", "VALID_CARD", "PASS"],
+const trafficLightStarter = createStarter(
+  ["RED", "RED_YELLOW", "GREEN", "YELLOW"],
+  ["TICK", "HOLD", "RESET"],
   {
-    ALWAYS_OPEN: { symbol: "OPEN", code: 1 },
-    CARD_CLOSED: { symbol: "CLOSED", code: 0 },
-    CARD_OPEN: { symbol: "OPEN", code: 1 },
+    RED: { symbol: "RED", code: 0 },
+    RED_YELLOW: { symbol: "RED_YELLOW", code: 1 },
+    GREEN: { symbol: "GREEN", code: 2 },
+    YELLOW: { symbol: "YELLOW", code: 3 },
   },
-  "CARD_CLOSED",
+  "RED",
 );
-const barrierSolution: MooreProgram = {
-  ...barrierStarter,
+const trafficLightSolution: MooreProgram = {
+  ...trafficLightStarter,
   transitions: {
-    GUEST_MODE: {
-      ALWAYS_OPEN: "ALWAYS_OPEN",
-      CARD_CLOSED: "ALWAYS_OPEN",
-      CARD_OPEN: "ALWAYS_OPEN",
+    TICK: {
+      RED: "RED_YELLOW",
+      RED_YELLOW: "GREEN",
+      GREEN: "YELLOW",
+      YELLOW: "RED",
     },
-    CARD_MODE: {
-      ALWAYS_OPEN: "CARD_CLOSED",
-      CARD_CLOSED: "CARD_CLOSED",
-      CARD_OPEN: "CARD_OPEN",
+    HOLD: {
+      RED: "RED",
+      RED_YELLOW: "RED_YELLOW",
+      GREEN: "GREEN",
+      YELLOW: "YELLOW",
     },
-    VALID_CARD: {
-      ALWAYS_OPEN: "ALWAYS_OPEN",
-      CARD_CLOSED: "CARD_OPEN",
-      CARD_OPEN: "CARD_OPEN",
-    },
-    PASS: {
-      ALWAYS_OPEN: "ALWAYS_OPEN",
-      CARD_CLOSED: "CARD_CLOSED",
-      CARD_OPEN: "CARD_CLOSED",
+    RESET: {
+      RED: "RED",
+      RED_YELLOW: "RED",
+      GREEN: "RED",
+      YELLOW: "RED",
     },
   },
 };
 
 const vendingStarter = createStarter(
-  ["CREDIT_0", "CREDIT_050", "CREDIT_100", "CREDIT_150"],
+  ["CREDIT_0", "CREDIT_050", "CREDIT_100", "CREDIT_150", "REFUND"],
   ["COIN_050", "COIN_100", "START", "CANCEL"],
   {
     CREDIT_0: { symbol: "WAIT", code: 0 },
     CREDIT_050: { symbol: "WAIT", code: 0 },
     CREDIT_100: { symbol: "DRINK_100_READY", code: 1 },
     CREDIT_150: { symbol: "DRINK_150_READY", code: 2 },
+    REFUND: { symbol: "RETURN_COINS", code: 3 },
   },
   "CREDIT_0",
 );
@@ -180,25 +180,29 @@ const vendingSolution: MooreProgram = {
       CREDIT_0: "CREDIT_050",
       CREDIT_050: "CREDIT_100",
       CREDIT_100: "CREDIT_150",
-      CREDIT_150: "CREDIT_150",
+      CREDIT_150: "REFUND",
+      REFUND: "REFUND",
     },
     COIN_100: {
       CREDIT_0: "CREDIT_100",
       CREDIT_050: "CREDIT_150",
-      CREDIT_100: "CREDIT_150",
-      CREDIT_150: "CREDIT_150",
+      CREDIT_100: "REFUND",
+      CREDIT_150: "REFUND",
+      REFUND: "REFUND",
     },
     START: {
       CREDIT_0: "CREDIT_0",
       CREDIT_050: "CREDIT_050",
       CREDIT_100: "CREDIT_0",
       CREDIT_150: "CREDIT_0",
+      REFUND: "CREDIT_0",
     },
     CANCEL: {
       CREDIT_0: "CREDIT_0",
-      CREDIT_050: "CREDIT_0",
-      CREDIT_100: "CREDIT_0",
-      CREDIT_150: "CREDIT_0",
+      CREDIT_050: "REFUND",
+      CREDIT_100: "REFUND",
+      CREDIT_150: "REFUND",
+      REFUND: "CREDIT_0",
     },
   },
 };
@@ -298,7 +302,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.turnstile.title",
     storageId: 0x30,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: turnstileStarter,
     solutionProgram: turnstileSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -322,7 +326,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.elevator.title",
     storageId: 0x31,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: elevatorStarter,
     solutionProgram: elevatorSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -344,36 +348,41 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
   },
   {
     machineType: "moore",
-    id: "moore-mealy.exercises.barrier.title",
+    id: "moore-mealy.exercises.trafficLight.title",
     storageId: 0x32,
-    starterProgram: createEmptyExerciseProgram(),
-    solutionProgram: barrierSolution,
+    starterProgram: trafficLightStarter,
+    solutionProgram: trafficLightSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
-      { input: ["VALID_CARD"], expectedOutputCodes: [0, 1] },
-      { input: ["VALID_CARD", "PASS"], expectedOutputCodes: [0, 1, 0] },
-      { input: ["GUEST_MODE", "PASS"], expectedOutputCodes: [0, 1, 1] },
+      { input: ["TICK"], expectedOutputCodes: [0, 1] },
+      { input: ["TICK", "TICK"], expectedOutputCodes: [0, 1, 2] },
+      { input: ["TICK", "TICK", "TICK"], expectedOutputCodes: [0, 1, 2, 3] },
       {
-        input: ["GUEST_MODE", "CARD_MODE"],
-        expectedOutputCodes: [0, 1, 0],
+        input: ["TICK", "TICK", "TICK", "TICK"],
+        expectedOutputCodes: [0, 1, 2, 3, 0],
+      },
+      { input: ["HOLD"], expectedOutputCodes: [0, 0] },
+      {
+        input: ["TICK", "HOLD", "TICK"],
+        expectedOutputCodes: [0, 1, 1, 2],
       },
       {
-        input: ["VALID_CARD", "CARD_MODE", "PASS"],
-        expectedOutputCodes: [0, 1, 1, 0],
+        input: ["TICK", "TICK", "RESET"],
+        expectedOutputCodes: [0, 1, 2, 0],
       },
     ],
     definition: {
-      titleKey: "moore-mealy.exercises.barrier.title",
-      descriptionKey: "moore-mealy.exercises.barrier.description",
+      titleKey: "moore-mealy.exercises.trafficLight.title",
+      descriptionKey: "moore-mealy.exercises.trafficLight.description",
       difficulty: "easy",
-      icon: Car,
+      icon: TrafficCone,
     },
   },
   {
     machineType: "moore",
     id: "moore-mealy.exercises.vending.title",
     storageId: 0x33,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: vendingStarter,
     solutionProgram: vendingSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -387,8 +396,20 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
         input: ["COIN_100", "COIN_050", "START"],
         expectedOutputCodes: [0, 1, 2, 0],
       },
-      { input: ["COIN_050", "CANCEL"], expectedOutputCodes: [0, 0, 0] },
-      { input: ["COIN_100", "COIN_100"], expectedOutputCodes: [0, 1, 2] },
+      { input: ["COIN_050", "CANCEL"], expectedOutputCodes: [0, 0, 3] },
+      {
+        input: ["COIN_050", "CANCEL", "START"],
+        expectedOutputCodes: [0, 0, 3, 0],
+      },
+      {
+        input: ["COIN_100", "COIN_050", "COIN_050"],
+        expectedOutputCodes: [0, 1, 2, 3],
+      },
+      { input: ["COIN_100", "COIN_100"], expectedOutputCodes: [0, 1, 3] },
+      {
+        input: ["COIN_100", "COIN_100", "START"],
+        expectedOutputCodes: [0, 1, 3, 0],
+      },
     ],
     definition: {
       titleKey: "moore-mealy.exercises.vending.title",
@@ -401,7 +422,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.wiper.title",
     storageId: 0x34,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: wiperStarter,
     solutionProgram: wiperSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -430,7 +451,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.alarm.title",
     storageId: 0x35,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: alarmStarter,
     solutionProgram: alarmSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -456,7 +477,7 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
     machineType: "moore",
     id: "moore-mealy.exercises.cruise.title",
     storageId: 0x36,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: cruiseStarter,
     solutionProgram: cruiseSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [0] },
@@ -490,15 +511,3 @@ export const mooreExerciseScenarios: MooreExerciseScenario[] = [
 export const mooreExercises = mooreExerciseScenarios.map(
   (scenario) => scenario.definition,
 );
-
-function createEmptyExerciseProgram(): MooreProgram {
-  return {
-    states: ["STATE_0"],
-    inputSymbols: [],
-    transitions: {},
-    outputs: { STATE_0: { symbol: "OUT_0", code: 0 } },
-    initialState: "STATE_0",
-    inputWord: [],
-    representation: "binary",
-  };
-}

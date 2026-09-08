@@ -9,7 +9,11 @@ import { RLLanguageToGrammar } from "@/pages/FundamentalsCS/RegularLanguages/com
 import { rlExamples } from "@/pages/FundamentalsCS/RegularLanguages/components/Simulator/config/rlExamples";
 import { rlExercises } from "@/pages/FundamentalsCS/RegularLanguages/exercises/rlExerciseDefinitions";
 import { RL_STORAGE_TASK_IDS } from "@/pages/FundamentalsCS/RegularLanguages/components/Simulator/useRLPersistedSource";
-import { trainingCenterStorage } from "@/lib/trainingCenter";
+import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
+import {
+  createTrainingCenterIdentifier,
+  trainingCenterStorage,
+} from "@/lib/trainingCenter";
 import type { Example } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 
@@ -103,7 +107,7 @@ describe("RegularLanguages ExercisesTab — handlers", () => {
     );
   });
 
-  it("clears the stored draft of every simulator mode on reset", () => {
+  it("clears every exercise's stored draft on reset", () => {
     const remove = vi.spyOn(trainingCenterStorage, "delete");
     render(
       <ExercisesTab
@@ -116,9 +120,39 @@ describe("RegularLanguages ExercisesTab — handlers", () => {
     fireEvent.click(screen.getByTestId("rl-reset-all-exercises"));
     fireEvent.click(screen.getByTestId("rl-reset-all-exercises-confirm"));
 
-    expect(remove).toHaveBeenCalledTimes(
-      Object.keys(RL_STORAGE_TASK_IDS).length,
+    expect(remove).toHaveBeenCalledTimes(rlExercises.length);
+    for (const exercise of rlExercises) {
+      expect(remove).toHaveBeenCalledWith(
+        createTrainingCenterIdentifier(
+          TOPIC_STORAGE_IDS.regularLanguages,
+          exercise.storageId,
+        ),
+      );
+    }
+    remove.mockRestore();
+  });
+
+  it("leaves the free simulator's three mode drafts alone", () => {
+    const remove = vi.spyOn(trainingCenterStorage, "delete");
+    render(
+      <ExercisesTab
+        selectedExercise={null}
+        onSelectExercise={vi.fn()}
+        onOpenExerciseInSimulation={vi.fn()}
+      />,
     );
+
+    fireEvent.click(screen.getByTestId("rl-reset-all-exercises"));
+    fireEvent.click(screen.getByTestId("rl-reset-all-exercises-confirm"));
+
+    for (const taskStorageId of Object.values(RL_STORAGE_TASK_IDS)) {
+      expect(remove).not.toHaveBeenCalledWith(
+        createTrainingCenterIdentifier(
+          TOPIC_STORAGE_IDS.regularLanguages,
+          taskStorageId,
+        ),
+      );
+    }
     remove.mockRestore();
   });
 });
@@ -167,6 +201,31 @@ describe("RLLanguageToGrammar — remaining controls", () => {
     fireEvent.change(field, { target: { value: 'L = {"ab"}' } });
 
     expect(field).toHaveValue('L = {"ab"}');
+  });
+
+  it("refuses a mistyped word that is not written as a set", () => {
+    render(<RLLanguageToGrammar />);
+
+    const field = screen.getByTestId("rl-language-to-grammar-source");
+    fireEvent.change(field, { target: { value: "cvvvvvvv" } });
+
+    expect(
+      screen.getByText("regular-languages.languageErrors.missingBraces"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Enter a valid language definition to derive a grammar.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("builds the grammar once the same word is written as a set", () => {
+    render(<RLLanguageToGrammar />);
+
+    const field = screen.getByTestId("rl-language-to-grammar-source");
+    fireEvent.change(field, { target: { value: "L = {cvvvvvvv}" } });
+
+    expect(screen.getByText(/S -> cA1/)).toBeInTheDocument();
   });
 
   it("opens the supported-formats panel", () => {

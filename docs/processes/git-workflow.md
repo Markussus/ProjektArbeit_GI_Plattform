@@ -1,111 +1,62 @@
-# Git Workflow
+# Git-Workflow, Commits & Release-Leitfaden
 
-## Overview
+Kurzer Leitfaden für Branching, Commits und die Erstellung neuer Plattform-Releases.
 
-This project follows a structured Git workflow to ensure code quality, traceability, and stable project states.
+---
 
-The repository uses two main long-lived branches:
+## 1. Branching-Modell
 
--   `main` – stable, production-ready states
--   `development` – active integration branch for ongoing work
+* **`main`:** Enthält ausschließlich stabile, abgenommene Release-Stände. Keine direkten Commits.
+* **`development`:** Zentraler Integrations-Branch für laufende Entwicklungen.
+* **Feature-/Fix-Branches:** Werden von `development` abgezweigt.
+  * Namensschema: `develop/<thema>`, `fix/<problem>`, `docs/<thema>`.
 
-All development work is performed through short-lived feature branches.
+---
 
-------------------------------------------------------------------------
+## 2. Commit-Konventionen
 
-## Branch Strategy
+Commits folgen dem Schema der **Conventional Commits**:
 
-### Main Branch (`main`)
+| Typ | Bedeutung | Beispiel |
+| :--- | :--- | :--- |
+| `feat:` | Neues Feature / Didaktik-Erweiterung | `feat: add stepBack to Moore simulator` |
+| `fix:` | Fehlerbehebung | `fix: resolve WASM memory leak in Java runner` |
+| `docs:` | Änderungen an Dokumentation / Texten | `docs: update module guide and architecture` |
+| `test:` | Ergänzung oder Korrektur von Tests | `test: add unit tests for DNF minimization` |
+| `refactor:` | Code-Überarbeitung ohne Verhaltensänderung | `refactor: clean up topic storage IDs` |
 
--   Contains only stable and presentation-ready versions of the project
--   Represents milestones or validated intermediate results
--   Direct commits to `main` are not allowed
-
-### Development Branch (`development`)
-
--   Central integration branch for all completed features
--   May contain work-in-progress but should remain functional at all times
-
-### Feature Branches
-
--   Created from `development`
-
--   One branch per issue or work item
-
--   Naming convention:
-
-    -   `develop/<workitem or issue id and name>`
-    -   `fix/<short-description>`
-    -   `docs/<short-description>`
-
-Example:
-
-```         
-develop/80-initialize-vite-with-react-and-typescript
-fix/import-parser
-docs/git-workflow
+Vor dem Push/Commit empfiehlt sich:
+```bash
+npm run pre:commit:check
 ```
 
-------------------------------------------------------------------------
+---
 
-## Workflow Process
+## 3. Merge Requests & Reviews
 
-1.  Create or select an issue in GitLab
-2.  Create a new branch from `development`
-3.  Implement the feature or fix
-4.  Commit changes with meaningful commit messages
-5.  Open a Merge Request (MR) into `development`
-6.  After approval, merge into `development`
-7.  Periodically merge `development` into `main` for stable releases
+1. MR von Feature-Branch nach `development` erstellen.
+2. GitLab-CI-Pipeline muss grün durchlaufen (Lint, Unit-Tests, Build, E2E, Lighthouse).
+3. Mindestens **1 Approval** eines anderen Teammitglieds erforderlich.
 
-------------------------------------------------------------------------
+---
 
-## Merge & Approval Rules
+## 4. Neuen Release erstellen (Offline-Bundle)
 
-To ensure code quality and shared responsibility, the following rules apply:
+Die Plattform kann als eigenständiges, offline lauffähiges ZIP-Paket für Prüfer oder den Einsatz ohne Internet bereitgestellt werden:
 
-### Merge into `development`
-
--   Requires **at least 1 approval**
--   Approval must come from **another team member**
--   The author of the MR cannot approve their own changes
-
-### Merge into `main`
-
--   Requires **at least 2 approvals**
--   Approvals must come from **two different team members**
--   Only stable and reviewed code may be merged
-
-------------------------------------------------------------------------
-
-## Commit Guidelines
-
--   Each commit should be **small, focused, and meaningful**
--   Commit messages should clearly describe the change
--   Commit messages shall follow the conventional commit guidelines
--   If applicable, reference the related issue
-
-Example:
-
-```         
-feat: add step-by-step simulation for Turing Machine
-fix: handle invalid binary input
-docs: update architecture description
+### 1. Release bauen
+Im Ordner `app/` ausführen:
+```bash
+npm run release
 ```
 
-------------------------------------------------------------------------
+### 2. Was das Skript macht (`deployment/create-release.mjs`):
+1. Führt `npm run build` aus (inklusive Java-WASM-Kompilierung nach `app/dist`).
+2. Packt den Build zusammen mit dem Python-Offline-Server (`serve.py`) und den 1-Klick-Startern (`start.cmd`, `start.sh`).
+3. Erzeugt ein datiertes/getagtes ZIP-Archiv unter `deployment/releases/`.
 
-## Release Strategy
-
--   `main` is updated only when a stable state is reached
--   Each merge into `main` represents a **milestone or release candidate**
--   Use Git tags for important versions (e.g. `v0.1`, `v1.0`)
-
-------------------------------------------------------------------------
-
-## Goals of This Workflow
-
--   Maintain a stable `main` branch at all times
--   Enable parallel development through feature branches
--   Ensure code quality via reviews
--   Provide clear traceability between branches, issues, commits, and work items
+### 3. Release lokal testen
+Das erzeugte Release oder der Ordner `deployment/` kann direkt offline getestet werden:
+* **Windows:** Doppelklick auf `deployment/start.cmd`
+* **Linux/macOS:** `./deployment/start.sh`
+* **Manuell per Python:** `python deployment/serve.py` (öffnet `http://localhost:8000`)

@@ -20,6 +20,7 @@ import {
   createPasteLimitListener,
   syncMonacoMarkers,
 } from "./domain/javaEditorMarkers";
+import "./monacoConfig";
 
 const MonacoEditor = lazy(() => import("@monaco-editor/react"));
 

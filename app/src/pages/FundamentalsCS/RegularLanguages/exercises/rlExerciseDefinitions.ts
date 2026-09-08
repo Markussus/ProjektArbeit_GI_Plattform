@@ -12,8 +12,14 @@ import type { SimulationMode } from "../components/Simulator/domain/rlTypes";
 export type RLExerciseCategory =
   "grammarToLanguage" | "languageToGrammar" | "applied";
 
+/** One authored RL exercise: prompt, seed and reference answer. */
 export interface RLExerciseDefinition extends ExerciseDefinition {
   id: string;
+  /**
+   * Training Center slot, unique within the topic, so each exercise keeps its own
+   * draft. The free simulator's modes sit at the top of the range.
+   */
+  storageId: number;
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   /** One-line statement of what to achieve, shown in the workspace panel. */
@@ -23,20 +29,17 @@ export interface RLExerciseDefinition extends ExerciseDefinition {
   /** Which of the three on-page sections this exercise belongs to. */
   category: RLExerciseCategory;
   /**
-   * The monospaced problem statement shown in the workspace panel before the
-   * solution is revealed: the given grammar (grammarToLanguage) or the target
-   * language (languageToGrammar / applied). Notation is language-neutral, so it
-   * lives here rather than in the translation files. Use "ε" for the empty word.
+   * The problem statement shown in the workspace panel: the given grammar, or the
+   * target language. Notation is language-neutral, so it lives here rather than
+   * in the translation files. Use "ε" for the empty word.
    */
   prompt: string;
   /** Which simulator mode the exercise opens in. */
   mode: SimulationMode;
   /**
-   * The worked input loaded into the simulator when the solution is revealed
-   * (arrow notation the parser understands). For grammarToLanguage this is the
-   * given grammar (the simulator then enumerates the language); for
-   * languageToGrammar / applied it is the language (the simulator then derives
-   * a grammar).
+   * The worked input loaded when the solution is revealed, in arrow notation: the
+   * grammar for grammarToLanguage (the simulator enumerates it), the language for
+   * the other modes (the simulator derives a grammar).
    */
   seed: {
     grammarSource?: string;
@@ -74,10 +77,12 @@ const identifiersReferenceGrammar = [
   `A -> ${LETTERS.map((c) => `${c}A`).join(" | ")} | ε`,
 ].join("\n");
 
+/** All exercises, grouped by category in the order the tab shows them. */
 export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 1: Grammar → Language ───────────────────────────────────────────
   {
     id: "g2l-finite-binary",
+    storageId: 0,
     titleKey: "regular-languages.exercises.g2lFiniteBinary.title",
     descriptionKey: "regular-languages.exercises.g2lFiniteBinary.description",
     goalKey: "regular-languages.exercises.g2lFiniteBinary.goal",
@@ -94,6 +99,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-trailing-zero",
+    storageId: 1,
     titleKey: "regular-languages.exercises.g2lTrailingZero.title",
     descriptionKey: "regular-languages.exercises.g2lTrailingZero.description",
     goalKey: "regular-languages.exercises.g2lTrailingZero.goal",
@@ -108,6 +114,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-epsilon-loop",
+    storageId: 2,
     titleKey: "regular-languages.exercises.g2lEpsilonLoop.title",
     descriptionKey: "regular-languages.exercises.g2lEpsilonLoop.description",
     goalKey: "regular-languages.exercises.g2lEpsilonLoop.goal",
@@ -124,6 +131,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "g2l-grouped",
+    storageId: 3,
     titleKey: "regular-languages.exercises.g2lGrouped.title",
     descriptionKey: "regular-languages.exercises.g2lGrouped.description",
     goalKey: "regular-languages.exercises.g2lGrouped.goal",
@@ -144,6 +152,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 2: Language → Grammar ───────────────────────────────────────────
   {
     id: "l2g-zero-ones-zero",
+    storageId: 4,
     titleKey: "regular-languages.exercises.l2gZeroOnesZero.title",
     descriptionKey: "regular-languages.exercises.l2gZeroOnesZero.description",
     goalKey: "regular-languages.exercises.l2gZeroOnesZero.goal",
@@ -158,6 +167,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-four-words",
+    storageId: 5,
     titleKey: "regular-languages.exercises.l2gFourWords.title",
     descriptionKey: "regular-languages.exercises.l2gFourWords.description",
     goalKey: "regular-languages.exercises.l2gFourWords.goal",
@@ -177,6 +187,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "l2g-nested-zeros",
+    storageId: 6,
     titleKey: "regular-languages.exercises.l2gNestedZeros.title",
     descriptionKey: "regular-languages.exercises.l2gNestedZeros.description",
     goalKey: "regular-languages.exercises.l2gNestedZeros.goal",
@@ -201,6 +212,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   // ── Type 3: Applied grammars ─────────────────────────────────────────────
   {
     id: "applied-integers",
+    storageId: 7,
     titleKey: "regular-languages.exercises.appliedIntegers.title",
     descriptionKey: "regular-languages.exercises.appliedIntegers.description",
     goalKey: "regular-languages.exercises.appliedIntegers.goal",
@@ -215,6 +227,7 @@ export const rlExercises: RLExerciseDefinition[] = [
   },
   {
     id: "applied-identifiers",
+    storageId: 8,
     titleKey: "regular-languages.exercises.appliedIdentifiers.title",
     descriptionKey:
       "regular-languages.exercises.appliedIdentifiers.description",

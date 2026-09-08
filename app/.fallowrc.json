@@ -7,5 +7,14 @@
   },
   "rules": {
     "unused-dependencies": "warn"
+  },
+  "health": {
+    "ignore": [
+      // programCommon.ts: 76 LOC, encapsulates stateless mathematical primitives for automata (bit calculations, alphabet checks).
+      // splitting would cause artificial fragmentation.
+      "src/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/programCommon.ts",
+      // mealyProgram.ts: 142 LOC, encapsulates invariants, validation, and normalization for the Mealy aggregate.
+      "src/pages/FundamentalsCS/MooreMealy/components/Simulator/domain/mealyProgram.ts"
+    ]
   }
 }

@@ -1,0 +1,316 @@
+{
+  "title": "Ayırıcı Normal Form",
+  "description": "Boolean ifadelerinin doğruluk tablolarıyla nasıl değerlendirildiğini ve sonuç 1 olan satırlardan Ayırıcı Normal Formun nasıl türetildiğini öğrenin.",
+  "tutorialVideo": "Eğitim videosu",
+  "taskGroups": {
+    "expression_to_truth_table": {
+      "title": "Başlangıç noktası olarak ifade",
+      "description": "Bir ifadeyi değerlendirin, doğruluk tablosunu oluşturun, DNF'yi türetin ve basitleştirin."
+    },
+    "truth_table_to_dnf": {
+      "title": "Başlangıç noktası olarak doğruluk tablosu",
+      "description": "Belirli bir doğruluk tablosundan DNF'yi türetin ve basitleştirin."
+    }
+  },
+  "algebra": {
+    "title": "Boole cebiri kuralları",
+    "intro": "Bu kurallar, bir DNF'yi daha kısa eşdeğer formlara yeniden yazmanıza olanak tanır. Adım adım çözüm yolunu ve simülatördeki çalışılan örnekleri güçlendirirler.",
+    "rules": {
+      "identity": {
+        "name": "Kimlik",
+        "example": "1, ∧'nin nötr elemanı, 0 ise ∨'nin nötr elemanı gibi davranır."
+      },
+      "domination": {
+        "name": "Hakimiyet",
+        "example": "1 ile VEYA işlemine giren her ifade 1 olur; 0 ile VE işlemine giren her ifade 0 olur."
+      },
+      "idempotence": {
+        "name": "İdempotans",
+        "example": "Aynı işlenenin tekrarlanması terimi ne sıkılaştırır ne de gevşetir."
+      },
+      "double_negation": {
+        "name": "Çift olumsuzlama",
+        "example": "İki olumsuzluk birbirini iptal eder."
+      },
+      "complement": {
+        "name": "Tamamlayıcı",
+        "example": "Bir değişken her zaman ya doğrudur ya da yanlıştır; yani a ∨ ¬a her zaman 1'dir ve a ∧ ¬a her zaman 0'dır."
+      },
+      "commutativity": {
+        "name": "Değişebilirlik",
+        "example": "İşlenen sırası ∧ ve ∨ için sonucu etkilemez."
+      },
+      "associativity": {
+        "name": "Birleşme özelliği",
+        "example": "Çoklu ∧ veya ∨ işlemlerinde gruplamanın önemi yoktur — (a ∧ b) ∧ c eşittir a ∧ (b ∧ c)."
+      },
+      "distributivity": {
+        "name": "Dağıtıcılık",
+        "example": "Paylaşılan bir işlenen, normal matematikteki çarpanlara ayırma gibi, ancak · ve + yerine ∧ ve ∨ kullanılarak çarpanlara ayrılabilir."
+      },
+      "absorption": {
+        "name": "Emilim",
+        "example": "Eğer a zaten doğruysa, o zaman a ∨ (a ∧ b) de doğrudur — AND kısmı hiçbir şey eklemez."
+      },
+      "de_morgan": {
+        "name": "De Morgan",
+        "example": "Olumsuzlama operatörü çevirir: ∧, ∨ olur ve her işlenen olumsuzlanır."
+      }
+    }
+  },
+  "examples": {
+    "walkthroughs": {
+      "lectureExpression": {
+        "title": "Ders örneği: a ∨ (b ∧ c)",
+        "explanation": "Ders doğruluk tablosu a'nın 1 veya b ve c'nin her ikisinin de 1 olduğunu gösterir."
+      },
+      "parentheses": {
+        "title": "Alıştırma 1: (a ∨ b) ∧ c",
+        "explanation": "Ders alıştırması yalnızca parantezleri değiştirir ve sonucu önceki tabloyla karşılaştırır."
+      },
+      "dnfIntro": {
+        "title": "Dersten DNF tanıtımı",
+        "explanation": "Yalnızca 000 ve 111. satırlar 1 olarak değerlendirilir ve iki AND terimi üretilir."
+      },
+      "exerciseTwo": {
+        "title": "Alıştırma 2: Doğruluk tablosundan polinom",
+        "explanation": "Sonucu 1 olan üç satır (010, 100, 101), ders alıştırması 2'nin DNF'sini verir."
+      }
+    }
+  },
+  "exercises": {
+    "worksheet02bTruthTable1": {
+      "title": "DNF'yi Doğruluk Tablosundan Türetme",
+      "description": "Verilen doğruluk tablosundan a, b ve c ile kanonik DNF'yi türetin ve ardından basitleştirin. Çalışma sayfası 02b, alıştırma 1'e göre."
+    },
+    "simpleExpression": {
+      "title": "Bir İfadeden Doğruluk Tablosu Oluşturma",
+      "description": "Verilen ifade için doğruluk tablosunu oluşturun ve kanonik DNF'sini türetin."
+    },
+    "overlappingGroups": {
+      "title": "Çakışan Gruplarla DNF'yi Basitleştirin",
+      "description": "Doğruluk tablosundan kanonik DNF'yi türetin ve minimum DNF'yi belirleyin. 1 satırın birden fazla grup tarafından kapsanabileceğini unutmayın."
+    },
+    "negatedExpression": {
+      "title": "Olumsuzlukları Olan Bir İfadeyi Değerlendirin",
+      "description": "Birden fazla olumsuzlama içeren bir ifade için doğruluk tablosunu oluşturun ve kanonik DNF'sini belirleyin."
+    },
+    "worksheet02bTruthTable2": {
+      "title": "Dört Değişkenli DNF'yi Türetme",
+      "description": "Verilen doğruluk tablosundan a, b, c ve d ile kanonik DNF'yi türetin ve ardından basitleştirin. Çalışma sayfası 02b, alıştırma 2'ye göre."
+    },
+    "complexExpression": {
+      "title": "Karmaşık Bir İfadeyi DNF'ye Dönüştürme",
+      "description": "Dört değişkenli ifade için doğruluk tablosunu oluşturun, kanonik DNF'sini belirleyin ve basitleştirin."
+    }
+  },
+  "exprBuilder": {
+    "evaluate": "Değerlendir"
+  },
+  "simulator": {
+    "tabs": {
+      "expression_to_truth_table": "İfade → tablo",
+      "truth_table_to_dnf": "Tablo → DNF"
+    },
+    "tableModeTitle": "Doğruluk tablosundan DNF",
+    "tableModeHint": "Kendi doğruluk tablonuzu oluşturun, sonuç sütununu ayarlayın ve DNF'yi buradan yazın.",
+    "variableCount": "Değişkenler",
+    "variableCountLabel": "Sayım",
+    "variableCountHelp": "{{min}} ila {{max}} değişkenlerine izin verilir",
+    "clearTable": "Tabloyu 0'a ayarla",
+    "fillTable": "Tabloyu 1'e ayarla",
+    "randomTable": "Rastgeleleştir",
+    "invertTable": "Sonuçları ters çevir",
+    "setupPreviewTitle": "Doğruluk tablosunu kurun",
+    "setupPreviewHint": "Her satır için f sütununu ayarlayın. Tablo hazır olduğunda DNF alıştırmasını başlatmak için \"Tabloyu tamamla\"ya tıklayın.",
+    "commitTable": "Tabloyu tamamla",
+    "loadSolution": "Çözümü yükle",
+    "editConfig": "Yapılandırmayı düzenle"
+  },
+  "builder": {
+    "inputTitle": "Boole ifadesi",
+    "inputHint": "Değişkenleri, 0/1'i, parantezleri ve ¬, ∧, ∨ operatörlerini kullanın.",
+    "keyboardAliases": "Klavye takma adları: ! veya ~ = ¬, & veya && = ∧, | veya || = ∨.",
+    "operatorHelp": "Operatörler:",
+    "insertNot": "Olumsuzluk ekle",
+    "insertAnd": "VE ekle",
+    "insertOr": "VEYA Ekle",
+    "insertOpenParen": "Açılış parantezini ekle",
+    "insertCloseParen": "Kapanış parantezi ekle",
+    "clear": "Temizle",
+    "exercise": {
+      "taskTitle": "Egzersiz görevi",
+      "given": "Boolean ifadesi göz önüne alındığında:",
+      "givenTruthTable": "Doğruluk tablosu göz önüne alındığında:",
+      "buildTruthTable": "Doğruluk tablosunu oluşturun:",
+      "chooseResultColumn": "Sonuç değerlerini kendiniz ayarlayın. Ardından DNF'yi tüm 1 satırlardan oluşturun.",
+      "findExpressionFromTable": "Boolean polinomunu ayırıcı normal formda bulun.",
+      "stepsTitle": "İş akışı",
+      "instructionStepTable": "Doğruluk tablosunu doldurun.",
+      "instructionStepDnf": "Her 1 satırdan bir AND terimi oluşturun ve terimleri ∨ ile birleştirin.",
+      "instructionStepEditableTable": "Sonuç sütunu f'yi doğruluk tablosunda ayarlayın.",
+      "instructionStepOneRows": "Yalnızca sonuç 1 olan satırları göz önünde bulundurun.",
+      "instructionStepDnfFromTable": "Her 1 satır için bir AND terimi oluşturun ve bunları ∨ ile birleştirin.",
+      "tableTitle": "Çalışma alanı",
+      "tableHint": "Her satır için sonuç değerini 0 veya 1 olarak seçin. Klavye odağıyla 0/1 ve ok tuşlarını kullanın.",
+      "tableHintEditable": "Her satır için sonuç değerini f olarak ayarlayın. DNF'niz bu doğruluk tablosunu tam olarak tanımlamalıdır.",
+      "tableHintGiven": "Sonuç sütunu verilir. DNF'yi ondan türetin.",
+      "rowHeader": "Satır",
+      "resultGroupLabel": "{{row}} satırının sonucu",
+      "resultButtonLabel": "Satır {{row}}: sonucu seçin {{value}}",
+      "dnfLabel": "DNF",
+      "dnfHint": "Kural: Her 1 satır, tüm değişkenleri içeren tam olarak bir AND terimine katkıda bulunur.",
+      "dnfPlaceholder": "örneğin (¬a ∧ b ∧ c) ∨ (a ∧ ¬b ∧ c)",
+      "check": "Kontrol et",
+      "feedbackTitle": "Geribildirim",
+      "notChecked": "Henüz kontrol edilmedi. Tabloyu doldurun, DNF'yi girin ve Kontrol Et'e tıklayın.",
+      "notCheckedDnfOnly": "Henüz kontrol edilmedi. Verilen doğruluk tablosu için DNF'yi girin ve Kontrol Et'e tıklayın.",
+      "notCheckedEditable": "Henüz kontrol edilmedi. Sonuç değerlerini ayarlayın, eşleşen DNF'yi girin ve Kontrol Et'e tıklayın.",
+      "progressTable": "Doğruluk tablosu",
+      "progressTableValue": "{{answered}} / {{total}} satır yanıtlandı",
+      "progressTableProvided": "verildi",
+      "progressTableEditable": "kendi kendine tanımlanmış",
+      "progressDnf": "DNF girişi",
+      "progressDnfReady": "mevcut",
+      "progressDnfMissing": "hala boş",
+      "tableCorrectValue": "{{correct}} / {{total}} satır doğru",
+      "dnfStatus": {
+        "deferred": "doğruluk tablosu bekleniyor",
+        "empty": "kayıp",
+        "syntax_error": "sözdizimini kontrol et",
+        "correct": "doğru",
+        "equivalent_not_canonical": "eşdeğer, yanlış biçim",
+        "not_equivalent": "eşleşmiyor"
+      },
+      "oneRowsLabel": "DNF için 1 satır",
+      "noOneRows": "hiçbiri",
+      "correctTitle": "Hepsi doğru",
+      "correctDesc": "Doğruluk tablosu ve DNF görevle eşleşiyor.",
+      "tableIncomplete": "{{count}} tablo satırları hala boş.",
+      "tableWrongRows_one": "{{total}} tablo satırlarından {{count}} hâlâ yanlış; bunu kendiniz bulun.",
+      "tableWrongRows_other": "{{total}} tablo satırlarından {{count}} hâlâ yanlış; bunları kendiniz bulun.",
+      "dnfEmpty": "DNF girişi hala eksik.",
+      "dnfSyntax": "DNF girişi ayrıştırılamıyor.",
+      "dnfEquivalentNotCanonical": "Giriş aynı işlevi açıklar ancak sonuç 1 olan satırlardan bir DNF olarak oluşturulmaz; her 1 satır tam olarak bir AND terimi gerektirir.",
+      "dnfMissingTerms": "DNF'de satır(lar) için {{count}} terim(ler) eksik: {{rows}}.",
+      "dnfExpectedTerms": "Beklenen eksik terimler: {{terms}}.",
+      "dnfExtraTerms": "DNF, 1 satıra ait olmayan terim(ler) içeriyor: {{rows}}.",
+      "dnfExtraTermDetails": "Bu terim(ler) 0-satırları etkinleştirir: {{terms}}.",
+      "dnfWrongRows": "DNF şu tablo satırlarıyla eşleşmiyor: {{rows}}.",
+      "dnfDeferredUntilTable": "DNF, ancak doğruluk tablosunun tamamlanması ve doğrulanmasının ardından ayrıntılı olarak kontrol edilir.",
+      "tipTitle": "İpucu",
+      "tipCompleteTable": "DNF ancak her tablo satırında bir yanıt bulunduğunda anlamlı bir şekilde kontrol edilebilir.",
+      "tipTableRows": "Tabloyu satır satır inceleyin ve her değeri kendiniz doğrulayın. DNF yalnızca her satır doğru olduğunda türetilebilir.",
+      "tipStartDnf": "Sonuç 1 olan her satır için tüm değişkenleri içeren bir VE terimi yazın.",
+      "tipSyntax": "Parantezleri ve ¬, ∧, ∨ operatörlerini veya !, &, | takma adlarını kullanın.",
+      "tipCanonical": "Her AND terimi, her değişkeni tam olarak bir kez (olduğu gibi veya olumsuzlanmış) içermelidir.",
+      "tipMissingTerms": "Tablonun 1 satırlarını DNF'nizdeki AND terimleriyle karşılaştırın.",
+      "tipCompareRows": "Listelenen satırlarda DNF'nizi değerlendirin ve sonucu tabloyla karşılaştırın.",
+      "solutionHint": "Tam çözüm artık son ipucu olarak gösterilebilir.",
+      "showSolutionHelp": "Çözümü göster",
+      "solutionAfterCheck": "Kontrol sonrası çözüm",
+      "hideSolution": "Çözümü gizle",
+      "simplificationTitle": "DNF'yi basitleştirin",
+      "simplificationHint": "DNF'yi daha kısa bir eşdeğer forma getirmek için Boole cebiri kurallarını (soğurma, dağılım, tümleyen,…) kullanın.",
+      "canonicalDnfLabel": "Orijinal DNF",
+      "simplifiedDnfLabel": "Basitleştirilmiş form",
+      "simplifiedDnfPlaceholder": "örneğin a ∨ (b ∧ ¬c)",
+      "checkSimplification": "Basitleştirmeyi kontrol edin",
+      "revealAlgebraReferenceTitle": "Kural Özeti",
+      "minimalDnfLabel": "Olası bir minimum DNF",
+      "minimalDnfNote": "{{literalsLabel}} in {{termsLabel}} — DNF formu (VE terimlerinin VEYA), ör. Quine-McCluskey'in sonucu.",
+      "factoredLabel": "Matematiksel olarak en kısa form",
+      "factoredNote": "{{literalsLabel}} — minimum DNF'den daha kısa ve matematiksel olarak eşdeğerdir ancak artık DNF biçiminde değildir.",
+      "factoredFallbackLabel": "En iyi bulunan form",
+      "factoredFallbackNote": "{{literalsLabel}} — minimum DNF'ye eşdeğer ve daha kısa. 4'ten fazla değişken için bu formun genel olarak minimum düzeyde olacağı garanti edilmez.",
+      "literalCount_one": "{{count}} literal",
+      "literalCount_other": "{{count}} literal",
+      "termCount_one": "{{count}} terim",
+      "termCount_other": "{{count}} terim",
+      "walkthroughTitle": "Olası bir çözüm yolu",
+      "walkthroughNote": "Bu yol tek çözüm değildir. Sonucu 1 olan satırların minimum biçimdeki olası bir gruplandırmasını gösterir.",
+      "showFullWalkthrough": "Tam çözüm yolunu göster",
+      "showCompactWalkthrough": "Kompakt çözüm yolunu göster",
+      "walkthroughRowsTitle": "1 satırla başlayın",
+      "walkthroughRowsText": "{{rows}} satırları doğru DNF'nin terimlerini verir.",
+      "walkthroughNoRows": "Sonucu 1 olan satır yoktur; işlev her değer ataması için 0'dır.",
+      "walkthroughConstantTitle": "Sabit durumu tanıyın",
+      "walkthroughAllRows": "Tüm satırlar sonuç 1'e sahiptir, dolayısıyla tüm DNF 1'e daraltılabilir.",
+      "walkthroughAlwaysFalse": "1 satır olmadan hiçbir AND grubu kalmaz. Bu nedenle minimum form 0'dır.",
+      "walkthroughGroupsTitle": "Eşleşen satırları birleştir",
+      "walkthroughGroupsIntro": "Aşağıdaki her grup, sonucu 1 olan satırların adım adım daha kısa bir terime indirgenmesini gösterir. Dağıtma özelliği ortak literalleri paranteze alır, tümleme kuralı (x ∨ ¬x) ifadesini 1'e indirger ve özdeşlik kuralı sondaki ∧ 1'i kaldırır.",
+      "walkthroughGroupHeading": "Grup {{index}}",
+      "walkthroughGroupCoverage": "{{rows}} satırlarını kapsar",
+      "walkthroughGroupEliminated": "elendi: {{variables}}",
+      "walkthroughGroupNoEliminated": "Bu zaten tek bir terimdir; indirgeme gerekmez.",
+      "walkthroughCoverTitle": "Sonucu 1 olan tüm satırları kapsayın",
+      "walkthroughCoverText": "Seçilen gruplar sonucu 1 olan tüm satırları kapsar; açıkta satır kalmaz.",
+      "walkthroughResultTitle": "Olası minimum form",
+      "walkthroughFactoredTitle": "İsteğe bağlı: DNF dışındaki en kısa biçim",
+      "walkthroughFactoredText": "Minimum DNF {{minimalLiterals}} literal içerir. Daha kısa eşdeğer biçim yalnızca {{factoredLiterals}} literal gerektirir; ancak artık DNF biçiminde değildir.",
+      "walkthroughFactoredNote": "Bu form matematiksel olarak eşdeğerdir ancak artık bir DNF değildir. Faktoring söz konusu olduğunda, dağıtım adımları da gösterilir.",
+      "walkthroughFactoredFallbackTitle": "İsteğe bağlı: DNF dışında bulunan en iyi form",
+      "walkthroughFactoredFallbackText": "Minimum DNF {{minimalLiterals}} literal içerir. Bulunan eşdeğer biçim yalnızca {{factoredLiterals}} literal gerektirir; ancak artık DNF biçiminde değildir.",
+      "walkthroughFactoredFallbackNote": "4'ten fazla değişken için burada güvenli geri dönüş kullanılır. Form doğru ve basitleştirilmiştir ancak küresel olarak en kısa boole formülü olacağı garanti edilmez.",
+      "walkthroughRowListMore": "{{visible}}, ... (+{{count}} daha fazlası)",
+      "derivationNotes": {
+        "factorOut": "{{variable}} çarpanını paranteze alın; diğer literaller kalır.",
+        "complementToOne": "{{variable}} ∨ ¬{{variable}} 1 olarak değerlendirilir.",
+        "andOneEqualsTerm": "Herhangi bir ∧ 1 terimi aynı kalır; sondaki 1 çıkar.",
+        "factorOutCommon": "Ortak {{variables}} değişkenlerini paranteze alın (dağılma özelliği)."
+      },
+      "simplificationStatus": {
+        "empty": "Henüz hiçbir şey girilmedi",
+        "syntax_error": "Giriş ayrıştırılamadı",
+        "unknown_variable": "Bilinmeyen değişken",
+        "not_equivalent": "Eşdeğer değil",
+        "equivalent_not_shorter": "Eşdeğer ancak daha kısa değil",
+        "accepted_not_minimal": "Doğru şekilde basitleştirilmiş — ancak daha da kısa olabilir",
+        "accepted_minimal": "Minimal form – mükemmel"
+      },
+      "simplificationDetail": {
+        "empty": "Doğru DNF'nin basitleştirilmiş eşdeğer formunu yazın.",
+        "syntax_error": "Parantezleri ve ¬, ∧, ∨ operatörlerini (veya takma adları !, &, |) kontrol edin.",
+        "unknown_variable": "Aşağıdaki değişken(ler) doğruluk tablosunun parçası değildir: {{variables}}.",
+        "not_equivalent": "Formunuz orijinal doğruluk tablosuyla eşleşmiyor.",
+        "equivalent_not_shorter": "Eşdeğerdir ancak {{userLiterals}} literal ile özgün DNF'den ({{canonicalLiterals}} literal) daha kısa değildir.",
+        "accepted_not_minimal": "Orijinal DNF'ye eşdeğer ve daha kısa. {{userLiterals}} literaliniz var; minimum değer {{minimumLiterals}}.",
+        "accepted_minimal": "{{userLiterals}} literal ile minimum değere ({{minimumLiterals}}) ulaşıldı."
+      }
+    },
+    "followUpTitle": "Devam et",
+    "solutionTitle": "Çözüm",
+    "resultTitle": "DNF",
+    "resultHint": "Vurgulanan her satır bir AND terimine katkıda bulunur.",
+    "resultRuleHint": "Temel kural: 0 → değişkeni olumsuzlayın, 1 → olduğu gibi bırakın. Yalnızca sonucu 1 olan satırlar terim haline gelir ve ∨ ile birleştirilir.",
+    "variableLimitTitle": "Çok fazla değişken",
+    "variableLimitDesc": "İfade {{variables}} değişkenlerini içeriyor. Doğruluk tablosunun ve DNF'nin tarayıcıda güvenilir bir şekilde hesaplanabilmesi için en fazla {{max}} değişkeni kullanın.",
+    "resultCompact": "Büyük DNF: tüm {{total}} terimleri kompakt görünümde kaydırılabilir.",
+    "resultFull": "{{total}} terimleriyle tam DNF.",
+    "showFullResult": "DNF'nin tamamını göster",
+    "showCompactResult": "Kompakt DNF'yi göster",
+    "variables": "Değişkenler",
+    "rows": "Tablo satırları",
+    "oneRows": "Sonuç 1 olan satırlar",
+    "truthTableTitle": "Doğruluk tablosu",
+    "truthTableRow": "Satır",
+    "truthTablePreview": "Büyük tablo: önce {{shown}} ilgili satırları gösterir. Toplam: {{total}} satırlar, sonuç 1 olan {{oneRows}} satırlar.",
+    "truthTableFull": "{{total}} satırları içeren tam tablo. Bu alan kaydırılabilir durumda kalır.",
+    "showFullTable": "Tam tabloyu göster",
+    "showCompactTable": "Kompakt tabloyu göster",
+    "truthTableNoVariables": "İfade",
+    "truthTableResult": "Sonuç",
+    "truthTableTerm": "DNF terimi",
+    "truthTableConstant": "sabit",
+    "truthTableIgnored": "-",
+    "errors": {
+      "title": "İfade ayrıştırılamıyor",
+      "emptyExpression": "Önce bir boolean ifadesi girin.",
+      "expressionTooComplex": "İfade çok uzun veya çok derin bir şekilde iç içe geçmiş.",
+      "unexpectedCharacter": "{{index}} konumunda beklenmeyen karakter '{{value}}'.",
+      "unexpectedToken": "{{index}} konumunda beklenmeyen jeton '{{value}}'.",
+      "unexpectedEnd": "İfade {{index}} konumunda çok erken bitiyor.",
+      "missingClosingParenthesis": "{{index}} konumuna yakın bir kapanış parantezi eksik."
+    }
+  }
+}

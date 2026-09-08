@@ -4,9 +4,16 @@ import type { ExerciseDefinition, ExerciseDifficulty } from "@/types/exercise";
 import type { TranslationKey } from "@/types/i18n";
 import type { FAProgram } from "../components/Simulator/domain/faTypes";
 
+/** One authored FA exercise: prompt, reference automaton and starter program. */
 export interface FAExerciseDefinition extends ExerciseDefinition {
   /** Stable id used internally for store lookups. */
   id: string;
+  /**
+   * Training Center task slot, unique within the Finite Automata topic, so each
+   * exercise keeps its own saved draft. Never {@link SIMULATOR_TASK_STORAGE_ID},
+   * which belongs to the free simulator.
+   */
+  storageId: number;
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   goalKey: TranslationKey;
@@ -37,6 +44,7 @@ export interface FAExerciseDefinition extends ExerciseDefinition {
    Helpers for authoring starter programs
    ──────────────────────────────────────────────────────────── */
 
+/** Starter with only a start state — the learner builds the rest. */
 function emptyStarter(alphabet: string[]): FAProgram {
   return {
     type: "DFA",
@@ -136,9 +144,11 @@ const divisibleBy3Solution: FAProgram = {
    Registry
    ──────────────────────────────────────────────────────────── */
 
+/** The build-an-automaton exercises, in the order the tab shows them. */
 export const faExercises: FAExerciseDefinition[] = [
   {
     id: "ends-with-01",
+    storageId: 0,
     titleKey: "finite-automata.exercisesTab.endsWith01.title",
     goalKey: "finite-automata.exercisesTab.endsWith01.goal",
     descriptionKey: "finite-automata.exercisesTab.endsWith01.description",
@@ -154,6 +164,7 @@ export const faExercises: FAExerciseDefinition[] = [
   },
   {
     id: "ends-with-00",
+    storageId: 1,
     titleKey: "finite-automata.exercisesTab.endsWith00.title",
     goalKey: "finite-automata.exercisesTab.endsWith00.goal",
     descriptionKey: "finite-automata.exercisesTab.endsWith00.description",
@@ -169,6 +180,7 @@ export const faExercises: FAExerciseDefinition[] = [
   },
   {
     id: "even-ones",
+    storageId: 2,
     titleKey: "finite-automata.exercisesTab.evenOnes.title",
     goalKey: "finite-automata.exercisesTab.evenOnes.goal",
     descriptionKey: "finite-automata.exercisesTab.evenOnes.description",
@@ -184,6 +196,7 @@ export const faExercises: FAExerciseDefinition[] = [
   },
   {
     id: "no-consecutive-ones",
+    storageId: 3,
     titleKey: "finite-automata.exercisesTab.noConsecOnes.title",
     goalKey: "finite-automata.exercisesTab.noConsecOnes.goal",
     descriptionKey: "finite-automata.exercisesTab.noConsecOnes.description",
@@ -199,6 +212,7 @@ export const faExercises: FAExerciseDefinition[] = [
   },
   {
     id: "divisible-by-3",
+    storageId: 4,
     titleKey: "finite-automata.exercisesTab.divBy3.title",
     goalKey: "finite-automata.exercisesTab.divBy3.goal",
     descriptionKey: "finite-automata.exercisesTab.divBy3.description",
@@ -288,6 +302,7 @@ const grammarOnesZeroSolution: FAProgram = {
 export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   {
     id: "g2a-two-ones-zeros",
+    storageId: 5,
     titleKey: "finite-automata.exercisesTab.grammarTwoOnesZeros.title",
     goalKey: "finite-automata.exercisesTab.grammarTwoOnesZeros.goal",
     descriptionKey:
@@ -305,6 +320,7 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   },
   {
     id: "g2a-ones",
+    storageId: 6,
     titleKey: "finite-automata.exercisesTab.grammarOnes.title",
     goalKey: "finite-automata.exercisesTab.grammarOnes.goal",
     descriptionKey: "finite-automata.exercisesTab.grammarOnes.description",
@@ -321,6 +337,7 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   },
   {
     id: "g2a-0011",
+    storageId: 7,
     titleKey: "finite-automata.exercisesTab.grammar0011.title",
     goalKey: "finite-automata.exercisesTab.grammar0011.goal",
     descriptionKey: "finite-automata.exercisesTab.grammar0011.description",
@@ -344,6 +361,7 @@ export const faGrammarToAutomatonExercises: FAExerciseDefinition[] = [
   },
   {
     id: "g2a-ones-zero",
+    storageId: 8,
     titleKey: "finite-automata.exercisesTab.grammarOnesZero.title",
     goalKey: "finite-automata.exercisesTab.grammarOnesZero.goal",
     descriptionKey: "finite-automata.exercisesTab.grammarOnesZero.description",

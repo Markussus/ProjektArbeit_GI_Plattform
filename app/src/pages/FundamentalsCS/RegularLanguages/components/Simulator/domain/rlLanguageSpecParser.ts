@@ -1,12 +1,15 @@
 import type { TFunction } from "i18next";
 import type { TranslationKey } from "@/types/i18n";
 import type { RegexNode } from "./rlTypes";
+import { resolveEmptyWord } from "./rlLanguageOps";
 
+/** How often a factor repeats: once, a fixed count, or a bounded variable. */
 export type ExponentSpec =
   | { kind: "none" }
   | { kind: "literal"; count: number }
   | { kind: "variable"; name: string; lowerBound: number };
 
+/** One factor of a set-builder pattern, e.g. `a^n`, with its display text. */
 export interface PatternFactor {
   atom: RegexNode;
   /** Pretty text of the atom: "a", "(ab)", "ε" */
@@ -41,6 +44,9 @@ export type LanguageSpec = EnumerationLang | SetBuilderLang;
 export interface LanguageParseIssue {
   code:
     | "empty"
+    | "missingBraces"
+    | "strayQuote"
+    | "wordWhitespace"
     | "variableReused"
     | "patternUnexpectedChar"
     | "missingGroupClose"
@@ -94,6 +100,7 @@ function fail(
   throw new LanguageParseError({ code, params }, message);
 }
 
+/** Turn a thrown parse error into a failure result, however it was raised. */
 function toFailure(e: unknown): {
   ok: false;
   error: string;
@@ -111,24 +118,17 @@ function toFailure(e: unknown): {
 }
 
 /**
- * Parse a language description in either enumeration or set-builder form.
+ * Parse a language description in either form. The `L = ` prefix is optional, the
+ * braces are not — requiring them keeps a mistyped word from reading as a
+ * one-word language:
+ *   L = {"010", "0010"}          // enumeration, quotes optional
+ *   {a^n c b^m | n, m > 0}       // set-builder
  *
- * Accepted shapes (the `L = ` / `L_1 = ` prefix and outer braces are optional):
- *   L = {"010", "0010", "00010"}            // enumeration
- *   {010, 0010, 00010}                       // enumeration (unquoted ok)
- *   L1 = {a^n c b^m | n, m > 0}              // set-builder
- *   {a^n | n in N}                           // set-builder, n ≥ 0
- *   {(ab)^n | n >= 1}                        // groups allowed
- *
- * Set-builder pattern: a sequence of factors. Each factor is either a single
- * symbol, ε, or a parenthesised sub-pattern, optionally followed by `^k` for
- * literal repetition or `^v` (single letter) for variable repetition.
- *
- * Set-builder constraints: comma-separated groups. Each group is one or more
- * variables followed by `in N`/`∈ ℕ` and/or comparison operators (`>`, `>=`,
- * `≥`, `=`). Upper bounds are not supported. Default is `≥ 0`. The same
- * variable may not appear in two factors — `a^n b^n`-style correlations are
- * rejected as non-regular.
+ * A pattern is a sequence of factors — a symbol, ε, or a parenthesised group —
+ * each optionally followed by `^k` (literal) or `^v` (variable) repetition.
+ * Constraints are comma-separated groups of variables with `in N`/`∈ ℕ` or `>`,
+ * `>=`, `≥`, `=`; the default is `≥ 0` and upper bounds are rejected. One
+ * variable may not appear in two factors — `a^n b^n` is not regular.
  */
 export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
   let source = rawSource.trim();
@@ -143,9 +143,17 @@ export function parseLanguageSpec(rawSource: string): ParseLanguageResult {
   // Strip optional "L = " / "L_1 = " / "L1 = " prefix.
   source = source.replace(/^L[\w]*\s*=\s*/i, "");
 
-  // Strip outer braces if present.
+  // The braces are what makes the text a set. Without them any typo parses as
+  // a one-word language, so ask for the notation instead of guessing.
   const braced = source.match(/^\{([\s\S]*)\}$/);
-  const body = (braced ? braced[1] : source).trim();
+  if (!braced) {
+    return {
+      ok: false,
+      error: 'Write the language as a set in braces, e.g. L = {"010", "0010"}.',
+      issue: { code: "missingBraces" },
+    };
+  }
+  const body = braced[1].trim();
 
   if (body.length === 0) {
     return { ok: true, spec: { kind: "enumeration", words: [] } };
@@ -176,6 +184,7 @@ function isContinuationMarker(item: string): boolean {
   return /^\.{2,}$/.test(item);
 }
 
+/** Read the word list in the braces, tolerating `..` markers. */
 function parseEnumerationBody(body: string): ParseLanguageResult {
   const words: string[] = [];
   let sawContinuation = false;
@@ -191,7 +200,28 @@ function parseEnumerationBody(body: string): ParseLanguageResult {
       continue;
     }
 
-    words.push(item === "ε" || item === "epsilon" ? "" : item);
+    // Both quote styles delimit a word and the notation has no escape for
+    // them, so a quote that survives unquoting can never be a terminal
+    // symbol. `{"hello""World"}` is a missing comma, not a 12-symbol word.
+    if (/["']/.test(item)) {
+      return {
+        ok: false,
+        error: `'${trimmed}' has a stray quote. Quotes surround one whole word — separate words with commas, e.g. L = {"hello", "World"}.`,
+        issue: { code: "strayQuote", params: { item: trimmed } },
+      };
+    }
+
+    // A space is not a terminal symbol — inside a word it means the comma
+    // between two words is missing (quotes don't make it a symbol either).
+    if (/\s/.test(item)) {
+      return {
+        ok: false,
+        error: `The word '${item}' contains a space. Separate words with commas, e.g. L = {"ab", "cd"}.`,
+        issue: { code: "wordWhitespace", params: { word: item } },
+      };
+    }
+
+    words.push(resolveEmptyWord(item));
   }
 
   // A trailing `..` / `...` marker signals "this is a pattern" — try to
@@ -207,14 +237,10 @@ function parseEnumerationBody(body: string): ParseLanguageResult {
 /* ── Inference: enumeration → set-builder ──────────────────────────── */
 
 /**
- * Try to read a list of example words as a set-builder description.
- * Currently recognises the shape `α^n y β^m` (with optional empty α / β),
- * i.e. some single character repeated 0+ times, a unique pivot character
- * that appears exactly once in every word, and another single character
- * repeated 0+ times. This is enough to capture textbook patterns like
- * 0^n 1 0^m, a^n c b^m, a^n b, …
- *
- * Returns `null` if no recognised pattern fits all the words.
+ * Try to read a word list as a set-builder. Recognises `α^n y β^m` — a repeated
+ * character, a pivot appearing exactly once in every word, another repeated
+ * character — which covers 0^n 1 0^m, a^n c b^m, a^n b and the like. Null when
+ * no such pattern fits every word.
  */
 function inferSetBuilderFromWords(words: string[]): SetBuilderLang | null {
   const cleaned = words.filter((w) => w.length > 0);
@@ -254,6 +280,7 @@ function countChar(s: string, c: string): number {
   return n;
 }
 
+/** The symbol every part repeats and the shortest run, or null. */
 function analyseRepeatedPart(
   parts: string[],
 ): { char: string | null; minK: number } | null {
@@ -267,6 +294,7 @@ function analyseRepeatedPart(
   return { char, minK };
 }
 
+/** Assemble the `a^n c b^m` pattern inferred from a word list. */
 function buildInferredSetBuilder(input: {
   leftChar: string | null;
   leftMinK: number;
@@ -318,10 +346,9 @@ function buildInferredSetBuilder(input: {
 /* ── Set-builder form ──────────────────────────────────────────────── */
 
 /**
- * A variable exponent inside a group, as in `(a^n)b`, makes the group's atom a
- * repetition rather than a fixed word. The grammar builder walks atoms symbol
- * by symbol and has nothing to walk here, so reject it with a message instead
- * of letting it throw out of the render.
+ * A variable exponent inside a group, as in `(a^n)b`, leaves the grammar builder
+ * with no fixed word to walk. Reject it with a message rather than letting it
+ * throw out of the render.
  */
 function rejectNestedRepetitions(factors: PatternFactor[]): void {
   for (const factor of factors) {
@@ -427,6 +454,7 @@ function orderedVariableBounds(
   return bounds;
 }
 
+/** Parse the pattern and constraints, and pin each lower bound. */
 function parseSetBuilderBody(
   patternText: string,
   constraintsText: string,
@@ -457,6 +485,7 @@ function parseSetBuilderBody(
 
 /* ── Pattern parser ────────────────────────────────────────────────── */
 
+/** Parse a whole pattern, rejecting anything left over at the end. */
 function parsePatternText(text: string): PatternFactor[] {
   const result = parsePattern(text, 0);
   if (result.endIdx !== text.length) {
@@ -565,6 +594,7 @@ function parseExponent(
   );
 }
 
+/** Read factors until the end of the source or the closing parenthesis. */
 function parsePattern(
   source: string,
   startIdx: number,
@@ -617,6 +647,7 @@ function isSymbolChar(c: string): boolean {
   return /^[\S]$/.test(c);
 }
 
+/** Concatenate the factors into one regex; an empty pattern is ε. */
 function patternToRegex(factors: PatternFactor[]): RegexNode {
   if (factors.length === 0) return { kind: "epsilon" };
   let acc: RegexNode | null = null;
@@ -627,6 +658,7 @@ function patternToRegex(factors: PatternFactor[]): RegexNode {
   return acc!;
 }
 
+/** A factor as a regex — a variable exponent becomes its minimum plus a star. */
 function factorToRegex(f: PatternFactor): RegexNode {
   const exp = f.exponent;
   if (exp.kind === "none") return f.atom;
@@ -638,6 +670,7 @@ function factorToRegex(f: PatternFactor): RegexNode {
   return { kind: "concat", left: fixed, right: star };
 }
 
+/** `atom` concatenated with itself n times; ε for n <= 0. */
 function repeatExactly(atom: RegexNode, n: number): RegexNode {
   if (n <= 0) return { kind: "epsilon" };
   let acc: RegexNode = atom;
@@ -649,6 +682,7 @@ function repeatExactly(atom: RegexNode, n: number): RegexNode {
 
 /* ── Constraint parser ─────────────────────────────────────────────── */
 
+/** One constraint clause and the variables it binds, e.g. `n, m > 0`. */
 interface ConstraintGroup {
   vars: string[];
   lowerBound: number;
@@ -656,6 +690,7 @@ interface ConstraintGroup {
   exact: number | null;
 }
 
+/** Read the constraint list after the `|`, one group per clause. */
 function parseConstraintsText(text: string): ConstraintGroup[] {
   if (text.length === 0) return [];
   const pieces = splitTopLevelCommas(text);
@@ -697,6 +732,7 @@ function parseConstraintsText(text: string): ConstraintGroup[] {
 
 /** ℕ and ℕ0 both say "≥ 0", which is already the default lower bound. */
 const NATURAL_NUMBER_SETS = new Set(["N", "ℕ", "N0", "ℕ0"]);
+/** Comparisons the parser understands; upper bounds are rejected. */
 const LOWER_BOUND_OPERATORS = new Set([">", ">=", "≥", "="]);
 const UPPER_BOUND_OPERATORS = new Set(["<", "<=", "≤"]);
 
@@ -794,10 +830,9 @@ function bracketDelta(c: string, openers: string, closers: string): number {
 }
 
 /**
- * Walk `s` and hand `visit` every character that sits at bracket depth 0 and
- * outside any quoted run; returning `true` stops the walk. Both the constraint
- * bar search and the comma split need exactly this, and neither should have to
- * re-implement the quote and bracket bookkeeping.
+ * Hand `visit` every character at bracket depth 0 and outside quotes; returning
+ * `true` stops the walk. The bar search and the comma split both need exactly
+ * this bookkeeping.
  */
 function forEachTopLevelChar(
   s: string,

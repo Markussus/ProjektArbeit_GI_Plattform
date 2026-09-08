@@ -10,14 +10,7 @@ import { ListChecks } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExecutionControls } from "@/components/shared/ExecutionControls";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
-import { useTrainingCenterAutoSave } from "@/hooks/useTrainingCenterAutoSave";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
-import {
-  SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
-} from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import type { Exercise, TopicItem } from "@/types/exercise";
 import {
   getJavaDefaultStdin,
@@ -50,6 +43,33 @@ interface JavaSimulatorProps {
   isFocused: boolean;
 }
 
+function computeSessionControlState(snapshot: {
+  phase: string;
+  compilerStatus: string;
+}) {
+  const isBusy =
+    snapshot.phase === "loading" ||
+    snapshot.phase === "compiling" ||
+    snapshot.phase === "running";
+  const canRun = snapshot.compilerStatus === "ready" && !isBusy;
+  const canStop = isBusy || snapshot.compilerStatus === "loading";
+  return { canRun, canStop };
+}
+
+function parseTimeoutSeconds(rawValue: string): number | null {
+  if (!rawValue.trim()) {
+    return null;
+  }
+  const nextValue = Number(rawValue);
+  if (Number.isNaN(nextValue)) {
+    return null;
+  }
+  return Math.min(300, Math.max(1, nextValue));
+}
+
+/**
+ * Handles session switching based on the selected exercise/example item.
+ */
 export const JavaSimulator = forwardRef<
   JavaSimulatorHandle,
   JavaSimulatorProps
@@ -71,6 +91,12 @@ interface JavaSimulatorSessionProps {
   isFocused: boolean;
 }
 
+/**
+ * 1. Code state & training center persistence
+ * 2. Standard input (stdin) & timeout configuration
+ * 3. Execution state from useJavaExecutionContext()
+ * 4. Monaco editor, compiler badge, execution controls, and console panel
+ */
 const JavaSimulatorSession = forwardRef<
   JavaSimulatorHandle,
   JavaSimulatorSessionProps
@@ -80,7 +106,6 @@ const JavaSimulatorSession = forwardRef<
   const exerciseScenario = scenario?.kind === "exercise" ? scenario : null;
   const isStorageEnabled = scenario?.kind !== "example";
   const [code, setCode] = useState(() => getJavaStarterCode(itemId));
-  const [isStorageReady, setIsStorageReady] = useState(false);
   const [standardInput, setStandardInput] = useState(() =>
     getJavaDefaultStdin(itemId),
   );
@@ -90,63 +115,31 @@ const JavaSimulatorSession = forwardRef<
     useJavaExecutionContext();
 
   const fileName = useMemo(() => getJavaFileName(itemId), [itemId]);
-  const isBusy =
-    snapshot.phase === "loading" ||
-    snapshot.phase === "compiling" ||
-    snapshot.phase === "running";
-  const canRun = snapshot.compilerStatus === "ready" && !isBusy;
-  const canStop = isBusy || snapshot.compilerStatus === "loading";
-  const storageIdentifier = useMemo(
-    () =>
-      createTrainingCenterIdentifier(
-        TOPIC_STORAGE_IDS.javaProgramming,
-        exerciseScenario?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
-      ),
-    [exerciseScenario?.storageId],
+  const { canRun, canStop } = useMemo(
+    () => computeSessionControlState(snapshot),
+    [snapshot],
   );
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: code,
-    codec: javaCodeTransferCodec,
-  });
 
   useEffect(() => {
     preload();
   }, [preload]);
 
-  useEffect(() => {
-    let isCancelled = false;
-    setIsStorageReady(false);
-
-    if (!isStorageEnabled) {
-      return;
-    }
-
-    void loadTrainingCenterValue(storageIdentifier, javaCodeTransferCodec)
-      .then((storedCode) => {
-        if (!isCancelled && storedCode !== null) {
-          setCode(storedCode);
-          reset();
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (!isCancelled) {
-          setIsStorageReady(true);
-        }
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isStorageEnabled, reset, storageIdentifier]);
-
-  const saveCode = useTrainingCenterAutoSave({
-    identifier: storageIdentifier,
-    value: code,
-    codec: javaCodeTransferCodec,
-    enabled: isStorageEnabled && isStorageReady,
-  });
+  const restoreCode = useCallback(
+    (storedCode: string) => {
+      setCode(storedCode);
+      reset();
+    },
+    [reset],
+  );
+  const { clear: clearStoredCode, save: saveCode } =
+    useTrainingCenterPersistence({
+      topicStorageId: TOPIC_STORAGE_IDS.javaProgramming,
+      taskStorageId: exerciseScenario?.storageId,
+      codec: javaCodeTransferCodec,
+      value: code,
+      onRestore: restoreCode,
+      enabled: isStorageEnabled,
+    });
 
   const handleRun = useCallback(() => {
     if (isStorageEnabled) {
@@ -168,13 +161,21 @@ const JavaSimulatorSession = forwardRef<
     timeoutSeconds,
   ]);
 
+  const handleTimeoutChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const parsed = parseTimeoutSeconds(event.target.value);
+      if (parsed !== null) {
+        setTimeoutSeconds(parsed);
+      }
+    },
+    [],
+  );
+
   useImperativeHandle(
     ref,
     () => ({
       resetStoredState: () => {
-        if (isStorageEnabled) {
-          trainingCenterStorage.delete(storageIdentifier);
-        }
+        clearStoredCode();
 
         setCode(getJavaStarterCode(itemId));
         setStandardInput(getJavaDefaultStdin(itemId));
@@ -203,13 +204,12 @@ const JavaSimulatorSession = forwardRef<
     }),
     [
       code,
+      clearStoredCode,
       exerciseScenario,
-      isStorageEnabled,
       itemId,
       reset,
       runAsync,
       standardInput,
-      storageIdentifier,
       t,
       timeoutSeconds,
     ],
@@ -285,14 +285,7 @@ const JavaSimulatorSession = forwardRef<
               max={300}
               step={1}
               value={timeoutSeconds}
-              onChange={(event) => {
-                const nextValue = Number(event.target.value);
-                if (Number.isNaN(nextValue)) {
-                  return;
-                }
-
-                setTimeoutSeconds(Math.min(300, Math.max(1, nextValue)));
-              }}
+              onChange={handleTimeoutChange}
               data-testid="java-timeout-input"
               className="border-input bg-background w-20 rounded-md border px-3 py-2 text-sm"
             />

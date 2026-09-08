@@ -268,6 +268,40 @@ describe("JavaSimulator", () => {
     });
   });
 
+  describe("when configuring execution timeout", () => {
+    it("clamps values within the allowed 1-300 seconds range", async () => {
+      await renderJavaSimulator(
+        <JavaSimulator selectedExercise={null} isFocused={false} />,
+      );
+
+      const timeoutInput = screen.getByTestId("java-timeout-input");
+
+      // Too low (< 1) -> clamps to 1
+      await act(async () => {
+        fireEvent.change(timeoutInput, { target: { value: "0" } });
+      });
+      expect(timeoutInput).toHaveValue(1);
+
+      // Too high (> 300) -> clamps to 300
+      await act(async () => {
+        fireEvent.change(timeoutInput, { target: { value: "999" } });
+      });
+      expect(timeoutInput).toHaveValue(300);
+
+      // Normal valid value
+      await act(async () => {
+        fireEvent.change(timeoutInput, { target: { value: "45" } });
+      });
+      expect(timeoutInput).toHaveValue(45);
+
+      // Invalid non-numeric input does not mutate existing value
+      await act(async () => {
+        fireEvent.change(timeoutInput, { target: { value: "not-a-number" } });
+      });
+      expect(timeoutInput).toHaveValue(45);
+    });
+  });
+
   describe("when the simulator initializes", () => {
     it("starts compiler preload in the background and exposes the timeout control", async () => {
       await renderJavaSimulator(
@@ -276,6 +310,7 @@ describe("JavaSimulator", () => {
 
       expect(preloadSpy).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("java-timeout-input")).toHaveValue(60);
+      expect(screen.getByTestId("java-compiler-status")).toBeInTheDocument();
       expect(
         screen.getByTestId("java-command-overview-button"),
       ).toBeInTheDocument();
@@ -306,7 +341,7 @@ describe("JavaSimulator", () => {
   });
 
   describe("imperative handle methods", () => {
-    it("loads solution code when loadSolution is invoked", async () => {
+    it("loads solution code when loadSolution is invoked on an exercise", async () => {
       const ref = createRef<JavaSimulatorHandle>();
       await renderJavaSimulator(
         <JavaSimulator
@@ -326,6 +361,34 @@ describe("JavaSimulator", () => {
 
       expect(screen.getByTestId("mock-java-editor-code").textContent).toContain(
         'System.out.println("Hello World");',
+      );
+    });
+
+    it("safely ignores loadSolution when the active item is an example", async () => {
+      const ref = createRef<JavaSimulatorHandle>();
+      await renderJavaSimulator(
+        <JavaSimulator
+          ref={ref}
+          selectedItem={{
+            id: "java-programming.example1",
+            title: "Example 1",
+            category: "syntax",
+          }}
+          selectedExercise={null}
+          isFocused={false}
+        />,
+      );
+
+      const initialCode = screen.getByTestId(
+        "mock-java-editor-code",
+      ).textContent;
+
+      await act(async () => {
+        ref.current?.loadSolution();
+      });
+
+      expect(screen.getByTestId("mock-java-editor-code").textContent).toBe(
+        initialCode,
       );
     });
 

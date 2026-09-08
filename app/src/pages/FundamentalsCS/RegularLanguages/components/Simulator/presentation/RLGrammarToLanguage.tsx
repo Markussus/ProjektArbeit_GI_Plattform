@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useActiveSimulatorTransfer } from "@/hooks/useActiveSimulatorTransfer";
 import { enumerateLanguage } from "../domain/rlLanguageOps";
 import { parseGrammar } from "../domain/rlGrammarValidation";
 import { rlGrammarTransferCodec } from "../domain/rlGrammarTransfer";
@@ -32,6 +31,7 @@ const GRAMMAR_STRUCTURED_EXAMPLE = [
   "A -> 0A | 1",
 ].join("\n");
 
+/** Free mode grammar → language: enumerates the words a grammar generates. */
 export function RLGrammarToLanguage({
   initialGrammar,
   transferActive = true,
@@ -57,18 +57,13 @@ export function RLGrammarToLanguage({
     setSource(EMPTY_SOURCE);
   }
 
-  const storageIdentifier = useRLPersistedSource({
+  useRLPersistedSource({
     taskStorageId: RL_STORAGE_TASK_IDS.grammarToLanguage,
     codec: rlGrammarTransferCodec,
     source,
     setSource,
     hasSeed: initialGrammar !== undefined,
-  });
-  useActiveSimulatorTransfer({
-    identifier: storageIdentifier,
-    value: source,
-    codec: rlGrammarTransferCodec,
-    enabled: transferActive,
+    transferActive,
   });
 
   const result = useMemo(() => {

@@ -19,7 +19,7 @@ const edgeDetectorSolution: MealyProgram = {
       HIGH: { symbol: "NO_PULSE", code: 0 },
     },
   },
-  initialState: "LOW",
+  initialState: "HIGH",
   inputWord: [],
   representation: "binary",
 };
@@ -90,19 +90,107 @@ const parityTrackerSolution: MealyProgram = {
   representation: "binary",
 };
 
+function createMealyStarter(
+  states: string[],
+  inputSymbols: string[],
+  outputs: MealyProgram["outputs"],
+  initialState: string,
+): MealyProgram {
+  return {
+    states,
+    inputSymbols,
+    transitions: Object.fromEntries(
+      inputSymbols.map((input) => [
+        input,
+        Object.fromEntries(states.map((state) => [state, state])),
+      ]),
+    ),
+    outputs,
+    initialState,
+    inputWord: [],
+    representation: "binary",
+  };
+}
+
+const edgeDetectorStarter = createMealyStarter(
+  ["LOW", "HIGH"],
+  ["0", "1"],
+  {
+    "0": {
+      LOW: { symbol: "NO_PULSE", code: 0 },
+      HIGH: { symbol: "NO_PULSE", code: 0 },
+    },
+    "1": {
+      LOW: { symbol: "NO_PULSE", code: 0 },
+      HIGH: { symbol: "NO_PULSE", code: 0 },
+    },
+  },
+  "HIGH",
+);
+
+const doorControllerStarter = createMealyStarter(
+  ["LOCKED", "UNLOCKED"],
+  ["CARD", "PASS"],
+  {
+    CARD: {
+      LOCKED: { symbol: "NO_ACTION", code: 0 },
+      UNLOCKED: { symbol: "UNLOCK_PULSE", code: 1 },
+    },
+    PASS: {
+      LOCKED: { symbol: "NO_ACTION", code: 0 },
+      UNLOCKED: { symbol: "LOCK_PULSE", code: 2 },
+    },
+  },
+  "LOCKED",
+);
+
+const sequenceDetectorStarter = createMealyStarter(
+  ["WAITING", "SEEN_0"],
+  ["0", "1"],
+  {
+    "0": {
+      WAITING: { symbol: "NO_MATCH", code: 0 },
+      SEEN_0: { symbol: "MATCH_01", code: 1 },
+    },
+    "1": {
+      WAITING: { symbol: "NO_MATCH", code: 0 },
+      SEEN_0: { symbol: "NO_MATCH", code: 0 },
+    },
+  },
+  "WAITING",
+);
+
+const parityTrackerStarter = createMealyStarter(
+  ["EVEN", "ODD"],
+  ["0", "1"],
+  {
+    "0": {
+      EVEN: { symbol: "EVEN_PARITY", code: 0 },
+      ODD: { symbol: "EVEN_PARITY", code: 0 },
+    },
+    "1": {
+      EVEN: { symbol: "ODD_PARITY", code: 1 },
+      ODD: { symbol: "ODD_PARITY", code: 1 },
+    },
+  },
+  "EVEN",
+);
+
 export const mealyExerciseScenarios: MealyExerciseScenario[] = [
   {
     machineType: "mealy",
     id: "moore-mealy.exercises.edgeDetector.title",
     storageId: 0x37,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: edgeDetectorStarter,
     solutionProgram: edgeDetectorSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [] },
+      { input: ["1"], expectedOutputCodes: [0] },
       { input: ["0"], expectedOutputCodes: [0] },
-      { input: ["1"], expectedOutputCodes: [1] },
-      { input: ["1", "1"], expectedOutputCodes: [1, 0] },
-      { input: ["1", "0", "1"], expectedOutputCodes: [1, 0, 1] },
+      { input: ["0", "1"], expectedOutputCodes: [0, 1] },
+      { input: ["1", "1"], expectedOutputCodes: [0, 0] },
+      { input: ["1", "0", "1"], expectedOutputCodes: [0, 0, 1] },
+      { input: ["0", "1", "0", "1"], expectedOutputCodes: [0, 1, 0, 1] },
     ],
     definition: {
       titleKey: "moore-mealy.exercises.edgeDetector.title",
@@ -115,7 +203,7 @@ export const mealyExerciseScenarios: MealyExerciseScenario[] = [
     machineType: "mealy",
     id: "moore-mealy.exercises.doorController.title",
     storageId: 0x38,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: doorControllerStarter,
     solutionProgram: doorControllerSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [] },
@@ -136,7 +224,7 @@ export const mealyExerciseScenarios: MealyExerciseScenario[] = [
     machineType: "mealy",
     id: "moore-mealy.exercises.sequenceDetector.title",
     storageId: 0x39,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: sequenceDetectorStarter,
     solutionProgram: sequenceDetectorSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [] },
@@ -156,7 +244,7 @@ export const mealyExerciseScenarios: MealyExerciseScenario[] = [
     machineType: "mealy",
     id: "moore-mealy.exercises.parityTracker.title",
     storageId: 0x3a,
-    starterProgram: createEmptyExerciseProgram(),
+    starterProgram: parityTrackerStarter,
     solutionProgram: parityTrackerSolution,
     validationCases: [
       { input: [], expectedOutputCodes: [] },
@@ -177,15 +265,3 @@ export const mealyExerciseScenarios: MealyExerciseScenario[] = [
 export const mealyExercises = mealyExerciseScenarios.map(
   (scenario) => scenario.definition,
 );
-
-function createEmptyExerciseProgram(): MealyProgram {
-  return {
-    states: ["STATE_0"],
-    inputSymbols: [],
-    transitions: {},
-    outputs: {},
-    initialState: "STATE_0",
-    inputWord: [],
-    representation: "binary",
-  };
-}

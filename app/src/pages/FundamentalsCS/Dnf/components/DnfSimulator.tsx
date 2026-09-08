@@ -14,13 +14,14 @@ import { cn } from "@/lib/utils";
 import { TOPIC_STORAGE_IDS } from "@/data/topicStorageIds";
 import {
   SIMULATOR_TASK_STORAGE_ID,
-  createTrainingCenterIdentifier,
-  loadTrainingCenterValue,
-  trainingCenterStorage,
+  exportAndStoreTrainingCenterValue,
 } from "@/lib/trainingCenter";
+import { useTrainingCenterPersistence } from "@/hooks/useTrainingCenterPersistence";
 import { DnfBuilder, type DnfBuilderHandle } from "./DnfBuilder/DnfBuilder";
 import {
+  createDnfAttemptDraft,
   dnfTransferCodec,
+  type DnfExerciseTransferDraft,
   type DnfExpressionTransferDraft,
   type DnfTransferValue,
   type DnfTruthTableTransferDraft,
@@ -106,18 +107,10 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       selectedExerciseDefinition?.mode ??
       (selectedExercise ? "expression_to_truth_table" : null);
     const isStorageEnabled = walkthroughExample === null;
-    const storageIdentifier = useMemo(
-      () =>
-        createTrainingCenterIdentifier(
-          TOPIC_STORAGE_IDS.dnf,
-          selectedExerciseDefinition?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
-        ),
-      [selectedExerciseDefinition?.storageId],
-    );
+
     const [storedValue, setStoredValue] = useState<DnfTransferValue | null>(
       null,
     );
-    const [isStorageReady, setIsStorageReady] = useState(!isStorageEnabled);
     const [hasStoredState, setHasStoredState] = useState(false);
     const [hasUserChanges, setHasUserChanges] = useState(false);
     const [resetVersion, setResetVersion] = useState(0);
@@ -128,6 +121,69 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     );
 
     const visibleMode = selectedExerciseMode ?? activeMode;
+
+    const restoreDnfState = useCallback(
+      (restored: DnfTransferValue) => {
+        setStoredValue(restored);
+        setHasStoredState(true);
+        if (!selectedExercise && restored.mode !== "exercise_attempt") {
+          setActiveMode(restored.mode);
+        }
+      },
+      [selectedExercise],
+    );
+
+    const fallbackValue = useMemo<DnfTransferValue>(() => {
+      if (selectedExercise) {
+        return {
+          mode: "exercise_attempt",
+          ...createDnfAttemptDraft(),
+        };
+      }
+      if (visibleMode === "truth_table_to_dnf") {
+        return {
+          mode: "truth_table_to_dnf",
+          variableCount: 3,
+          resultValues: Array.from({ length: 8 }, () => false),
+          committed: false,
+          ...createDnfAttemptDraft(),
+        };
+      }
+      return {
+        mode: "expression_to_truth_table",
+        expression: "",
+        committed: false,
+        ...createDnfAttemptDraft(),
+      };
+    }, [selectedExercise, visibleMode]);
+
+    const persistenceValue = useMemo<DnfTransferValue>(() => {
+      if (selectedExercise) {
+        return storedValue?.mode === "exercise_attempt"
+          ? storedValue
+          : fallbackValue;
+      }
+      if (storedValue?.mode === visibleMode) {
+        return storedValue;
+      }
+      return fallbackValue;
+    }, [fallbackValue, selectedExercise, storedValue, visibleMode]);
+
+    const {
+      identifier: storageIdentifier,
+      clear: clearStoredState,
+      isReady: isStorageReady,
+    } = useTrainingCenterPersistence<DnfTransferValue>({
+      topicStorageId: TOPIC_STORAGE_IDS.dnf,
+      taskStorageId:
+        selectedExerciseDefinition?.storageId ?? SIMULATOR_TASK_STORAGE_ID,
+      codec: dnfTransferCodec,
+      value: persistenceValue,
+      onRestore: restoreDnfState,
+      enabled: isStorageEnabled,
+      autoSaveEnabled: hasStoredState || hasUserChanges,
+    });
+
     const buildResetValue = useCallback((): DnfTransferValue | null => {
       return buildDnfResetValue({
         hasSelectedExercise: Boolean(selectedExercise),
@@ -141,64 +197,12 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
       onStorageReadyChange?.(isStorageReady);
     }, [isStorageReady, onStorageReadyChange]);
 
-    useEffect(() => {
-      let isCancelled = false;
-      setStoredValue(null);
-      setIsStorageReady(false);
-      setHasStoredState(false);
-      setHasUserChanges(false);
-
-      if (!isStorageEnabled) {
-        setIsStorageReady(true);
-        return;
-      }
-
-      void loadTrainingCenterValue(storageIdentifier, dnfTransferCodec)
-        .then((value) => {
-          if (isCancelled || !value) {
-            return;
-          }
-
-          setStoredValue(value);
-          setHasStoredState(true);
-          if (!selectedExercise && value.mode !== "exercise_attempt") {
-            setActiveMode(value.mode);
-          }
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          if (!isCancelled) {
-            setIsStorageReady(true);
-          }
-        });
-
-      return () => {
-        isCancelled = true;
-      };
-    }, [isStorageEnabled, selectedExercise, storageIdentifier]);
-
-    useEffect(() => {
-      if (resetVersion === 0 || !isStorageEnabled) {
-        return;
-      }
-
-      const timeoutId = window.setTimeout(() => {
-        trainingCenterStorage.delete(storageIdentifier);
-      }, 0);
-
-      return () => window.clearTimeout(timeoutId);
-    }, [isStorageEnabled, resetVersion, storageIdentifier]);
-
     useImperativeHandle(
       ref,
       () => ({
         resetStoredState: () => {
+          clearStoredState();
           const resetValue = buildResetValue();
-
-          if (isStorageEnabled) {
-            trainingCenterStorage.delete(storageIdentifier);
-          }
-
           setStoredValue(resetValue);
           setHasStoredState(false);
           setHasUserChanges(false);
@@ -208,10 +212,32 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
           if (!isStorageReady) {
             return;
           }
-          dnfBuilderRef.current?.loadSolution();
+          const solved = dnfBuilderRef.current?.loadSolution();
+          if (solved) {
+            const nextValue: DnfTransferValue = {
+              mode: "exercise_attempt",
+              ...solved,
+            };
+            setStoredValue(nextValue);
+            setHasStoredState(true);
+            setHasUserChanges(true);
+            if (isStorageEnabled) {
+              void exportAndStoreTrainingCenterValue(
+                storageIdentifier,
+                nextValue,
+                dnfTransferCodec,
+              );
+            }
+          }
         },
       }),
-      [buildResetValue, isStorageEnabled, isStorageReady, storageIdentifier],
+      [
+        buildResetValue,
+        clearStoredState,
+        isStorageEnabled,
+        isStorageReady,
+        storageIdentifier,
+      ],
     );
 
     const handleExpressionChange = useCallback(
@@ -223,6 +249,12 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     const handleTruthTableChange = useCallback(
       (value: DnfTruthTableTransferDraft) => {
         setStoredValue({ mode: "truth_table_to_dnf", ...value });
+      },
+      [],
+    );
+    const handleExerciseChange = useCallback(
+      (value: DnfExerciseTransferDraft) => {
+        setStoredValue({ mode: "exercise_attempt", ...value });
       },
       [],
     );
@@ -244,11 +276,6 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
     };
 
     const contentKey = `${resetVersion}-${isStorageReady ? "ready" : "loading"}`;
-    const commonStorageProps = {
-      storageIdentifier,
-      storageEnabled: isStorageEnabled && (hasStoredState || hasUserChanges),
-      storageReady: isStorageReady,
-    };
     const activeWalkthroughExample =
       walkthroughExample?.mode === visibleMode ? walkthroughExample : null;
 
@@ -286,13 +313,13 @@ export const DnfSimulator = forwardRef<DnfSimulatorHandle, DnfSimulatorProps>(
             visibleMode,
             activeWalkthroughExample,
             contentKey,
-            commonStorageProps,
             dnfBuilderRef,
             storedValue,
             handleUserChange,
             isStorageReady,
             handleExpressionChange,
             handleTruthTableChange,
+            handleExerciseChange,
           })}
         </div>
       </div>
@@ -305,17 +332,13 @@ interface RenderSimulatorBuilderProps {
   visibleMode: DnfSimulatorMode;
   activeWalkthroughExample: DnfWalkthroughExample | null;
   contentKey: string;
-  commonStorageProps: {
-    storageIdentifier: string;
-    storageEnabled: boolean;
-    storageReady: boolean;
-  };
   dnfBuilderRef: RefObject<DnfBuilderHandle | null>;
   storedValue: DnfTransferValue | null;
   handleUserChange: () => void;
   isStorageReady: boolean;
   handleExpressionChange: (value: DnfExpressionTransferDraft) => void;
   handleTruthTableChange: (value: DnfTruthTableTransferDraft) => void;
+  handleExerciseChange: (value: DnfExerciseTransferDraft) => void;
 }
 
 function renderSimulatorBuilder({
@@ -323,13 +346,13 @@ function renderSimulatorBuilder({
   visibleMode,
   activeWalkthroughExample,
   contentKey,
-  commonStorageProps,
   dnfBuilderRef,
   storedValue,
   handleUserChange,
   isStorageReady,
   handleExpressionChange,
   handleTruthTableChange,
+  handleExerciseChange,
 }: RenderSimulatorBuilderProps) {
   if (selectedExercise) {
     return (
@@ -340,8 +363,10 @@ function renderSimulatorBuilder({
         initialAttempt={
           storedValue?.mode === "exercise_attempt" ? storedValue : undefined
         }
+        onTransferValueChange={
+          isStorageReady ? handleExerciseChange : undefined
+        }
         onUserChange={handleUserChange}
-        {...commonStorageProps}
       />
     );
   }
@@ -359,7 +384,6 @@ function renderSimulatorBuilder({
         }
         onUserChange={handleUserChange}
         seedInitialFeedback={activeWalkthroughExample !== null}
-        {...commonStorageProps}
       />
     );
   }
@@ -376,7 +400,6 @@ function renderSimulatorBuilder({
       }
       onUserChange={handleUserChange}
       seedInitialFeedback={activeWalkthroughExample !== null}
-      {...commonStorageProps}
     />
   );
 }

@@ -2,18 +2,15 @@ import type { ISimulatorTransferCodec } from "@/types/simulatorTransfer";
 import { BitReader, BitWriter } from "@/lib/trainingCenter";
 import { parseLanguageSpec } from "./rlLanguageSpecParser";
 
+/** Error codes and the size ceiling a stored source may not exceed. */
 const SOURCE_INVALID = "rl_language_transfer_invalid";
 const PAYLOAD_INVALID = "rl_language_transfer_payload_invalid";
 const MAX_SOURCE_BYTES = 1_000_000;
 
 /**
- * Transfer codec for regular language definitions (enumeration or set-builder).
- *
- * Unlike grammars or automata, a language definition is the user-authored text
- * itself, so the codec encodes the source verbatim (UTF-8 -> Base64url) rather
- * than a normalized structure. Both ends validate that the text parses, which
- * keeps the round-trip exact while rejecting malformed payloads. Mirrors the
- * grammar transfer codec's interface and feedback flow.
+ * Transfer codec for language definitions. A definition is user-authored text, so
+ * the source is encoded verbatim rather than normalized; both ends check that it
+ * parses, which keeps the round trip exact.
  */
 export const rlLanguageTransferCodec: ISimulatorTransferCodec<string> = {
   async exportValue(source) {
@@ -43,6 +40,7 @@ export const rlLanguageTransferCodec: ISimulatorTransferCodec<string> = {
   },
 };
 
+/** Read the payload back as UTF-8 text; parsing it is left to the caller. */
 function decodeSource(serializedValue: string): string {
   const reader = BitReader.fromBase64Url(serializedValue, PAYLOAD_INVALID);
 

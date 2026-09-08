@@ -1,20 +1,24 @@
-\subNsection{1}{Reguläre Sprachen}{Kristian Popov}
+\subNsection{1}{Reguläre Sprachen}{Kristian Popov} \label{4_3_RL}
 
-Das Thema \emph{Reguläre Sprachen} unterstützt die Arbeit mit regulären Sprachen
-und rechtslinearen Grammatiken. Es bietet drei miteinander verbundene Funktionen:
-die Aufzählung erzeugter Wörter, die Erzeugung einer Grammatik aus einer
-Sprachbeschreibung und die Prüfung einzelner Wörter. Sprachbeschreibungen können
-als Aufzählung oder in Mengenschreibweise eingegeben werden. Die Aufzählung ist
-dabei auf eine maximale Wortlänge und Wortanzahl begrenzt. Beide
-Umwandlungsrichtungen sind zusätzlich als Übungen mit automatischer Rückmeldung
+Das Thema \emph{Reguläre Sprachen} unterstützt die Arbeit mit regulären Sprachen und
+rechtslinearen Grammatiken.
+Es bietet drei miteinander verbundene Funktionen: die Aufzählung erzeugter Wörter,
+die Erzeugung einer Grammatik aus einer Sprachbeschreibung und die Prüfung einzelner
+Wörter.
+Sprachbeschreibungen können als Aufzählung oder in Mengenschreibweise eingegeben
+werden.
+Die Aufzählung ist dabei auf eine maximale Wortlänge und Wortanzahl begrenzt.
+Beide Umwandlungsrichtungen sind zusätzlich als Übungen mit automatischer Rückmeldung
 verfügbar.
 
 \subNsection{2}{Entscheidungen in der Architektur}{Kristian Popov}
 
 Der Simulator besteht aus einer koordinierenden Komponente und fachlich getrennten
-Bausteinen. \texttt{RLSimulator} verwaltet die drei Arbeitsmodi und den Einstieg
-in Übungen, enthält selbst aber keine formale Logik. Diese liegt im Verzeichnis
-\texttt{domain} und bleibt dadurch unabhängig von React testbar.
+Bausteinen.
+\texttt{RLSimulator} verwaltet die drei Arbeitsmodi und den Einstieg in Übungen,
+enthält selbst aber keine formale Logik.
+Diese liegt im Verzeichnis \texttt{domain} und bleibt dadurch unabhängig von React
+testbar.
 
 Die Fachlogik ist in mehrere Bereiche aufgeteilt:
 
@@ -24,8 +28,8 @@ Parser und Validierung prüfen rechtslineare Grammatiken und überführen sie in
 gemeinsame Datentypen.
 
 \item[Sprachbeschreibung]
-Ein eigener Parser verarbeitet Aufzählungen und Mengenschreibweisen und
-erzeugt daraus eine strukturierte Beschreibung.
+Ein eigener Parser verarbeitet Aufzählungen und Mengenschreibweisen und erzeugt
+daraus eine strukturierte Beschreibung.
 
 \item[Umwandlung und Vereinfachung]
 Sprachbeschreibungen werden in strikt rechtslineare Grammatiken umgewandelt.
@@ -37,81 +41,96 @@ fachlichen Funktionen.
 \end{description}
 
 Wiederverwendet werden der Grammatikparser, die Grammatikvalidierung und die
-gemeinsamen Datentypen. Eine eigene Ableitungslogik direkt auf den Produktionen
-hätte zwei Implementierungen erfordert, die dasselbe Verhalten abbilden müssen;
-mit der gemeinsamen Grundlage stimmen Aufzählung, Worterkennung und
-Übungskontrolle stets überein.
+gemeinsamen Datentypen.
+Eine eigene Ableitungslogik direkt auf den Produktionen hätte zwei Implementierungen
+erfordert, die dasselbe Verhalten abbilden müssen; mit der gemeinsamen Grundlage
+stimmen Aufzählung, Worterkennung und Übungskontrolle stets überein.
 
 Der Parser unterstützt sowohl direkte Aufzählungen, beispielsweise
 \verb|L = {"010", "0010"}|, als auch Mengenschreibweisen wie
-\verb+L = {a^n c b^m | n, m > 0}+.
-Endet eine Aufzählung mit einer Fortsetzungsmarkierung, versucht der Parser
-daraus ein wiederkehrendes Muster abzuleiten, statt die Wörter nur wörtlich zu
-übernehmen. So lässt sich eine unendliche Sprache angeben, ohne die
-Mengenschreibweise schon zu beherrschen.
+\verb+L = {a^n c b^m | n, m > 0}+. Endet eine Aufzählung mit einer
+Fortsetzungsmarkierung, versucht der Parser daraus ein wiederkehrendes Muster
+abzuleiten, statt die Wörter nur wörtlich zu übernehmen.
+So lässt sich eine unendliche Sprache angeben, ohne die Mengenschreibweise schon zu
+beherrschen.
 
-Bestimmte Eingaben werden bewusst abgelehnt, auch wenn sie sich formal
-beschreiben lassen. Verwendet dieselbe Variable mehrere Faktoren, wie in
-\verb|a^n b^n|, koppelt das deren Längen aneinander; eine solche Sprache ist
-nicht regulär. Obere Schranken werden ebenfalls nicht unterstützt, obwohl sie
-endliche und damit reguläre Sprachen beschreiben, denn sie lassen sich klarer
-als Aufzählung angeben. Diese Fälle ausdrücklich zu erklären, ist lehrreicher,
-als sie stillschweigend zu verwerfen.
+Bestimmte Eingaben werden bewusst abgelehnt, auch wenn sie sich formal beschreiben
+lassen.
+Verwendet dieselbe Variable mehrere Faktoren, wie in \verb|a^n b^n|, koppelt das
+deren Längen aneinander; eine solche Sprache ist nicht regulär.
+Obere Schranken werden ebenfalls nicht unterstützt, obwohl sie endliche und damit
+reguläre Sprachen beschreiben, denn sie lassen sich klarer als Aufzählung angeben.
+Wiederholungen innerhalb einer Gruppe, etwa \verb|(a^n)b|, weist der Parser zurück
+und verweist auf die gleichwertige Schreibweise \verb|a^n b|. Diese Fälle
+ausdrücklich zu erklären, ist lehrreicher, als sie stillschweigend zu verwerfen.
 
 Die erzeugten Grammatiken bleiben strikt rechtslinear und verwenden ausschließlich
-Produktionen wie \verb|A -> aB|, \verb|A -> a| und
-$A \rightarrow \varepsilon$. Eine kompaktere, aber allgemeinere
-kontextfreie Darstellung wurde bewusst nicht verwendet, da sie die Grenze zu
-anderen Grammatiktypen überschreiten würde. Für die Ausgabe gibt es zwei
-Sichten auf dasselbe Ergebnis: Die detaillierte Sicht zeigt ein Nichtterminal je
-Präfix, die vereinfachte führt Nichtterminale zusammen, die dieselben Wörter
-ableiten. Die Vereinfachung bleibt rechtslinear und kann die Grammatik nur
-verkleinern, nie ihre Sprache verändern.
+Produktionen der Form $A \rightarrow aB$, $A \rightarrow a$ und
+$A \rightarrow \varepsilon$. Eine kompaktere, aber allgemeinere kontextfreie
+Darstellung wurde bewusst nicht verwendet, da sie die Grenze zu anderen
+Grammatiktypen überschreiten würde.
+Für die Ausgabe gibt es zwei Sichten auf dasselbe Ergebnis: Die detaillierte Sicht
+zeigt ein Nichtterminal je Präfix, die vereinfachte führt Nichtterminale zusammen,
+die dieselben Wörter ableiten.
+Die Vereinfachung bleibt rechtslinear und kann die Grammatik nur verkleinern, nie
+ihre Sprache verändern.
 
 Alle Stellen, die eine rechtslineare Grammatik ausgeben, benutzen dieselbe
-Namensvergabe und Ausgabefunktion. Zuvor lag diese Logik in drei leicht
-unterschiedlichen Kopien vor; in einer davon verbrauchte ein weggelassener
-Endzustand einen Buchstaben, sodass in der Ausgabe etwa \verb|E| übersprungen
-wurde und eine exportierte Grammatik nach dem Import andere Namen trug.
+Namensvergabe und Ausgabefunktion.
+Zuvor lag diese Logik in drei leicht unterschiedlichen Kopien vor; in einer davon
+verbrauchte ein weggelassener Endzustand einen Buchstaben, sodass in der Ausgabe etwa
+\verb|E| übersprungen wurde und eine exportierte Grammatik nach dem Import andere
+Namen trug.
 
 \subNsection{2}{Entscheidungen im UI}{Kristian Popov}
 
-Die drei Arbeitsweisen sind über eine Modusauswahl erreichbar. Die Komponenten
-bleiben beim Wechsel zwischen den Modi erhalten, sodass begonnene Eingaben nicht
-verloren gehen.
+Die drei Arbeitsweisen sind über eine Modusauswahl erreichbar.
+Die Komponenten bleiben beim Wechsel zwischen den Modi erhalten, sodass begonnene
+Eingaben nicht verloren gehen.
 
-Bei geöffneten Übungen wird eine geführte Arbeitsfläche angezeigt, in der Vorgabe
-und Aufgabe nebeneinander stehen. Ein Wechsel des Modus würde den aktuellen
-Bearbeitungsstand verwerfen und erfordert deshalb eine Bestätigung.
+Bei geöffneten Übungen wird eine geführte Arbeitsfläche angezeigt, in der Vorgabe und
+Aufgabe nebeneinander stehen.
+Ein Wechsel des Modus würde den aktuellen Bearbeitungsstand verwerfen und erfordert
+deshalb eine Bestätigung.
 
 Fehlermeldungen erscheinen direkt am jeweiligen Eingabefeld und erst nach einer
-Eingabe. Zusätzlich kann die unterstützte Syntax direkt am Eingabefeld angezeigt
-werden.
+Eingabe.
+Zusätzlich kann die unterstützte Syntax direkt am Eingabefeld angezeigt werden.
 
 \subNsection{2}{Andere Entscheidungen}{Kristian Popov}
 
-Die Übungskontrolle vergleicht nicht die Texte der Lösungen, sondern deren
-Verhalten. Ein Textvergleich mit einer Musterlösung wäre unbrauchbar, da dieselbe
-Sprache von vielen unterschiedlichen Grammatiken erzeugt werden kann und die
-Sprachen zum Teil unendlich sind. Bei \emph{Sprache} $\rightarrow$
-\emph{Grammatik} wird geprüft, ob geforderte Wörter erzeugt und ausgeschlossene
-Wörter nicht erzeugt werden.
-Dadurch können unterschiedliche Grammatiken akzeptiert werden, sofern sie das
-gleiche gewünschte Verhalten zeigen.
+Die Übungskontrolle vergleicht nicht die Texte der Lösungen, sondern deren Verhalten.
+Ein Textvergleich mit einer Musterlösung wäre unbrauchbar, da dieselbe Sprache von
+vielen unterschiedlichen Grammatiken erzeugt werden kann und die Sprachen zum Teil
+unendlich sind.
 
-Bei \emph{Grammatik} $\rightarrow$ \emph{Sprache} verwendet die Kontrolle
-dieselben Grenzen für Wortlänge und Wortanzahl wie die Anzeige der Lösung.
-Andernfalls könnte eine angezeigte Lösung die anschließende Prüfung nicht
-bestehen.
-Die Rückmeldung zeigt konkrete fehlende oder falsch erzeugte Wörter statt nur
-einer Ja-Nein-Aussage. Die Prüfung ist dabei bewusst kein formaler Beweis für
-die Gleichheit zweier Sprachen.
+Bei \emph{Sprache} $\rightarrow$ \emph{Grammatik} prüft die Kontrolle zwei Dinge.
+Zunächst muss die eingegebene Grammatik die geforderten Wörter erzeugen und die
+ausgeschlossenen Wörter ablehnen.
+Anschließend wird sie mit der Referenzgrammatik verglichen: Beide werden in Automaten
+überführt und gemeinsam durchlaufen, bis ein Wort auftritt, das nur eine der beiden
+Sprachen enthält.
+Ein solches Wort erscheint als Gegenbeispiel in der Rückmeldung.
+Dadurch werden unterschiedlich aufgebaute Grammatiken akzeptiert, solange sie
+dieselbe Sprache erzeugen; eine Grammatik, die nur die vorgegebenen Beispielwörter
+richtig behandelt, genügt dagegen nicht.
+Der gemeinsame Durchlauf bricht nach einer festen Schranke ab und liefert dann kein
+abschließendes Urteil; die Grammatiken der Übungen erreichen diese Schranke nicht.
 
-Für Import und Export werden unterschiedliche Formate verwendet. Grammatiken
-werden strukturiert gespeichert, während Sprachbeschreibungen als Text erhalten
-bleiben. Die Daten werden beim Kodieren und Dekodieren auf ihre Gültigkeit geprüft.
+Bei \emph{Grammatik} $\rightarrow$ \emph{Sprache} verwendet die Kontrolle dieselben
+Grenzen für Wortlänge und Wortanzahl wie die Anzeige der Lösung.
+Andernfalls könnte eine angezeigte Lösung die anschließende Prüfung nicht bestehen.
+Die Rückmeldung zeigt auch hier konkrete fehlende oder falsch erzeugte Wörter statt
+nur einer Ja-Nein-Aussage.
+Diese Richtung bleibt damit eine Stichprobe im festgelegten Bereich und kein Nachweis
+über die gesamte Sprache.
 
-Jeder Modus speichert seinen Zustand getrennt in der lokalen Ablage, sodass sich
-die Eingaben der verschiedenen Arbeitsbereiche nicht gegenseitig überschreiben.
-Die Aufgabenstellungen verwenden außerdem eine sprachneutrale Notation und
-müssen daher nicht in den Übersetzungsdateien gepflegt werden.
+Für Import und Export werden unterschiedliche Formate verwendet.
+Grammatiken werden strukturiert gespeichert, während Sprachbeschreibungen als Text
+erhalten bleiben.
+Die Daten werden beim Kodieren und Dekodieren auf ihre Gültigkeit geprüft.
+
+Jeder Modus speichert seinen Zustand getrennt in der lokalen Ablage, sodass sich die
+Eingaben der verschiedenen Arbeitsbereiche nicht gegenseitig überschreiben.
+Die Aufgabenstellungen verwenden außerdem eine sprachneutrale Notation und müssen
+daher nicht in den Übersetzungsdateien gepflegt werden.

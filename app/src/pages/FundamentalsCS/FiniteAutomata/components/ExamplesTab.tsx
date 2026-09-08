@@ -87,6 +87,7 @@ function exampleIcon(example: FAExample) {
   return example.type === "NFA" ? Zap : GitBranch;
 }
 
+/** Adapt an FA example to the card shape the shared topic components expect. */
 function toTopicExample(
   example: FAExample,
   t: (key: TranslationKey) => string,

@@ -24,13 +24,9 @@
       "title": "Elevator control",
       "description": "Model a two-floor elevator with states EG_CLOSED, EG_OPEN, OG_CLOSED, and OG_OPEN. OPEN and CLOSE control the door. GO_OG and GO_EG move the elevator only while the door is closed; movement commands have no effect while it is open. Complete the Moore transition table and state diagram."
     },
-    "barrier": {
-      "title": "Parking garage barrier",
-      "description": "Model a parking garage barrier with an always-open guest mode and a card-controlled mode. In card mode, VALID_CARD opens the barrier and PASS closes it after the induction loop detects the vehicle. Rework the behavior as a Moore machine and define suitable state-dependent output actions."
-    },
     "vending": {
       "title": "Vending machine",
-      "description": "Model a vending machine accepting 50-cent and 1-euro coins for drinks costing 1.00 and 1.50 euros. START has no effect below 1 euro, extra coins at 1.50 euros are returned, and CANCEL returns the full credit. Determine events and actions, handle every event in every state, mark the initial state, and express the behavior as a Moore machine."
+      "description": "Model a vending machine accepting 50-cent and 1-euro coins for drinks costing 1.00 and 1.50 euros. Exceeding 1.50 euros or pressing CANCEL triggers coin return (REFUND state), requiring a restart via START or CANCEL. Below 1.00 euro, START has no effect."
     },
     "wiper": {
       "title": "Windshield wiper control",
@@ -46,11 +42,11 @@
     },
     "edgeDetector": {
       "title": "Rising-edge detector",
-      "description": "Design a Mealy machine that emits RISING_EDGE only when the input signal changes from 0 to 1. An unchanged signal or a falling edge emits NO_PULSE."
+      "description": "Design a Mealy machine with initial state HIGH (idle state). Only when the input signal changes from 0 to 1 is a RISING_EDGE pulse emitted. If the signal remains unchanged or drops to 0, NO_PULSE is emitted."
     },
     "doorController": {
       "title": "Door control with action pulses",
-      "description": "Model a locked and an unlocked door as a Mealy machine. CARD emits UNLOCK_PULSE only when it unlocks the door; PASS emits LOCK_PULSE only when it locks the door again. Events without an effect emit NO_ACTION."
+      "description": "Model a locked and an unlocked door as a Mealy machine (initial state LOCKED). CARD produces an UNLOCK_PULSE when unlocking. Passing through the open door (PASS while in UNLOCKED) triggers a LOCK_PULSE signal and locks the door again (LOCKED). Ineffective events (e.g. PASS when already locked) yield NO_ACTION."
     },
     "sequenceDetector": {
       "title": "01 sequence detector",
@@ -59,6 +55,10 @@
     "parityTracker": {
       "title": "Serial parity output",
       "description": "Design a Mealy machine that outputs the parity of all ones read so far after every input bit. A zero preserves parity; a one toggles between EVEN_PARITY and ODD_PARITY."
+    },
+    "trafficLight": {
+      "title": "Traffic light control",
+      "description": "Model a traffic light controller with the four typical phases RED, RED_YELLOW, GREEN, and YELLOW. The clock signal TICK cyclically advances the light to the next phase. The signal HOLD keeps the light in its current phase (e.g. extending green). RESET safely forces the controller back to the initial RED phase from any state."
     }
   },
   "groups": {
@@ -191,6 +191,6 @@
     "diagram": "Logic gate diagram for {{output}}",
     "binaryGates": "Use only two-input gates",
     "minimizationUnavailable": "Automatic gate minimization is unavailable for this variable count.",
-    "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT. Falstad export: TODO."
+    "iecHint": "IEC notation: & = AND, ≥1 = OR, 1 with an output bubble = NOT."
   }
 }

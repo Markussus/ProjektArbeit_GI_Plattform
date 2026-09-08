@@ -5,23 +5,15 @@ import { EPSILON } from "./faTypes";
  * A single violation of DFA determinism rules.
  */
 export interface DFAViolation {
-  /** The source state */
   state: string;
-  /** The input symbol (or "ε" for epsilon violations) */
   symbol: string;
-  /** The multiple target states (only for nondeterministic transitions) */
   targets: string[];
-  /** Type of violation */
   type: "nondeterministic" | "epsilon";
 }
 
 /**
- * Find all DFA-determinism violations in the given program.
- * Only meaningful when `program.type === "DFA"`.
- *
- * Violations:
- *  - A transition with more than one target state for the same symbol
- *  - Any ε-transition
+ * Every DFA-determinism violation: a symbol with more than one target, or an
+ * ε-transition. Only meaningful when `program.type === "DFA"`.
  */
 export function findDFAViolations(program: FAProgram): DFAViolation[] {
   if (program.type !== "DFA") return [];
