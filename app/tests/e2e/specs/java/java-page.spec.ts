@@ -16,7 +16,7 @@ function encodeJavaTransfer(sourceCode: string) {
 
 test.describe("Java page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/programming-1/java-programming");
+    await page.goto("/gi_learningtool/programming-1/java-programming");
     await expect(page.getByTestId("java-topic-page")).toBeVisible();
   });
 

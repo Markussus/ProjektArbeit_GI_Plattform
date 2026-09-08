@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const RL_URL = "/fundamentals-cs/regular-languages";
+const RL_URL = "/gi_learningtool/fundamentals-cs/regular-languages";
 // Free mode opens blank; the worked grammars live in the Examples tab.
 const BLANK_GRAMMAR = "";
 

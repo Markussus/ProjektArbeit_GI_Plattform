@@ -7,7 +7,7 @@ import {
 
 test.describe("Encoding page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/fundamentals-cs/encoding");
+    await page.goto("/gi_learningtool/fundamentals-cs/encoding");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 

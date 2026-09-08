@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { exportActiveSimulator } from "./support/app-shell";
 
-const TURING_MACHINE_ROUTE = "/fundamentals-cs/turing-machine";
+const TURING_MACHINE_ROUTE = "/gi_learningtool/fundamentals-cs/turing-machine";
 const ERASE_TAPE_EXERCISE_ID = "turing-machine.exercises.exerciseEraseTape";
 const INVERT_BINARY_WORD_EXERCISE_ID =
   "turing-machine.exercises.exerciseInvertBinaryWord";

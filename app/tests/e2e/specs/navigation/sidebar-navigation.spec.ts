@@ -37,7 +37,9 @@ test.describe("Sidebar navigation", () => {
 
     await test.step("The info link should navigate to the info route", async () => {
       await page.getByTestId(appTestIds.sidebarInfoLink).click();
-      await expect.poll(() => new URL(page.url()).pathname).toBe("/info");
+      await expect
+        .poll(() => new URL(page.url()).pathname)
+        .toBe("/gi_learningtool/info");
     });
 
     await test.step("The info route should render the info page content", async () => {

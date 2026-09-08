@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const ROUTE = "/fundamentals-cs/moore-mealy";
+const ROUTE = "/gi_learningtool/fundamentals-cs/moore-mealy";
 
 async function preparePage(page: Page) {
   await page.addInitScript(() => {

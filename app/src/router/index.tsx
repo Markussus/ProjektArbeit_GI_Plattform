@@ -20,22 +20,25 @@ function getRouterBasename() {
 
 const routerBasename = getRouterBasename();
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      element: <MainLayout />,
+      children: [
+        { path: "/", element: <HomePage /> },
+
+        ...learningRoutes,
+
+        { path: "/info", element: <InfoPage /> },
+        { path: "/help", element: <Navigate to="/info" replace /> },
+        { path: "/legal", element: <Navigate to="/info#legal" replace /> },
+        { path: "/documentation", element: <Navigate to="/info" replace /> },
+
+        { path: "*", element: <NotFoundPage /> },
+      ],
+    },
+  ],
   {
-    element: <MainLayout />,
-    children: [
-      { path: "/", element: <HomePage /> },
-
-      ...learningRoutes,
-
-      { path: "/info", element: <InfoPage /> },
-      { path: "/help", element: <Navigate to="/info" replace /> },
-      { path: "/legal", element: <Navigate to="/info#legal" replace /> },
-      { path: "/documentation", element: <Navigate to="/info" replace /> },
-
-      { path: "*", element: <NotFoundPage /> },
-    ],
+    basename: routerBasename,
   },
-], {
-  basename: routerBasename,
-});
+);

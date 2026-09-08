@@ -11,12 +11,14 @@ test.describe("Unknown routes", () => {
   }) => {
     const invalidPath = "/does-not-exist";
 
-    await page.goto("/");
+    await page.goto("/gi_learningtool/");
     await switchLanguage(page, "en");
-    await page.goto(invalidPath);
+    await page.goto(`/gi_learningtool${invalidPath}`);
 
     await test.step("The browser should stay on the unknown route and render the 404 page", async () => {
-      await expect.poll(() => new URL(page.url()).pathname).toBe(invalidPath);
+      await expect
+        .poll(() => new URL(page.url()).pathname)
+        .toBe(`/gi_learningtool${invalidPath}`);
       await expect(page.getByTestId(appTestIds.notFoundTitle)).toHaveText(
         localizedContent.en.notFoundTitle,
       );

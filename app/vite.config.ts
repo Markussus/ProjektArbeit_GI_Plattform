@@ -49,7 +49,7 @@ function previewCompressionPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(),previewCompressionPlugin()],
+  plugins: [react(), tailwindcss(), previewCompressionPlugin()],
   base: normalizeDeploymentBaseUrl(DEPLOYMENT_BASE_URL),
   optimizeDeps: {
     include: ["java-parser"],

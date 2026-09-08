@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { exportActiveSimulator, importFromHeader } from "./support/app-shell";
 
-const DNF_ROUTE = "/fundamentals-cs/dnf";
+const DNF_ROUTE = "/gi_learningtool/fundamentals-cs/dnf";
 const FIRST_DNF_EXERCISE_ID = "dnf.exercises.worksheet02bTruthTable1.title";
 const SIMPLE_EXPRESSION_EXERCISE_ID = "dnf.exercises.simpleExpression.title";
 const COMPLEX_DNF_EXERCISE_ID = "dnf.exercises.complexExpression.title";

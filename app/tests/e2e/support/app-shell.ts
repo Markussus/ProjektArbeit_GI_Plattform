@@ -94,7 +94,7 @@ export const localizedContent = {
 } as const;
 
 export async function gotoHome(page: Page) {
-  await page.goto("/");
+  await page.goto("/gi_learningtool/");
   await expect(page.getByTestId(appTestIds.heroTitle)).toBeVisible();
 }
 

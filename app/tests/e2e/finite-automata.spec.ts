@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const FA_URL = "/fundamentals-cs/finite-automata";
+const FA_URL = "/gi_learningtool/fundamentals-cs/finite-automata";
 
 async function gotoFAPage(page: Page) {
   await page.addInitScript(() => {

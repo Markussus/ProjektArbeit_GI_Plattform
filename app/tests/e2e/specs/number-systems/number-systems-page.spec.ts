@@ -9,7 +9,7 @@ async function openSimulatorTab(page: Page, tabTestId: string) {
 
 test.describe("Number Systems page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/fundamentals-cs/number-systems");
+    await page.goto("/gi_learningtool/fundamentals-cs/number-systems");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 

@@ -6,14 +6,14 @@ import {
 } from "./support/app-shell";
 
 const simulatorRoutes = [
-  ["Turing Machine", "/fundamentals-cs/turing-machine"],
-  ["Finite Automata", "/fundamentals-cs/finite-automata"],
-  ["Regular Languages", "/fundamentals-cs/regular-languages"],
-  ["Number Systems", "/fundamentals-cs/number-systems"],
-  ["Moore", "/fundamentals-cs/moore-mealy"],
-  ["DNF", "/fundamentals-cs/dnf"],
-  ["Encoding", "/fundamentals-cs/encoding"],
-  ["Java", "/programming-1/java-programming"],
+  ["Turing Machine", "/gi_learningtool/fundamentals-cs/turing-machine"],
+  ["Finite Automata", "/gi_learningtool/fundamentals-cs/finite-automata"],
+  ["Regular Languages", "/gi_learningtool/fundamentals-cs/regular-languages"],
+  ["Number Systems", "/gi_learningtool/fundamentals-cs/number-systems"],
+  ["Moore", "/gi_learningtool/fundamentals-cs/moore-mealy"],
+  ["DNF", "/gi_learningtool/fundamentals-cs/dnf"],
+  ["Encoding", "/gi_learningtool/fundamentals-cs/encoding"],
+  ["Java", "/gi_learningtool/programming-1/java-programming"],
 ] as const;
 
 // Regular Languages opens on a blank grammar, and a blank workspace has nothing
@@ -24,14 +24,14 @@ const seedBeforeExport: Partial<
   "Regular Languages": (page) =>
     page
       .getByTestId("rl-grammar-to-language-source")
-      .fill(["S -> aS | bA", "A -> bA | ε"].join("\n")),
+      .fill(["S -> aS | bA", "A -> bA | \u03b5"].join("\n")),
 };
 
 test.describe("global simulator import and export", () => {
   test("keeps export disabled without an active simulation and unregisters on tab exit", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/gi_learningtool/");
     await expect(
       page.getByTestId(appTestIds.headerTransferExport),
     ).toBeDisabled();
@@ -39,7 +39,7 @@ test.describe("global simulator import and export", () => {
       page.getByTestId(appTestIds.headerTransferImport),
     ).toBeDisabled();
 
-    await page.goto("/programming-1/java-programming");
+    await page.goto("/gi_learningtool/programming-1/java-programming");
     await page.getByTestId(appTestIds.tabSimulation).click();
     await expect(
       page.getByTestId(appTestIds.headerTransferExport),
@@ -54,7 +54,7 @@ test.describe("global simulator import and export", () => {
   test("shows the exported string without enabling import", async ({
     page,
   }) => {
-    await page.goto("/fundamentals-cs/number-systems");
+    await page.goto("/gi_learningtool/fundamentals-cs/number-systems");
     await page.getByTestId(appTestIds.tabSimulation).click();
 
     await page.getByTestId(appTestIds.headerTransferExport).click();
@@ -89,7 +89,7 @@ test.describe("global simulator import and export", () => {
       const transferValue = await exportActiveSimulator(page);
       expect(transferValue).toMatch(/^[A-Za-z0-9_-]{4,}$/);
 
-      await page.goto("/");
+      await page.goto("/gi_learningtool/");
       await expect(
         page.getByTestId(appTestIds.headerTransferExport),
       ).toBeDisabled();
@@ -106,16 +106,18 @@ test.describe("global simulator import and export", () => {
   }
 
   test("a Mealy export reopens the Mealy mode", async ({ page }) => {
-    await page.goto("/fundamentals-cs/moore-mealy");
+    await page.goto("/gi_learningtool/fundamentals-cs/moore-mealy");
     await page.getByTestId(appTestIds.tabSimulation).click();
     await page.getByTestId("moore-machine-tab-mealy").click();
     await expect(page.getByTestId("mealy-simulator")).toBeVisible();
 
     const transferValue = await exportActiveSimulator(page);
-    await page.goto("/");
+    await page.goto("/gi_learningtool/");
     await importFromHeader(page, transferValue);
 
-    await expect(page).toHaveURL("/fundamentals-cs/moore-mealy");
+    await expect(page).toHaveURL(
+      "/gi_learningtool/fundamentals-cs/moore-mealy",
+    );
     await expect(page.getByTestId("mealy-simulator")).toBeVisible();
     await expect(page.getByTestId("moore-machine-tab-mealy")).toHaveAttribute(
       "aria-selected",
