@@ -14,11 +14,62 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
 
 \subNsection{2}{Entscheidungen in der Architektur}{Duy Tan Pham}
 
+Abbildung~\ref{fig:dnf_ablauf} fasst den fachlichen Datenfluss der beiden
+Eingabemodi zusammen.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.0cm},
+    flow/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
+    bound/.style={flow, dashed},
+    lbl/.style={font=\scriptsize\itshape, inner sep=2pt, fill=white}
+  ]
+    \node[box, text width=2.1cm, fill=black!5]  (source)    at (0,0)
+      {Boolescher\\Ausdruck};
+    \node[box, text width=2.1cm, fill=black!5]  (parser)    at (3,0)
+      {Parser und\\Syntaxbaum};
+    \node[box, text width=2.1cm, fill=black!12] (table)     at (6,0)
+      {Referenz-\\tabelle};
+    \node[box, text width=2.1cm, fill=black!5]  (canonical) at (9,0)
+      {Kanonische DNF};
+    \node[box, text width=2.1cm, fill=black!12] (minimal)   at (12,0)
+      {Minimale DNF\\exakte Minimierung};
+
+    \node[box, text width=2.1cm, fill=black!5]  (tableinput) at (0,-2.3)
+      {Vorgegebene\\Tabelle};
+    \node[box, text width=2.1cm, fill=black!5]  (answer)     at (3,-4.6)
+      {Antwort der\\Lernenden};
+    \node[box, text width=2.5cm, fill=black!12] (check)      at (6,-4.6)
+      {Prüfung von Form\\und Äquivalenz};
+    \node[box, text width=2.7cm, fill=black!12] (global)     at (10.5,-3.0)
+      {Optional: global\\kleinste Formel};
+
+    \draw[flow] (source) -- (parser);
+    \draw[flow] (parser) -- (table);
+    \draw[flow] (table) -- (canonical);
+    \draw[flow] (canonical) -- (minimal);
+    \draw[flow] (tableinput.east) -- (1.5,-2.3) -| (table.south)
+      node[lbl, near start, above] {direkt};
+    \draw[flow] (answer) -- (check);
+    \draw[flow] (table.south) -- (check.north)
+      node[lbl, midway, right] {Referenz};
+    \draw[flow] (table.south east) to[out=-25,in=165]
+      node[lbl, midway, above] {Funktion} (global.west);
+    \draw[bound] (minimal.south) to[out=-90,in=35]
+      node[lbl, midway, right] {Obergrenze} (global.north east);
+  \end{tikzpicture}
+  \caption[Fachlicher Datenfluss im DNF-Bereich]{%
+    Fachlicher Datenfluss im DNF-Bereich. Die Referenztabelle verbindet beide
+    Eingabemodi mit Ableitung, Minimierung, globaler Suche und Äquivalenzprüfung.}
+  \label{fig:dnf_ablauf}
+\end{figure}
+
 \begin{itemize}
-  \item Der Bereich ist klar in \texttt{domain}, \texttt{application}, \texttt{adapters}
-  und \texttt{presentation} getrennt. Die gesamte Fachlogik liegt in \texttt{domain}:
-  Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und Prüfung. Diese Funktionen sind
-  unabhängig von React und lassen sich dadurch einzeln testen.
+  \item Der Bereich trennt \texttt{domain}, \texttt{application}, \texttt{adapters}
+  und \texttt{presentation}. Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und
+  Prüfung liegen in \texttt{domain} und lassen sich ohne React testen.
 
   \item Der boolesche Ausdruck wird von einem eigenen Parser (\texttt{dnfParser.ts}) in
   einen Syntaxbaum umgewandelt. Aus diesem Baum wird die Wahrheitstabelle erzeugt. Die
@@ -29,42 +80,33 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
   \item Die Ableitung trennt drei Ergebnisstufen sauber: die kanonische DNF
   (\texttt{dnfDerivation.ts}, ein Vollminterm je Eins-Zeile \cite[S.~163]{schiffmann2003}), die minimale DNF
   (\texttt{quineMcCluskey.ts}) und die optional global kleinste Formel
-  (\texttt{minimalExpression.ts}). Darstellung und Rechenform sind getrennt. So ist die
-  Anzeige nicht an die interne Bitdarstellung der Implikanten gebunden.
+  (\texttt{minimalExpression.ts}). Berechnung und Darstellung bleiben dabei getrennt.
 
   \item Die wichtigste fachliche Entscheidung betrifft die Minimierung. Die erste Version
   wählte die restliche Überdeckung nach Quine-McCluskey
-  \cite[S.~172]{schiffmann2003} \emph{greedy} aus. Dadurch konnte
-  sie die beste Lösung verpassen. Diese Auswahl wurde durch ein exaktes Branch-and-Bound
-  über den zyklischen Kern ersetzt (Funktion \texttt{selectCover}). Das Verfahren liefert
-  dieselbe Optimalitätsgarantie wie das Petrick-Verfahren und findet
-  eine DNF mit minimaler Literalzahl. Durch das Abschneiden von Zweigen (Pruning) verwirft es Teile des Suchraums,
-  die keine bessere Lösung mehr liefern können, ohne den Petrick-Ausdruck vollständig
-  auszumultiplizieren.
+  \cite[S.~172]{schiffmann2003} \emph{greedy} aus und konnte dadurch die beste Lösung
+  verpassen. Quine-McCluskey bildet nun die Primimplikanten. Die Funktion
+  \texttt{selectCover} wählt daraus mit Branch-and-Bound exakt eine vollständige
+  Abdeckung mit minimaler Literalzahl. Zweige, die das beste bekannte Ergebnis nicht
+  mehr verbessern können, werden frühzeitig verworfen.
 
   \item Für die optional kleinste Formel wird zusätzlich eine exakte Synthese über den
-  Funktionsraum berechnet. Für Ausdrücke aus Literalen, die mit UND und ODER verbunden
-  werden, liefert sie bis vier Variablen das globale Literalminimum. Negationen stehen
-  dabei nur direkt an Variablen. Ab fünf Variablen wird der Zustandsraum
-  (\(2^{2^{n}}\)) praktisch zu groß. Deshalb ist das Werkzeug bewusst auf vier Variablen
-  begrenzt.
-
-  \item Die Vier-Variablen-Grenze ist an drei Stellen abgesichert: in der Prüfung der
-  Anwendungsschicht, in der Tabellen-Eingabe der Oberfläche und im Import. So bleibt jede
-  Aufgabe in dem Bereich, in dem die exakte Synthese sicher funktioniert.
+  Funktionsraum berechnet. Die minimale DNF liefert dafür eine gültige Obergrenze. Für
+  Ausdrücke aus Literalen, die mit UND und ODER verbunden werden, findet die Suche bis
+  vier Variablen das globale Literalminimum. Negationen stehen dabei nur direkt an
+  Variablen. Da die Anzahl möglicher Funktionen mit \(2^{2^{n}}\) stark wächst, ist das
+  Werkzeug auf vier Variablen begrenzt. Diese Grenze wird in Anwendungsschicht,
+  Tabellen-Eingabe und Import geprüft.
 
   \item Die Prüfung ist von der Darstellung getrennt. Ein eingegebener Ausdruck wird für
   jede Zeile der Wahrheitstabelle ausgewertet und nicht durch einen reinen Textvergleich
-  bewertet. Dadurch werden logisch gleichwertige Schreibweisen erkannt. Die Übungsprüfung
-  (\texttt{dnfExerciseCheck.ts}) unterscheidet zusätzlich zwischen \glqq korrekt\grqq{},
-  \glqq äquivalent, aber nicht kanonisch\grqq{} und \glqq nicht äquivalent\grqq{}. Sie
-  benennt außerdem fehlende oder überzählige Terme. Die Vereinfachungsprüfung
-  (\texttt{dnfSimplificationCheck.ts}) prüft zuerst die logische Gleichwertigkeit und
-  anschließend, ob die Literalzahl das exakte Minimum erreicht.
+  bewertet. Dadurch erkennt die Übungsprüfung (\texttt{dnfExerciseCheck.ts}) korrekte,
+  nur äquivalente und nicht äquivalente Antworten. Die Vereinfachungsprüfung
+  (\texttt{dnfSimplificationCheck.ts}) prüft zusätzlich, ob die Literalzahl das exakte
+  Minimum erreicht.
 
-  \item Import und Export nutzen wie die anderen Simulatoren einen kompakten, URL-sicheren
-  Base64-Code und sind an den gemeinsamen Training-Center-Speicher angebunden. So verhält
-  sich der DNF-Bereich beim Speichern und Teilen genauso wie der Rest der Plattform.
+  \item Import, Export und automatisches Speichern verwenden den gemeinsamen
+  Training-Center-Speicher und einen kompakten, URL-sicheren Base64-Code.
 \end{itemize}
 
 \subNsection{2}{Entscheidungen im UI}{Duy Tan Pham}
@@ -77,28 +119,24 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
 
   \item Die einzelnen Schritte der Ableitung werden sichtbar gemacht: von den Eins-Zeilen
   der Tabelle über die passenden kanonischen Terme bis zur minimalen Form. Bei der
-  Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg.
-
-  \item In den Übungen bearbeiten die Lernenden Wahrheitstabellen oder DNF-Ausdrücke
-  selbst. Die Rückmeldung wird dabei aus der DNF-Fachlogik abgeleitet.
+  Vereinfachung wird nicht nur das Ergebnis gezeigt, sondern auch der Lösungsweg. In den
+  Übungen bearbeiten die Lernenden Wahrheitstabellen oder DNF-Ausdrücke selbst und
+  erhalten eine fachlich berechnete Rückmeldung.
 
   \item Kleinere Wahrheitstabellen werden vollständig angezeigt. Bei \texttt{16} Zeilen,
   also bei vier Variablen, gibt es eine kompakte, scrollbare Ansicht, die sich auf eine
   Vollansicht umschalten lässt. Dadurch bleibt die maximale Darstellungshöhe begrenzt.
 
-  \item Folgeaktionen bleiben sichtbar und werden ausgegraut, bis ihre Voraussetzungen
-  erfüllt sind, statt plötzlich aufzutauchen. Rein kontextabhängige Schaltflächen, etwa für
-  die Vollansicht einer großen Tabelle, erscheinen dagegen nur dann, wenn sie tatsächlich
-  benötigt werden. Dadurch bleibt die Bedienung vorhersehbar.
+  \item Folgeaktionen bleiben sichtbar und werden bis zum Erfüllen ihrer Voraussetzungen
+  ausgegraut. Nur kontextabhängige Schaltflächen, etwa für die Vollansicht einer großen
+  Tabelle, erscheinen bei Bedarf. Dadurch bleibt die Bedienung vorhersehbar.
 
   \item Eingaben werden vereinheitlicht: Lernende dürfen \texttt{!}, \texttt{\&} und
   \texttt{|} tippen, angezeigt wird aber immer \(\lnot\), \(\land\), \(\lor\). Das macht die
   Eingabe leichter, ohne die Darstellung uneinheitlich zu machen.
 
-  \item Für die Fehlersuche stehen Import und Export zur Verfügung. So können Lernende
-  einen Aufgabenstand teilen und nachvollziehen. Der DNF-Bereich nutzt außerdem den
-  gemeinsamen Themenaufbau mit Kopfbereich, Tabs und globaler Sidebar, damit er sich wie
-  ein Teil derselben Lernplattform anfühlt.
+  \item Der DNF-Bereich nutzt den gemeinsamen Themenaufbau mit Kopfbereich, Tabs und
+  globaler Sidebar. Dadurch fügt er sich in die übrige Lernplattform ein.
 \end{itemize}
 
 \subNsection{2}{Andere Entscheidungen}{Duy Tan Pham}
