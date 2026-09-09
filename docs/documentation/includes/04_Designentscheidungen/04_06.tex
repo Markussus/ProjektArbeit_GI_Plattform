@@ -4,7 +4,7 @@ Die \gls{dnf} ist ein eigener Themenbereich im Modul
 \glqq Grundlagen der Informatik\grqq{}. Sie folgt dem gleichen Aufbau wie die anderen
 Themen: Übersicht, Übungen, Beispiele und eine freie Simulation. Die Inhalte bauen
 schrittweise aufeinander auf: von der kanonischen DNF über die minimale DNF bis zur
-optional global kleinsten Formel. Die einzelnen Schritte der Ableitung werden dabei
+optionalen global kleinsten Formel. Die einzelnen Schritte der Ableitung werden dabei
 sichtbar gemacht.
 
 Die inhaltliche Ausrichtung folgt den vorhandenen Übungsunterlagen der Lehrveranstaltung.
@@ -14,62 +14,74 @@ Grenze von vier Variablen deckt damit zugleich die vorgesehenen Übungsbeispiele
 
 \subNsection{2}{Entscheidungen in der Architektur}{Duy Tan Pham}
 
-Abbildung~\ref{fig:dnf_ablauf} fasst den fachlichen Datenfluss der beiden
-Eingabemodi zusammen.
+Der \texttt{DnfSimulator} koordiniert Moduswahl, Transfer und Persistenz. Abhängig vom
+Kontext verwendet er den \texttt{DnfBuilder} für Übungen, den
+\texttt{ExpressionBuilder} für einen vorgegebenen Ausdruck oder den
+\texttt{TableToDnfBuilder} für eine vorgegebene Wahrheitstabelle.
+Abbildung~\ref{fig:dnf_architektur} zeigt diese Aufteilung und die wichtigsten
+Abhängigkeiten zwischen den Bestandteilen.
 
 \begin{figure}[htbp]
   \centering
   \begin{tikzpicture}[
     font=\footnotesize,
     box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.0cm},
-    flow/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
-    bound/.style={flow, dashed},
-    lbl/.style={font=\scriptsize\itshape, inner sep=2pt, fill=white}
+    wide/.style={box, text width=13.6cm},
+    third/.style={box, text width=3.8cm, minimum height=1.8cm},
+    nutzt/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick}
   ]
-    \node[box, text width=2.1cm, fill=black!5]  (source)    at (0,0)
-      {Boolescher\\Ausdruck};
-    \node[box, text width=2.1cm, fill=black!5]  (parser)    at (3,0)
-      {Parser und\\Syntaxbaum};
-    \node[box, text width=2.1cm, fill=black!12] (table)     at (6,0)
-      {Referenz-\\tabelle};
-    \node[box, text width=2.1cm, fill=black!5]  (canonical) at (9,0)
-      {Kanonische DNF};
-    \node[box, text width=2.1cm, fill=black!12] (minimal)   at (12,0)
-      {Minimale DNF\\exakte Minimierung};
+    \node[wide, fill=black!5] (simulator) at (0,0)
+      {\textbf{\texttt{DnfSimulator}}\\
+       Moduswahl, Transfer und Persistenz};
 
-    \node[box, text width=2.1cm, fill=black!5]  (tableinput) at (0,-2.3)
-      {Vorgegebene\\Tabelle};
-    \node[box, text width=2.1cm, fill=black!5]  (answer)     at (3,-4.6)
-      {Antwort der\\Lernenden};
-    \node[box, text width=2.5cm, fill=black!12] (check)      at (6,-4.6)
-      {Prüfung von Form\\und Äquivalenz};
-    \node[box, text width=2.7cm, fill=black!12] (global)     at (10.5,-3.0)
-      {Optional: global\\kleinste Formel};
+    \node[wide, fill=black!5] (builders) at (0,-2.1)
+      {\textbf{Builder-Komponenten}\\
+       \texttt{DnfBuilder} -- Übungen\\
+       \texttt{ExpressionBuilder} -- Ausdruck\\
+       \texttt{TableToDnfBuilder} -- Wahrheitstabelle};
 
-    \draw[flow] (source) -- (parser);
-    \draw[flow] (parser) -- (table);
-    \draw[flow] (table) -- (canonical);
-    \draw[flow] (canonical) -- (minimal);
-    \draw[flow] (tableinput.east) -- (1.5,-2.3) -| (table.south)
-      node[lbl, near start, above] {direkt};
-    \draw[flow] (answer) -- (check);
-    \draw[flow] (table.south) -- (check.north)
-      node[lbl, midway, right] {Referenz};
-    \draw[flow] (table.south east) to[out=-25,in=165]
-      node[lbl, midway, above] {Funktion} (global.west);
-    \draw[bound] (minimal.south) to[out=-90,in=35]
-      node[lbl, midway, right] {Obergrenze} (global.north east);
+    \node[third, fill=black!5] (pres) at (-4.7,-4.9)
+      {\textbf{\texttt{presentation}}\\
+       Arbeitsbereiche, Tabellen,\\Ergebnisse und Rückmeldungen};
+    \node[third, fill=black!5] (app) at (0,-4.9)
+      {\textbf{\texttt{application}}\\
+       \texttt{dnfAnalysis}, \texttt{dnfFollowUp}\\
+       Analyse, Folgeaktionen und React-Hooks};
+    \node[third, fill=black!5] (adap) at (4.7,-4.9)
+      {\textbf{\texttt{adapters}}\\
+       \texttt{truthTableAdapter}\\
+       Fachmodell für die Tabellenanzeige};
+
+    \node[wide, fill=black!12] (dom) at (0,-8.1)
+      {\textbf{\texttt{domain}} -- reine Fachlogik, ohne React testbar\\
+       Parser und Syntaxbaum\\
+       Wahrheitstabelle und DNF-Ableitung\\
+       exakte Minimierung mit Quine-McCluskey und Branch-and-Bound\\
+       globale Synthese und semantische Prüfungen};
+
+    \draw[nutzt] (simulator) -- (builders);
+    \foreach \layer in {pres,app,adap}{%
+      \draw[nutzt] (builders.south -| \layer.north) -- (\layer.north);
+      \draw[nutzt] (\layer.south) -- (dom.north -| \layer.south);
+    }
   \end{tikzpicture}
-  \caption[Fachlicher Datenfluss im DNF-Bereich]{%
-    Fachlicher Datenfluss im DNF-Bereich. Die Referenztabelle verbindet beide
-    Eingabemodi mit Ableitung, Minimierung, globaler Suche und Äquivalenzprüfung.}
-  \label{fig:dnf_ablauf}
+  \caption[Architektur des DNF-Bereichs]{%
+    Architektur des DNF-Bereichs. Die Pfeile zeigen die Hauptabhängigkeiten vom
+    \texttt{DnfSimulator} über die Builder und die unterstützenden Bereiche bis zur
+    gemeinsamen Fachlogik.}
+  \label{fig:dnf_architektur}
 \end{figure}
 
 \begin{itemize}
-  \item Der Bereich trennt \texttt{domain}, \texttt{application}, \texttt{adapters}
-  und \texttt{presentation}. Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und
-  Prüfung liegen in \texttt{domain} und lassen sich ohne React testen.
+  \item Wiederverwendbare Ansichten liegen in \texttt{presentation}. Die
+  Anwendungsschicht bündelt Analyse und Folgeaktionen in
+  \texttt{dnf\allowbreak{}Analysis} und \texttt{dnf\allowbreak{}FollowUp}.\newline
+  Der Adapter \mbox{\texttt{truthTableAdapter}} bereitet das fachliche Tabellenmodell
+  für die Darstellung auf.
+
+  \item Parser, Wahrheitstabelle, DNF-Ableitung, Minimierung und Prüfung liegen in
+  \texttt{domain}. Diese Fachlogik besitzt keine React-Abhängigkeit und lässt sich
+  unabhängig von der Benutzeroberfläche testen.
 
   \item Der boolesche Ausdruck wird von einem eigenen Parser (\texttt{dnfParser.ts}) in
   einen Syntaxbaum umgewandelt. Aus diesem Baum wird die Wahrheitstabelle erzeugt. Die
@@ -79,7 +91,7 @@ Eingabemodi zusammen.
 
   \item Die Ableitung trennt drei Ergebnisstufen sauber: die kanonische DNF
   (\texttt{dnfDerivation.ts}, ein Vollminterm je Eins-Zeile \cite[S.~163]{schiffmann2003}), die minimale DNF
-  (\texttt{quineMcCluskey.ts}) und die optional global kleinste Formel
+  (\texttt{quineMcCluskey.ts}) und die optionale global kleinste Formel
   (\texttt{minimalExpression.ts}). Berechnung und Darstellung bleiben dabei getrennt.
 
   \item Die wichtigste fachliche Entscheidung betrifft die Minimierung. Die erste Version
@@ -90,7 +102,7 @@ Eingabemodi zusammen.
   Abdeckung mit minimaler Literalzahl. Zweige, die das beste bekannte Ergebnis nicht
   mehr verbessern können, werden frühzeitig verworfen.
 
-  \item Für die optional kleinste Formel wird zusätzlich eine exakte Synthese über den
+  \item Für die optionale kleinste Formel wird zusätzlich eine exakte Synthese über den
   Funktionsraum berechnet. Die minimale DNF liefert dafür eine gültige Obergrenze. Für
   Ausdrücke aus Literalen, die mit UND und ODER verbunden werden, findet die Suche bis
   vier Variablen das globale Literalminimum. Negationen stehen dabei nur direkt an

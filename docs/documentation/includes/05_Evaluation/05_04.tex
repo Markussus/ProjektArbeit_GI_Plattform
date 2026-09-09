@@ -9,14 +9,15 @@ Backend. Der Umfang und die technische Umsetzung entwickelten sich dagegen schri
 weiter.
 
 Der anfangs vorgesehene fachliche Umfang konzentrierte sich auf Themen aus Grundlagen
-Informatik. Später wuchs er auf zwei Ebenen. Zum einen kamen mit den regulären Sprachen
-und den Kodierungsverfahren zwei weitere Fachthemen hinzu. Zum anderen wurden vorhandene
+Informatik. Der Umfang wuchs im Projekt in zwei Richtungen. Mit Programmieren~1 und der
+Java-Umgebung kam ein ergänzender Lernbereich außerhalb von Grundlagen Informatik hinzu.
+Innerhalb von Grundlagen Informatik kamen im weiteren Verlauf die regulären Sprachen und
+die Kodierungsverfahren als weitere Fachthemen hinzu. Zusätzlich wurden vorhandene
 Funktionen weiter konkretisiert. Im DNF-Bereich wurde das im Lastenheft vorgesehene
 Vereinfachen als eigener interaktiver Arbeitsschritt mit Prüfung und Lösungsweg umgesetzt.
-Mit Programmieren 1 und der Java-Umgebung kam später ein ergänzender Lernbereich außerhalb
-von Grundlagen Informatik hinzu. Die Erweiterungen wurden jeweils vorher abgestimmt. Für
-die Plattform bedeutete das, dass die gemeinsame Struktur mehrmals neue Themen aufnehmen
-musste, ohne die bestehenden Bereiche dafür umzubauen.
+Die Erweiterungen wurden jeweils vorher abgestimmt. Für die Plattform bedeutete das, dass
+die gemeinsame Struktur mehrmals neue Themen aufnehmen musste, ohne die bestehenden
+Bereiche dafür umzubauen.
 
 Die grobe Seitenarchitektur wurde bereits zu Beginn des Projekts festgelegt. Schon das
 frühe Plattformgerüst registrierte Lernbereiche, Themenbereiche, Routen und
@@ -39,14 +40,14 @@ wurden zunächst unabhängig umgesetzt. Bei der Integration wurden dann gemeinsa
 und Automatenmodelle sowie Bausteine für das Übertragungsformat wiederverwendet. Die
 themenspezifischen Prüfverfahren blieben dagegen in den jeweiligen Bereichen.
 
-Eine weitere Änderung betraf Import, Export und die Speicherung von Aufgabenständen.
-Import und Export waren anfangs nur als optionale Funktionen vorgesehen und wurden zuerst
-in einzelnen Simulatoren umgesetzt. Später wurden das Datenformat und der Einstieg über
-den globalen Kopfbereich zusammengeführt. Daraus entstand die gemeinsame
-Training-Center-Struktur. Zusätzlich werden geeignete Aufgabenstände und Einstellungen im
-lokalen Speicher des Browsers gesichert. Damit bleiben Ergebnisse zwischen Aufrufen
-erhalten, ohne die ursprüngliche Entscheidung gegen Benutzerkonten und ein Backend
-aufzugeben.
+Eine weitere Änderung betraf die Vereinheitlichung von Import, Export und der Speicherung
+von Aufgabenständen. Diese Funktionen wurden zunächst modulspezifisch in einzelnen
+Simulatoren umgesetzt. Später wurden der gemeinsame Transferrahmen und die Bedienung über
+den globalen Kopfbereich zusammengeführt. Die Fachmodule behalten dabei eigene Codecs für
+ihre jeweiligen Daten. Daraus entstand die gemeinsame Training-Center-Struktur. Zusätzlich
+werden geeignete Aufgabenstände und Einstellungen im lokalen Speicher des Browsers
+gesichert. Damit bleiben Ergebnisse zwischen Aufrufen erhalten, ohne die ursprüngliche
+Entscheidung gegen Benutzerkonten und ein Backend aufzugeben.
 
 Die gemeinsame Struktur entstand aus den wiederkehrenden Abläufen der Fachthemen und wurde
 angepasst, sobald mehrere unabhängige Lösungen dieselbe Aufgabe erfüllten. Dadurch konnten neue
