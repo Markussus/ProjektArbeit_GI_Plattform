@@ -1,4 +1,4 @@
-\subNsection{1}{Moore- und Mealy-Automaten}{Markus Nöth}
+\subNsection{1}{Moore- und Mealy-Automaten}{Markus Nöth} \label{4_5_MM}
 
 Das Modul vermittelt den Entwurf synchroner Schaltwerke mit Tabellen, Zustandsgraphen und Logikschaltungen. Beide Automatentypen bieten freie Simulationen, Beispiele und Übungen.
 
@@ -13,28 +13,44 @@ Für beide Automatentypen erzeugt das Modul Wahrheitstabellen, disjunktive Norma
   \item \textbf{Moore-Transformation (\texttt{buildMooreConversion}):} Da die Ausgabe allein an den Zustand gekoppelt ist, hängen die Ausgangsvariablen ($y$) nur von den Zustandsvariablen ($S_0 \dots S_n$) ab. Die Übergangsfunktionen für den Folgezustand ($T_0 \dots T_n$) berechnen sich aus den Zustands- und Eingangsvariablen ($E_0 \dots E_m$).
   \item \textbf{Mealy-Transformation (\texttt{buildMealyConversion}):} Sowohl der Folgezustand als auch die Ausgänge hängen gleichzeitig von Zustand und Eingabe ab. Die Wahrheitstabelle der Ausgänge umfasst daher die Bitbelegungen der definierten Zustands-Eingabe-Paare.
 \end{itemize}
-Aus den generierten Wahrheitstabellen berechnet das angebundene DNF-Modul über den Funktionsaufruf \texttt{compute\-Smallest\-Boolean\-Expression()} die minimierten Schaltfunktionen. Bis vier Variablen wird das globale Literalminimum für UND/ODER-Formeln mit negierten Literalen bestimmt. Bei fünf bis acht Variablen wird zwischen minimaler DNF und ihrer Faktorisierung gewählt, ohne globale Optimalitätsgarantie. Darüber bleibt die kanonische DNF. Die Grenze begrenzt den Aufwand, garantiert aber keine blockierungsfreie Berechnung.
+Aus den generierten Wahrheitstabellen berechnet das angebundene DNF-Modul (siehe Abschnitt~\ref{4_6_DNF}) über den Funktionsaufruf \texttt{compute\-Smallest\-Boolean\-Expression()} die minimierten Schaltfunktionen. Bis vier Variablen wird das globale Literalminimum für UND/ODER-Formeln mit negierten Literalen bestimmt. Bei fünf bis acht Variablen wird zwischen minimaler DNF und ihrer Faktorisierung gewählt, ohne globale Optimalitätsgarantie. Darüber bleibt die kanonische DNF. Die Grenze begrenzt den Aufwand, garantiert aber keine blockierungsfreie Berechnung.
 
+Abbildung~\ref{fig:moore_mealy_pipeline} veranschaulicht diesen durchgängigen Ablauf von der Definition im Editor über die binären Wahrheitstabellen und die DNF-Minimierung bis hin zur Gatterschaltung samt den zugehörigen Visualisierungen der Benutzeroberfläche.
 
 \begin{figure}[htbp]
   \centering
   \begin{tikzpicture}[
     font=\footnotesize,
-    box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, text width=4.2cm, minimum height=0.8cm},
-    flow/.style={-{Stealth[length=2mm]}, semithick}
+    stepbox/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, text width=2.9cm, minimum height=0.9cm, fill=black!10},
+    uibox/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, text width=2.9cm, minimum height=0.9cm, fill=black!3},
+    pipe/.style={-{Stealth[length=2.2mm,width=1.8mm]}, semithick},
+    view/.style={-{Stealth[length=1.8mm,width=1.4mm]}, dashed},
+    lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
   ]
-    \node[box, fill=black!5] (config) at (0,0) {Editor-Konfiguration};
-    \node[box, fill=black!12] (sim) at (-3.5,-1.5) {Übernommene Konfiguration\\Simulator mit Historie};
-    \node[box, fill=black!12] (conv) at (3.5,-1.5) {Konvertierung\\Wahrheitstabellen und Formeln};
-    \node[box] (graph) at (-3.5,-3) {Laufzeitansicht\\Tabelle und Zustandsgraph};
-    \node[box] (logic) at (3.5,-3) {Konvertierungsansicht\\Tabellen und Logikgatter};
-    \draw[flow] (config.south) -- ++(0,-0.25) -| (sim.north);
-    \draw[flow] (config.south) -- ++(0,-0.25) -| (conv.north);
-    \draw[flow] (sim) -- (graph);
-    \draw[flow] (conv) -- (logic);
+    \node[stepbox] (edit) at (-5.1, 0)
+      {\textbf{Automaten-Editor}\\Moore- / Mealy-Matrix};
+    \node[stepbox] (tab) at (-1.7, 0)
+      {\textbf{Wahrheits-}\\\textbf{tabelle}\\[1pt]Binäre Bit-Belegung};
+    \node[stepbox] (dnf) at (1.7, 0)
+      {\textbf{DNF-Modul}\\Minimierung (\S\ref{4_6_DNF})};
+    \node[stepbox] (gate) at (5.1, 0)
+      {\textbf{Logikgatter}\\Schaltfunktionen};
+    \node[uibox] (graph) at (-5.1, -1.9)
+      {\textbf{Zustandsgraph}\\[1pt]{\scriptsize\texttt{StateMachineGraph}}};
+    \node[uibox] (view) at (-1.7, -1.9)
+      {\textbf{Tabellenansicht}\\[1pt]{\scriptsize\texttt{Automata\-Conversion\-View}}};
+    \node[uibox] (circuit) at (5.1, -1.9)
+      {\textbf{Gatterdiagramm}\\[1pt]{\scriptsize\texttt{LogicGateDiagram}}};
+    \draw[pipe] (edit) -- (tab);
+    \draw[pipe] (tab) -- (dnf);
+    \draw[pipe] (dnf) -- (gate);
+    \draw[view] (edit) -- (graph) node[lbl, midway, right] {Graph};
+    \draw[view] (tab) -- (view) node[lbl, midway, right] {Tabelle};
+    \draw[view] (gate) -- (circuit) node[lbl, midway, right] {Schaltung};
   \end{tikzpicture}
-  \caption{Die Simulation übernimmt die geprüfte Konfiguration; die Konvertierung nutzt den Editorstand.}
-  \label{fig:moore_mealy_datenfluss}
+  \caption[Transformationspipeline für Moore- und Mealy-Automaten]{%
+    Transformationspipeline von der Automatendefinition zur Visualisierung}
+  \label{fig:moore_mealy_pipeline}
 \end{figure}
 
 \subNsection{2}{Entscheidungen im UI}{Markus Nöth}
@@ -53,4 +69,3 @@ Beide Komponenten wurden modular unter \verb|app/src/components/shared/| abgeleg
 Das Modul enthält elf praxisnahe Übungsaufgaben: sieben für Moore-Automaten sowie vier für Mealy-Automaten. Jede Aufgabe stellt ein Starterprogramm, eine Lösung und Validierungsfälle bereit.
 
 Für Speicherung und Austausch kommt der Modul-Codec \verb|programTransfer.ts| zum Einsatz: Anstelle von unkomprimiertem \gls{json} serialisieren ein \verb|BitWriter| und \verb|BitReader| Zustände, Symbole, Übergänge und Ausgaben direkt in dichte Bitfolgen. Dies spart den Syntax-Overhead von Attributnamen ein: Bezeichner werden nur einmalig deklariert und in den Übergängen als Bit-Indizes minimaler Breite ($\lceil\log_2 N\rceil$) referenziert, während Kanten über 1-Bit-Flags kodiert werden. Die Bitfolgen werden Base64URL-kodiert und ermöglichen kompakte \glspl{url} für das Teilen von Automaten sowie die persistente Ablage im Local Storage des Trainingscenters.
-
