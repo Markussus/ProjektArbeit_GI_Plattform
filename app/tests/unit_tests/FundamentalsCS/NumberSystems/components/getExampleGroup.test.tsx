@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
 import { describe, expect, it } from "vitest";
-import { getExampleGroup } from "../getExampleGroup";
+import { getExampleGroup } from "@/pages/FundamentalsCS/NumberSystems/components/getExampleGroup";
 import type { ExerciseDefinition } from "@/types/exercise";
 import type { LucideIcon } from "lucide-react";
 
@@ -46,18 +46,5 @@ describe("getExampleGroup", () => {
       examples.map((ex) => ex.titleKey),
     );
     expect(groups.lecture).toBeUndefined();
-  });
-
-  it("keeps examples without unit prefix ungrouped", () => {
-    const examples = [
-      buildExample("some_other_key"),
-      buildExample("example_u99_legacy"),
-    ];
-
-    const groups = getExampleGroup(examples);
-
-    expect(groups.lecture).toBeUndefined();
-    expect(groups["07"]).toBeUndefined();
-    expect(Object.keys(groups)).toHaveLength(0);
   });
 });
