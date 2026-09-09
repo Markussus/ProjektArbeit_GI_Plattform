@@ -1,54 +1,18 @@
 \subNsection{1}{Perspektiven}{Kristian Popov} \label{6_2_Perspektiven}
 
-Ein naheliegender nächster Schritt ist die Erweiterung um weitere Lernbereiche –
-beispielsweise um zusätzliche Themen, die von Professoren beigesteuert oder definiert werden.
-Da Lernbereiche und Themen zentral im Modulkatalog registriert sind, werden Navigation
-und Routing daraus dynamisch abgeleitet.
-Ein neuer Lernbereich benötigt lediglich eine eigene Übersichtsseite,
-während ein neues Thema zusätzlich seine Fachlogik und einen eigenen Simulator mitbringt.
+Die modulare Architektur erlaubt eine flexible Erweiterung der Anwendung. Künftige Perspektiven gliedern sich in folgende Schwerpunkte:
 
-Auch die Erstellung von Aufgaben könnte stärker über die Oberfläche erfolgen.
-Lehrende könnten Aufgaben und Beispiele direkt anlegen und weitergeben, wobei
-das bestehende Übertragungsformat um Angaben wie Beschreibung,
-Schwierigkeitsgrad und Prüfkriterien erweitert werden könnte.
+\begin{itemize}
+    \item \textbf{Weitere Lernbereiche und Topics:} Neue Themen – etwa von anderen Professoren beigesteuerte Fachmodule – lassen sich über den zentralen Modulkatalog dynamisch in Navigation und Routing integrieren.
+    \item \textbf{Aufgabenverwaltung und -varianten:} Lehrende können Aufgaben und Vorlagen direkt über die Oberfläche anlegen, automatisch Varianten erzeugen sowie Quizfragen und Lernkarten ergänzen.
+    \item \textbf{Mobile Nutzung:} Optimierung der Benutzeroberfläche – insbesondere von Übergangstabellen und Zustandsdiagrammen – für kleine Bildschirme und Tablets.
+    \item \textbf{Java-Zeilensperrung:} Abgrenzung bearbeitbarer Code-Bereiche im Editor durch Marker, um nicht zu bearbeitende Zeilen schreibgeschützt zu halten.
+    \item \textbf{Gamification und LMS-Anbindung:} Motivationselemente wie Streaks oder Abzeichen sowie eine Moodle-Anbindung zur zentralen Lernstandsauswertung.
+    \item \textbf{Offene Punkte aus dem Lastenheft (Abschnitt~\ref{5_2_LH}):}
+    \begin{itemize}
+        \item \textit{Usability-Erhebung:} Durchführung strukturierter Tests zur Bedienbarkeit über einen internen Testzugang.
+        \item \textit{Barrierefreiheit \& Mobil-Profiling:} Automatisierte CI-Prüfungen für Kontraste, Tastaturbedienung und mobile Performance-Messungen.
+    \end{itemize}
+\end{itemize}
 
-Darauf aufbauend wäre eine automatische Generierung von Aufgabenvarianten
-möglich. Bisher sind die Varianten außerhalb der Anwendung mit
-KI-Unterstützung entstanden; aus einer Vorlage könnten sie künftig direkt erzeugt
-und anschließend automatisch überprüft werden. Ergänzend könnten Quizfragen,
-Lernkarten und Theoriefragen das praktische Üben erweitern.
-
-Für Programmieraufgaben in Java wäre eine Zeilensperrung im Editor hilfreich.
-Marker im Quelltext würden den bearbeitbaren Bereich abgrenzen, alle übrigen
-Zeilen blieben schreibgeschützt. Die Machbarkeit ist geprüft; Aufgaben ließen
-sich damit zuverlässig automatisch überprüfen.
-
-Für Lehrende wäre außerdem eine Auswertung der Bearbeitungsergebnisse sinnvoll.
-Sie könnte zeigen, welche Aufgaben besonders häufig falsch gelöst oder
-abgebrochen werden. Die Fortschritte könnten zusätzlich für Gamification,
-beispielsweise durch Streaks oder Abzeichen, genutzt werden.
-
-Weitere Möglichkeiten sind ein PDF- oder Druckexport sowie eine verbesserte
-mobile Darstellung. Besonders Übergangstabellen und Zustandsdiagramme sind auf
-kleinen Bildschirmen derzeit noch schwer zu bedienen.
-
-Offen bleiben außerdem drei Punkte aus dem Abgleich mit dem Lastenheft
-(siehe Abschnitt~\ref{5_2_LH}). Eine systematische Usability-Erhebung mit
-Studierenden konnte nicht stattfinden, da die Anwendung nicht öffentlich
-betrieben wird. Über einen hochschulintern erreichbaren Testzugang ließen sich
-Bedienbarkeit und Verständlichkeit der Simulatoren strukturiert erheben und die
-Ergebnisse gezielt in die Oberfläche zurückführen.
-
-Ebenso ließe sich die Barrierefreiheit automatisiert absichern. Die
-Lighthouse-Stufe der Pipeline ist bewusst auf die Kategorie Performance
-beschränkt; eine zusätzliche Prüfung der Kategorie Barrierefreiheit würde
-Tastaturbedienung, Kontraste und Beschriftungen bei jedem Merge Request messbar
-machen. Ergänzende Läufe mit dem Mobilprofil würden zugleich die bislang
-fehlenden Messwerte für kleine Bildschirme liefern.
-
-Insgesamt lassen sich weitere Lernbereiche, Aufgabenvarianten und Exporte
-vergleichsweise einfach in die bestehende Struktur integrieren. Funktionen wie
-Benutzerkonten, zentrale Auswertungen oder eine Anbindung an ein \gls{lms} wie
-Moodle würden dagegen
-ein Backend und serverseitige Speicherung erfordern, da die aktuelle Anwendung
-bewusst ohne diese Infrastruktur auskommt.
+Während sich neue Lernbereiche, Aufgabenvarianten und Editor-Sperren vollständig in die bestehende, wartungsfreie Client-Architektur integrieren lassen, würden zentrale Auswertungen, Nutzerkonten oder eine direkte Moodle-Anbindung ein Backend erfordern.

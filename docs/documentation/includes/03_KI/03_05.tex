@@ -2,71 +2,81 @@
 
 Mein Schwerpunkt lag während des Projekts auf den Themen \emph{Endliche Automaten}
 und \emph{Reguläre Sprachen}.
-Dabei habe ich Gemini 3.1 Pro, die kostenlose Version von ChatGPT sowie Claude Opus
-4.8 und später Opus 5 ausprobiert.
+Dabei habe ich Gemini 3.1 Pro, die kostenlose Version von ChatGPT sowie 
+Claude Opus 4.8 und später Claude Opus 5 ausprobiert.
+Während Gemini und ChatGPT theoretische Zusammenhänge verständlicher aufbereiteten,
+überzeugte Claude bei der Implementierung und Fehlersuche.
+Da seine Codevorschläge häufiger direkt brauchbar waren und Nacharbeiten minimierten,
+wurde Claude zu meinem primären Werkzeug für die Entwicklung.
 
-Die Modelle waren dabei unterschiedlich gut.
-Manche erklärten theoretische Zusammenhänge besser, während andere bei der
-Implementierung oder Fehlersuche hilfreicher waren.
-Überwiegend arbeitete ich mit Claude, da die Vorschläge bei Programmieraufgaben
-häufiger direkt brauchbar waren und ich dadurch weniger nacharbeiten musste.
+Im Laufe des Projekts ist mir außerdem aufgefallen, dass sich die Modelle darin unterscheiden, 
+wie viel Rechenaufwand sie in die Planung einer Antwort investieren.
+Bei Claude lässt sich dieser Aufwand über die Einstellung \emph{Effort} steuern. 
+In Claude Code standen mir dabei die Stufen \texttt{high} (Standard), \texttt{xhigh} und \texttt{max} zur Verfügung.
 
-Im Laufe des Projekts ist mir außerdem aufgefallen, dass die Modelle unterschiedlich
-viel Aufwand in die Planung einer Antwort stecken.
-Eine höhere Planungsstufe bedeutet mehr verbrauchte Tokens und längere Wartezeiten,
-führt aber nicht automatisch zu besseren Ergebnissen.
-Für kleine Änderungen reichte meist eine niedrige Stufe aus, während komplexere
-Aufgaben mit mehreren Dateien von einer höheren Stufe profitierten.
-Deshalb habe ich je nach Aufgabe entschieden, welche Einstellung sinnvoll war.
+In der Praxis führten höhere Effort-Stufen zu mehr Tokenverbrauch und längeren Wartezeiten, 
+jedoch nicht automatisch zu besseren Ergebnissen. Für kleine Änderungen genügte meist die Standardstufe, 
+während komplexere Aufgaben, insbesondere Änderungen über mehrere Dateien hinweg, 
+von einer höheren Stufe profitierten. Deshalb habe ich vor jeder Aufgabe manuell entschieden, 
+welche Effort-Stufe dem Aufwand angemessen war. 
+Da sich die Modelle in ihren Stärken und ihrem benötigten Rechenaufwand unterschieden, wäre eine automatische Auswahl 
+des geeigneten Modells beziehungsweise der passenden Einstellungen interessant. 
+Ein Orchestrator wie Sakana Fugu könnte dabei künftig unterstützen~\cite{sakana2026fugu}. 
+Da das System erst kurz vor Abschluss der Arbeit erschien, konnte ich es nicht mehr erproben.
 
 \subNsection{2}{KI als Co-Developer}{Kristian Popov}
 
-Die KI habe ich direkt in die Entwicklungsumgebung eingebunden.
-Dadurch konnte sie auf Projektdateien zugreifen, Änderungen vorschlagen und diese
-direkt im Projekt überprüfen.
+Als Entwicklungsumgebung nutzte ich WebStorm.
+Claude Code führte ich dort im integrierten Terminal aus.
+Dadurch konnte es auf die Projektdateien zugreifen und Änderungen direkt vornehmen.
+Auch Builds, Tests und Linting konnte Claude Code selbst ausführen und die Ausgaben auswerten.
 
-Besonders hilfreich war sie bei wiederkehrenden Aufgaben wie Refactorings,
-Boilerplate-Code, Unit-Tests, Internationalisierung und dem Beheben von
-TypeScript-Warnungen.
-Bei der Automatenlogik und beim Parsen von Grammatiken konnte sie außerdem schnell
+Besonders hilfreich war dieser Ansatz bei wiederkehrenden Aufgaben wie dem Refactoring, 
+dem Schreiben von Boilerplate-Code und Unit-Tests, der Internationalisierung 
+und dem Beheben von TypeScript-Warnungen.
+Bei der Automatenlogik und beim Parsen von Grammatiken konnte die KI außerdem schnell
 passende Testfälle ableiten.
 
-Bei Architekturentscheidungen ließ ich mir zunächst mehrere Lösungsansätze mit ihren
+Vor Architekturentscheidungen ließ ich mir zunächst mehrere Lösungsansätze mit ihren
 Vor- und Nachteilen erklären und traf die Entscheidung anschließend selbst.
-Jede vorgeschlagene Änderung habe ich überprüft und getestet.
+Jede vorgeschlagene Änderung habe ich manuell überprüft und getestet.
 
 Unterstützt wurde diese Arbeitsweise durch Erweiterungen aus dem offiziellen
 Plugin-Verzeichnis \texttt{claude-\allowbreak plugins-\allowbreak official}.
-Aktiv waren mehrere, darunter \texttt{typescript-lsp} für Typinformationen über das
+Aktiv waren mehrere Plugins, darunter \texttt{typescript-lsp} für Typinformationen über das
 \gls{lsp}.
-Für meine Themen am wichtigsten waren zwei:
+Für meine Themenbereiche waren zwei Plugins besonders hilfreich:
 
 \begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
 \item[\texttt{playwright}]
-ermöglicht der KI, die Anwendung im Browser auszuführen und aus Sicht des Benutzers
-zu testen.
-Dadurch konnten beispielsweise Oberflächen, Navigation und Benutzerinteraktionen
-überprüft werden.
+ermöglichte der KI, die Anwendung direkt im Browser auszuführen und aus Sicht 
+des Benutzers zu testen.
+So ließen sich beispielsweise Benutzeroberfläche, Navigation und interaktive Abläufe automatisiert
+überprüfen.
 
 \item[\texttt{chrome-devtools-mcp}]
-ermöglicht über das \gls{mcp} den Zugriff auf Konsolenausgaben und das Verhalten der
-laufenden Anwendung.
-Dadurch konnte ich bei Fehlern genauer untersuchen, was zur Laufzeit tatsächlich
-passiert.
+ermöglichte über das \gls{mcp} den Zugriff auf Konsolenausgaben und Netzwerkanalysen. 
+Dadurch konnte ich bei Fehlern das genaue Laufzeitverhalten der Anwendung untersuchen.
 \end{description}
 
 Zusätzlich habe ich das Projekt einmalig mit Graphify~\cite{shamsi2026graphify}
 analysiert und einen Wissensgraphen erzeugt.
-Dadurch konnte die KI bei späteren Aufgaben gezielt auf relevante Dateien, Klassen
-und Funktionen zugreifen, ohne das gesamte Projekt erneut einlesen zu müssen.
+Dieser erleichterte es der KI bei späteren Aufgaben, 
+relevante Dateien, Klassen und Funktionen gezielt aufzufinden, 
+ohne das gesamte Projekt erneut analysieren zu müssen.
 
 \subNsection{2}{Automatisierte Aufgabengenerierung}{Kristian Popov}
 
-Für die Übungen wurden neben der Aufgabenstellung auch eine Referenzlösung, ein
-Startprogramm und Beispielwörter benötigt.
+Für die Übungen zu den Themen \emph{Endliche Automaten} und \emph{Reguläre Sprachen}
+benötigte ich neben der Aufgabenstellung jeweils eine Referenzlösung, ein Startprogramm
+sowie passende Beispielwörter.
 Die KI nutzte ich vor allem, um Varianten bestehender Aufgaben zu erzeugen,
 beispielsweise mit anderem Alphabet, anderen Wortlängen oder unterschiedlichen
 Schwierigkeitsgraden.
+
+Für die Automaten-Aufgaben nutzte ich die KI beispielsweise, um deterministische und 
+nichtdeterministische Automaten mit unterschiedlichen Eingabewörtern zu erzeugen.
+Bei regulären Sprachen wurden dagegen die Grammatikformen und Sprachbeschreibungen abgewandelt.
 
 Ob eine Aufgabe tatsächlich korrekt war, habe ich anschließend mit der automatischen
 Übungskontrolle des Simulators gegen die Referenzlösung geprüft
@@ -95,16 +105,14 @@ Nur geprüfte Aufgaben wurden in den Aufgabenkatalog aufgenommen
 			{Abweichung: Variante wird verworfen};
 	\end{tikzpicture}
 	\caption[Erzeugung und Prüfung von Aufgabenvarianten]{%
-		Erzeugung und Prüfung von Aufgabenvarianten. Nur Varianten, die sich
-		gegenüber der Referenzlösung identisch verhalten, werden in den
-		Aufgabenkatalog übernommen.}
+		Erzeugung und Prüfung von Aufgabenvarianten mit der Übungskontrolle.}
 	\label{fig:ki_aufgaben}
 \end{figure}
 
 \subNsection{2}{Kritische Reflexion}{Kristian Popov}
 
 Die KI lieferte häufig brauchbare, aber nicht immer korrekte Vorschläge.
-Teilweise verwendete sie APIs, die in der verwendeten Version nicht mehr existierten,
+Teilweise verwendete sie APIs, die in der eingesetzten Version nicht mehr existierten,
 oder erfand Funktionen und Bibliotheken.
 Auch Sonderfälle und Auswirkungen auf andere Teile des Projekts wurden gelegentlich
 übersehen.
@@ -118,12 +126,6 @@ kleinere Schritte aufteilen.
 
 Insgesamt sparte mir die KI besonders bei wiederkehrenden Aufgaben und beim Ausbau
 bestehender Funktionen viel Zeit.
-Bei theoretischen Konzepten und größeren Architekturänderungen war jedoch weiterhin
-meine eigene Prüfung entscheidend.
-Ein Orchestrator wie Sakana Fugu könnte künftig die Auswahl des passenden Modells
-übernehmen~\cite{sakana2026fugu}; da das System erst kurz vor Abschluss meiner Arbeit
-erschien, konnte ich es nicht mehr einsetzen.
-
-Für mich war die KI damit vor allem ein Werkzeug zur Unterstützung.
-Die fachlichen Entscheidungen und die Verantwortung für die Korrektheit der
-Implementierung lagen jederzeit bei mir.
+Bei theoretischen Konzepten und größeren Architekturänderungen diente die KI dagegen eher als Ausgangspunkt 
+für meine eigenen Überlegungen. Die fachlichen Entscheidungen und die Verantwortung 
+für die Korrektheit der Implementierung lagen jederzeit bei mir.
