@@ -12,38 +12,27 @@ Rückmeldung.
 \subNsection{2}{Entscheidungen in der Architektur}{Kristian Popov}
 
 Ursprünglich war nur die Unterstützung deterministischer Automaten vorgesehen.
-Nichtdeterministische kamen hinzu, weil dort ein Symbol in mehrere Zustände zugleich
-führen darf: Ein Automat ist so oft direkt aus der Sprachbeschreibung ablesbar und
-kompakter, und die Mehrdeutigkeit muss erst beim Schritt zum DFA aufgelöst werden.
+Nichtdeterministische Automaten kamen hinzu, weil dort ein Symbol in mehrere Zustände zugleich
+führen darf: Ein NFA lässt sich häufig direkt aus der Sprachbeschreibung ablesen und bleibt
+kompakter. Die Mehrdeutigkeit muss erst beim Schritt zum DFA aufgelöst werden.
 Da jeder DFA gleichzeitig ein NFA ist, wurde für beide Varianten bewusst nur eine
 Ausführungslogik verwendet.
 Der Kern arbeitet mit einer Menge aktiver Zustände, die bei einem DFA höchstens ein
-Element enthält; $\varepsilon$-Übergänge werden dabei stets über die
+Element enthält. $\varepsilon$-Übergänge werden dabei stets über die
 $\varepsilon$-Hülle aufgelöst.
 Der deklarierte Automatentyp steuert Validierung und Eingabemaske, nicht aber die
 Ausführung.
 
-Der Simulator ist in fünf Bereiche aufgeteilt
+Der Simulator ist in fünf Schichten aufgeteilt
 (siehe Abbildung~\ref{fig:fa_schichten}):
 
-\begin{description}[leftmargin=*,style=nextline,itemsep=0.75ex]
-\item[\texttt{domain}]
-enthält die Fachlogik wie Simulation, Validierung, Grammatikumwandlung, Stapeltest
-und Übungskontrolle.
-
-\item[\texttt{application}]
-verbindet die Fachlogik mit React und verwaltet Simulation und Editor.
-
-\item[\texttt{adapters}]
-bereitet die Daten für die Übergangstabelle auf.
-
-\item[\texttt{presentation}]
-enthält die Benutzeroberfläche mit Diagramm, Tabelle, Eingabewort, Stapeltest und
-Grammatikeingabe.
-
-\item[\texttt{config}]
-enthält Standardautomaten und Beispiele.
-\end{description}
+\begin{itemize}\itemsep0.4ex
+\item \textbf{\texttt{domain}}: Fachlogik mit Simulation, Validierung, Grammatikumwandlung, Stapeltest und Übungskontrolle.
+\item \textbf{\texttt{application}}: Anbindung an React, Verwaltung von Simulation und Editor.
+\item \textbf{\texttt{adapters}}: Aufbereitung der Übergangstabelle.
+\item \textbf{\texttt{presentation}}: Benutzeroberfläche mit Diagramm, Tabelle, Eingabewort, Stapeltest und Grammatikeingabe.
+\item \textbf{\texttt{config}}: Standardautomaten und Beispiele.
+\end{itemize}
 
 \begin{figure}[htbp]
 	\centering
@@ -57,27 +46,19 @@ enthält Standardautomaten und Beispiele.
 		lbl/.style={font=\scriptsize\itshape, inner sep=2pt}
 	]
 		\node[wide, fill=black!5] (pres) at (0,0)
-			{\textbf{\texttt{presentation}}\\
-			 Zustandsdiagramm, Übergangstabelle, Eingabewort, Stapeltest, Grammatikeingabe};
+			{\texttt{presentation}};
 
 		\node[half, fill=black!5] (app) at (-3.55,-2.1)
-			{\textbf{\texttt{application}}\\
-			 Anbindung an React,\\
-			 Simulation und Editor};
+			{\texttt{application}};
 
 		\node[half, fill=black!5] (adap) at (3.55,-2.1)
-			{\textbf{\texttt{adapters}}\\
-			 Aufbereitung der\\
-			 Übergangstabelle};
+			{\texttt{adapters}};
 
 		\node[wide, fill=black!12] (dom) at (0,-4.2)
-			{\textbf{\texttt{domain}} -- ohne React-Abhängigkeit, ohne Oberfläche testbar\\
-			 Simulation, Validierung, Grammatikumwandlung, Stapeltest, Übungskontrolle};
+			{{\texttt{domain}} -- ohne React-Abhängigkeit, ohne Oberfläche testbar};
 
 		\node[half, fill=black!5] (conf) at (-3.55,-6.5)
-			{\textbf{\texttt{config}}\\
-			 Standardautomaten\\
-			 und Beispiele};
+			{{\texttt{config}}};
 
 		\node[half, dashed] (rl) at (3.55,-6.5)
 			{Thema \emph{Reguläre Sprachen}\\
@@ -91,16 +72,12 @@ enthält Standardautomaten und Beispiele.
 		\draw[reuse] (rl.north)   -- (rl.north   |- dom.south)
 			node[lbl, midway, left=3pt, align=right] {nutzt die\\Grammatikumwandlung};
 	\end{tikzpicture}
-	\caption[Schichten des Simulators für endliche Automaten]{%
-		Schichten des Simulators für endliche Automaten. Durchgezogene Pfeile zeigen,
-		welche Schicht auf welche zugreift. Die Fachlogik in \texttt{domain} kennt
-		React nicht und ist ohne gerenderte Oberfläche testbar; das Thema
-		\emph{Reguläre Sprachen} greift ausschließlich auf diese Schicht zu.}
+	\caption{Schichten des Simulators für endliche Automaten.}
 	\label{fig:fa_schichten}
 \end{figure}
 
-Die Trennung sorgt dafür, dass die Fachlogik unabhängig von React bleibt und ohne
-gerenderte Oberfläche testbar ist.
+Die Trennung hält die Fachlogik unabhängig von React und ohne gerenderte Oberfläche
+testbar.
 Das Thema \emph{Reguläre Sprachen} folgt demselben Schnitt und greift zusätzlich
 direkt auf die Grammatikumwandlung dieses Themas zurück.
 
@@ -111,7 +88,7 @@ ohne eine zusätzliche Historie in der Oberfläche zu verwalten.
 Auch die Validierung ist von der Oberfläche getrennt.
 Sie liefert Fehlercodes und relevante Werte, während die Oberfläche daraus die
 passenden Meldungen erzeugt.
-Dadurch bleibt die Fachlogik unabhängig von der Sprache der Benutzeroberfläche.
+So bleibt die Fachlogik unabhängig von der Sprache der Benutzeroberfläche.
 
 Die mitgelieferten Automaten sind bewusst partiell definiert.
 Fehlt ein Übergang, wird das Wort abgelehnt.
@@ -120,7 +97,7 @@ verändert, aber die Diagramme unnötig vergrößert.
 
 \subNsection{2}{Entscheidungen im UI}{Kristian Popov}
 
-Ursprünglich war für die Simulation nur die Übergangstabelle vorgesehen.
+Zunächst sollte die Simulation ausschließlich über die Übergangstabelle laufen.
 Während der Entwicklung zeigte sich jedoch, dass der Ablauf eines Wortes damit schwer
 nachzuvollziehen ist: Zyklen und Sackgassen werden erst sichtbar, wenn man mehrere
 Zeilen gedanklich verknüpft.
@@ -179,10 +156,8 @@ beschriftet.
 		\node[lbl, fill=white] at (4.475,-1.7) {derselbe Simulationsschritt};
 	\end{tikzpicture}
 	\caption[Kopplung von Übergangstabelle und Zustandsdiagramm]{%
-		Beim Lesen des Symbols $a$ im Zustand $q_0$ hebt die Übergangstabelle genau
-		die Zelle hervor, die dem im Zustandsdiagramm markierten Übergang entspricht.
-		Der Automat ist partiell definiert; ein fehlender Übergang ist mit $-$
-		gekennzeichnet und führt zur Ablehnung des Wortes.}
+		Kopplung von Übergangstabelle und Zustandsdiagramm beim Lesen des Symbols $a$
+		im Zustand $q_0$. Ein fehlender Übergang ist mit $-$ gekennzeichnet.}
 	\label{fig:fa_kopplung}
 \end{figure}
 
@@ -203,7 +178,7 @@ ist oder ausdrücklich angefordert wird.
 Neben der Einzelsimulation gibt es einen Schrittverlauf, über den bereits erreichte
 Schritte direkt ausgewählt werden können.
 Der gewählte Schritt wird dabei vom Anfang des Laufs an neu berechnet statt
-zwischengespeichert; bei den hier üblichen Wortlängen ist das unkritisch und hält
+zwischengespeichert. Bei den hier üblichen Wortlängen ist das unkritisch und hält
 Anzeige und tatsächlichen Ablauf zwingend deckungsgleich.
 Der Stapeltest ermöglicht es, mehrere Wörter gleichzeitig zu prüfen.
 Ein Ergebnis kann anschließend direkt in die Einzelsimulation übernommen werden.

@@ -34,8 +34,8 @@ Jede Stufe startet erst nach einem erfolgreichen Vorgänger, und nur ein
 vollständig fehlerfreier Lauf gibt den Merge frei.
 Für das Qualitätsziel Performance wertet die letzte Stufe den Median aus drei
 Läufen je Seite aus.
-Überschreitet der \gls{lcp} einer Themenseite 1,4~Sekunden, schlägt sie fehl;
-für die Java-Seite, die den Compiler lädt, gilt eine Schranke von 5~Sekunden.
+Überschreitet der \gls{lcp} einer Themenseite 1,4~Sekunden, schlägt sie fehl.
+Für die Java-Seite, die den Compiler lädt, gilt eine Schranke von 5~Sekunden.
 Dass die Themenseiten einzeln nachgeladen werden, hält die je Aufruf übertragene
 Datenmenge klein.
 Ergänzend sichert die Pipeline die Herkunft der Abhängigkeiten ab, indem sie deren
@@ -52,4 +52,3 @@ Messungen für kleine Bildschirme fehlen, da alle Lighthouse-Läufe mit dem
 Desktop-Profil erfolgen.
 Alle drei Punkte werden im Ausblick wieder aufgegriffen
 (siehe Abschnitt~\ref{6_2_Perspektiven}).
-
