@@ -7,17 +7,9 @@ Kompakter Überblick über die Softwarearchitektur, Kernmuster und Designentsche
 ## 1. Systemübersicht: Zero-Backend SPA
 
 Die Lernplattform ist als **rein clientseitige Single-Page Application (SPA)** ohne Backend konzipiert:
-* **Kein Server-Overhead:** Keine Datenbank, kein API-Server. Hosting erfolgt vollständig statisch (z. B. GitLab Pages, Nginx oder offline per lokalem Webserver).
+* **Kein Server-Overhead:** Keine Datenbank, kein API-Server. Hosting erfolgt vollständig statisch (z. B. GitLab Pages, Nginx oder offline per lokalem Python Webserver).
 * **Datenschutz & Persistenz:** Alle Eingaben, Zustände und Übungsfortschritte verbleiben im Browser (`localStorage`).
 * **Client-Only Execution:** Simulationen, Algorithmen und selbst das Kompilieren von Java-Code laufen direkt im Browser des Nutzers.
-
-```mermaid
-graph TB
-    Browser["Client-Browser (SPA)"] --> UI["UI Layer (React 19, Tailwind CSS 4, Monaco Editor)"]
-    UI --> App["Application Layer (Hooks, Reducer, Zustand)"]
-    App --> Domain["Domain Layer (Pure TypeScript: Automaten, TM, DNF, Java-Parser)"]
-    UI -.->|postMessage| Worker["Web Worker (OpenJDK javac + TeaVM WASM)"]
-```
 
 ---
 
@@ -26,15 +18,14 @@ graph TB
 Jedes Fachmodul unter `app/src/pages/<Module>/<Topic>/` folgt einer klaren Schichtentrennung:
 
 1. **Domänenschicht (`domain/`):**
-   * Mathematische Kernlogik, Schrittfunktionen, Validierungen.
-   * **Reines TypeScript**: Keine Abhängigkeiten zu React, DOM oder CSS. Vollständig unit-testbar via Vitest.
+   * Kernlogik, Schrittfunktionen, Validierungen.
 2. **Anwendungsschicht (`application/` bzw. Hooks):**
    * Kapselt Simulationssteuerung, Play/Step/Reset, Vor-/Zurück-Historie (`stepBack`) und Editorzustände.
 3. **Präsentationsschicht (`components/`):**
    * React-Komponenten für die 4 Tabs, Tabellen, SVG-Zustandsgraphen und Steuerleisten.
 4. **Isolierte Worker-Schicht (`javaRunner.worker.ts`):**
    * Kompiliert und führt Java-Code in einer WebAssembly-Sandbox aus.
-   * Schützt den UI-Thread vor Blockaden; Endlosschleifen lassen sich per `worker.terminate()` sicher abbrechen.
+   * Schützt den UI-Thread vor Blockaden; Endlosschleifen lassen sich per `worker.terminate()` abbrechen.
 
 ---
 
@@ -44,9 +35,9 @@ Jedes Einzelthema bindet die geteilte Shell `ModuleTopicPage` ein und gliedert s
 
 | Tab | Komponente | Zweck |
 | :--- | :--- | :--- |
-| **Übersicht** | `OverviewTab` | Theoretische Grundlagen, formale Definitionen und Begriffserklärungen. |
-| **Beispiele** | `ExamplesTab` | Interaktive Beispielprogramme/Automaten mit Direktübernahme in die Simulation. |
-| **Übungen** | `ExercisesTab` | Aufgaben mit automatisierten Validierungsprüfungen und didaktischem Feedback. |
+| **Übersicht** | `OverviewTab` | Erklärvideo Einbindung |
+| **Beispiele** | `ExamplesTab` | Beispiele mit Direktübernahme in die Simulation |
+| **Übungen** | `ExercisesTab` | Aufgaben |
 | **Simulation** | `SimulationTab` | Interaktiver Arbeitsbereich (`SimulationWorkspace`) zum freien Experimentieren. |
 
 ---
@@ -64,4 +55,4 @@ Die Plattform steuert Navigation, Metadaten und Routen deklarativ über zwei Dat
 
 * **Globaler State:** Minimal gehalten via Zustand (`uiStore.ts` für Navigation/Sidebar, `themeStore.ts` für Hell/Dunkel).
 * **Fachlicher State:** Verbleibt lokal in den Custom Hooks der Module.
-* **Mehrsprachigkeit:** `i18next` mit getrennten JSON-Dateien je Thema (`app/src/i18n/locales/{de,en}/<topic>.json`).
+* **Mehrsprachigkeit:** `i18next` mit getrennten JSON-Dateien je Thema (`app/src/i18n/locales/{de,en,tr,uk}/<topic>.json`).

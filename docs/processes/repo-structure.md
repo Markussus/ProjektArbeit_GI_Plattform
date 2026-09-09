@@ -1,7 +1,6 @@
 # Repository-Struktur & Aufteilungsbegründung
 
-Dieses Dokument erläutert den Aufbau des Repositories der **GI-Lernplattform** und begründet die architektonische Aufteilung der Verzeichnisse und Werkzeuge.
-
+Dieses Dokument erläutert den Aufbau des Repositories der **GI-Lernplattform**.
 ---
 
 ## 1. Gesamtübersicht der Repository-Struktur
@@ -30,8 +29,7 @@ projektarbeit_gi_plattform/
 │   ├── documentation/              # Wissenschaftlicher Abschlussbericht (LaTeX, THWS-Vorlage)
 │   ├── presentation/               # Beamer-Präsentationsfolien (LaTeX Beamer & PPTX)
 │   ├── processes/                  # Architektur-, Tech-Stack- & Prozessdokumentation
-│   ├── personal_notes/             # Reflexionen, Feedback & Mitschriften
-│   └── PROJEKT_GESAMTUEBERSICHT... # Umfassendes Nachschlagewerk für Verteidigung & Audit
+│   └── feedback/                   # Feedback von Personen die die Plattform getestet haben
 │
 └── deployment/                     # Portable Offline-Releases & Bereitstellungswerkzeuge
     ├── create-release.mjs          # Release-Automatisierungsskript
@@ -43,33 +41,12 @@ projektarbeit_gi_plattform/
 
 ---
 
-## 2. Warum ist das Repository so aufgeteilt? (Architekturbegründung)
+## 2. Repo Aufteilung
+Quellcode (`app/`), wissenschaftliche Ausarbeitung (`docs/documentation/`), Beamer-Folien (`docs/presentation/`) und Release-Werkzeuge (`deployment/`) liegen in einem gemeinsamen Git-Repository
 
-### 2.1 Monorepo-Ansatz statt Multi-Repo
-* **Begründung:** Quellcode (`app/`), wissenschaftliche Ausarbeitung (`docs/documentation/`), Beamer-Folien (`docs/presentation/`) und Release-Werkzeuge (`deployment/`) liegen in einem gemeinsamen Git-Repository.
-* **Vorteile:**
-  * **Atomare Commits:** Änderungen an einer Fachlogik können im selben Commit mit der entsprechenden Dokumentation im LaTeX-Bericht aktualisiert werden. Ein Auseinanderdriften von Code und schriftlicher Arbeit wird verhindert.
-  * **Einheitliche Versionskontrolle:** Es gibt nur eine Commit-Historie, ein Issue-Tracking und ein Release-Tagging.
-  * **Nachvollziehbarkeit bei der Benotung:** Prüfer und Dozenten finden alle Ergebnisse (Software, Dokumente, Präsentationen) an einem zentralen Ort.
-
-### 2.2 Warum KEIN Workspace-Overhead (Single `package.json`)?
-* **Begründung:** Viele Monorepos nutzen Werkzeuge wie npm-/yarn-Workspaces, Turborepo oder Nx. Wir haben uns bewusst für ein **einzelnes `package.json` in `app/`** entschieden.
-* **Vorteile:**
-  * **Vermeidung von Dependency-Drift:** Es existiert genau eine `package-lock.json`. Keine Versionskonflikte zwischen unterschiedlichen internen Paketen.
-  * **Schnelle CI/CD-Zeiten:** `npm ci` muss nur einmal ausgeführt werden, ohne rekursives Auflösen von Workspace-Bäumen.
-  * **Geringe Komplexität:** Für neue Entwickler oder Studierende entfällt die Einarbeitung in komplexe Monorepo-Tools.
-
-### 2.3 Strikte Trennung von `app/` und `docs/`
-* **Begründung:** Die Entwicklungs- und Build-Werkzeuge von Web-Apps (Node.js, Vite, WebAssembly) und Dokumenten (LaTeX, BibTeX, PDF-Generierung) arbeiten mit völlig unterschiedlichen Toolchains.
-* **Vorteile:**
-  * Der Frontend-Bundler wird durch LaTeX-Artefakte (`.aux`, `.log`, `.toc`, `.pdf`) nicht verlangsamt.
-  * `docs/` bleibt unabhängig vom Node-Ökosystem lesbar und pflegbar.
-
-### 2.4 Kapselung der Bereitstellung in `deployment/`
-* **Begründung:** Die GI-Lernplattform muss sowohl online als auch **lokal offline** (z. B. auf Prüfer-Laptops oder USB-Sticks ohne Internetzugang) lauffähig sein.
-* **Vorteile:**
-  * Das `deployment/`-Verzeichnis enthält eigenständige Starter (`start.cmd`, `start.sh`, `serve.py`), die ein erzeugtes Build-Bundle (`app/dist`) per Python starten.
-  * Release-Skripte greifen erst nach erfolgreichem Build ein und verunreinigen nicht das Entwicklungsverzeichnis `app/src/`.
+### 2.1 Trennung von `app/` und `docs/`
+* Die Entwicklungs- und Build-Werkzeuge von Web-Apps (Node.js, Vite, WebAssembly) und Dokumenten (LaTeX, BibTeX, PDF-Generierung) arbeiten mit völlig unterschiedlichen Toolchains und auf verschiedenen Daten.
+    * --> `docs/` bleibt unabhängig vom Node-Ökosystem lesbar und pflegbar.
 
 ---
 
@@ -94,16 +71,12 @@ app/src/
 │   └── Documentation/      # Integrierte Plattformdokumentation
 │
 ├── components/             # UI-Komponentenbibliothek
-│   ├── shared/             # Wiederverwendbare Layout-Blöcke (Header, Sidebar,
-│   │                       # ModuleTopicPage-Shell, SimulationWorkspace, Controls)
-│   └── ui/                 # Elementare Primitives (Buttons, Dialoge, Badges, Tabs)
 │
 ├── data/                   # Single Source of Truth
 │   ├── moduleCatalogData.ts# Deklarative Metadaten aller Module & Topics
 │   ├── moduleCatalog.tsx   # Lazy-Loading-Verknüpfung und Routen-Export
 │   └── topicStorageIds.ts  # Eindeutige IDs für LocalStorage-Persistenz
 │
-├── domain/                 # Modulübergreifende Rechenlogik & Interfaces
 ├── router/                 # Client-Routing (React Router 7)
 ├── store/                  # Globale Zustände (Zustand: themeStore, uiStore)
 ├── i18n/                   # Übersetzungen nach Namespaces aufgeteilt
@@ -112,14 +85,14 @@ app/src/
 
 ### 3.1 Warum liegen Themenlogik und UI zusammen in `pages/<Modul>/<Topic>/`?
 Anstelle eines veralteten Schichtenmodells ("alle Komponenten in `components/`, alle Logik in `services/`") nutzt die Plattform **Feature Folders**:
-* Alles, was zur Turing-Maschine gehört (Algorithmen, UI-Tabs, Übungen, Testfälle), liegt in einem gemeinsamen Ordner.
+* Alles, was z.B. zur Turing-Maschine gehört (Algorithmen, UI-Tabs, Übungen, Testfälle), liegt in einem gemeinsamen Ordner.
 * Beim Bearbeiten eines Themas muss der Entwickler nicht quer durch den gesamten Projektbaum springen.
 * Löschen oder Umbenennen eines Themas hinterlässt keine verwaisten Code-Fragmente in entfernten Verzeichnissen.
 
 ### 3.2 Warum `public/java/compiler/`?
 * Der vorkompilierte Java-Compiler (`javac` via TeaVM WebAssembly) ist mehrere Megabyte groß.
 * Er liegt in `public/` und wird bei Bedarf zur Laufzeit asynchron vom Web Worker über die `fetch`-API geladen.
-* Dadurch wird das Initial-Bundle der React-Anwendung nicht aufgebläht und die Startseite lädt in unter 200 Millisekunden.
+* Dadurch wird das Initial-Bundle der React-Anwendung nicht aufgebläht und die Startseite lädt schneller
 
 ### 3.3 Warum `app/scripts/`?
 * Enthält Node-Skripte (`.mjs`) für Pre-Build-Schritte:
