@@ -14,9 +14,7 @@ Dieser Leitfaden beschreibt Schritt für Schritt, wie ein neues Thema (**Topic**
 ## Ablauf in 6 Schritten
 
 ```text
-1. Verzeichnis anlegen  -->  2. Speicher-ID  -->  3. Katalogeintrag
-                                                          │
-6. 4 Sprachen reg.      <--  5. 4 i18n JSONs <--  4. Lazy-Route
+1. Verzeichnis anlegen  -->  2. Speicher-ID  -->  3. Katalogeintrag --> 4. Lazy-Route --> 5. i18n JSONs --> 6. Sprachen reg.  
 ```
 
 ---
@@ -82,7 +80,7 @@ import { Sparkles } from "lucide-react";
   descriptionKey: "mein-thema.description",
   path: "/fundamentals-cs/mein-thema",
   icon: Sparkles,
-  accent: "purple", // "orange" | "blue" | "purple" | "green" | "rose"
+  accent: "purple",
   tutorialVideoUrl: "https://oc-stream.thws.de/.../video.mp4", // optional
 }
 ```
@@ -102,7 +100,7 @@ const topicPageElements: Record<string, React.ReactElement> = {
   "mein-thema": <MeinThemaTopicPage />,
 };
 ```
-*(Das Routen-Array `learningRoutes` wird automatisch aus dem Katalog generiert – kein manueller Eintrag in `router/index.tsx` nötig!)*
+*(Das Routen-Array `learningRoutes` wird automatisch aus dem Katalog generiert – kein manueller Eintrag in `router/index.tsx` nötig)*
 
 ---
 

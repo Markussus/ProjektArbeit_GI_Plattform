@@ -2,15 +2,31 @@
 
 Das Unified UI-Konzept verbindet die unterschiedlichen Themenbereiche zu einer
 einheitlichen Plattform, statt sie wie einzelne Systeme nebeneinanderzustellen.
-Kopfbereich, Seitenleiste und Fußbereich bilden einen gemeinsamen Rahmen.
+Kopfbereich, Seitenleiste und Fußbereich bilden einen gemeinsamen Rahmen
+(siehe Abbildung~\ref{fig:ui_startseite}).
 Die Navigation wird aus dem zentralen Modulkatalog erzeugt. Dadurch führen dieselben
 Informationen zu den Einträgen in der Seitenleiste, den Routen und den Übersichtsseiten.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{includes/02_Architektur/startseite.png}
+	\caption[Startseite der Plattform]{Startseite der Plattform mit Kopfbereich und Modulauswahl.}
+	\label{fig:ui_startseite}
+\end{figure}
 
 Die Themenbereiche verwenden mit \texttt{ModuleTopicPage} denselben grundlegenden
 Seitenaufbau. Die Inhalte sind in Übersicht, Übungen, Beispiele und Simulation gegliedert.
 Gemeinsame Komponenten stellen unter anderem Aufgaben, Tabellen, Dialoge, Rückmeldungen
-und Simulationsbereiche dar. Ein ausgewähltes Beispiel oder eine Aufgabe kann dadurch
+und Simulationsbereiche dar (siehe Abbildung~\ref{fig:ui_turing_simulation}).
+Ein ausgewähltes Beispiel oder eine Aufgabe kann dadurch
 nach einem wiederkehrenden Ablauf in der Simulation geöffnet und bearbeitet werden.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.85\textwidth]{includes/02_Architektur/turing_simulation.png}
+	\caption[Turingmaschine im Simulationsreiter]{Themenbereich der Turingmaschine im gestarteten Simulationsreiter.}
+	\label{fig:ui_turing_simulation}
+\end{figure}
 
 Auch die visuelle Gestaltung wird zentral zusammengehalten. CSS-Variablen legen Farben
 und Zustände für die helle und dunkle Darstellung fest. Gemeinsame Stilregeln sorgen für
