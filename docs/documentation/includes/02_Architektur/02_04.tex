@@ -1,7 +1,103 @@
 \subNsection{1}{Simulator-Architektur}{Richard Schröder}
 
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		font=\footnotesize,
+		box/.style={
+			draw,
+			rounded corners=2pt,
+			align=center,
+			inner sep=4.5pt
+		},
+		umlclass/.style={
+			draw,
+			rounded corners=2pt,
+			align=left,
+			inner sep=5pt,
+			fill=black!8
+		},
+		flow/.style={
+			-{Stealth[length=2.5mm,width=1.8mm]},
+			semithick
+		},
+		realize/.style={
+			-{Triangle[open,length=2.8mm,width=2.5mm]},
+			dashed,
+			semithick
+		},
+		lbl/.style={
+			font=\scriptsize\itshape,
+			inner sep=2pt
+		}
+	]
+		% 1. Ebene: UI-Bedienelemente
+		\node[box, fill=black!4, text width=7.2cm] (controls) at (0, 0) {
+			\textbf{\guillemotleft Component\guillemotright}\\[1pt]
+			\textbf{SimulatorControls}\\[2pt]
+			\scriptsize Play, Pause, Schritt vor/zurück, Reset, Tempo
+		};
+
+		% 2. Ebene: React-Hook / Steuerung
+		\node[box, fill=black!4, text width=7.2cm, below=0.65cm of controls] (hook) {
+			\textbf{\guillemotleft Hook\guillemotright}\\[1pt]
+			\textbf{\texttt{useSimulationEngine}}\\[2pt]
+			\scriptsize Timer (\texttt{setInterval}), Status (\texttt{RUNNING}, \dots), React-State-Sync
+		};
+
+		% 3. Ebene: Zentrales Interface (Fokus auf Kernmethoden)
+		\node[umlclass, text width=7.2cm, below=0.65cm of hook] (isim) {
+			\centering\textbf{\guillemotleft interface\guillemotright}\\[1pt]
+			\centering\textbf{\texttt{ISimulator<TConfig, TState>}}\\[2pt]
+			\rule{\linewidth}{0.4pt}\\[2pt]
+			\scriptsize
+			\texttt{+ initialize(config, state?): void}\\[1pt]
+			\texttt{+ step() / stepBack() / reset(): void}\\[1pt]
+			\texttt{+ getCurrentState(): TState}\\[1pt]
+			\texttt{+ isFinished(): boolean}
+		};
+
+		% 4. Ebene: Konkrete Fachsimulatoren (exakt symmetrisch und entzerrt)
+		\node[box, fill=black!4, text width=3.4cm, below=1.1cm of isim.south, xshift=-2.05cm] (fa) {
+			\textbf{\texttt{FiniteAutomaton-}}\\\textbf{\texttt{Simulator}}\\[2pt]
+			\scriptsize DEA / NEA, Wortindex
+		};
+		\node[box, fill=black!4, text width=3.4cm, left=0.4cm of fa] (tm) {
+			\textbf{\texttt{TuringMachine-}}\\\textbf{\texttt{Simulator}}\\[2pt]
+			\scriptsize Band, Kopf, $\delta$-Tabelle
+		};
+		\node[box, fill=black!4, text width=3.4cm, below=1.1cm of isim.south, xshift=2.05cm] (moore) {
+			\textbf{\texttt{MooreMachine-}}\\\textbf{\texttt{Simulator}}\\[2pt]
+			\scriptsize Zustand, Ausgabe $\lambda(s)$
+		};
+		\node[box, fill=black!4, text width=3.4cm, right=0.4cm of moore] (mealy) {
+			\textbf{\texttt{MealyMachine-}}\\\textbf{\texttt{Simulator}}\\[2pt]
+			\scriptsize Zustand, Ausgabe $\lambda(s, a)$
+		};
+
+		% Verbindungen zwischen den Ebenen mit seitlichen Beschriftungen
+		\draw[flow] (controls) -- (hook)
+			node[lbl, midway, right=3pt] {Aktionen \& Tempo};
+
+		\draw[flow] (hook) -- (isim)
+			node[lbl, midway, right=3pt] {steuert (\texttt{<<uses>>})};
+
+		% Realisierung: sauberer Bus im Freiraum zwischen Ebene 3 und 4
+		\path (isim.south) -- (0,0 |- fa.north) coordinate[midway] (bus);
+		\draw[dashed, semithick] (tm.north) |- (bus);
+		\draw[dashed, semithick] (fa.north) |- (bus);
+		\draw[dashed, semithick] (moore.north) |- (bus);
+		\draw[dashed, semithick] (mealy.north) |- (bus);
+		\draw[realize] (bus) -- (isim.south);
+
+	\end{tikzpicture}
+	\caption[Architektur der Simulationsengine]{%
+		Architektur der Simulationsengine. Die UI-Komponente \texttt{SimulatorControls} interagiert mit dem Hook \texttt{useSimulationEngine}. Dieser steuert über das gemeinsame Interface \texttt{ISimulator} die Ausführung und synchronisiert den Laufzeitzustand, während die modulspezifischen Simulator-Klassen die fachlichen Zustandsübergänge implementieren.}
+	\label{fig:simulator_architektur}
+\end{figure}
+
 Turingmaschinen, endliche Automaten sowie Moore- und Mealy-Automaten verwenden dieselbe Simulationsengine. Ihre Klassen implementieren \verb|ISimulator<TConfig, TState>|. Das Interface umfasst Initialisierung, Schritt, Rückschritt, Reset, Konfiguration, aktuellen Zustand und eine Prüfung ob der Haltezustand erreicht wurde. Es verbindet damit die fachliche Simulationslogik mit der Steuerung, ohne eine konkrete Darstellung vorzuschreiben.
 
-Der Hook \verb|useSimulationEngine| verwaltet Ausführungsstatus, Geschwindigkeit, Browser-Timer und Fehlerbehandlung. Nach einem Schritt übernimmt er den Zustand des Simulators in den React-State. Alle vier Maschinentypen erhalten über den Hook und die gemeinsamen Simulator-Controls Play, Pause, Schritt, Rückschritt, Reset und Geschwindigkeitssteuerung, während ihre Klassen die jeweiligen Zustandsübergänge ausführen.
+Die Gesamtausführung folgt dabei dem in Abbildung~\ref{fig:simulator_architektur} dargestellten Schichtenmodell: Der Hook \verb|useSimulationEngine| verwaltet Ausführungsstatus, Geschwindigkeit, Browser-Timer und Fehlerbehandlung. Nach einem Schritt übernimmt er den Zustand des Simulators in den React-State. Alle vier Maschinentypen erhalten über den Hook und die gemeinsamen Simulator-Controls Play, Pause, Schritt, Rückschritt, Reset und Geschwindigkeitssteuerung, während ihre Klassen die jeweiligen Zustandsübergänge ausführen.
 
 Ein weiterer Maschinentyp benötigt eine Implementierung des Interfaces, einen modulspezifischen Hook-Aufruf und die Anbindung an eine Laufzeitansicht. Die allgemeine Timerlogik und die vorhandenen Simulator-Controls können dabei unverändert bleiben.
