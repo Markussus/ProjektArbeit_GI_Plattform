@@ -30,7 +30,7 @@ Die Aufgabenstellung von Prof. Dr. Braun sah vor, generative \gls{ki} intensiv i
 Sprachmodelle sparten Zeit bei Standardstrukturen, Testfällen und \gls{ui}-Gerüsten. Gleichzeitig zeigten sich zwei wesentliche Grenzen:
 \begin{itemize}
   \item \textbf{Hang zur Überkomplexität:} Werkzeuge schlugen mehrfach überdimensionierte Hilfsklassen oder globale Zustände vor. Ein generierter Entwurf für ein dynamisches, zustandsbehaftetes Routingsystem wurde verworfen und durch die zwei einfachen Dateien \verb|moduleCatalogData.ts| und \verb|moduleCatalog.tsx| ersetzt.
-  \item \textbf{Unübliche Ansätze:} Für die browserbasierte Java-Ausführung schlug die \gls{ki} anfangs Java-Transpiler oder oberflächliche Mocks vor. Nach eigener Recherche entschied ich mich für TeaVM, um Bytecode im Browser über \gls{wasm} auszuführen.Dies stellt in diesem Kontext die elegantere Lösung dar.
+  \item \textbf{Unübliche Ansätze:} Für die browserbasierte Java-Ausführung schlug die \gls{ki} anfangs Java-Transpiler oder oberflächliche Mocks vor. Nach eigener Recherche entschied ich mich für TeaVM~\cite{teavm}, um den von \texttt{javac} erzeugten Bytecode in \gls{wasm} zu übersetzen und im Browser auszuführen. Damit nutzt die Umgebung die Syntax- und Typprüfung eines Java-Compilers und kann Programme ohne eigenes Ausführungsbackend verarbeiten. Dafür müssen Compiler und Klassenbibliotheken zunächst im Browser geladen werden; zudem bleibt der nutzbare Java-Funktionsumfang durch die Laufzeit und die vereinfachte Eingabeverarbeitung begrenzt.
 \end{itemize}
 
 KI als Werkzeug war somit eine nützliche Hilfe im Entwicklungsprozess. Es waren jedoch klare Vorgaben und eigene kreative Ideen erforderlich und die Ergebnisse mussten manuell kontrolliert werden.
