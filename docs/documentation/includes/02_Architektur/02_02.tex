@@ -1,25 +1,25 @@
 \subNsection{1}{Modulare Softwarearchitektur}{Markus Nöth}
 
-Die Architektur der Plattform ist modular aufgebaut, damit sich neue Lernmodule und Simulatoren ohne Änderungen an bestehenden Kernkomponenten einfügen lassen. Sie trennt die globale Rahmenstruktur, die deklarative Modulkonfiguration und die fachspezifischen Implementierungen voneinander.
+Die Plattform trennt Layout, Modulkonfiguration und Fachimplementierungen. Neue Themen nutzen die vorhandenen Komponenten und werden im \verb|moduleCatalog| registriert.
 
-Die Komponente \verb|MainLayout| bildet den äußeren Rahmen der Anwendung. Sie bindet \verb|Header|, \verb|Sidebar| und \verb|Footer| ein und rendert die aktive Route über ein React-Router-\verb|Outlet|. Ein umschließendes \verb|Suspense|-Element mit der Komponente \verb|LoadingFallback| fängt Ladezeiten beim asynchronen Nachladen von Seiten ab. Den Zustand der Seitenleiste (ein- oder ausgeklappt) verwaltet ein zentraler Zustand-Store (\verb|useUiStore|). Dadurch führen Änderungen an der Navigation nicht zum erneuten Rendern des Hauptinhalts.
+Die Komponente \verb|MainLayout| bildet den äußeren Rahmen der Anwendung. Sie bindet \verb|Header|, \verb|Sidebar| und \verb|Footer| ein und rendert die aktive Route über ein React-Router-\verb|Outlet|. Ein \verb|Suspense|-Element mit der Komponente \verb|LoadingFallback| fängt Ladezeiten beim asynchronen Nachladen von Seiten ab. Den Zustand der Seitenleiste (ein- oder ausgeklappt) verwaltet ein zentraler Zustand-Store (\verb|useUiStore|).
 
-Die Konfiguration der Lerninhalte teilt sich in zwei Dateien auf, um zirkuläre Abhängigkeiten zu vermeiden und Code-Splitting zu unterstützen:
+Bei der Konfiguration der Lerninhalte werden Metadaten und nachladbare Seitenkomponenten in zwei separaten Dateien gespeichert.
 \begin{itemize}
-  \item \textbf{Metadaten-Katalog (\texttt{moduleCatalogData.ts}):} Enthält reine Datenstrukturen ohne React-Abhängigkeiten. Hier sind die Moduldefinitionen (\texttt{Learning\-Module\-Definition}) und Themenbereiche (\texttt{Module\-Topic\-Definition}) mit Pfaden, Lucide-Icons, Farbwerten, Opencast-Video-\glspl{url} und getypten Lokalisierungsschlüsseln (\texttt{TranslationKey}) hinterlegt. Jedes Thema erhält hier zusätzlich seine numerische Speicher-\gls{id} aus \texttt{topicStorageIds.ts}.
+  \item \textbf{Metadaten-Katalog (\texttt{moduleCatalogData.ts}):} Enthält Metadaten und Lucide-Icon-Komponenten, aber keine Seitenelemente. Hier sind die Moduldefinitionen (\texttt{Learning\-Module\-Definition}) und Themenbereiche (\texttt{Module\-Topic\-Definition}) mit Pfaden, Icons, Akzentfarben, Video-\glspl{url} und Übersetzungsschlüsseln hinterlegt. Die LocalStorage-\gls{id} stammt aus \texttt{topic\-Storage\-Ids.ts}.
   \item \textbf{Komponenten-Binding (\texttt{moduleCatalog.tsx}):} Bindet Seitendateien asynchron per \texttt{React.lazy()} ein. Es weist die Komponenten in den Maps \texttt{modulePage\-Elements} sowie \texttt{topicPage\-Elements} zu und übergibt das Routen-Array \texttt{learningRoutes} an den Router.
 \end{itemize}
 
-Für die Ansicht eines Themenbereichs stellt die Shared-Komponente \verb|ModuleTopicPage| eine einheitliche Struktur bereit. Sie steuert Kopfbereich, Tab-Navigation, Übungsauswahl und Vollbildmodus. Die Inhalte sind auf vier Reiter verteilt: Übersicht (\verb|OverviewTab|), Beispiele (\verb|ExamplesTab|), Übungen (\verb|ExercisesTab|) und Simulation (\verb|SimulationTab|). Der Simulations-Reiter nutzt den Rahmen \verb|SimulationWorkspace|, der Steuerelemente, Informationsbereiche und die jeweilige Simulator-Komponente einbindet.
+Für die Ansicht eines Themenbereichs stellt die Shared-Komponente \verb|ModuleTopicPage| eine einheitliche Struktur bereit. Sie steuert Kopfbereich, Tab-Navigation, Übungsauswahl und Fokusmodus. Die vier nutzbaren Reiter heißen Übersicht, Beispiele, Übungen und Simulation. Der Simulations-Reiter nutzt den Rahmen \verb|SimulationWorkspace|, der Steuerelemente, Informationsbereiche und die jeweilige Simulator-Komponente einbindet.
 
-Um ein neues Lernmodul mit einem Thema hinzuzufügen, sind folgende Schritte erforderlich:
+Um einen Themenbereich hinzuzufügen, sind folgende Schritte erforderlich:
 \begin{enumerate}
   \item \textbf{Verzeichnisstruktur anlegen:} Unter \verb|app/src/pages/<ModuleName>/<TopicName>/| werden die vier Reiter-Komponenten und die Datei \verb|<TopicName>Page.tsx| erstellt, welche die \verb|ModuleTopicPage| aufruft.
-  \item \textbf{Speicher-\gls{id} vergeben:} In \texttt{topicStorageIds.ts} wird eine eindeutige Zahl im Objekt \texttt{TOPIC\_STORAGE\_IDS} hinterlegt. Diese \gls{id} trennt die Speicherstände der Themen im Local Storage und verhindert Konflikte beim automatischen Sichern oder Zurücksetzen.
+  \item \textbf{Speicher-\gls{id} vergeben:} In \texttt{topicStorageIds.ts} wird eine eindeutige Zahl im Objekt \texttt{TOPIC\_STORAGE\_IDS} hinterlegt. Sie trennt die lokalen Speicherstände der Themen im LocalStorage.
   \item \textbf{Katalogeintrag definieren:} In \verb|moduleCatalogData.ts| wird das Thema mit Pfad, Icon und Metadaten dem gewünschten Modul zugeordnet.
-  \item \textbf{Lazy-Route einbinden:} In \verb|moduleCatalog.tsx| wird die Seite mit \verb|React.lazy()| importiert und in \verb|topicPageElements| eingetragen.
-  \item \textbf{Lokalisierungsdateien anlegen:} Unter \texttt{app/src/i18n/locales/} wird jeweils eine themenspezifische Übersetzungsdatei für Deutsch und Englisch (z.\,B. \texttt{de/<topic>.json}) mit allen Bezeichnungen und Aufgaben angelegt.
-  \item \textbf{Sprachdateien registrieren:} In \verb|app/src/i18n/index.ts| werden die beiden \gls{json}-Dateien importiert und in den Objekten \verb|de| und \verb|en| als neuer Namespace der \gls{i18n} hinterlegt.
+  \item \textbf{Lazy-Route einbinden:} In \verb|moduleCatalog.tsx| wird die Seite mit \verb|React.lazy()| importiert und in \verb|topicPageElements| eingetragen. Neue Lernbereiche benötigen zusätzlich eine Übersichtsseite in \verb|modulePageElements|.
+  \item \textbf{Lokalisierungsdateien anlegen:} Unter \texttt{app/src/i18n/locales/} wird je eine Übersetzungsdatei für Deutsch, Englisch, Türkisch und Ukrainisch (z.\,B. \texttt{de/<topic>.json}) mit allen Bezeichnungen und Aufgaben angelegt.
+  \item \textbf{Sprachdateien registrieren:} In \verb|app/src/i18n/index.ts| werden die Dateien importiert und in \verb|de|, \verb|en|, \verb|tr| und \verb|uk| unter einem Themenschlüssel im Namespace \verb|translation| hinterlegt.
 \end{enumerate}
 
-Durch diesen Ablauf erzeugt das System Routen, Navigationseinträge und Breadcrumbs automatisch aus den Metadaten. Der Browser lädt den Quellcode eines Themas erst herunter, wenn der Benutzer die Seite im Browser aufruft.
+Durch diesen Ablauf erzeugt das System Routen und Navigationseinträge aus den Metadaten. Der Header zeigt den Namen des aktiven Lernbereichs. Die benötigten Komponenten werden beim Routenaufruf nachgeladen. 

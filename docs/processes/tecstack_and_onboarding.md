@@ -11,15 +11,15 @@ Die Plattform ist eine **reine Client-Only SPA** ohne serverseitiges Backend:
 | Bereich | Technologie | Zweck |
 | :--- | :--- | :--- |
 | **Framework & Sprache** | React 19, TypeScript 5.9 (Strict) | Reaktive Komponenten & strikte Typisierung |
-| **Bundler & Tooling** | Vite 8 | Schnelles HMR & ES-Module Build |
-| **Routing** | React Router 7 | Clientseitiges Routing mit `React.lazy()` |
-| **Styling & UI** | Tailwind CSS 4, Lucide Icons | Design-Tokens & modulare Icons |
+| **Bundler & Tooling** | Vite | Schnelles HMR & ES-Module Build |
+| **Routing** | React Router | Clientseitiges Routing mit `React.lazy()` |
+| **Styling & UI** | Tailwind CSS, Lucide Icons | Design-Tokens & modulare Icons |
 | **Editor** | Monaco Editor | Java-Code-Eingabe mit Syntax-Highlighting |
 | **Java-Laufzeit** | OpenJDK `javac` + TeaVM (WASM) | Kompilieren & Ausführen von Java im Web Worker |
-| **State Management** | Zustand 5 | Schlanke globale UI-Stores (`uiStore`, `themeStore`) |
+| **State Management** | Zustand | Schlanke globale UI-Stores (`uiStore`, `themeStore`) |
 | **Internationalisierung**| i18next & react-i18next | Mehrsprachigkeit (DE/EN) |
 | **Testing** | Vitest, Playwright | Unit-, Domänen- und End-to-End-Browser-Tests |
-| **Linter & Format** | ESLint 9, Prettier | Code-Qualität & einheitliche Formatierung |
+| **Linter & Format** | ESLint, Prettier | Code-Qualität & einheitliche Formatierung |
 
 ---
 

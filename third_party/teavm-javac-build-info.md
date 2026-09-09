@@ -25,8 +25,6 @@ runtime-classlib-teavm.bin
 worker.js
 ```
 
-This eliminates local dependencies on JDK 25, Gradle, and Git for building the web application.
-
 ## Upstream build reference
 
 For reference, upstream `teavm-javac` distributions can be built from source using:
