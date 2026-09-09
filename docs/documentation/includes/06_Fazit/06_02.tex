@@ -1,13 +1,61 @@
-\subNsection{1}{Perspektiven}{Kristian Popov} \label{6_2_Perspektiven}
+\subNsection{1}{Lessons Learned}{Alle}
+\subNsection*{2}{Lessons Learned}{Kristian Popov}
+Am meisten habe ich darüber gelernt, wie ich effizient
+mit \gls{ki} arbeite.
+Entscheidend war weniger die Wahl des Modells als seine Anbindung an das Projekt:
+Über den Sprachserver (\gls{lsp}) und die Entwicklerwerkzeuge des Browsers fragte
+das Modell Signaturen und Laufzeitverhalten ab, statt sie aus dem Quelltext
+abzuleiten.
+Zusammen mit einer Regeldatei für Konventionen und Architekturgrenzen brauchte es
+weniger Tokens, und erfundene Bezeichner traten seltener auf.
 
-Die modulare Architektur erlaubt eine flexible Erweiterung der Anwendung. Künftige Perspektiven gliedern sich in die folgenden Schwerpunkte:
+Außerdem habe ich gelernt, Aufgaben konsequent zu planen und festzuhalten.
+Über GitLab Issues und Milestones habe ich größere Vorhaben in überschaubare
+Arbeitspakete zerlegt.
+Gerade weil ich an zwei Themen parallel gearbeitet habe, blieb dadurch jederzeit
+klar, was noch offen war.
 
-\begin{itemize}
-    \item \textbf{Weitere Lernbereiche und Topics:} Neue Themen, etwa in Form von Fachmodulen, die von anderen Professoren beigesteuert werden, lassen sich in Zukunft über den zentralen Modulkatalog dynamisch in Navigation und Routing integrieren.
-    \item \textbf{Aufgabenverwaltung und -varianten:} Lehrende können Aufgaben und Vorlagen direkt über die Oberfläche anlegen, automatisch Varianten erzeugen sowie Quizfragen und Lernkarten ergänzen.
-    \item \textbf{Mobile Nutzung:} Die Benutzeroberfläche, insbesondere die Übergangstabellen und Zustandsdiagramme, für kleine Bildschirme und Tablets optimieren.
-    \item \textbf{Java-Zeilensperrung:} Abgrenzung bearbeitbarer Code-Bereiche im Editor durch Marker, um nicht zu bearbeitende Zeilen schreibgeschützt zu halten.
-    \item \textbf{Gamification und LMS-Anbindung:} Motivationselemente wie Streaks oder Abzeichen sowie eine Moodle-Anbindung zur zentralen Lernstandsauswertung.
-\end{itemize}
+Wie viel eine \gls{ci}-Pipeline abnimmt, habe ich ebenfalls erst im Projekt
+gemerkt.
+Formatierung, Lint, Tests und Build liefen bei jeder Änderung automatisch, sodass
+ich Fehler nicht erst am Ende einer Entwicklung gefunden habe.
+Gerade bei vielen kleinen Änderungen habe ich mich darauf verlassen können.
 
-Neue Lernbereiche, Aufgabenvarianten und Editor-Sperren würden sich vollständig in die bestehende Client-Architektur integrieren lassen. Zentrale Auswertungen, Nutzerkonten oder eine direkte Moodle-Anbindung hingegen würden ein Backend erfordern.
+\subNsection*{2}{Lessons Learned}{Duy Tan Pham}
+Im Projekt habe ich gelernt, größere Funktionen schrittweise zu entwickeln
+und dabei ihre Einbindung in die gesamte Plattform mitzudenken. Durch einzelne
+Ausbaustufen konnten neue Anforderungen aufgenommen und vorhandene Abläufe nach jeder
+Erweiterung erneut geprüft werden. Der Abgleich mit den anderen Themenbereichen half
+außerdem, die Bedienung einheitlich zu gestalten.
+
+Bei Architekturentscheidungen zeigte sich, dass Wiederverwendung nicht automatisch mehr
+Abstraktion bedeutet. Eine gemeinsame Zustandsabstraktion für mehrere Eingaben wurde
+wieder entfernt, weil die eigenständigen Komponenten leichter nachzuvollziehen waren.
+Gemeinsame Seitenrahmen und Bedienmuster waren dagegen an mehreren Stellen sinnvoll. Ich
+habe daraus gelernt, eine Abstraktion nur dann einzuführen, wenn sie ein tatsächlich
+wiederkehrendes Problem vereinfacht.
+
+Eine weitere Erkenntnis war, dass nicht jede technisch mögliche Erweiterung das Produkt
+verbessert. Einige Ansätze wirkten zunächst sinnvoll, passten nach genauerer Prüfung aber
+nicht zu den Anforderungen oder erhöhten die Komplexität unnötig. Deshalb war es wichtig,
+Entscheidungen erneut zu hinterfragen und Lösungen bei Bedarf bewusst zurückzunehmen.
+Dadurch blieb der Fokus auf einem verständlichen und verlässlichen Lernerlebnis.
+
+\subNsection*{2}{Lessons Learned}{Richard Schröder}
+Für die Zusammenarbeit im Team war ein einheitliches Verständnis der Anforderungen entscheidend. Wenn vor der Umsetzung nicht genau geklärt war, wie eine Komponente aufgebaut sein soll, wichen die Teilergebnisse voneinander ab und mussten nachträglich mühsam angeglichen werden.
+
+Beim Einsatz von \gls{ki}-Werkzeugen zeigte sich, dass der Zeitgewinn durch den hohen Aufwand für Prompt-Zerlegung, Fehlersuche sowie das Refactoring von totem oder doppeltem Code oft geringer ausfiel als erwartet. Da Modelle dazu neigten, Probleme unnötig zu verkomplizieren oder Änderungen an falschen Stellen im Projekt vorzunehmen, blieben gründliche manuelle Reviews und Bereinigungen notwendig. Zudem fiel der eigene Lerneffekt beim reinen Übernehmen generierter Lösungen geringer aus als beim eigenständigen Erarbeiten der Lösungswege.
+
+Auch bei der Versionsverwaltung mit Git zeigte sich die Bedeutung enger Absprachen: Wurden Branches über längere Zeit ohne Zwischenabgleich entwickelt, führten gleichzeitige Änderungen an denselben Dateien schnell zu unübersichtlichen Merge-Konflikten. Kleinere und regelmäßig zusammengeführte Stände verhinderten diesen Mehraufwand.
+
+\subNsection*{2}{Lessons Learned}{Enrico Ebert}
+Bei der Arbeit mit \gls{bigint} wurde mir deutlich, dass JavaScripts mathematische Standardtypen bei großen Ganzzahlen an Präzision verlieren. Die Konvertierung zwischen verschiedenen Basen musste vollständig selbst implementiert werden, da keine native Funktion für Basis-zu-Basis-Umrechnung existiert. Die Visualisierung von \gls{ieee754} erwies sich als didaktisch besonders wertvoll: Studierende, die zuvor den Zusammenhang zwischen Dezimalzahl und Bitrepräsentation nicht verstanden, konnten durch die schrittweise Aufschlüsselung den Normalisierungsprozess nachvollziehen.
+
+Die Validierung von \gls{utf8}-Byteströmen war komplexer als anfänglich angenommen. Insbesondere die korrekte Behandlung von Overlong Encodings erforderte intensives Lesen der \gls{unicode}-Spezifikation. Die Sicherheitsrelevanz dieser Prüfungen wurde mir erst durch die Auseinandersetzung mit Web-Sicherheitsthemen wie dem Facebook-Encoding-Bug bewusst. Die programmatische Übungsgenerierung erwies sich dagegen als besonders wertvoll: Sie bietet unbegrenzte Variationsmöglichkeiten ohne eine Datenbank pflegen zu müssen. Der Schwierigkeitsgrad wird über Parameter gesteuert und kann leicht angepasst werden.
+
+\subNsection*{2}{Lessons Learned}{Markus Nöth}
+Bei der Arbeit an den übergreifenden Plattformkomponenten habe ich gelernt, wie wichtig eine saubere Branching-Strategie und klare Schnittstellen innerhalb des Teams sind. Da zentrale Teile wie der Modulkatalog, die Zustandsgraph-Komponente oder die Transfer-Codecs von mehreren Teammitgliedern gleichzeitig genutzt wurden, waren für mich beim Arbeiten kurzlebige Feature-Branches, regelmäßige Absprachen und Merges wichtig.
+
+Bei der Verwendung von \gls{ki} habe ich die Erfahrung gemacht, dass Sprachmodelle zwar schnell lauffähige Codefragmente erzeugen, dabei jedoch oft zu unnötig komplizierten Architekturen neigen oder Änderungen an den falschen Stellen vorschlagen. Der in Kapitel 3.1 beschriebene Prozess aus Konzeption, Planung, Prompting, schrittweiser Umsetzung und Gegenprüfung half mir, den Überblick über den generierten Code zu behalten. Die \gls{ci}-Pipeline unterstützte die Prüfung zusätzlich, indem nach jedem Push das Linting, die Typprüfung, der Build und die Tests Rückmeldung zu den Änderungen gaben.
+
+Ebenso wichtig war für mich die Arbeit mit den GitLab Work Items. Das Festhalten und Aktualisieren der Aufgaben half mir dabei, offene Punkte im Blick zu behalten. Über die Kommentarfunktion ließen sich gefundene Zwischenergebnisse und getroffene Entscheidungen direkt dokumentieren. Im Kanban Board eines Meilensteins konnte ich außerdem sehen, welche Aufgaben noch zu erledigen waren.
