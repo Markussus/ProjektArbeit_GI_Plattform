@@ -6,31 +6,55 @@ Die Java-Programmierumgebung ist Bestandteil des Moduls \glqq Programmieren~1\gr
 
 Die Umgebung folgt einer mehrschichtigen Architektur aus Präsentation, Orchestrierung und isolierter Ausführungsumgebung:
 \begin{enumerate}
-  \item \textbf{Präsentationsschicht:} Der React-Kontext \verb|JavaExecutionProvider| verwaltet den Gesamtzustand über das Datenobjekt \verb|JavaExecutionSnapshot| (Status, Konsolenausgaben, Compiler-Diagnosen und Fortschrittsanzeige). Im Monaco-Editor~\cite{monacoeditor} (\verb|JavaEditorPanel|) begrenzt die Anwendung den Quelltext über \verb|javaEditorLimits.ts| auf 500.000~Zeichen und 10.000~Zeilen und somit ca.~500\,kB und visualisiert Fehlermeldungen direkt im Code.
-  \item \textbf{Orchestrierungsschicht:} Der Hook \verb|useJavaExecution| steuert den Lebenszyklus des Web Workers (\verb|javaRunner.worker.ts|) über asynchrone Nachrichten mit eindeutigen Request-\glspl{id}. Eine konfigurierbare Laufzeitüberwachung schützt vor Endlosschleifen: Überschreitet ein Programm das Zeitlimit, beendet der Hauptthread den Worker mittels \texttt{worker.\allowbreak{}terminate()} und startet eine neue Instanz. Dadurch bleibt die Benutzeroberfläche stets reaktionsfähig.
-  \item \textbf{Compiler- und \gls{wasm}-Laufzeit:} Der Worker lädt OpenJDK-\verb|javac| und den TeaVM-Compiler~\cite{teavm} als statische Assets nach. Nach der Syntax- und Typprüfung durch \verb|javac| übersetzt TeaVM den erzeugten Bytecode in \gls{wasm}, das anschließend in einer isolierten Browser-Sandbox ausgeführt wird.
+  \item \textbf{Präsentationsschicht:} Der \verb|JavaExecutionProvider| stellt den vom Hook verwalteten Zustand als \verb|JavaExecutionSnapshot| bereit (Status, Konsolenausgaben, Diagnosen und Artefakte). Im Monaco-Editor~\cite{monacoeditor} (\verb|JavaEditorPanel|) begrenzt die Anwendung den Quelltext über \verb|javaEditorLimits.ts| auf 500.000~UTF-16-Codeeinheiten und 10.000~Zeilen und visualisiert Fehlermeldungen direkt im Code.
+  \item \textbf{Orchestrierungsschicht:} Der Hook \verb|useJavaExecution| steuert den Lebenszyklus des Web Workers (\verb|javaRunner.worker.ts|) über asynchrone Nachrichten mit eindeutigen Request-\glspl{id}. Eine konfigurierbare Laufzeitüberwachung schützt vor Endlosschleifen: Überschreitet der Auftrag einschließlich Laden, Kompilieren und Ausführen das Zeitlimit, beendet der Hauptthread den Worker mittels \texttt{worker.\allowbreak{}terminate()} und startet eine neue Instanz. Die Programmausführung blockiert damit nicht den Hauptthread.
+  \item \textbf{Compiler- und \gls{wasm}-Laufzeit:} Ein untergeordneter Compiler-Worker lädt das vorkompilierte \gls{wasm}-Compilermodul (\texttt{teavm-javac}) samt Klassenbibliotheken als statische Assets nach. Dieses bündelt das OpenJDK-\verb|javac|-Frontend mit dem TeaVM-Backend~[6]: Nach der Syntax- und Typprüfung durch \verb|javac| übersetzt TeaVM den erzeugten Bytecode in \gls{wasm}, das anschließend im Runner-Worker ausgeführt wird.
 \end{enumerate}
 
-Der Ablauf vom Quellcode bis zur Programmausgabe gliedert sich in drei aufeinanderfolgende Schritte:
+
+
+Abbildung~\ref{fig:java_worker_ablauf} zeigt den Ablauf:
 \begin{enumerate}
-  \item \textbf{Quelltext-Vorverarbeitung:} Da \gls{wasm} im Browser keine synchron blockierenden Leseoperationen auf \texttt{System.in} unterstützt, analysiert die Funktion \verb|inlineScannerInput()| den Quelltext vor der Übersetzung. Der Parser \verb|ScannerInputCursor| liest die im Eingabefeld bereitgestellten Daten sequenziell aus und ersetzt Aufrufe wie \texttt{nextLine()}, \texttt{nextInt()}, \texttt{nextDouble()} oder \texttt{next()} deterministisch durch feste Literale im Syntaxbaum.
-  \item \textbf{Übersetzung und Sandbox-Start:} Der vorverarbeitete Quelltext wird im Web Worker durch \verb|javac| kompiliert und via TeaVM in ein \gls{wasm}-Modul transformiert, das in der Sandbox instanziiert wird.
-  \item \textbf{Pufferung des Ausgabestroms:} Standardausgaben (\texttt{stdout}) und Fehlerausgaben (\texttt{stderr}) werden von TeaVM zeichenweise an Hilfsfunktionen übergeben. Ein Ausgabetimer (\verb|createBufferedWorkerOutput|) sammelt die Zeichen und sendet sie gebündelt alle 50 Millisekunden per \verb|postMessage| an den React-Zustand. Diese Taktung verhindert, dass hochfrequente Einzelausgaben den Hauptthread durch permanente Re-Renderings überlasten.
+  \item \textbf{Quelltext-Vorverarbeitung:} Ein synchron blockierendes \texttt{System.in} ist in WebAssembly zur Laufzeit nur mit erheblichem Mehraufwand realisierbar (etwa über \texttt{SharedArrayBuffer} mit \texttt{Atomics.wait()} oder Wasm-Stack-Switching via Asyncify). Aus diesem Grund setzt das Modul auf einen leichtgewichtigen Vorprozessor: \verb|inlineScannerInput()| ersetzt erkannte Scanner-Aufrufe vor der Kompilierung per regulärem Ausdruck durch feste Werte aus einem vorbereiteten \verb|ScannerInputCursor|. Da Schleifen und dynamische Verzweigungen textuell nicht ausgewertet werden, bildet dieses pragmatische Verfahren die Scanner-Semantik nur für einfache Abläufe ab, reicht für die didaktischen Grundaufgaben jedoch vollkommen aus.
+  \item \textbf{Übersetzung und Ausführung:} Der vorverarbeitete Quelltext wird im Web Worker durch \verb|javac| kompiliert und via TeaVM in ein \gls{wasm}-Modul transformiert, das im Runner-Worker instanziiert wird.
+  \item \textbf{Pufferung des Ausgabestroms:} Über das Foreign Function Interface (\gls{ffi}) von WebAssembly registriert \verb|installTeaVmConsole()| Host-Funktionen (\texttt{putcharStdout}, \texttt{putcharStderr}) in der Import-Tabelle des Wasm-Moduls. Standard- und Fehlerausgaben von \texttt{System.out} bzw. \texttt{System.err} werden so zeichenweise über die FFI-Grenze an JavaScript übergeben. Um Performance-Einbrüche durch viele UI-Updates zu verhindern, bündelt \texttt{create\-Buffered\-Worker\-Output} die Zeichen in einem 50-Millisekunden-Zeitfenster. Erst nach Ablauf dieses Fensters, bei weiteren Zeichen oder bei Programmende wird der Puffer per \texttt{postMessage} an den Hauptthread gesendet. Dadurch wird in React nur etwa alle 50\,ms ein Re-Render der Konsole ausgelöst, anstatt den Browser-Thread mit tausenden Einzelzustandsänderungen zu blockieren.
 \end{enumerate}
+
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, text width=3.8cm, minimum height=1cm},
+    flow/.style={-{Stealth[length=2mm]}, semithick},
+    lbl/.style={font=\scriptsize, fill=white, inner sep=2pt}
+  ]
+    \node[box, fill=black!5] (ui) at (0,0) {Hauptthread\\Editor und Ausführungs-Hook};
+    \node[box, fill=black!12] (runner) at (5,0) {Runner-Worker\\Scanner-Vorverarbeitung};
+    \node[box, fill=black!5] (compiler) at (10,0) {Compiler-Worker\\javac $\rightarrow$ Bytecode\\TeaVM $\rightarrow$ Wasm};
+    \node[box, fill=black!12] (wasm) at (5,-2) {Runner-Worker\\Wasm-Ausführung und Ausgabepuffer};
+    \draw[flow] (ui) -- (runner);
+    \draw[flow] (runner) -- (compiler);
+    \draw[flow] (compiler.south) |- (wasm.east) node[lbl, near end, above] {Wasm};
+    \draw[flow] (wasm.west) -| (ui.south) node[lbl, near start, above] {Ausgaben, Status};
+  \end{tikzpicture}
+  \caption[Java-Ausführung mit zwei Workern]{Java-Ausführung mit getrenntem Runner- und Compiler-Worker.}
+  \label{fig:java_worker_ablauf}
+\end{figure}
 
 \subNsection{2}{Entscheidungen im UI}{Markus Nöth}
 
 Die Arbeitsoberfläche orientiert sich an vertrauten \glspl{ide} wie Visual Studio Code:
 \begin{itemize}
-  \item \textbf{Monaco-Editor:} Der Editor bietet Code-Faltung, Volltextsuche (\texttt{Strg+F}) und automatische Einrückung. Diagnosemeldungen des Compilers, beispielsweise fehlende Semikolons oder inkompatible Typen, werden als rote Inline-Marker an der betroffenen Zeile hervorgehoben.
+  \item \textbf{Monaco-Editor:} Der Editor bietet Code-Faltung, Volltextsuche (\texttt{Strg+F}) und automatische Einrückung. Compilerfehler mit Positionsangabe, beispielsweise fehlende Semikolons oder inkompatible Typen, erscheinen als rote Marker. Entfernte Scanner-Zeilen werden dabei nicht auf den ursprünglichen Quelltext zurückgerechnet.
   \item \textbf{Eingabebereich für \texttt{System.in}:} Über ein separates Texteingabefeld kann der Benutzer Konsoleneingaben vorab definieren, die der Vorprozessor beim Programmstart verarbeitet.
-  \item \textbf{Konsole und Problemliste (\texttt{JavaConsolePanel}):} Der Ausgabebereich schaltet zwischen der Programmausgabe (mit optischer Trennung von regulären Ausgaben und Fehlermeldungen) und einer tabellarischen Fehlerliste um. Ein Klick auf einen Tabelleneintrag führt den Cursor direkt zur fehlerhaften Quelltextposition.
-  \item \textbf{Steuerleiste:} Beinhaltet Schaltflächen für Start, Abbruch, Zurücksetzen auf den Ausgangszustand und den Vollbild-Fokusmodus.
+  \item \textbf{Konsole und Problemliste (\texttt{JavaConsolePanel}):} Standardausgabe, Fehlerausgabe und Diagnosen erscheinen in getrennten Abschnitten. Die Diagnoseliste nennt die Meldung sowie, falls vorhanden, Datei und Position; ein Sprung in den Editor ist dort nicht implementiert.
+  \item \textbf{Steuerleiste:} Start und Abbruch liegen beim Simulator; Zurücksetzen und Fokusmodus bietet der gemeinsame Simulationsrahmen.
 \end{itemize}
 
 \subNsection{2}{Andere Entscheidungen}{Markus Nöth}
 
-Das Modul enthält vier interaktive Beispielprogramme und 13~strukturierte Übungsaufgaben (u.\,a. Konsolenausgaben, Schleifen, Variablenberechnungen).
-Die Aufgabenprüfung kompiliert den eingegebenen Code und führt ihn gegen definierte Testfälle aus. Bei Aufgaben mit vorgegebenen Variablenbelegungen ersetzt ein regulärer Ausdruck (\verb|sourceTransform|) die Initialisierungswerte im Code durch alternative Testdaten, um die Allgemeingültigkeit der Lösung zu prüfen. Ändert der Lernende jedoch die Bezeichner oder den syntaktischen Aufbau dieser Vorgabezeilen tiefgreifend, greift der Ersetzungsausdruck nicht mehr. In diesem Fall kann die Validierung fehlschlagen, obwohl der geschriebene Algorithmus fachlich korrekt ist.
+Das Modul enthält vier interaktive Beispielprogramme und 13~Übungsaufgaben (u.\,a. Konsolenausgaben, Schleifen, Variablenberechnungen).
+Die Aufgabenprüfung kompiliert den eingegebenen Code und vergleicht seine normalisierte Standardausgabe mit den erwarteten Ausgaben definierter Testfälle. Dies belegt keine allgemeine Korrektheit. Bei Aufgaben mit vorgegebenen Variablenbelegungen ersetzt ein regulärer Ausdruck (\verb|sourceTransform|) die Initialisierungswerte im Code durch alternative Testdaten, um weitere Eingabefälle zu prüfen. Ändert der Lernende jedoch die Bezeichner oder den vom Muster erwarteten Aufbau dieser Vorgabezeilen, greift der Ersetzungsausdruck nicht mehr. In diesem Fall kann die Validierung fehlschlagen, obwohl der geschriebene Algorithmus fachlich korrekt ist. Eine Lösung für dieses Problem wäre das gezielte Sperren von Zeilen im Editor (siehe Abschnitt~\ref{6_2_Perspektiven}).
 
-Für die Speicherung im Local Storage und das Teilen von Lösungen über \gls{url}-Parameter nutzt \verb|javaCodeTransfer.ts| ein zweistufiges Verfahren: Häufige Java-Schlüsselwörter und Sonderzeichen werden über ein Wörterbuch auf Einzelbytes (0x80 bis 0xFF) komprimiert, anschließend mit dem Deflate-Algorithmus verkleinert und als Base64URL kodiert.
+Für Speicherung und Austausch wählt \verb|javaCodeTransfer.ts| den kürzesten Transfer-String aus drei Verfahren: direkte Wörterbuch-Tokens, deflatierte Tokens oder deflatiertes UTF-8, jeweils gekennzeichnet durch ein Formatpräfix (\texttt{A}, \texttt{B} oder \texttt{C}) mit Base64URL-Nutzdaten. Das integrierte Wörterbuch ersetzt häufige Java-Idiome (z.,B. \texttt{System.out.println} oder Methodensignaturen) sowie Umlaute durch kompakte 1-Byte-Tokens im Bereich oberhalb des Standard-ASCII-Codes. Falls die Browser-Laufzeit keine Deflate-Kompression unterstützt, stehen die unkomprimierten Tokens als Fallback bereit. Der Export validiert den Quelltext strikt und akzeptiert nur die im Codec zugelassenen Zeichen.
