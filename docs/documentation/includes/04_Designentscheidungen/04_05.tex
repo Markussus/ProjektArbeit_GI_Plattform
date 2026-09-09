@@ -1,19 +1,41 @@
 \subNsection{1}{Moore- und Mealy-Automaten}{Markus Nöth}
 
-Das Modul Moore- und Mealy-Automaten vermittelt den Entwurf und die Funktionsweise dieser Schaltwerke über interaktive Tabellen, Zustandsgraphen, Logikschaltungen und Übergangstabellen. Es umfasst die Modi Simulation, Aufgaben und Beispiele für beide Automaten-Typen.
+Das Modul vermittelt den Entwurf synchroner Schaltwerke mit Tabellen, Zustandsgraphen und Logikschaltungen. Beide Automatentypen bieten freie Simulationen, Beispiele und Übungen.
 
 \subNsection{2}{Entscheidungen in der Architektur}{Markus Nöth}
 
 Die Implementierung beider Automatentypen baut auf dem gemeinsamen Interface \texttt{ISimulator\allowbreak<TConfig,\allowbreak{}TState>} der Plattform auf. Die mathematische Definition und die Aufgabengestaltung orientieren sich an den Vorlesungsfolien von Prof.~Braun sowie am Lehrbuch von Vossen und Witt~\cite[Kapitel~4]{vossen2000}: Beim Moore-Automaten hängt die Ausgabe nur vom aktuellen Zustand ab ($\lambda: S \to \Gamma$). Beim Mealy-Automaten ist die Ausgabefunktion an das Wertepaar aus aktuellem Zustand und anliegendem Eingabesymbol gekoppelt ($\lambda: S \times \Sigma \to \Gamma$).
 
-Die Simulationslogik kapseln die Klassen \verb|MooreMachineSimulator| und \verb|MealyMachineSimulator|. Bei jedem Taktschritt sichern sie den gesamten Ausführungszustand in einer Historie ab. Dadurch kann der Benutzer über \verb|stepBack()| deterministisch zurückspringen, ohne dass Berechnungen neu aufgerollt werden müssen oder Seiteneffekte entstehen.
+Die Logik liegt in den Klassen \verb|MooreMachineSimulator| und \verb|MealyMachineSimulator|. Bei jedem Taktschritt sichern sie den gesamten Ausführungszustand in einer Historie ab. Dadurch kann der Benutzer über \verb|stepBack()| deterministisch zurückspringen, indem der gesicherte Zustand wiederhergestellt wird.
 
 Für beide Automatentypen erzeugt das Modul Wahrheitstabellen, disjunktive Normalformen (\gls{dnf}) und Logikgatter:
 \begin{itemize}
   \item \textbf{Moore-Transformation (\texttt{buildMooreConversion}):} Da die Ausgabe allein an den Zustand gekoppelt ist, hängen die Ausgangsvariablen ($y$) nur von den Zustandsvariablen ($S_0 \dots S_n$) ab. Die Übergangsfunktionen für den Folgezustand ($T_0 \dots T_n$) berechnen sich aus den Zustands- und Eingangsvariablen ($E_0 \dots E_m$).
-  \item \textbf{Mealy-Transformation (\texttt{buildMealyConversion}):} Sowohl der Folgezustand als auch die Ausgänge hängen gleichzeitig von Zustand und Eingabe ab. Die Wahrheitstabelle der Ausgänge umfasst daher Zeilen mit der Kombination aller Bits von $S$ und $E$.
+  \item \textbf{Mealy-Transformation (\texttt{buildMealyConversion}):} Sowohl der Folgezustand als auch die Ausgänge hängen gleichzeitig von Zustand und Eingabe ab. Die Wahrheitstabelle der Ausgänge umfasst daher die Bitbelegungen der definierten Zustands-Eingabe-Paare.
 \end{itemize}
-Aus den generierten Wahrheitstabellen berechnet das angebundene DNF-Modul über den Funktionsaufruf \texttt{compute\-Smallest\-Boolean\-Expression()} die minimierten Schaltfunktionen. Um Blockaden des Browser-Threads durch die exponentielle Rechenkomplexität bei vielen Eingängen auszuschließen, ist die automatische Minimierung auf maximal acht Eingangsvariablen ($2^8 = 256$ Zeilen) begrenzt. Bei größeren Schaltungen gibt das System stattdessen die kanonische Normalform aus.
+Aus den generierten Wahrheitstabellen berechnet das angebundene DNF-Modul über den Funktionsaufruf \texttt{compute\-Smallest\-Boolean\-Expression()} die minimierten Schaltfunktionen. Bis vier Variablen wird das globale Literalminimum für UND/ODER-Formeln mit negierten Literalen bestimmt. Bei fünf bis acht Variablen wird zwischen minimaler DNF und ihrer Faktorisierung gewählt, ohne globale Optimalitätsgarantie. Darüber bleibt die kanonische DNF. Die Grenze begrenzt den Aufwand, garantiert aber keine blockierungsfreie Berechnung.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, text width=4.2cm, minimum height=0.8cm},
+    flow/.style={-{Stealth[length=2mm]}, semithick}
+  ]
+    \node[box, fill=black!5] (config) at (0,0) {Editor-Konfiguration};
+    \node[box, fill=black!12] (sim) at (-3.5,-1.5) {Übernommene Konfiguration\\Simulator mit Historie};
+    \node[box, fill=black!12] (conv) at (3.5,-1.5) {Konvertierung\\Wahrheitstabellen und Formeln};
+    \node[box] (graph) at (-3.5,-3) {Laufzeitansicht\\Tabelle und Zustandsgraph};
+    \node[box] (logic) at (3.5,-3) {Konvertierungsansicht\\Tabellen und Logikgatter};
+    \draw[flow] (config.south) -- ++(0,-0.25) -| (sim.north);
+    \draw[flow] (config.south) -- ++(0,-0.25) -| (conv.north);
+    \draw[flow] (sim) -- (graph);
+    \draw[flow] (conv) -- (logic);
+  \end{tikzpicture}
+  \caption{Die Simulation übernimmt die geprüfte Konfiguration; die Konvertierung nutzt den Editorstand.}
+  \label{fig:moore_mealy_datenfluss}
+\end{figure}
 
 \subNsection{2}{Entscheidungen im UI}{Markus Nöth}
 
@@ -21,13 +43,14 @@ Die Konfiguration der Automaten erfolgt über Editoren, deren Erscheinungsbild f
 \begin{itemize}
   \item \textbf{Editor-Tabellen:} Bei Mealy-Automaten werden Folgezustand und Ausgabesymbol gemeinsam in einer Matrixzelle editiert. Bei Moore-Automaten sind Übergangsmatrix und Zustandsausgabetabelle in zwei getrennte Bereiche aufgeteilt.
   \item \textbf{Transformationsansichten:} In der Konvertierungsansicht (\verb|AutomataConversionView|) kann der Anwender zwischen Übergangs- und Ausgabetabellen wechseln. Jede Zeile schlüsselt die symbolischen Werte in ihre Bitbelegung auf. Die zugehörige Formelliste zeigt kanonische und minimierte Ausdrücke für jedes Bit an.
-  \item \textbf{Zustandsgraph (\texttt{StateMachineGraph}):} Diese Komponente visualisiert den Automaten als Graphen. Sie berechnet die Knotenverteilung, bündelt parallele Kanten mit symmetrischem Versatz und zeichnet Selbstschleifen als Kurven. Zoom und Pan sind über die \gls{svg}-\verb|viewBox| implementiert, was Skalierungsartefakte im Vergleich zu \gls{css}-Transformationen vermeidet. Während der Simulation heben sich der aktive Zustand und die geschaltete Kante hervor.
-  \item \textbf{Logikgatter-Diagramm (\texttt{LogicGateDiagram}):} Stellt die Schaltfunktionen für jedes Bit mit standardisierten Gattersymbolen (AND, OR, NOT) dar. Ein Klick auf ein Ausgangsbit hebt den zugehörigen Signalpfad farblich hervor.
+  \item \textbf{Zustandsgraph (\texttt{StateMachineGraph}):} Diese Komponente visualisiert den Automaten als gerichteten Graphen. Sie verteilt Knoten, bündelt gleichgerichtete Kanten und versetzt Gegenrichtungen. Selbstschleifen erscheinen als Kurven. Zoom und Pan verändern den sichtbaren Koordinatenausschnitt über die \gls{svg}-\verb|viewBox|. Hervorgehoben werden der aktuelle Zustand und die Kante für das nächste Eingabesymbol.
+  \item \textbf{Logikgatter-Diagramm (\texttt{LogicGateDiagram}):} Stellt wahlweise die kanonischen oder minimierten Schaltfunktionen für jedes Bit mit Gattersymbolen für AND, OR und NOT dar. Knoten und einzelne Verbindungen lassen sich durch Anklicken hervorheben.
 \end{itemize}
-StateMachineGraph und LogicGateDiagram wurden modular unter \verb|app/src/components/shared/| abgelegt, sodass sie neben Moore- und Mealy-Maschinen auch von künftigen Simulatoren der Plattform direkt wiederverwendet werden können.
+Beide Komponenten wurden modular unter \verb|app/src/components/shared/| abgelegt, sodass sie neben Moore- und Mealy-Maschinen auch von künftigen Simulatoren der Plattform direkt wiederverwendet werden können.
 
 \subNsection{2}{Andere Entscheidungen}{Markus Nöth}
 
 Das Modul enthält elf praxisnahe Übungsaufgaben: sieben für Moore-Automaten sowie vier für Mealy-Automaten. Jede Aufgabe stellt ein Starterprogramm, eine Lösung und Validierungsfälle bereit.
 
 Für Speicherung und Austausch kommt der Modul-Codec \verb|programTransfer.ts| zum Einsatz: Anstelle von unkomprimiertem \gls{json} serialisieren ein \verb|BitWriter| und \verb|BitReader| Zustände, Symbole, Übergänge und Ausgaben direkt in dichte Bitfolgen. Dies spart den Syntax-Overhead von Attributnamen ein: Bezeichner werden nur einmalig deklariert und in den Übergängen als Bit-Indizes minimaler Breite ($\lceil\log_2 N\rceil$) referenziert, während Kanten über 1-Bit-Flags kodiert werden. Die Bitfolgen werden Base64URL-kodiert und ermöglichen kompakte \glspl{url} für das Teilen von Automaten sowie die persistente Ablage im Local Storage des Trainingscenters.
+
